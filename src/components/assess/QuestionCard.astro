@@ -26,7 +26,7 @@ const PAPERS = { 'paper-1': 'Paper 1 style', 'paper-2': 'Paper 2 style', 'paper-
 const H = headingLevel === 2 ? 'h2' : 'h3';
 const uid = `q-${id}`;
 const ms = q.markscheme;
-const config = { id, marks: q.marks, kind: ms.kind, points: ms.points.map((p) => p.marks) };
+const config = { id, marks: q.marks, kind: ms.kind, points: ms.points.map((p) => p.marks), criteria: ms.criteria.map((k) => ({ id: k.id, marks: k.marks })) };
 ---
 
 <article class="qcard" id={uid} data-ix="question" data-level={q.level === 'HL' ? 'HL' : undefined} aria-labelledby={`${uid}-title`}>
@@ -153,6 +153,43 @@ const config = { id, marks: q.marks, kind: ms.kind, points: ms.points.map((p) =>
             </fieldset>
             <p class="qcard__score js-only" data-level-score aria-live="polite" />
           </div>
+        )
+      }
+      {
+        ms.criteria.length > 0 && (
+          <fieldset class="qcard__criteria">
+            <legend class="label label--ink">Mark your answer on each criterion</legend>
+            <p class="small muted">
+              The criteria and their maximum marks are the guide's (Business management guide, pp. 48 to 50). The questions beside them are the
+              platform's prompts; the IB's level descriptors are in the guide and are not reproduced here.
+            </p>
+            <ol class="qcard__crit-list" role="list">
+              {ms.criteria.map((k) => (
+                <li class="qcard__crit">
+                  <div class="qcard__crit-head">
+                    <span class="num">{k.id}</span>
+                    <span class="qcard__crit-name">{k.name}</span>
+                    <span class="small muted">out of {k.marks}</span>
+                    <label class="js-only qcard__crit-sel">
+                      <span class="sr-only">
+                        Your mark for criterion {k.id}, {k.name}
+                      </span>
+                      <select class="select" data-crit={k.id}>
+                        <option value="">Not marked</option>
+                        {Array.from({ length: k.marks + 1 }, (_, m) => (
+                          <option value={String(m)}>{m}</option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                  <div class="small" set:html={rich(k.prompt)} />
+                </li>
+              ))}
+            </ol>
+            <p class="qcard__score js-only" data-crit-score aria-live="polite">
+              Choose a mark for each criterion to total your self-check.
+            </p>
+          </fieldset>
         )
       }
       {

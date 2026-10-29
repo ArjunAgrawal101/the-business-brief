@@ -28,10 +28,10 @@ each('[data-ix="progress"]', (root) => {
   let answered = 0;
   let marked = 0;
   for (const q of cfg.questions) {
-    const v = store.get<{ answer?: string; points?: number[]; level?: string } | null>(`q:${q.id}`, null);
+    const v = store.get<{ answer?: string; points?: number[]; level?: string; crit?: Record<string, number> } | null>(`q:${q.id}`, null);
     if (!v) continue;
     const a = Boolean(v.answer && v.answer.trim());
-    const m = Boolean((v.points && v.points.length) || v.level);
+    const m = Boolean((v.points && v.points.length) || v.level || (v.crit && Object.keys(v.crit).length));
     if (!a && !m) continue;
     answered += a ? 1 : 0;
     marked += m ? 1 : 0;

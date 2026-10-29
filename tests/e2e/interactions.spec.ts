@@ -176,6 +176,21 @@ test.describe('Exam Desk', () => {
     await expect(page.locator('#q-q-costs-p2-price [data-answer]')).toHaveValue('Variable cost is €7.26 at €24.');
   });
 
+  test('a paper 3 plan is self-marked on the four criteria', async ({ page }) => {
+    await page.goto('/exam-desk/paper-3/');
+    const q = page.locator('#q-q-growth-p3-plan');
+    await ready(page, '#q-q-growth-p3-plan[data-ix="question"]');
+    await q.locator('[data-ms] summary').click();
+    await q.locator('[data-crit="A"]').selectOption('3');
+    await q.locator('[data-crit="B"]').selectOption('2');
+    await q.locator('[data-crit="C"]').selectOption('4');
+    await q.locator('[data-crit="D"]').selectOption('2');
+    await expect(q.locator('[data-crit-score]')).toHaveText('Your self-check: 11 of 17 marks.');
+    await page.reload();
+    await ready(page, '#q-q-growth-p3-plan[data-ix="question"]');
+    await expect(q.locator('[data-crit="C"]')).toHaveValue('4');
+  });
+
   test('the filters narrow the practice set', async ({ page }) => {
     await page.goto('/exam-desk/practice/');
     await page.selectOption('#f-paper', 'paper-3');

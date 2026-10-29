@@ -221,6 +221,15 @@ export function checkIntegrity(c: Corpus): Problem[] {
     // Guide, p. 43: paper 1 excludes HL extension material; p. 47: paper 3 is HL only.
     if (q.paperStyle === 'paper-1' && q.level === 'HL') problems.push({ where: w, message: 'paper 1 excludes HL-only content, so an HL question cannot be in the style of paper 1' });
     if (q.paperStyle === 'paper-3' && q.level !== 'HL') problems.push({ where: w, message: 'paper 3 is HL only' });
+    if (q.markscheme.kind === 'criteria') {
+      const sum = q.markscheme.criteria.reduce((n, k) => n + k.marks, 0);
+      if (sum !== q.marks) problems.push({ where: w, message: `the criteria add up to ${sum}, not the question's ${q.marks} marks` });
+      if (q.paperStyle === 'paper-3') {
+        const official = c.assessment['paper-3']?.criteria ?? [];
+        const same = official.length === q.markscheme.criteria.length && official.every((k, i) => q.markscheme.criteria[i]?.id === k.id && q.markscheme.criteria[i]?.name === k.name && q.markscheme.criteria[i]?.marks === k.marks);
+        if (!same) problems.push({ where: w, message: 'a paper 3 question marked on criteria must use the guide\'s criteria A to D, with their names and maximum marks' });
+      }
+    }
     const term = Object.values(c.commandTerms).find((ct) => ct.term === q.commandTerm);
     if (term && term.ao !== q.ao) problems.push({ where: w, message: `command term "${q.commandTerm}" is ${term.ao} in the guide, but the question says ${q.ao}` });
     if (q.case) {

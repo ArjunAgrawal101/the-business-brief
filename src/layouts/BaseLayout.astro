@@ -69,6 +69,7 @@ const ogImage = Astro.site ? new URL('/brand/social-card.png', Astro.site).href 
 
     <!-- Apply the reader's SL or HL choice before the page paints. -->
     <script is:inline>
+      document.documentElement.classList.add('js');
       try {
         var l = localStorage.getItem('bb:level');
         if (l === 'SL' || l === 'HL') document.documentElement.setAttribute('data-level', l);

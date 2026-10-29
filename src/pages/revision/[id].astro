@@ -31,7 +31,7 @@ const misconceptions = t.sections.flatMap((s) => s.blocks).filter((b) => b.type 
       <h1>{t.title}</h1>
       <p class="rev__decision"><span class="label">The decision</span> {t.decisionQuestion}</p>
       <p class="rev__actions noprint">
-        <button type="button" class="btn btn--primary" onclick="window.print()">Print this brief</button>
+        <button type="button" class="btn btn--primary needs-js" onclick="window.print()">Print this brief</button>
         <a class="btn" href={href.topic(id)}>Open the full brief</a>
       </p>
     </header>

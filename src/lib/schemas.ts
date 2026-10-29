@@ -499,10 +499,12 @@ export const questionSchema = z.object({
   requiresCalculation: z.boolean().default(false),
   requiresEvaluation: z.boolean().default(false),
   markscheme: z.object({
-    kind: z.enum(['points', 'levels', 'calculation']),
+    kind: z.enum(['points', 'levels', 'calculation', 'criteria']),
     guidance: md.optional(),
     points: z.array(z.object({ marks: z.number().int().positive(), text: md })).default([]),
     levels: z.array(z.object({ marks: z.string(), descriptor: md })).default([]),
+    /** Assessment criteria by name and maximum mark, each with the platform's own self-check prompt (never the IB's descriptors). */
+    criteria: z.array(z.object({ id: z.string(), name: z.string(), marks: z.number().int().positive(), prompt: md })).default([]),
     answer: md.optional(),
     exemplar: md.optional(),
   }),
