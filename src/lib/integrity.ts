@@ -10,6 +10,7 @@
 import type { AssessmentComponent, Block, Calculation, CaseEntry, Claim, CommandTerm, Concept, Curriculum, Decision, GlossaryEntry, Interactive, Question, Source, Topic, Tool } from './schemas';
 import { topoOrder } from './plan';
 import { buildWorking, workings } from './finance';
+import { checkStudioInteractives } from './integrity-studio';
 
 type Dict<T> = Record<string, T>;
 
@@ -262,6 +263,7 @@ export function checkIntegrity(c: Corpus): Problem[] {
   for (const [id, it] of Object.entries(c.interactives)) {
     if ('case' in it && it.case) need(c.cases, it.case, `interactives/${id}`, 'case');
   }
+  problems.push(...checkStudioInteractives(c.interactives));
 
   /* Case labs: evidence from the case, answers among the options, a plan without loops */
   for (const [id, it] of Object.entries(c.interactives)) {

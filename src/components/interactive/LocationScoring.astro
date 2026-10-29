@@ -1,0 +1,335 @@
+---
+/**
+ * Operations Floor: weighted scoring of locations (5.4). The ranking for the
+ * default weights is rendered on the server from src/lib/operations.ts; the
+ * script recalculates the totals, the ranking and its sensitivity as the
+ * learner changes the weights.
+ */
+import { lowScores, readLocation, sensitivity, weightedScores } from '../../lib/operations';
+import { locationTableHtml, lowScoresHtml } from '../../lib/render-studio';
+import { jsonForScript, rich } from '../../lib/markup';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'location-scoring' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const weights = Object.fromEntries(data.factors.map((f) => [f.id, f.weight]));
+const results = weightedScores(data.sites, data.factors, weights, data.maxScore);
+const sens = sensitivity(data.sites, data.factors, weights, data.maxScore, data.maxWeight);
+const reading = readLocation(results, sens, data.sites, data.factors, weights);
+const maxTotal = data.factors.reduce((n, f) => n + f.weight * data.maxScore, 0);
+const flags = lowScores(data.sites, data.factors, data.lowThreshold);
+const config = { uid, factors: data.factors, sites: data.sites, maxScore: data.maxScore, maxWeight: data.maxWeight, lowThreshold: data.lowThreshold };
+---
+
+<div class="loc" data-ix="location" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The tool could not start. The ranking below uses the suggested weights.</p>
+  <p class="loc__decision">{data.decision}</p>
+
+  <ul class="loc__sites" role="list">
+    {
+      data.sites.map((s) => (
+        <li class="loc__site">
+          <span class="loc__site-name">{s.name}</span>
+          <span class="small">{s.summary}</span>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="loc__grid">
+    <form class="loc__weights js-only" data-form novalidate aria-label="Weights for each factor">
+      <fieldset>
+        <legend class="label label--ink">How much does each factor matter? 0 to {data.maxWeight}</legend>
+        <ol class="loc__list" role="list">
+          {
+            data.factors.map((f) => (
+              <li class="loc__factor">
+                <label class="loc__label" for={`${uid}-w-${f.id}`}>{f.label}</label>
+                <div class="loc__control">
+                  <input
+                    id={`${uid}-w-${f.id}`}
+                    type="range"
+                    min="0"
+                    max={data.maxWeight}
+                    step="1"
+                    value={String(f.weight)}
+                    data-weight={f.id}
+                    aria-valuetext={`Weight ${f.weight} of ${data.maxWeight}`}
+                    aria-describedby={f.hint ? `${uid}-h-${f.id}` : undefined}
+                  />
+                  <output class="loc__value num" data-out={f.id} for={`${uid}-w-${f.id}`}>{f.weight}</output>
+                </div>
+                {f.hint && <span class="field__hint" id={`${uid}-h-${f.id}`}>{f.hint}</span>}
+              </li>
+            ))
+          }
+        </ol>
+        <p class="cluster">
+          <button type="button" class="btn btn--small btn--ink" data-reset>Back to the suggested weights</button>
+        </p>
+      </fieldset>
+    </form>
+
+    <div class="loc__results">
+      <div class="table-scroll" role="region" aria-label="Scores for each site" tabindex="0">
+        <table class="table loc__scores">
+          <caption class="sr-only">Scores out of {data.maxScore} for each factor and site, with the weight of each factor</caption>
+          <thead>
+            <tr>
+              <th scope="col">Factor</th>
+              <th scope="col" class="n">Weight</th>
+              {data.sites.map((s) => <th scope="col" class="n">{s.name}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {
+              data.factors.map((f) => (
+                <tr>
+                  <th scope="row">{f.label}</th>
+                  <td class="n" data-wcell={f.id}>{f.weight}</td>
+                  {data.sites.map((s) => {
+                    const v = s.scores[f.id] ?? 0;
+                    return (
+                      <td class={`n${v <= data.lowThreshold ? ' is-low' : ''}`}>
+                        {v}
+                        {v <= data.lowThreshold && <span class="sr-only"> (low)</span>}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <h4 class="label label--ink">Weighted ranking</h4>
+      <div class="table-scroll" role="region" aria-label="Weighted ranking" tabindex="0">
+        <table class="table">
+          <caption class="sr-only">Each site's weighted total: the sum of weight times score</caption>
+          <thead>
+            <tr>
+              <th scope="col">Site</th>
+              <th scope="col" class="n">Rank</th>
+              <th scope="col" class="n">Total</th>
+              <th scope="col" class="n">% of maximum</th>
+              <th scope="col" class="loc__barcell"><span class="sr-only">Bar</span></th>
+            </tr>
+          </thead>
+          <tbody data-ranking set:html={locationTableHtml(results, maxTotal)} />
+        </table>
+      </div>
+      <div class="bew__reading">
+        <p><strong>Reading.</strong> <span data-interp>{reading.reading}</span></p>
+        <p class="muted"><strong>Implication.</strong> <span data-impl>{reading.implication}</span></p>
+      </div>
+      <div class="loc__low">
+        <h4 class="label label--ink">Scores of {data.lowThreshold} or below: check whether any rules a site out</h4>
+        <div data-low set:html={lowScoresHtml(flags, data.sites, data.factors, data.lowThreshold, data.maxScore)} />
+      </div>
+    </div>
+  </div>
+
+  <details class="disclosure">
+    <summary>How the totals are worked out</summary>
+    <div class="disclosure__body prose small">
+      <p>
+        Each site's total is the sum, over the factors, of the factor's weight times the site's score. With the suggested weights, {results[0]?.name} scores{' '}
+        {data.factors.map((f) => `${f.weight} × ${data.sites.find((s) => s.id === results[0]?.id)?.scores[f.id] ?? 0}`).join(' + ')} = {results[0]?.total}. The most a
+        site could score is the sum of the weights times {data.maxScore}, which is {maxTotal}. Weighted scoring is a decision-making method, not one of the
+        guide's toolkit tools or formulas.
+      </p>
+    </div>
+  </details>
+
+  <div class="field loc__reflect">
+    <label for={`${uid}-why`}>Which site would you recommend to Meera, and what would have to be true for it to be the right choice?</label>
+    <textarea class="textarea" id={`${uid}-why`} rows="3" data-note></textarea>
+    <span class="field__hint js-only">Saved on this device only.</span>
+  </div>
+
+  <aside class="callout callout--caution">
+    <span class="callout__kicker">What the scores leave out</span>
+    <div class="prose" set:html={rich(data.caution)} />
+  </aside>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/location';
+</script>
+
+<style>
+  .loc {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .loc__decision {
+    margin: 0;
+    max-width: var(--text-max);
+  }
+
+  .loc__sites {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .loc__site {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-1);
+    margin: 0;
+    padding: var(--sp-3) var(--sp-4);
+    border: 1px solid var(--rule-hair);
+    border-top: 3px solid var(--bb-ink);
+    background: #fff;
+  }
+
+  .loc__site-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  .loc__grid {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  @media (min-width: 64rem) {
+    .loc__grid {
+      grid-template-columns: minmax(17rem, 22rem) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  .loc__weights fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .loc__weights legend {
+    margin-bottom: var(--sp-3);
+    padding: 0;
+  }
+
+  .loc__list {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0 0 var(--sp-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  .loc__factor {
+    display: grid;
+    gap: var(--sp-1);
+  }
+
+  .loc__label {
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .loc__control {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 2rem;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  .loc__control input[type="range"] {
+    width: 100%;
+    min-height: 24px;
+    accent-color: var(--bb-cobalt);
+  }
+
+  .loc__value {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--cobalt-text);
+    text-align: right;
+  }
+
+  .loc__results {
+    display: grid;
+    gap: var(--sp-4);
+    min-width: 0;
+  }
+
+  .loc__results > h4 {
+    margin: 0;
+  }
+
+  .loc__scores td.is-low {
+    color: var(--signal-text);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+
+  .loc :global(.loc__bar) {
+    display: block;
+    min-width: 6rem;
+    height: 0.75rem;
+    background: var(--surface-sunk);
+  }
+
+  .loc :global(.loc__bar > span) {
+    display: block;
+    height: 100%;
+    background: var(--bb-ink);
+    transition: width var(--dur-base) var(--ease);
+  }
+
+  .loc :global(tr.is-focus) th {
+    color: var(--cobalt-text);
+  }
+
+  .loc :global(.loc__site-cell) {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 36rem) {
+    .loc :global(.loc__barcell) {
+      display: none;
+    }
+  }
+
+  .loc :global(tr.is-focus .loc__bar > span) {
+    background: var(--bb-cobalt);
+  }
+
+  .loc__low h4 {
+    margin: 0 0 var(--sp-2);
+  }
+
+  .loc :global(.loc__flags) {
+    display: grid;
+    gap: var(--sp-1);
+    margin: 0;
+    padding-left: 1.1em;
+    font-size: 0.9375rem;
+  }
+
+  .loc__reflect {
+    max-width: 48rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loc :global(.loc__bar > span) {
+      transition: none;
+    }
+  }
+</style>

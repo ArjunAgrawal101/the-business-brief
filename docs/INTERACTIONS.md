@@ -212,3 +212,67 @@ On the IA Studio page.
 | **Misconception diagnosed** | The target is the problem; more causes make a better answer; the expensive or forceful option is the serious one; a plan is a list rather than a sequence; one number on one day shows success or failure |
 | **Objective** | Diagnose a business problem from evidence and carry the reasoning through to a plan and its evaluation (Arjun Agrawal framework C) |
 
+## 17. Market share and growth workspace
+
+`market-share-porto`, in the Market Studio. Subtopic 4.1, AO2 and AO4; the closing question is HL (AO3).
+
+| | |
+| --- | --- |
+| **The learner does** | Edits two years of sales for five sellers in a simulated market of hand-made mugs in Porto, or runs a flat market or a price rise to €24 |
+| **Must understand** | A share is relative to the whole market: a firm can sell more and still lose share, or sell less and gain it |
+| **Decides or infers** | Whether Atelier Barro is gaining ground, and (HL) how much market share matters to a premium studio |
+| **Feedback** | Market size and growth, each seller's share, change in percentage points and sales growth, the leader, a reading that names the misleading cases and who overtook whom, a paired bar chart with a table, and the working for the share and for growth; invalid sales are named beside the field |
+| **Misconception diagnosed** | Rising sales mean a rising share; a group of small sellers is the market leader; volume share and value share are the same thing |
+| **Objective** | Calculate and interpret market share and market growth. Both are standard definitions; the page says that the guide's formula list does not include them |
+
+## 18. Position map builder
+
+`market-position-map-porto`, in the Market Studio. Subtopic 4.2, AO2 and AO4.
+
+| | |
+| --- | --- |
+| **The learner does** | Chooses two of four attributes for the axes of a map built from a simulated survey of 200 buyers, then says which part of the map is empty (or that none is) |
+| **Must understand** | A position map shows perceptions from one sample; different attributes give different maps |
+| **Decides or infers** | Where the gap is, and whether it is worth filling |
+| **Feedback** | The map and its table redraw for every pair of axes; the check marks the choice right or not, shows the answer, shades the empty part of the map and explains whether the gap is an opening or empty for a good reason |
+| **Misconception diagnosed** | Every gap is an opportunity; a position map shows facts about products |
+| **Objective** | Construct and read a position map, and judge a gap against demand, capability, brand fit and rivals' response |
+
+## 19. Capacity utilization and productivity (HL)
+
+`ops-capacity-atelier`, on the Operations Floor. Subtopic 5.6, HL only, AO2 and AO4.
+
+| | |
+| --- | --- |
+| **The learner does** | Moves between October, November with the hotel order and December at Atelier Barro's studio, or enters figures of their own |
+| **Must understand** | Utilization spreads fixed costs but removes slack; the productivity rate needs output and input in the same units; rejected units are output that never reaches a customer |
+| **Decides or infers** | How hard the kiln is working, and what that means for cost and risk |
+| **Feedback** | Capacity utilization, defect rate, labour productivity, productivity rate and the fixed cost carried by each mug, a capacity bar with the busy zone marked, a reading, and the working for each measure; impossible figures (output above capacity, units that do not add up) are named beside the field |
+| **Misconception diagnosed** | Higher utilization is always better; productivity rate in mixed units; good output and units made are the same |
+| **Objective** | Calculate and interpret the guide's capacity utilization and productivity rate formulas (p. 65), with labour productivity and defect rate as standard definitions |
+
+## 20. Stock control chart (HL)
+
+`ops-stock-control-atelier`, on the Operations Floor. Subtopic 5.6, HL only, AO2 and AO4.
+
+| | |
+| --- | --- |
+| **The learner does** | Sets usage, lead time, buffer stock and reorder quantity for the studio's clay, runs a busy November and a late delivery, and answers three questions |
+| **Must understand** | The reorder level covers usage during the lead time on top of the buffer; the buffer is insurance against usage above plan and late deliveries |
+| **Decides or infers** | The reorder level, the maximum stock, and how much of the buffer a scenario uses |
+| **Feedback** | Reorder level, maximum stock, weeks an order lasts and the lowest stock; a saw-tooth chart (planned line dotted under a scenario) with the lead time, the delivery and the lowest point labelled, and a week-by-week table; each answer is checked against the plan on screen, with targeted feedback for the usual wrong answers |
+| **Misconception diagnosed** | The reorder level is the buffer; the reorder level is only the usage during the lead time; maximum stock is the reorder quantity; buffer stock is waste |
+| **Objective** | Construct and interpret a stock control chart, and evaluate the size of the buffer |
+
+## 21. Location weighted scoring
+
+`ops-location-marigold`, on the Operations Floor. Subtopic 5.4, AO2.
+
+| | |
+| --- | --- |
+| **The learner does** | Weighs six location factors from 0 to 5 for Marigold Kitchens' first Mumbai restaurant, against scores given for three simulated sites, and writes a recommendation |
+| **Must understand** | A weighted score turns judgements into numbers; the answer depends on the weights, and a total can hide a weakness |
+| **Decides or infers** | Which factors matter most, and whether any low score rules a site out |
+| **Feedback** | Weighted totals and ranking as the weights move; a reading that states the nearest weight for each factor at which the leader changes or a tie appears; the scores of 3 or below flagged; a caution listing the qualitative factors the table leaves out |
+| **Misconception diagnosed** | A weighted score is an objective answer; the highest total has no fatal weakness |
+| **Objective** | Explain reasons for a location decision, and judge how far a weighted score can be trusted. Weighted scoring is a decision method, not one of the guide's toolkit tools |

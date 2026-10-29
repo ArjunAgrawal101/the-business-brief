@@ -1,0 +1,27 @@
+# Stock control for Atelier Barro's clay. Fictional and simulated. At about
+# 0.5 kg of clay a mug, 640 mugs a month is about 75 kg a week: 3 bags of 25 kg.
+# Reorder level = 4 + 3 × 2 = 10 bags; maximum stock = 4 + 12 = 16 bags.
+# tests/unit/operations.test.ts simulates both scenarios.
+component: stock-control
+title: When should the studio order more clay?
+purpose: >
+  The learner sets usage, lead time, buffer stock and reorder quantity, sees the reorder level and maximum stock
+  computed and the stock control chart redrawn, then runs a busy season and a late delivery to see the buffer used.
+  It diagnoses confusing the reorder level with the buffer, forgetting that usage during the lead time must be
+  covered, and treating buffer stock as waste rather than insurance.
+provenance: simulated-data
+case: atelier-barro
+item: stoneware clay, in 25 kg bags
+labels: { one: bag, many: bags }
+defaults: { usage: 3, leadTime: 2, buffer: 4, reorderQty: 12 }
+weeks: 16
+scenarios:
+  - id: rush
+    label: The November rush
+    note: The hotel order and the busy season raise clay use to 4 bags a week in weeks 5 to 8.
+    usage: [{ from: 5, to: 8, usage: 4 }]
+  - id: late
+    label: A late delivery
+    note: The supplier delivers the second order a week late.
+    late: { order: 2, extraWeeks: 1 }
+rushScenario: rush

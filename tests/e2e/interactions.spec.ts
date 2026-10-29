@@ -327,3 +327,107 @@ test.describe('Privacy', () => {
     expect(await page.evaluate(() => localStorage.getItem('other-site'))).toBe('keep');
   });
 });
+
+test.describe('Market Studio', () => {
+  test('the market share workspace catches rising sales with a falling share', async ({ page }) => {
+    await page.goto('/market-studio/');
+    await ready(page, '[data-ix="market-share"]');
+    const ws = page.locator('[data-ix="market-share"]');
+    await expect(ws.locator('[data-figures]')).toContainText('10.0%');
+    await expect(ws.locator('[data-interp]')).toContainText('its share fell from 18.0% to 17.5%');
+    await expect(ws.locator('[data-interp]')).toContainText('Growing sales are not the same as a growing share');
+    await ws.locator('[data-scenario="flat"]').click();
+    await expect(ws.locator('[data-scenario="flat"]')).toHaveAttribute('aria-pressed', 'true');
+    // 7,680 of an unchanged 40,000 is 19.2%
+    await expect(ws.locator('[data-interp]')).toContainText('its share rose from 18.0% to 19.2%');
+    await ws.locator('input[name="barro-now"]').fill('-5');
+    await expect(ws.locator('input[name="barro-now"]')).toHaveAttribute('aria-invalid', 'true');
+    await expect(ws.locator('[data-err="barro-now"]')).toContainText('cannot be negative');
+    await ws.locator('[data-reset]').click();
+    await expect(ws.locator('input[name="barro-now"]')).toHaveValue('7680');
+    await expect(ws.locator('[data-working-share]')).toContainText('7,680 ÷ 44,000 × 100');
+  });
+
+  test('the position map redraws for new axes and checks the gap', async ({ page }) => {
+    await page.goto('/market-studio/');
+    await ready(page, '[data-ix="position-map"]');
+    const pm = page.locator('[data-ix="position-map"]');
+    await pm.locator('label[data-value="high-low"]').click();
+    await pm.locator('[data-check]').click();
+    await expect(pm.locator('[data-feedback]')).toContainText('empty for a good reason');
+    await expect(pm.locator('label[data-value="high-low"]')).toHaveClass(/is-right/);
+    // Design across, ease of buying up: every part of the map has a seller
+    await pm.locator('[data-axis="x"]').selectOption('design');
+    await pm.locator('[data-axis="y"]').selectOption('convenience');
+    await expect(pm.locator('[data-head-x]')).toHaveText('Design');
+    await expect(pm.locator('[data-feedback]')).toBeHidden();
+    await pm.locator('label[data-value="none"]').click();
+    await pm.locator('[data-check]').click();
+    await expect(pm.locator('[data-feedback]')).toContainText('every part of the map has at least one seller');
+    // Choosing the other axis's attribute swaps the axes rather than plotting one attribute against itself
+    await pm.locator('[data-axis="x"]').selectOption('convenience');
+    await expect(pm.locator('[data-axis="y"]')).toHaveValue('design');
+    await page.reload();
+    await ready(page, '[data-ix="position-map"]');
+    await expect(pm.locator('[data-axis="x"]')).toHaveValue('convenience');
+  });
+});
+
+test.describe('Operations Floor', () => {
+  test('location weights change the ranking where the reading says they will', async ({ page }) => {
+    await page.goto('/operations-floor/');
+    await ready(page, '[data-ix="location"]');
+    const loc = page.locator('[data-ix="location"]');
+    await expect(loc.locator('[data-interp]')).toContainText('Site C ranks first with 117 points, 6 ahead of Site A');
+    await expect(loc.locator('[data-interp]')).toContainText('at a weight of 2 on rent and running costs (now 4), Site A ranks first');
+    await loc.locator('input[data-weight="rent"]').fill('2');
+    await expect(loc.locator('[data-interp]')).toContainText('Site A ranks first with 105 points');
+    await expect(loc.locator('[data-ranking] tr').first()).toContainText('Site A');
+    await loc.locator('[data-reset]').click();
+    await expect(loc.locator('[data-interp]')).toContainText('Site C ranks first with 117 points');
+  });
+
+  test('capacity utilization follows the month and validates the figures', async ({ page }) => {
+    await page.goto('/operations-floor/');
+    await ready(page, '[data-ix="capacity"]');
+    const cp = page.locator('[data-ix="capacity"]');
+    await expect(cp.locator('[data-figures]')).toContainText('53.3%');
+    await cp.locator('[data-month="november"]').click();
+    await expect(cp.locator('[data-month="november"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(cp.locator('[data-figures]')).toContainText('94.2%');
+    await expect(cp.locator('[data-interp]')).toContainText('70 mugs of spare capacity');
+    await cp.locator('input[name="output"]').fill('1300');
+    await expect(cp.locator('input[name="output"]')).toHaveAttribute('aria-invalid', 'true');
+    await expect(cp.locator('[data-err="output"]')).toContainText('cannot be more than capacity');
+  });
+
+  test('the stock control chart answers its questions from the plan on screen', async ({ page }) => {
+    await page.goto('/operations-floor/');
+    await ready(page, '[data-ix="stock-control"]');
+    const st = page.locator('[data-ix="stock-control"]');
+    await st.locator('#ix-ops-stock-control-atelier-q-rol').fill('6');
+    await st.locator('[data-check="rol"]').click();
+    await expect(st.locator('[data-feedback="rol"]')).toContainText('leaves out the buffer');
+    await st.locator('#ix-ops-stock-control-atelier-q-rol').fill('10');
+    await st.locator('[data-check="rol"]').click();
+    await expect(st.locator('[data-feedback="rol"]')).toContainText('Right');
+    await st.locator('label[data-value="some"]').click();
+    await st.locator('[data-check="buffer"]').click();
+    await expect(st.locator('[data-feedback="buffer"]')).toContainText('The lowest point is 2 bags');
+    await expect(st.locator('[data-scenario="rush"]')).toHaveAttribute('aria-pressed', 'true');
+    // A larger buffer changes the plan, and the answer is worked out again from it
+    await st.locator('input[name="buffer"]').fill('6');
+    await st.locator('#ix-ops-stock-control-atelier-q-rol').fill('12');
+    await st.locator('[data-check="rol"]').click();
+    await expect(st.locator('[data-feedback="rol"]')).toContainText('6 + 3 × 2 = 12 bags');
+  });
+
+  test('HL tools are hidden when SL is chosen', async ({ page }) => {
+    await page.goto('/operations-floor/');
+    await page.locator('[data-level-switch] label:has(input[value="SL"])').first().click();
+    await expect(page.locator('[data-ix="capacity"]')).toBeHidden();
+    await expect(page.locator('[data-ix="stock-control"]')).toBeHidden();
+    await expect(page.locator('[data-ix="location"]')).toBeVisible();
+    await expect(page.locator('.hl-notice')).toBeVisible();
+  });
+});

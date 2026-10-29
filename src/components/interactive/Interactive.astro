@@ -18,6 +18,11 @@ import ScaleExplorer from './ScaleExplorer.astro';
 import SpecialOrder from './SpecialOrder.astro';
 import CashFlowLab from './CashFlowLab.astro';
 import CaseLab from './CaseLab.astro';
+import MarketShareWorkspace from './MarketShareWorkspace.astro';
+import PositionMap from './PositionMap.astro';
+import CapacityProductivity from './CapacityProductivity.astro';
+import StockControl from './StockControl.astro';
+import LocationScoring from './LocationScoring.astro';
 import { corpus } from '../../lib/content';
 import { rich } from '../../lib/markup';
 import type { Interactive as InteractiveData, Level, Provenance } from '../../lib/schemas';
@@ -62,5 +67,10 @@ const H = headingLevel === 2 ? 'h2' : 'h3';
     {data.component === 'special-order' && <SpecialOrder data={data} uid={uid} />}
     {data.component === 'cash-flow-lab' && <CashFlowLab data={data} uid={uid} />}
     {data.component === 'case-lab' && <CaseLab data={data} uid={uid} />}
+    {data.component === 'market-share-workspace' && <MarketShareWorkspace data={data} uid={uid} />}
+    {data.component === 'position-map' && <PositionMap data={data} uid={uid} />}
+    {data.component === 'capacity-productivity' && <CapacityProductivity data={data} uid={uid} />}
+    {data.component === 'stock-control' && <StockControl data={data} uid={uid} />}
+    {data.component === 'location-scoring' && <LocationScoring data={data} uid={uid} />}
   </div>
 </section>

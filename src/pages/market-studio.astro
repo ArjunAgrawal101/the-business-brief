@@ -1,0 +1,103 @@
+---
+import RoomPage from '../components/rooms/RoomPage.astro';
+import SectionHead from '../components/layout/SectionHead.astro';
+import Interactive from '../components/interactive/Interactive.astro';
+import LevelSwitch from '../components/ui/LevelSwitch.astro';
+import LevelTag from '../components/ui/LevelTag.astro';
+import { corpus, href } from '../lib/content';
+
+const c = await corpus();
+const unit = c.curricula['ib-dp-bm']?.units.find((u) => u.number === 4);
+/** What this room has for each subtopic of unit 4. */
+const HERE: Record<string, string> = {
+  '4.1': 'Market share and market growth workspace, with the HL question on market share and leadership',
+  '4.2': 'Position map builder',
+};
+---
+
+<RoomPage id="market-studio" description="Market share, market growth and position maps for IB Business Management unit 4, worked on a simulated market with live charts and feedback." section="topics">
+    <section aria-labelledby="ms-serves">
+      <SectionHead no={1} title="What this room covers" dek="Unit 4 subtopic by subtopic. Tools for the rest of the unit are planned; nothing is linked until it works." id="ms-serves" />
+      <ul class="room-cover" role="list">
+        {
+          unit?.subtopics.map((s) => (
+            <li>
+              <span class="num">{s.code}</span>
+              <span>{s.title}</span>
+              <span class="tags">
+                <LevelTag level={s.level} />
+                {HERE[s.code] ? <span class="tag tag--live">Tool here</span> : <span class="tag tag--planned">Planned</span>}
+              </span>
+              {HERE[s.code] && <span class="room-cover__note small">{HERE[s.code]}</span>}
+            </li>
+          ))
+        }
+      </ul>
+      <p class="small muted">
+        The market and every seller in it are fictional, and every figure is simulated. Read the case first: <a href={href.case('atelier-barro')}>Atelier Barro</a>.
+      </p>
+    </section>
+
+    <LevelSwitch id="lvl-market" />
+
+    <section aria-labelledby="ms-share">
+      <SectionHead no={2} title="Market share and market growth" dek="Subtopic 4.1, AO2 and AO4. Edit the sales and watch what happens to each seller's share." id="ms-share" />
+      <div style="margin-top:var(--sp-5)">
+        <Interactive
+          component="market-share-workspace"
+          refId="market-share-porto"
+          title="Atelier Barro's share of a growing market"
+          intro="Atelier Barro sold more mugs this year than last. Did it gain ground? Work out its share of the market in each year, and the growth of the market, before you trust the answer."
+          provenance="simulated-data"
+          headingLevel={3}
+        />
+      </div>
+    </section>
+
+    <section aria-labelledby="ms-map">
+      <SectionHead no={3} title="Position maps" dek="Subtopic 4.2, AO2 and AO4. Choose the axes, find the gap, and decide whether it is worth filling." id="ms-map" />
+      <div style="margin-top:var(--sp-5)">
+        <Interactive
+          component="position-map"
+          refId="market-position-map-porto"
+          title="Where Atelier Barro sits in customers' minds"
+          intro="A position map plots how customers see competing sellers on two attributes. Different attributes tell different stories, and an empty space on the map is a question, not an answer."
+          provenance="simulated-data"
+          headingLevel={3}
+        />
+      </div>
+    </section>
+</RoomPage>
+
+<style>
+  .room-cover {
+    margin: var(--sp-4) 0 var(--sp-3);
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .room-cover li {
+    display: grid;
+    gap: var(--sp-1) var(--sp-4);
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  @media (min-width: 52rem) {
+    .room-cover li {
+      grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+      align-items: baseline;
+    }
+  }
+
+  .room-cover .num {
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .room-cover__note {
+    grid-column: 2 / -1;
+    color: var(--text-muted);
+  }
+</style>

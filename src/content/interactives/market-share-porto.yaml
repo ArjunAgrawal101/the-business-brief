@@ -1,0 +1,40 @@
+# The Porto hand-made mug market. Fictional: Atelier Barro's figures follow its
+# case file (7,680 mugs in the last twelve months, Exhibit 2); every other firm
+# and figure is simulated. tests/unit/market.test.ts recomputes the shares.
+component: market-share-workspace
+title: Atelier Barro's share of a growing market
+purpose: >
+  The learner edits two years of sales for five sellers in a simulated market and sees each firm's market share,
+  the change in share and the growth of the market recalculated, with a bar chart and a table. It diagnoses
+  reading rising sales as a rising share, reading falling sales as a falling share, and forgetting that a group of
+  small sellers is not a market leader.
+provenance: simulated-data
+case: atelier-barro
+market: Hand-made stoneware mugs sold by studios in Porto, in their shops and online
+basis: volume
+unit: mugs
+periods: { last: '2025', now: '2026' }
+focus: barro
+firms:
+  - { id: barro, name: Atelier Barro, last: 7200, now: 7680 }
+  - { id: seixo, name: Oficina Seixo, last: 9800, now: 9400 }
+  - { id: gres, name: Grés e Sal, last: 6100, now: 7900 }
+  - { id: lento, name: Estúdio Lento, last: 3900, now: 4400 }
+  - { id: others, name: Other studios and makers, last: 13000, now: 14620, group: true }
+scenarios:
+  - id: flat
+    label: A market that did not grow
+    note: The other studios and makers sell 10,620 mugs instead of 14,620, so the market stays at 40,000.
+    set: { others: { now: 10620 } }
+  - id: price-24
+    label: Atelier Barro at €24
+    note: The survey in the case file suggests 590 mugs a month at €24, which is 7,080 a year.
+    set: { barro: { now: 7080 } }
+hlPrompt:
+  question: >
+    To what extent does market share matter to a premium, hand-made studio such as Atelier Barro?
+  points:
+    - Share brings scale and recognition, and the market leader can shape customers' expectations of price and quality.
+    - A premium studio may choose not to chase share. Inês wants Atelier Barro known for premium, hand-made work, and higher prices can mean fewer mugs but more profit.
+    - Share measured by volume can understate a premium seller. Measured by value, Atelier Barro's share would be larger if its mugs sell for more than the market's average price.
+    - 'A falling share in a growing market still means more sales. Whether that matters depends on the objective: survival, profit, growth or reputation.'

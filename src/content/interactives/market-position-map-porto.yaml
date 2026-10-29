@@ -1,0 +1,50 @@
+# A position map of the Porto hand-made mug market. Fictional: the sellers and
+# the survey are simulated. No score sits exactly on the middle of the scale
+# (5.5), so every seller falls clearly in one part of the map; the integrity
+# check enforces it, and checks that each gap note describes an empty part.
+component: position-map
+title: Where Atelier Barro sits in customers' minds
+purpose: >
+  The learner chooses two of four attributes for the axes of a position map built from a simulated customer survey,
+  sees where six sellers sit, and identifies the empty part of the map. Feedback explains whether that gap is an
+  opening or empty for a good reason. It diagnoses treating every gap as an opportunity and reading a position map
+  as a set of facts about products rather than perceptions of them.
+provenance: simulated-data
+case: atelier-barro
+survey: >
+  Simulated survey of 200 mug buyers in Porto and online, September 2026. Each rated each seller from 1 (low) to 10
+  (high) on four attributes; the scores are averages. Casa Loja is a department store's own-label range of imported
+  mugs. All six sellers are fictional.
+scale: { min: 1, max: 10 }
+attributes:
+  - { id: price, label: Price, low: low price, high: high price }
+  - { id: craft, label: Craftsmanship, low: mass-produced feel, high: hand-made feel }
+  - { id: design, label: Design, low: traditional design, high: modern design }
+  - { id: convenience, label: Ease of buying, low: hard to buy, high: easy to buy }
+defaults: { x: price, y: craft }
+focus: barro
+brands:
+  - { id: barro, name: Atelier Barro, scores: { price: 7.8, craft: 8.6, design: 7.0, convenience: 6.6 } }
+  - { id: seixo, name: Oficina Seixo, scores: { price: 6.4, craft: 7.4, design: 3.9, convenience: 5.1 } }
+  - { id: gres, name: Grés e Sal, scores: { price: 5.2, craft: 6.2, design: 8.3, convenience: 8.1 } }
+  - { id: lento, name: Estúdio Lento, scores: { price: 8.9, craft: 9.1, design: 5.8, convenience: 3.2 } }
+  - { id: loja, name: Casa Loja, scores: { price: 2.4, craft: 2.1, design: 4.7, convenience: 8.8 } }
+  - { id: feira, name: Market-stall makers, scores: { price: 3.6, craft: 7.3, design: 3.4, convenience: 2.6 } }
+gaps:
+  - poles: { price: high, craft: low }
+    note: >
+      This gap is empty for a good reason: few customers would pay a premium for a mug that looks mass-produced. Not
+      every gap on a map is a market.
+  - poles: { craft: low, design: high }
+    note: >
+      This could be an opening: modern designs made with moulds or machines, sold for less than hand-made work. A
+      seller would need evidence that customers want it, and Atelier Barro would have to ask whether it fits a brand
+      built on hand-made mugs. For Inês, it would not.
+  - poles: { craft: low, convenience: low }
+    note: >
+      This gap is empty for a good reason: a mug that is neither hand-made nor easy to buy offers customers nothing
+      they cannot get elsewhere.
+caution: >
+  A position map shows how one sample of customers sees the sellers, not facts about the mugs. Another sample, or
+  other attributes, would give another map. And a gap is a question, not an answer: before filling it, a business
+  needs evidence of demand, the ability to deliver, and a reason to think rivals will not follow straight away.

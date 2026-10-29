@@ -1046,6 +1046,116 @@ export const interactiveSchema = z.discriminatedUnion('component', [
       .min(3),
     memo: z.object({ title: z.string(), to: z.string() }),
   }),
+  /* Market Studio and Operations Floor */
+  z.object({
+    component: z.literal('market-share-workspace'),
+    ...interactiveBase,
+    case: z.string(),
+    /** What the market is, in a phrase. */
+    market: z.string(),
+    /** Sales are measured by volume (in `unit`) or by value. */
+    basis: z.enum(['volume', 'value']),
+    unit: z.string(),
+    periods: z.object({ last: z.string(), now: z.string() }),
+    /** The firm the reading is about. */
+    focus: z.string(),
+    firms: z
+      .array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          last: z.number().nonnegative(),
+          now: z.number().nonnegative(),
+          /** A line grouping many small sellers: counted, but not ranked. */
+          group: z.boolean().default(false),
+        }),
+      )
+      .min(3),
+    scenarios: z
+      .array(z.object({ id: z.string(), label: z.string(), note: z.string(), set: z.record(z.string(), z.object({ last: z.number().optional(), now: z.number().optional() })) }))
+      .default([]),
+    /** The HL-only AO3 prompt on the importance of market share and market leadership. */
+    hlPrompt: z.object({ question: md, points: z.array(md).min(2) }),
+  }),
+  z.object({
+    component: z.literal('position-map'),
+    ...interactiveBase,
+    case: z.string(),
+    survey: md,
+    scale: z.object({ min: z.number(), max: z.number() }),
+    attributes: z.array(z.object({ id: z.string(), label: z.string(), low: z.string(), high: z.string() })).min(3).max(4),
+    defaults: z.object({ x: z.string(), y: z.string() }),
+    focus: z.string(),
+    brands: z.array(z.object({ id: z.string(), name: z.string(), note: z.string().optional(), scores: z.record(z.string(), z.number()) })).min(4).max(8),
+    /** What an empty part of the map means, for the empty parts the data produce: { poles: { price: high, craft: low }, note }. */
+    gaps: z.array(z.object({ poles: z.record(z.string(), z.enum(['high', 'low'])), note: md })).default([]),
+    caution: md,
+  }),
+  z.object({
+    component: z.literal('capacity-productivity'),
+    ...interactiveBase,
+    case: z.string(),
+    currency: z.string(),
+    labels: z.object({ one: z.string(), many: z.string(), period: z.string() }),
+    months: z
+      .array(
+        z.object({
+          id: z.string(),
+          label: z.string(),
+          note: z.string(),
+          values: z.object({
+            capacity: z.number().positive(),
+            output: z.number().nonnegative(),
+            made: z.number().nonnegative(),
+            rejected: z.number().nonnegative(),
+            labourHours: z.number().nonnegative(),
+            outputValue: z.number().nonnegative(),
+            inputCost: z.number().nonnegative(),
+            fixedCosts: z.number().nonnegative(),
+          }),
+        }),
+      )
+      .min(2),
+    /** How total output and total input are valued for the productivity rate. */
+    valueNote: md,
+  }),
+  z.object({
+    component: z.literal('stock-control'),
+    ...interactiveBase,
+    case: z.string(),
+    /** The item held in stock, in a phrase. */
+    item: z.string(),
+    labels: z.object({ one: z.string(), many: z.string() }),
+    defaults: z.object({ usage: z.number().positive(), leadTime: z.number().nonnegative(), buffer: z.number().nonnegative(), reorderQty: z.number().positive() }),
+    weeks: z.number().int().min(8).max(26),
+    scenarios: z
+      .array(
+        z.object({
+          id: z.string(),
+          label: z.string(),
+          note: z.string(),
+          usage: z.array(z.object({ from: z.number().int().positive(), to: z.number().int().positive(), usage: z.number().nonnegative() })).optional(),
+          late: z.object({ order: z.number().int().positive(), extraWeeks: z.number().positive() }).optional(),
+        }),
+      )
+      .min(1),
+    /** The scenario the buffer-stock question asks about. */
+    rushScenario: z.string(),
+  }),
+  z.object({
+    component: z.literal('location-scoring'),
+    ...interactiveBase,
+    case: z.string(),
+    decision: z.string(),
+    /** Scores run from 1 to `maxScore`; weights from 0 to `maxWeight`. */
+    maxScore: z.number().int().min(5).max(10),
+    maxWeight: z.number().int().min(3).max(10).default(5),
+    /** Scores at or below this are flagged as weaknesses to check. */
+    lowThreshold: z.number().int().nonnegative(),
+    factors: z.array(z.object({ id: z.string(), label: z.string(), weight: z.number().int().nonnegative(), hint: z.string().optional() })).min(3),
+    sites: z.array(z.object({ id: z.string(), name: z.string(), summary: z.string(), scores: z.record(z.string(), z.number()) })).min(2),
+    caution: md,
+  }),
 ]);
 export type Interactive = z.infer<typeof interactiveSchema>;
 export type Assessment = AssessmentComponent;

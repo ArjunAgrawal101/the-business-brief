@@ -1,0 +1,215 @@
+---
+/**
+ * Operations Floor: capacity utilization and productivity (5.6, HL). The first
+ * month is rendered on the server from src/lib/operations.ts; the script
+ * recalculates the measures, the capacity bar and the workings as the learner
+ * changes month or edits the figures.
+ */
+import { capacityModel, capacityNotes, capacityWorkings, readCapacity } from '../../lib/operations';
+import { capacityBarStudioHtml, capacityFiguresHtml } from '../../lib/render-studio';
+import { workingHtml } from '../../lib/render';
+import { esc, jsonForScript, rich } from '../../lib/markup';
+import { inputValue } from '../../scripts/ix';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'capacity-productivity' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const first = data.months[0];
+if (!first) throw new Error(`${uid} has no months`);
+const m = capacityModel(first.values);
+const unit = { one: data.labels.one, many: data.labels.many };
+const reading = readCapacity(m, data.currency, unit);
+const w = capacityWorkings(m, data.currency, data.labels);
+const notes = capacityNotes(m, data.currency, unit);
+const cur = data.currency;
+const L = data.labels;
+const fields = [
+  { key: 'capacity', label: `Productive capacity a ${L.period}`, suffix: L.many, step: '1', hint: '' },
+  { key: 'output', label: `Actual output: good ${L.many} fired`, suffix: L.many, step: '1', hint: '' },
+  { key: 'made', label: `${L.many.charAt(0).toUpperCase()}${L.many.slice(1)} made, before inspection`, suffix: L.many, step: '1', hint: '' },
+  { key: 'rejected', label: `${L.many.charAt(0).toUpperCase()}${L.many.slice(1)} that failed inspection`, suffix: L.many, step: '1', hint: 'Reclaimed as clay, never fired.' },
+  { key: 'labourHours', label: 'Labour hours worked', suffix: 'hours', step: '1', hint: '' },
+  { key: 'outputValue', label: 'Total output, at selling prices', prefix: cur, step: '0.01', hint: '' },
+  { key: 'inputCost', label: 'Total input, at cost', prefix: cur, step: '0.01', hint: 'All the costs of the month, fixed and variable.' },
+  { key: 'fixedCosts', label: `Fixed costs a ${L.period}`, prefix: cur, step: '0.01', hint: '' },
+] as const;
+const config = { uid, months: data.months, currency: cur, labels: L };
+const values = first.values as Record<string, number>;
+---
+
+<div class="cpu" data-ix="capacity" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The workspace could not start. The figures below are for {first.label}.</p>
+
+  <fieldset class="bew__scenarios js-only">
+    <legend class="label label--ink">Choose a month</legend>
+    <div class="cluster">
+      {
+        data.months.map((mo, k) => (
+          <button type="button" class="btn btn--small" data-month={mo.id} aria-pressed={k === 0 ? 'true' : 'false'}>
+            {mo.label}
+          </button>
+        ))
+      }
+    </div>
+    <p class="small muted" data-month-note>{first.label}: {first.note}</p>
+  </fieldset>
+  <p class="nojs-only small muted">Showing {first.label}. With JavaScript on, you can change month and edit the figures.</p>
+
+  <div class="bew__grid">
+    <form class="bew__inputs" data-form novalidate aria-label="Capacity and productivity inputs">
+      <fieldset class="bew__fields">
+        <legend class="label label--ink">Inputs</legend>
+        {
+          fields.map((f) => (
+            <div class="field">
+              <label for={`${uid}-${f.key}`}>{f.label}</label>
+              <div class="affix">
+                {'prefix' in f && f.prefix && <span class="affix__pre" aria-hidden="true">{f.prefix}</span>}
+                <input
+                  class="input input--num"
+                  id={`${uid}-${f.key}`}
+                  name={f.key}
+                  type="number"
+                  inputmode="decimal"
+                  min="0"
+                  step={f.step}
+                  value={inputValue(values[f.key] ?? 0, f.step)}
+                  aria-describedby={`${uid}-${f.key}-err${f.hint ? ` ${uid}-${f.key}-hint` : ''}`}
+                />
+                {'suffix' in f && f.suffix && <span class="affix__post" aria-hidden="true">{f.suffix}</span>}
+              </div>
+              {f.hint && <span class="field__hint" id={`${uid}-${f.key}-hint`}>{f.hint}</span>}
+              <span class="field__error" id={`${uid}-${f.key}-err`} data-err={f.key} />
+            </div>
+          ))
+        }
+      </fieldset>
+    </form>
+
+    <div class="bew__results">
+      <h4 class="label label--ink">Results</h4>
+      <dl class="figs" data-figures set:html={capacityFiguresHtml(m, cur, unit)} />
+      <div class="cpu__bar" data-bar set:html={capacityBarStudioHtml(m, unit)} />
+      <div class="bew__reading">
+        <p><strong>Reading.</strong> <span data-interp>{reading.reading}</span></p>
+        <p class="muted"><strong>Implication.</strong> <span data-impl>{reading.implication}</span></p>
+      </div>
+      <p class="small muted">The bands used in the reading (below 60%, 60 to 85%, 85 to 97%, 97% and above) are the platform's rule of thumb, not an IB rule.</p>
+    </div>
+  </div>
+
+  <aside class="callout callout--note">
+    <span class="callout__kicker">Where the formulas come from</span>
+    <div class="prose small" set:html={rich(data.valueNote)} />
+  </aside>
+
+  <section class="bew__working" aria-label="Working for capacity utilization">
+    <h4 class="label label--ink">The working: capacity utilization rate</h4>
+    <div data-working="utilization" set:html={workingHtml(w.utilization, esc(reading.reading), esc(reading.implication))} />
+  </section>
+  {
+    (['productivity', 'defect', 'labour'] as const).map((k) => (
+      <details class="disclosure">
+        <summary>The working: {k === 'productivity' ? 'productivity rate' : k === 'defect' ? 'defect rate' : 'labour productivity'}</summary>
+        <div class="disclosure__body" data-working={k} set:html={workingHtml(w[k], esc(notes[k].interpretation), esc(notes[k].implication))} />
+      </details>
+    ))
+  }
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/capacity';
+</script>
+
+<style>
+  .cpu {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .cpu__bar {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .cpu__bar :global(.cpu__track) {
+    position: relative;
+    height: 1.5rem;
+    background: repeating-linear-gradient(135deg, var(--surface-sunk) 0 6px, #fff 6px 12px);
+    border: 1px solid var(--rule);
+  }
+
+  .cpu__bar :global(.cpu__used) {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--bb-ink);
+    transition: width var(--dur-base) var(--ease);
+  }
+
+  .cpu__bar :global(.cpu__mark) {
+    position: absolute;
+    top: -0.35rem;
+    bottom: -0.35rem;
+    width: 0;
+    border-left: 2px dashed var(--bb-brass);
+  }
+
+  .cpu__bar :global(.cpu__mark span) {
+    position: absolute;
+    top: -1.25rem;
+    left: 0;
+    transform: translateX(-50%);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--brass-text);
+  }
+
+  .cpu__bar :global(.cpu__key) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-4);
+    margin: var(--sp-2) 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  .cpu__bar :global(.cpu__key li) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .cpu__bar :global(.cpu__sw) {
+    display: inline-block;
+    width: 0.85rem;
+    height: 0.85rem;
+    border: 1px solid var(--rule);
+  }
+
+  .cpu__bar :global(.cpu__sw--used) {
+    background: var(--bb-ink);
+  }
+
+  .cpu__bar :global(.cpu__sw--spare) {
+    background: repeating-linear-gradient(135deg, var(--surface-sunk) 0 3px, #fff 3px 6px);
+  }
+
+  .cpu__bar :global(.cpu__sw--mark) {
+    width: 0;
+    border: 0;
+    border-left: 2px dashed var(--bb-brass);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cpu__bar :global(.cpu__used) {
+      transition: none;
+    }
+  }
+</style>
