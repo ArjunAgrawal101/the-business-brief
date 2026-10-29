@@ -1,0 +1,41 @@
+# Capacity utilization and productivity at Atelier Barro. Fictional and
+# simulated. Capacity (1,200 mugs a month) and sales come from the case file
+# (Exhibit 5); costs come from Exhibit 1. Pieces are inspected after throwing,
+# before firing: a rejected mug is reclaimed as clay, is not fired and is not
+# paid for, so only good mugs use the kiln. tests/unit/operations.test.ts
+# recomputes every figure.
+#
+# October: 640 good mugs. Output value 640 × €22 = €14,080. Inputs €8,060 + 640 × €6.88 = €12,463.20.
+# November: 830 regular mugs + 300 for the hotel = 1,130. Output value 830 × €22 + 300 × €11 = €21,560.
+#   Inputs €8,140 + 830 × €7.18 + 300 × €5.85 + €150 stamp = €16,004.40 (the case's €1,395 order is inside).
+# December: 1,020 mugs. Output value 1,020 × €22 = €22,440. Inputs €8,140 + 1,020 × €7.18 = €15,463.60.
+component: capacity-productivity
+title: How hard is the kiln working?
+purpose: >
+  The learner moves between three months at the studio, or enters figures of their own, and sees capacity
+  utilization, the defect rate, labour productivity, the productivity rate and the fixed cost carried by each mug
+  recalculated, with a capacity bar and the working. It diagnoses reading high utilization as always good, mixing
+  units in the productivity rate, and forgetting that rejected units are output that never reaches the customer.
+provenance: simulated-data
+case: atelier-barro
+currency: '€'
+labels: { one: mug, many: mugs, period: month }
+months:
+  - id: october
+    label: October, actual
+    note: A normal month, before the new electricity tariff.
+    values: { capacity: 1200, output: 640, made: 680, rejected: 40, labourHours: 320, outputValue: 14080, inputCost: 12463.2, fixedCosts: 8060 }
+  - id: november
+    label: November, with the hotel order
+    note: The busy season plus 300 mugs for Casa Alfama Hotels; the throwers work long weeks.
+    values: { capacity: 1200, output: 1130, made: 1200, rejected: 70, labourHours: 560, outputValue: 21560, inputCost: 16004.4, fixedCosts: 8140 }
+  - id: december
+    label: December, forecast
+    note: The Christmas peak, about 60% above an average month.
+    values: { capacity: 1200, output: 1020, made: 1080, rejected: 60, labourHours: 510, outputValue: 22440, inputCost: 15463.6, fixedCosts: 8140 }
+valueNote: >
+  The guide gives the productivity rate formula without saying how output and input are measured (p. 65). As a
+  percentage it needs both in the same units, so here both are valued in euros: the mugs made at the price they sell
+  for, and the inputs (labour, clay, energy, the studio and the kiln) at what they cost, from the case file. Above
+  100%, the studio gets more value out than it puts in. Labour productivity and the defect rate are standard
+  definitions; the guide's formula list does not include them.

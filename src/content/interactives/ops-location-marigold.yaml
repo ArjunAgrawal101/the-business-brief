@@ -1,0 +1,46 @@
+# Choosing a site for Marigold Kitchens' first Mumbai restaurant. Fictional and
+# simulated: the sites are not real addresses. The three rents average ₹5.4m a
+# year, the Mumbai rent in the case file's forecast for organic growth
+# (Exhibit 3). tests/unit/operations.test.ts recomputes the totals and the
+# sensitivity.
+component: location-scoring
+title: Where should the first Mumbai restaurant go?
+purpose: >
+  The learner sets the weight of each location factor against scores given for three sites, sees the weighted
+  totals and ranking recalculated, and is told at which weights the ranking changes and which low scores the
+  totals hide. It diagnoses treating a weighted score as an objective answer, and forgetting the qualitative factors
+  a table leaves out.
+provenance: simulated-data
+case: marigold-kitchens
+decision: >
+  If Meera chooses organic growth, the first of the four Mumbai restaurants needs a site. Farah Sheikh, the finance
+  manager, has visited three and scored each factor from 1 (poor) to 10 (excellent).
+maxScore: 10
+maxWeight: 5
+lowThreshold: 3
+factors:
+  - { id: rent, label: Rent and running costs, weight: 4, hint: A higher score means lower costs. }
+  - { id: customers, label: Customers nearby at lunch and dinner, weight: 5 }
+  - { id: produce, label: Access to fresh produce and suppliers, weight: 3, hint: 'The recipes depend on fresh, local produce.' }
+  - { id: cooks, label: Cooks available to recruit, weight: 2, hint: Training a cook to Marigold's standard takes about four months. }
+  - { id: competition, label: Little direct competition nearby, weight: 2 }
+  - { id: brand, label: Fit with a home-style brand, weight: 3 }
+sites:
+  - id: a
+    name: Site A
+    summary: A ground-floor unit on a busy street in an office district. Rent ₹6.6m a year. Full at weekday lunchtimes, with many restaurants nearby.
+    scores: { rent: 3, customers: 9, produce: 5, cooks: 6, competition: 3, brand: 7 }
+  - id: b
+    name: Site B
+    summary: A narrow unit beside a suburban railway station, with a small kitchen. Rent ₹5.4m a year. Heavy footfall at commuting hours.
+    scores: { rent: 6, customers: 7, produce: 5, cooks: 5, competition: 6, brand: 3 }
+  - id: c
+    name: Site C
+    summary: A residential neighbourhood beside a produce market. Rent ₹4.2m a year. Families nearby in the evening, but few offices, so lunchtimes would be thin.
+    scores: { rent: 8, customers: 3, produce: 7, cooks: 7, competition: 7, brand: 7 }
+caution: >
+  The scores are one person's judgements, and the weights are the decision-maker's priorities: change either and the
+  answer changes. A weighted total can also hide a weakness that should rule a site out. And some factors are not in
+  the table at all: the landlord's terms and the length of the lease, how safe and easy the journey is for staff
+  late at night, planning permission, how quickly the site could open, and Meera's own view of what Marigold should
+  be.
