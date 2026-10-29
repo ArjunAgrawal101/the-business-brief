@@ -6,6 +6,15 @@ The Business Brief deploys as a **separate Vercel project** from Arjun Agrawal E
 
 **Not deployed.** This release was built and tested in a development environment with no Vercel access. The steps below are what to do next; nothing here has been run against Vercel yet.
 
+## GitHub Pages is switched on, and cannot serve this site as it is
+
+On 29 October 2026 the repository's settings had GitHub Pages enabled in "deploy from a branch" mode (branch `main`), which starts a "pages build and deployment" run on every push. That run builds the repository with Jekyll, which stops on the Astro components' front matter, so every run fails and nothing is published. Even if it succeeded, it would publish the source files, not the built site.
+
+This was found, not changed: Pages is a repository setting, and the deployment choice is the creator's. The options:
+
+- **Use Vercel, as planned below,** and switch Pages off (Settings, Pages: under Build and deployment, set the branch to None and save). The failing runs then stop.
+- **Use GitHub Pages instead.** Set the Pages source to "GitHub Actions" and add a workflow that runs `npm ci` and `npm run build` and publishes `dist/` with `actions/deploy-pages`. On a project page (`https://arjunagrawal101.github.io/the-business-brief/`) every page would sit under `/the-business-brief/`, and the site's links are written from the root, so it would need either a custom domain (served from the root, which works as it is) or a base-path change throughout the site.
+
 ## What is configured
 
 `vercel.json`:

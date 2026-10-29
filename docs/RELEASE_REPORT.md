@@ -44,6 +44,7 @@ The Finance Desk desks and the studio tools were built in parallel in separate w
 | Item | Status | What is needed |
 | --- | --- | --- |
 | **Deployment** | Not deployed; no Vercel access from this environment | Follow [DEPLOYMENT.md](DEPLOYMENT.md), as a new Vercel project separate from the Economics site |
+| **GitHub Pages** | Switched on in the repository settings in "deploy from a branch" mode; its Jekyll build fails on every push and would not serve the built site anyway. Found, not changed | Switch it off if Vercel is used, or move it to a GitHub Actions build with a custom domain ([DEPLOYMENT.md](DEPLOYMENT.md#github-pages-is-switched-on-and-cannot-serve-this-site-as-it-is)) |
 | **Astro 7.4 upgrade** | Astro 6.4.8 has published advisories (low exposure for a static site, see [SECURITY.md](../SECURITY.md)); the fix needs Node 22.23.4 or later, which this environment does not have | Run the upgrade in SECURITY.md on a machine with Node 24, then `npm run qa` |
 | **Live comparison with the Economics site** | The network policy blocked the live site; the comparison used renders of its source | Allow the domain in the environment's network settings if a live comparison is wanted |
 | **Remaining subtopics** | 3 complete briefs; 9 more subtopics have tools or calculations; 24 are planned | See [ROADMAP.md](ROADMAP.md) |
