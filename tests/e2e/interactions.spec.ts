@@ -266,6 +266,24 @@ test.describe('Case lab', () => {
   });
 });
 
+test.describe('Progress', () => {
+  test('the progress page summarizes what this browser has kept, and nothing else', async ({ page }) => {
+    await page.goto('/progress/');
+    await ready(page, '[data-ix="progress"]');
+    await expect(page.locator('[data-empty]')).toBeVisible();
+    await page.evaluate(() => {
+      localStorage.setItem('bb:q:q-costs-p2-beq', JSON.stringify({ answer: '550 mugs', points: [0] }));
+      localStorage.setItem('bb:case-lab:ix-halden-diagnosis', JSON.stringify({ done: ['problem', 'cause'] }));
+    });
+    await page.reload();
+    await ready(page, '[data-ix="progress"]');
+    await expect(page.locator('[data-empty]')).toBeHidden();
+    await expect(page.locator('[data-summary]')).toContainText('Case lab stages done2 of 5');
+    await expect(page.locator('[data-groups]')).toContainText('Self-marked');
+    await expect(page.locator('[data-groups] a[href="/case-room/halden-diagnosis/#ix-halden-diagnosis"]')).toBeVisible();
+  });
+});
+
 test.describe('IA Studio', () => {
   test('the planner checks supporting documents, totals the marks and keeps the plan', async ({ page }) => {
     await page.goto('/ia-studio/');

@@ -1,0 +1,309 @@
+---
+/**
+ * The course map: every subtopic of the IB course as a tile, coloured by what
+ * the platform has for it and marked with the rooms that serve it. Computed
+ * from the content, like the coverage table, so it cannot show material that
+ * does not exist.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import Icon from '../../components/ui/Icon.astro';
+import { corpus, href, modulesInOrder } from '../../lib/content';
+import { isIcon } from '../../lib/icons';
+
+const c = await corpus();
+const cur = c.curricula['ib-dp-bm'];
+const rooms = (await modulesInOrder()).filter((m) => m.data.href);
+/** The room a page belongs to: the room whose address is the longest prefix of the page's. */
+const roomOf = (page: string) =>
+  rooms
+    .filter((r) => r.data.href && (page.startsWith(r.data.href) || (r.id === 'business-brief' && page.startsWith('/topics/'))))
+    .sort((a, b) => (b.data.href?.length ?? 0) - (a.data.href?.length ?? 0))[0];
+
+const units = (cur?.units ?? []).map((u) => ({
+  u,
+  tiles: u.subtopics.map((s) => {
+    const ixs = Object.entries(c.interactives).filter(([, it]) => it.syllabus.includes(s.code) && it.page);
+    const calcs = Object.entries(c.calculations).filter(([, k]) => k.syllabus.some((x) => x.code === s.code));
+    const questions = Object.values(c.questions).filter((q) => q.syllabus.includes(s.code)).length;
+    const pages = [...ixs.map(([, it]) => it.page as string), ...calcs.map(([, k]) => k.page)];
+    const servedBy = new Map<string, { id: string; name: string }>();
+    if (s.topic) servedBy.set('business-brief', { id: 'business-brief', name: 'The Business Brief' });
+    pages.forEach((p) => {
+      const r = roomOf(p);
+      if (r) servedBy.set(r.id, { id: r.id, name: r.data.name });
+    });
+    rooms.forEach((r) => {
+      if (r.data.syllabus.includes(s.code)) servedBy.set(r.id, { id: r.id, name: r.data.name });
+    });
+    const state = s.topic ? 'brief' : ixs.length || calcs.length ? 'tools' : 'planned';
+    const link = s.topic ? href.topic(s.topic) : ixs[0] ? `${ixs[0][1].page}#ix-${ixs[0][0]}` : calcs[0] ? href.calculation(calcs[0][0], calcs[0][1].page) : `/ib/#st-${s.code.replace('.', '-')}`;
+    return { s, ixs: ixs.length, calcs: calcs.length, questions, rooms: [...servedBy.values()], state, link };
+  }),
+}));
+const all = units.flatMap((x) => x.tiles);
+const count = (st: string) => all.filter((t) => t.state === st).length;
+---
+
+<BaseLayout title="Course map" description="Every subtopic of IB DP Business Management at a glance: what the platform has for each, and the rooms that serve it." section="pathways">
+  <PageIntro
+    trail={[{ label: 'IB course', href: '/ib/' }, { label: 'Course map' }]}
+    kicker="IB Diploma Programme"
+    title="The course at a glance"
+    lead={`All ${all.length} subtopics in their five units. ${count('brief')} have a complete brief, ${count('tools')} more have working tools or worked calculations, and ${count('planned')} are planned. Each tile shows the rooms that serve it.`}
+  />
+  <div class="wrap page-body">
+    <ul class="map-key" aria-label="Key">
+      <li><span class="map-swatch map-swatch--brief" aria-hidden="true"></span> Complete brief</li>
+      <li><span class="map-swatch map-swatch--tools" aria-hidden="true"></span> Working tools or calculations</li>
+      <li><span class="map-swatch map-swatch--planned" aria-hidden="true"></span> Planned</li>
+      <li><span class="tag tag--hl">HL</span> HL only, or with HL-only content</li>
+    </ul>
+    <div class="map" data-reveal="group">
+      {
+        units.map(({ u, tiles }) => (
+          <section class="map-unit" aria-labelledby={`map-u${u.number}`}>
+            <h2 class="map-unit__head" id={`map-u${u.number}`}>
+              <span class="num">Unit {u.number}</span> {u.title}
+            </h2>
+            <ol class="map-tiles" role="list">
+              {tiles.map((t) => (
+                <li class:list={['map-tile', `map-tile--${t.state}`]}>
+                  <a class="map-tile__link" href={t.link}>
+                    <span class="map-tile__code num">{t.s.code}</span>
+                    <span class="map-tile__title">{t.s.title}</span>
+                    <span class="sr-only">
+                      {t.state === 'brief' ? 'Complete brief.' : t.state === 'tools' ? 'Working tools.' : 'Planned.'}
+                    </span>
+                  </a>
+                  <span class="map-tile__meta">
+                    {t.s.level !== 'SL/HL' && <span class="tag tag--hl">HL</span>}
+                    {t.ixs > 0 && (
+                      <span class="small">
+                        {t.ixs} {t.ixs === 1 ? 'interaction' : 'interactions'}
+                      </span>
+                    )}
+                    {t.calcs > 0 && (
+                      <span class="small">
+                        {t.calcs} {t.calcs === 1 ? 'calculation' : 'calculations'}
+                      </span>
+                    )}
+                    {t.questions > 0 && <span class="small">{t.questions} practice</span>}
+                  </span>
+                  {t.rooms.length > 0 && (
+                    <span class="map-tile__rooms">
+                      <span class="sr-only">Served by {t.rooms.map((r) => r.name).join(', ')}.</span>
+                      {t.rooms.map((r) => (
+                        <span class="map-tile__room" title={r.name}>
+                          {isIcon(r.id) && <Icon id={r.id} size={16} />}
+                        </span>
+                      ))}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ol>
+          </section>
+        ))
+      }
+    </div>
+    <p class="small muted">
+      Generated from the content: a tile is filled only when a brief, an interaction or a worked calculation for that subtopic exists. The table version, with every
+      link, is the <a href="/ib/coverage/">coverage page</a>; the content statements are on the <a href="/ib/">course page</a>.
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .map-key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-5);
+    margin: 0 0 var(--sp-5);
+    padding: 0;
+    list-style: none;
+    font-size: var(--fs-small);
+  }
+
+  .map-key li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin: 0;
+  }
+
+  .map-swatch {
+    display: inline-block;
+    width: 1.25rem;
+    height: 1rem;
+    border: 1px solid var(--bb-ink);
+  }
+
+  .map-swatch--brief {
+    background: var(--bb-ink);
+  }
+
+  .map-swatch--tools {
+    background: #fff;
+    border-color: var(--bb-cobalt);
+    box-shadow: inset 4px 0 0 var(--bb-cobalt);
+  }
+
+  .map-swatch--planned {
+    border-style: dashed;
+    border-color: var(--rule-control);
+  }
+
+  .map {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: var(--sp-4);
+    margin-bottom: var(--sp-5);
+  }
+
+  .map-unit {
+    margin: 0;
+  }
+
+  .map-unit__head {
+    margin: 0 0 var(--sp-3);
+    padding-top: var(--sp-2);
+    border-top: 2px solid var(--rule-ink);
+    font-size: 1rem;
+    line-height: 1.3;
+  }
+
+  .map-unit__head .num {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .map-tiles {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .map-tiles > li {
+    margin: 0;
+  }
+
+  .map-tile {
+    position: relative;
+    display: grid;
+    gap: var(--sp-1);
+    padding: var(--sp-2) var(--sp-3);
+    border: 1px solid var(--rule);
+    background: #fff;
+  }
+
+  .map-tile__link {
+    display: grid;
+    grid-template-columns: 2.4rem minmax(0, 1fr);
+    gap: var(--sp-2);
+    color: var(--text-strong);
+    text-decoration: none;
+  }
+
+  .map-tile__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .map-tile:focus-within {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .map-tile__link:focus-visible {
+    outline: none;
+  }
+
+  .map-tile__code {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  .map-tile__title {
+    font-size: 0.875rem;
+    font-weight: 560;
+    line-height: 1.3;
+  }
+
+  .map-tile__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.15rem var(--sp-2);
+    padding-left: 2.9rem;
+    color: var(--text-muted);
+  }
+
+  .map-tile__meta:empty {
+    display: none;
+  }
+
+  .map-tile__rooms {
+    display: flex;
+    gap: 0.25rem;
+    padding-left: 2.9rem;
+  }
+
+  .map-tile__room {
+    display: inline-grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1px solid var(--rule);
+    color: var(--text-strong);
+  }
+
+  .map-tile--brief {
+    border-color: var(--bb-ink);
+    background: var(--bb-ink);
+  }
+
+  .map-tile--brief .map-tile__link,
+  .map-tile--brief .map-tile__meta {
+    color: var(--text-on-ink);
+  }
+
+  .map-tile--brief .map-tile__room {
+    border-color: var(--text-on-ink-muted);
+    color: var(--text-on-ink);
+  }
+
+  .map-tile--brief .tag--hl {
+    border-color: var(--bb-brass);
+  }
+
+  .map-tile--tools {
+    border-color: var(--bb-cobalt);
+    box-shadow: inset 4px 0 0 var(--bb-cobalt);
+  }
+
+  .map-tile--planned {
+    border-style: dashed;
+    background: transparent;
+  }
+
+  .map-tile--planned .map-tile__link {
+    color: var(--text-muted);
+  }
+
+  .map-tile:hover {
+    border-color: var(--bb-cobalt);
+  }
+
+  .map-tile--brief:hover {
+    border-color: var(--bb-brass);
+  }
+</style>

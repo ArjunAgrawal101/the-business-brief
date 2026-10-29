@@ -20,10 +20,12 @@ const rows = (cur?.units ?? []).flatMap((u) =>
     const calcs = Object.entries(c.calculations).filter(([, k]) => k.syllabus.some((x) => x.code === s.code));
     const questions = Object.entries(c.questions).filter(([, q]) => q.syllabus.includes(s.code));
     const tools = s.tools.map((t) => ({ id: t, data: c.tools[t] }));
-    return { u, s, topic, cases, decisions, calcs, questions, tools };
+    const ixs = Object.entries(c.interactives).filter(([, it]) => it.syllabus.includes(s.code) && it.page);
+    return { u, s, topic, cases, decisions, calcs, questions, tools, ixs };
   }),
 );
 const covered = rows.filter((r) => r.topic).length;
+const withTools = rows.filter((r) => r.topic || r.ixs.length || r.calcs.length).length;
 ---
 
 <BaseLayout title="Syllabus coverage" description="What the platform has for each subtopic of IB DP Business Management, including the gaps." section="pathways">
@@ -31,7 +33,7 @@ const covered = rows.filter((r) => r.topic).length;
     trail={[{ label: 'IB course', href: '/ib/' }, { label: 'Coverage' }]}
     kicker="IB Diploma Programme"
     title="Syllabus coverage"
-    lead={`${covered} of ${rows.length} subtopics have a complete brief in this release. This table is generated from the content itself, so a subtopic shows coverage only when the material exists.`}
+    lead={`${covered} of ${rows.length} subtopics have a complete brief, and ${withTools} have a brief, an interaction or a worked calculation. This table is generated from the content itself, so a subtopic shows coverage only when the material exists.`}
   />
   <div class="wrap page-body">
     <div class="table-scroll" role="region" aria-label="Coverage by subtopic" tabindex="0">
@@ -41,6 +43,7 @@ const covered = rows.filter((r) => r.topic).length;
             <th scope="col">Subtopic</th>
             <th scope="col">Level and status</th>
             <th scope="col">Brief</th>
+            <th scope="col">Interactions</th>
             <th scope="col">Cases and decisions</th>
             <th scope="col">Calculations</th>
             <th scope="col" class="n">Practice</th>
@@ -60,6 +63,19 @@ const covered = rows.filter((r) => r.topic).length;
                   </span>
                 </td>
                 <td>{r.topic && r.s.topic ? <a href={href.topic(r.s.topic)}>Complete</a> : <span class="muted">Planned</span>}</td>
+                <td>
+                  {r.ixs.length ? (
+                    <ul class="plain-list">
+                      {r.ixs.map(([id, it]) => (
+                        <li>
+                          <a href={`${it.page}#ix-${id}`}>{it.title}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <span class="muted">None yet</span>
+                  )}
+                </td>
                 <td>
                   {r.cases.length || r.decisions.length ? (
                     <ul class="plain-list">
@@ -99,12 +115,13 @@ const covered = rows.filter((r) => r.topic).length;
       </table>
     </div>
     <aside class="callout callout--note">
-      <span class="callout__kicker">Why so few briefs</span>
+      <span class="callout__kicker">Why so few complete briefs</span>
       <div class="prose">
         <p>
-          The first release builds three subtopics completely (a strategic one, a quantitative one and a people one) rather than all of
-          them thinly. Each brief has a case, interactions, a Decision Room or workspace, practice questions and a revision page.
-          The same structure will be used for the rest.
+          The platform builds a few subtopics completely rather than all of them thinly: each complete brief has a case, interactions, a
+          Decision Room or workspace, practice questions and a revision page. Between the briefs, the rooms add working tools for subtopics
+          that do not have a brief yet, such as cash flow, ratios, investment appraisal, market share and stock control. The same structure
+          will be used for the rest.
         </p>
       </div>
     </aside>

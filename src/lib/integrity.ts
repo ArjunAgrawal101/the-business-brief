@@ -281,6 +281,14 @@ export function checkIntegrity(c: Corpus): Problem[] {
   }
   problems.push(...checkStudioInteractives(c.interactives));
 
+  /* Interactions name real subtopics */
+  const codes = new Set(Object.values(c.curricula).flatMap((cu) => cu.units.flatMap((u) => u.subtopics.map((st) => st.code))));
+  for (const [id, it] of Object.entries(c.interactives)) {
+    it.syllabus.forEach((code) => {
+      if (!codes.has(code)) problems.push({ where: `interactives/${id}`, message: `subtopic ${code} is not in the curriculum` });
+    });
+  }
+
   /* Case labs: evidence from the case, answers among the options, a plan without loops */
   for (const [id, it] of Object.entries(c.interactives)) {
     if (it.component !== 'case-lab') continue;

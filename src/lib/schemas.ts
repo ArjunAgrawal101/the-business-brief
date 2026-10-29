@@ -722,6 +722,10 @@ const interactiveBase = {
   /** What the learner must understand, decide and learn from it (shown to teachers; documented in docs/INTERACTIONS.md). */
   purpose: z.string(),
   provenance,
+  /** IB subtopics the interaction serves, for the coverage map. */
+  syllabus: z.array(z.string()).default([]),
+  /** The page where the interaction lives; its anchor is #ix-<id>. */
+  page: z.string().regex(/^\/.*\/$/).optional(),
 };
 
 export const ANSOFF = ['market-penetration', 'product-development', 'market-development', 'diversification'] as const;

@@ -16,8 +16,6 @@ const modules = await modulesInOrder();
 const pathways = await pathwaysInOrder();
 const memo = c.decisions['marigold-growth'];
 const memoCase = memo ? c.cases[memo.case] : undefined;
-const cur = c.curricula['ib-dp-bm'];
-const subtopics = cur?.units.reduce((n, u) => n + u.subtopics.length, 0) ?? 0;
 const METHODS = [
   {
     letter: 'A',
@@ -38,10 +36,19 @@ const METHODS = [
     name: 'Diagnose',
     steps: ['Problem', 'Cause', 'Strategy', 'Implementation', 'Evaluation'],
     text: 'Find the cause before choosing the cure, then say how you would know it worked.',
-    where: { label: 'In every topic brief', href: '/topics/' },
+    where: { label: 'In the Case Room lab', href: '/case-room/halden-diagnosis/' },
   },
 ];
 const liveRooms = modules.filter((m) => m.data.status !== 'planned').length;
+/** Working experiences, each a link to a page that exists (the link check fails the build otherwise). */
+const WORKBENCH = [
+  { room: 'case-room', title: 'Diagnose before you decide', text: 'A staged case lab: problem, cause, strategy, a plan against the deadline, and a judgement on the results.', href: '/case-room/halden-diagnosis/' },
+  { room: 'finance-desk', title: 'Will the cash last the winter?', text: 'A cash flow forecast in the IB layout, and five ways to pay for a kiln.', href: '/finance-desk/cash-flow/' },
+  { room: 'finance-desk', title: 'Ratio analysis', text: "Two years of accounts, the guide's ratios, and strategies that move them.", href: '/finance-desk/ratios/' },
+  { room: 'finance-desk', title: 'Investment appraisal', text: "Payback, ARR and, at HL, NPV with the guide's discount factors.", href: '/finance-desk/investment-appraisal/' },
+  { room: 'market-studio', title: 'Market share and position maps', text: 'A growing market where more sales can mean a smaller share.', href: '/market-studio/' },
+  { room: 'operations-floor', title: 'Capacity, stock and location', text: 'Stock control charts and capacity at HL; weighted location scoring for all.', href: '/operations-floor/' },
+];
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -136,9 +143,31 @@ const jsonLd = {
     </div>
   </section>
 
+  <section class="band" aria-labelledby="bench-h">
+    <div class="wrap">
+      <SectionHead no="02" title="Work on something real" id="bench-h" dek="Labs and workspaces where you change the plan and the numbers answer back. Every business in them is fictional; every figure is checked." />
+      <ul class="bench" role="list" data-reveal="group">
+        {
+          WORKBENCH.map((w) => (
+            <li class="bench__item lift">
+              <span class="bench__icon" aria-hidden="true">{isIcon(w.room) && <Icon id={w.room} size={22} />}</span>
+              <h3 class="bench__title">
+                <a href={w.href}>{w.title}</a>
+              </h3>
+              <p class="bench__text">{w.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="small" style="margin-top:var(--sp-4)">
+        <a href="/ib/map/">See the whole course on one map</a>, with what exists for every subtopic.
+      </p>
+    </div>
+  </section>
+
   <section class="band" aria-labelledby="briefs-h">
     <div class="wrap">
-      <SectionHead no="02" title="Three complete briefs" id="briefs-h" dek={`A strategic topic, a quantitative one and a people one, each with a case, interactions, practice and a revision page. ${subtopics - topics.length} more subtopics are mapped and planned.`} />
+      <SectionHead no="03" title="Three complete briefs" id="briefs-h" dek="A strategic topic, a quantitative one and a people one, each with a case, interactions, a Decision Room, practice and a revision page." />
       <div class="feature-briefs" data-reveal="group">
         {
           topics.map(([id, t]) => {
@@ -164,7 +193,7 @@ const jsonLd = {
 
   <section class="band band--sunk" aria-labelledby="modules-h">
     <div class="wrap">
-      <SectionHead no="03" title="Fourteen rooms, one platform" id="modules-h" dek={`${liveRooms} of the fourteen rooms have working material now. A room is linked only when something in it works; the rest say what is planned.`} />
+      <SectionHead no="04" title="Fourteen rooms, one platform" id="modules-h" dek={`${liveRooms} of the fourteen rooms have working material now. A room is linked only when something in it works; the rest say what is planned.`} />
       <ul class="rooms" role="list" data-reveal="group">
         {
           modules.map((m) => (
@@ -182,7 +211,7 @@ const jsonLd = {
 
   <section class="band" aria-labelledby="paths-h">
     <div class="wrap">
-      <SectionHead no="04" title="Who it is for" id="paths-h" dek="One foundation, with a way in for each kind of learner." />
+      <SectionHead no="05" title="Who it is for" id="paths-h" dek="One foundation, with a way in for each kind of learner." />
       <ul class="pathway-strip" data-reveal="group">
         {
           pathways.map((p) => (
@@ -201,7 +230,7 @@ const jsonLd = {
 
   <section class="band band--sunk" aria-labelledby="honest-h">
     <div class="wrap">
-      <SectionHead no="05" title="How far to trust it" id="honest-h" />
+      <SectionHead no="06" title="How far to trust it" id="honest-h" />
       <div class="honesty" data-reveal="group">
         <div>
           <h3>Every claim is sourced</h3>

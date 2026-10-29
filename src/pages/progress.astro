@@ -1,0 +1,135 @@
+---
+/**
+ * Progress on this device. Reads what the platform's own interactions already
+ * keep in this browser's local storage and summarizes it: nothing new is
+ * collected, nothing is sent anywhere, and the page says what it cannot count.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageIntro from '../components/layout/PageIntro.astro';
+import SectionHead from '../components/layout/SectionHead.astro';
+import { corpus, decisionsInOrder, href, questionsInOrder, topicsInOrder } from '../lib/content';
+import { jsonForScript } from '../lib/markup';
+
+const c = await corpus();
+const topics = await topicsInOrder();
+const questions = await questionsInOrder();
+const decisions = await decisionsInOrder();
+/** Interactions that keep something between visits, and the storage keys they use. */
+const tracked = Object.entries(c.interactives)
+  .filter(([, it]) => it.page)
+  .map(([id, it]) => {
+    const uid = `ix-${id}`;
+    const quizLike = ['cost-classifier', 'error-diagnosis', 'ansoff-placer', 'style-matcher', 'functions-sorter'].includes(it.component);
+    const keys =
+      it.component === 'case-lab'
+        ? [`case-lab:${uid}`]
+        : it.component === 'cash-flow-lab'
+          ? [`cash-flow:${uid}`, `quiz:${uid}-q`]
+          : it.component === 'force-field-builder'
+            ? [`ff:${uid}`]
+            : ['position-map', 'location-scoring', 'market-share-workspace'].includes(it.component)
+              ? [`studio:${uid}`, `studio:${uid}:note`]
+              : quizLike
+                ? [`quiz:${uid}`]
+                : [];
+    return { id, uid, title: it.title, href: `${it.page}#${uid}`, keys, stages: it.component === 'case-lab' ? it.stages.length : 0 };
+  });
+const config = {
+  questions: questions.map(([id, q]) => ({ id, title: q.title, href: href.question(id), paper: q.paperStyle })),
+  decisions: decisions.map(([id, d]) => ({ id, title: d.title, href: href.decision(id), rounds: d.rounds.map((r) => r.id) })),
+  topics: topics.map(([id, t]) => ({ id, title: t.title, href: href.topic(id), cards: t.revision.retrieval.length })),
+  interactions: tracked.filter((t) => t.keys.length),
+  untracked: tracked.filter((t) => !t.keys.length).length,
+  ia: { href: '/ia-studio/', steps: 10 },
+};
+---
+
+<BaseLayout title="Your progress" description="What you have done on The Business Brief, read from this browser only. Nothing is sent anywhere." section="platform">
+  <PageIntro
+    trail={[{ label: 'Your progress' }]}
+    kicker="On this device"
+    title="Your progress"
+    lead="A summary of what you have done here, read from this browser's own storage. Nothing is sent anywhere, there is no account, and another device or browser starts fresh."
+  />
+  <div class="wrap page-body" data-ix="progress">
+    <script type="application/json" data-config set:html={jsonForScript(config)} />
+    <p class="nojs-only state">This page needs JavaScript to read what this browser has kept. Nothing is kept anywhere else.</p>
+    <p class="state js-only" data-empty hidden>
+      Nothing yet. Answer a practice question, make a decision in a Decision Room or work through a case lab, and it will appear here.
+      <a href="/rooms/">Choose a room</a>.
+    </p>
+    <section class="js-only" aria-labelledby="pr-sum-h">
+      <SectionHead no={1} title="So far" id="pr-sum-h" />
+      <dl class="figs pr-figs" data-summary></dl>
+    </section>
+    <section class="js-only" aria-labelledby="pr-list-h">
+      <SectionHead no={2} title="Where you are" dek="Started and finished work, with a link back to each." id="pr-list-h" />
+      <div class="pr-groups" data-groups></div>
+    </section>
+    <section aria-labelledby="pr-about-h">
+      <SectionHead no={3} title="What this page can and cannot count" id="pr-about-h" />
+      <ul class="prose">
+        <li>It counts what the platform already keeps so that your work is there when you return: answers, self-checks, choices, notes and stages.</li>
+        <li>{config.untracked} workspaces, such as the break-even and ratio desks, keep nothing between visits, so they are not counted here.</li>
+        <li>A self-assessed mark is your own judgement against the platform's mark scheme, not a grade.</li>
+        <li>To remove everything, use the button on the <a href="/privacy/">privacy page</a>. Private browsing keeps nothing after you close the window.</li>
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../scripts/progress';
+</script>
+
+<style>
+  .pr-figs {
+    margin-top: var(--sp-4);
+  }
+
+  .pr-groups {
+    display: grid;
+    gap: var(--sp-5);
+    margin-top: var(--sp-4);
+  }
+
+  .pr-groups :global(.pr-group h3) {
+    margin: 0 0 var(--sp-2);
+    font-size: var(--fs-h4);
+  }
+
+  .pr-groups :global(.pr-list) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-ink);
+  }
+
+  .pr-groups :global(.pr-list li) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-1) var(--sp-4);
+    margin: 0;
+    padding: var(--sp-2) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .pr-groups :global(.pr-list a) {
+    min-height: 24px;
+    font-weight: 560;
+  }
+
+  .pr-groups :global(.pr-state) {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .pr-groups :global(.pr-state--done) {
+    color: var(--green-text);
+  }
+</style>
