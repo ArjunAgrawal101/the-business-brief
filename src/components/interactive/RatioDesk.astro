@@ -1,0 +1,478 @@
+---
+/**
+ * Finance Desk: the ratio desk (3.5, and 3.6 at HL). Two years of accounts in
+ * the guide's layout, every ratio for both years, a panel per ratio with the
+ * learner's own answer checked against the eight-part working, and strategies
+ * applied to the second year's accounts. The default state is rendered here
+ * from src/lib/ratios.ts; the script recalculates the same figures.
+ */
+import LevelTag from '../ui/LevelTag.astro';
+import { buildWorking } from '../../lib/finance';
+import { esc, inline, jsonForScript, rich } from '../../lib/markup';
+import { GROUP_NAMES, RATIOS, RATIO_IDS, ratioInputs, type RatioGroup, type Statement } from '../../lib/ratios';
+import { ratioChangeText, ratioFiguresHtml, statementsHtml, summaryRowsHtml, type DeskYears } from '../../lib/ratio-view';
+import { workingHtml } from '../../lib/render';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'ratio-desk' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const [s1, s2] = data.statements as [Statement, Statement];
+const [y1, y2] = data.years as [{ label: string; short: string }, { label: string; short: string }];
+const period = `${data.yearEnd} ${y1.short} and ${y2.short}`;
+const years: DeskYears = { labels: [y1.short, y2.short], statements: [s1, s2], openingStock: [data.openingStock, s1.stock] };
+const GROUPS: RatioGroup[] = ['profitability', 'liquidity', 'efficiency'];
+const SUFFIX = { percent: '%', ratio: '', times: 'times', days: 'days' } as const;
+const working = (id: (typeof RATIO_IDS)[number], s: Statement, opening: number, interp: string, impl: string) =>
+  workingHtml(buildWorking(id, ratioInputs(id, s, opening), data.unit), interp, impl);
+const config = {
+  uid,
+  unit: data.unit,
+  entity: data.entity,
+  period,
+  years: data.years,
+  openingStock: data.openingStock,
+  statements: data.statements,
+  readings: data.readings,
+  strategies: data.strategies,
+};
+---
+
+<div class="rd" data-ix="ratio-desk" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The desk could not start. The accounts, the ratios and the workings below are complete without it.</p>
+
+  <section class="rd__block" aria-labelledby={`${uid}-acc`}>
+    <h4 class="label label--ink" id={`${uid}-acc`}>The accounts</h4>
+    <div data-statements set:html={statementsHtml(data.entity, data.unit, period, { heads: [y1.short, y2.short], statements: [s1, s2] })} />
+    <ol class="rd__notes small">
+      {data.notes.map((n) => <li set:html={inline(n)} />)}
+    </ol>
+  </section>
+
+  <fieldset class="rd__strategies js-only">
+    <legend class="label label--ink">Try a strategy on the {y2.short} accounts</legend>
+    <div class="cluster">
+      {
+        data.strategies.map((s) => (
+          <button type="button" class="btn btn--small" data-strategy={s.id} aria-pressed="false" data-level={s.level === 'HL' ? 'HL' : undefined}>
+            {s.label}
+            {s.level === 'HL' && <span class="tag tag--hl">HL</span>}
+          </button>
+        ))
+      }
+      <button type="button" class="btn btn--small btn--ink" data-reset>Back to the accounts as published</button>
+    </div>
+    <p class="small muted" data-strategy-note>
+      Each strategy changes the {y2.short} accounts as if it had happened during the year. The statements, the ratios and the readings update; changed figures
+      are marked.
+    </p>
+  </fieldset>
+
+  <section class="rd__block" aria-labelledby={`${uid}-sum`}>
+    <h4 class="label label--ink" id={`${uid}-sum`}>The ratios, both years</h4>
+    <div class="table-scroll" role="region" aria-label="The ratios for both years" tabindex="0">
+      <table class="table rd-summary">
+        <caption class="sr-only">Each ratio in {y1.short} and {y2.short}, the change, and whether it is better or worse</caption>
+        <thead>
+          <tr>
+            <th scope="col">Ratio</th>
+            <th scope="col" class="n">{y1.short}</th>
+            <th scope="col" class="n">{y2.short}</th>
+            <th scope="col" class="n">Change</th>
+            <th scope="col">Other things equal</th>
+            <th scope="col" class="n rd-whatif" data-whatif-head hidden>{y2.short} with the strategy</th>
+          </tr>
+        </thead>
+        <tbody data-summary set:html={summaryRowsHtml(years)} />
+      </table>
+    </div>
+    <p class="small muted">
+      To two decimal places. "Other things equal" is only a first reading: whether a change is good depends on why it happened, which is what the panels
+      below ask.
+    </p>
+  </section>
+
+  <fieldset class="rd__pick js-only">
+    <legend class="label label--ink">Work on one ratio</legend>
+    <div class="rd__pick-groups">
+      {
+        GROUPS.map((g) => (
+          <div class="rd__pick-group" data-level={g === 'efficiency' ? 'HL' : undefined}>
+            <p class="rd__pick-head">{GROUP_NAMES[g]}</p>
+            {RATIO_IDS.filter((id) => RATIOS[id].group === g).map((id, k) => (
+              <label class="rd__pick-opt">
+                <input type="radio" name={`${uid}-ratio`} value={id} checked={g === 'profitability' && k === 0} />
+                <span>{RATIOS[id].name}</span>
+              </label>
+            ))}
+          </div>
+        ))
+      }
+    </div>
+  </fieldset>
+
+  <div class="rd__panels">
+    {
+      RATIO_IDS.map((id) => {
+        const def = RATIOS[id];
+        const r = data.readings[id];
+        const change = ratioChangeText(id, years);
+        const interp = `${esc(change)} ${inline(r.why)}`;
+        const impl = inline(r.matters);
+        return (
+          <section class="rd__panel" data-panel={id} data-level={def.level === 'HL' ? 'HL' : undefined} aria-labelledby={`${uid}-${id}-h`}>
+            <header class="rd__panel-head">
+              <h4 class="rd__panel-title" id={`${uid}-${id}-h`}>
+                {def.name}
+              </h4>
+              <div class="tags">
+                <LevelTag level={def.level} always />
+                <span class="tag tag--plain">IB {def.level === 'HL' ? '3.6' : '3.5'}</span>
+              </div>
+            </header>
+            <p class="rd__formula">{def.formula}</p>
+            <p class="small muted">{def.measures}</p>
+            <div class="rd__try js-only">
+              <label for={`${uid}-${id}-try`}>Work out the {y2.short} figure yourself first</label>
+              <div class="rd__try-row">
+                <div class="affix">
+                  <input class="input input--num" id={`${uid}-${id}-try`} type="text" inputmode="decimal" autocomplete="off" data-try={id} aria-describedby={`${uid}-${id}-fb`} />
+                  {SUFFIX[def.kind] && (
+                    <span class="affix__post" aria-hidden="true">
+                      {SUFFIX[def.kind]}
+                    </span>
+                  )}
+                </div>
+                <button type="button" class="btn btn--small" data-check={id}>
+                  Check my answer
+                </button>
+              </div>
+              <p class="rd__fb" id={`${uid}-${id}-fb`} data-feedback={id} aria-live="polite" />
+            </div>
+            <dl class="figs" data-figs={id} set:html={ratioFiguresHtml(id, years)} />
+            <div class="bew__reading">
+              <p>
+                <strong>Reading.</strong> <span data-change={id}>{change}</span> <span set:html={inline(r.why)} />
+              </p>
+              <p class="muted">
+                <strong>Why it matters.</strong> <span set:html={inline(r.matters)} />
+              </p>
+            </div>
+            <details class="disclosure">
+              <summary>The working for {y2.short}</summary>
+              <div class="disclosure__body" data-working={id} set:html={working(id, s2, s1.stock, interp, impl)} />
+            </details>
+            <details class="disclosure">
+              <summary>The working for {y1.short}</summary>
+              <div class="disclosure__body" set:html={working(id, s1, data.openingStock, `${esc(ratioChangeText(id, years))}`, impl)} />
+            </details>
+          </section>
+        );
+      })
+    }
+  </div>
+
+  <section class="rd__block" aria-labelledby={`${uid}-think`}>
+    <h4 class="label label--ink" id={`${uid}-think`}>Strategies to improve the ratios: think it through</h4>
+    <div class="rd__prompts">
+      {
+        GROUPS.map((g) => (
+          <div data-level={g === 'efficiency' ? 'HL' : undefined}>
+            <p class="rd__pick-head">{GROUP_NAMES[g]}</p>
+            <ol class="numbered">
+              {data.prompts[g].map((p) => (
+                <li set:html={inline(p)} />
+              ))}
+            </ol>
+          </div>
+        ))
+      }
+    </div>
+    <p class="small muted" set:html={rich('These are questions for evaluation, not a mark scheme. A good answer names the strategy, says which ratio it moves and by how much, and weighs what it costs the business elsewhere.')} />
+  </section>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/ratio-desk';
+</script>
+
+<style>
+  .rd {
+    display: grid;
+    gap: var(--sp-6);
+  }
+
+  .rd__block {
+    display: grid;
+    gap: var(--sp-3);
+    min-width: 0;
+  }
+
+  .rd :global(.rd-statements) {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  @media (min-width: 64rem) {
+    .rd :global(.rd-statements) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+  }
+
+  .rd :global(.rd-table caption) {
+    padding-bottom: var(--sp-2);
+  }
+
+  .rd :global(.rd-table__title) {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  .rd :global(.rd-table__cap) {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  .rd :global(.rd-table td),
+  .rd :global(.rd-table th) {
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+  }
+
+  .rd :global(.rd-table tbody th) {
+    font-weight: 450;
+  }
+
+  .rd-summary {
+    min-width: 46rem;
+  }
+
+  .rd-summary :global(tbody th) {
+    min-width: 14rem;
+  }
+
+  .rd :global(.rd-table tr.is-sub th),
+  .rd :global(.rd-table tr.is-sub td) {
+    font-weight: 650;
+    color: var(--text-strong);
+    border-bottom-color: var(--rule);
+  }
+
+  .rd :global(.rd-table tr.is-strong th),
+  .rd :global(.rd-table tr.is-strong td) {
+    border-top: 1px solid var(--rule-ink);
+    border-bottom: 2px solid var(--rule-ink);
+  }
+
+  .rd :global(.rd-whatif) {
+    background: var(--surface-cobalt-wash);
+  }
+
+  .rd :global(td.is-changed) {
+    font-weight: 700;
+    color: var(--cobalt-text);
+    box-shadow: inset 3px 0 0 var(--bb-cobalt);
+  }
+
+  .rd__notes {
+    margin: 0;
+    padding-left: 1.2em;
+    color: var(--text-muted);
+    max-width: var(--text-max);
+  }
+
+  .rd__notes li + li {
+    margin-top: 0.25rem;
+  }
+
+  .rd__strategies,
+  .rd__pick {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .rd__strategies > legend,
+  .rd__pick > legend {
+    margin-bottom: var(--sp-3);
+    padding: 0;
+  }
+
+  .rd__strategies [aria-pressed="true"] {
+    background: var(--surface-cobalt-wash);
+    border-color: var(--bb-cobalt);
+    box-shadow: inset 0 0 0 1px var(--bb-cobalt);
+  }
+
+  .rd__strategies .tag {
+    margin-left: 0.25rem;
+  }
+
+  .rd__strategies p {
+    margin: var(--sp-2) 0 0;
+    max-width: var(--text-max);
+  }
+
+  .rd :global(.rd-verdict) {
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  .rd :global(.rd-verdict--better) {
+    color: var(--green-text);
+  }
+
+  .rd :global(.rd-verdict--worse) {
+    color: var(--signal-text);
+  }
+
+  .rd :global(.rd-verdict--judgement),
+  .rd :global(.rd-verdict--unchanged) {
+    color: var(--brass-text);
+  }
+
+  .rd__pick-groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: var(--sp-4);
+  }
+
+  .rd__pick-group {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-1);
+  }
+
+  .rd__pick-head {
+    margin: 0 0 var(--sp-1);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .rd__pick-opt {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-height: 2.25rem;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid var(--rule-hair);
+    background: #fff;
+    cursor: pointer;
+    font-size: 0.9375rem;
+  }
+
+  .rd__pick-opt:has(input:checked) {
+    border-color: var(--bb-cobalt);
+    background: var(--surface-cobalt-wash);
+    box-shadow: inset 0 0 0 1px var(--bb-cobalt);
+  }
+
+  .rd__pick-opt input {
+    accent-color: var(--bb-cobalt);
+  }
+
+  .rd__panels {
+    display: grid;
+    gap: var(--sp-6);
+  }
+
+  .rd__panel {
+    display: grid;
+    gap: var(--sp-4);
+    min-width: 0;
+    padding-top: var(--sp-4);
+    border-top: 3px solid var(--bb-ink);
+  }
+
+  .rd__panel[hidden] {
+    display: none;
+  }
+
+  .rd__panel-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-2) var(--sp-4);
+  }
+
+  .rd__panel-title {
+    margin: 0;
+    font-size: var(--fs-h4);
+  }
+
+  .rd__formula {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    color: var(--text-strong);
+  }
+
+  .rd__panel > p {
+    margin: 0;
+    max-width: var(--text-max);
+  }
+
+  .rd__try {
+    display: grid;
+    gap: var(--sp-2);
+    max-width: 32rem;
+  }
+
+  .rd__try label {
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .rd__try-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: var(--sp-2);
+  }
+
+  .rd__try-row .affix {
+    flex: 1 1 10rem;
+    max-width: 14rem;
+  }
+
+  .rd__fb {
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  .rd__fb:empty {
+    display: none;
+  }
+
+  .rd__fb[data-state="right"] {
+    color: var(--green-text);
+    font-weight: 600;
+  }
+
+  .rd__fb[data-state="wrong"] {
+    color: var(--signal-text);
+  }
+
+  .rd__prompts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: var(--sp-5);
+  }
+
+  .rd__prompts .numbered {
+    margin: 0;
+  }
+</style>

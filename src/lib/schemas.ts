@@ -10,6 +10,7 @@
  * This module imports nothing from `astro:content`, so tests can use it too.
  */
 import { z } from 'astro/zod';
+import { RATIO_IDS, STATEMENT_FIELDS } from './ratios';
 
 /* ------------------------------------------------------------------ */
 /* Shared vocabularies                                                 */
@@ -778,6 +779,27 @@ const labTask = z.discriminatedUnion('kind', [
 ]);
 export type LabTask = z.infer<typeof labTask>;
 
+/** The line items of one year's statement of profit or loss and statement of financial position. */
+const statementFigures = z.object({
+  salesRevenue: z.number().nonnegative(),
+  costOfSales: z.number().nonnegative(),
+  expenses: z.number().nonnegative(),
+  interest: z.number().nonnegative(),
+  tax: z.number().nonnegative(),
+  dividends: z.number().nonnegative(),
+  propertyPlantEquipment: z.number().nonnegative(),
+  accumulatedDepreciation: z.number().nonnegative(),
+  cash: z.number().nonnegative(),
+  debtors: z.number().nonnegative(),
+  stock: z.number().nonnegative(),
+  bankOverdraft: z.number().nonnegative(),
+  tradeCreditors: z.number().nonnegative(),
+  otherShortTermLoans: z.number().nonnegative(),
+  longTermBorrowings: z.number().nonnegative(),
+  shareCapital: z.number().nonnegative(),
+  retainedEarnings: z.number(),
+});
+
 export const interactiveSchema = z.discriminatedUnion('component', [
   z.object({
     component: z.literal('cost-classifier'),
@@ -1155,6 +1177,61 @@ export const interactiveSchema = z.discriminatedUnion('component', [
     factors: z.array(z.object({ id: z.string(), label: z.string(), weight: z.number().int().nonnegative(), hint: z.string().optional() })).min(3),
     sites: z.array(z.object({ id: z.string(), name: z.string(), summary: z.string(), scores: z.record(z.string(), z.number()) })).min(2),
     caution: md,
+  }),
+  z.object({
+    component: z.literal('ratio-desk'),
+    ...interactiveBase,
+    case: z.string(),
+    /** The company whose accounts these are. */
+    entity: z.string(),
+    /** The unit the statements are published in, for example "£000". */
+    unit: z.string(),
+    years: z.array(z.object({ label: z.string(), short: z.string() })).length(2),
+    /** The day and month the financial year ends, for example "30 June". */
+    yearEnd: z.string(),
+    /** Stock at the start of the first year, for its average stock. */
+    openingStock: z.number().nonnegative(),
+    statements: z.array(statementFigures).length(2),
+    notes: z.array(md).default([]),
+    /** Why each ratio moved in this case, and why that matters to the business. */
+    readings: z.record(z.enum(RATIO_IDS), z.object({ why: md, matters: md })),
+    /** What-ifs applied to the second year's accounts. Each must keep the statement of financial position balanced. */
+    strategies: z
+      .array(
+        z.object({
+          id: z.string(),
+          label: z.string(),
+          level,
+          note: md,
+          adjust: z.partialRecord(z.enum(STATEMENT_FIELDS), z.number()),
+        }),
+      )
+      .min(2),
+    prompts: z.object({ profitability: z.array(md).min(2), liquidity: z.array(md).min(2), efficiency: z.array(md).min(2) }),
+  }),
+  z.object({
+    component: z.literal('investment-appraisal'),
+    ...interactiveBase,
+    case: z.string(),
+    currency: z.string(),
+    /** The discount rate shown first: one of the rates in the guide's table. */
+    rate: z.union([z.literal(4), z.literal(6), z.literal(8), z.literal(10), z.literal(20)]).default(10),
+    context: md,
+    projects: z
+      .array(
+        z.object({
+          id: z.string(),
+          label: z.string(),
+          name: z.string(),
+          summary: md,
+          capitalCost: z.number().positive(),
+          returns: z.array(z.number()).min(1).max(10),
+        }),
+      )
+      .length(2),
+    /** What the three methods leave out, for the judgement. */
+    limits: z.array(md).min(2),
+    questions: z.array(z.string()).min(2),
   }),
 ]);
 export type Interactive = z.infer<typeof interactiveSchema>;

@@ -1,0 +1,382 @@
+---
+/**
+ * Finance Desk: the investment appraisal desk (3.8; NPV is HL only). Two
+ * projects appraised by payback, ARR and NPV with the guide's discount
+ * factors. The default state is rendered here from src/lib/investment.ts;
+ * the script recalculates the same figures, chart and workings.
+ */
+import { buildWorking } from '../../lib/finance';
+import { appraise, projectInputs, readAppraisals, RATES, type Project, type Rate } from '../../lib/investment';
+import { cashFlowRowsHtml, chartKeyHtml, cumulativeSvg, methodsRowsHtml, presentValueRowsHtml } from '../../lib/investment-view';
+import { esc, inline, jsonForScript, rich } from '../../lib/markup';
+import { workingHtml } from '../../lib/render';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'investment-appraisal' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const cur = data.currency;
+const rate = data.rate as Rate;
+const projects = data.projects.map((p) => ({ id: p.id, label: p.label, capitalCost: p.capitalCost, returns: p.returns })) as [Project, Project];
+const [a, b] = projects.map((p) => appraise(p, rate)) as [ReturnType<typeof appraise>, ReturnType<typeof appraise>];
+const reading = readAppraisals(a, b, rate, cur, true);
+const METHODS = [
+  { id: 'payback-period', title: 'Payback period', hl: false },
+  { id: 'average-rate-of-return', title: 'Average rate of return', hl: false },
+  { id: 'net-present-value', title: 'Net present value', hl: true },
+] as const;
+const methodReading = { 'payback-period': reading.payback, 'average-rate-of-return': reading.arr, 'net-present-value': reading.npv };
+const workingFor = (method: (typeof METHODS)[number]['id'], p: Project) =>
+  workingHtml(buildWorking(method, projectInputs(p, method === 'net-present-value' ? rate : undefined), cur), esc(methodReading[method]), esc(reading.agreement));
+const config = { uid, currency: cur, rate, projects };
+---
+
+<div class="iad" data-ix="investment" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The desk could not start. The figures below are for the estimates as given.</p>
+  <div class="prose iad__context" set:html={rich(data.context)} />
+
+  <div class="bew__grid">
+    <form class="bew__inputs" data-form novalidate aria-label="Investment appraisal inputs">
+      {
+        data.projects.map((p) => (
+          <fieldset class="iad__project">
+            <legend class="iad__legend">
+              <span class="iad__label">{p.label}</span> {p.name}
+            </legend>
+            <div class="small iad__summary" set:html={rich(p.summary)} />
+            <div class="field">
+              <label for={`${uid}-${p.id}-cost`}>Capital cost, paid in year 0</label>
+              <div class="affix">
+                <span class="affix__pre" aria-hidden="true">{cur}</span>
+                <input class="input input--num" id={`${uid}-${p.id}-cost`} name={`${p.id}-cost`} type="number" inputmode="decimal" step="1000" min="0" value={p.capitalCost} aria-describedby={`${uid}-${p.id}-cost-err`} />
+              </div>
+              <span class="field__error" id={`${uid}-${p.id}-cost-err`} data-err={`${p.id}-cost`} />
+            </div>
+            <p class="iad__returns-head">Net cash flow (returns) in each year</p>
+            <div class="iad__returns">
+              {p.returns.map((r, i) => (
+                <div class="field">
+                  <label for={`${uid}-${p.id}-r${i + 1}`}>
+                    <span class="sr-only">Net cash flow, </span>Year {i + 1}
+                  </label>
+                  <div class="affix">
+                    <span class="affix__pre" aria-hidden="true">{cur}</span>
+                    <input class="input input--num" id={`${uid}-${p.id}-r${i + 1}`} name={`${p.id}-r${i + 1}`} type="number" inputmode="decimal" step="1000" value={r} aria-describedby={`${uid}-${p.id}-r${i + 1}-err`} />
+                  </div>
+                  <span class="field__error" id={`${uid}-${p.id}-r${i + 1}-err`} data-err={`${p.id}-r${i + 1}`} />
+                </div>
+              ))}
+            </div>
+          </fieldset>
+        ))
+      }
+      <fieldset class="iad__rate" data-level="HL">
+        <legend class="label label--ink">Discount rate for NPV <span class="tag tag--hl">HL</span></legend>
+        <div class="cluster">
+          {
+            RATES.map((r) => (
+              <label class="iad__rate-opt">
+                <input type="radio" name="rate" value={r} checked={r === rate} />
+                <span>{r}%</span>
+              </label>
+            ))
+          }
+        </div>
+        <p class="small muted">Only the rates in the guide's discount table (p. 66), whose factors are used exactly as printed.</p>
+      </fieldset>
+      <p class="js-only"><button type="button" class="btn btn--small btn--ink" data-reset>Back to the estimates</button></p>
+    </form>
+
+    <div class="bew__results">
+      <h4 class="label label--ink">Results</h4>
+      <div class="table-scroll" role="region" aria-label="The three methods for both projects" tabindex="0">
+        <table class="table iad__methods">
+          <caption class="sr-only">Payback, average rate of return and net present value for each project, and which project each method prefers</caption>
+          <thead>
+            <tr>
+              <th scope="col">Method</th>
+              <th scope="col" class="n">{a.project.label}</th>
+              <th scope="col" class="n">{b.project.label}</th>
+              <th scope="col">Prefers</th>
+            </tr>
+          </thead>
+          <tbody data-methods set:html={methodsRowsHtml(a, b, rate, cur, reading.prefers)} />
+        </table>
+      </div>
+      <div class="bew__reading">
+        <p><strong>Payback.</strong> <span data-read="payback">{reading.payback}</span></p>
+        <p><strong>Average rate of return.</strong> <span data-read="arr">{reading.arr}</span></p>
+        <p data-level="HL"><strong>Net present value.</strong> <span data-read="npv">{reading.npv}</span></p>
+        <p class="muted"><strong>Taken together.</strong> <span data-read="agreement">{reading.agreement}</span></p>
+      </div>
+    </div>
+  </div>
+
+  <figure class="bew__chart">
+    <div class="chart-scroll iad__chart" role="region" aria-label="Cumulative net cash flow chart" tabindex="0" data-chart set:html={cumulativeSvg(a, b, { currency: cur, id: `${uid}-chart` })} />
+    <ul class="iad-key" data-key set:html={chartKeyHtml(a, b)} />
+    <figcaption class="exhibit__source">
+      <b>Chart</b> Cumulative net cash flow, from the capital cost in year 0. A project pays back where its line crosses zero. Simulated estimates; the chart is
+      redrawn from the inputs above.
+    </figcaption>
+    <details class="disclosure">
+      <summary>The chart's figures as a table</summary>
+      <div class="disclosure__body table-scroll" role="region" aria-label="Net and cumulative cash flow by year" tabindex="0">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col" rowspan="2">Year</th>
+              <th scope="colgroup" colspan="2">{a.project.label}</th>
+              <th scope="colgroup" colspan="2">{b.project.label}</th>
+            </tr>
+            <tr>
+              <th scope="col" class="n">Net cash flow</th>
+              <th scope="col" class="n">Cumulative</th>
+              <th scope="col" class="n">Net cash flow</th>
+              <th scope="col" class="n">Cumulative</th>
+            </tr>
+          </thead>
+          <tbody data-flows set:html={cashFlowRowsHtml(a, b, cur)} />
+        </table>
+      </div>
+    </details>
+  </figure>
+
+  <section class="iad__pv" data-level="HL" aria-labelledby={`${uid}-pv`}>
+    <h4 class="label label--ink" id={`${uid}-pv`}>Present values at <span data-rate-label>{rate}</span>% <span class="tag tag--hl">HL</span></h4>
+    <div class="table-scroll" role="region" aria-label="Discount factors and present values" tabindex="0">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Year</th>
+            <th scope="col" class="n">Discount factor</th>
+            <th scope="col" class="n">Present value, {a.project.label}</th>
+            <th scope="col" class="n">Present value, {b.project.label}</th>
+          </tr>
+        </thead>
+        <tbody data-pv set:html={presentValueRowsHtml(a, b, rate, cur)} />
+      </table>
+    </div>
+    <p class="small muted">Discount factors from the Business management guide, p. 66. The capital cost is paid now, in year 0, so it is not discounted.</p>
+  </section>
+
+  <section class="iad__workings" aria-labelledby={`${uid}-w`}>
+    <h4 class="label label--ink" id={`${uid}-w`}>The workings</h4>
+    {
+      METHODS.map((m) => (
+        <details class="disclosure" data-level={m.hl ? 'HL' : undefined}>
+          <summary>
+            <span>
+              {m.title}
+              {m.hl && <span class="tag tag--hl">HL</span>}
+            </span>
+          </summary>
+          <div class="disclosure__body iad__pair">
+            {projects.map((p) => (
+              <section aria-label={`${m.title}: ${p.label}`}>
+                <p class="iad__who">{p.label}</p>
+                <div data-working={`${m.id}:${p.id}`} set:html={workingFor(m.id, p)} />
+              </section>
+            ))}
+          </div>
+        </details>
+      ))
+    }
+  </section>
+
+  <div class="iad__think">
+    <h4 class="label label--ink">What the methods leave out</h4>
+    <ul class="prose">
+      {data.limits.map((l) => <li set:html={inline(l)} />)}
+    </ul>
+    <h4 class="label label--ink">Think it through</h4>
+    <ol class="numbered">
+      {data.questions.map((q) => <li>{q}</li>)}
+    </ol>
+  </div>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/investment';
+</script>
+
+<style>
+  .iad {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .iad__context {
+    max-width: var(--text-max);
+  }
+
+  .iad__project {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding: var(--sp-4);
+    border: 1px solid var(--rule-hair);
+    border-top: 3px solid var(--bb-ink);
+    background: #fff;
+    min-width: 0;
+  }
+
+  /* Floated so that the legend sits inside the box instead of on its border. */
+  .iad__legend {
+    float: left;
+    width: 100%;
+    padding: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  .iad__legend + * {
+    clear: both;
+  }
+
+  .iad__label {
+    display: inline-block;
+    margin-right: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--cobalt-text);
+  }
+
+  .iad__summary {
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  .iad__summary :global(p) {
+    margin: 0;
+  }
+
+  .iad__returns-head {
+    margin: 0;
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .iad__returns {
+    display: grid;
+    align-items: end;
+    grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    gap: var(--sp-3);
+  }
+
+  .iad__rate {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .iad__rate > legend {
+    margin-bottom: var(--sp-2);
+    padding: 0;
+  }
+
+  .iad__rate p {
+    margin: var(--sp-2) 0 0;
+  }
+
+  .iad__rate-opt {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2.25rem;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--rule-control);
+    background: #fff;
+    font-family: var(--font-mono);
+    cursor: pointer;
+  }
+
+  .iad__rate-opt:has(input:checked) {
+    border-color: var(--bb-cobalt);
+    background: var(--surface-cobalt-wash);
+    box-shadow: inset 0 0 0 1px var(--bb-cobalt);
+  }
+
+  .iad__rate-opt input {
+    accent-color: var(--bb-cobalt);
+  }
+
+  .iad__methods td,
+  .iad__methods th {
+    vertical-align: middle;
+  }
+
+  .iad__pv,
+  .iad__workings,
+  .iad__think {
+    display: grid;
+    gap: var(--sp-3);
+    min-width: 0;
+  }
+
+  .iad__pair {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  @media (min-width: 72rem) {
+    .iad__pair {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .iad__who {
+    margin: 0 0 var(--sp-2);
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  .iad__think .numbered,
+  .iad__think ul {
+    margin: 0;
+  }
+
+  .iad .tag--hl {
+    margin-left: 0.35rem;
+  }
+
+  .iad__chart :global(.chart) {
+    max-width: 46rem;
+    margin: 0 auto;
+  }
+
+  .iad-key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-5);
+    margin: var(--sp-3) 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.875rem;
+  }
+
+  .iad-key :global(li) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .iad-key :global(.iad-key__sw) {
+    display: inline-block;
+    width: 1.75rem;
+    height: 0;
+    border-top: 3px solid var(--bb-cobalt);
+  }
+
+  .iad-key :global(.iad-key__sw--b) {
+    border-top: 3px dashed var(--bb-ink);
+  }
+</style>

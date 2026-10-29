@@ -114,6 +114,20 @@ describe('the eight-part workings', () => {
       'expected-value': { cost: 10, p1: 0.6, x1: 95, p2: 0.4, x2: 30 },
       'net-cash-flow': { inflows: 13420, outflows: 29442.8 },
       'closing-balance': { opening: 10732, inflows: 13420, outflows: 29442.8 },
+      // Ratio analysis and investment appraisal: checked in full in ratios.test.ts and investment.test.ts.
+      'gross-profit-margin': { grossProfit: 1920, salesRevenue: 9600 },
+      'profit-margin': { pbit: 384, salesRevenue: 9600 },
+      roce: { pbit: 384, nonCurrentLiabilities: 1650, equity: 3360 },
+      'current-ratio': { currentAssets: 1727, currentLiabilities: 1307 },
+      'acid-test-ratio': { currentAssets: 1727, stock: 290, currentLiabilities: 1307 },
+      'stock-turnover-times': { costOfSales: 7680, openingStock: 230, closingStock: 290 },
+      'stock-turnover-days': { costOfSales: 7680, openingStock: 230, closingStock: 290 },
+      'debtor-days': { debtors: 1420, salesRevenue: 9600 },
+      'creditor-days': { creditors: 1157, costOfSales: 7680 },
+      'gearing-ratio': { nonCurrentLiabilities: 1650, equity: 3360 },
+      'payback-period': { cost: 240000, r1: 110000, r2: 100000, r3: 60000, r4: 30000 },
+      'average-rate-of-return': { cost: 240000, r1: 110000, r2: 100000, r3: 60000, r4: 30000 },
+      'net-present-value': { cost: 240000, rate: 10, r1: 110000, r2: 100000, r3: 60000, r4: 30000 },
     };
     expect(Object.keys(samples).sort()).toEqual(Object.keys(workings).sort());
     for (const [id, inputs] of Object.entries(samples)) {

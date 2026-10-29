@@ -13,6 +13,8 @@
  */
 import { expectedValueWorking } from './decision-tree';
 import { fmtMoney, fmtNumber, fmtPercent, round, roundUp, units } from './format';
+import { investmentWorkings } from './investment';
+import { ratioWorkings } from './ratios';
 
 /* ------------------------------------------------------------------ */
 /* Core arithmetic                                                     */
@@ -560,6 +562,10 @@ export const workings: Record<string, WorkingBuilder> = {
     }
     return expectedValueWorking({ id: 'option', label: 'The option', cost, outcomes }, s, '');
   },
+
+  /* Ratio analysis (3.5, 3.6) in src/lib/ratios.ts; investment appraisal (3.8) in src/lib/investment.ts. */
+  ...ratioWorkings,
+  ...investmentWorkings,
 };
 
 export function buildWorking(id: string, inputs: Inputs, currency: string, labels?: Labels): Working {

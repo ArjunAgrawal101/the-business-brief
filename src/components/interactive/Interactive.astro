@@ -23,6 +23,8 @@ import PositionMap from './PositionMap.astro';
 import CapacityProductivity from './CapacityProductivity.astro';
 import StockControl from './StockControl.astro';
 import LocationScoring from './LocationScoring.astro';
+import RatioDesk from './RatioDesk.astro';
+import InvestmentAppraisal from './InvestmentAppraisal.astro';
 import { corpus } from '../../lib/content';
 import { rich } from '../../lib/markup';
 import type { Interactive as InteractiveData, Level, Provenance } from '../../lib/schemas';
@@ -72,5 +74,7 @@ const H = headingLevel === 2 ? 'h2' : 'h3';
     {data.component === 'capacity-productivity' && <CapacityProductivity data={data} uid={uid} />}
     {data.component === 'stock-control' && <StockControl data={data} uid={uid} />}
     {data.component === 'location-scoring' && <LocationScoring data={data} uid={uid} />}
+    {data.component === 'ratio-desk' && <RatioDesk data={data} uid={uid} />}
+    {data.component === 'investment-appraisal' && <InvestmentAppraisal data={data} uid={uid} />}
   </div>
 </section>
