@@ -30,8 +30,8 @@ const c = loadCorpus();
 const desk = c.interactives['finance-ratios-halden'];
 if (desk?.component !== 'ratio-desk') throw new Error('ratio desk missing');
 const [s1, s2] = desk.statements as [Statement, Statement];
-const open1 = desk.openingStock; // stock at 1 September 2024: 210
-const open2 = s1.stock; // stock at 1 September 2025: 230
+const open1 = desk.openingStock; // stock at 1 July 2024: 210
+const open2 = s1.stock; // stock at 1 July 2025: 230
 const v1 = (id: RatioId) => ratioValue(id, s1, open1) as number;
 const v2 = (id: RatioId) => ratioValue(id, s2, open2) as number;
 
