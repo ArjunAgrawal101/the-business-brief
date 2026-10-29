@@ -1,0 +1,24 @@
+---
+/**
+ * An item's answer and explanation. Readers without JavaScript open it
+ * themselves; with JavaScript it stays hidden until the item is checked, then
+ * opens with the verdict in its summary.
+ */
+import { inline, rich } from '../../../lib/markup';
+
+interface Props {
+  answerLabel: string;
+  answer: string;
+  explanation: string;
+}
+const { answerLabel, answer, explanation } = Astro.props;
+---
+
+<details class="quiz__key feedback" data-key>
+  <summary><span class="feedback__verdict" data-verdict>Answer and explanation</span></summary>
+  <div class="quiz__keybody">
+    <p data-answer><strong>{answerLabel}</strong> <span set:html={inline(answer)} /></p>
+    <div class="prose" set:html={rich(explanation)} />
+    <slot />
+  </div>
+</details>

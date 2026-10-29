@@ -1,0 +1,11 @@
+---
+import { PROVENANCE_LABELS } from '../../lib/labels';
+import type { Provenance } from '../../lib/schemas';
+interface Props {
+  kind: Provenance;
+}
+const { kind } = Astro.props;
+const l = PROVENANCE_LABELS[kind];
+---
+
+<span class={`tag ${l.css}`}><span class="sr-only">Source: </span>{l.label}</span>

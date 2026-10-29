@@ -1,0 +1,183 @@
+---
+/**
+ * A case exhibit: numbered, titled, labelled for its evidence, with a source
+ * line. Tables keep numbers in the monospace face, right-aligned, and scroll
+ * inside a labelled region on narrow screens rather than overflowing the page.
+ */
+import ProvenanceTag from '../ui/ProvenanceTag.astro';
+import { formatCell } from '../../lib/cells';
+import { inline, rich } from '../../lib/markup';
+import type { Exhibit } from '../../lib/schemas';
+
+interface Props {
+  exhibit: Exhibit;
+  /** The case's title, when the exhibit is shown outside its case. */
+  caseTitle?: string;
+  caseHref?: string;
+  headingLevel?: 3 | 4;
+}
+const { exhibit: e, caseTitle, caseHref, headingLevel = 3 } = Astro.props;
+const no = e.id.replace(/^ex-/, '');
+const H = headingLevel === 3 ? 'h3' : 'h4';
+const titleId = `${caseTitle ? caseTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' : ''}${e.id}-title`;
+---
+
+<figure class="exhibit" id={caseTitle ? undefined : e.id} aria-labelledby={titleId}>
+  <div class="exhibit__head">
+    <span class="exhibit__no">Exhibit {no}</span>
+    <H class="exhibit__title" id={titleId}>{e.title}</H>
+    <ProvenanceTag kind={e.provenance} />
+    {caseTitle && caseHref && <a class="small" href={`${caseHref}#${e.id}`}>From the case file: {caseTitle}</a>}
+  </div>
+
+  {
+    e.kind === 'table' && e.columns && e.rows && (
+      <div class="table-scroll" role="region" aria-labelledby={titleId} tabindex="0">
+        <table class="table">
+          <thead>
+            <tr>
+              {e.columns.map((c) => (
+                <th scope="col" class={c.numeric ? 'n' : undefined}>
+                  {c.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {e.rows.map((r) => (
+              <tr>
+                {r.map((cell, i) => {
+                  const col = e.columns?.[i];
+                  const text = formatCell(cell, col?.format);
+                  return i === 0 ? (
+                    <th scope="row">{text}</th>
+                  ) : (
+                    <td class={col?.numeric ? 'n' : undefined} set:html={col?.numeric ? text : inline(String(text))} />
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+          {e.footer && (
+            <tfoot>
+              <tr>
+                {e.footer.map((cell, i) => {
+                  const col = e.columns?.[i];
+                  return i === 0 ? <th scope="row">{formatCell(cell, col?.format)}</th> : <td class={col?.numeric ? 'n' : undefined}>{formatCell(cell, col?.format)}</td>;
+                })}
+              </tr>
+            </tfoot>
+          )}
+        </table>
+      </div>
+    )
+  }
+
+  {
+    e.kind === 'kpis' && e.items && (
+      <dl class="kpis">
+        {e.items.map((it) => (
+          <div class="kpi">
+            <dt>{it.label}</dt>
+            <dd>
+              <span class="kpi__value">{it.value}</span>
+              {it.note && <span class="kpi__note">{it.note}</span>}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    )
+  }
+
+  {
+    e.kind === 'list' && e.items && (
+      <ul class="exhibit__list">
+        {e.items.map((it) => (
+          <li>
+            <strong>{it.label}</strong> {it.value}
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  {
+    e.kind === 'quote' && e.quote && (
+      <blockquote class="exhibit__quote">
+        <div class="narrative" set:html={rich(e.quote.text)} />
+        <footer>{e.quote.attribution}</footer>
+      </blockquote>
+    )
+  }
+
+  {e.note && <div class="exhibit__note small" set:html={rich(e.note)} />}
+  <figcaption class="exhibit__source"><b>Source</b> <span set:html={inline(e.source)} /></figcaption>
+</figure>
+
+<style>
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11.5rem), 1fr));
+    gap: 0;
+    margin: 0;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .kpi {
+    padding: var(--sp-3) var(--sp-4) var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .kpi dt {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    line-height: 1.35;
+  }
+
+  .kpi dd {
+    margin: var(--sp-1) 0 0;
+    display: grid;
+  }
+
+  .kpi__value {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: var(--text-strong);
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .kpi__note {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  .exhibit__quote {
+    margin: 0;
+    padding: var(--sp-4) var(--sp-5);
+    border-left: 3px solid var(--bb-brass);
+    background: var(--surface-sheet);
+  }
+
+  .exhibit__quote footer {
+    margin-top: var(--sp-3);
+    font-size: var(--fs-small);
+    color: var(--text-muted);
+  }
+
+  .exhibit__quote footer::before {
+    content: 'From ';
+  }
+
+  .exhibit__note {
+    margin-top: var(--sp-3);
+    color: var(--text-body);
+    max-width: 52rem;
+  }
+
+  .exhibit__list {
+    margin: 0;
+    padding-left: 1.1em;
+  }
+</style>

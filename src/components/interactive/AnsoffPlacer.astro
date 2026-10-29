@@ -1,0 +1,76 @@
+---
+/**
+ * Place each option in one of Ansoff's four directions of growth. Placements
+ * appear on the matrix as they are chosen; checking marks each one right,
+ * arguable or not.
+ */
+import QuizShell from './parts/QuizShell.astro';
+import Choice from './parts/Choice.astro';
+import Key from './parts/Key.astro';
+import CheckRow from './parts/CheckRow.astro';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'ansoff-placer' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const DIRECTIONS = [
+  { value: 'market-penetration', label: 'Market penetration', note: 'Existing products, existing markets. Lowest risk.' },
+  { value: 'product-development', label: 'Product development', note: 'New products, existing markets.' },
+  { value: 'market-development', label: 'Market development', note: 'Existing products, new markets.' },
+  { value: 'diversification', label: 'Diversification', note: 'New products, new markets. Highest risk.' },
+] as const;
+const label = (v: string) => DIRECTIONS.find((d) => d.value === v)?.label ?? v;
+const config = {
+  uid,
+  kind: 'ansoff',
+  labels: Object.fromEntries(DIRECTIONS.map((d) => [d.value, d.label])),
+  items: data.items.map((it) => ({
+    id: it.id,
+    groups: [{ name: 'place', legend: 'A direction of growth', right: [it.answer], partial: it.arguable }],
+  })),
+};
+---
+
+<QuizShell uid={uid} kind="ansoff" config={config} count={data.items.length}>
+  <div slot="before" class="ansoff-wrap">
+    <p class="quiz__lead">Choose a direction for each option. Your placements appear on the matrix as you go.</p>
+    <div class="ansoff" data-board role="group" aria-label="Your placements on the Ansoff matrix">
+      <span class="ansoff__axis ansoff__axis--x1" aria-hidden="true">Existing products</span>
+      <span class="ansoff__axis ansoff__axis--x2" aria-hidden="true">New products</span>
+      <span class="ansoff__axis ansoff__axis--y1" aria-hidden="true">Existing markets</span>
+      <span class="ansoff__axis ansoff__axis--y2" aria-hidden="true">New markets</span>
+      {
+        DIRECTIONS.map((d) => (
+          <div class={`ansoff__cell ansoff__cell--${d.value} is-empty`} data-cell={d.value}>
+            <p class="ansoff__name">{d.label}</p>
+            <p class="ansoff__note">{d.note}</p>
+            <ol class="ansoff__chips" data-chips role="list" />
+          </div>
+        ))
+      }
+      <span class="ansoff__risk" aria-hidden="true">Risk rises towards new products in new markets</span>
+    </div>
+  </div>
+  {
+    data.items.map((it, k) => (
+      <li class="quiz__item ap__item" data-item={it.id}>
+        <div class="ap__option">
+          <span class="quiz__no" aria-hidden="true">{k + 1}</span>
+          <div>
+            <p class="ap__label" data-short>{it.label}</p>
+            <p class="ap__detail">{it.detail}</p>
+          </div>
+        </div>
+        <Choice uid={uid} itemId={it.id} name="place" legend="Direction of growth" options={DIRECTIONS.map((d) => ({ value: d.value, label: d.label }))} layout="grid" />
+        <CheckRow />
+        <Key
+          answerLabel="Placement:"
+          answer={`${label(it.answer)}.${it.arguable.length ? ` Also arguable: ${it.arguable.map(label).join(', ').toLowerCase()}.` : ''}`}
+          explanation={it.explanation}
+        />
+      </li>
+    ))
+  }
+</QuizShell>

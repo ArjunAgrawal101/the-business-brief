@@ -1,0 +1,86 @@
+---
+/**
+ * Classify each cost twice: by behaviour (fixed, variable, semi-variable) and
+ * by whether it can be traced to the cost object (direct or indirect).
+ */
+import QuizShell from './parts/QuizShell.astro';
+import Choice from './parts/Choice.astro';
+import Key from './parts/Key.astro';
+import CheckRow from './parts/CheckRow.astro';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'cost-classifier' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const BEHAVIOUR = [
+  { value: 'fixed', label: 'Fixed' },
+  { value: 'variable', label: 'Variable' },
+  { value: 'semi-variable', label: 'Semi-variable' },
+];
+const DIRECT = [
+  { value: 'direct', label: 'Direct' },
+  { value: 'indirect', label: 'Indirect' },
+];
+const name = (v: string) => [...BEHAVIOUR, ...DIRECT].find((o) => o.value === v)?.label ?? v;
+const config = {
+  uid,
+  kind: 'cost',
+  labels: Object.fromEntries([...BEHAVIOUR, ...DIRECT].map((o) => [o.value, o.label])),
+  items: data.items.map((it) => ({
+    id: it.id,
+    groups: [
+      { name: 'behaviour', legend: 'How it behaves', right: [it.behaviour], partial: [] },
+      { name: 'directness', legend: 'Direct or indirect', right: [it.directness], partial: [] },
+    ],
+  })),
+};
+const sorted = BEHAVIOUR.map((b) => ({ ...b, items: data.items.filter((it) => it.behaviour === b.value) }));
+---
+
+<QuizShell uid={uid} kind="cost" config={config} count={data.items.length}>
+  <p slot="before" class="quiz__lead">
+    For each cost, decide how it behaves as output changes, and whether it can be traced to <strong>{data.costObject}</strong>.
+  </p>
+  {
+    data.items.map((it, k) => (
+      <li class="quiz__item cc__item" data-item={it.id}>
+        <div class="cc__cost">
+          <span class="quiz__no" aria-hidden="true">{String(k + 1).padStart(2, '0')}</span>
+          <div>
+            <p class="cc__label" data-short>{it.label}</p>
+            <p class="cc__detail">{it.detail}</p>
+          </div>
+        </div>
+        <div class="cc__choices">
+          <Choice uid={uid} itemId={it.id} name="behaviour" legend="How it behaves" options={BEHAVIOUR} />
+          <Choice uid={uid} itemId={it.id} name="directness" legend={`Traced to ${data.costObject}?`} options={DIRECT} />
+        </div>
+        <CheckRow />
+        <Key answerLabel="Answer:" answer={`${name(it.behaviour)} cost; ${name(it.directness).toLowerCase()} cost.`} explanation={it.explanation} />
+      </li>
+    ))
+  }
+  <details slot="after" class="disclosure cc__sorted" data-after-all>
+    <summary>Every cost, sorted</summary>
+    <div class="disclosure__body">
+      <div class="cc__columns">
+        {
+          sorted.map((col) => (
+            <section>
+              <h4 class="label label--ink">{col.label} costs</h4>
+              <ul class="cc__list">
+                {col.items.map((it) => (
+                  <li>
+                    {it.label} <span class="muted small">({it.directness})</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+      </div>
+    </div>
+  </details>
+</QuizShell>

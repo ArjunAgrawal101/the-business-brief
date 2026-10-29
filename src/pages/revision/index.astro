@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import { href, topicsInOrder } from '../../lib/content';
+
+const topics = await topicsInOrder();
+---
+
+<BaseLayout title="Revision Briefs" description="One printable page for each complete topic: the key points, the traps, the formulas and retrieval questions." section="revision">
+  <PageIntro
+    trail={[{ label: 'Revision' }]}
+    kicker="Revision Brief"
+    title="Revision briefs"
+    lead="One page for each complete topic, made to be printed: what to know, the traps that cost marks, the formulas, and questions to answer from memory. Revise by retrieving, not by rereading."
+  />
+  <div class="wrap page-body">
+    <ol class="index-list">
+      {
+        topics.map(([id, t]) => (
+          <li class="index-item">
+            <span class="index-item__code">{t.code}</span>
+            <div class="index-item__body">
+              <h2 class="index-item__title">
+                <a href={href.revision(id)}>{t.title}</a>
+              </h2>
+              <p>{t.revision.keyPoints.length} key points, {t.revision.traps.length} traps, {t.revision.retrieval.length} retrieval questions.</p>
+            </div>
+            <div class="index-item__side">
+              <a href={href.topic(id)}>The full brief</a>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</BaseLayout>

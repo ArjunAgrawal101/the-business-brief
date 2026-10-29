@@ -1,0 +1,243 @@
+# Decision Room: Halden Distribution. Outcomes are one plausible simulation of
+# each approach, built on the reading of the evidence in the case analysis.
+# The arithmetic in each outcome (percentages of orders) is checked by
+# tests/unit/cases.test.ts.
+
+title: 'Halden Distribution: how to lead in the first ninety days'
+case: halden-distribution
+dek: Choose how to lead a warehouse in trouble, then lead it through a crisis two weeks before peak season.
+role: You are Amara Osei, the new site manager. The owners want the client kept; the staff want to know what kind of manager you are.
+briefing: >
+  On-time dispatch is 91.4% and the client needs 97% by the first week of November. Read the evidence by shift
+  before you choose: the two shifts are not in the same position. Your first decision sets your approach for the
+  next ninety days. Your second is about a single night.
+objectives:
+  - On-time dispatch above 97% by the first week of November.
+  - Lower labour turnover, especially on the night shift.
+  - A team that can run the warehouse well without the manager on the floor.
+evidence: [ex-1, ex-2, ex-3, ex-5]
+metrics:
+  - { id: "dispatch90", label: "On-time dispatch after ninety days", unit: '%', better: "higher" }
+  - { id: "dispatchPeak", label: "On-time dispatch in peak week", unit: '%', better: "higher" }
+  - { id: "errors", label: 'Picking errors per 1,000 orders', better: "lower" }
+  - { id: "turnover", label: "Labour turnover, annual rate", unit: '%', better: "lower" }
+  - { id: "engagement", label: "Engagement score", unit: "out of 100", better: "higher" }
+  - { id: "client", label: "Lumen Home's contract", better: "context" }
+  - { id: "nightOnTime", label: "Queued orders out on time on the crisis night", unit: '%', better: "higher" }
+  - { id: "lumenOnTime", label: "Lumen Home's urgent orders out on time that night", unit: '%', better: "higher" }
+  - { id: "overtime", label: "Overtime cost that night", unit: "£", better: "lower" }
+baseline:
+  dispatch90: 91.4
+  dispatchPeak: Not yet known
+  errors: 5.2
+  turnover: 34.1
+  engagement: 53
+  client: At risk
+  nightOnTime: Not yet known
+  lumenOnTime: Not yet known
+  overtime: 0
+rounds:
+  - id: approach
+    title: Choose your approach
+    question: How will you lead for the first ninety days?
+    help: Look at Exhibits 2 and 3 by shift. Ask whether the problem is effort, skill, the system or the way the change was made.
+    choices:
+      - id: autocratic
+        label: Autocratic turnaround
+        detail: Daily targets for every zone, compulsory scanner use, and formal warnings for repeated errors.
+        outcome:
+          headline: Targets on every wall, and dispatch climbs, for now
+          narrative: >
+            Within six weeks on-time dispatch rises to 95.8% and errors fall to 3.1 per 1,000 orders: clear instructions
+            fix the easy problems quickly. But the night shift's real gap, training on the new system, is treated as a
+            discipline problem. Eleven night-shift pickers leave in three months, and their replacements are slower than
+            the people they replace. In peak week dispatch reaches 96.2%: better, but short of the client's 97%. Lumen
+            Home puts the contract under review.
+          metrics: { dispatch90: 95.8, dispatchPeak: 96.2, errors: 3.1, turnover: 41.0, engagement: 44, client: "Under review" }
+          stakeholders:
+            - { name: "Lumen Home", reaction: "Sees improvement, but not enough.", mood: "mixed" }
+            - { name: "Day shift", reaction: "Values the clarity and resents the warnings.", mood: "mixed" }
+            - { name: "Night shift", reaction: "Feels blamed for a system nobody taught them.", mood: "negative" }
+            - { name: "Team leaders", reaction: "Sidelined by targets set above them.", mood: "negative" }
+          risks:
+            - Control works fastest where the problem is effort. Where the problem is skill or the system, it raises pressure without raising capability.
+          theory: >
+            Autocratic leadership brings fast decisions and clear standards. It is useful in a crisis or with
+            inexperienced staff, at the cost of motivation and of the ideas the people doing the work could contribute.
+      - id: paternalistic
+        label: Paternalistic care
+        detail: Restore the founder's Friday breakfasts and a peak-season bonus, visit both shifts weekly, and decide everything yourself.
+        outcome:
+          headline: Morale recovers; the system does not
+          narrative: >
+            Long-serving staff respond. Turnover falls towards 29% a year and the engagement score rises to 58. But
+            nobody is trained on the scanners, and the night shift still works around the system rather than with it.
+            On-time dispatch is 93.1% at ninety days and 93.9% in peak week. Lumen Home gives notice that it will move
+            its contract.
+          metrics: { dispatch90: 93.1, dispatchPeak: 93.9, errors: 4.6, turnover: 29.0, engagement: 58, client: "Lost" }
+          stakeholders:
+            - { name: "Long-serving staff", reaction: "Feel looked after again.", mood: "positive" }
+            - { name: "Night shift", reaction: "Appreciate the attention; still struggle with the scanners.", mood: "mixed" }
+            - { name: "Lumen Home", reaction: "Leaves at the end of the year.", mood: "negative" }
+            - { name: "The owners", reaction: "Paid a bonus and lost a third of the work.", mood: "negative" }
+          risks:
+            - Care without capability. Goodwill does not close a skills gap.
+          theory: >
+            Paternalistic leadership means the leader decides, in what she sees as the staff's interest, and looks after
+            their welfare. It builds loyalty, as the founder's style did, but keeps decisions at the top and does not by
+            itself build skills.
+      - id: democratic
+        label: Democratic redesign
+        detail: Form a working group on each shift to redesign how the system is used, and adopt their proposals unless there is a safety or cost reason not to.
+        outcome:
+          headline: Slow to start, and then the night shift finds the fix
+          narrative: >
+            The first month is slow, and at ninety days dispatch is only 92.8%. Then the night-shift group finds that
+            half the scanner faults come from a charging rota that leaves handsets flat at 3 a.m., and that the
+            system's pick paths send pickers across the building twice. Fixing both, and training everyone in the
+            redesigned process, lifts peak-week dispatch to 97.4%. Lumen Home renews. Engagement rises to 63 and
+            turnover falls towards 27.5% a year.
+          metrics: { dispatch90: 92.8, dispatchPeak: 97.4, errors: 3.4, turnover: 27.5, engagement: 63, client: "Renewed" }
+          stakeholders:
+            - { name: "Night shift", reaction: "Sees its ideas adopted.", mood: "positive" }
+            - { name: "Team leaders", reaction: "Lead the working groups and grow into the role.", mood: "positive" }
+            - { name: "Lumen Home", reaction: "Renews after an anxious two months.", mood: "positive" }
+            - { name: "The owners", reaction: "Were worried in the second month.", mood: "mixed" }
+          risks:
+            - Consultation takes weeks the business may not have. Here it worked because the deadline was four months away.
+          theory: >
+            Democratic leadership shapes decisions with the people affected. It is slower, but it uses their knowledge
+            and builds commitment to the result.
+      - id: laissez-faire
+        label: Laissez-faire delegation
+        detail: Give each team leader full authority over their own zone, and step back.
+        outcome:
+          headline: Freedom works where people already know what to do
+          narrative: >
+            The day shift's experienced team leaders keep their zones near 98%. The night shift's two new team leaders,
+            untrained on the system and unsupported, make different rules for different zones, and night-shift dispatch
+            slips to 88%. Across the site, dispatch is 92.0% at ninety days and 91.6% in peak week. Lumen Home gives
+            notice.
+          metrics: { dispatch90: 92.0, dispatchPeak: 91.6, errors: 5.6, turnover: 36.0, engagement: 50, client: "Lost" }
+          stakeholders:
+            - { name: "Day-shift team leaders", reaction: "Enjoy the trust.", mood: "positive" }
+            - { name: "Night-shift team leaders", reaction: "Feel abandoned.", mood: "negative" }
+            - { name: "Night pickers", reaction: "Get different rules from different leaders.", mood: "negative" }
+            - { name: "Lumen Home", reaction: "Leaves at the end of the year.", mood: "negative" }
+          risks:
+            - Delegation without readiness. Autonomy suits capable, motivated teams and fails inexperienced ones.
+          theory: >
+            Laissez-faire leadership gives minimal direction. It can release the talent of an expert team; with an
+            inexperienced team it amounts to an absence of leadership.
+      - id: situational
+        label: Situational leadership
+        detail: Direct and train the night shift, delegate to the day shift's team leaders, and consult everyone on the system.
+        outcome:
+          headline: Different teams, different leadership, one result
+          narrative: >
+            For the night shift Amara is directive: a clear process, daily coaching on the floor and training for every
+            picker in the first month. She delegates to the day shift's experienced team leaders, asking only for
+            results, and consults both shifts on the system, adopting the night shift's ideas on the charging rota and
+            the pick paths. At ninety days dispatch is 95.1%; in peak week it is 97.8%. Lumen Home renews. Turnover
+            falls towards 26% a year. Some day-shift staff ask why the night shift gets more attention, and Amara has to
+            explain the difference more than once.
+          metrics: { dispatch90: 95.1, dispatchPeak: 97.8, errors: 2.9, turnover: 26.0, engagement: 61, client: "Renewed" }
+          stakeholders:
+            - { name: "Night shift", reaction: "Trained, coached and listened to.", mood: "positive" }
+            - { name: "Day shift", reaction: "Trusted, and a little puzzled by the difference.", mood: "mixed" }
+            - { name: "Lumen Home", reaction: "Renews.", mood: "positive" }
+            - { name: "Team leaders", reaction: "Night leaders learn; day leaders lead.", mood: "positive" }
+          risks:
+            - People see different treatment before they see the reason for it. It needs explaining.
+          theory: >
+            Situational leadership matches the style to the task and to the readiness of the people: more direction
+            where skill or confidence is low, more delegation where it is high.
+
+  - id: crisis
+    title: The night the scanners fail
+    question: Two weeks before peak, a failed update takes the scanners down. 3,200 orders are queued, 2,000 of them Lumen Home's next-day orders, and the trucks leave at 6 a.m. What do you do?
+    help: >
+      This round is about decision-making under time pressure. Some secondary sources place scientific and intuitive
+      decision-making in subtopic 2.3 as HL-only content; that has not been checked against the Guide.
+    choices:
+      - id: take-charge
+        label: Take charge on the floor
+        detail: Decide fast. Split the warehouse into zones, switch to paper pick lists, and run the night yourself.
+        outcome:
+          headline: Most orders out, and nobody's priorities set
+          narrative: >
+            Within twenty minutes every picker has a zone and a paper list. The night is fast and loud, and by 6 a.m.
+            2,870 of the 3,200 orders are on the trucks (89.7%). But orders were picked in the order they came, so 220
+            of Lumen Home's 2,000 urgent orders miss the trucks. Overtime costs £1,850. The team leaders, sidelined, say
+            afterwards that they could have run it.
+          metrics: { nightOnTime: 89.7, lumenOnTime: 89.0, overtime: 1850 }
+          stakeholders:
+            - { name: "Pickers", reaction: "Relieved that someone took charge.", mood: "positive" }
+            - { name: "Team leaders", reaction: "Sidelined in the moment they could have led.", mood: "negative" }
+            - { name: "Lumen Home", reaction: "Unhappy about 220 late orders.", mood: "mixed" }
+          risks:
+            - Fast intuitive decisions can miss what a few minutes of analysis would have caught.
+          theory: >
+            Directive leadership and intuitive decision-making are often right in a crisis, when speed matters more than
+            consultation. Intuition is fast, but it can miss what analysis would have caught, here the client's priorities.
+      - id: delegate
+        label: Back the night team leaders
+        detail: Let the night shift's team leaders run the recovery, and give them whatever support they ask for.
+        outcome:
+          headline: A slow start, and leaders who learn
+          narrative: >
+            The two new team leaders take forty minutes to agree a plan. By 6 a.m. 2,610 orders are out (81.6%),
+            including 1,620 of Lumen Home's 2,000 (81.0%). Overtime costs £1,200. The team leaders' confidence grows,
+            and the review they write afterwards is the best the site has produced, but Lumen Home's operations
+            director calls at 7 a.m.
+          metrics: { nightOnTime: 81.6, lumenOnTime: 81.0, overtime: 1200 }
+          stakeholders:
+            - { name: "Team leaders", reaction: "Grow in confidence.", mood: "positive" }
+            - { name: "Lumen Home", reaction: "Calls to complain about 380 late orders.", mood: "negative" }
+          risks:
+            - Delegating in a crisis develops people and costs speed when they are inexperienced.
+          theory: Delegation builds capability over time. In a crisis its cost is speed, and the cost is highest when the people trusted with the decision are new to it.
+      - id: prioritise
+        label: Analyse first, then act
+        detail: Spend twenty minutes finding which orders matter most, call Lumen Home, and pick its urgent orders first.
+        outcome:
+          headline: Fewer orders out, but the right ones
+          narrative: >
+            Amara and the shift's data analyst sort the queue by promised delivery. Lumen Home agrees that 60 of its
+            orders can go a day late if the rest are guaranteed. Picking starts later, and by 6 a.m. only 2,350 orders
+            are out (73.4%), but 1,940 of Lumen Home's 2,000 urgent orders are among them (97.0%). Two smaller clients
+            complain about delays. Overtime costs £1,850.
+          metrics: { nightOnTime: 73.4, lumenOnTime: 97.0, overtime: 1850 }
+          stakeholders:
+            - { name: "Lumen Home", reaction: "Its promise to customers is kept.", mood: "positive" }
+            - { name: "Smaller clients", reaction: "Their orders go out a day late.", mood: "negative" }
+            - { name: "Pickers", reaction: "Frustrated by the slow start.", mood: "mixed" }
+          risks:
+            - Prioritizing one client can breach promises to others. Whether that was right depends on their contracts.
+          theory: >
+            Scientific decision-making gathers and analyses data before deciding. It is slower, but it can find what
+            matters most, here one client's orders.
+
+debrief:
+  tradeoffs:
+    - Speed against capability. Directive leadership raises performance fastest; only consultation and training raised the night shift's capability.
+    - Consistency against fit. One style for everyone is easy to explain; matching the style to each team works better and has to be explained.
+    - Care against results. The founder's paternalistic style built loyalty the site still relies on, but it did not prepare anyone for a new system.
+  evidenceThatMatters:
+    - Exhibit 2. Night-shift turnover of 51.9% against 22.2% on days, and two hours of training per person. The problem is concentrated, and it is a problem of skill.
+    - Exhibit 3. Only 21% of the night shift feel consulted about changes. The new system was imposed on the people who had to make it work.
+    - Exhibit 4. The deadline. Four months is long enough for consultation to pay off, and not long enough for it to drift.
+  changeYourMind:
+    - If the client's deadline were four weeks away instead of four months, which approach would you choose?
+    - If the night shift's team leaders had ten years' experience, what would change?
+    - If most night-shift leavers had cited pay, what could leadership alone achieve?
+  misconceptions:
+    - Treating one leadership style as the best. Each works in some situations and damages others.
+    - Confusing paternalistic with democratic leadership. A paternalistic leader cares about the staff but still decides alone.
+    - Treating laissez-faire as always a failure of leadership. With an expert team, stepping back can be the right decision.
+  examLink: >
+    Leadership questions reward the situation: which style fits these people, this task and this deadline, and why.
+    Try the practice questions for 2.3 on the Exam Desk.
+topics: [leadership-and-management]
+questions: [q-lead-p1-recommend, q-lead-p2-turnover, q-lead-hl-decisions]
+updated: 2026-10-29

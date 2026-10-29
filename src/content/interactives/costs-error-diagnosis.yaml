@@ -1,0 +1,52 @@
+component: error-diagnosis
+title: Find the error
+purpose: >
+  The learner reads a worked solution with one wrong line, chooses the line, and sees why it is wrong and how to
+  correct it. Each item targets one of the errors that most often cost marks in break-even calculations.
+provenance: subject-knowledge
+items:
+  - id: round-down
+    task: Calculate Atelier Barro's break-even quantity from November, at a price of €22.
+    lines:
+      - Contribution per mug = €22.00 − €7.18 = €14.82
+      - Break-even quantity = €8,140 ÷ €14.82 = 549.26
+      - Break-even quantity = 549 mugs a month
+    errorLine: 2
+    explanation: At 549 mugs, total contribution is 549 × €14.82 = €8,136.18, which is €3.82 short of the fixed costs. That is a loss, so 549 mugs is not the break-even quantity.
+    correction: Round up. The break-even quantity is 550 mugs a month.
+  - id: price-not-contribution
+    task: Calculate the break-even quantity before November, at a price of €22.
+    lines:
+      - Fixed costs = €8,060 a month
+      - Break-even quantity = €8,060 ÷ €22.00
+      - = 366.4, so 367 mugs
+    errorLine: 1
+    explanation: Fixed costs must be divided by contribution per mug, not by the price. Each mug's price also has to pay for its own clay, labour, packaging, firing and fees.
+    correction: Contribution per mug is €22.00 − €6.88 = €15.12, so the break-even quantity is €8,060 ÷ €15.12 = 533.07, which is 534 mugs.
+  - id: fee-at-new-price
+    task: Calculate contribution per mug at a price of €24, from November.
+    lines:
+      - Variable cost per mug = €2.30 + €2.40 + €0.85 + €0.75 + €0.88 = €7.18
+      - Contribution per mug = €24.00 − €7.18
+      - = €16.82
+    errorLine: 0
+    explanation: The card and platform fee is 4% of the price, so at €24 it is €0.96, not €0.88. A cost that is a share of the price changes when the price changes.
+    correction: Variable cost per mug is €7.26, so contribution per mug is €24.00 − €7.26 = €16.74.
+  - id: mos-as-money
+    task: Calculate the margin of safety at 640 mugs a month and a price of €22, from November.
+    lines:
+      - Break-even quantity = 550 mugs
+      - Margin of safety = 640 − 550 = 90
+      - The margin of safety is €90 a month
+    errorLine: 2
+    explanation: The margin of safety is measured in units of output. It is not a sum of money, and it is not profit (profit at 640 mugs is €1,344.80).
+    correction: The margin of safety is 90 mugs a month, or 14.1% of forecast sales.
+  - id: target-subtract
+    task: How many mugs must the studio sell at €22 to make a profit of €2,000 a month, from November?
+    lines:
+      - Target profit output = (fixed costs − target profit) ÷ contribution per mug
+      - = (€8,140 − €2,000) ÷ €14.82
+      - = 414.3, so 415 mugs
+    errorLine: 0
+    explanation: The target profit must be added to the fixed costs. The mugs have to cover the fixed costs first and then earn the profit on top.
+    correction: (€8,140 + €2,000) ÷ €14.82 = 684.21, so 685 mugs a month.

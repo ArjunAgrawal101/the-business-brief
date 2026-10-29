@@ -1,0 +1,133 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import StatusTag from '../../components/ui/StatusTag.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import { href, pathwaysInOrder, topicsInOrder } from '../../lib/content';
+import { inline, rich } from '../../lib/markup';
+import type { Pathway } from '../../lib/schemas';
+
+export async function getStaticPaths() {
+  return (await pathwaysInOrder()).map((p) => ({ params: { id: p.id }, props: { id: p.id, p: p.data } }));
+}
+interface Props {
+  id: string;
+  p: Pathway;
+}
+const { id, p } = Astro.props;
+const topics = await topicsInOrder();
+const lenses = topics.flatMap(([tid, t]) => t.lenses.filter((l) => l.pathway === id).map((l) => ({ tid, t, l })));
+let n = 0;
+---
+
+<BaseLayout title={`${p.name}: Pathways`} description={p.promise} section="pathways">
+  <PageIntro trail={[{ label: 'Pathways', href: '/pathways/' }, { label: p.name }]} kicker="Pathway" title={p.name} lead={p.promise}>
+    <div class="tags"><StatusTag status={p.status} /></div>
+  </PageIntro>
+  <div class="wrap page-body">
+    <div class="grid grid--2">
+      <div class="stack">
+        <p class="label">For</p>
+        <p>{p.audience}</p>
+        <div class="prose" set:html={rich(p.intro)} />
+      </div>
+      <div>
+        <h2 class="label label--ink">Principles</h2>
+        <ul class="prose">{p.principles.map((x) => <li set:html={inline(x)} />)}</ul>
+      </div>
+    </div>
+    {
+      p.caution && (
+        <aside class="callout callout--caution">
+          <span class="callout__kicker">Caution</span>
+          <div class="prose" set:html={rich(p.caution)} />
+        </aside>
+      )
+    }
+    <section aria-labelledby="now-h">
+      <SectionHead no={++n} title="Available now" id="now-h" />
+      <ul class="link-list" style="margin-top:var(--sp-4)">
+        {
+          p.available.map((a) => (
+            <li>
+              <a href={a.href}>{a.label}</a>
+              <span class="small muted">{a.note}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+    {
+      id === 'teachers' && (
+        <section id="sequences" aria-labelledby="seq-h">
+          <SectionHead no={++n} title="Lesson sequences" dek="One sequence for each complete brief, with timings and discussion prompts. Adapt them to your class." id="seq-h" />
+          <div class="stack stack-lg" style="margin-top:var(--sp-5)">
+            {topics.map(([tid, t]) => (
+              <article>
+                <h3>
+                  <a href={href.topic(tid)}>
+                    {t.code} {t.title}
+                  </a>
+                </h3>
+                <div class="tags" style="margin:var(--sp-2) 0">
+                  <ProvenanceTag kind="aa-framework" />
+                  <span class="tag tag--plain">{t.teaching.sequence.reduce((m, s) => m + s.minutes, 0)} minutes</span>
+                </div>
+                <div class="table-scroll" role="region" aria-label={`Lesson sequence for ${t.title}`} tabindex="0">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col" class="n">Minutes</th>
+                        <th scope="col">Activity</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {t.teaching.sequence.map((s) => (
+                        <tr>
+                          <td class="n">{s.minutes}</td>
+                          <td set:html={inline(s.activity)} />
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <h4 class="label label--ink" style="margin-top:var(--sp-3)">Discussion prompts</h4>
+                <ul class="prose">{t.teaching.prompts.map((q) => <li>{q}</li>)}</ul>
+              </article>
+            ))}
+          </div>
+        </section>
+      )
+    }
+    {
+      lenses.length > 0 && (
+        <section aria-labelledby="lens-h">
+          <SectionHead no={++n} title="From the briefs" dek="What each complete brief adds for this pathway." id="lens-h" />
+          <div class="lens-grid" style="margin-top:var(--sp-4)">
+            {lenses.map(({ tid, t, l }) => (
+              <article class="lens">
+                <p class="lens__for">
+                  <a href={href.topic(tid)}>
+                    {t.code} {t.title}
+                  </a>
+                </p>
+                <h3 class="lens__title">{l.title}</h3>
+                <ProvenanceTag kind={l.provenance} />
+                <div class="prose small" set:html={rich(l.body)} />
+              </article>
+            ))}
+          </div>
+        </section>
+      )
+    }
+    {
+      p.planned.length > 0 && (
+        <section aria-labelledby="planned-h">
+          <SectionHead no={++n} title="Planned" id="planned-h" />
+          <ul class="prose" style="margin-top:var(--sp-4)">{p.planned.map((x) => <li>{x}</li>)}</ul>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>

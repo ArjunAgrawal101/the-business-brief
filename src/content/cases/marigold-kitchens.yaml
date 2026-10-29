@@ -1,0 +1,331 @@
+# Marigold Kitchens. A fictional organization; every figure is simulated.
+# The figures follow the model stated in `method`, and
+# tests/unit/cases.test.ts recomputes them from the exhibits below. If you
+# change an exhibit, run the tests: the Decision Room outcomes are checked
+# against it.
+
+title: Marigold Kitchens
+dek: A profitable four-restaurant business in Pune has five ways to grow, and a founder who will not compromise on the food.
+kind: fictional
+dataStatus: simulated
+organization:
+  name: Marigold Kitchens
+  sector: Restaurants (home-style lunches and dinners)
+  location: Pune, India
+  size: Four restaurants, 118 employees
+  legalForm: Private limited company
+currency:
+  code: INR
+  symbol: '₹'
+  unit: ₹ million (₹m) a year
+decision: Should Marigold Kitchens grow, and if it should, by which route?
+brief: >
+  Marigold Kitchens has four profitable restaurants in Pune and five routes in front of it: open its own
+  restaurants in Mumbai, franchise, form a joint venture with a mall operator, buy a weaker rival, or stay at
+  four restaurants and add a lunch service for offices. Each route makes the business bigger in a different way,
+  and each changes who controls it, how it is financed and what it is like to work for.
+
+narrative:
+  - >
+    Meera Rao opened the first Marigold Kitchens in Pune in 2017, with eleven tables and a menu built from her
+    grandmother's recipes: dal, seasonal vegetables, millet rotis, a rice of the day and one dessert. Nine years
+    later there are four restaurants across the city, all of them profitable, and the queue at lunchtime is still
+    the best advertisement the business has.
+  - >
+    The question in front of Meera this autumn is not whether Marigold is successful. It is what success should
+    look like next. In the last twelve months, forty-one people have asked to open a Marigold franchise. A mall
+    operator, Sterling Malls, has proposed a joint venture that would put Marigold into six of its malls in three
+    cities. A rival with nine restaurants, Tiffin Lane, is for sale because its owner wants to retire. Meera's bank
+    has offered a loan for company-owned restaurants in Mumbai. And her head chef, Sunil Patil, has a different view
+    entirely: four excellent restaurants and a new lunch service for offices would make the business better without
+    making it bigger.
+  - >
+    Each route would change more than the size of the business. Franchising would put the brand in the hands of
+    people Meera has not trained. The joint venture would mean sharing decisions with a partner whose business is
+    footfall, not food. Buying Tiffin Lane would bring nine sites and their staff at once, along with a reputation
+    for cutting corners, and it would need an investor, Banyan Growth Partners, who would want thirty per cent of
+    Marigold in return. Growing organically keeps control, but it is slow, it needs a large loan, and it would make
+    Marigold's profit fall before it rose.
+  - >
+    Meera's finance manager, Farah Sheikh, has built the forecasts in the exhibits from the restaurants' own
+    figures. They are careful, but they are forecasts. The things that worry Farah most are not in the tables: how
+    long a new restaurant takes to find its regulars, whether franchisees will follow the recipes when nobody is
+    watching, and how many of Tiffin Lane's staff would stay.
+  - >
+    Meera has written down what she wants (Exhibit 6). Her four aims do not all point the same way. That is the
+    decision.
+
+exhibits:
+  - id: ex-1
+    title: Restaurant economics, last financial year (one restaurant)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: "Item" }
+      - { label: '₹m a year', numeric: true, format: d2 }
+      - { label: "Share of revenue (%)", numeric: true }
+    rows:
+      - [Revenue, 24.00, 100]
+      - [Food and packaging, 7.68, 32]
+      - [Staff, 6.00, 25]
+      - [Rent, 3.60, 15]
+      - [Utilities and maintenance, 1.20, 5]
+      - [Other costs, 1.20, 5]
+      - [Restaurant profit, 4.32, 18]
+    note: Food and packaging rise and fall with sales. Staff, rent, utilities and other costs do not change with the number of meals within a restaurant's normal range.
+    source: Simulated teaching data, prepared by the finance manager from the four restaurants' accounts. The four restaurants are assumed identical.
+
+  - id: ex-2
+    title: The group today
+    kind: kpis
+    provenance: simulated-data
+    items:
+      - { label: "Restaurants", value: '4', note: "All in Pune" }
+      - { label: "Revenue", value: '₹96.0m', note: '4 × ₹24.0m' }
+      - { label: "Restaurants' combined profit", value: '₹17.28m', note: '4 × ₹4.32m' }
+      - { label: "Central costs", value: '₹4.50m', note: "Management, marketing, accounts" }
+      - { label: "Operating profit", value: '₹12.78m', note: '₹17.28m − ₹4.50m' }
+      - { label: "Cash available to invest", value: '₹20m', note: "Retained profit" }
+    source: Simulated teaching data.
+
+  - id: ex-3
+    title: The five routes, as forecast by the finance manager
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: "Route" }
+      - { label: "What it involves" }
+      - { label: "Money needed and where it comes from" }
+      - { label: "Key terms and forecast assumptions" }
+    rows:
+      - - Organic growth
+        - Four company-owned restaurants in Mumbai, opened over two years.
+        - ₹72m (₹18m a restaurant). ₹20m from cash and a ₹52m bank loan at 11% a year.
+        - Mumbai rent ₹5.4m a year; other restaurant costs as in Pune. Sales ₹26m a restaurant when mature, about 85% of that in the first full year. Central costs rise to ₹7.0m for an area manager and training.
+      - - Franchising
+        - Twelve franchised restaurants over two years, mainly in Mumbai and Bengaluru.
+        - ₹10m from cash for a training academy, an operations manual and franchise recruitment.
+        - Fee ₹1.5m a franchise, once. Royalty 6% of the franchisee's sales; marketing levy 2%, spent on marketing for the whole network. Franchisees' sales about ₹19m each in year two, ₹21m when mature. Support team ₹6.0m a year; academy ₹1.5m a year.
+      - - Joint venture
+        - A company owned 50:50 with Sterling Malls, opening six restaurants in its malls in Pune, Mumbai and Bengaluru.
+        - ₹45m from each partner (₹15m a restaurant). Marigold's share from ₹15m of cash and a ₹30m loan at 11%.
+        - Rent 15% of sales. Staff ₹6.6m and utilities and other costs ₹2.4m a restaurant. Sales ₹25.2m a restaurant in year two, ₹28m when mature. Joint venture overheads ₹2.0m a year; Marigold's oversight ₹0.5m a year.
+      - - Acquisition
+        - Buy Tiffin Lane's nine restaurants. Convert the six best to the Marigold format; close the three weakest.
+        - ₹120m from Banyan Growth Partners for 30% of Marigold (₹96m price, ₹24m for conversions). Closures ₹6m from cash, once.
+        - Buying for the whole group lowers food and packaging to 30% of sales. Converted restaurants sell ₹20m in year two and ₹23m when mature, with costs of ₹11m a year each besides food. Central costs ₹8.0m a year.
+      - - Stay focused
+        - Stay at four restaurants and add a weekday lunch service for offices in Pune, cooked in the existing kitchens.
+        - ₹3m from cash for vans and equipment.
+        - Sales ₹6m in year two, ₹9m when mature. Food and packaging 36% of sales; delivery and selling costs ₹1.2m a year.
+    source: Simulated teaching data. Year two is the first full year after the decision; mature means year four. Taxes, depreciation and inflation are left out.
+
+  - id: ex-4
+    title: Tiffin Lane, last financial year
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: "Item" }
+      - { label: 'One restaurant, ₹m', numeric: true, format: d2 }
+      - { label: 'Nine restaurants, ₹m', numeric: true, format: d2 }
+    rows:
+      - [Revenue, 16.00, 144.00]
+      - [Food and packaging (34% of sales), 5.44, 48.96]
+      - [Other restaurant costs, 9.80, 88.20]
+      - [Restaurant profit, 0.76, 6.84]
+      - [Central costs, '', 3.00]
+      - [Operating profit, '', 3.84]
+    note: The asking price is ₹96m, twenty-five times Tiffin Lane's operating profit.
+    source: Simulated teaching data, from the information pack supplied by Tiffin Lane's owner.
+
+  - id: ex-5
+    title: Customers and staff
+    kind: kpis
+    provenance: simulated-data
+    items:
+      - { label: "Marigold average review rating", value: "4.6 out of 5", note: '2,310 reviews in the last twelve months' }
+      - { label: "Tiffin Lane average review rating", value: "3.6 out of 5", note: '4,870 reviews in the last twelve months' }
+      - { label: "Marigold visits by returning customers", value: "62%", note: "From the loyalty card" }
+      - { label: "Marigold staff turnover", value: "18% a year" }
+      - { label: "Tiffin Lane staff turnover", value: "46% a year" }
+      - { label: "Time to train a new cook to Marigold's standard", value: "About four months", note: "Trained by the head chef" }
+    source: Simulated teaching data.
+
+  - id: ex-6
+    title: What the founder wants
+    kind: quote
+    provenance: simulated-data
+    quote:
+      text: >
+        Four things matter to me. The food stays as good as it is now: people come back because it tastes like home.
+        Marigold should be known in at least three cities within five years. I will not give up control of what I
+        built. And the people who grew with us should grow with the business.
+      attribution: Meera Rao, founder, in a note to the board
+    source: Fictional note, written for this case.
+
+  - id: ex-7
+    title: Who wants a Marigold franchise?
+    kind: kpis
+    provenance: simulated-data
+    items:
+      - { label: "Franchise inquiries", value: '41', note: "In the last twelve months" }
+      - { label: "From Mumbai", value: '17' }
+      - { label: "From Bengaluru", value: '9' }
+      - { label: "From other cities", value: '15' }
+      - { label: "With restaurant experience", value: '9' }
+      - { label: "Able to fund a restaurant without a loan", value: '4', note: "A franchised restaurant costs its owner about ₹16m to open" }
+    source: Simulated teaching data, from the inquiries log.
+
+  - id: ex-8
+    title: Decision tree estimates for three routes (value over ten years)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: "Route" }
+      - { label: 'Money invested, ₹m', numeric: true }
+      - { label: "Probability of strong demand", numeric: true }
+      - { label: 'Value if demand is strong, ₹m', numeric: true }
+      - { label: 'Value if demand is weak, ₹m', numeric: true }
+    rows:
+      - [Organic growth, 72, 0.6, 150, 60]
+      - [Franchising, 10, 0.6, 95, 30]
+      - [Stay focused, 3, 0.6, 40, 25]
+    note: Value is the extra profit the route adds over ten years, before subtracting the money invested and without discounting. Strong and weak demand are the only outcomes considered.
+    source: Simulated teaching data, prepared for a decision tree. These are rough judgements, not forecasts.
+
+constraints:
+  - Cash available to invest is ₹20m. Anything larger needs a loan, a partner or an investor.
+  - The bank will lend up to ₹55m at 11% a year for company-owned restaurants, secured on the business.
+  - The recipes depend on fresh, local produce and on cooks trained by the head chef. Training a new cook takes about four months.
+  - Tiffin Lane's owner will consider other buyers if there is no offer by the end of the year.
+
+stakeholders:
+  - name: Meera Rao, founder and sole owner
+    interest: Control, the quality of the food and the future of the business she built.
+    influence: high
+    stake: high
+    concern: Losing the character of the food and of the business.
+  - name: Employees (118)
+    interest: Jobs, pay, training and the chance of promotion.
+    influence: medium
+    stake: high
+    concern: Growth could bring promotion, or a new owner's rules and more pressure.
+  - name: Customers
+    interest: Food that tastes the same every time, at a fair price.
+    influence: medium
+    stake: medium
+    concern: A Marigold in a mall, or run by a franchisee, may not taste like the one they know.
+  - name: Banyan Growth Partners (possible investor)
+    interest: A return on its investment and a sale of its stake in five to seven years.
+    influence: high
+    stake: medium
+    concern: A business that grows too slowly to sell at a good price.
+  - name: Sterling Malls (possible joint venture partner)
+    interest: Restaurants that bring shoppers to its malls, and the rent they pay.
+    influence: high
+    stake: medium
+    concern: Restaurants that do not draw enough footfall.
+  - name: Prospective franchisees
+    interest: A profitable restaurant and real support from the brand.
+    influence: medium
+    stake: high
+    concern: Paying fees and royalties to a brand that cannot help them succeed, with their own savings at risk.
+  - name: The bank
+    interest: Interest, and repayment of the loan.
+    influence: medium
+    stake: medium
+    concern: Lending against forecasts for a city Marigold has never traded in.
+  - name: Tiffin Lane's owner and staff
+    interest: A fair price for the owner; jobs for the staff.
+    influence: low
+    stake: high
+    concern: Closures and new rules after a sale.
+  - name: Local farms and dairies
+    interest: Steady orders at fair prices.
+    influence: low
+    stake: medium
+    concern: Being replaced by large suppliers if the business grows.
+
+options:
+  - id: organic
+    label: Organic growth in Mumbai
+    summary: Open four company-owned restaurants in Mumbai over two years.
+    requires: ₹72m, of which ₹52m is borrowed; an area manager; cooks trained to Marigold's standard before each opening.
+    upside: Full control of the food, the culture and the brand; growth that can be paused after the first openings.
+    risks: Profit falls before it rises, because new restaurants take time to find customers and interest is due from the start. Debt magnifies a weak start.
+    evidence: [ex-1, ex-3]
+  - id: franchise
+    label: Franchising
+    summary: Sell the right to run Marigold restaurants to twelve franchisees over two years.
+    requires: ₹10m for an academy, a manual and recruitment; a support team; twelve capable franchisees.
+    upside: Fast reach into new cities using other people's money; royalties without running the restaurants.
+    risks: Quality in the hands of owners Meera did not train; only four inquirers can fund a restaurant.
+    evidence: [ex-3, ex-7]
+  - id: joint-venture
+    label: Joint venture with Sterling Malls
+    summary: A jointly owned company opens six Marigold restaurants in Sterling's malls in three cities.
+    requires: ₹45m from Marigold, of which ₹30m is borrowed; agreement on control, menu and exit.
+    upside: Three cities in two years, with high footfall and the partner sharing cost and risk.
+    risks: Shared control of the menu and prices; exit terms that may favour the partner who owns the sites.
+    evidence: [ex-3]
+  - id: acquisition
+    label: Acquire Tiffin Lane
+    summary: Buy nine restaurants, convert six to Marigold and close three, funded by selling 30% of Marigold to an investor.
+    requires: ₹120m from Banyan Growth Partners; an integration plan; Tiffin Lane's staff to stay.
+    upside: The largest business fastest, with purchasing economies of scale and a presence in Mumbai.
+    risks: Paying twenty-five times profit; integrating a weaker business with a different culture; an investor who will want to sell.
+    evidence: [ex-3, ex-4, ex-5]
+  - id: stay-focused
+    label: Stay focused
+    summary: Keep four restaurants and use the kitchens' quiet mornings for an office lunch service.
+    requires: ₹3m for vans and equipment.
+    upside: Control and quality kept; little risk; better use of capacity the business already has.
+    risks: No progress towards three cities; opportunities may go to competitors; ambitious staff may leave for growing rivals.
+    evidence: [ex-2, ex-3, ex-6]
+
+analysis:
+  data:
+    - Each restaurant earns ₹4.32m on ₹24m of sales (18%). The four together earn ₹17.28m, and central costs of ₹4.5m leave an operating profit of ₹12.78m (Exhibits 1 and 2).
+    - The routes differ most in three things. Capital needed runs from ₹3m to ₹126m. Control runs from full, through shared, to diluted. And profit rises at once on some routes and only after two or more years on others (Exhibit 3).
+    - Tiffin Lane earns ₹3.84m on ₹144m of sales, a margin under 3%, with a review rating a full point below Marigold's and staff turnover of 46% (Exhibits 4 and 5).
+    - Only four of the forty-one franchise inquirers could fund a restaurant without borrowing (Exhibit 7).
+  insight:
+    - Marigold's advantage is its food and the cooks who make it. Any route that loosens control of the kitchen puts that advantage at risk, which is why the founder's first and third aims matter more than the forecasts suggest.
+    - The routes that look best by year four, the acquisition and the joint venture, depend most on the things that are hardest to control. One is integrating a weaker business. The other is working with a partner whose priorities are different.
+    - Franchising looks capital-light, but the plan needs twelve capable franchisees in two years and the evidence shows four with the means. The bottleneck is people, not money.
+    - Organic growth lowers profit in year two, because new restaurants take time to find customers and interest is paid from the start. It is the slowest route and the one most consistent with the founder's aims.
+  options:
+    - Organic growth meets the aims on quality, control and people. It reaches a second city, but not a third, within two years.
+    - The joint venture reaches three cities fastest with moderate capital, at the cost of shared control in the malls.
+    - The acquisition builds the largest business and the largest forecast profit, at the cost of 30% of the company and the highest integration risk.
+    - Franchising and staying focused sit at the two extremes, one of reach and the other of control.
+  recommendation: >
+    One defensible recommendation is organic growth in Mumbai, taken in steps. Open two restaurants first, and train
+    a second head chef in Pune before each opening. Decide on the second pair only when the first pair reaches 85% of
+    mature sales. Add the office lunch service now, because it uses spare kitchen capacity at little risk. Revisit a
+    joint venture for mall sites only on terms that give Marigold control of the menu and a way out. This keeps the
+    first, third and fourth aims, and moves towards the second more slowly than Meera would like.
+  caveat: >
+    The recommendation depends on Mumbai demand coming close to the forecast and on the bank's terms. If first-year
+    sales in Mumbai came in well below ₹22m a restaurant, the second pair should not open, and the joint venture's
+    mall footfall would look more valuable. A founder whose first aim was reach could reasonably choose the joint
+    venture instead.
+
+method: >
+  Marigold Kitchens and everyone in this case are fictional, and every figure is simulated. The restaurant economics
+  in Exhibit 1 were chosen for teaching, not taken from a real restaurant. Every forecast in the Decision Room is
+  calculated from Exhibits 1 to 4 with one stated model. Restaurant profit is sales multiplied by one minus the food
+  and packaging share, minus the restaurant's other costs. Group profit is the restaurants' profit, plus royalties or
+  a share of joint venture profit where they apply, minus central costs and interest. Year two is the first full year
+  after the decision, and maturity is year four. Interest is charged at 11% on the full loan in both years, as if it
+  had not yet been repaid. Taxes, depreciation and inflation are left out so that the comparison stays visible.
+  The tests in the repository recompute every figure from the exhibits.
+
+topics: [growth-and-evolution]
+tools: [ansoff-matrix, decision-trees, force-field-analysis, swot-analysis]
+concepts: [change, creativity, ethics, sustainability]
+calculations: [expected-value]
+questions: [q-growth-p1-define, q-growth-p1-explain, q-growth-p1-distinguish, q-growth-p1-ansoff, q-growth-p2-tree, q-growth-p1-discuss]
+decisionRoom: marigold-growth
+sources: [method-simulated]
+updated: 2026-10-29

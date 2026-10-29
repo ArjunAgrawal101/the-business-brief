@@ -1,0 +1,54 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import Interactive from '../../components/interactive/Interactive.astro';
+import CalcCard from '../../components/finance/CalcCard.astro';
+import { corpus } from '../../lib/content';
+
+const PATH = '/finance-desk/break-even/';
+const c = await corpus();
+const calcs = Object.entries(c.calculations)
+  .filter(([, k]) => k.page === PATH)
+  .sort((a, b) => a[1].order - b[1].order);
+---
+
+<BaseLayout title="Break-even: Finance Desk" description="A live break-even workspace with chart, margin of safety and target profit, the calculations worked in full, and the errors that cost marks." section="finance-desk">
+  <PageIntro
+    trail={[{ label: 'Finance Desk', href: '/finance-desk/' }, { label: 'Break-even' }]}
+    kicker="Finance Desk"
+    title="Break-even"
+    lead="Change the price, the costs or the forecast and watch the break-even point, the margin of safety and profit move together. Then check the method against the worked calculations, and find the error in five flawed solutions."
+  />
+  <div class="wrap page-body">
+    <section aria-labelledby="ws-h">
+      <SectionHead no={1} title="The workspace" id="ws-h" />
+      <div style="margin-top:var(--sp-5)">
+        <Interactive
+          component="break-even-workspace"
+          refId="costs-break-even-atelier"
+          title="Atelier Barro's break-even, from November"
+          intro="The inputs start from the case: €22 a mug, €6.30 of variable cost plus a 4% card fee, and €8,140 of monthly fixed costs. Try each scenario, then set your own."
+          provenance="simulated-data"
+          headingLevel={3}
+        />
+      </div>
+    </section>
+    <section aria-labelledby="calcs-h">
+      <SectionHead no={2} title="The calculations" dek="Each with a worked example from the case." id="calcs-h" />
+      <div class="stack stack-lg" style="margin-top:var(--sp-5)">
+        {calcs.map(([id, k]) => <CalcCard id={id} calc={k} headingLevel={3} />)}
+      </div>
+    </section>
+    <section aria-labelledby="errors-h">
+      <SectionHead no={3} title="Find the error" dek="Five solutions, one wrong line in each." id="errors-h" />
+      <div style="margin-top:var(--sp-5)">
+        <Interactive component="error-diagnosis" refId="costs-error-diagnosis" title="Find the error" provenance="subject-knowledge" headingLevel={3} />
+      </div>
+    </section>
+    <p class="cluster">
+      <a class="btn" href="/finance-desk/costs-and-revenue/">Back: costs and revenue</a>
+      <a class="btn" href="/finance-desk/contribution/">Next: contribution decisions (HL)</a>
+    </p>
+  </div>
+</BaseLayout>

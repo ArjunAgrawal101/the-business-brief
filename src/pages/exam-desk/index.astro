@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import FactList from '../../components/assess/FactList.astro';
+import { corpus, href, questionsInOrder } from '../../lib/content';
+
+const c = await corpus();
+const comps = Object.entries(c.assessment).sort((a, b) => a[1].order - b[1].order);
+const questions = await questionsInOrder();
+const weightClaim = c.claims['assessment-weightings'];
+---
+
+<BaseLayout title="Exam Desk" description="The IB Business Management assessment, stated with its sources and verification status, and original practice organized by paper." section="exam-desk">
+  <PageIntro
+    trail={[{ label: 'Exam Desk' }]}
+    kicker="Exam Desk"
+    title="The assessment, and how to prepare"
+    lead="What is known about each component, where it comes from and how sure it is, followed by original practice. Nothing here is an IB examination question, and no mark allocation is stated that a source does not establish."
+  />
+  <div class="wrap page-body">
+    <section aria-labelledby="comp-h">
+      <SectionHead no={1} title="The components" id="comp-h" />
+      <ol class="index-list" style="margin-top:var(--sp-4)">
+        {
+          comps.map(([id, a]) => (
+            <li class="index-item">
+              <span class="index-item__code">{a.short}</span>
+              <div class="index-item__body">
+                <h3 class="index-item__title">
+                  <a href={href.assessment(id)}>{a.name}</a>
+                </h3>
+                <p>{a.summary}</p>
+              </div>
+              <div class="index-item__side">
+                <span class={`tag ${a.levels === 'HL only' ? 'tag--hl' : 'tag--sl'}`}>{a.levels}</span>
+                <span class="muted">{a.questions.length} practice questions</span>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+    <section aria-labelledby="w-h">
+      <SectionHead no={2} title="Weightings and timings" dek="As reported by secondary sources that agree with each other. The Guide was not available to confirm them." id="w-h" />
+      <div style="margin-top:var(--sp-4)">
+        <FactList facts={comps.flatMap(([, a]) => a.facts.filter((f) => /%|hour|minute/.test(f.text)))} />
+      </div>
+      {weightClaim && <p class="small muted" style="margin-top:var(--sp-3)">Claims register entry: {weightClaim.statement}</p>}
+    </section>
+    <section aria-labelledby="p-h">
+      <SectionHead no={3} title="Practice" id="p-h" />
+      <div class="grid grid--2" style="margin-top:var(--sp-4)">
+        <div class="prose">
+          <p>
+            {questions.length} original practice questions, written for the cases on this platform in the style of each paper. Each
+            has a mark scheme or level descriptors of its own, labelled as the platform's, and the errors that most often cost marks.
+          </p>
+          <p><a class="btn btn--primary" href="/exam-desk/practice/">Open the practice set</a></p>
+        </div>
+        <div class="prose">
+          <p>
+            Command terms decide what an answer must do. The <a href="/examiner-lens/">Examiner Lens</a> lists each term with its
+            definition, where the definition comes from, and how to answer to it.
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>

@@ -1,0 +1,103 @@
+/*
+  The Business Brief: design tokens.
+  Brand hues are kept exactly as specified. Where a hue does not reach WCAG AA
+  as small text on the paper surfaces, a darker text companion is defined beside
+  it (the "-text" tokens). scripts/qa/contrast.mjs checks every pairing listed in
+  DESIGN_SYSTEM.md, so a change here that breaks contrast fails the QA run.
+*/
+:root {
+  /* Brand hues */
+  --bb-ink: #111417;
+  --bb-paper: #f4f1ea;
+  --bb-slate: #65717c;
+  --bb-cobalt: #315cff;
+  --bb-brass: #c79a45;
+  --bb-signal: #b84a4a;
+  --bb-green: #2f7565;
+
+  /* Surfaces */
+  --surface-page: var(--bb-paper);
+  --surface-sheet: #fbfaf7;
+  --surface-sunk: #ece7dc;
+  --surface-ink: var(--bb-ink);
+  --surface-ink-raised: #1d2126;
+  --surface-cobalt-wash: #e6ebff;
+  /* Feedback washes behind checked answers */
+  --surface-right: #e7f0ed;
+  --surface-wrong: #f6e9e9;
+  --surface-partial: #f6efe0;
+
+  /* Text */
+  --text-strong: #111417;
+  --text-body: #2a2f35;
+  --text-muted: #5a6670;
+  --text-on-ink: #f4f1ea;
+  --text-on-ink-muted: #b8bec4;
+
+  /* Accent companions for text on paper, sheet and sunk surfaces */
+  --cobalt-text: #2b50e0;
+  --cobalt-deep: #2346cc;
+  --signal-text: #a13d3d;
+  --green-text: #296657;
+  --brass-text: #7a5a1c;
+
+  /* Lines */
+  --rule-hair: #dcd6ca;
+  --rule: #c4bdb0;
+  --rule-control: #65717c;
+  --rule-ink: #111417;
+
+  /* Type families (self-hosted, SIL Open Font Licence; see public/fonts) */
+  --font-display: "Inter Tight", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --font-serif: "Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif;
+
+  /* Type scale */
+  --fs-label: 0.75rem;
+  --fs-small: 0.875rem;
+  --fs-body: 1.0625rem;
+  --fs-lead: clamp(1.125rem, 1.06rem + 0.32vw, 1.3125rem);
+  --fs-h4: 1.125rem;
+  --fs-h3: clamp(1.25rem, 1.16rem + 0.42vw, 1.5rem);
+  --fs-h2: clamp(1.625rem, 1.38rem + 1.05vw, 2.25rem);
+  --fs-h1: clamp(2.125rem, 1.6rem + 2.4vw, 3.5rem);
+  --fs-display: clamp(2.75rem, 1.7rem + 4.8vw, 5.75rem);
+
+  --lh-tight: 1.02;
+  --lh-snug: 1.18;
+  --lh-body: 1.6;
+
+  /* Space: a 4 px base */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 3rem;
+  --sp-8: 4rem;
+  --sp-9: 6rem;
+
+  /* Layout */
+  --page-max: 80rem;
+  --text-max: 42rem;
+  --gutter: clamp(1rem, 0.55rem + 1.9vw, 2.5rem);
+  --header-h: 4.25rem;
+
+  /* Shape: documents have corners */
+  --radius-0: 0;
+  --radius-1: 2px;
+  --radius-2: 4px;
+
+  /* Motion */
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* Focus */
+  --focus-ring: 3px solid var(--bb-cobalt);
+  --focus-ring-on-ink: 3px solid var(--bb-brass);
+
+  color-scheme: light;
+}

@@ -1,0 +1,55 @@
+---
+/**
+ * Retrieval practice: say or write the answer, then reveal it and rate your
+ * recall. Ratings stay on this device, so the cards you found hard come first
+ * next time. Without JavaScript each answer is a disclosure.
+ */
+import { jsonForScript, rich } from '../../lib/markup';
+
+interface Props {
+  id: string;
+  items: Array<{ q: string; a: string }>;
+}
+const { id, items } = Astro.props;
+const config = { id, count: items.length };
+---
+
+<div class="rcards" data-ix="retrieval" id={`rc-${id}`}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="small muted rcards__how">Answer each question from memory, out loud or on paper, before you reveal the answer.</p>
+  <ol class="rcards__list" data-list role="list">
+    {
+      items.map((it, k) => (
+        <li class="rcard" data-card={k}>
+          <details class="rcard__inner">
+            <summary class="rcard__q">
+              <span class="rcard__no num" aria-hidden="true">{String(k + 1).padStart(2, '0')}</span>
+              <span class="rcard__text">{it.q}</span>
+              <span class="rcard__reveal" aria-hidden="true"><span class="rcard__closed">Reveal</span><span class="rcard__open">Hide</span></span>
+            </summary>
+            <div class="rcard__a">
+              <div class="prose" set:html={rich(it.a)} />
+              <div class="rcard__rate js-only" role="group" aria-label="How well did you recall it?">
+                <span class="small muted">How well did you recall it?</span>
+                <button type="button" class="btn btn--small" data-rate="2">Got it</button>
+                <button type="button" class="btn btn--small" data-rate="1">Partly</button>
+                <button type="button" class="btn btn--small" data-rate="0">Not yet</button>
+              </div>
+            </div>
+          </details>
+        </li>
+      ))
+    }
+  </ol>
+  <div class="quiz__bar js-only">
+    <p class="quiz__summary" data-summary>Reveal and rate each card.</p>
+    <div class="cluster">
+      <button type="button" class="btn btn--small" data-hard-first>Put the hard ones first</button>
+      <button type="button" class="btn btn--small" data-clear>Clear ratings</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import '../../scripts/retrieval';
+</script>

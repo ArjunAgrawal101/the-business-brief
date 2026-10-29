@@ -1,0 +1,127 @@
+---
+/**
+ * One calculation from the register: what it is for, its formula and
+ * variables, a worked example in eight parts, and the errors that cost marks.
+ */
+import LevelTag from '../ui/LevelTag.astro';
+import VerifyTag from '../ui/VerifyTag.astro';
+import Worked from '../blocks/Worked.astro';
+import { corpus, href } from '../../lib/content';
+import { expectedValueWorking } from '../../lib/decision-tree';
+import { inline, rich } from '../../lib/markup';
+import { workingHtml } from '../../lib/render';
+import type { Calculation } from '../../lib/schemas';
+
+interface Props {
+  id: string;
+  calc: Calculation;
+  headingLevel?: 2 | 3;
+}
+const { id, calc: k, headingLevel = 2 } = Astro.props;
+const c = await corpus();
+const H = headingLevel === 2 ? 'h2' : 'h3';
+const GROUPS = { 'costs-revenue': 'Costs and revenue', 'break-even': 'Break-even', contribution: 'Contribution', decision: 'Decisions', scale: 'Scale' } as const;
+const ex = k.example;
+let treeHtml: string | undefined;
+if (ex?.tree) {
+  const ix = c.interactives[ex.tree.interactive];
+  const op = ix && ix.component === 'decision-tree-lab' ? ix.options.find((o) => o.id === ex.tree?.option) : undefined;
+  if (ix && ix.component === 'decision-tree-lab' && op) treeHtml = workingHtml(expectedValueWorking(op, ix.currency, ix.unit), rich(ex.interpretation), rich(ex.implication));
+}
+const theCase = ex?.case ? c.cases[ex.case] : undefined;
+---
+
+<article class="calc" id={`calc-${id}`} aria-labelledby={`calc-${id}-h`} data-level={k.level === 'HL' ? 'HL' : undefined}>
+  <header class="calc__head">
+    <p class="label">{GROUPS[k.group]}</p>
+    <H class="calc__name" id={`calc-${id}-h`}>{k.name}</H>
+    <div class="tags">
+      <LevelTag level={k.level} always />
+      <VerifyTag status={k.verification} />
+      <span class="tag tag--plain">IB {k.syllabus.map((s) => s.code).join(', ')}</span>
+    </div>
+  </header>
+  <div class="formula">
+    <p class="label">Formula</p>
+    <p class="formula__expr">{k.formula}</p>
+    <dl class="formula__vars">
+      {
+        k.variables.map((v) => (
+          <>
+            <dt>{v.symbol}</dt>
+            <dd>
+              {v.meaning} <span class="muted">({v.unit})</span>
+            </dd>
+          </>
+        ))
+      }
+    </dl>
+  </div>
+  <div class="calc__what prose">
+    <p><strong>Unit.</strong> {k.unit}</p>
+    <div set:html={rich(k.interpretation)} />
+  </div>
+  {
+    ex && (
+      <div class="calc__example">
+        <p class="label label--ink">
+          Worked example{theCase && <>: from the case <a href={href.case(ex.case ?? '')}>{theCase.title}</a></>}
+        </p>
+        {treeHtml ? (
+          <section class="worked" aria-label={`Worked calculation: ${ex.title}`}>
+            <h3 class="worked__title">{ex.title}</h3>
+            <Fragment set:html={treeHtml} />
+          </section>
+        ) : (
+          <Worked calculation={id} inputs={ex.inputs} currency={ex.currency} labels={ex.labels} interpretation={ex.interpretation} implication={ex.implication} title={ex.title} />
+        )}
+      </div>
+    )
+  }
+  <details class="disclosure calc__errors">
+    <summary>Errors that cost marks</summary>
+    <div class="disclosure__body">
+      <ul class="prose">{k.errors.map((e) => <li set:html={inline(e)} />)}</ul>
+      {
+        k.syllabus.some((s) => s.note) && (
+          <p class="small muted">
+            {k.syllabus
+              .filter((s) => s.note)
+              .map((s) => `${s.code}: ${s.note}`)
+              .join(' ')}
+          </p>
+        )
+      }
+    </div>
+  </details>
+</article>
+
+<style>
+  .calc {
+    display: grid;
+    gap: var(--sp-4);
+    padding-top: var(--sp-5);
+    border-top: 3px solid var(--bb-ink);
+    scroll-margin-top: calc(var(--header-h) + var(--sp-3));
+  }
+
+  .calc__head {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .calc__name {
+    margin: 0;
+    font-size: var(--fs-h3);
+  }
+
+  .calc__example > .label {
+    display: block;
+    margin-bottom: var(--sp-3);
+  }
+
+  .worked__title {
+    font-size: var(--fs-h4);
+    margin-bottom: var(--sp-3);
+  }
+</style>

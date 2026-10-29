@@ -1,0 +1,221 @@
+---
+/** A one-page revision brief, designed to print on two sides of A4. */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import RetrievalCards from '../../components/assess/RetrievalCards.astro';
+import BriefMark from '../../components/brand/BriefMark.astro';
+import { corpus, href, longDate, topicsInOrder } from '../../lib/content';
+import { inline } from '../../lib/markup';
+import type { Topic } from '../../lib/schemas';
+
+export async function getStaticPaths() {
+  return (await topicsInOrder()).map(([id, topic]) => ({ params: { id }, props: { id, topic } }));
+}
+interface Props {
+  id: string;
+  topic: Topic;
+}
+const { id, topic: t } = Astro.props;
+const c = await corpus();
+const calcs = t.related.calculations.map((k) => ({ id: k, data: c.calculations[k] })).filter((k) => k.data);
+const terms = t.related.glossary.map((g) => ({ id: g, data: c.glossary[g] })).filter((g) => g.data);
+const misconceptions = t.sections.flatMap((s) => s.blocks).filter((b) => b.type === 'misconception');
+---
+
+<BaseLayout title={`${t.code} ${t.title}: revision brief`} description={`A one-page revision brief for ${t.code} ${t.title}.`} section="revision">
+  <div class="wrap page-body rev">
+    <header class="rev__head">
+      <div class="rev__brand">
+        <BriefMark size={36} decorative />
+        <span class="label">Revision Brief {t.code}</span>
+      </div>
+      <h1>{t.title}</h1>
+      <p class="rev__decision"><span class="label">The decision</span> {t.decisionQuestion}</p>
+      <p class="rev__actions noprint">
+        <button type="button" class="btn btn--primary" onclick="window.print()">Print this brief</button>
+        <a class="btn" href={href.topic(id)}>Open the full brief</a>
+      </p>
+    </header>
+    <div class="rev__grid">
+      <section>
+        <h2 class="label label--ink">Know</h2>
+        <ul class="rev__list">{t.revision.keyPoints.map((k) => <li set:html={inline(k)} />)}</ul>
+      </section>
+      <section>
+        <h2 class="label label--ink">Traps</h2>
+        <ul class="rev__list traps">{t.revision.traps.map((k) => <li set:html={inline(k)} />)}</ul>
+        {
+          misconceptions.length > 0 && (
+            <>
+              <h2 class="label label--ink" style="margin-top:var(--sp-4)">Misconceptions</h2>
+              <ul class="rev__list">
+                {misconceptions.map((m) => m.type === 'misconception' && <li set:html={inline(`Not: ${m.claim}`)} />)}
+              </ul>
+            </>
+          )
+        }
+      </section>
+      {
+        calcs.length > 0 && (
+          <section>
+            <h2 class="label label--ink">Formulas</h2>
+            <ul class="rev__formulas">
+              {calcs.map((k) => (
+                <li>
+                  <span class="rev__fname">{k.data?.name}</span>
+                  <span class="rev__fexpr">{k.data?.formula}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+      <section>
+        <h2 class="label label--ink">Terms</h2>
+        <dl class="rev__terms">
+          {
+            terms.map((g) => (
+              <div>
+                <dt>{g.data?.term}</dt>
+                <dd set:html={inline(g.data?.definition ?? '')} />
+              </div>
+            ))
+          }
+        </dl>
+      </section>
+    </div>
+    <section class="rev__retrieval">
+      <h2 class="label label--ink">Answer from memory</h2>
+      <RetrievalCards id={`rev-${id}`} items={t.revision.retrieval} />
+    </section>
+    <footer class="rev__foot small muted">
+      Arjun Agrawal | The Business Brief. Updated {longDate(t.updated)}. Statements about the IB course carry verification statuses on the full brief. Original teaching material; not an IB publication.
+    </footer>
+  </div>
+</BaseLayout>
+
+<style>
+  .rev {
+    max-width: 62rem;
+    padding-top: var(--sp-6);
+  }
+
+  .rev__head {
+    display: grid;
+    gap: var(--sp-3);
+    padding-bottom: var(--sp-4);
+    border-bottom: 3px solid var(--rule-ink);
+  }
+
+  .rev__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  .rev__head h1 {
+    margin: 0;
+    font-size: var(--fs-h1);
+  }
+
+  .rev__decision {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+  }
+
+  .rev__decision .label {
+    margin-right: 0.5rem;
+  }
+
+  .rev__grid {
+    display: grid;
+    gap: var(--sp-5) var(--sp-6);
+  }
+
+  @media (min-width: 52rem) {
+    .rev__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .rev__grid section {
+    padding-top: var(--sp-2);
+    border-top: 1px solid var(--rule-ink);
+  }
+
+  .rev__list {
+    margin: var(--sp-2) 0 0;
+    padding-left: 1.1em;
+    font-size: 0.9375rem;
+  }
+
+  .rev__list li + li {
+    margin-top: 0.4em;
+  }
+
+  .rev__formulas {
+    margin: var(--sp-2) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .rev__formulas li {
+    display: grid;
+    gap: 0.1rem;
+    padding: var(--sp-2) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .rev__fname {
+    font-weight: 650;
+    font-size: 0.875rem;
+  }
+
+  .rev__fexpr {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .rev__terms {
+    margin: var(--sp-2) 0 0;
+    font-size: 0.875rem;
+  }
+
+  .rev__terms div {
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .rev__terms dt {
+    display: inline;
+    font-weight: 700;
+  }
+
+  .rev__terms dt::after {
+    content: ". ";
+  }
+
+  .rev__terms dd {
+    display: inline;
+    margin: 0;
+  }
+
+  .rev__foot {
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  @media print {
+    .noprint {
+      display: none !important;
+    }
+
+    .rev {
+      padding: 0;
+    }
+
+    .rev__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

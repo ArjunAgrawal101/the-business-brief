@@ -1,0 +1,376 @@
+---
+/**
+ * A topic brief: the Business Brief's main page type. Situation, the ideas in
+ * order, the tools and evidence, a decision, an evaluation, practice, and
+ * revision, with the IB mapping, concept lens and teaching notes alongside.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import Block from '../../components/blocks/Block.astro';
+import QuestionCard from '../../components/assess/QuestionCard.astro';
+import RetrievalCards from '../../components/assess/RetrievalCards.astro';
+import LevelSwitch from '../../components/ui/LevelSwitch.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import VerifyTag from '../../components/ui/VerifyTag.astro';
+import LevelTag from '../../components/ui/LevelTag.astro';
+import { corpus, href, longDate, pathwaysInOrder, topicsInOrder } from '../../lib/content';
+import { CONCEPT_NAMES } from '../../lib/labels';
+import { inline, rich } from '../../lib/markup';
+import type { Topic } from '../../lib/schemas';
+
+export async function getStaticPaths() {
+  const topics = await topicsInOrder();
+  return topics.map(([id, topic]) => ({ params: { id }, props: { id, topic } }));
+}
+
+interface Props {
+  id: string;
+  topic: Topic;
+}
+const { id, topic: t } = Astro.props;
+const c = await corpus();
+const pathways = Object.fromEntries((await pathwaysInOrder()).map((p) => [p.id, p.data.name]));
+const curriculum = c.curricula['ib-dp-bm'];
+const unit = curriculum?.units.find((u) => u.id === t.unit);
+const sub = unit?.subtopics.find((s) => s.code === t.code);
+const sectionHasHL = (s: Topic['sections'][number]) => s.blocks.some((b) => b.level === 'HL');
+const relatedCases = t.related.cases.map((x) => ({ id: x, data: c.cases[x] })).filter((x) => x.data);
+const relatedDecisions = t.related.decisions.map((x) => ({ id: x, data: c.decisions[x] })).filter((x) => x.data);
+const relatedTools = t.related.tools.map((x) => ({ id: x, data: c.tools[x] })).filter((x) => x.data);
+const relatedCalcs = t.related.calculations.map((x) => ({ id: x, data: c.calculations[x] })).filter((x) => x.data);
+const relatedTopics = t.related.topics.map((x) => ({ id: x, data: c.topics[x] })).filter((x) => x.data);
+const glossary = t.related.glossary.map((x) => ({ id: x, data: c.glossary[x] })).filter((x) => x.data);
+const questions = t.related.questions.map((x) => ({ id: x, data: c.questions[x] })).filter((x) => x.data).sort((a, b) => (a.data?.order ?? 0) - (b.data?.order ?? 0));
+const sources = t.sources.map((x) => ({ id: x, data: c.sources[x] })).filter((x) => x.data);
+const n = t.sections.length;
+// Calculations whose home is this brief get an anchor on their first worked example.
+const anchors = new Map<string, string>();
+for (const s of t.sections)
+  s.blocks.forEach((b, k) => {
+    if (b.type !== 'worked') return;
+    const anchor = `calc-${b.calculation}`;
+    if (c.calculations[b.calculation]?.page === `/topics/${id}/` && ![...anchors.values()].includes(anchor)) anchors.set(`${s.id}:${k}`, anchor);
+  });
+const nav = [
+  ...t.sections.map((s, i) => ({ id: s.id, label: s.title, no: String(i + 1).padStart(2, '0') })),
+  { id: 'practice', label: 'Practice questions', no: String(n + 1).padStart(2, '0') },
+  { id: 'concepts', label: 'The concept lens', no: String(n + 2).padStart(2, '0') },
+  { id: 'revision', label: 'Revision', no: String(n + 3).padStart(2, '0') },
+  { id: 'connections', label: 'Connections and sources', no: String(n + 4).padStart(2, '0') },
+];
+---
+
+<BaseLayout title={`${t.code} ${t.title}`} description={t.summary} section="topics">
+  <PageIntro trail={[{ label: 'Topics', href: '/topics/' }, { label: `${t.code} ${t.title}` }]} kicker={`Business Brief ${t.code} · ${unit?.title ?? ''}`} title={t.title} lead={t.summary}>
+    <div class="brief-meta">
+      <div class="tags">
+        <LevelTag level={t.level} always />
+        {sub && <VerifyTag status={sub.verification} />}
+        <span class="tag tag--plain">Updated {longDate(t.updated)}</span>
+      </div>
+      <LevelSwitch id={`lvl-${id}`} />
+    </div>
+  </PageIntro>
+
+  <div class="band band--ink">
+    <div class="wrap brief-cover">
+      <div class="brief-cover__decision">
+        <p class="label">The decision</p>
+        <p class="brief-cover__q">{t.decisionQuestion}</p>
+      </div>
+      <div class="brief-cover__situation narrative" set:html={rich(t.situation)} />
+    </div>
+  </div>
+
+  <div class="wrap brief">
+    <aside class="brief__aside" aria-label="This brief">
+      <nav class="brief-toc" aria-labelledby="toc-h">
+        <p class="label label--ink" id="toc-h">In this brief</p>
+        <ol>
+          {
+            nav.map((item) => (
+              <li>
+                <a href={`#${item.id}`}>
+                  <span class="num">{item.no}</span> {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+    </aside>
+
+    <div class="brief__main">
+      <section class="brief-why" aria-labelledby="why-h">
+        <div class="brief-why__grid">
+          <div>
+            <h2 class="label label--ink" id="why-h">Why it matters</h2>
+            <div class="prose" set:html={rich(t.whyItMatters)} />
+          </div>
+          <div>
+            <h2 class="label label--ink">By the end you can</h2>
+            <ul class="objectives">
+              {
+                t.objectives.map((o) => (
+                  <li data-level={o.level === 'HL' ? 'HL' : undefined}>
+                    {o.text} {o.level === 'HL' && <LevelTag level="HL" />}
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
+        <details class="disclosure syllabus-box">
+          <summary>
+            In the IB course: subtopic {t.code}
+            {sub && <VerifyTag status={sub.verification} />}
+          </summary>
+          <div class="disclosure__body stack">
+            <div class="small muted" set:html={rich(t.syllabus.note)} />
+            <ul class="syllabus-items">
+              {
+                t.syllabus.items.map((it) => (
+                  <li>
+                    <span>{it.text}</span>
+                    <span class="tags">
+                      <LevelTag level={it.level} />
+                      <VerifyTag status={it.verification} />
+                    </span>
+                  </li>
+                ))
+              }
+            </ul>
+            <p class="small">
+              <a href="/ib/">See the whole syllabus map</a> · <a href="/ib/coverage/">What the platform covers</a>
+            </p>
+          </div>
+        </details>
+      </section>
+
+      {
+        t.sections.map((s, i) => (
+          <section class={`brief-section brief-section--${s.kind}`} id={s.id} aria-labelledby={`${s.id}-h`}>
+            <SectionHead no={i + 1} title={s.title} dek={s.dek} id={`${s.id}-h`} />
+            <div class="brief-section__blocks">
+              {s.blocks.map((b, k) => (
+                <Block block={b} index={k} sectionId={s.id} anchor={anchors.get(`${s.id}:${k}`)} />
+              ))}
+            </div>
+            {sectionHasHL(s) && (
+              <p class="hl-notice">
+                <span class="tag tag--hl">HL</span> This section has HL-only material, hidden while you are viewing SL content. Switch to HL at the top of the page to see it.
+              </p>
+            )}
+          </section>
+        ))
+      }
+
+      <section class="brief-section" id="practice" aria-labelledby="practice-h">
+        <SectionHead no={n + 1} title="Practice questions" dek="Original practice questions in the style of each paper. They are not IB questions, and their marks and level descriptors are the platform's." id="practice-h" />
+        <div class="stack">
+          {questions.map((q) => q.data && <QuestionCard id={q.id} question={q.data} showCase={true} />)}
+        </div>
+        <p class="hl-notice">
+          <span class="tag tag--hl">HL</span> HL-only questions are hidden while you are viewing SL content.
+        </p>
+      </section>
+
+      <section class="brief-section" id="concepts" aria-labelledby="concepts-h">
+        <SectionHead no={n + 2} title="The concept lens" dek="The four IB concepts, applied to this topic's case." id="concepts-h" />
+        <div class="concept-grid">
+          {
+            t.conceptLens.map((cl) => (
+              <article class={`concept-card concept-card--${cl.concept}`}>
+                <p class="label">
+                  <a href={href.concept(cl.concept)}>{CONCEPT_NAMES[cl.concept]}</a>
+                </p>
+                <h3 class="concept-card__q">{cl.question}</h3>
+                <div class="prose small" set:html={rich(cl.insight)} />
+              </article>
+            ))
+          }
+        </div>
+        {
+          t.lenses.length > 0 && (
+            <div class="lenses">
+              <h3 class="label label--ink">Beyond the course</h3>
+              <div class="lens-grid">
+                {t.lenses.map((l) => (
+                  <article class="lens">
+                    <p class="lens__for">
+                      For <a href={href.pathway(l.pathway)}>{pathways[l.pathway] ?? l.pathway}</a>
+                    </p>
+                    <h4 class="lens__title">{l.title}</h4>
+                    <ProvenanceTag kind={l.provenance} />
+                    <div class="prose small" set:html={rich(l.body)} />
+                  </article>
+                ))}
+              </div>
+            </div>
+          )
+        }
+      </section>
+
+      <section class="brief-section" id="revision" aria-labelledby="revision-h">
+        <SectionHead no={n + 3} title="Revision" id="revision-h">
+          <p class="small">
+            <a href={href.revision(id)}>Open the one-page revision brief</a>, ready to print.
+          </p>
+        </SectionHead>
+        <div class="revision-grid">
+          <div>
+            <h3 class="label label--ink">Key points</h3>
+            <ul class="prose keypoints">{t.revision.keyPoints.map((k) => <li set:html={inline(k)} />)}</ul>
+          </div>
+          <div>
+            <h3 class="label label--ink">Traps</h3>
+            <ul class="prose traps">{t.revision.traps.map((k) => <li set:html={inline(k)} />)}</ul>
+          </div>
+        </div>
+        <h3 class="label label--ink retrieval-h">Retrieval practice</h3>
+        <RetrievalCards id={id} items={t.revision.retrieval} />
+      </section>
+
+      <section class="brief-section" id="connections" aria-labelledby="connections-h">
+        <SectionHead no={n + 4} title="Connections and sources" id="connections-h" />
+        <div class="connections">
+          {
+            relatedCases.length > 0 && (
+              <div>
+                <h3 class="label label--ink">Cases</h3>
+                <ul class="link-list">
+                  {relatedCases.map((x) => (
+                    <li>
+                      <a href={href.case(x.id)}>{x.data?.title}</a>
+                      <span class="small muted">{x.data?.kind === 'fictional' ? 'Fictional, simulated data' : 'Real organization'}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+          {
+            relatedDecisions.length > 0 && (
+              <div>
+                <h3 class="label label--ink">Decision Room</h3>
+                <ul class="link-list">
+                  {relatedDecisions.map((x) => (
+                    <li>
+                      <a href={href.decision(x.id)}>{x.data?.title}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+          {
+            relatedTools.length > 0 && (
+              <div>
+                <h3 class="label label--ink">Toolkit</h3>
+                <ul class="link-list">
+                  {relatedTools.map((x) => {
+                    const link = x.data ? href.tool(x.id, x.data) : null;
+                    return (
+                      <li>
+                        {link ? <a href={link}>{x.data?.name}</a> : <span>{x.data?.name}</span>}
+                        {!link && <span class="small muted">Guide in preparation</span>}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )
+          }
+          {
+            relatedCalcs.length > 0 && (
+              <div>
+                <h3 class="label label--ink">Calculations</h3>
+                <ul class="link-list">
+                  {relatedCalcs.map((x) => (
+                    <li>
+                      <a href={href.calculation(x.id, x.data?.page ?? '/finance-desk/')}>{x.data?.name}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+          {
+            glossary.length > 0 && (
+              <div>
+                <h3 class="label label--ink">Glossary</h3>
+                <ul class="link-list link-list--inline">
+                  {glossary.map((x) => (
+                    <li>
+                      <a href={href.glossary(x.id)}>{x.data?.term}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+          {
+            relatedTopics.length > 0 && (
+              <div>
+                <h3 class="label label--ink">Other briefs</h3>
+                <ul class="link-list">
+                  {relatedTopics.map((x) => (
+                    <li>
+                      <a href={href.topic(x.id)}>
+                        {x.data?.code} {x.data?.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )
+          }
+        </div>
+        <div class="brief-sources">
+          <h3 class="label label--ink">Sources for this brief</h3>
+          <ol class="small">
+            {
+              sources.map((s) => (
+                <li>
+                  <a href={href.source(s.id)}>{s.data?.title}</a>
+                  {s.data?.author && `, ${s.data.author}`}
+                  {s.data?.year && ` (${s.data.year})`}
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+        <details class="disclosure teaching">
+          <summary>For teachers: a lesson sequence and discussion prompts</summary>
+          <div class="disclosure__body stack">
+            <div class="tags"><ProvenanceTag kind="aa-framework" /></div>
+            <div class="table-scroll" role="region" aria-label="Lesson sequence" tabindex="0">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="n">Minutes</th>
+                    <th scope="col">Activity</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {t.teaching.sequence.map((s) => (
+                    <tr>
+                      <td class="n">{s.minutes}</td>
+                      <td set:html={inline(s.activity)} />
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <h4 class="label label--ink">Discussion prompts</h4>
+              <ul class="prose">{t.teaching.prompts.map((p) => <li>{p}</li>)}</ul>
+            </div>
+            {t.teaching.notes && <div class="prose small" set:html={rich(t.teaching.notes)} />}
+          </div>
+        </details>
+      </section>
+    </div>
+  </div>
+</BaseLayout>

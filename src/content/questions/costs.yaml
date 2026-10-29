@@ -1,0 +1,259 @@
+# Original practice questions for 3.3 Costs and revenues, with break-even
+# (5.5). Written for this platform; not IB examination questions. Marks are
+# each question's own allocation. Every calculation answer is recomputed in
+# tests/unit/questions.test.ts with src/lib/finance.ts.
+
+- id: q-costs-p2-classify
+  title: Why electricity is semi-variable
+  qualification: ib-dp-bm
+  level: SL/HL
+  paperStyle: paper-2
+  topic: costs-and-revenues
+  syllabus: ['3.3']
+  commandTerm: Explain
+  ao: AO2
+  marks: 2
+  case: atelier-barro
+  exhibits: [ex-1]
+  prompt: Explain why electricity is a semi-variable cost for Atelier Barro.
+  skills: [Cost classification, Use of the case]
+  markscheme:
+    kind: points
+    points:
+      - marks: 1
+        text: It has a fixed part, the standing charge of €340 a month, which is paid whatever the output.
+      - marks: 1
+        text: It has a variable part, about €0.75 for each mug fired, which rises with output.
+  errors:
+    - Calling electricity variable because the bill goes up in busy months.
+    - Describing semi-variable costs in general without the studio's two parts.
+  provenance: original-practice
+  order: 301
+
+- id: q-costs-p2-direct
+  title: Direct and indirect costs
+  qualification: ib-dp-bm
+  level: SL/HL
+  paperStyle: paper-2
+  topic: costs-and-revenues
+  syllabus: ['3.3']
+  commandTerm: Distinguish
+  ao: AO2
+  marks: 4
+  case: atelier-barro
+  exhibits: [ex-1]
+  prompt: Distinguish between a direct cost and an indirect cost, using **two** costs from Exhibit 1.
+  skills: [Precise distinction, Classification]
+  markscheme:
+    kind: points
+    points:
+      - marks: 1
+        text: A direct cost can be traced to a particular cost object, such as one mug.
+      - marks: 1
+        text: An indirect cost (overhead) cannot be traced to one product because it is shared across the business.
+      - marks: 1
+        text: A correct direct example from the ledger, such as clay and glaze, the piece rate, packaging or the card fee.
+      - marks: 1
+        text: A correct indirect example from the ledger, such as rent, the kiln lease, a salary, insurance, marketing or electricity.
+  errors:
+    - Confusing direct with variable, and indirect with fixed. The two classifications answer different questions.
+  provenance: original-practice
+  order: 302
+
+- id: q-costs-p1-streams
+  title: Revenue streams beyond the mugs
+  qualification: ib-dp-bm
+  level: SL/HL
+  paperStyle: paper-1
+  topic: costs-and-revenues
+  syllabus: ['3.3']
+  commandTerm: Outline
+  ao: AO1
+  marks: 4
+  case: atelier-barro
+  exhibits: [ex-2]
+  prompt: Outline **two** revenue streams of Atelier Barro other than mug sales.
+  skills: [Knowledge of revenue streams, Use of the case]
+  markscheme:
+    kind: points
+    guidance: For each stream, award [1] for identifying it and [1] for a brief account of how it earns revenue.
+    points:
+      - marks: 2
+        text: Weekend workshops, which earn a fee from each participant (€55 a person), service revenue from the studio's skills and spare capacity.
+      - marks: 2
+        text: Kiln firing for other potters, which earns a charge for each firing, rental-like revenue from spare kiln capacity.
+  errors:
+    - Listing the two shops (online and studio) as separate streams. They are channels for the same stream, mug sales.
+  provenance: original-practice
+  order: 303
+
+- id: q-costs-p2-beq
+  title: Break-even quantity from November
+  qualification: ib-dp-bm
+  level: SL/HL
+  paperStyle: paper-2
+  topic: costs-and-revenues
+  syllabus: ['5.5', '3.3']
+  commandTerm: Calculate
+  ao: AO4
+  marks: 3
+  case: atelier-barro
+  exhibits: [ex-1]
+  prompt: Calculate Atelier Barro's break-even quantity per month from November, at a price of €22. Show your working.
+  skills: [Contribution, Break-even calculation, Rounding]
+  requiresCalculation: true
+  markscheme:
+    kind: calculation
+    points:
+      - marks: 1
+        text: Contribution per mug = €22.00 − €7.18 = €14.82
+      - marks: 1
+        text: €8,140 ÷ €14.82 = 549.26
+      - marks: 1
+        text: Rounded up to 550 mugs a month
+    answer: 550 mugs a month.
+  errors:
+    - Rounding down to 549, which leaves a loss of €3.82.
+    - Dividing the fixed costs by the price instead of by contribution per mug.
+  provenance: original-practice
+  order: 304
+
+- id: q-costs-p2-mos
+  title: Margin of safety from November
+  qualification: ib-dp-bm
+  level: SL/HL
+  paperStyle: paper-2
+  topic: costs-and-revenues
+  syllabus: ['5.5']
+  commandTerm: Calculate
+  ao: AO4
+  marks: 3
+  case: atelier-barro
+  exhibits: [ex-1]
+  prompt: Calculate the margin of safety, in mugs and as a percentage of sales, at 640 mugs a month from November and a price of €22.
+  skills: [Margin of safety, Units]
+  requiresCalculation: true
+  markscheme:
+    kind: calculation
+    points:
+      - marks: 1
+        text: Break-even quantity of 550 mugs, from €8,140 ÷ €14.82 rounded up
+      - marks: 1
+        text: 640 − 550 = 90 mugs
+      - marks: 1
+        text: 90 ÷ 640 × 100 = 14.1% of sales
+    answer: 90 mugs a month, or 14.1% of sales.
+  errors:
+    - Giving the margin of safety in euros.
+    - Confusing it with profit.
+  provenance: original-practice
+  order: 305
+
+- id: q-costs-p2-price
+  title: Profit at €24
+  qualification: ib-dp-bm
+  level: SL/HL
+  paperStyle: paper-2
+  topic: costs-and-revenues
+  syllabus: ['3.3', '5.5']
+  commandTerm: Calculate
+  ao: AO4
+  marks: 3
+  case: atelier-barro
+  exhibits: [ex-1, ex-3]
+  prompt: Using Exhibits 1 and 3, calculate Atelier Barro's monthly profit from November if it raises its price to €24.
+  skills: [Price-linked costs, Profit calculation]
+  requiresCalculation: true
+  markscheme:
+    kind: calculation
+    points:
+      - marks: 1
+        text: Variable cost per mug at €24 = €6.30 + 4% of €24 (€0.96) = €7.26
+      - marks: 1
+        text: Total contribution = 590 × (€24.00 − €7.26) = 590 × €16.74 = €9,876.60
+      - marks: 1
+        text: Profit = €9,876.60 − €8,140 = €1,736.60
+    answer: €1,736.60 a month.
+  errors:
+    - Keeping the card fee at €0.88, the fee at the old price, which gives €1,783.80.
+    - Using 640 mugs instead of the 590 expected at €24.
+  provenance: original-practice
+  order: 306
+
+- id: q-costs-p2-evaluate
+  title: How useful is break-even analysis here?
+  qualification: ib-dp-bm
+  level: SL/HL
+  paperStyle: paper-2
+  topic: costs-and-revenues
+  syllabus: ['5.5', '3.3']
+  commandTerm: Evaluate
+  ao: AO3
+  marks: 10
+  case: atelier-barro
+  exhibits: [ex-1, ex-3, ex-5]
+  prompt: Evaluate the usefulness of break-even analysis to Inês Carvalho in deciding the price of Atelier Barro's mugs.
+  skills: [Strengths and limitations in context, Judgement]
+  requiresEvaluation: true
+  markscheme:
+    kind: levels
+    guidance: Practice level descriptors written for this question, not the IB's markbands.
+    levels:
+      - marks: '0'
+        descriptor: Nothing that addresses the question.
+      - marks: 1-2
+        descriptor: Some knowledge of break-even analysis, not applied to Atelier Barro.
+      - marks: 3-4
+        descriptor: Strengths or limitations of break-even analysis, applied to the studio in places, with little weighing.
+      - marks: 5-6
+        descriptor: Strengths and limitations applied to the pricing decision, using the studio's figures, with some weighing.
+      - marks: 7-8
+        descriptor: A balanced evaluation in context. For example, it shows the effect of each price on break-even and the margin of safety, but its result depends on the sales estimates in Exhibit 3. A supported judgement.
+      - marks: 9-10
+        descriptor: As for 7 to 8, with a judgement that says how the analysis should be used (for example, as a test of each price against the uncertain demand estimates) and what else Inês needs to decide.
+    exemplar: >
+      Useful: it shows quickly that at €24 the break-even quantity falls from 550 to 487 mugs and the margin of safety
+      rises, so the studio is safer if the survey is right. Limited: it assumes every mug made is sold, and the sales at
+      each price are estimates, so the answer is only as good as Exhibit 3. It says nothing about the brand or regular
+      customers' reactions. Judgement: useful for comparing prices on the same assumptions, but the decision depends
+      more on the reliability of the demand estimates than on the arithmetic.
+  errors:
+    - Listing generic limitations, such as "it assumes a straight line", without saying why they matter for this decision.
+    - Forgetting that the 4% fee changes with the price.
+  provenance: original-practice
+  order: 307
+
+- id: q-costs-hl-special
+  title: The hotel's order (HL)
+  qualification: ib-dp-bm
+  level: HL
+  paperStyle: paper-2
+  topic: costs-and-revenues
+  syllabus: ['3.3']
+  commandTerm: Recommend
+  ao: AO3
+  marks: 6
+  case: atelier-barro
+  exhibits: [ex-4, ex-5]
+  prompt: Using contribution, recommend whether Atelier Barro should accept Casa Alfama Hotels' order.
+  skills: [Contribution analysis, Non-financial factors, Recommendation]
+  requiresCalculation: true
+  requiresEvaluation: true
+  markscheme:
+    kind: levels
+    guidance: Practice level descriptors written for this question, not the IB's markbands. The calculation is (€11.00 − €5.85) × 300 − €150 = €1,395.
+    levels:
+      - marks: '0'
+        descriptor: Nothing that addresses the question.
+      - marks: 1-2
+        descriptor: A recommendation with little use of contribution, or a calculation with no recommendation.
+      - marks: 3-4
+        descriptor: A correct or nearly correct contribution calculation and a recommendation that refers to it, with limited consideration of other factors.
+      - marks: 5-6
+        descriptor: A correct calculation, a recommendation that weighs it against capacity and the brand, and a condition, for example that the order must not be in December.
+    answer: The order adds €1,395 to November's profit.
+  errors:
+    - Comparing the €11 price with the average cost of a mug (about €20) and rejecting the order.
+    - Forgetting the €150 stamp.
+  provenance: original-practice
+  order: 308

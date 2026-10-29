@@ -1,0 +1,40 @@
+component: special-order
+title: The hotel's order, judged on contribution
+purpose: >
+  The learner sets the order's price, size and extra costs and sees the change in profit, compared with variable
+  cost and with average cost, and the capacity it uses. It diagnoses the belief that an order priced below average
+  cost must lose money, and shows the conditions under which that belief is right.
+provenance: simulated-data
+case: atelier-barro
+currency: '€'
+labels: { unit: mug, units: mugs, period: month }
+defaults:
+  orderPrice: 11
+  variableCost: 5.85
+  quantity: 300
+  extraFixedCosts: 150
+  regularSales: 830
+  capacity: 1200
+  fullCostPerUnit: 19.90
+  regularContribution: 14.82
+scenarios:
+  - id: december
+    label: Deliver in December
+    note: Regular sales of about 1,020 mugs leave room for only 180 more, so 120 shop mugs at full price would be displaced.
+    set: { regularSales: 1020 }
+  - id: counter
+    label: Hotel pays €13
+    note: The price Inês might ask for if she negotiates, in November.
+    set: { orderPrice: 13 }
+  - id: bigger
+    label: Order of 400 mugs
+    note: The hotel's possible larger order, in November, which runs past the kiln's capacity.
+    set: { quantity: 400 }
+hints:
+  variableCost: Clay, the thrower's piece rate, firing and bulk packaging. No card fee on an invoiced order.
+  regularContribution: €14.82, the contribution of a shop mug at €22 from November (Exhibit 1).
+  fullCostPerUnit: Total cost divided by mugs sold, at 640 mugs a month. It includes fixed costs.
+questions:
+  - Why does the order add profit when its price is below the average cost of a mug?
+  - What would accepting the order cost if it were for December, when regular sales are about 1,020 mugs?
+  - What could the order cost the studio that this calculation does not show?

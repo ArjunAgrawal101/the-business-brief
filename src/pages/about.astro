@@ -1,0 +1,84 @@
+---
+/** About the creator and the platform. Creator facts come only from the creator's own published profile (claims register: creator-facts). */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageIntro from '../components/layout/PageIntro.astro';
+import SectionHead from '../components/layout/SectionHead.astro';
+import { corpus } from '../lib/content';
+
+const c = await corpus();
+const claim = c.claims['creator-facts'];
+---
+
+<BaseLayout title="About" description="About Arjun Agrawal and The Business Brief, an independent business management learning platform." section="platform">
+  <PageIntro trail={[{ label: 'About' }]} kicker="About" title="Arjun Agrawal and The Business Brief" />
+  <div class="wrap page-body">
+    <div class="about">
+      <figure class="about__photo">
+        <img src="/brand/creator/arjun-agrawal-portrait-4x5.webp" width="432" height="540" alt="Arjun Agrawal" loading="lazy" decoding="async" />
+      </figure>
+      <div class="about__text stack">
+        <img class="about__mono" src="/brand/creator/arjun-agrawal-monogram.svg" width="88" height="67" alt="" />
+        <dl class="casefile-facts about__facts">
+          <div><dt>Education</dt><dd>Economics, St. Stephen's College, University of Delhi</dd></div>
+          <div><dt>Higher education</dt><dd>Assistant Professor, Fergusson College, Pune: undergraduate Economics</dd></div>
+          <div><dt>IB Diploma Programme</dt><dd>Teaching and academic work, including at BLISS International School, Pune and Symbiosis International School, Pune</dd></div>
+          <div><dt>Subjects</dt><dd>Economics, Business Management and Global Politics, at SL and HL</dd></div>
+          <div><dt>Mentorship</dt><dd>UPSC Civil Services aspirants, in Economics</dd></div>
+        </dl>
+        <p class="small muted">From the creator's published profile, checked {claim?.checked}. No role is described as a current post.</p>
+        <SectionHead no={1} title="The Business Brief" id="tbb-h" level={2} />
+        <div class="prose">
+          <p>
+            The Business Brief is an independent platform for learning business management through decisions: a business in a
+            situation, the ideas needed to read it, a choice to make and defend, and its consequences. It is written first for IB
+            Diploma Programme students and teachers, with pathways for other learners built on the same foundation.
+          </p>
+          <p>
+            It is a sibling of <a href="https://ib-economics-pi.vercel.app/" rel="noopener">Arjun Agrawal Economics</a>, sharing its
+            standards of accuracy and accessibility but not its design.
+          </p>
+          <p>
+            The Business Brief is not affiliated with, endorsed by or connected to the International Baccalaureate Organization.
+            Statements about the IB course carry their sources and verification status on the <a href="/sources/">sources page</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .about {
+    display: grid;
+    gap: var(--sp-6);
+  }
+
+  @media (min-width: 52rem) {
+    .about {
+      grid-template-columns: minmax(14rem, 20rem) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  .about__photo {
+    margin: 0;
+    border: 1px solid var(--bb-ink);
+    box-shadow: 8px 8px 0 var(--bb-ink);
+    background: #fff;
+  }
+
+  .about__photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .about__mono {
+    width: 88px;
+    height: auto;
+  }
+
+  .about__facts > div {
+    grid-template-columns: 10rem 1fr;
+  }
+</style>

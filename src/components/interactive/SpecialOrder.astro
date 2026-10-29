@@ -1,0 +1,125 @@
+---
+/**
+ * Special order panel (HL): judge an order on contribution, and see when the
+ * rule of thumb breaks down because the order displaces regular sales.
+ */
+import { readSpecialOrder, specialOrderModel } from '../../lib/special-order';
+import { buildWorking } from '../../lib/finance';
+import { fmtMoney } from '../../lib/format';
+import { capacityBarHtml, specialOrderFiguresHtml, workingHtml } from '../../lib/render';
+import { esc, jsonForScript } from '../../lib/markup';
+import { inputValue } from '../../scripts/ix';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'special-order' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const d = data.defaults;
+const cur = data.currency;
+const L = data.labels;
+const model = specialOrderModel(d);
+const money = (v: number) => fmtMoney(v, cur, 2);
+const reading = readSpecialOrder(model, money, L);
+const working = buildWorking(
+  'special-order',
+  { orderPrice: d.orderPrice, variableCost: d.variableCost, quantity: d.quantity, extraFixedCosts: d.extraFixedCosts, displaced: model.displaced, regularContribution: d.regularContribution },
+  cur,
+  L,
+);
+const config = { uid, defaults: d, scenarios: data.scenarios, currency: cur, labels: L };
+const fields = [
+  { key: 'orderPrice', label: `Price offered per ${L.unit}`, prefix: cur, step: '0.01' },
+  { key: 'variableCost', label: `Variable cost per ${L.unit} on the order`, prefix: cur, step: '0.01' },
+  { key: 'quantity', label: 'Order size', suffix: L.units, step: '1' },
+  { key: 'extraFixedCosts', label: 'Extra costs caused only by the order', prefix: cur, step: '1' },
+  { key: 'regularSales', label: `Regular sales that ${L.period}`, suffix: L.units, step: '1' },
+  { key: 'capacity', label: `Capacity per ${L.period}`, suffix: L.units, step: '1' },
+  { key: 'regularContribution', label: `Contribution of a regular ${L.unit}`, prefix: cur, step: '0.01' },
+  { key: 'fullCostPerUnit', label: `Average cost of a regular ${L.unit}`, prefix: cur, step: '0.01' },
+] as const;
+---
+
+<div class="sop" data-ix="special-order" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The panel could not start. The figures below are for the order as offered.</p>
+  <div class="bew__grid">
+    <form class="bew__inputs" data-form novalidate aria-label="Special order inputs">
+      <fieldset class="bew__fields">
+        <legend class="label label--ink">The order</legend>
+        {
+          fields.map((f) => (
+            <div class="field">
+              <label for={`${uid}-${f.key}`}>{f.label}</label>
+              <div class="affix">
+                {'prefix' in f && <span class="affix__pre" aria-hidden="true">{f.prefix}</span>}
+                <input
+                  class="input input--num"
+                  id={`${uid}-${f.key}`}
+                  name={f.key}
+                  type="number"
+                  inputmode="decimal"
+                  step={f.step}
+                  value={inputValue((d as Record<string, number>)[f.key] ?? 0, f.step)}
+                  aria-describedby={`${uid}-${f.key}-err${data.hints[f.key] ? ` ${uid}-${f.key}-hint` : ''}`}
+                />
+                {'suffix' in f && <span class="affix__post" aria-hidden="true">{f.suffix}</span>}
+              </div>
+              {data.hints[f.key] && (
+                <span class="field__hint" id={`${uid}-${f.key}-hint`}>
+                  {data.hints[f.key]}
+                </span>
+              )}
+              <span class="field__error" id={`${uid}-${f.key}-err`} data-err={f.key} />
+            </div>
+          ))
+        }
+      </fieldset>
+      {
+        data.scenarios.length > 0 && (
+          <fieldset class="bew__scenarios">
+            <legend class="label label--ink">Try a scenario</legend>
+            <div class="cluster">
+              {data.scenarios.map((s) => (
+                <button type="button" class="btn btn--small" data-scenario={s.id}>
+                  {s.label}
+                </button>
+              ))}
+              <button type="button" class="btn btn--small btn--ink" data-reset>
+                Reset to the offer
+              </button>
+            </div>
+            <p class="small muted" data-scenario-note>
+              Each scenario changes only what it names, starting from the offer.
+            </p>
+          </fieldset>
+        )
+      }
+    </form>
+    <div class="bew__results">
+      <h4 class="label label--ink">Results</h4>
+      <dl class="figs" data-figures set:html={specialOrderFiguresHtml(model, cur, L)} />
+      <div class="capbar" data-capbar aria-hidden="true" set:html={capacityBarHtml(model, L)} />
+      <div class="bew__reading">
+        <p><strong>Reading.</strong> <span data-interp>{reading.interpretation}</span></p>
+        <p class="muted"><strong>Implication.</strong> <span data-impl>{reading.implication}</span></p>
+      </div>
+    </div>
+  </div>
+  <section class="bew__working" aria-label="Working for the change in profit">
+    <h4 class="label label--ink">The working: change in profit</h4>
+    <div data-working set:html={workingHtml(working, esc(reading.interpretation), esc(reading.implication))} />
+  </section>
+  <div class="sop__think">
+    <h4 class="label label--ink">Think it through</h4>
+    <ol class="numbered">
+      {data.questions.map((q) => <li>{q}</li>)}
+    </ol>
+  </div>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/special-order';
+</script>

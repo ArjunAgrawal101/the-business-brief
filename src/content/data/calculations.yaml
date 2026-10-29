@@ -1,0 +1,366 @@
+# The calculation register. Each id matches a function in src/lib/finance.ts
+# (or src/lib/decision-tree.ts for expected value), which is the only place the
+# arithmetic is done. Formulas are standard; `verification` records how far the
+# calculation's place in the IB syllabus has been confirmed.
+
+- id: total-revenue
+  name: Total revenue
+  status: complete
+  group: costs-revenue
+  syllabus: [{ code: '3.3' }]
+  verification: corroborated
+  level: SL/HL
+  formula: Total revenue = selling price per unit × quantity sold
+  variables:
+    - { symbol: "TR", meaning: "Total revenue", unit: "currency per period" }
+    - { symbol: "P", meaning: "Selling price per unit", unit: "currency" }
+    - { symbol: "Q", meaning: "Quantity sold", unit: "units per period" }
+  unit: currency per period
+  interpretation: Revenue is the value of sales, before any cost is paid. A business with rising revenue can still be making a loss.
+  errors:
+    - Treating revenue as profit.
+    - Counting sales made by franchisees as the franchisor's own revenue. The franchisor's revenue is the fees and royalties it receives.
+  page: /finance-desk/costs-and-revenue/
+  example:
+    title: "Atelier Barro: revenue in an average month at €22"
+    case: atelier-barro
+    currency: '€'
+    labels: { unit: mug, units: mugs, period: month }
+    inputs: { price: 22, quantity: 640 }
+    interpretation: The studio takes €14,080 in an average month, before any cost is paid.
+    implication: Revenue alone says nothing about profit. The studio's costs that month are almost as large.
+  provenance: aa-framework
+  order: 1
+
+- id: total-cost
+  name: Total cost
+  status: complete
+  group: costs-revenue
+  syllabus: [{ code: '3.3' }]
+  verification: corroborated
+  level: SL/HL
+  formula: Total cost = total fixed costs + (variable cost per unit × output)
+  variables:
+    - { symbol: "TC", meaning: "Total cost", unit: "currency per period" }
+    - { symbol: "TFC", meaning: "Total fixed costs", unit: "currency per period" }
+    - { symbol: "AVC", meaning: "Variable cost per unit", unit: "currency" }
+    - { symbol: "Q", meaning: "Output", unit: "units per period" }
+  unit: currency per period
+  interpretation: Total cost rises with output only through variable costs. Fixed costs are paid even at zero output, which is why a quiet month can still be an expensive one.
+  errors:
+    - Multiplying fixed costs by output.
+    - Leaving semi-variable costs out because they are neither purely fixed nor purely variable. Split them into their fixed and variable parts.
+  page: /finance-desk/costs-and-revenue/
+  example:
+    title: "Atelier Barro: total cost of 640 mugs, from November"
+    case: atelier-barro
+    currency: '€'
+    labels: { unit: mug, units: mugs, period: month }
+    inputs: { fixedCosts: 8140, variableCost: 7.18, quantity: 640 }
+    interpretation: Making and selling 640 mugs costs €12,735.20 a month, of which €8,140 is paid whatever happens.
+    implication: Only €4,595.20 of the month's costs depends on how many mugs are made, so cutting output saves less than it seems.
+  provenance: aa-framework
+  order: 2
+
+- id: profit
+  name: Profit or loss
+  status: complete
+  group: costs-revenue
+  syllabus: [{ code: '3.3' }, { code: '5.5' }]
+  verification: corroborated
+  level: SL/HL
+  formula: Profit = total revenue − total cost
+  variables:
+    - { symbol: "TR", meaning: "Total revenue", unit: "currency per period" }
+    - { symbol: "TC", meaning: "Total cost", unit: "currency per period" }
+  unit: currency per period
+  interpretation: A negative result is a loss. Profit is not cash, and a profitable business can still run out of cash.
+  errors:
+    - Using contribution per unit times output and forgetting to subtract fixed costs.
+  page: /finance-desk/costs-and-revenue/
+  example:
+    title: "Atelier Barro: profit in an average month, from November, at €22"
+    case: atelier-barro
+    currency: '€'
+    labels: { unit: mug, units: mugs, period: month }
+    inputs: { price: 22, variableCost: 7.18, fixedCosts: 8140, quantity: 640 }
+    interpretation: The studio makes €1,344.80 a month, down from €1,616.80 before the new electricity tariff.
+    implication: The cost rise takes about a sixth of the profit if nothing else changes. That is the problem the owner has to solve.
+  provenance: aa-framework
+  order: 3
+
+- id: contribution-per-unit
+  name: Contribution per unit
+  status: complete
+  group: break-even
+  syllabus: [{ code: '5.5' }]
+  verification: corroborated
+  level: SL/HL
+  formula: Contribution per unit = selling price per unit − variable cost per unit
+  variables:
+    - { symbol: "P", meaning: "Selling price per unit", unit: "currency" }
+    - { symbol: "AVC", meaning: "Variable cost per unit", unit: "currency" }
+  unit: currency per unit
+  interpretation: What each unit sold adds towards paying the fixed costs and, once they are covered, towards profit.
+  errors:
+    - Calling contribution per unit "profit per unit". It is not profit until the fixed costs are covered.
+    - Forgetting a variable cost that is a share of the price, such as a card fee, which changes when the price changes.
+  page: /finance-desk/break-even/
+  example:
+    title: "Atelier Barro: contribution per mug at €22, from November"
+    case: atelier-barro
+    currency: '€'
+    labels: { unit: mug, units: mugs, period: month }
+    inputs: { price: 22, variableCost: 7.18 }
+    interpretation: Each mug sold adds €14.82 towards the studio's €8,140 of monthly fixed costs, and then to profit.
+    implication: This is the figure that answers the question "what does one more mug do for the business?"
+  provenance: aa-framework
+  order: 4
+
+- id: total-contribution
+  name: Total contribution
+  status: complete
+  group: break-even
+  syllabus: [{ code: '5.5' }]
+  verification: corroborated
+  level: SL/HL
+  formula: Total contribution = contribution per unit × quantity sold
+  variables:
+    - { symbol: "C", meaning: "Contribution per unit", unit: "currency" }
+    - { symbol: "Q", meaning: "Quantity sold", unit: "units per period" }
+  unit: currency per period
+  interpretation: Profit equals total contribution minus fixed costs.
+  errors:
+    - Treating total contribution as profit.
+  page: /finance-desk/break-even/
+  example:
+    title: "Atelier Barro: total contribution from 640 mugs, from November"
+    case: atelier-barro
+    currency: '€'
+    labels: { unit: mug, units: mugs, period: month }
+    inputs: { price: 22, variableCost: 7.18, quantity: 640 }
+    interpretation: The month's mugs contribute €9,484.80, which covers the €8,140 of fixed costs and leaves €1,344.80 of profit.
+    implication: Profit is total contribution minus fixed costs, so any decision can be judged by what it does to contribution.
+  provenance: aa-framework
+  order: 5
+
+- id: break-even-quantity
+  name: Break-even quantity
+  status: complete
+  group: break-even
+  syllabus: [{ code: '5.5' }]
+  verification: corroborated
+  level: SL/HL
+  formula: Break-even quantity = total fixed costs ÷ contribution per unit
+  variables:
+    - { symbol: "TFC", meaning: "Total fixed costs", unit: "currency per period" }
+    - { symbol: "C", meaning: "Contribution per unit", unit: "currency" }
+  unit: units per period
+  interpretation: The output at which total revenue equals total cost. In whole units it is rounded up, because one unit fewer leaves a loss.
+  errors:
+    - Rounding down to the nearest whole unit.
+    - Dividing fixed costs by the selling price instead of by contribution per unit.
+  page: /finance-desk/break-even/
+  example:
+    title: "Atelier Barro: break-even quantity at €22, from November"
+    case: atelier-barro
+    currency: '€'
+    labels: { unit: mug, units: mugs, period: month }
+    inputs: { fixedCosts: 8140, price: 22, variableCost: 7.18 }
+    interpretation: The studio must sell 550 mugs a month to cover all its costs.
+    implication: In an average month it sells 640, so it is above break-even, but not by much.
+  provenance: aa-framework
+  order: 6
+
+- id: break-even-revenue
+  name: Break-even revenue
+  status: complete
+  group: break-even
+  syllabus: [{ code: '5.5' }]
+  verification: corroborated
+  level: SL/HL
+  formula: Break-even revenue = break-even quantity × selling price per unit
+  variables:
+    - { symbol: "BEQ", meaning: "Break-even quantity", unit: "units per period" }
+    - { symbol: "P", meaning: "Selling price per unit", unit: "currency" }
+  unit: currency per period
+  interpretation: The value of sales at which the business makes neither a profit nor a loss.
+  errors:
+    - Giving the answer in units when revenue was asked for.
+  page: /finance-desk/break-even/
+  example:
+    title: "Atelier Barro: break-even revenue at €22, from November"
+    case: atelier-barro
+    currency: '€'
+    labels: { unit: mug, units: mugs, period: month }
+    inputs: { fixedCosts: 8140, price: 22, variableCost: 7.18 }
+    interpretation: The studio needs about €12,083.67 of sales a month to break even, the exact break-even quantity multiplied by the price.
+    implication: A target in money is easier to track week by week in the shop's till than a target in mugs.
+  provenance: aa-framework
+  order: 7
+
+- id: margin-of-safety
+  name: Margin of safety
+  status: complete
+  group: break-even
+  syllabus: [{ code: '5.5' }]
+  verification: corroborated
+  level: SL/HL
+  formula: Margin of safety = actual or forecast output − break-even output
+  variables:
+    - { symbol: "Q", meaning: "Actual or forecast output", unit: "units per period" }
+    - { symbol: "BEQ", meaning: "Break-even output", unit: "units per period" }
+  unit: units per period
+  interpretation: How far sales can fall before the business makes a loss. A negative margin means the business is below break-even.
+  errors:
+    - Confusing the margin of safety with profit.
+    - Using the exact break-even figure for one purpose and the rounded figure for another in the same answer.
+  page: /finance-desk/break-even/
+  example:
+    title: "Atelier Barro: margin of safety at 640 mugs, from November"
+    case: atelier-barro
+    currency: '€'
+    labels: { unit: mug, units: mugs, period: month }
+    inputs: { fixedCosts: 8140, price: 22, variableCost: 7.18, quantity: 640 }
+    interpretation: Sales could fall by 90 mugs a month, about 14%, before the studio makes a loss.
+    implication: A slow month, or one lost wholesale customer, could take away the profit. That is why the owner is worried.
+  provenance: aa-framework
+  order: 8
+
+- id: target-profit-output
+  name: Target profit output
+  status: complete
+  group: break-even
+  syllabus: [{ code: '5.5' }]
+  verification: corroborated
+  level: SL/HL
+  formula: Target profit output = (total fixed costs + target profit) ÷ contribution per unit
+  variables:
+    - { symbol: "TFC", meaning: "Total fixed costs", unit: "currency per period" }
+    - { symbol: "TP", meaning: "Target profit", unit: "currency per period" }
+    - { symbol: "C", meaning: "Contribution per unit", unit: "currency" }
+  unit: units per period
+  interpretation: The output needed to reach a chosen profit. Compare it with capacity and with realistic demand before treating it as a plan.
+  errors:
+    - Subtracting the target profit from fixed costs instead of adding it.
+  page: /finance-desk/break-even/
+  example:
+    title: "Atelier Barro: mugs needed for €2,000 of profit a month, from November"
+    case: atelier-barro
+    currency: '€'
+    labels: { unit: mug, units: mugs, period: month }
+    inputs: { fixedCosts: 8140, targetProfit: 2000, price: 22, variableCost: 7.18 }
+    interpretation: At €22 the studio would need to sell 685 mugs a month to make €2,000, 45 more than it sells now.
+    implication: That is 7% more sales at the same price. The survey in Exhibit 3 gives no reason to expect it, so the owner looks at price instead.
+  provenance: aa-framework
+  order: 9
+
+- id: target-price
+  name: Target price
+  status: complete
+  group: break-even
+  syllabus: [{ code: '5.5' }]
+  verification: unverified
+  level: SL/HL
+  formula: Target price = ((total fixed costs + target profit) ÷ expected sales) + variable cost per unit
+  variables:
+    - { symbol: "TFC", meaning: "Total fixed costs", unit: "currency per period" }
+    - { symbol: "TP", meaning: "Target profit", unit: "currency per period" }
+    - { symbol: "Q", meaning: "Expected sales", unit: "units per period" }
+    - { symbol: "AVC", meaning: "Variable cost per unit", unit: "currency" }
+  unit: currency per unit
+  interpretation: The price needed to reach a target profit if expected sales are achieved. A higher price usually lowers sales, so the expected sales figure is itself a judgement.
+  errors:
+    - Assuming sales stay the same when the price rises.
+  page: /finance-desk/break-even/
+  example:
+    title: "Atelier Barro: the price for €2,000 of profit at 640 mugs, from November"
+    case: atelier-barro
+    currency: '€'
+    labels: { unit: mug, units: mugs, period: month }
+    inputs: { fixedCosts: 8140, targetProfit: 2000, variableCost: 6.30, quantity: 640, priceShare: 4 }
+    interpretation: The studio would need to charge €23.07 a mug to make €2,000 a month, if it still sold 640 mugs.
+    implication: The answer assumes sales stay at 640 at the higher price. Exhibit 3 suggests they would fall, so the price that meets the target is higher still, or the target is out of reach.
+  provenance: aa-framework
+  order: 10
+
+- id: special-order
+  name: Special order (contribution)
+  status: complete
+  group: contribution
+  syllabus: [{ code: '3.3', note: Contribution is listed as an HL toolkit tool }]
+  verification: unverified
+  level: HL
+  formula: Change in profit = (order price − variable cost per unit) × order size − extra fixed costs caused by the order
+  variables:
+    - { symbol: "P₀", meaning: "Price offered for the order", unit: "currency" }
+    - { symbol: "AVC", meaning: "Variable cost per unit", unit: "currency" }
+    - { symbol: "Q₀", meaning: "Order size", unit: "units" }
+  unit: currency
+  interpretation: If there is spare capacity and regular sales are unaffected, an order priced above variable cost adds to profit, even when its price is below the full cost per unit.
+  errors:
+    - Rejecting an order because its price is below average total cost, when fixed costs are already covered by regular sales.
+    - Ignoring the effect on regular customers, who may ask for the same price.
+  page: /finance-desk/contribution/
+  example:
+    title: "Atelier Barro: the hotel's order of 300 mugs at €11, in November"
+    case: atelier-barro
+    currency: '€'
+    labels: { unit: mug, units: mugs, period: month }
+    inputs: { orderPrice: 11, variableCost: 5.85, quantity: 300, extraFixedCosts: 150 }
+    interpretation: The order adds €1,395 to November's profit, although €11 is far below the average cost of a shop mug.
+    implication: On the numbers, accept. The judgement is whether the order harms the price position, and whether the kiln can take it.
+  provenance: aa-framework
+  order: 11
+
+- id: labour-turnover
+  name: Labour turnover
+  status: complete
+  group: costs-revenue
+  syllabus: [{ code: '2.1' }]
+  verification: unverified
+  level: SL/HL
+  formula: Labour turnover = (number of employees leaving ÷ average number of employees) × 100
+  variables:
+    - { symbol: "L", meaning: "Employees leaving during the period", unit: "people" }
+    - { symbol: "N", meaning: "Average number of employees in the period", unit: "people" }
+  unit: per cent per period
+  interpretation: The share of the workforce that leaves in a period. Judge it against the business's own history and its industry, not against an ideal of zero.
+  errors:
+    - Dividing by the number of employees at the end of the year instead of the average.
+  page: /topics/leadership-and-management/
+  example:
+    title: "Halden Distribution: labour turnover on the night shift"
+    case: halden-distribution
+    inputs: { leavers: 28, averageEmployees: 54 }
+    interpretation: Over half of the night shift's average workforce left in the year.
+    implication: Against 22.2% on days, this is a problem concentrated on one shift, and a site-wide policy would treat it in the wrong place.
+  provenance: aa-framework
+  order: 12
+
+- id: expected-value
+  name: Expected value (decision trees)
+  status: complete
+  group: decision
+  syllabus: [{ code: '1.5', note: 'Decision trees are a toolkit tool, used here on a growth decision' }]
+  verification: corroborated
+  level: SL/HL
+  formula: Expected value = Σ (probability of outcome × payoff of outcome) − cost of the option
+  variables:
+    - { symbol: "p", meaning: "Probability of an outcome", unit: "between 0 and 1" }
+    - { symbol: "x", meaning: "Payoff of the outcome", unit: "currency" }
+  unit: currency
+  interpretation: The average result over many repetitions of the same decision. It does not show the spread of outcomes or the risk of the worst one.
+  errors:
+    - Probabilities at a chance node that do not add up to 1.
+    - Forgetting to subtract the cost of the option.
+  page: /toolkit/decision-trees/
+  example:
+    title: "Marigold Kitchens: the expected value of franchising"
+    case: marigold-kitchens
+    currency: '₹'
+    tree: { interactive: growth-tree-marigold, option: franchise }
+    interpretation: On these estimates franchising is worth ₹59m on average, after its ₹10m cost.
+    implication: It has the highest expected value of the three routes, but the decision also depends on control, quality and the founder's aims, which the number leaves out.
+  provenance: aa-framework
+  order: 13

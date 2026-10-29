@@ -1,0 +1,48 @@
+---
+/** Assign each of a manager's activities to one of the classic functions of management. */
+import QuizShell from './parts/QuizShell.astro';
+import Choice from './parts/Choice.astro';
+import Key from './parts/Key.astro';
+import CheckRow from './parts/CheckRow.astro';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'functions-sorter' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const FUNCTION_LABELS: Record<string, string> = {
+  planning: 'Planning',
+  organizing: 'Organizing',
+  commanding: 'Commanding',
+  coordinating: 'Coordinating',
+  controlling: 'Controlling',
+};
+const OPTIONS = Object.entries(FUNCTION_LABELS).map(([value, label]) => ({ value, label }));
+const config = {
+  uid,
+  kind: 'functions',
+  labels: FUNCTION_LABELS,
+  items: data.items.map((it) => ({
+    id: it.id,
+    groups: [{ name: 'fn', legend: 'A function', right: [it.answer], partial: [] }],
+  })),
+};
+---
+
+<QuizShell uid={uid} kind="functions" config={config} count={data.items.length}>
+  <p slot="before" class="quiz__lead">Which function of management does each activity mainly belong to?</p>
+  {
+    data.items.map((it, k) => (
+      <li class="quiz__item fs__item" data-item={it.id}>
+        <div class="fs__activity">
+          <span class="quiz__no" aria-hidden="true">{String(k + 1).padStart(2, '0')}</span>
+          <p data-short>{it.activity}</p>
+        </div>
+        <Choice uid={uid} itemId={it.id} name="fn" legend="Function of management" options={OPTIONS} showLegend={false} />
+        <CheckRow />
+        <Key answerLabel="Function:" answer={`${FUNCTION_LABELS[it.answer]}.`} explanation={it.explanation} />
+      </li>
+    ))
+  }
+</QuizShell>

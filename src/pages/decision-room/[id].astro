@@ -1,0 +1,30 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import DecisionRoom from '../../components/decision/DecisionRoom.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import { corpus, decisionsInOrder, href } from '../../lib/content';
+import type { Decision } from '../../lib/schemas';
+
+export async function getStaticPaths() {
+  return (await decisionsInOrder()).map(([id, decision]) => ({ params: { id }, props: { id, decision } }));
+}
+interface Props {
+  id: string;
+  decision: Decision;
+}
+const { id, decision: d } = Astro.props;
+const c = await corpus();
+---
+
+<BaseLayout title={`${d.title}: Decision Room`} description={d.dek} section="decision-room">
+  <PageIntro trail={[{ label: 'Decision Room', href: '/decision-room/' }, { label: c.cases[d.case]?.title ?? d.title }]} kicker="Decision Room" title={d.title} lead={d.dek} wide>
+    <div class="tags">
+      <ProvenanceTag kind="simulated-data" />
+      <a class="tag tag--plain" href={href.case(d.case)}>Case file: {c.cases[d.case]?.title}</a>
+    </div>
+  </PageIntro>
+  <div class="wrap page-body">
+    <DecisionRoom id={id} decision={d} />
+  </div>
+</BaseLayout>

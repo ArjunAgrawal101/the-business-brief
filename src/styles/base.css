@@ -1,0 +1,409 @@
+/* The Business Brief: base styles, typography and layout primitives. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: calc(var(--header-h) + var(--sp-4));
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--surface-page);
+  color: var(--text-body);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-feature-settings: "cv05" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+svg {
+  overflow: visible;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  margin: 0;
+  color: var(--text-strong);
+  font-family: var(--font-display);
+  font-weight: 680;
+  line-height: var(--lh-snug);
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--fs-h1);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.028em;
+  font-weight: 720;
+}
+
+h2 {
+  font-size: var(--fs-h2);
+  letter-spacing: -0.022em;
+}
+
+h3 {
+  font-size: var(--fs-h3);
+}
+
+h4 {
+  font-size: var(--fs-h4);
+  letter-spacing: -0.01em;
+}
+
+p,
+ul,
+ol,
+dl,
+blockquote,
+figure,
+table {
+  margin: 0;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+ul,
+ol {
+  padding-left: 1.25em;
+}
+
+li + li {
+  margin-top: 0.35em;
+}
+
+strong,
+b {
+  font-weight: 650;
+  color: var(--text-strong);
+}
+
+a {
+  color: var(--cobalt-text);
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  transition: text-decoration-thickness var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+
+a:hover {
+  color: var(--cobalt-deep);
+  text-decoration-thickness: 2px;
+}
+
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-1);
+}
+
+.on-ink :focus-visible {
+  outline: var(--focus-ring-on-ink);
+}
+
+::selection {
+  background: #c9d4ff;
+  color: var(--text-strong);
+}
+
+code,
+kbd,
+samp {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule-hair);
+  margin: var(--sp-6) 0;
+}
+
+abbr[title] {
+  text-decoration: underline dotted;
+  text-underline-offset: 0.2em;
+  cursor: help;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/*
+ * Grid items, flex items and fieldsets default to the minimum width of their
+ * content, so one wide table or chart can widen the whole page. Inside main,
+ * blocks may shrink instead, and wide content scrolls inside its own region
+ * (.table-scroll, .chart-scroll). Zero specificity, so any component can
+ * override it.
+ */
+:where(main) :where(div, section, article, header, footer, figure, form, fieldset, aside, details, dl, dd, li, nav) {
+  min-width: 0;
+}
+
+
+/* Screen-reader-only text */
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  left: var(--sp-4);
+  top: -100px;
+  z-index: 100;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--surface-ink);
+  color: var(--text-on-ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: var(--sp-3);
+  outline: var(--focus-ring-on-ink);
+}
+
+/* ---------- Layout primitives ---------- */
+
+.wrap {
+  width: 100%;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.measure {
+  max-width: var(--text-max);
+}
+
+.stack > * + * {
+  margin-top: var(--stack-gap, var(--sp-4));
+}
+
+.stack-sm {
+  --stack-gap: var(--sp-2);
+}
+
+.stack-lg {
+  --stack-gap: var(--sp-6);
+}
+
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cluster-gap, var(--sp-3));
+  align-items: center;
+}
+
+.band {
+  padding-block: clamp(var(--sp-7), 5vw, var(--sp-9));
+  border-top: 1px solid var(--rule-hair);
+}
+
+.band--sunk {
+  background: var(--surface-sunk);
+  border-top-color: transparent;
+}
+
+.band--ink {
+  background: var(--surface-ink);
+  color: var(--text-on-ink);
+  border-top-color: transparent;
+}
+
+.band--ink h2,
+.band--ink h3,
+.band--ink h4,
+.band--ink strong {
+  color: var(--text-on-ink);
+}
+
+.band--ink a {
+  color: var(--text-on-ink);
+}
+
+/* Prose: the reading column */
+.prose {
+  max-width: var(--text-max);
+}
+
+.prose > * + * {
+  margin-top: 1em;
+}
+
+.prose h3 {
+  margin-top: 1.6em;
+}
+
+.prose li + li {
+  margin-top: 0.45em;
+}
+
+.lead {
+  font-size: var(--fs-lead);
+  line-height: 1.5;
+  color: var(--text-body);
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.small {
+  font-size: var(--fs-small);
+}
+
+/* Mono label: the system's metadata voice */
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.label--ink {
+  color: var(--text-strong);
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Serif narrative: reserved for case narrative and quoted evidence */
+.narrative {
+  font-family: var(--font-serif);
+  font-size: 1.1875rem;
+  line-height: 1.62;
+  color: var(--text-strong);
+  font-optical-sizing: auto;
+}
+
+.narrative p + p {
+  margin-top: 0.9em;
+}
+
+/* Section heading: a tab number on a heavy rule */
+.sec-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--sp-4);
+  row-gap: var(--sp-2);
+  align-items: start;
+  padding-top: var(--sp-4);
+  border-top: 2px solid var(--rule-ink);
+}
+
+.sec-head__no {
+  display: inline-grid;
+  place-items: center;
+  min-width: 2.25rem;
+  height: 1.75rem;
+  padding-inline: 0.35rem;
+  background: var(--surface-ink);
+  color: var(--text-on-ink);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  margin-top: 0.3rem;
+}
+
+.sec-head__text > * + * {
+  margin-top: var(--sp-2);
+}
+
+.sec-head__dek {
+  max-width: var(--text-max);
+  color: var(--text-muted);
+}
+
+.band--ink .sec-head {
+  border-top-color: var(--text-on-ink);
+}
+
+.band--ink .sec-head__no {
+  background: var(--bb-brass);
+  color: var(--bb-ink);
+}
+
+.band--ink .sec-head__dek {
+  color: var(--text-on-ink-muted);
+}
+
+/* Grids */
+.grid {
+  display: grid;
+  gap: var(--grid-gap, var(--sp-5));
+}
+
+.grid--2 {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+}
+
+.grid--3 {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+}
+
+.grid--4 {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13.5rem), 1fr));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

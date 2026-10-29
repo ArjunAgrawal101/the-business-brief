@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import VerifyTag from '../../components/ui/VerifyTag.astro';
+import { corpus, href, topicsInOrder } from '../../lib/content';
+import { rich } from '../../lib/markup';
+
+const c = await corpus();
+const concepts = Object.entries(c.concepts).sort((a, b) => a[1].order - b[1].order);
+const topics = await topicsInOrder();
+const cur = c.curricula['ib-dp-bm'];
+---
+
+<BaseLayout title="The four concepts" description="Change, creativity, ethics and sustainability: the concepts of IB DP Business Management, and the questions each asks of a business." section="pathways">
+  <PageIntro
+    trail={[{ label: 'IB course', href: '/ib/' }, { label: 'Concepts' }]}
+    kicker="IB Diploma Programme"
+    title="The four concepts"
+    lead="The course is organized around four concepts. Used well, a concept changes how a situation is read; used badly, it is a word added to the end of an answer. Each one below comes with the questions it asks of a business and how the topic briefs use it."
+  >
+    <div class="tags">{cur && <VerifyTag status={cur.concepts.verification} />}</div>
+  </PageIntro>
+  <div class="wrap page-body">
+    {
+      concepts.map(([id, k], i) => (
+        <section id={id} aria-labelledby={`${id}-h`} class="concept-section">
+          <SectionHead no={i + 1} title={k.name} id={`${id}-h`} />
+          <div class="grid grid--2" style="margin-top:var(--sp-4)">
+            <div class="stack">
+              <div class="tags">
+                <ProvenanceTag kind={k.provenance} />
+              </div>
+              <div class="prose" set:html={rich(k.summary)} />
+              <div class="prose small" set:html={rich(k.inPractice)} />
+            </div>
+            <div>
+              <h3 class="label label--ink">Questions it asks</h3>
+              <ul class="prose">{k.questions.map((q) => <li>{q}</li>)}</ul>
+              <h3 class="label label--ink" style="margin-top:var(--sp-4)">In the briefs</h3>
+              <ul class="link-list">
+                {topics.map(([tid, t]) => {
+                  const lens = t.conceptLens.find((l) => l.concept === id);
+                  return (
+                    lens && (
+                      <li>
+                        <a href={`${href.topic(tid)}#concepts`}>
+                          {t.code} {t.title}
+                        </a>
+                        <span class="small muted">{lens.question}</span>
+                      </li>
+                    )
+                  );
+                })}
+              </ul>
+            </div>
+          </div>
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .concept-section {
+    scroll-margin-top: calc(var(--header-h) + var(--sp-3));
+  }
+</style>

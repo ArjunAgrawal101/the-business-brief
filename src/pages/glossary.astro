@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageIntro from '../components/layout/PageIntro.astro';
+import LevelTag from '../components/ui/LevelTag.astro';
+import { corpus, href } from '../lib/content';
+import { inline } from '../lib/markup';
+
+const c = await corpus();
+const entries = Object.entries(c.glossary).sort((a, b) => a[1].term.localeCompare(b[1].term, 'en'));
+const letters = [...new Set(entries.map(([, g]) => g.term[0]?.toUpperCase() ?? ''))];
+---
+
+<BaseLayout title="Glossary" description="Business management terms defined in plain language, with links to the briefs that use them." section="glossary">
+  <PageIntro trail={[{ label: 'Glossary' }]} kicker="Reference" title="Glossary" lead={`${entries.length} terms, defined in the platform's own words. Each links to the brief that teaches it.`} />
+  <div class="wrap page-body">
+    <nav aria-label="Letters">
+      <ul class="az">
+        {letters.map((l) => <li><a href={`#letter-${l}`}>{l}</a></li>)}
+      </ul>
+    </nav>
+    {
+      letters.map((l) => (
+        <section aria-labelledby={`letter-${l}`}>
+          <h2 class="az-head" id={`letter-${l}`}>{l}</h2>
+          <dl class="glossary-list">
+            {entries
+              .filter(([, g]) => g.term[0]?.toUpperCase() === l)
+              .map(([id, g]) => (
+                <div id={`term-${id}`}>
+                  <dt>
+                    {g.term} {g.level === 'HL' && <LevelTag level="HL" />}
+                  </dt>
+                  <dd>
+                    <span set:html={inline(g.definition)} />{' '}
+                    <span class="small muted">
+                      {g.topics.map((t, k) => (
+                        <>
+                          {k > 0 && ', '}
+                          <a href={href.topic(t)}>{c.topics[t]?.title ?? t}</a>
+                        </>
+                      ))}
+                      {g.related.length > 0 && (
+                        <>
+                          . See also{' '}
+                          {g.related.map((r, k) => (
+                            <>
+                              {k > 0 && ', '}
+                              <a href={href.glossary(r)}>{c.glossary[r]?.term ?? r}</a>
+                            </>
+                          ))}
+                        </>
+                      )}
+                      .
+                    </span>
+                  </dd>
+                </div>
+              ))}
+          </dl>
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>

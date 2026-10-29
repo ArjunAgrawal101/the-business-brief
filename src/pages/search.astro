@@ -1,0 +1,123 @@
+---
+/**
+ * Search. The page lists everything that can be found, grouped by kind, so
+ * without JavaScript it is a complete index of the site. With JavaScript the
+ * box filters the list as you type.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageIntro from '../components/layout/PageIntro.astro';
+import { corpus, href, modulesInOrder, pathwaysInOrder, slug, topicsInOrder } from '../lib/content';
+import { plain } from '../lib/markup';
+
+const c = await corpus();
+type Entry = { kind: string; title: string; url: string; text: string };
+const entries: Entry[] = [];
+for (const [id, t] of await topicsInOrder()) {
+  entries.push({ kind: 'Topic brief', title: `${t.code} ${t.title}`, url: href.topic(id), text: `${t.summary} ${t.decisionQuestion}` });
+  t.sections.forEach((s) => entries.push({ kind: 'Topic section', title: `${s.title} (${t.title})`, url: `${href.topic(id)}#${s.id}`, text: plain(s.dek ?? '') }));
+}
+for (const [id, cs] of Object.entries(c.cases)) entries.push({ kind: 'Case', title: cs.title, url: href.case(id), text: `${cs.dek} ${cs.decision} ${cs.organization.sector}` });
+for (const [id, d] of Object.entries(c.decisions)) entries.push({ kind: 'Decision Room', title: d.title, url: href.decision(id), text: d.dek });
+for (const [id, t] of Object.entries(c.tools)) {
+  const url = href.tool(id, t);
+  entries.push({ kind: 'Tool', title: t.name, url: url ?? '/toolkit/', text: `${t.summary}${url ? '' : ' Guide in preparation.'}` });
+}
+for (const [id, k] of Object.entries(c.calculations)) entries.push({ kind: 'Calculation', title: k.name, url: href.calculation(id, k.page), text: k.formula });
+for (const [id, q] of Object.entries(c.questions)) entries.push({ kind: 'Practice question', title: q.title, url: href.question(id), text: `${q.commandTerm}. ${plain(q.prompt)}` });
+for (const [id, g] of Object.entries(c.glossary)) entries.push({ kind: 'Glossary', title: g.term, url: href.glossary(id), text: plain(g.definition) });
+for (const [, ct] of Object.entries(c.commandTerms)) entries.push({ kind: 'Command term', title: ct.term, url: href.commandTerm(ct.term), text: ct.definition });
+for (const [id, k] of Object.entries(c.concepts)) entries.push({ kind: 'Concept', title: k.name, url: href.concept(id), text: plain(k.summary) });
+for (const p of await pathwaysInOrder()) entries.push({ kind: 'Pathway', title: p.data.name, url: href.pathway(p.id), text: p.data.promise });
+for (const m of await modulesInOrder()) if (m.data.href) entries.push({ kind: 'Module', title: m.data.name, url: m.data.href, text: m.data.purpose });
+const cur = c.curricula['ib-dp-bm'];
+cur?.units.forEach((u) =>
+  u.subtopics.forEach((s) =>
+    entries.push({ kind: 'IB subtopic', title: `${s.code} ${s.title}`, url: s.topic ? href.topic(s.topic) : `/ib/#st-${s.code.replace('.', '-')}`, text: s.topic ? 'Complete brief' : 'On the syllabus map' }),
+  ),
+);
+const kinds = [...new Set(entries.map((e) => e.kind))];
+---
+
+<BaseLayout title="Search" description="Search the topics, cases, tools, calculations, practice questions and glossary." section="search">
+  <PageIntro trail={[{ label: 'Search' }]} kicker="Search" title="Find anything" lead={`${entries.length} entries: topics, cases, tools, calculations, practice questions, glossary terms and command terms.`} />
+  <div class="wrap page-body">
+    <form class="search-box" role="search" data-search-form hidden onsubmit="return false">
+      <label for="q" class="label label--ink">Search the platform</label>
+      <input class="input" id="q" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="For example: break-even, franchising, autocratic" aria-describedby="search-count" />
+      <p class="small muted" id="search-count" data-count aria-live="polite"></p>
+    </form>
+    <div data-results>
+      {
+        kinds.map((k) => (
+          <section class="search-group" data-group aria-labelledby={`k-${slug(k)}`}>
+            <h2 class="label label--ink" id={`k-${slug(k)}`}>{k}</h2>
+            <ul class="link-list">
+              {entries
+                .filter((e) => e.kind === k)
+                .map((e) => (
+                  <li data-entry data-text={`${e.title} ${e.text} ${e.kind}`.toLowerCase()}>
+                    <a href={e.url}>{e.title}</a>
+                    {e.text && <span class="small muted">{e.text.length > 160 ? `${e.text.slice(0, 157).trimEnd()}...` : e.text}</span>}
+                  </li>
+                ))}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+    <p class="state" data-none hidden>Nothing matches. Try a shorter word, or browse the <a href="/topics/">topics</a> and the <a href="/glossary/">glossary</a>.</p>
+  </div>
+</BaseLayout>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-search-form]');
+  const input = document.querySelector<HTMLInputElement>('#q');
+  const count = document.querySelector<HTMLElement>('[data-count]');
+  const none = document.querySelector<HTMLElement>('[data-none]');
+  const items = [...document.querySelectorAll<HTMLElement>('[data-entry]')];
+  const groups = [...document.querySelectorAll<HTMLElement>('[data-group]')];
+  if (form && input) {
+    form.hidden = false;
+    const run = () => {
+      const terms = input.value.toLowerCase().trim().split(/\s+/).filter(Boolean);
+      let shown = 0;
+      items.forEach((li) => {
+        const ok = terms.every((t) => (li.dataset.text ?? '').includes(t));
+        li.hidden = !ok;
+        if (ok) shown++;
+      });
+      groups.forEach((g) => (g.hidden = !g.querySelector('[data-entry]:not([hidden])')));
+      if (none) none.hidden = shown > 0;
+      if (count) count.textContent = terms.length ? `${shown} ${shown === 1 ? 'result' : 'results'}` : `${items.length} entries`;
+      const url = new URL(window.location.href);
+      if (terms.length) url.searchParams.set('q', input.value.trim());
+      else url.searchParams.delete('q');
+      history.replaceState(null, '', url);
+    };
+    const initial = new URL(window.location.href).searchParams.get('q');
+    if (initial) input.value = initial;
+    input.addEventListener('input', run);
+    run();
+    input.focus();
+  }
+</script>
+
+<style>
+  .search-box {
+    display: grid;
+    gap: var(--sp-2);
+    max-width: 40rem;
+    margin-bottom: var(--sp-6);
+  }
+
+  .search-box .input {
+    min-height: 3.25rem;
+    font-size: 1.125rem;
+    border-width: 2px;
+    border-color: var(--bb-ink);
+  }
+
+  .search-group + .search-group {
+    margin-top: var(--sp-6);
+  }
+</style>

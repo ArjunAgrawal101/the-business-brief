@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import Interactive from '../../components/interactive/Interactive.astro';
+import CalcCard from '../../components/finance/CalcCard.astro';
+import LevelSwitch from '../../components/ui/LevelSwitch.astro';
+import { corpus } from '../../lib/content';
+
+const PATH = '/finance-desk/contribution/';
+const c = await corpus();
+const calcs = Object.entries(c.calculations)
+  .filter(([, k]) => k.page === PATH)
+  .sort((a, b) => a[1].order - b[1].order);
+---
+
+<BaseLayout title="Contribution decisions: Finance Desk" description="Judge a special order on contribution, and see when the rule of thumb fails because the order displaces regular sales." section="finance-desk">
+  <PageIntro
+    trail={[{ label: 'Finance Desk', href: '/finance-desk/' }, { label: 'Contribution decisions' }]}
+    kicker="Finance Desk · HL"
+    title="Contribution decisions"
+    lead="An order priced below the average cost of a unit can still add profit, when the business has spare capacity and its fixed costs are already covered. This desk shows why, and shows the conditions under which the order loses money after all."
+  >
+    <div class="tags"><span class="tag tag--hl">HL only</span></div>
+  </PageIntro>
+  <div class="wrap page-body">
+    <aside class="callout callout--note">
+      <span class="callout__kicker">For SL students</span>
+      <div class="prose">
+        <p>
+          Contribution as a decision tool is reported to be HL-only in the toolkit. The idea of contribution per unit is used by
+          SL and HL alike on the <a href="/finance-desk/break-even/">break-even desk</a>.
+        </p>
+      </div>
+    </aside>
+    <LevelSwitch id="lvl-contribution" />
+    <section aria-labelledby="panel-h" data-level="HL">
+      <SectionHead no={1} title="The special order panel" id="panel-h" />
+      <div style="margin-top:var(--sp-5)">
+        <Interactive component="special-order" refId="costs-special-order-atelier" title="The hotel's order, judged on contribution" level="HL" provenance="simulated-data" headingLevel={3} />
+      </div>
+    </section>
+    <section aria-labelledby="calcs-h" data-level="HL">
+      <SectionHead no={2} title="The calculation" id="calcs-h" />
+      <div class="stack stack-lg" style="margin-top:var(--sp-5)">
+        {calcs.map(([id, k]) => <CalcCard id={id} calc={k} headingLevel={3} />)}
+      </div>
+    </section>
+    <p class="hl-notice"><span class="tag tag--hl">HL</span> This desk is HL-only material, hidden while you are viewing SL content. Switch to HL above to see it.</p>
+    <p><a class="btn" href="/finance-desk/break-even/">Back: break-even</a></p>
+  </div>
+</BaseLayout>

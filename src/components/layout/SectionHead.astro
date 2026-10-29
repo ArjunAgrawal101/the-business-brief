@@ -1,0 +1,22 @@
+---
+import { rich } from '../../lib/markup';
+interface Props {
+  no?: string | number;
+  title: string;
+  dek?: string;
+  id?: string;
+  level?: 2 | 3;
+}
+const { no, title, dek, id, level = 2 } = Astro.props;
+const Tag = level === 2 ? 'h2' : 'h3';
+const num = no === undefined ? undefined : typeof no === 'number' ? String(no).padStart(2, '0') : no;
+---
+
+<header class="sec-head">
+  {num ? <span class="sec-head__no" aria-hidden="true">{num}</span> : <span aria-hidden="true"></span>}
+  <div class="sec-head__text">
+    <Tag id={id}>{num && <span class="sr-only">Section {num}: </span>}{title}</Tag>
+    {dek && <div class="sec-head__dek" set:html={rich(dek)} />}
+    <slot />
+  </div>
+</header>

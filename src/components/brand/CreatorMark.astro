@@ -1,0 +1,17 @@
+---
+/**
+ * The creator's authentic AA monogram, used as a signature. The file is the
+ * unchanged original from the Economics repository (public/brand/creator/).
+ */
+interface Props {
+  height?: number;
+  reversed?: boolean;
+  class?: string;
+}
+const { height = 40, reversed = false, class: className } = Astro.props;
+// The monogram's own proportions: viewBox 350.8 x 268.4
+const width = Math.round((height * 350.8) / 268.4);
+const src = reversed ? '/brand/creator/arjun-agrawal-monogram-reversed.svg' : '/brand/creator/arjun-agrawal-monogram.svg';
+---
+
+<img class={className} src={src} width={width} height={height} alt="" decoding="async" />

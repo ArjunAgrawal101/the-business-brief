@@ -1,0 +1,84 @@
+component: cost-classifier
+title: Classify Atelier Barro's costs
+purpose: >
+  The learner classifies each cost twice: by how it behaves as output changes (fixed, variable or
+  semi-variable) and by whether it can be traced to a single mug (direct or indirect). The feedback
+  diagnoses the usual misconceptions: that labour is always fixed, that electricity is always variable,
+  and that a cost the owner chooses, such as marketing, cannot be fixed.
+provenance: subject-knowledge
+costObject: one mug
+items:
+  - id: clay
+    label: Clay and glaze
+    detail: €2.30 for each mug
+    behaviour: variable
+    directness: direct
+    explanation: Each mug uses its own clay and glaze, so the cost rises with every mug made and can be traced to each one.
+  - id: piece-rate
+    label: Thrower's piece rate
+    detail: €2.40 for each mug that passes inspection
+    behaviour: variable
+    directness: direct
+    explanation: >
+      Labour is not always a fixed cost. These throwers are paid for each mug, so their pay rises and falls with
+      output and can be traced to each mug. If they were paid a monthly wage, the same work would be a fixed,
+      indirect cost.
+  - id: packaging
+    label: Packaging
+    detail: €0.85 for each mug sent out
+    behaviour: variable
+    directness: direct
+    explanation: Each mug sold uses one box and its padding, so the cost varies with sales and belongs to each mug.
+  - id: fees
+    label: Card and platform fees
+    detail: 4% of the price of each mug sold
+    behaviour: variable
+    directness: direct
+    explanation: >
+      The fee is charged on each sale, so it is variable and direct. Because it is a share of the price, it also
+      rises when the price rises, which matters in any pricing decision.
+  - id: electricity
+    label: Electricity
+    detail: A standing charge of €340 a month, plus about €0.75 for each mug fired
+    behaviour: semi-variable
+    directness: indirect
+    explanation: >
+      Part fixed (the standing charge) and part variable (the firing), so it is semi-variable. It is indirect because
+      one meter serves the whole studio, including the workshops and the firing service, so the cost per mug is an
+      estimate, not a traced amount.
+  - id: rent
+    label: Studio rent
+    detail: €1,900 a month
+    behaviour: fixed
+    directness: indirect
+    explanation: The rent is the same whether the studio makes 200 mugs or 1,200, and it cannot be traced to any one mug.
+  - id: kiln
+    label: Kiln lease
+    detail: €450 a month
+    behaviour: fixed
+    directness: indirect
+    explanation: >
+      The lease is paid every month however many mugs are fired. The kiln is also used for workshops and for other
+      potters' work, so its cost cannot be traced to one mug.
+  - id: manager
+    label: Studio manager's salary
+    detail: €2,300 a month
+    behaviour: fixed
+    directness: indirect
+    explanation: The manager is paid the same in a quiet month as in a busy one, and the work supports the whole studio rather than any one mug.
+  - id: owner
+    label: Owner's salary
+    detail: €2,400 a month
+    behaviour: fixed
+    directness: indirect
+    explanation: >
+      An owner who pays herself a salary has a fixed cost. Leaving it out makes the business look more profitable
+      than it is, which is a common mistake in small businesses.
+  - id: marketing
+    label: Social media advertising
+    detail: €480 a month, set by the owner
+    behaviour: fixed
+    directness: indirect
+    explanation: >
+      Marketing does not change with the number of mugs made in a month, so it is a fixed cost, even though the
+      owner chooses it and can cut it. It cannot be traced to any one mug.

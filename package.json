@@ -1,0 +1,41 @@
+{
+  "name": "the-business-brief",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Arjun Agrawal | The Business Brief. Strategy. Leadership. Decisions. A Business Management learning platform built around situation, decision and consequence.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview --port 4321",
+    "check": "astro check",
+    "lint": "eslint . && node scripts/qa/content-lint.mjs",
+    "lint:content": "node scripts/qa/content-lint.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "qa:links": "node scripts/qa/link-check.mjs",
+    "qa:contrast": "node scripts/qa/contrast.mjs",
+    "qa:screens": "node scripts/qa/screens.mjs",
+    "qa": "npm run check && npm run lint && npm test && npm run build && npm run qa:links && npm run test:e2e",
+    "brand": "node scripts/brand/render-assets.mjs"
+  },
+  "dependencies": {
+    "astro": "6.4.8",
+    "yaml": "2.9.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "0.9.12",
+    "@axe-core/playwright": "4.11.3",
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.63.0",
+    "@types/node": "22.20.5",
+    "eslint": "10.13.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1",
+    "vitest": "5.0.5"
+  }
+}

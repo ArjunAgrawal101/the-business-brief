@@ -1,0 +1,18 @@
+---
+interface Props {
+  dir?: 'right' | 'left' | 'down' | 'external';
+}
+const { dir = 'right' } = Astro.props;
+---
+
+{
+  dir === 'external' ? (
+    <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path d="M6 3h7v7M13 3L4 12" fill="none" stroke="currentColor" stroke-width="1.6" />
+    </svg>
+  ) : (
+    <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true" focusable="false" style={dir === 'left' ? 'transform:rotate(180deg)' : dir === 'down' ? 'transform:rotate(90deg)' : undefined}>
+      <path d="M2 8h11M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" />
+    </svg>
+  )
+}

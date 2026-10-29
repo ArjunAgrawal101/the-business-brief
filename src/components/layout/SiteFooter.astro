@@ -1,0 +1,287 @@
+---
+import BriefMark from '../brand/BriefMark.astro';
+import CreatorMark from '../brand/CreatorMark.astro';
+
+const COLUMNS = [
+  {
+    title: 'Learn',
+    links: [
+      ['Topics', '/topics/'],
+      ['IB Business Management', '/ib/'],
+      ['Syllabus coverage', '/ib/coverage/'],
+      ['Concepts', '/ib/concepts/'],
+      ['Toolkit', '/toolkit/'],
+      ['Glossary', '/glossary/'],
+      ['Revision Briefs', '/revision/'],
+    ],
+  },
+  {
+    title: 'Practise',
+    links: [
+      ['Case Vault', '/cases/'],
+      ['Decision Room', '/decision-room/'],
+      ['Finance Desk', '/finance-desk/'],
+      ['Exam Desk', '/exam-desk/'],
+      ['Practice questions', '/exam-desk/practice/'],
+      ['Examiner Lens', '/examiner-lens/'],
+      ['IA Studio', '/ia-studio/'],
+    ],
+  },
+  {
+    title: 'Pathways',
+    links: [
+      ['IB Diploma', '/pathways/ib-dp/'],
+      ['IGCSE and secondary', '/pathways/secondary/'],
+      ['Undergraduate', '/pathways/undergraduate/'],
+      ['MBA and advanced', '/pathways/mba/'],
+      ['Teachers', '/pathways/teachers/'],
+      ['Entrepreneurs', '/pathways/entrepreneurs/'],
+      ['Independent learners', '/pathways/independent/'],
+    ],
+  },
+  {
+    title: 'Platform',
+    links: [
+      ['Search', '/search/'],
+      ['About the creator', '/about/'],
+      ['Sources and evidence', '/sources/'],
+      ['The platform', '/platform/'],
+      ['Accessibility', '/accessibility/'],
+      ['Privacy', '/privacy/'],
+    ],
+  },
+];
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer on-ink" id="site-footer">
+  <div class="wrap">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <a class="site-footer__lockup" href="/">
+          <BriefMark size={44} reversed />
+          <span>
+            <span class="site-footer__kicker">Arjun Agrawal</span>
+            <span class="site-footer__name">The Business Brief</span>
+          </span>
+        </a>
+        <p class="site-footer__tagline">Strategy. Leadership. Decisions.</p>
+        <p class="site-footer__about">
+          A Business Management learning platform built around one sequence: read the situation, weigh the evidence, make
+          the decision, follow the consequence.
+        </p>
+      </div>
+
+      <nav class="site-footer__nav" id="footer-nav" aria-label="Site">
+        {
+          COLUMNS.map((col) => (
+            <div>
+              <h2 class="site-footer__h">{col.title}</h2>
+              <ul>
+                {col.links.map(([label, url]) => (
+                  <li>
+                    <a href={url}>{label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </nav>
+    </div>
+
+    <div class="site-footer__creator">
+      <CreatorMark height={38} reversed />
+      <p>
+        Created by <a href="/about/">Arjun Agrawal</a>, IB Diploma Programme educator in Economics, Business Management and
+        Global Politics.
+        <span class="site-footer__sibling">
+          Also by Arjun Agrawal: <a href="https://ib-economics-pi.vercel.app/" rel="noopener">Arjun Agrawal Economics<span class="sr-only"> (external site)</span></a>.
+        </span>
+      </p>
+    </div>
+
+    <div class="site-footer__legal">
+      <p>
+        An independent educational resource. It is not affiliated with, endorsed by or produced by the International
+        Baccalaureate Organization. "International Baccalaureate", "IB" and "Diploma Programme" are trademarks of the
+        International Baccalaureate Organization. Organizations in the teaching cases are fictional unless a case says
+        otherwise, and their figures are simulated.
+      </p>
+      <p>
+        &copy; {year} Arjun Agrawal. Educational content and brand: all rights reserved. Code: MIT licence.
+        <a href="/privacy/">No account, no tracking: your saved work stays on this device.</a>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--surface-ink);
+    color: var(--text-on-ink-muted);
+    padding-block: var(--sp-8) var(--sp-6);
+    margin-top: var(--sp-9);
+    font-size: 0.9375rem;
+  }
+
+  .site-footer a {
+    color: var(--text-on-ink);
+    text-decoration-color: rgba(244, 241, 234, 0.35);
+  }
+
+  .site-footer a:hover {
+    color: #fff;
+    text-decoration-color: var(--bb-brass);
+  }
+
+  .site-footer__top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr);
+    gap: var(--sp-7);
+    padding-bottom: var(--sp-7);
+    border-bottom: 1px solid rgba(244, 241, 234, 0.16);
+  }
+
+  .site-footer__lockup {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    text-decoration: none;
+  }
+
+  .site-footer__lockup > span {
+    display: grid;
+    line-height: 1.05;
+  }
+
+  .site-footer__kicker {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-on-ink-muted);
+  }
+
+  .site-footer__name {
+    margin-top: 0.25rem;
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 720;
+    letter-spacing: -0.022em;
+    color: var(--text-on-ink);
+  }
+
+  .site-footer__tagline {
+    margin-top: var(--sp-4);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--bb-brass);
+  }
+
+  .site-footer__about {
+    margin-top: var(--sp-3);
+    max-width: 30rem;
+  }
+
+  .site-footer__nav {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--sp-5);
+  }
+
+  .site-footer__h {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-on-ink-muted);
+    padding-bottom: var(--sp-2);
+    border-bottom: 1px solid rgba(244, 241, 234, 0.22);
+  }
+
+  .site-footer__nav ul {
+    list-style: none;
+    padding: 0;
+    margin: var(--sp-3) 0 0;
+  }
+
+  .site-footer__nav li + li {
+    margin-top: 0.45rem;
+  }
+
+  .site-footer__nav a {
+    text-decoration: none;
+  }
+
+  .site-footer__nav a:hover {
+    text-decoration: underline;
+  }
+
+  .site-footer__creator {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+    padding-block: var(--sp-5);
+    border-bottom: 1px solid rgba(244, 241, 234, 0.16);
+  }
+
+  .site-footer__creator p {
+    max-width: 52rem;
+  }
+
+  .site-footer__sibling {
+    display: block;
+    margin-top: 0.2rem;
+  }
+
+  .site-footer__legal {
+    display: grid;
+    gap: var(--sp-3);
+    padding-top: var(--sp-5);
+    font-size: 0.8125rem;
+    line-height: 1.55;
+  }
+
+  .site-footer__legal p {
+    max-width: 62rem;
+  }
+
+  @media (max-width: 62rem) {
+    .site-footer__top {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sp-6);
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .site-footer__nav {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .site-footer__creator {
+      align-items: flex-start;
+    }
+  }
+
+  @media print {
+    .site-footer {
+      background: none;
+      color: #000;
+      margin-top: var(--sp-6);
+      padding-block: var(--sp-4) 0;
+    }
+
+    .site-footer__top,
+    .site-footer__creator img {
+      display: none;
+    }
+
+    .site-footer a {
+      color: #000;
+    }
+  }
+</style>

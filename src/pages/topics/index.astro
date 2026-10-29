@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import LevelTag from '../../components/ui/LevelTag.astro';
+import VerifyTag from '../../components/ui/VerifyTag.astro';
+import { corpus, href, topicsInOrder } from '../../lib/content';
+
+const c = await corpus();
+const topics = await topicsInOrder();
+const curriculum = c.curricula['ib-dp-bm'];
+const subtopicCount = curriculum?.units.reduce((n, u) => n + u.subtopics.length, 0) ?? 0;
+---
+
+<BaseLayout title="Topics" description="Topic briefs for IB DP Business Management: each starts from a business situation and works through the ideas to a decision." section="topics">
+  <PageIntro
+    trail={[{ label: 'Topics' }]}
+    kicker="The Business Brief"
+    title="Topic briefs"
+    lead={`Each brief starts with a business in a situation, works through the ideas in order, and ends with a decision you make and defend. ${topics.length} of the ${subtopicCount} subtopics in the IB course have a complete brief in this release.`}
+  />
+  <div class="wrap page-body">
+    <ol class="index-list">
+      {
+        topics.map(([id, t]) => {
+          const unit = curriculum?.units.find((u) => u.id === t.unit);
+          const sub = unit?.subtopics.find((s) => s.code === t.code);
+          return (
+            <li class="index-item">
+              <span class="index-item__code">{t.code}</span>
+              <div class="index-item__body">
+                <p class="label">{unit?.title}</p>
+                <h2 class="index-item__title">
+                  <a href={href.topic(id)}>{t.title}</a>
+                </h2>
+                <p>{t.summary}</p>
+                <p class="narrative small">The decision: {t.decisionQuestion}</p>
+              </div>
+              <div class="index-item__side">
+                <div class="tags">
+                  <LevelTag level={t.level} always />
+                  {sub && <VerifyTag status={sub.verification} />}
+                </div>
+                <span class="muted">
+                  {t.sections.length} sections, {t.related.questions.length} practice questions
+                </span>
+                {t.related.decisions[0] && <a href={href.decision(t.related.decisions[0])}>Its Decision Room</a>}
+              </div>
+            </li>
+          );
+        })
+      }
+    </ol>
+    <aside class="callout callout--note">
+      <span class="callout__kicker">What comes next</span>
+      <div class="prose">
+        <p>
+          The other subtopics are listed on the <a href="/ib/">syllabus map</a>, with what already exists for each one on the
+          <a href="/ib/coverage/">coverage page</a>. Briefs are added one at a time, each complete, rather than many at once and thin.
+        </p>
+      </div>
+    </aside>
+  </div>
+</BaseLayout>

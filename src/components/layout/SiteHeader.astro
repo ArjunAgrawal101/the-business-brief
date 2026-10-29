@@ -1,0 +1,403 @@
+---
+import BriefMark from '../brand/BriefMark.astro';
+
+interface Props {
+  current?: string;
+}
+const { current } = Astro.props;
+
+const PRIMARY = [
+  { id: 'topics', label: 'Topics', href: '/topics/' },
+  { id: 'cases', label: 'Cases', href: '/cases/' },
+  { id: 'decision-room', label: 'Decision Room', href: '/decision-room/' },
+  { id: 'finance-desk', label: 'Finance Desk', href: '/finance-desk/' },
+  { id: 'toolkit', label: 'Toolkit', href: '/toolkit/' },
+  { id: 'exam-desk', label: 'Exam Desk', href: '/exam-desk/' },
+  { id: 'pathways', label: 'Pathways', href: '/pathways/' },
+];
+
+const GROUPS = [
+  {
+    title: 'Learn',
+    links: [
+      { label: 'Topics', href: '/topics/' },
+      { label: 'IB Business Management', href: '/ib/' },
+      { label: 'Syllabus coverage', href: '/ib/coverage/' },
+      { label: 'Concepts', href: '/ib/concepts/' },
+      { label: 'Toolkit', href: '/toolkit/' },
+      { label: 'Glossary', href: '/glossary/' },
+      { label: 'Revision Briefs', href: '/revision/' },
+    ],
+  },
+  {
+    title: 'Practise',
+    links: [
+      { label: 'Case Vault', href: '/cases/' },
+      { label: 'Decision Room', href: '/decision-room/' },
+      { label: 'Finance Desk', href: '/finance-desk/' },
+      { label: 'Exam Desk', href: '/exam-desk/' },
+      { label: 'Practice questions', href: '/exam-desk/practice/' },
+      { label: 'Examiner Lens', href: '/examiner-lens/' },
+      { label: 'IA Studio', href: '/ia-studio/' },
+    ],
+  },
+  {
+    title: 'Pathways',
+    links: [
+      { label: 'All pathways', href: '/pathways/' },
+      { label: 'IB Diploma', href: '/pathways/ib-dp/' },
+      { label: 'Teachers', href: '/pathways/teachers/' },
+      { label: 'Entrepreneurs', href: '/pathways/entrepreneurs/' },
+      { label: 'University and MBA', href: '/pathways/undergraduate/' },
+    ],
+  },
+  {
+    title: 'Platform',
+    links: [
+      { label: 'Search', href: '/search/' },
+      { label: 'About the creator', href: '/about/' },
+      { label: 'Sources and evidence', href: '/sources/' },
+      { label: 'The platform', href: '/platform/' },
+      { label: 'Accessibility', href: '/accessibility/' },
+    ],
+  },
+];
+---
+
+<header class="site-header" id="site-header">
+  <div class="wrap site-header__bar">
+    <a class="brand" href="/" aria-label="The Business Brief, by Arjun Agrawal: home">
+      <BriefMark size={34} />
+      <span class="brand__text" aria-hidden="true">
+        <span class="brand__kicker">Arjun Agrawal</span>
+        <span class="brand__name">The Business Brief</span>
+      </span>
+    </a>
+
+    <nav class="primary-nav" aria-label="Primary">
+      <ul>
+        {
+          PRIMARY.map((item) => (
+            <li>
+              <a href={item.href} aria-current={current === item.id ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="site-header__tools">
+      <a class="icon-link" href="/search/" aria-current={current === 'search' ? 'page' : undefined}>
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+          <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"></circle>
+          <path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="square"></path>
+        </svg>
+        <span class="icon-link__text">Search</span>
+      </a>
+      <a class="menu-toggle" href="#footer-nav" data-menu-toggle aria-controls="menu-panel">
+        <span class="menu-toggle__bars" aria-hidden="true"><span></span><span></span></span>
+        <span class="menu-toggle__text">Menu</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="menu-panel" id="menu-panel" data-menu-panel hidden>
+    <div class="wrap menu-panel__inner">
+      {
+        GROUPS.map((g) => (
+          <section class="menu-panel__group" aria-labelledby={`menu-${g.title.toLowerCase()}`}>
+            <h2 class="label" id={`menu-${g.title.toLowerCase()}`}>
+              {g.title}
+            </h2>
+            <ul>
+              {g.links.map((l) => (
+                <li>
+                  <a href={l.href}>{l.label}</a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(244, 241, 234, 0.96);
+    border-bottom: 1px solid var(--rule-hair);
+    backdrop-filter: saturate(1.2) blur(6px);
+  }
+
+  .site-header__bar {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-5);
+    height: var(--header-h);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: var(--text-strong);
+    text-decoration: none;
+    flex: none;
+  }
+
+  .brand__text {
+    display: grid;
+    line-height: 1.05;
+  }
+
+  .brand__kicker {
+    font-family: var(--font-mono);
+    font-size: 0.65625rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .brand__name {
+    margin-top: 0.2rem;
+    font-family: var(--font-display);
+    font-size: 1.1875rem;
+    font-weight: 720;
+    letter-spacing: -0.022em;
+  }
+
+  .primary-nav {
+    margin-left: auto;
+  }
+
+  .primary-nav ul {
+    display: flex;
+    gap: 0.15rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .primary-nav li {
+    margin: 0;
+  }
+
+  .primary-nav a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: var(--header-h);
+    padding: 0 0.6rem;
+    color: var(--text-strong);
+    font-size: 0.9375rem;
+    font-weight: 560;
+    letter-spacing: -0.005em;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .primary-nav a::after {
+    content: '';
+    position: absolute;
+    left: 0.6rem;
+    right: 0.6rem;
+    bottom: -1px;
+    height: 3px;
+    background: transparent;
+    transition: background var(--dur-fast) var(--ease);
+  }
+
+  .primary-nav a:hover::after {
+    background: var(--rule);
+  }
+
+  .primary-nav a[aria-current='page'] {
+    color: var(--text-strong);
+  }
+
+  .primary-nav a[aria-current='page']::after {
+    background: var(--bb-cobalt);
+  }
+
+  .site-header__tools {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .icon-link,
+  .menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2.5rem;
+    padding: 0 0.7rem;
+    border: 1px solid var(--rule-hair);
+    border-radius: var(--radius-1);
+    color: var(--text-strong);
+    background: transparent;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .icon-link:hover,
+  .menu-toggle:hover {
+    border-color: var(--rule-ink);
+    color: var(--text-strong);
+  }
+
+  .icon-link[aria-current='page'] {
+    border-color: var(--bb-cobalt);
+  }
+
+  .menu-toggle {
+    display: none;
+  }
+
+  .menu-toggle__bars {
+    display: grid;
+    gap: 4px;
+    width: 16px;
+  }
+
+  .menu-toggle__bars span {
+    display: block;
+    height: 2px;
+    background: currentColor;
+    transition: transform var(--dur-base) var(--ease);
+  }
+
+  :global(.menu-open) .menu-toggle__bars span:first-child {
+    transform: translateY(3px) rotate(45deg);
+  }
+
+  :global(.menu-open) .menu-toggle__bars span:last-child {
+    transform: translateY(-3px) rotate(-45deg);
+  }
+
+  .menu-panel {
+    border-top: 1px solid var(--rule-hair);
+    background: var(--surface-page);
+    max-height: calc(100vh - var(--header-h));
+    overflow-y: auto;
+    box-shadow: 0 18px 30px -24px rgba(17, 20, 23, 0.45);
+  }
+
+  .menu-panel__inner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: var(--sp-5) var(--sp-6);
+    padding-block: var(--sp-5) var(--sp-6);
+  }
+
+  .menu-panel__group ul {
+    list-style: none;
+    margin: var(--sp-2) 0 0;
+    padding: 0;
+    border-top: 1px solid var(--rule-ink);
+  }
+
+  .menu-panel__group li {
+    margin: 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .menu-panel__group a {
+    display: block;
+    padding: 0.6rem 0;
+    color: var(--text-strong);
+    font-weight: 560;
+    text-decoration: none;
+  }
+
+  .menu-panel__group a:hover {
+    color: var(--cobalt-text);
+  }
+
+  @media (max-width: 75rem) {
+    .primary-nav {
+      display: none;
+    }
+
+    .menu-toggle {
+      display: inline-flex;
+    }
+
+    .site-header__tools {
+      margin-left: auto;
+    }
+  }
+
+  @media (max-width: 30rem) {
+    .icon-link__text {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+
+    .brand__name {
+      font-size: 1.0625rem;
+    }
+  }
+
+  @media print {
+    .site-header {
+      position: static;
+      backdrop-filter: none;
+    }
+
+    .primary-nav,
+    .site-header__tools,
+    .menu-panel {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector<HTMLAnchorElement>('[data-menu-toggle]');
+  const panel = document.querySelector<HTMLElement>('[data-menu-panel]');
+  if (toggle && panel) {
+    toggle.setAttribute('role', 'button');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.removeAttribute('href');
+    toggle.tabIndex = 0;
+
+    const setOpen = (open: boolean, returnFocus = false) => {
+      panel.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      document.documentElement.classList.toggle('menu-open', open);
+      if (open) panel.querySelector<HTMLAnchorElement>('a')?.focus();
+      else if (returnFocus) toggle.focus();
+    };
+
+    toggle.addEventListener('click', () => setOpen(panel.hidden === true));
+    toggle.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        setOpen(panel.hidden === true);
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !panel.hidden) setOpen(false, true);
+    });
+    document.addEventListener('click', (e) => {
+      const t = e.target as Node;
+      if (!panel.hidden && !panel.contains(t) && !toggle.contains(t)) setOpen(false);
+    });
+    window.matchMedia('(min-width: 75.0625rem)').addEventListener('change', (mq) => {
+      if (mq.matches) setOpen(false);
+    });
+  }
+</script>

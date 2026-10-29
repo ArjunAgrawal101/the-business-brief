@@ -1,0 +1,494 @@
+title: Costs and revenues
+code: '3.3'
+unit: unit-3
+qualification: ib-dp-bm
+level: SL/HL
+status: complete
+summary: What a business's costs are, how they behave as output changes, where its revenue comes from, and how contribution connects them to break-even, profit and the orders worth accepting.
+decisionQuestion: What does each unit really cost, and what does that mean for the price and for the orders a business should accept?
+situation: >
+  Atelier Barro, a ceramics studio in Porto, sells about 640 hand-made mugs a month at €22. In the same week its
+  electricity costs rose and a hotel group offered to buy 300 mugs at €11, half the shop price. The owner's instinct
+  is to raise prices and refuse the order. To know whether her instinct is right, she needs to know which of her costs
+  change with output, which do not, and what each mug contributes.
+whyItMatters: >
+  Almost every business decision changes costs or revenues: a price, an order, a new product, a cut. Classifying costs
+  correctly is what makes those decisions calculable. Getting it wrong, by treating a fixed cost as variable or by
+  forgetting a cost that rises with the price, gives a confident answer to the wrong question.
+syllabus:
+  verification: unverified
+  note: >
+    No source found in this session lists the content of 3.3 in detail, so the items below are unverified (claims
+    register, costs-content). The brief connects 3.3 to break-even analysis, subtopic 5.5, whose content is
+    corroborated (breakeven-content): contribution, break-even quantity and revenue, margin of safety and target
+    profit. Contribution as a decision tool (special orders) is part of the HL toolkit, as reported by one source.
+  items:
+    - text: 'Types of costs: fixed, variable, semi-variable, direct and indirect (overhead) costs'
+      level: SL/HL
+      verification: unverified
+    - text: Total revenue and revenue streams
+      level: SL/HL
+      verification: unverified
+objectives:
+  - text: Classify costs as fixed, variable or semi-variable, and as direct or indirect for a stated cost object.
+  - text: Calculate total cost, total revenue and profit, with working and units.
+  - text: Identify a business's revenue streams and explain how each behaves.
+  - text: Calculate contribution per unit and use it to find the break-even quantity, the margin of safety and the target profit output (5.5).
+  - text: Evaluate a pricing decision using contribution, and state the limits of the model.
+  - text: Use contribution to decide whether to accept a special order.
+    level: HL
+
+sections:
+  - id: situation
+    kind: situation
+    title: The situation
+    dek: One studio, two letters, and an instinct to check.
+    blocks:
+      - type: prose
+        provenance: simulated-data
+        body: >
+          Inês Carvalho's studio makes about €1,600 a month from its mugs, after every cost including her own salary.
+          From November the kiln will cost more to run. In the same week a hotel group asked for 300 mugs at €11 each.
+          She is inclined to raise her prices and to say no to the hotel, because €11 looks like less than a mug costs.
+
+
+          Both instincts depend on what a mug costs, and that turns out to be two different questions. What does one
+          more mug add to the studio's costs? And what does a mug cost on average, once every bill is shared out? The
+          first answer is about €7. The second is about €20. Which one matters depends on the decision.
+      - type: callout
+        tone: framework
+        title: How this brief works
+        provenance: aa-framework
+        body: >
+          First classify the costs, then calculate, then decide. At section 07 you will make Atelier Barro's decisions in
+          the Decision Room. Every number on this page comes from one cost ledger, and every calculation shows its
+          working in the same eight parts.
+
+  - id: costs
+    kind: learn
+    title: Types of costs
+    dek: Two separate questions about every cost. How does it behave, and can it be traced?
+    blocks:
+      - type: definition
+        provenance: subject-knowledge
+        term: Fixed costs
+        body: Costs that do not change with the level of output, within a range of output and over a given period. Rent and salaries are the usual examples.
+      - type: definition
+        provenance: subject-knowledge
+        term: Variable costs
+        body: Costs that change in direct proportion to output. Raw materials and packaging are the usual examples.
+      - type: definition
+        provenance: subject-knowledge
+        term: Semi-variable costs
+        body: Costs with a fixed part and a variable part, such as an electricity bill with a standing charge and a charge for each unit used.
+      - type: definition
+        provenance: subject-knowledge
+        term: Direct and indirect costs
+        body: >
+          A direct cost can be traced to a particular cost object, such as a product. An indirect cost, or overhead,
+          cannot, because it is shared across the business.
+      - type: comparison
+        title: Cost behaviour at Atelier Barro
+        provenance: simulated-data
+        columns: [How it behaves as output rises, Example at Atelier Barro]
+        rows:
+          - label: Fixed
+            cells:
+              - Stays the same in total, so it falls per unit.
+              - Studio rent of €1,900 a month, whether the studio makes 200 mugs or 1,200.
+          - label: Variable
+            cells:
+              - Rises in proportion to output, so it is the same per unit.
+              - Clay and glaze at €2.30 for every mug.
+          - label: Semi-variable
+            cells:
+              - Has a fixed part and a part that rises with output.
+              - Electricity, at €340 a month plus about €0.75 for each mug fired.
+      - type: callout
+        tone: note
+        title: Two classifications, not one
+        provenance: subject-knowledge
+        body: >
+          Behaviour (fixed or variable) and traceability (direct or indirect) answer different questions, so a cost can
+          be any combination. A machine leased for only one product is fixed but direct to that product. Electricity for
+          a shared building is semi-variable and indirect. Always say what the cost object is: a cost can be direct to a
+          product line and indirect to a single unit.
+      - type: interactive
+        component: cost-classifier
+        ref: costs-classifier-atelier
+        title: Classify Atelier Barro's costs
+        intro: Classify each cost twice. The cost object is one mug.
+        provenance: subject-knowledge
+      - type: misconception
+        provenance: subject-knowledge
+        claim: Labour is always a fixed cost.
+        correction: >
+          It depends on how people are paid. Atelier Barro's throwers are paid €2.40 for each mug, so their pay is a
+          variable, direct cost. A salaried studio manager is a fixed, indirect cost. The same work can be either.
+      - type: misconception
+        provenance: subject-knowledge
+        claim: A cost the owner can cut, such as marketing, must be a variable cost.
+        correction: >
+          Whether a cost is fixed or variable depends on whether it changes with output, not on whether it can be
+          changed by a decision. Marketing of €480 a month is fixed: it is the same whether the studio makes 500 mugs or
+          700.
+      - type: prose
+        title: Fixed, within a range
+        provenance: subject-knowledge
+        body: >
+          Fixed costs are fixed only within a range of output and over a period. The kiln can fire 1,200 mugs a month.
+          To make more, Atelier Barro would need a second kiln, and its fixed costs would step up. Over a long enough
+          period every cost can change, which is why break-even analysis is a short-run tool.
+
+  - id: revenue
+    kind: learn
+    title: Revenue and revenue streams
+    dek: Where the money comes from, before any cost is paid.
+    blocks:
+      - type: definition
+        provenance: subject-knowledge
+        term: Total revenue
+        body: The value of a business's sales in a period, found by multiplying the price of each product by the quantity sold and adding up.
+      - type: definition
+        provenance: subject-knowledge
+        term: Revenue stream
+        body: A distinct source of revenue, such as sales of a product, fees for a service, subscriptions, commissions or licences.
+      - type: exhibit
+        case: atelier-barro
+        exhibit: ex-2
+        provenance: simulated-data
+        commentary: >
+          Atelier Barro has four revenue streams, but mugs bring in 92% of the money. The workshops and the firing
+          service use the studio's spare capacity. Notice that each stream has its own costs: revenue alone does not say
+          which stream is worth growing.
+      - type: list
+        title: Common revenue streams
+        style: pairs
+        provenance: subject-knowledge
+        items:
+          - { label: Sales of goods, body: 'The price of each item sold, as with Atelier Barro''s mugs.' }
+          - { label: Fees for services, body: 'Payment for work done, as with the studio''s workshops and firing service.' }
+          - { label: Subscriptions, body: 'Regular payments for continuing access, as with a streaming service.' }
+          - { label: Commission, body: 'A share of the value of sales made on behalf of others, as with an estate agent.' }
+          - { label: Licensing and royalties, body: 'Payment for the right to use a brand, design or idea, as with franchise royalties.' }
+          - { label: Advertising, body: 'Payment for access to an audience, as with a free app or website.' }
+          - { label: Rental, body: 'Payment for the use of an asset, as with renting out kiln time or equipment.' }
+      - type: worked
+        title: Total revenue from mugs in an average month
+        calculation: total-revenue
+        provenance: simulated-data
+        currency: '€'
+        labels: { unit: mug, units: mugs, period: month }
+        inputs: { price: 22, quantity: 640 }
+        interpretation: The mugs bring in €14,080 in an average month, before any cost is paid.
+        implication: Revenue says nothing about profit on its own. The studio's costs that month are almost as large.
+      - type: misconception
+        provenance: subject-knowledge
+        claim: Rising revenue means the business is doing better.
+        correction: >
+          Revenue is not profit. Suppose Atelier Barro cut its price to €20 and sales rose to 720 mugs a month. Revenue
+          would rise from €14,080 to €14,400. But each mug would contribute only €12.90 instead of €14.82, so total
+          contribution, and with it profit, would fall: from €9,484.80 to €9,288. The studio would work harder for less.
+
+  - id: calculate
+    kind: learn
+    title: Total cost, total revenue and profit
+    dek: Three calculations, each set out the same way.
+    blocks:
+      - type: formula
+        name: Total cost
+        expression: TC = TFC + (AVC × Q)
+        provenance: subject-knowledge
+        variables:
+          - { symbol: TC, meaning: Total cost }
+          - { symbol: TFC, meaning: Total fixed costs }
+          - { symbol: AVC, meaning: Variable cost per unit }
+          - { symbol: Q, meaning: Output }
+      - type: worked
+        title: Atelier Barro's total cost in an average month, from November
+        calculation: total-cost
+        provenance: simulated-data
+        currency: '€'
+        labels: { unit: mug, units: mugs, period: month }
+        inputs: { fixedCosts: 8140, variableCost: 7.18, quantity: 640 }
+        interpretation: Making and selling 640 mugs costs €12,735.20 a month in total.
+        implication: Of that, €8,140 is paid whatever happens. Only €4,595.20 depends on how many mugs are made.
+      - type: worked
+        title: Atelier Barro's profit in an average month, from November, at €22
+        calculation: profit
+        provenance: simulated-data
+        currency: '€'
+        labels: { unit: mug, units: mugs, period: month }
+        inputs: { price: 22, variableCost: 7.18, fixedCosts: 8140, quantity: 640 }
+        interpretation: The studio makes €1,344.80 a month, down from €1,616.80 before the new electricity tariff.
+        implication: The cost rise takes about a sixth of the studio's profit if nothing else changes. That is the problem the owner has to solve.
+
+  - id: break-even
+    kind: learn
+    title: From costs to break-even
+    dek: Contribution connects costs and revenue. Break-even analysis is subtopic 5.5; its inputs are the costs of 3.3.
+    blocks:
+      - type: definition
+        provenance: subject-knowledge
+        term: Contribution
+        body: The amount each unit sold adds towards paying the fixed costs and, once they are covered, towards profit. Contribution per unit is the selling price minus the variable cost per unit.
+      - type: worked
+        title: Contribution per mug at €22, from November
+        calculation: contribution-per-unit
+        provenance: simulated-data
+        currency: '€'
+        labels: { unit: mug, units: mugs, period: month }
+        inputs: { price: 22, variableCost: 7.18 }
+        interpretation: Each mug sold adds €14.82 towards the studio's €8,140 of monthly costs.
+        implication: This is the figure that answers "what does one more mug do for the business?"
+      - type: worked
+        title: Break-even quantity at €22, from November
+        calculation: break-even-quantity
+        provenance: simulated-data
+        currency: '€'
+        labels: { unit: mug, units: mugs, period: month }
+        inputs: { fixedCosts: 8140, price: 22, variableCost: 7.18 }
+        interpretation: The studio must sell 550 mugs a month to cover all its costs.
+        implication: In an average month it sells 640, so it is above break-even, but only just.
+      - type: worked
+        title: Margin of safety at 640 mugs, from November
+        calculation: margin-of-safety
+        provenance: simulated-data
+        currency: '€'
+        labels: { unit: mug, units: mugs, period: month }
+        inputs: { fixedCosts: 8140, price: 22, variableCost: 7.18, quantity: 640 }
+        interpretation: Sales could fall by 90 mugs a month, about 14%, before the studio makes a loss.
+        implication: A slow month, or a lost wholesale customer, could wipe out the profit. That is why the owner is worried.
+      - type: callout
+        tone: exam
+        title: Round the break-even quantity up
+        provenance: subject-knowledge
+        body: >
+          €8,140 ÷ €14.82 = 549.26. At 549 mugs the studio would be €3.82 short of covering its costs, so the
+          break-even quantity in whole mugs is 550. Show the exact figure, then the rounded one, and say why.
+      - type: interactive
+        component: break-even-workspace
+        ref: costs-break-even-atelier
+        title: Work the numbers yourself
+        intro: Change the price, the costs or the forecast and watch every figure, the chart and the working update. Try each scenario, then predict before you click the next.
+        provenance: simulated-data
+      - type: interactive
+        component: error-diagnosis
+        ref: costs-error-diagnosis
+        title: Find the error
+        intro: Each worked solution below contains one wrong line. Find it before you look at the explanation.
+        provenance: subject-knowledge
+
+  - id: evidence
+    kind: evidence
+    title: The evidence
+    dek: The ledger is the only source of costs. The survey is the only source of demand.
+    blocks:
+      - type: exhibit
+        case: atelier-barro
+        exhibit: ex-1
+        provenance: simulated-data
+        commentary: >
+          Read down the second column: most of the studio's costs are incurred each month, whatever is made. The fee of
+          4% of the price is the cost most often forgotten when the price changes.
+      - type: exhibit
+        case: atelier-barro
+        exhibit: ex-3
+        provenance: simulated-data
+        commentary: >
+          Every pricing decision rests on this table, and every figure in it except the current one is an estimate.
+          Ask how much a decision would change if the estimate were wrong.
+
+  - id: decide
+    kind: decide
+    title: Make the decisions
+    dek: Price first, then the hotel's order.
+    blocks:
+      - type: callout
+        tone: framework
+        title: Enter the Decision Room
+        provenance: aa-framework
+        body: >
+          Choose how Atelier Barro responds to the cost rise, then decide on the hotel's order. Each outcome shows its
+          numbers, and you can check every one on the Finance Desk. [Open the Atelier Barro Decision Room](/decision-room/atelier-pricing/).
+
+  - id: evaluate
+    kind: evaluate
+    title: The arithmetic and the judgement
+    dek: A calculation answers a narrower question than the decision.
+    blocks:
+      - type: comparison
+        title: What the calculation tells you, and what you still have to judge
+        provenance: aa-framework
+        columns: [What the calculation tells you, What you still have to judge]
+        rows:
+          - label: Raising the price to €24
+            cells:
+              - Contribution per mug rises to €16.74 and the break-even quantity falls to 487.
+              - Whether sales really fall only to 590, and how regular customers feel about it.
+          - label: Cutting marketing
+            cells:
+              - Fixed costs fall by €280 and the break-even quantity falls to 531.
+              - How far sales depend on the advertising being cut.
+          - label: The hotel's order
+            cells:
+              - The order adds €1,395 to November's profit.
+              - Whether half-price mugs in hotel rooms change what shop customers will pay.
+      - type: list
+        title: The limits of break-even analysis
+        style: bullets
+        provenance: subject-knowledge
+        items:
+          - body: It assumes the price and the variable cost per unit stay the same at every level of output. In practice bulk discounts and price cuts change both.
+          - body: It assumes every unit produced is sold, with no stock left over.
+          - body: It assumes fixed costs are fixed. Above the kiln's capacity they would step up.
+          - body: It is simplest for one product. With several products, the answer depends on the mix sold.
+          - body: It is only as good as the estimates it uses, and the sales estimate is often the weakest.
+      - type: callout
+        tone: exam
+        title: Contribution and special orders
+        level: HL
+        provenance: subject-knowledge
+        body: >
+          A special order is judged on contribution. If the business has spare capacity and the order does not affect its
+          regular sales, an order adds to profit whenever its price is above the variable cost of fulfilling it, even if
+          that price is below the average cost of a unit. Contribution appears in the business management toolkit as an
+          HL-only tool, as reported by one secondary source.
+      - type: worked
+        title: The hotel's order at €11
+        calculation: special-order
+        level: HL
+        provenance: simulated-data
+        currency: '€'
+        labels: { unit: mug, units: mugs, period: month }
+        inputs: { orderPrice: 11, variableCost: 5.85, quantity: 300, extraFixedCosts: 150 }
+        interpretation: The order adds €1,395 to November's profit.
+        implication: On the numbers, accept. The judgement is whether the order harms the price position, and whether the kiln can take it in November.
+      - type: interactive
+        component: special-order
+        ref: costs-special-order-atelier
+        title: Test the order on contribution
+        level: HL
+        provenance: simulated-data
+      - type: misconception
+        level: HL
+        provenance: subject-knowledge
+        claim: An order priced below the average cost of a unit must lose money.
+        correction: >
+          Average cost includes fixed costs that are already covered by regular sales. If they are, the order only has to
+          cover its own variable costs to add profit. The belief is right only when the order displaces sales at the full
+          price or needs extra fixed costs.
+
+conceptLens:
+  - concept: change
+    question: What changes when a cost changes?
+    insight: >
+      An energy price rise changes contribution, the break-even quantity and the margin of safety at once. The concept
+      asks how the business adapts: through its price, through its costs, or through what it makes.
+  - concept: creativity
+    question: Can the business change its cost structure rather than its price?
+    insight: >
+      Atelier Barro could fire fuller kilns, schedule firings at cheaper times, or sell spare kiln time to other
+      potters. Creative answers change the numbers the calculation starts from.
+  - concept: ethics
+    question: Who pays for the cost rise?
+    insight: >
+      Customers through the price, the throwers through fewer mugs at a piece rate, or the owner through lower profit.
+      Passing a cost to the people with the least power to object is a choice, and an ethical one.
+  - concept: sustainability
+    question: Can this cost structure be kept up?
+    insight: >
+      A margin of safety of 90 mugs leaves the studio one bad month from a loss. An energy-intensive process also raises
+      the question of how to use less energy, not just how to pay for it.
+
+lenses:
+  - pathway: entrepreneurs
+    title: Know your three numbers
+    provenance: aa-framework
+    body: >
+      Contribution per unit, the break-even quantity and the margin of safety. Without them you cannot tell whether a
+      discount, a hire or an order makes you richer or poorer. Include the costs that are a share of the price, such as
+      card fees, marketplace commissions and royalties: they are the ones most often forgotten.
+  - pathway: undergraduate
+    title: From cost behaviour to relevant costing
+    provenance: enrichment
+    body: >
+      University management accounting extends this topic into cost-volume-profit analysis, activity-based costing and
+      relevant costing. The hotel's order is an example of relevant costing: only the costs and revenues that change
+      because of the decision count.
+  - pathway: mba
+    title: Operating leverage
+    provenance: enrichment
+    body: >
+      A business with high fixed costs and a high contribution per unit, like Atelier Barro, has high operating
+      leverage: its profit rises fast when sales rise and falls fast when they fall. That is why the margin of safety
+      matters more than the profit in a good month.
+  - pathway: secondary
+    title: For IGCSE and other courses
+    provenance: aa-framework
+    body: >
+      Most secondary courses teach fixed and variable costs and break-even, often by reading break-even from a chart.
+      Check whether your course uses the word overheads for indirect costs, and whether it expects the contribution
+      method of calculating break-even.
+
+teaching:
+  sequence:
+    - minutes: 5
+      activity: "Hook. Ask: should Atelier Barro sell a mug for €11 when it charges €22? Take a vote and keep the result."
+    - minutes: 15
+      activity: Pairs use the cost classifier, then the class discusses the three costs most pairs disagreed on.
+    - minutes: 15
+      activity: Work contribution, the break-even quantity and the margin of safety on the board in the eight-part form, stopping at the rounding.
+    - minutes: 15
+      activity: In the break-even workspace, each pair tests one scenario and reports what changed and why.
+    - minutes: 10
+      activity: Return to the hook with the special order panel (HL) or the profit comparison (SL), then vote again.
+    - minutes: 5
+      activity: Exit ticket. Explain, in one sentence, why the break-even quantity is rounded up.
+  prompts:
+    - Is the owner's salary a cost of the business?
+    - When is it right to sell below average cost?
+    - Who should bear an energy price rise?
+    - What does break-even analysis assume that is not true at Atelier Barro?
+  notes: >
+    Watch for students who divide fixed costs by the price, who round the break-even quantity down, and who leave out
+    the 4% fee when the price changes. The error diagnosis activity targets all three.
+
+revision:
+  keyPoints:
+    - Fixed costs do not change with output within a range. Variable costs change in proportion to output. Semi-variable costs have both parts.
+    - Direct costs can be traced to a cost object such as a product. Indirect costs, or overheads, cannot.
+    - Total cost = fixed costs + (variable cost per unit × output). Total revenue = price × quantity. Profit = total revenue − total cost.
+    - Contribution per unit = price − variable cost per unit. Break-even quantity = fixed costs ÷ contribution per unit, rounded up.
+    - Margin of safety = actual or forecast output − break-even output, measured in units.
+    - Break-even analysis assumes a constant price and unit cost, and that everything produced is sold.
+  retrieval:
+    - q: What is a semi-variable cost?
+      a: A cost with a fixed part and a part that varies with output, such as electricity with a standing charge and a charge for each unit used.
+    - q: Is a piece rate a fixed or a variable cost?
+      a: Variable, because it is paid for each unit produced.
+    - q: What is a revenue stream?
+      a: A distinct source of revenue, such as product sales, service fees, subscriptions or commission.
+    - q: How do you calculate contribution per unit?
+      a: Selling price per unit minus variable cost per unit.
+    - q: Why is the break-even quantity rounded up?
+      a: Because one unit fewer than the exact figure leaves a loss.
+    - q: In what is the margin of safety measured?
+      a: In units of output, or as a share of sales. Not in money.
+  traps:
+    - Dividing fixed costs by the price instead of by contribution per unit.
+    - Rounding the break-even quantity down.
+    - Forgetting that a cost which is a share of the price changes when the price changes.
+    - Confusing the margin of safety with profit.
+
+related:
+  cases: [atelier-barro]
+  decisions: [atelier-pricing]
+  tools: [contribution]
+  calculations: [total-revenue, total-cost, profit, contribution-per-unit, total-contribution, break-even-quantity, break-even-revenue, margin-of-safety, target-profit-output, target-price, special-order]
+  questions: [q-costs-p2-classify, q-costs-p2-direct, q-costs-p1-streams, q-costs-p2-beq, q-costs-p2-mos, q-costs-p2-price, q-costs-p2-evaluate, q-costs-hl-special]
+  topics: [growth-and-evolution]
+  glossary: [fixed-cost, variable-cost, semi-variable-cost, direct-cost, indirect-cost, total-cost, total-revenue, revenue-stream, contribution, break-even-quantity, margin-of-safety, target-profit-output, average-cost, special-order]
+syllabusLinks: ['5.5', '3.1', '4.5']
+sources: [method-simulated, sme-bm-2024, tutorchase-bm, revisiondojo-bm]
+updated: 2026-10-29

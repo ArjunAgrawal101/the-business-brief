@@ -1,0 +1,123 @@
+---
+/**
+ * Finance Desk: the break-even workspace. The default state is fully rendered
+ * on the server from src/lib/breakeven.ts; the script recalculates the same
+ * figures, chart, working and reading in the browser as the inputs change.
+ */
+import { breakEvenModel, readBreakEven } from '../../lib/breakeven';
+import { breakEvenSvg } from '../../lib/charts';
+import { buildWorking } from '../../lib/finance';
+import { breakEvenFiguresHtml, breakEvenTableHtml, workingHtml } from '../../lib/render';
+import { esc, jsonForScript } from '../../lib/markup';
+import { inputValue } from '../../scripts/ix';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'break-even-workspace' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const d = data.defaults;
+const model = breakEvenModel({ ...d, priceShare: d.priceShare ?? 0 });
+const cur = data.currency;
+const L = data.labels;
+const reading = readBreakEven(model, cur, L);
+const working = buildWorking('break-even-quantity', { fixedCosts: d.fixedCosts, price: d.price, variableCost: model.unitVariableCost }, cur, L);
+const config = { defaults: { ...d, priceShare: d.priceShare ?? 0 }, scenarios: data.scenarios, currency: cur, labels: L, uid };
+const fields = [
+  { key: 'price', label: `Selling price per ${L.unit}`, prefix: cur, step: '0.01', hint: '' },
+  { key: 'variableCost', label: `Variable cost per ${L.unit}`, prefix: cur, step: '0.01', hint: 'Excluding costs that are a share of the price.' },
+  { key: 'priceShare', label: 'Costs that are a share of the price', suffix: '%', step: '0.1', hint: 'Card fees, commissions, royalties.' },
+  { key: 'fixedCosts', label: `Fixed costs per ${L.period}`, prefix: cur, step: '1', hint: '' },
+  { key: 'quantity', label: `Forecast sales per ${L.period}`, suffix: L.units, step: '1', hint: '' },
+  { key: 'targetProfit', label: `Target profit per ${L.period}`, prefix: cur, step: '1', hint: '' },
+  { key: 'capacity', label: `Capacity per ${L.period}`, suffix: L.units, step: '1', hint: '' },
+] as const;
+---
+
+<div class="bew" data-ix="break-even" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The workspace could not start. The figures below are for the default inputs.</p>
+
+  <div class="bew__grid">
+    <form class="bew__inputs" data-form novalidate aria-label="Break-even inputs">
+      <fieldset class="bew__fields">
+        <legend class="label label--ink">Inputs</legend>
+        {
+          fields.map((f) => (
+            <div class="field">
+              <label for={`${uid}-${f.key}`}>{f.label}</label>
+              <div class="affix">
+                {'prefix' in f && f.prefix && <span class="affix__pre" aria-hidden="true">{f.prefix}</span>}
+                <input
+                  class="input input--num"
+                  id={`${uid}-${f.key}`}
+                  name={f.key}
+                  type="number"
+                  inputmode="decimal"
+                  step={f.step}
+                  value={inputValue((config.defaults as Record<string, number>)[f.key] ?? 0, f.step)}
+                  aria-describedby={`${uid}-${f.key}-err${f.hint ? ` ${uid}-${f.key}-hint` : ''}`}
+                />
+                {'suffix' in f && f.suffix && <span class="affix__post" aria-hidden="true">{f.suffix}</span>}
+              </div>
+              {f.hint && <span class="field__hint" id={`${uid}-${f.key}-hint`}>{f.hint}</span>}
+              <span class="field__error" id={`${uid}-${f.key}-err`} data-err={f.key} />
+            </div>
+          ))
+        }
+      </fieldset>
+      <fieldset class="bew__scenarios">
+        <legend class="label label--ink">Try a scenario</legend>
+        <div class="cluster">
+          {
+            data.scenarios.map((s) => (
+              <button type="button" class="btn btn--small" data-scenario={s.id} title={s.note}>
+                {s.label}
+              </button>
+            ))
+          }
+          <button type="button" class="btn btn--small btn--ink" data-reset>Reset to the case</button>
+        </div>
+        <p class="small muted" data-scenario-note>Each scenario changes only the inputs it names, starting from the case's figures.</p>
+      </fieldset>
+    </form>
+
+    <div class="bew__results">
+      <h4 class="label label--ink">Results</h4>
+      <dl class="figs" data-figures set:html={breakEvenFiguresHtml(model, cur, L.units, L.unit)} />
+      <div class="bew__reading" data-reading>
+        <p><strong>Reading.</strong> <span data-interp>{reading.interpretation}</span></p>
+        <p class="muted"><strong>Implication.</strong> <span data-impl>{reading.implication}</span></p>
+      </div>
+    </div>
+  </div>
+
+  <figure class="bew__chart">
+    <div class="chart-scroll" role="region" aria-label="Break-even chart" tabindex="0" data-chart set:html={breakEvenSvg(model, { currency: cur, unitsLabel: L.units, periodLabel: L.period, id: `${uid}-chart` })} />
+    <figcaption class="exhibit__source">
+      <b>Chart</b> Total revenue (blue), total cost (black) and fixed costs (dashed). Simulated teaching data from the case file; the chart is redrawn from the inputs above.
+    </figcaption>
+    <details class="disclosure">
+      <summary>The chart's figures as a table</summary>
+      <div class="disclosure__body table-scroll" role="region" aria-label="Chart figures" tabindex="0">
+        <table class="table">
+          <thead>
+            <tr><th scope="col">Point</th><th scope="col" class="n">Output</th><th scope="col" class="n">Total revenue</th><th scope="col" class="n">Total cost</th><th scope="col" class="n">Profit or loss</th></tr>
+          </thead>
+          <tbody data-table set:html={breakEvenTableHtml(model, cur, L.units)} />
+        </table>
+      </div>
+    </details>
+  </figure>
+
+  <section class="bew__working" aria-label="Working for the break-even quantity">
+    <h4 class="label label--ink">The working: break-even quantity</h4>
+    <div data-working set:html={workingHtml(working, esc(reading.interpretation), esc(reading.implication))} />
+  </section>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/break-even';
+</script>

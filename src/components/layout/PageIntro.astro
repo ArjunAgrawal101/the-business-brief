@@ -1,0 +1,22 @@
+---
+import Breadcrumbs from './Breadcrumbs.astro';
+import { rich } from '../../lib/markup';
+interface Props {
+  trail: Array<{ label: string; href?: string }>;
+  kicker: string;
+  title: string;
+  lead?: string;
+  wide?: boolean;
+}
+const { trail, kicker, title, lead, wide = false } = Astro.props;
+---
+
+<div class="wrap">
+  <div class="page-intro">
+    <Breadcrumbs trail={trail} />
+    <p class="label label--ink page-intro__kicker">{kicker}</p>
+    <h1 style={wide ? 'max-width:28ch' : undefined}>{title}</h1>
+    {lead && <div class="lead page-intro__lead" set:html={rich(lead)} />}
+    <div class="page-intro__meta"><slot /></div>
+  </div>
+</div>

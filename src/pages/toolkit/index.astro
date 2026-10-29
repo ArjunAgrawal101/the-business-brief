@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import LevelTag from '../../components/ui/LevelTag.astro';
+import VerifyTag from '../../components/ui/VerifyTag.astro';
+import StatusTag from '../../components/ui/StatusTag.astro';
+import { corpus, href, toolsInOrder } from '../../lib/content';
+import { inline } from '../../lib/markup';
+
+const c = await corpus();
+const tools = await toolsInOrder();
+const claim = c.claims['toolkit-hl-tools'];
+const both = tools.filter(([, t]) => t.level === 'SL/HL');
+const hl = tools.filter(([, t]) => t.level === 'HL');
+const FAMILIES = { strategic: 'Strategic', quantitative: 'Quantitative', planning: 'Planning', people: 'People', sustainability: 'Sustainability' } as const;
+---
+
+<BaseLayout title="Toolkit" description="The business management toolkit: what each tool is for, how to build it, what it reveals and what it hides, applied to a case." section="toolkit">
+  <PageIntro
+    trail={[{ label: 'Toolkit' }]}
+    kicker="Strategy Studio · Toolkit"
+    title="The toolkit"
+    lead="A tool is only as good as the question it answers. Each guide says what the tool is for, how to build it, what evidence it needs, what it reveals and what it hides, and shows it applied to one of the cases."
+  />
+  <div class="wrap page-body">
+    <aside class="callout callout--caution">
+      <span class="callout__kicker">How far this list is confirmed</span>
+      <div class="prose">
+        <p>
+          {claim?.statement} {claim && <VerifyTag status={claim.status} />} The Business management guide was not available when this release was written, so the list follows secondary sources, which agree on it. Check it against the Guide.
+        </p>
+      </div>
+    </aside>
+    {
+      [
+        { title: 'Tools for SL and HL', list: both, no: 1 },
+        { title: 'Tools for HL only', list: hl, no: 2 },
+      ].map((g) => (
+        <section aria-labelledby={`tk-${g.no}`}>
+          <SectionHead no={g.no} title={g.title} id={`tk-${g.no}`} />
+          <ol class="index-list" style="margin-top:var(--sp-4)">
+            {g.list.map(([id, t]) => {
+              const link = href.tool(id, t);
+              return (
+                <li class="index-item">
+                  <span class="index-item__code" style="font-size:1rem">{FAMILIES[t.family]}</span>
+                  <div class="index-item__body">
+                    <h3 class="index-item__title">{link ? <a href={link}>{t.name}</a> : t.name}</h3>
+                    <p>{t.summary}</p>
+                    {t.verificationNote && <p class="small muted" set:html={inline(t.verificationNote)} />}
+                  </div>
+                  <div class="index-item__side">
+                    <div class="tags">
+                      <StatusTag status={t.status === 'complete' ? 'complete' : 'planned'} />
+                      <LevelTag level={t.level} always />
+                      <VerifyTag status={t.verification} />
+                    </div>
+                    {!link && <span class="muted">Guide in preparation</span>}
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>

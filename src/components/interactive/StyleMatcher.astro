@@ -1,0 +1,54 @@
+---
+/** Choose the leadership style that best fits each situation. */
+import QuizShell from './parts/QuizShell.astro';
+import Choice from './parts/Choice.astro';
+import Key from './parts/Key.astro';
+import CheckRow from './parts/CheckRow.astro';
+import { rich } from '../../lib/markup';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'style-matcher' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const STYLE_LABELS: Record<string, string> = {
+  autocratic: 'Autocratic',
+  paternalistic: 'Paternalistic',
+  democratic: 'Democratic',
+  'laissez-faire': 'Laissez-faire',
+  situational: 'Situational',
+};
+const OPTIONS = ['autocratic', 'paternalistic', 'democratic', 'laissez-faire'].map((v) => ({ value: v, label: STYLE_LABELS[v] ?? v }));
+const list = (vs: string[]) => vs.map((v) => STYLE_LABELS[v] ?? v).join(' or ');
+const config = {
+  uid,
+  kind: 'styles',
+  labels: STYLE_LABELS,
+  items: data.scenarios.map((s) => ({
+    id: s.id,
+    groups: [{ name: 'style', legend: 'A style', right: s.strong, partial: s.defensible }],
+  })),
+};
+---
+
+<QuizShell uid={uid} kind="styles" config={config} count={data.scenarios.length}>
+  <p slot="before" class="quiz__lead">Choose the style that fits each situation best. More than one can sometimes be defended.</p>
+  {
+    data.scenarios.map((s, k) => (
+      <li class="quiz__item sm__item" data-item={s.id}>
+        <p class="label">
+          Situation <span data-short>{k + 1}</span>
+        </p>
+        <div class="sm__situation narrative" set:html={rich(s.situation)} />
+        <Choice uid={uid} itemId={s.id} name="style" legend="Best-fitting style" options={OPTIONS} />
+        <CheckRow />
+        <Key
+          answerLabel="Strong fit:"
+          answer={`${list(s.strong)}.${s.defensible.length ? ` Defensible: ${list(s.defensible).toLowerCase()}.` : ''}`}
+          explanation={s.explanation}
+        />
+      </li>
+    ))
+  }
+</QuizShell>

@@ -1,0 +1,370 @@
+# Decision Room: Marigold Kitchens. Every metric is computed from the case's
+# exhibits by the model in the case's method note; tests/unit/cases.test.ts
+# recomputes them. Figures are ₹ million a year unless stated.
+
+title: 'Marigold Kitchens: which way to grow?'
+case: marigold-kitchens
+dek: Five routes, four aims, and a decision that changes what the business is.
+role: You are advising Meera Rao, the founder. She wants a recommendation she can defend to her bank, a possible investor and her own staff.
+briefing: >
+  Marigold Kitchens has four profitable restaurants in Pune, ₹20m of cash and five ways forward. Read the evidence,
+  choose a route, and then decide how to make it work. The forecasts below each choice come from the finance
+  manager's model; what happens after that is one simulation of how the route might go. Commit before you read the
+  debrief.
+objectives:
+  - Keep the food as good as it is now.
+  - Be known in at least three cities within five years.
+  - Keep control of the business.
+  - Let the people who grew with Marigold grow with it.
+evidence: [ex-1, ex-3, ex-4, ex-6, ex-7]
+metrics:
+  - { id: outlets, label: Restaurants under the Marigold name by year two, better: context }
+  - { id: revenue2, label: "Marigold's own recurring revenue, year two", unit: ₹m, better: context, note: Franchisees' and the joint venture's sales are not Marigold's revenue }
+  - { id: profit2, label: "Founder's share of profit after interest, year two", unit: ₹m, better: higher }
+  - { id: profit4, label: "Founder's share of profit after interest, year four", unit: ₹m, better: higher }
+  - { id: capital, label: New money committed, unit: ₹m, better: lower }
+  - { id: debt, label: New borrowing, unit: ₹m, better: lower }
+  - { id: founder, label: "Founder's ownership of Marigold", unit: '%', better: higher }
+  - { id: control, label: Control of the kitchens, better: context }
+  - { id: risk, label: Risk to the brand and the food, better: context }
+baseline:
+  outlets: 4
+  revenue2: 96.0
+  profit2: 12.78
+  profit4: 12.78
+  capital: 0
+  debt: 0
+  founder: 100
+  control: Full
+  risk: Low
+rounds:
+  - id: route
+    title: Choose the route
+    question: Which route do you recommend to Meera?
+    help: Before you choose, decide which of the four aims matters most to you, and why. You will be asked about it in the debrief.
+    choices:
+      - id: organic
+        label: Organic growth in Mumbai
+        detail: Four company-owned restaurants over two years, financed by ₹20m of cash and a ₹52m loan.
+        outcome:
+          headline: Eight restaurants, a loan to repay, and profit that dips before it climbs
+          narrative: >
+            The Mumbai restaurants open one by one over two years, and each takes most of a year to find its
+            regulars. In year two they average ₹22.1m of sales, against ₹26m when mature, and each earns only ₹1.23m
+            after Mumbai's higher rent. With ₹5.72m of interest on the loan and central costs up to ₹7.0m for an
+            area manager and training, profit falls to ₹9.47m in year two, below today's ₹12.78m. If the restaurants
+            mature as forecast, it climbs to ₹20.08m by year four.
+          metrics: { outlets: 8, revenue2: 184.4, profit2: 9.47, profit4: 20.08, capital: 72, debt: 52, founder: 100, control: Full, risk: Medium }
+          stakeholders:
+            - { name: "Meera Rao", reaction: "Keeps full control and the recipes, but the debt keeps her awake.", mood: mixed }
+            - { name: "Staff", reaction: "Senior cooks see a path to running a kitchen of their own.", mood: positive }
+            - { name: "The bank", reaction: "Earns interest, and watches a new city's sales closely.", mood: mixed }
+            - { name: "Mumbai customers", reaction: "Find the food as good as its reputation; it takes time for word to spread.", mood: positive }
+          risks:
+            - If Mumbai demand is weaker than forecast, interest and rent are still due. The loan magnifies the downside.
+            - Committing to all four openings at once gives up the option to stop after the first two.
+          theory: >
+            Internal (organic) growth is slower and is financed here by retained profit and debt. It keeps control and
+            culture, and it raises gearing. At eight restaurants the economies of scale are modest; the main gain is
+            reach.
+      - id: franchise
+        label: Franchising
+        detail: Twelve franchised restaurants over two years, with a training academy and a support team.
+        outcome:
+          headline: Sixteen Marigold restaurants, twelve of them run by people Meera did not hire
+          narrative: >
+            Twelve franchises open within two years, most of them in Mumbai and Bengaluru. Their restaurants sell
+            ₹228m in year two, but that is the franchisees' revenue, not Marigold's. Marigold earns a 6% royalty,
+            ₹13.68m, and after the support team (₹6.0m) and the academy (₹1.5m), recurring profit rises to ₹18.96m in
+            year two and ₹20.40m when the franchises mature. Franchise fees add ₹9.0m in year two, but they stop when
+            the network stops growing, so they are left out of the recurring figures. Only four inquirers had the
+            capital, so eight franchisees were approved with bank loans.
+          metrics: { outlets: 16, revenue2: 109.68, profit2: 18.96, profit4: 20.40, capital: 10, debt: 0, founder: 100, control: Low, risk: High }
+          stakeholders:
+            - { name: "Meera Rao", reaction: "The brand reaches two new cities fast; she no longer knows every kitchen.", mood: mixed }
+            - { name: "Franchisees", reaction: "Gain a known brand; most carry heavy loans.", mood: mixed }
+            - { name: "Customers", reaction: "Find Marigold in more places; some say it is not the same everywhere.", mood: mixed }
+            - { name: "Staff", reaction: "A few join the new support team; the kitchens carry on as before.", mood: positive }
+          risks:
+            - Quality now depends on twelve owners following the recipes. One bad restaurant damages the brand everywhere.
+            - The plan assumes twelve capable franchisees in two years; the evidence shows four with the means.
+          theory: >
+            Franchising is external growth without ownership: fast and light on capital, it trades control for reach.
+            The franchisor's revenue is fees and royalties, not the network's sales.
+      - id: joint-venture
+        label: Joint venture with Sterling Malls
+        detail: A 50:50 company opens six mall restaurants in three cities; Marigold invests ₹45m, ₹30m of it borrowed.
+        outcome:
+          headline: Marigold in six malls across three cities, run by a company it owns half of
+          narrative: >
+            Six mall restaurants open by the end of year two, with high footfall: ₹25.2m of sales each in year two and
+            ₹28m when mature, but rent is 15% of sales. The joint venture earns ₹24.14m in year two. Marigold's half,
+            ₹12.07m, lifts its profit to ₹21.05m after interest and oversight, and to ₹25.50m by year four. The joint
+            venture's sales of ₹151.2m belong to the joint venture company, so Marigold's own revenue is still ₹96m.
+          metrics: { outlets: 10, revenue2: 96.0, profit2: 21.05, profit4: 25.50, capital: 45, debt: 30, founder: 100, control: Shared, risk: Medium }
+          stakeholders:
+            - { name: "Meera Rao", reaction: "Three cities in two years; now every decision in the malls needs a partner's agreement.", mood: mixed }
+            - { name: "Sterling Malls", reaction: "Gets a restaurant that draws shoppers.", mood: positive }
+            - { name: "Staff", reaction: "New roles in three cities.", mood: positive }
+            - { name: "Customers", reaction: "Convenient, but a mall food court is faster and noisier than a Marigold dining room.", mood: mixed }
+          risks:
+            - In the joint venture, menu and pricing decisions need the partner's agreement.
+            - Exit terms decide what happens if the partners disagree, and standard terms often favour the partner that owns the sites.
+          theory: >
+            A joint venture is external growth through a new, jointly owned business. It shares cost and risk, and it
+            shares control. It suits a market the business cannot easily enter alone, here the malls.
+      - id: acquisition
+        label: Acquire Tiffin Lane
+        detail: Banyan Growth Partners invests ₹120m for 30% of Marigold to buy and convert Tiffin Lane.
+        outcome:
+          headline: Ten restaurants after integration, and an investor at the table
+          narrative: >
+            ₹96m buys Tiffin Lane and ₹24m converts its six best restaurants to the Marigold format; the three weakest
+            close at a one-off cost of ₹6m. Buying for ten restaurants, Marigold negotiates food and packaging down
+            from 32% to 30% of sales, a purchasing economy of scale. The converted restaurants sell ₹20m each in year
+            two. Group profit reaches ₹29.2m in year two and ₹41.8m by year four, but Meera now owns 70%, so her share
+            is ₹20.44m and ₹29.26m.
+          metrics: { outlets: 10, revenue2: 216.0, profit2: 20.44, profit4: 29.26, capital: 126, debt: 0, founder: 70, control: Full, risk: High }
+          stakeholders:
+            - { name: "Meera Rao", reaction: "Runs the largest business in this decision, and now answers to an investor.", mood: mixed }
+            - { name: "Banyan Growth Partners", reaction: "Has growth it can one day sell.", mood: positive }
+            - { name: "Tiffin Lane staff", reaction: "Three restaurants close; the rest work to new rules.", mood: negative }
+            - { name: "Marigold staff", reaction: "Promotions to run converted kitchens, and the strain of integration.", mood: mixed }
+          risks:
+            - The savings depend on merging menus, suppliers and systems, and on Tiffin Lane's staff staying.
+            - Banyan will expect to sell its stake in five to seven years, which may mean selling the whole business.
+          theory: >
+            An acquisition is external growth by buying control of another business. It is the fastest route to scale
+            and can bring purchasing and managerial economies of scale. It also brings the risks of overpaying, culture
+            clash and diseconomies of scale while the two businesses are combined.
+      - id: stay-focused
+        label: Stay focused
+        detail: Four restaurants and an office lunch service, set up for ₹3m.
+        outcome:
+          headline: Four restaurants, a new lunch service, and a business that stays Meera's
+          narrative: >
+            Marigold stays at four restaurants and uses its kitchens' quiet mornings to cook weekday lunches for offices
+            in Pune, delivered in its own vans. The service sells ₹6m in year two, rising to ₹9m. After food and
+            packaging at 36% and ₹1.2m of delivery and selling costs, it adds ₹2.64m, lifting profit to ₹15.42m in year
+            two and ₹17.34m by year four. Outside Pune, Marigold is no better known than it was.
+          metrics: { outlets: 4, revenue2: 102.0, profit2: 15.42, profit4: 17.34, capital: 3, debt: 0, founder: 100, control: Full, risk: Low }
+          stakeholders:
+            - { name: "Meera Rao", reaction: "Keeps control and quality; her aim of three cities has not moved.", mood: mixed }
+            - { name: "Sunil Patil, head chef", reaction: "Sees his proposal adopted.", mood: positive }
+            - { name: "Staff", reaction: "Stability, and fewer chances of promotion.", mood: mixed }
+            - { name: "Customers", reaction: "Keep the restaurants they know.", mood: positive }
+          risks:
+            - Tiffin Lane, the mall sites and the franchise inquirers may go to a competitor.
+            - A business that does not grow may lose its most ambitious staff to one that does.
+          theory: >
+            Staying small is a strategic choice, not a failure to grow. It avoids diseconomies of scale and protects
+            quality and control. The lunch service is growth too, but internal and small.
+
+  - id: implement
+    title: Make it work
+    question: How will you implement the route you chose?
+    help: Implementation decides whether the forecast happens. Each choice changes the risk, the profit or both.
+    choices:
+      - id: organic-hire
+        followsFrom: organic
+        label: Hire an experienced area manager
+        detail: A proven operator from a national chain, paid ₹1.2m a year more than Marigold's own managers.
+        outcome:
+          headline: Mumbai finds its feet faster, under a manager the kitchens did not choose
+          narrative: >
+            The new area manager's systems help the Mumbai restaurants reach 90% of mature sales in year two instead of
+            85%, worth about ₹0.88m more profit for each restaurant. Profit in year two is ₹11.81m instead of ₹9.47m.
+            The extra salary is still paid when the restaurants mature, so profit by year four is ₹18.88m rather than
+            ₹20.08m. Two of Meera's longest-serving supervisors, passed over for the job, start looking elsewhere.
+          metrics: { profit2: 11.81, profit4: 18.88, risk: Medium }
+          stakeholders:
+            - { name: "Supervisors", reaction: "Feel overlooked.", mood: negative }
+            - { name: "Meera Rao", reaction: "Pleased with the speed, uneasy about the culture.", mood: mixed }
+          risks:
+            - An outsider's methods may not fit kitchens built on the head chef's training.
+          theory: Recruiting from outside brings skills quickly; promoting from inside motivates and keeps the culture. A growth decision contains human resource decisions.
+      - id: organic-promote
+        followsFrom: organic
+        label: Promote and train from within
+        detail: Promote two senior cooks and a supervisor, each trained for four months before an opening.
+        outcome:
+          headline: Slower openings, and kitchens that taste like Pune
+          narrative: >
+            Training slows the start: the Mumbai restaurants reach only 80% of mature sales in year two, so profit falls
+            to ₹5.54m, the lowest of any path. But the food is right from the first day, two supervisors become
+            managers, and by year four profit reaches ₹19.68m, more than with the outside hire, because there is no
+            premium salary to pay.
+          metrics: { profit2: 5.54, profit4: 19.68, risk: Low }
+          stakeholders:
+            - { name: "Senior cooks", reaction: "Promoted, and proud of it.", mood: positive }
+            - { name: "The bank", reaction: "Concerned by the slow first year.", mood: mixed }
+          risks:
+            - The low year-two profit leaves little margin if anything else goes wrong.
+          theory: Internal recruitment preserves culture and motivates staff, at the cost of speed. It also serves the founder's fourth aim.
+      - id: franchise-strict
+        followsFrom: franchise
+        label: Build a strict franchise system
+        detail: A central kitchen supplies sauces and spice blends, with quarterly audits and mystery diners. ₹3.0m a year, plus ₹2.2m of interest on a ₹20m loan for the central kitchen.
+        outcome:
+          headline: Fewer surprises, thinner profit
+          narrative: >
+            Every franchise uses the same sauces and spice blends, made in Marigold's central kitchen, and auditors visit
+            each one every quarter. One franchisee is warned in year three and improves. Franchise sales mature at ₹21m,
+            as forecast. The system costs ₹5.2m a year, so profit is ₹13.76m in year two and ₹15.20m by year four.
+          metrics: { profit2: 13.76, profit4: 15.20, capital: 30, debt: 20, risk: Medium, control: 'Low, with audit rights' }
+          stakeholders:
+            - { name: "Franchisees", reaction: "Grumble about the audits, and keep their customers.", mood: mixed }
+            - { name: "Customers", reaction: "Find the food the same in every city.", mood: positive }
+          risks:
+            - The central kitchen adds debt, and a single point of failure for the whole network.
+          theory: A franchisor protects its brand by controlling inputs and inspecting outputs. Control costs money, which is the price of reach without ownership.
+      - id: franchise-light
+        followsFrom: franchise
+        label: Keep franchise support light
+        detail: Rely on the manual and the academy, and save the cost of audits and a central kitchen.
+        outcome:
+          headline: Year two looks excellent; year three does not
+          narrative: >
+            Profit in year two is ₹18.96m. In year three two franchisees fail hygiene inspections and close, a third
+            quietly changes the recipes, and online reviews start to mention "the Marigold that isn't". By year four ten
+            franchises remain, selling ₹18.5m each, and sales in Marigold's own Pune restaurants are 5% lower. Profit
+            by year four is ₹13.12m, barely above today's ₹12.78m.
+          metrics: { profit2: 18.96, profit4: 13.12, outlets: 16, risk: High }
+          stakeholders:
+            - { name: "Customers", reaction: "Some stop trusting the name.", mood: negative }
+            - { name: "Franchisees who closed", reaction: "Lose their investment.", mood: negative }
+          risks:
+            - Damage to a brand lands on every restaurant that carries it, including the ones Marigold owns.
+          theory: The benefits of light-touch franchising arrive first and its costs arrive later. Judging the route on year two alone hides that.
+      - id: jv-negotiate
+        followsFrom: joint-venture
+        label: Negotiate brand control and a way out first
+        detail: Insist on a veto over menu and brand, and the right to buy Sterling's half after five years. Signing takes six months longer.
+        outcome:
+          headline: Four mall restaurants in year two instead of six, on terms Marigold can live with
+          narrative: >
+            Sterling agrees after months of negotiation. The delay means only four mall restaurants trade through year
+            two, so Marigold's share of the joint venture's profit is ₹7.71m and its profit is ₹16.69m. The other two
+            open in year three. By year four profit reaches ₹25.50m, as forecast, and Marigold decides what is served.
+          metrics: { profit2: 16.69, profit4: 25.50, control: 'Shared, with a veto on menu and brand', risk: Low }
+          stakeholders:
+            - { name: "Sterling Malls", reaction: "Accepts the terms, and remembers the delay.", mood: mixed }
+            - { name: "Meera Rao", reaction: "Has the protection she wanted.", mood: positive }
+          risks:
+            - Six months of negotiation is six months in which a competitor could take the mall sites.
+          theory: The terms of a joint venture matter as much as the decision to form one. A veto and an exit right turn shared control into protected control.
+      - id: jv-standard
+        followsFrom: joint-venture
+        label: Sign quickly on the partner's standard terms
+        detail: All six restaurants open on time. Sterling controls mall menus and prices, and the agreement runs for seven years.
+        outcome:
+          headline: Fast growth, and a menu that is no longer only Marigold's
+          narrative: >
+            All six restaurants open on schedule and profit reaches ₹21.05m in year two. In year three Sterling adds
+            cheaper "value meals" to raise footfall, and customers begin to say the mall Marigolds are not the real
+            thing. Sales in Marigold's own restaurants slip by 3%, and profit by year four is ₹23.54m instead of
+            ₹25.50m. The agreement cannot be ended for seven years.
+          metrics: { profit2: 21.05, profit4: 23.54, control: 'Shared, partner controls the malls', risk: High }
+          stakeholders:
+            - { name: "Sterling Malls", reaction: "Gets the footfall it wanted.", mood: positive }
+            - { name: "Meera Rao", reaction: "Cannot change what is served under her name.", mood: negative }
+          risks:
+            - Seven years is a long time to share a brand with a partner whose priorities differ.
+          theory: Speed in a joint venture can be bought with control. The cost appears later, in the brand.
+      - id: acq-rapid
+        followsFrom: acquisition
+        label: Integrate quickly
+        detail: Convert six restaurants and merge the two businesses' systems within six months.
+        outcome:
+          headline: The savings arrive early, and so does the exodus
+          narrative: >
+            The purchasing savings arrive within months. But four in ten Tiffin Lane employees leave in the first year,
+            and recruiting and training replacements costs ₹2.5m. Group profit in year two is ₹26.7m, of which Meera's
+            70% is ₹18.69m. By year four the converted restaurants reach maturity and her share is ₹29.26m, if the new
+            teams hold.
+          metrics: { profit2: 18.69, profit4: 29.26, risk: High }
+          stakeholders:
+            - { name: "Tiffin Lane staff", reaction: "Many leave rather than adapt to a new culture overnight.", mood: negative }
+            - { name: "Banyan Growth Partners", reaction: "Pleased with the early savings.", mood: positive }
+          risks:
+            - New teams in six restaurants at once, trained in a hurry.
+          theory: Rapid integration captures economies of scale sooner and raises the risk of culture clash, a source of diseconomies.
+      - id: acq-phased
+        followsFrom: acquisition
+        label: Integrate in phases
+        detail: Run Tiffin Lane under its own name for a year while menus and suppliers are merged step by step.
+        outcome:
+          headline: A calmer year, and savings that take longer
+          narrative: >
+            Most Tiffin Lane staff stay. But with two brands and two menus for a year, food and packaging fall only to
+            31% of sales, and the six restaurants still trading as Tiffin Lane sell ₹18m each. Group profit in year two
+            is ₹21.16m, of which Meera's share is ₹14.81m. By year four, with the conversions complete, her share
+            reaches ₹29.26m.
+          metrics: { profit2: 14.81, profit4: 29.26, risk: Medium }
+          stakeholders:
+            - { name: "Tiffin Lane staff", reaction: "Have time to learn the Marigold way.", mood: positive }
+            - { name: "Banyan Growth Partners", reaction: "Impatient with the slower savings.", mood: mixed }
+          risks:
+            - Running two brands for a year confuses suppliers and customers.
+          theory: Phased integration trades early savings for a lower risk of losing the people who make the restaurants work.
+      - id: stay-people
+        followsFrom: stay-focused
+        label: Invest the surplus in the people
+        detail: Raise kitchen pay by 8% and fund training for every cook, at ₹0.96m a year.
+        outcome:
+          headline: Fewer leavers, and the same four restaurants
+          narrative: >
+            Staff turnover falls from 18% towards 11% over two years, and the restaurants keep their best cooks. Profit
+            is ₹14.46m in year two and ₹16.38m by year four, about ₹1m a year below the plain version of this route.
+            The business is no bigger, but it is harder to copy.
+          metrics: { profit2: 14.46, profit4: 16.38, risk: Low }
+          stakeholders:
+            - { name: "Cooks", reaction: "Better paid and better trained.", mood: positive }
+            - { name: "Meera Rao", reaction: "Proud of the kitchens, and still not in three cities.", mood: mixed }
+          risks:
+            - The pay rise is permanent; the competitive advantage it buys has to keep paying for it.
+          theory: Investing in people can protect the source of a competitive advantage, here the cooking, even when it lowers profit in the short run.
+      - id: stay-pilot
+        followsFrom: stay-focused
+        label: Keep a reserve, then test one Mumbai restaurant
+        detail: Hold the cash, and open a single Mumbai restaurant in year three once the lunch service is running.
+        outcome:
+          headline: A small step towards a second city, taken when the business is ready
+          narrative: >
+            The lunch service runs as planned and the cash reserve grows. In year three a single Mumbai restaurant opens,
+            paid for from cash, with ₹0.5m a year of extra management cost. By year four it reaches 85% of mature sales
+            and earns ₹1.23m, so profit is ₹18.07m. Meera now has evidence of how Marigold does in Mumbai before she
+            decides anything bigger.
+          metrics: { profit2: 15.42, profit4: 18.07, risk: Low }
+          stakeholders:
+            - { name: "Meera Rao", reaction: "Moves towards her second aim without risking the first.", mood: positive }
+            - { name: "Staff", reaction: "See a first promotion to a new city.", mood: positive }
+          risks:
+            - Opportunities that will not wait, such as Tiffin Lane, are given up.
+          theory: Sequencing a decision keeps options open. A small test buys evidence before a large, hard-to-reverse commitment.
+
+debrief:
+  tradeoffs:
+    - Speed against control. The routes that grow fastest, franchising and the acquisition, are the ones that loosen control of the kitchen, which is Marigold's advantage.
+    - This year against later years. Organic growth lowers profit in year two and raises it by year four; light-touch franchising does the reverse.
+    - Money against ownership. The acquisition is paid for with 30% of the company. Meera keeps a majority, but gains a partner who expects to sell.
+    - Reach against the aims. Only the joint venture and the acquisition reach three cities quickly, and both strain the aim of keeping control.
+  evidenceThatMatters:
+    - Exhibit 7. Four of forty-one franchise inquirers could fund a restaurant. A plan for twelve franchises in two years depends on people the evidence does not show.
+    - Exhibits 4 and 5. Tiffin Lane's rating and staff turnover. Buying the restaurants means buying the reasons they underperform.
+    - Exhibit 6. The founder's aims. A recommendation that ignores them will not be carried out, however good its numbers.
+  changeYourMind:
+    - If Mumbai sales in the first year were 30% below forecast, which route would you choose?
+    - If Banyan offered the same money for 20% of Marigold instead of 30%, would the acquisition become the best route?
+    - If Sterling Malls offered control of the menu and an exit after three years, what would change?
+  misconceptions:
+    - Counting franchisees' sales (₹228m in year two) as Marigold's revenue. Marigold's revenue from franchising is the royalties and fees.
+    - Assuming an acquisition brings economies of scale automatically. The purchasing savings depend on integrating menus, suppliers and systems, and integration can raise costs before it lowers them.
+    - Treating the route with the highest forecast profit as the answer, without asking whose profit it is and what was given up for it.
+  examLink: >
+    This is the reasoning a Discuss or Recommend question on growth asks for: a route chosen against the
+    organization's own aims, with the trade-offs weighed and the conditions stated. Try the practice questions for 1.5
+    on the Exam Desk.
+topics: [growth-and-evolution]
+questions: [q-growth-p1-discuss, q-growth-p1-explain]
+updated: 2026-10-29

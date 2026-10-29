@@ -1,0 +1,33 @@
+---
+/**
+ * The Business Brief mark: a brief (a document with a folded corner), a
+ * decision node, the path taken and the path not taken. Drawn inline so it
+ * inherits nothing and needs no request. Master files: public/brand/.
+ */
+interface Props {
+  size?: number;
+  reversed?: boolean;
+  decorative?: boolean;
+  class?: string;
+}
+const { size = 36, reversed = false, decorative = true, class: className } = Astro.props;
+const doc = reversed ? '#F4F1EA' : '#111417';
+const taken = reversed ? '#111417' : '#F4F1EA';
+---
+
+<svg
+  class={className}
+  width={size}
+  height={size}
+  viewBox="0 0 64 64"
+  aria-hidden={decorative ? 'true' : undefined}
+  role={decorative ? undefined : 'img'}
+  aria-label={decorative ? undefined : 'The Business Brief'}
+  focusable="false"
+>
+  <path d="M0 0H46L64 18V64H0Z" fill={doc}></path>
+  <path d="M46 0V18H64Z" fill="#C79A45"></path>
+  <path d="M28 38L48 52" fill="none" stroke="#65717C" stroke-width="5.5"></path>
+  <path d="M9 38H28L48 24" fill="none" stroke={taken} stroke-width="5.5" stroke-linejoin="miter"></path>
+  <circle cx="28" cy="38" r="6" fill="#315CFF"></circle>
+</svg>

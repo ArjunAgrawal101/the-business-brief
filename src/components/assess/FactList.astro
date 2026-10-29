@@ -1,0 +1,64 @@
+---
+/** Statements about the IB assessment, each with its verification status, sources and location. */
+import VerifyTag from '../ui/VerifyTag.astro';
+import { corpus, href } from '../../lib/content';
+import type { Verification } from '../../lib/schemas';
+
+interface Props {
+  facts: Array<{ text: string; status: Verification; sources: string[]; location?: string }>;
+}
+const { facts } = Astro.props;
+const c = await corpus();
+---
+
+<ul class="facts">
+  {
+    facts.map((f) => (
+      <li class="fact">
+        <p class="fact__text">{f.text}</p>
+        <p class="fact__meta">
+          <VerifyTag status={f.status} />
+          <span class="small muted">
+            {f.sources.map((s, k) => (
+              <>
+                {k > 0 && '; '}
+                <a href={href.source(s)}>{c.sources[s]?.title ?? s}</a>
+              </>
+            ))}
+            {f.location && `, ${f.location}`}
+          </span>
+        </p>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .facts {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .fact {
+    display: grid;
+    gap: var(--sp-1);
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .fact__text {
+    margin: 0;
+    max-width: var(--text-max);
+    color: var(--text-strong);
+  }
+
+  .fact__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,180 @@
+---
+/**
+ * One original practice question: the prompt with its stimulus and exhibits,
+ * a space to answer (kept on this device), the mark scheme behind a
+ * disclosure, a self-check against it, and the errors that cost marks.
+ */
+import Exhibit from '../blocks/Exhibit.astro';
+import ProvenanceTag from '../ui/ProvenanceTag.astro';
+import LevelTag from '../ui/LevelTag.astro';
+import { corpus, href } from '../../lib/content';
+import { inline, jsonForScript, rich } from '../../lib/markup';
+import type { Question } from '../../lib/schemas';
+
+interface Props {
+  id: string;
+  question: Question;
+  headingLevel?: 2 | 3;
+  showCase?: boolean;
+}
+const { id, question: q, headingLevel = 3, showCase = true } = Astro.props;
+const c = await corpus();
+const theCase = q.case ? c.cases[q.case] : undefined;
+const exhibits = theCase ? q.exhibits.map((e) => theCase.exhibits.find((x) => x.id === e)).filter((x) => x !== undefined) : [];
+const term = c.commandTerms[Object.keys(c.commandTerms).find((k) => c.commandTerms[k]?.term === q.commandTerm) ?? ''];
+const PAPERS = { 'paper-1': 'Paper 1 style', 'paper-2': 'Paper 2 style', 'paper-3': 'Paper 3 style', 'ia-skill': 'IA skill', general: 'Practice' } as const;
+const H = headingLevel === 2 ? 'h2' : 'h3';
+const uid = `q-${id}`;
+const ms = q.markscheme;
+const config = { id, marks: q.marks, kind: ms.kind, points: ms.points.map((p) => p.marks) };
+---
+
+<article class="qcard" id={uid} data-ix="question" data-level={q.level === 'HL' ? 'HL' : undefined} aria-labelledby={`${uid}-title`}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <header class="qcard__head">
+    <div class="qcard__meta">
+      <span class="qcard__paper">{PAPERS[q.paperStyle]}</span>
+      <span class="qcard__marks num">[{q.marks} {q.marks === 1 ? 'mark' : 'marks'}]</span>
+    </div>
+    <H class="qcard__title" id={`${uid}-title`}>{q.title}</H>
+    <div class="tags">
+      <ProvenanceTag kind="original-practice" />
+      {q.level === 'HL' && <LevelTag level="HL" />}
+      {
+        term ? (
+          <a class="tag tag--plain qcard__term" href={href.commandTerm(q.commandTerm)}>
+            Command term: {q.commandTerm}
+          </a>
+        ) : (
+          <span class="tag tag--plain">Command term: {q.commandTerm}</span>
+        )
+      }
+      <span class="tag tag--plain">{q.ao}</span>
+    </div>
+  </header>
+
+  {
+    theCase && showCase && (
+      <p class="small qcard__case">
+        Based on the case <a href={href.case(q.case ?? '')}>{theCase.title}</a>
+        {theCase.kind === 'fictional' && ' (fictional, simulated data)'}.
+      </p>
+    )
+  }
+  {q.stimulus && <div class="prose qcard__stimulus narrative" set:html={rich(q.stimulus)} />}
+  {
+    exhibits.length > 0 && (
+      <div class="stack qcard__exhibits">
+        {exhibits.map((e) => (
+          <Exhibit exhibit={e} caseTitle={theCase?.title} caseHref={href.case(q.case ?? '')} headingLevel={headingLevel === 2 ? 3 : 4} />
+        ))}
+      </div>
+    )
+  }
+  <div class="qcard__prompt prose" set:html={rich(q.prompt)} />
+
+  <div class="field qcard__attempt">
+    <label for={`${uid}-answer`}>Your answer</label>
+    <textarea class="textarea" id={`${uid}-answer`} rows={q.marks >= 6 ? 8 : 4} data-answer></textarea>
+    <span class="field__hint js-only">Write your answer before you open the mark scheme. It is saved on this device only.</span>
+  </div>
+
+  <details class="disclosure qcard__ms" data-ms>
+    <summary>Mark scheme and guidance</summary>
+    <div class="disclosure__body stack">
+      <div class="tags">
+        <ProvenanceTag kind="assessment-explanation" />
+      </div>
+      {ms.guidance && <div class="prose" set:html={rich(ms.guidance)} />}
+      {
+        ms.answer && (
+          <div class="qcard__answer">
+            <span class="label">Answer</span>
+            <div class="prose" set:html={rich(ms.answer)} />
+          </div>
+        )
+      }
+      {
+        ms.points.length > 0 && (
+          <fieldset class="qcard__points">
+            <legend class="label label--ink">Award marks for</legend>
+            <ul>
+              {ms.points.map((p, k) => (
+                <li>
+                  <label class="qcard__point">
+                    <input type="checkbox" class="js-only" data-point={k} />
+                    <span class="qcard__pm num">[{p.marks}]</span>
+                    <span set:html={inline(p.text)} />
+                  </label>
+                </li>
+              ))}
+            </ul>
+            <p class="qcard__score js-only" data-score aria-live="polite">
+              Tick each point your answer makes to check it against the mark scheme.
+            </p>
+          </fieldset>
+        )
+      }
+      {
+        ms.levels.length > 0 && (
+          <div class="qcard__levels">
+            <p class="small muted">
+              These level descriptors were written for this practice question. They are not IB markbands, which are published only to schools.
+            </p>
+            <fieldset>
+              <legend class="label label--ink">Which level best fits your answer?</legend>
+              <div class="table-scroll" role="region" aria-label="Levels for this question" tabindex="0">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col" class="js-only">
+                        <span class="sr-only">Choose</span>
+                      </th>
+                      <th scope="col">Marks</th>
+                      <th scope="col">Descriptor</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ms.levels.map((l, k) => (
+                      <tr>
+                        <td class="js-only">
+                          <input type="radio" name={`${uid}-level`} value={l.marks} id={`${uid}-level-${k}`} data-level-pick aria-label={`${l.marks.replace('-', ' to ')} marks`} />
+                        </td>
+                        <th scope="row" class="num">
+                          {l.marks.replace('-', ' to ')}
+                        </th>
+                        <td set:html={inline(l.descriptor)} />
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </fieldset>
+            <p class="qcard__score js-only" data-level-score aria-live="polite" />
+          </div>
+        )
+      }
+      {
+        ms.exemplar && (
+          <div class="qcard__exemplar">
+            <span class="label">A strong answer might read</span>
+            <div class="prose narrative" set:html={rich(ms.exemplar)} />
+          </div>
+        )
+      }
+    </div>
+  </details>
+
+  <details class="disclosure qcard__errors">
+    <summary>Errors that cost marks</summary>
+    <div class="disclosure__body">
+      <ul class="prose">
+        {q.errors.map((e) => <li set:html={inline(e)} />)}
+      </ul>
+    </div>
+  </details>
+</article>
+
+<script>
+  import '../../scripts/question';
+</script>

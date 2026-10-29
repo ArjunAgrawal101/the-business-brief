@@ -1,0 +1,10 @@
+---
+import { STATUS_LABELS } from '../../lib/labels';
+interface Props {
+  status: keyof typeof STATUS_LABELS;
+}
+const { status } = Astro.props;
+const l = STATUS_LABELS[status];
+---
+
+<span class={`tag ${l.css}`}>{l.label}</span>

@@ -1,0 +1,45 @@
+---
+/**
+ * The wrapper shared by the classification interactions. It holds the
+ * configuration for src/scripts/quiz.ts, the summary line and the buttons
+ * that only make sense with JavaScript. Without JavaScript every item still
+ * shows its question, and its answer sits in an "Answer and explanation"
+ * disclosure that the reader can open after choosing.
+ */
+import { jsonForScript } from '../../../lib/markup';
+
+interface Props {
+  uid: string;
+  kind: 'cost' | 'errors' | 'ansoff' | 'styles' | 'functions';
+  config: unknown;
+  count: number;
+}
+const { uid, kind, config, count } = Astro.props;
+---
+
+<div class={`quiz quiz--${kind}`} data-ix="quiz" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>
+    This exercise could not start. Each item's answer is in the "Answer and explanation" section below it.
+  </p>
+  <slot name="before" />
+  <ol class="quiz__items" role="list">
+    <slot />
+  </ol>
+  <slot name="after" />
+  <div class="quiz__bar">
+    <p class="quiz__summary" data-summary>
+      <span class="nojs-only">Choose an answer for each item, then open its answer to compare.</span>
+      <span class="js-only">{count} to do. Choose your answers, then check each one or check them all.</span>
+    </p>
+    <div class="cluster js-only">
+      <button type="button" class="btn btn--primary btn--small" data-check-all>Check all</button>
+      <button type="button" class="btn btn--small" data-reset>Clear my answers</button>
+    </div>
+  </div>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../../scripts/quiz';
+</script>

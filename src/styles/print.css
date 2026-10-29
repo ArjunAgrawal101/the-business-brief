@@ -1,0 +1,94 @@
+/*
+  Print: a clean document for classroom use. Case files and Revision Briefs
+  print with their sources and the creator attribution, without navigation.
+*/
+@media print {
+  @page {
+    margin: 16mm 14mm 18mm;
+  }
+
+  :root {
+    --surface-page: #fff;
+    --surface-sheet: #fff;
+    --surface-sunk: #fff;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 10.5pt;
+    line-height: 1.45;
+  }
+
+  .skip-link,
+  .site-header,
+  .site-footer,
+  .no-print,
+  [data-no-print] {
+    display: none !important;
+  }
+
+  .band {
+    padding-block: 6mm;
+    border-top: 0.5pt solid #999;
+  }
+
+  .band--ink,
+  .band--sunk {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .band--ink * {
+    color: #000 !important;
+  }
+
+  a {
+    color: #000;
+    text-decoration: none;
+  }
+
+  .prose a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 8.5pt;
+    color: #444;
+  }
+
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+
+  table,
+  figure,
+  .sheet,
+  .callout,
+  .misconception,
+  .definition,
+  .formula,
+  .working {
+    break-inside: avoid;
+  }
+
+  .print-attribution {
+    display: block !important;
+    margin-top: 8mm;
+    padding-top: 3mm;
+    border-top: 0.5pt solid #000;
+    font-size: 8.5pt;
+  }
+
+  /* Interactive controls print as their content */
+  details > summary::after {
+    display: none;
+  }
+
+  details:not([open]) > *:not(summary) {
+    display: block !important;
+  }
+}
+
+.print-attribution {
+  display: none;
+}

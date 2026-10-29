@@ -1,0 +1,100 @@
+---
+/**
+ * Scale explorer: change the number of restaurants in a simulated chain and
+ * see the average cost of a meal broken into its parts.
+ */
+import { jsonForScript } from '../../lib/markup';
+import { lowestCost, scaleBreakdown, scaleCurve, scaleReading } from '../../lib/scale';
+import { scaleSvg } from '../../lib/charts';
+import { scaleTableHtml } from '../../lib/render';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'scale-explorer' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const { marks, currency, ...rest } = data;
+const params = {
+  mealsPerOutlet: rest.mealsPerOutlet,
+  foodPerMealAt4: rest.foodPerMealAt4,
+  purchasingSavingPerDoubling: rest.purchasingSavingPerDoubling,
+  outletFixedPerOutlet: rest.outletFixedPerOutlet,
+  centralBase: rest.centralBase,
+  centralPerOutlet: rest.centralPerOutlet,
+  coordinationThreshold: rest.coordinationThreshold,
+  coordinationFactor: rest.coordinationFactor,
+  maxOutlets: rest.maxOutlets,
+};
+const ref = marks[0]?.outlets ?? 4;
+const refLabel = marks[0]?.label ?? `${ref} restaurants`;
+const start = ref;
+const curve = scaleCurve(params);
+const low = lowestCost(params);
+const config = { uid, params, marks, currency, ref, refLabel };
+---
+
+<div class="sce" data-ix="scale" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The explorer could not start. The figures below are for {start} restaurants.</p>
+
+  <div class="sce__predict js-only" data-predict>
+    <label class="label label--ink" for={`${uid}-guess`}>Predict first</label>
+    <p>At what size, from 1 to {params.maxOutlets} restaurants, do you expect the average cost of a meal to be lowest?</p>
+    <div class="cluster">
+      <input class="input input--num sce__guess" id={`${uid}-guess`} type="number" min="1" max={params.maxOutlets} step="1" inputmode="numeric" />
+      <button type="button" class="btn btn--small btn--primary" data-check-guess>Check</button>
+    </div>
+    <div class="feedback" data-guess-feedback hidden></div>
+  </div>
+
+  <div class="sce__control">
+    <label for={`${uid}-n`} class="sce__label">
+      Restaurants in the chain: <output class="sce__n num" data-n-out for={`${uid}-n`}>{start}</output>
+    </label>
+    <input id={`${uid}-n`} type="range" min="1" max={params.maxOutlets} step="1" value={String(start)} data-n aria-valuetext={`${start} restaurants`} />
+    <div class="sce__scale" aria-hidden="true"><span>1</span><span>{params.maxOutlets}</span></div>
+  </div>
+
+  <div class="sce__grid">
+    <figure class="sce__chart">
+      <div class="chart-scroll" role="region" aria-label="Average cost chart" tabindex="0" data-chart set:html={scaleSvg(curve, { currency, id: `${uid}-chart`, current: start, marks })} />
+      <figcaption class="exhibit__source">
+        <b>Chart</b> Average cost of a meal at each size of chain. The vertical axis does not start at zero, so the curve looks steeper than it is. Simulated teaching data.
+      </figcaption>
+    </figure>
+    <div class="sce__side">
+      <div class="table-scroll" role="region" aria-label="Average cost broken down" tabindex="0">
+        <table class="table">
+          <caption class="sr-only">Average cost a meal, by part</caption>
+          <thead>
+            <tr>
+              <th scope="col">Cost a meal</th>
+              <th scope="col" class="n" data-now-head>{start} restaurants</th>
+              <th scope="col" class="n">{refLabel}</th>
+            </tr>
+          </thead>
+          <tbody data-table set:html={scaleTableHtml(scaleBreakdown(start, ref, params), currency)} />
+        </table>
+      </div>
+      <p class="sce__reading" data-reading>{scaleReading(start, params, currency)}</p>
+    </div>
+  </div>
+  <details class="disclosure">
+    <summary>How the model works</summary>
+    <div class="disclosure__body prose small">
+      <p>
+        Each restaurant serves {params.mealsPerOutlet.toLocaleString('en-GB')} meals a year. Food costs {currency}{params.foodPerMealAt4} a meal with four restaurants and
+        fall by {Math.round(params.purchasingSavingPerDoubling * 100)}% each time the chain doubles, from bulk buying. Running a restaurant costs {currency}{params.outletFixedPerOutlet}m a year,
+        whatever the size of the chain. Central costs are {currency}{params.centralBase}m a year plus {currency}{params.centralPerOutlet}m for each restaurant. Above {params.coordinationThreshold} restaurants,
+        coordination costs appear and grow with the square of the number above {params.coordinationThreshold}: more managers, more meetings, more mistakes between kitchens.
+      </p>
+      <p>The lowest average cost in the model is at {low.outlets} restaurants. The shape matters more than the numbers, which are invented for teaching.</p>
+    </div>
+  </details>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/scale';
+</script>

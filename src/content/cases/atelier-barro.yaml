@@ -1,0 +1,278 @@
+# Atelier Barro. A fictional organization; every figure is simulated.
+# Exhibit 1 is the only source of costs. Every contribution, break-even,
+# margin of safety and profit figure on the platform for this case is computed
+# from it by src/lib/finance.ts, and tests/unit/cases.test.ts checks them.
+
+title: Atelier Barro
+dek: A ceramics studio in Porto faces an energy price rise and an order at half its usual price, in the same week.
+kind: fictional
+dataStatus: simulated
+organization:
+  name: Atelier Barro
+  sector: Hand-made ceramics (stoneware mugs)
+  location: Porto, Portugal
+  size: One studio; the owner, a studio manager and two throwers
+  legalForm: Private limited company
+currency:
+  code: EUR
+  symbol: '€'
+  unit: euros (€) a month
+decision: How should Atelier Barro respond to higher energy costs, and should it accept the hotel's order?
+brief: >
+  Atelier Barro sells about 640 hand-thrown mugs a month at €22. From November its electricity costs rise, and a
+  hotel group has offered to buy 300 mugs at €11 each. To decide either question the owner needs to know what each
+  mug really costs, which costs change with output and which do not, and how many mugs the studio must sell to
+  cover its costs.
+
+narrative:
+  - >
+    Inês Carvalho left an architecture practice in 2021 to throw pots in a former printing workshop in Porto's
+    Bonfim district. Atelier Barro now sells about 640 hand-thrown stoneware mugs a month, seven in ten through its
+    own website and the rest in the studio shop, at €22 each. Two throwers make the mugs and are paid €2.40 for each
+    one that passes inspection. A studio manager, Rui Mendes, runs the shop, the website and the dispatch table.
+  - >
+    The business pays its way, just. After every cost, including the salary Inês pays herself, the mugs made about
+    €1,600 a month last year. Weekend workshops and firing other potters' work in the kiln bring in more, but Inês
+    keeps those figures separate and does not count on them.
+  - >
+    This autumn two letters arrived in the same week. The electricity supplier announced a new tariff from
+    1 November: the cost of firing the kiln rises from €0.45 to €0.75 a mug, and the monthly standing charge from
+    €260 to €340. And Casa Alfama Hotels, a small group of boutique hotels in Lisbon, asked whether Atelier Barro
+    would make 300 mugs stamped with the hotels' name, for delivery in November, at €11 each.
+  - >
+    Inês's first reaction to the hotel was to say no. €11 is half her shop price, and she suspects it is less than a
+    mug costs her to make. Her first reaction to the electricity bill was to raise prices. Rui is less sure on both
+    counts. He points out that most of the studio's costs do not change with the number of mugs, that the throwers
+    are paid by the mug in any case, and that their customer survey (Exhibit 3) suggests some customers would stop
+    buying at a higher price.
+  - >
+    Before deciding either question, Inês has asked Rui to put the numbers in front of her.
+
+exhibits:
+  - id: ex-1
+    title: Cost ledger, before and from 1 November
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Cost }
+      - { label: How it is incurred }
+      - { label: 'Before, €', numeric: true, format: money }
+      - { label: 'From November, €', numeric: true, format: money }
+    rows:
+      - [Studio rent, Each month, 1900, 1900]
+      - [Kiln lease, Each month, 450, 450]
+      - [Studio manager's salary, Each month, 2300, 2300]
+      - [Owner's salary, Each month, 2400, 2400]
+      - [Insurance, Each month, 150, 150]
+      - [Website and software, Each month, 120, 120]
+      - [Marketing (social media advertising), Each month, 480, 480]
+      - [Electricity standing charge, Each month, 260, 340]
+      - [Electricity for firing, Per mug, 0.45, 0.75]
+      - [Clay and glaze, Per mug, 2.30, 2.30]
+      - [Thrower's piece rate, Per mug, 2.40, 2.40]
+      - [Packaging, Per mug, 0.85, 0.85]
+      - [Card and platform fees, 'Per mug, 4% of the price', 0.88, 0.88]
+    note: >
+      Costs incurred each month total €8,060 before November and €8,140 from November. Costs per mug total €6.88 and
+      €7.18 at a price of €22. The card and platform fee is 4% of the price, so it changes if the price changes. All
+      the studio's monthly costs are counted against the mugs; workshops and firing services are left out.
+    source: Simulated teaching data, from the studio's accounts and the supplier's letter.
+
+  - id: ex-2
+    title: Revenue streams, last twelve months
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Stream }
+      - { label: Basis }
+      - { label: 'Revenue, €', numeric: true }
+    rows:
+      - ['Mug sales, online shop', '5,376 mugs at €22', 118272]
+      - ['Mug sales, studio shop', '2,304 mugs at €22', 50688]
+      - [Weekend workshops, '24 sessions, 8 people, €55 each', 10560]
+      - [Kiln firing for other potters, Charged per firing, 3600]
+    footer: [Total, '', 183120]
+    footerIsSum: true
+    note: Mug sales were 92% of revenue. The workshops and firing service have costs of their own, which are not in Exhibit 1.
+    source: Simulated teaching data.
+
+  - id: ex-3
+    title: Customer survey and price test, estimated mugs sold a month at each price
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: 'Price, €', numeric: true }
+      - { label: Estimated mugs a month, numeric: true }
+      - { label: Basis of the estimate }
+    rows:
+      - [20, 700, Survey]
+      - [22, 640, Actual average over the last twelve months]
+      - [24, 590, Survey and a two-week price test on the website]
+      - [25, 560, Survey]
+      - [27, 480, Survey]
+    note: >
+      Survey of 410 customers in September; price test at €24 for two weeks in October. The estimates assume the mugs
+      and the packaging do not change. Inês believes premium packaging could hold sales nearer 580 at €25, but that
+      has not been tested.
+    source: Simulated teaching data. Survey estimates are judgements about behaviour, not records of it.
+
+  - id: ex-4
+    title: The hotel's request
+    kind: quote
+    provenance: simulated-data
+    quote:
+      text: >
+        We would like 300 mugs in your Douro glaze, stamped with our name, delivered to Lisbon by 20 November. We can
+        pay €11 a mug, invoiced. We may want more next year.
+      attribution: Marta Sousa, purchasing manager, Casa Alfama Hotels
+    source: Fictional email, written for this case.
+
+  - id: ex-5
+    title: Capacity, the season and the order
+    kind: kpis
+    provenance: simulated-data
+    items:
+      - { label: Kiln capacity, value: '1,200 mugs a month' }
+      - { label: Average monthly sales, value: '640 mugs' }
+      - { label: November sales, value: 'About 830 mugs', note: Usually 30% above average }
+      - { label: December sales, value: 'About 1,020 mugs', note: Usually 60% above average }
+      - { label: Custom stamp for the hotel, value: '€150', note: Once }
+      - { label: Packaging for an invoiced bulk order, value: '€0.40 a mug', note: Instead of €0.85 }
+      - { label: Card and platform fee on an invoiced order, value: '€0' }
+    source: Simulated teaching data.
+
+constraints:
+  - The new electricity tariff starts on 1 November.
+  - The kiln can fire 1,200 mugs a month. Firing more would need a second kiln, which the studio cannot afford this year.
+  - Inês wants Atelier Barro to be known as a maker of premium, hand-made pieces, not as a supplier of cheap ones.
+
+stakeholders:
+  - name: Inês Carvalho, owner
+    interest: A business that pays her a living and keeps its reputation for premium, hand-made work.
+    influence: high
+    stake: high
+    concern: Being forced into a price war, or into making cheap mugs for other brands.
+  - name: Rui Mendes, studio manager
+    interest: A stable business and a sensible workload in the shop and at dispatch.
+    influence: medium
+    stake: high
+    concern: A rushed November with the hotel order on top of the busy season.
+  - name: The two throwers
+    interest: Earnings, which depend on the number of mugs made.
+    influence: low
+    stake: high
+    concern: Fewer mugs, and so lower pay, if sales fall after a price rise.
+  - name: Online and studio customers
+    interest: Distinctive, well-made mugs at a price they consider fair.
+    influence: medium
+    stake: medium
+    concern: Paying more, or discovering the same mugs in hotel rooms at half the price.
+  - name: Casa Alfama Hotels
+    interest: Distinctive local mugs for its rooms at a price that suits its budget.
+    influence: medium
+    stake: low
+    concern: Delivery on time for its guests' winter season.
+  - name: The electricity supplier
+    interest: Covering its own higher costs.
+    influence: low
+    stake: low
+    concern: None in this decision; its tariff is fixed.
+
+options:
+  - id: absorb
+    group: Pricing
+    label: Keep the price at €22
+    summary: Absorb the higher electricity costs.
+    requires: Nothing new.
+    upside: Customers see no change and sales should hold at about 640 mugs.
+    risks: Contribution per mug falls and the margin of safety narrows.
+    evidence: [ex-1]
+  - id: raise-24
+    group: Pricing
+    label: Raise the price to €24
+    summary: A modest rise, tested on the website for two weeks.
+    requires: A new price on the website and in the shop.
+    upside: Higher contribution per mug, on the best-tested estimate of demand.
+    risks: Fewer mugs sold (about 590), so the throwers make and earn less.
+    evidence: [ex-1, ex-3]
+  - id: premium-25
+    group: Pricing
+    label: Raise the price to €25 with premium packaging
+    summary: Reposition the mugs as gifts, with new packaging at €0.60 a mug more.
+    requires: New packaging and a change in how the mugs are presented.
+    upside: The highest contribution per mug.
+    risks: The sales estimate of 580 mugs rests on an untested assumption about the packaging.
+    evidence: [ex-1, ex-3]
+  - id: cut-marketing
+    group: Pricing
+    label: Keep €22 and cut marketing
+    summary: Reduce social media advertising from €480 to €200 a month.
+    requires: Nothing new.
+    upside: Lower fixed costs and a lower break-even quantity, if sales hold.
+    risks: Online sales depend on the advertising and may fall.
+    evidence: [ex-1]
+  - id: accept
+    group: The hotel order
+    label: Accept the hotel's order at €11
+    summary: Make 300 stamped mugs for Casa Alfama in November.
+    requires: Spare capacity in November, a custom stamp and bulk packaging.
+    upside: Each mug adds €5.15 of contribution; the order adds €1,395 to November's profit.
+    risks: The brand's price position, and a tight November with the kiln at 94% of capacity.
+    evidence: [ex-4, ex-5]
+  - id: negotiate
+    group: The hotel order
+    label: Make a counter-offer
+    summary: Ask for €13.50 a mug.
+    requires: Judgement about how much the hotel wants these mugs.
+    upside: A higher contribution per mug if the hotel agrees.
+    risks: The hotel may buy elsewhere.
+    evidence: [ex-4, ex-5]
+  - id: decline
+    group: The hotel order
+    label: Decline the order
+    summary: Keep the mugs at the studio's own prices only.
+    requires: Nothing.
+    upside: The price position and November's capacity are protected.
+    risks: €1,395 of profit is given up, and possibly a customer who might order again.
+    evidence: [ex-4]
+
+analysis:
+  data:
+    - From November, monthly costs rise from €8,060 to €8,140 and variable cost per mug from €6.88 to €7.18 at €22 (Exhibit 1).
+    - At €22, contribution per mug falls from €15.12 to €14.82, and the break-even quantity rises from 534 to 550 mugs a month (€8,140 ÷ €14.82 = 549.26, rounded up).
+    - The survey suggests about 590 mugs a month at €24 and 560 at €25 (Exhibit 3).
+    - Each hotel mug would have a variable cost of €5.85. The order would add (€11.00 − €5.85) × 300 − €150 = €1,395 (Exhibit 5).
+  insight:
+    - Most of the studio's costs do not change with output, so the question to ask of each decision is what it does to contribution.
+    - On the survey's estimates, a price of €24 raises contribution per mug by more than it loses in volume. Profit at €24 is €1,736.60 a month, against €1,344.80 at €22.
+    - The hotel's price is below the average cost of a mug sold in the shop, about €20, but well above the variable cost of a hotel mug. With spare capacity in November, the order adds profit.
+  options:
+    - Keeping €22 protects customers and narrows the margin of safety to 90 mugs.
+    - A rise to €24 restores profit and the margin of safety on tested evidence.
+    - A rise to €25 with new packaging could do slightly better, but only if an untested assumption holds.
+    - Cutting marketing lowers break-even and risks the sales that marketing brings in.
+  recommendation: >
+    One defensible recommendation: raise the price to €24, the option with the strongest evidence behind it, and
+    accept the hotel's order, negotiating only if Inês judges that the hotel would still buy. Ask for the stamp to read
+    "made by Atelier Barro for Casa Alfama", so that the order also advertises the studio. Review the price after three
+    months against actual sales.
+  caveat: >
+    This depends on the survey being right about customers' response to €24, and on the hotel's order not leading
+    shop customers to expect lower prices. If the hotel wanted its mugs in December, when the kiln is close to full,
+    accepting would displace sales at full price and the answer would change.
+
+method: >
+  Atelier Barro and everyone in this case are fictional, and every figure is simulated. Exhibit 1 is the only source
+  of costs. Every contribution, break-even, margin of safety and profit figure in the case, the Finance Desk and the
+  Decision Room is calculated from it by the platform's finance functions. The tests in the repository recompute
+  them. The sales estimates in Exhibit 3 are stated assumptions, not results. Break-even quantities are rounded up
+  to whole mugs, because one mug fewer would leave a loss.
+
+topics: [costs-and-revenues]
+tools: [contribution]
+concepts: [change, creativity, ethics, sustainability]
+calculations: [total-cost, total-revenue, profit, contribution-per-unit, break-even-quantity, margin-of-safety, target-price, special-order]
+questions: [q-costs-p2-classify, q-costs-p2-direct, q-costs-p1-streams, q-costs-p2-beq, q-costs-p2-mos, q-costs-p2-price, q-costs-p2-evaluate, q-costs-hl-special]
+decisionRoom: atelier-pricing
+sources: [method-simulated]
+updated: 2026-10-29

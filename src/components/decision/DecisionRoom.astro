@@ -1,0 +1,287 @@
+---
+/**
+ * The Decision Room: situation, decision, consequence, implementation,
+ * outcome, debrief. Without JavaScript the page reads as a complete case
+ * study: every choice shows what happens next under "See what happens". With
+ * JavaScript the learner commits to one choice per round, the board pack
+ * updates, later rounds offer only the choices that follow, and the debrief
+ * opens at the end. Choices and notes are kept on this device only.
+ */
+import Exhibit from '../blocks/Exhibit.astro';
+import SectionHead from '../layout/SectionHead.astro';
+import ProvenanceTag from '../ui/ProvenanceTag.astro';
+import { boardRowsHtml, boardValues, compareMetric, formatMetric } from '../../lib/decision-room';
+import { corpus, href } from '../../lib/content';
+import { esc, inline, jsonForScript, rich } from '../../lib/markup';
+import type { Decision } from '../../lib/schemas';
+
+interface Props {
+  id: string;
+  decision: Decision;
+}
+const { id, decision: d } = Astro.props;
+const c = await corpus();
+const theCase = c.cases[d.case];
+if (!theCase) throw new Error(`Decision ${id}: unknown case ${d.case}`);
+const evidence = d.evidence.map((e) => theCase.exhibits.find((x) => x.id === e)).filter((x) => x !== undefined);
+const firstRound = d.rounds[0];
+const firstLabels = Object.fromEntries((firstRound?.choices ?? []).map((ch) => [ch.id, ch.label]));
+const MOODS = { positive: 'Positive', mixed: 'Mixed', negative: 'Negative' } as const;
+const STEPS = d.rounds.length > 1 ? ['Situation', 'Decision', 'Consequence', 'Implementation', 'Outcome', 'Debrief'] : ['Situation', 'Decision', 'Consequence', 'Debrief'];
+const config = {
+  id,
+  decision: {
+    metrics: d.metrics,
+    baseline: d.baseline,
+    rounds: d.rounds.map((r) => ({
+      id: r.id,
+      title: r.title,
+      choices: r.choices.map((ch) => ({ id: ch.id, label: ch.label, followsFrom: ch.followsFrom, outcome: { headline: ch.outcome.headline, metrics: ch.outcome.metrics } })),
+    })),
+  },
+};
+const questions = d.questions.map((q) => ({ id: q, data: c.questions[q] })).filter((q) => q.data);
+const compare = (firstRound?.choices ?? []).map((ch) => ({ id: ch.id, label: ch.label, values: boardValues(d, { [firstRound?.id ?? '']: ch.id }) }));
+---
+
+<div class="dr" data-ix="decision-room" id={`dr-${id}`}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The Decision Room could not start. You can still read every choice and what follows from it below.</p>
+
+  <ol class="dr-steps js-only" aria-label="Progress" data-steps>
+    {STEPS.map((s, k) => <li data-step={k} aria-current={k === 0 ? 'step' : undefined}>{s}</li>)}
+  </ol>
+
+  <section class="dr-situation" aria-labelledby={`dr-${id}-situation`}>
+    <SectionHead no={1} title="The situation" id={`dr-${id}-situation`} />
+    <div class="dr-situation__grid">
+      <div class="stack">
+        <p class="dr-role narrative">{d.role}</p>
+        <div class="prose" set:html={rich(d.briefing)} />
+        <p class="small">
+          <a href={href.case(d.case)}>Read the full case: {theCase.title}</a>
+        </p>
+      </div>
+      <aside class="dr-aims" aria-labelledby={`dr-${id}-aims`}>
+        <h3 class="label label--ink" id={`dr-${id}-aims`}>The aims</h3>
+        <ol>
+          {d.objectives.map((o) => <li>{o}</li>)}
+        </ol>
+      </aside>
+    </div>
+    <details class="disclosure dr-evidence">
+      <summary>The evidence pack: {evidence.length} exhibits</summary>
+      <div class="disclosure__body stack">
+        {evidence.map((e) => <Exhibit exhibit={e} caseTitle={theCase.title} caseHref={href.case(d.case)} headingLevel={4} />)}
+      </div>
+    </details>
+  </section>
+
+  <section class="dr-board" aria-labelledby={`dr-${id}-board`}>
+    <div class="dr-board__head">
+      <h2 class="label label--ink" id={`dr-${id}-board`}>The board pack</h2>
+      <ProvenanceTag kind="simulated-data" />
+    </div>
+    <div class="table-scroll" role="region" aria-label="The board pack" tabindex="0">
+      <table class="table dr-board__table">
+        <thead>
+          <tr>
+            <th scope="col">Measure</th>
+            <th scope="col" class="n">Now</th>
+            <th scope="col" class="n js-only">After your decisions</th>
+            <th scope="col" class="js-only">Change</th>
+          </tr>
+        </thead>
+        <tbody data-board set:html={boardRowsHtml(d, {}, esc)} />
+      </table>
+    </div>
+  </section>
+
+  {
+    d.rounds.map((round, ri) => (
+      <section class="dr-round" data-round={round.id} data-index={ri} aria-labelledby={`dr-${id}-${round.id}`}>
+        <SectionHead no={ri + 2} title={round.title} id={`dr-${id}-${round.id}`} />
+        <p class="dr-locked js-only" data-locked hidden>
+          {ri > 0 ? 'Commit your first decision to unlock this one.' : ''}
+        </p>
+        <div class="dr-round__body" data-body>
+          <p class="dr-question">{round.question}</p>
+          {round.help && <div class="prose small dr-help" set:html={rich(round.help)} />}
+          <fieldset class="dr-choices">
+            <legend class="sr-only">{round.question}</legend>
+            {round.choices.map((ch) => (
+              <div class="dr-choice" data-choice={ch.id} data-follows={ch.followsFrom ?? ''}>
+                <label class="dr-choice__label">
+                  <input type="radio" name={`dr-${id}-${round.id}`} value={ch.id} />
+                  <span class="dr-choice__text">
+                    {ch.followsFrom && <span class="dr-choice__after nojs-only">After: {firstLabels[ch.followsFrom] ?? ch.followsFrom}</span>}
+                    <span class="dr-choice__name">{ch.label}</span>
+                    <span class="dr-choice__detail" set:html={inline(ch.detail)} />
+                  </span>
+                </label>
+                <details class="dr-peek nojs-only">
+                  <summary>See what happens</summary>
+                  <div class="dr-peek__slot" data-home={ch.id}>
+                    <article class="dr-outcome" data-outcome={ch.id} aria-labelledby={`dr-${id}-${ch.id}-h`}>
+                      <p class="dr-outcome__kicker">{ri === 0 ? 'Consequence' : 'Outcome'}</p>
+                      <h3 class="dr-outcome__headline" id={`dr-${id}-${ch.id}-h`} tabindex="-1">
+                        {ch.outcome.headline}
+                      </h3>
+                      <div class="prose narrative dr-outcome__story" set:html={rich(ch.outcome.narrative)} />
+                      <div class="dr-outcome__grid">
+                        <section>
+                          <h4 class="label label--ink">How people react</h4>
+                          <ul class="dr-people">
+                            {ch.outcome.stakeholders.map((s) => (
+                              <li class={`dr-person dr-person--${s.mood}`}>
+                                <span class="dr-person__name">{s.name}</span>
+                                <span class="dr-person__mood">{MOODS[s.mood]}</span>
+                                <span class="dr-person__said" set:html={inline(s.reaction)} />
+                              </li>
+                            ))}
+                          </ul>
+                        </section>
+                        <section>
+                          <h4 class="label label--ink">Risks now</h4>
+                          <ul class="dr-risks">
+                            {ch.outcome.risks.map((r) => (
+                              <li set:html={inline(r)} />
+                            ))}
+                          </ul>
+                          <h4 class="label label--ink dr-theory__h">The theory behind it</h4>
+                          <div class="prose small" set:html={rich(ch.outcome.theory)} />
+                        </section>
+                      </div>
+                      <details class="disclosure nojs-only">
+                        <summary>The figures after this choice</summary>
+                        <div class="disclosure__body table-scroll" role="region" aria-label={`Figures after: ${ch.label}`} tabindex="0">
+                          <table class="table">
+                            <tbody>
+                              {d.metrics
+                                .filter((m) => ch.outcome.metrics[m.id] !== undefined)
+                                .map((m) => {
+                                  const cmp = compareMetric(d.baseline[m.id], ch.outcome.metrics[m.id], m);
+                                  return (
+                                    <tr>
+                                      <th scope="row">{m.label}</th>
+                                      <td class="n">{formatMetric(ch.outcome.metrics[m.id], m)}</td>
+                                      <td class="small muted">{cmp.text && cmp.text !== 'No change' ? `${cmp.text} on now` : cmp.text}</td>
+                                    </tr>
+                                  );
+                                })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </details>
+                    </article>
+                  </div>
+                </details>
+              </div>
+            ))}
+          </fieldset>
+          <div class="field dr-why js-only">
+            <label for={`dr-${id}-${round.id}-why`}>Why this choice? Name the aim it serves and the evidence behind it.</label>
+            <textarea class="textarea" id={`dr-${id}-${round.id}-why`} rows="3" data-why={round.id} />
+            <span class="field__hint">Optional. Saved on this device only.</span>
+          </div>
+          <div class="dr-actions js-only">
+            <button type="button" class="btn btn--primary" data-commit={round.id}>
+              Commit this decision
+            </button>
+            <button type="button" class="btn btn--small" data-change={round.id} hidden>
+              Change this decision
+            </button>
+            <span class="field__error" data-round-msg={round.id} />
+          </div>
+          <div class="dr-result js-only" data-result={round.id} />
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="dr-debrief" data-debrief aria-labelledby={`dr-${id}-debrief`} tabindex="-1">
+    <SectionHead no={d.rounds.length + 2} title="Debrief" id={`dr-${id}-debrief`} />
+    <p class="dr-locked js-only" data-debrief-locked>The debrief opens when you have made every decision.</p>
+    <div class="dr-debrief__body" data-debrief-body>
+      <div class="dr-yours js-only" data-yours />
+      <div class="dr-debrief__grid">
+        <section>
+          <h3 class="label label--ink">The trade-offs</h3>
+          <ul class="prose">{d.debrief.tradeoffs.map((t) => <li set:html={inline(t)} />)}</ul>
+        </section>
+        <section>
+          <h3 class="label label--ink">The evidence that matters</h3>
+          <ul class="prose">{d.debrief.evidenceThatMatters.map((t) => <li set:html={inline(t)} />)}</ul>
+        </section>
+        <section>
+          <h3 class="label label--ink">What would change your mind?</h3>
+          <ul class="prose">{d.debrief.changeYourMind.map((t) => <li>{t}</li>)}</ul>
+        </section>
+        <section>
+          <h3 class="label label--ink">Misconceptions this tests</h3>
+          <ul class="prose">{d.debrief.misconceptions.map((t) => <li set:html={inline(t)} />)}</ul>
+        </section>
+      </div>
+      {
+        firstRound && compare.length > 1 && (
+          <section class="dr-compare">
+            <h3 class="label label--ink">Every first decision, side by side</h3>
+            <p class="small muted">The figures straight after each first-round choice, before any later decision.</p>
+            <div class="table-scroll" role="region" aria-label="Every first decision compared" tabindex="0">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Measure</th>
+                    <th scope="col" class="n">Now</th>
+                    {compare.map((col) => (
+                      <th scope="col" class="n">{col.label}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {d.metrics.map((m) => (
+                    <tr>
+                      <th scope="row">{m.label}</th>
+                      <td class="n">{formatMetric(d.baseline[m.id], m)}</td>
+                      {compare.map((col) => (
+                        <td class="n">{formatMetric(col.values[m.id], m)}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )
+      }
+      <section class="dr-exam">
+        <h3 class="label label--ink">Exam link</h3>
+        <div class="prose" set:html={rich(d.debrief.examLink)} />
+        {
+          questions.length > 0 && (
+            <ul class="entry-list dr-questions">
+              {questions.map((q) => (
+                <li class="entry">
+                  <a class="entry__title" href={href.question(q.id)}>
+                    {q.data?.title}
+                  </a>
+                  <span class="entry__meta">
+                    {q.data?.commandTerm}, {q.data?.marks} marks
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </section>
+      <div class="dr-restart js-only">
+        <button type="button" class="btn btn--small" data-restart>Start again</button>
+      </div>
+    </div>
+  </section>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/decision-room';
+</script>

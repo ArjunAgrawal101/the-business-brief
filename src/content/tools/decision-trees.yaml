@@ -1,0 +1,52 @@
+name: Decision trees
+status: complete
+family: quantitative
+ibStatus: ib-toolkit
+level: SL/HL
+verification: corroborated
+order: 6
+summary: A diagram of a decision, its options and their uncertain outcomes, used to calculate the expected value of each option.
+purpose: To compare options whose results are uncertain, using estimated probabilities and payoffs.
+whenToUse:
+  - When the outcomes of a decision are uncertain but can be estimated.
+  - When options differ in cost and in the spread of their possible results.
+construct:
+  - Draw a square decision node, with a branch for each option labelled with its cost.
+  - At the end of each option, draw a circular chance node with a branch for each possible outcome.
+  - Write the probability and the payoff on each outcome branch, and check that the probabilities at each chance node add up to 1.
+  - Calculate each option's expected value, the sum of probability times payoff, then subtract the option's cost.
+  - Compare the expected values, then weigh the risks and the factors that the numbers leave out.
+evidence:
+  - Estimates of the probability of each outcome.
+  - Estimates of each outcome's payoff and of each option's cost.
+reveals:
+  - Which option has the highest expected value on the estimates.
+  - How sensitive the ranking is to a change in a probability or a payoff.
+doesNotReveal:
+  - The spread of outcomes. Two options with the same expected value can have very different worst cases.
+  - Factors that are not in the numbers, such as control, quality or ethics.
+  - Whether the estimates are right.
+limitations:
+  - Probabilities and payoffs are estimates, and are often little more than informed guesses.
+  - The expected value is an average over many repetitions, but most strategic decisions are made once.
+  - It ignores the timing of payoffs unless they are discounted.
+application:
+  case: marigold-kitchens
+  title: Three of Marigold's routes, from the estimates in Exhibit 8
+  body: >
+    Organic growth: (0.6 × ₹150m) + (0.4 × ₹60m) − ₹72m = ₹42m. Franchising: (0.6 × ₹95m) + (0.4 × ₹30m) − ₹10m = ₹59m.
+    Staying focused: (0.6 × ₹40m) + (0.4 × ₹25m) − ₹3m = ₹31m.
+  result: >
+    On these estimates franchising has the highest expected value. The case evidence on finding franchisees and
+    protecting quality is the reason the decision is still open.
+examRelevance: >
+  Decision tree calculations reward clear working: each expected value set out, the cost subtracted, and a comment on
+  what the result does and does not show.
+commonErrors:
+  - Forgetting to subtract the cost of an option.
+  - Probabilities at a chance node that do not add up to 1.
+  - Recommending the option with the highest expected value without discussing risk or non-financial factors.
+interactive: growth-tree-marigold
+topics: [growth-and-evolution]
+cases: [marigold-kitchens, atelier-barro]
+updated: 2026-10-29

@@ -1,0 +1,122 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageIntro from '../components/layout/PageIntro.astro';
+import SectionHead from '../components/layout/SectionHead.astro';
+
+const KEYS = [
+  { key: 'bb:level', what: 'Whether you chose to see SL or HL content.' },
+  { key: 'bb:quiz:…', what: 'Your answers in the classification exercises, so they are still there when you return.' },
+  { key: 'bb:q:…', what: 'Your answers to practice questions, and your self-check against the mark scheme.' },
+  { key: 'bb:dr:…', what: 'Your choices and notes in each Decision Room.' },
+  { key: 'bb:ff:…', what: 'Your weighting of the forces in a force field analysis, and your note on it.' },
+  { key: 'bb:rc:…', what: 'How well you recalled each retrieval card.' },
+  { key: 'bb:ia-plan', what: 'The notes in the IA Studio planner.' },
+];
+---
+
+<BaseLayout title="Privacy" description="The Business Brief has no accounts, no analytics and no cookies. What it keeps on your device, and how to clear it." section="platform">
+  <PageIntro trail={[{ label: 'Privacy' }]} kicker="Privacy" title="Your work stays on your device" lead="There are no accounts, no analytics, no advertising and no cookies. Nothing you type is sent anywhere." />
+  <div class="wrap page-body">
+    <section aria-labelledby="kept-h">
+      <SectionHead no={1} title="What is kept, and where" id="kept-h" />
+      <div class="prose" style="margin-top:var(--sp-4)">
+        <p>
+          Some pages remember your work using your browser's local storage, which stays on this device and in this browser. It is not
+          sent to the platform or to anyone else, and the platform cannot see it. Each item starts with <code>bb:</code>.
+        </p>
+      </div>
+      <div class="table-scroll" role="region" aria-label="What is stored on this device" tabindex="0" style="margin-top:var(--sp-4)">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col">What it holds</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              KEYS.map((k) => (
+                <tr>
+                  <th scope="row">
+                    <code>{k.key}</code>
+                  </th>
+                  <td>{k.what}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="clear-box" data-clear-box>
+        <p class="small" data-count>Clearing needs JavaScript. You can also clear this site's data in your browser's settings.</p>
+        <button type="button" class="btn btn--primary" data-clear hidden>Clear everything this site has stored</button>
+      </div>
+    </section>
+    <section aria-labelledby="other-h">
+      <SectionHead no={2} title="Everything else" id="other-h" />
+      <div class="prose" style="margin-top:var(--sp-4)">
+        <p>
+          The site is a set of static files. Fonts and images are served from the site itself, so a visit makes no requests to other
+          services. The company that hosts the files may keep standard request logs, such as the time of a request and the address it came
+          from, for security and to keep the service running; the platform does not use them.
+        </p>
+        <p>
+          Links to other sites, such as the sources on the sources page, take you to sites with their own policies.
+        </p>
+        <p>
+          If accounts, analytics or progress tracking are ever added, this page will say so first, with what is collected, why, and how to
+          say no.
+        </p>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  const box = document.querySelector<HTMLElement>('[data-clear-box]');
+  const count = box?.querySelector<HTMLElement>('[data-count]');
+  const btn = box?.querySelector<HTMLButtonElement>('[data-clear]');
+  const keys = () => {
+    try {
+      return Object.keys(localStorage).filter((k) => k.startsWith('bb:'));
+    } catch {
+      return null;
+    }
+  };
+  const show = () => {
+    const k = keys();
+    if (!count || !btn) return;
+    if (k === null) {
+      count.textContent = 'This browser is not allowing the site to store anything, so there is nothing to clear.';
+      btn.hidden = true;
+      return;
+    }
+    count.textContent = k.length ? `This browser holds ${k.length} ${k.length === 1 ? 'item' : 'items'} from this site.` : 'This browser holds nothing from this site.';
+    btn.hidden = k.length === 0;
+  };
+  btn?.addEventListener('click', () => {
+    if (!window.confirm('Clear all your answers, notes and choices on this site, in this browser?')) return;
+    keys()?.forEach((k) => localStorage.removeItem(k));
+    document.documentElement.removeAttribute('data-level');
+    show();
+    btn.focus();
+  });
+  show();
+</script>
+
+<style>
+  .clear-box {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-3) var(--sp-5);
+    margin-top: var(--sp-5);
+    padding: var(--sp-4);
+    background: var(--surface-sunk);
+    border-left: 3px solid var(--bb-ink);
+  }
+
+  .clear-box p {
+    margin: 0;
+  }
+</style>

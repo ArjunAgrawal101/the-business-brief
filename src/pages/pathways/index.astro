@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import StatusTag from '../../components/ui/StatusTag.astro';
+import { href, pathwaysInOrder } from '../../lib/content';
+
+const pathways = await pathwaysInOrder();
+---
+
+<BaseLayout title="Pathways" description="One shared foundation of topics, cases and tools, with an entry point for each kind of learner." section="pathways">
+  <PageIntro
+    trail={[{ label: 'Pathways' }]}
+    kicker="Pathways"
+    title="One foundation, several ways in"
+    lead="The topics, cases, tools and calculations are shared. Each pathway is a route through them with its own emphasis and its own cautions. A pathway never relabels shared material as meeting a qualification's requirements unless that qualification has been mapped."
+  />
+  <div class="wrap page-body">
+    <ol class="index-list">
+      {
+        pathways.map((p) => (
+          <li class="index-item">
+            <span class="index-item__code" style="font-size:1rem">{String(p.data.order).padStart(2, '0')}</span>
+            <div class="index-item__body">
+              <h2 class="index-item__title">
+                <a href={href.pathway(p.id)}>{p.data.name}</a>
+              </h2>
+              <p>{p.data.audience}</p>
+              <p class="narrative small">{p.data.promise}</p>
+            </div>
+            <div class="index-item__side">
+              <StatusTag status={p.data.status} />
+              <span class="muted">{p.data.available.length} ways in now</span>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</BaseLayout>

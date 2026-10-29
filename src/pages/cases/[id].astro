@@ -1,0 +1,276 @@
+---
+/**
+ * A case file: the situation, the evidence, the people, the options and a
+ * worked analysis that follows DATA, INSIGHT, OPTIONS, RECOMMENDATION.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import Exhibit from '../../components/blocks/Exhibit.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import { casesInOrder, corpus, href, longDate } from '../../lib/content';
+import { CONCEPT_NAMES } from '../../lib/labels';
+import { inline, rich } from '../../lib/markup';
+import type { CaseEntry } from '../../lib/schemas';
+
+export async function getStaticPaths() {
+  return (await casesInOrder()).map(([id, cs]) => ({ params: { id }, props: { id, cs } }));
+}
+interface Props {
+  id: string;
+  cs: CaseEntry;
+}
+const { cs } = Astro.props;
+const c = await corpus();
+const exhibitTitle = (e: string) => {
+  const ex = cs.exhibits.find((x) => x.id === e);
+  return ex ? `Exhibit ${e.replace(/^ex-/, '')}` : e;
+};
+const groups = [...new Set(cs.options.map((o) => o.group ?? ''))];
+const LEVELS = { high: 'High', medium: 'Medium', low: 'Low' } as const;
+const tools = cs.tools.map((t) => ({ id: t, data: c.tools[t] })).filter((t) => t.data);
+const questions = cs.questions.map((q) => ({ id: q, data: c.questions[q] })).filter((q) => q.data);
+---
+
+<BaseLayout title={`${cs.title}: case file`} description={cs.dek} section="cases">
+  <PageIntro trail={[{ label: 'Cases', href: '/cases/' }, { label: cs.title }]} kicker={`Case file · ${cs.organization.sector}`} title={cs.title} lead={cs.dek}>
+    <div class="tags">
+      <ProvenanceTag kind={cs.dataStatus === 'simulated' ? 'simulated-data' : 'external-evidence'} />
+      <span class="tag tag--plain">{cs.kind === 'fictional' ? 'Fictional organization' : 'Real organization'}</span>
+      <span class="tag tag--plain">Updated {longDate(cs.updated)}</span>
+    </div>
+  </PageIntro>
+
+  <div class="wrap page-body">
+    <div class="casefile-head">
+      <div class="stack">
+        <div class="case-decision">
+          <p class="label">The decision</p>
+          <p>{cs.decision}</p>
+        </div>
+        <div class="prose narrative" set:html={rich(cs.brief)} />
+      </div>
+      <dl class="casefile-facts">
+        <div><dt>Organization</dt><dd>{cs.organization.name}</dd></div>
+        <div><dt>Sector</dt><dd>{cs.organization.sector}</dd></div>
+        <div><dt>Location</dt><dd>{cs.organization.location}</dd></div>
+        <div><dt>Size</dt><dd>{cs.organization.size}</dd></div>
+        {cs.organization.legalForm && <div><dt>Legal form</dt><dd>{cs.organization.legalForm}</dd></div>}
+        <div><dt>Figures in</dt><dd>{cs.currency.code} ({cs.currency.symbol}), {cs.currency.unit}</dd></div>
+        {
+          cs.kind === 'fictional' && (
+            <div>
+              <dt>Status</dt>
+              <dd>Fictional. Every figure is simulated for teaching and internally consistent.</dd>
+            </div>
+          )
+        }
+      </dl>
+    </div>
+
+    <section aria-labelledby="story-h">
+      <SectionHead no={1} title="The story so far" id="story-h" />
+      <div class="case-narrative prose narrative stack">
+        {cs.narrative.map((p) => <div set:html={rich(p)} />)}
+      </div>
+    </section>
+
+    <section aria-labelledby="exhibits-h">
+      <SectionHead no={2} title="The evidence" dek={`${cs.exhibits.length} exhibits. Each is labelled with what kind of evidence it is.`} id="exhibits-h" />
+      <div class="exhibit-stack" style="margin-top:var(--sp-5)">
+        {cs.exhibits.map((e) => <Exhibit exhibit={e} />)}
+      </div>
+    </section>
+
+    <section aria-labelledby="constraints-h">
+      <SectionHead no={3} title="Constraints" id="constraints-h" />
+      <ul class="prose" style="margin-top:var(--sp-4)">{cs.constraints.map((k) => <li set:html={inline(k)} />)}</ul>
+    </section>
+
+    <section aria-labelledby="people-h">
+      <SectionHead no={4} title="The people with a stake" id="people-h" />
+      <div class="table-scroll" role="region" aria-label="Stakeholders" tabindex="0" style="margin-top:var(--sp-4)">
+        <table class="table stakeholder-table">
+          <thead>
+            <tr>
+              <th scope="col">Stakeholder</th>
+              <th scope="col">Interest</th>
+              <th scope="col">Influence</th>
+              <th scope="col">Stake</th>
+              <th scope="col">Concern</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              cs.stakeholders.map((s) => (
+                <tr>
+                  <th scope="row">{s.name}</th>
+                  <td set:html={inline(s.interest)} />
+                  <td>{LEVELS[s.influence]}</td>
+                  <td>{LEVELS[s.stake]}</td>
+                  <td set:html={inline(s.concern)} />
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="options-h">
+      <SectionHead no={5} title="The options" id="options-h" />
+      <div style="margin-top:var(--sp-5)">
+        {
+          groups.map((g) => (
+            <div class="option-group">
+              {g && <h3 class="label label--ink">{g}</h3>}
+              <div class="options-grid">
+                {cs.options
+                  .filter((o) => (o.group ?? '') === g)
+                  .map((o) => (
+                    <article class="option-card" id={`option-${o.id}`}>
+                      <h3>{o.label}</h3>
+                      <div class="prose small" set:html={rich(o.summary)} />
+                      <dl>
+                        <div>
+                          <dt>Requires</dt>
+                          <dd set:html={inline(o.requires)} />
+                        </div>
+                        <div>
+                          <dt>Upside</dt>
+                          <dd set:html={inline(o.upside)} />
+                        </div>
+                        <div>
+                          <dt>Risks</dt>
+                          <dd set:html={inline(o.risks)} />
+                        </div>
+                      </dl>
+                      {o.evidence.length > 0 && (
+                        <p class="small muted">
+                          Evidence:{' '}
+                          {o.evidence.map((e, k) => (
+                            <>
+                              {k > 0 && ', '}
+                              <a href={`#${e}`}>{exhibitTitle(e)}</a>
+                            </>
+                          ))}
+                        </p>
+                      )}
+                    </article>
+                  ))}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section aria-labelledby="analysis-h">
+      <SectionHead no={6} title="A worked analysis" dek="From data to a recommendation, in the order an examiner rewards. Try your own before you read it." id="analysis-h" />
+      <details class="disclosure" style="margin-top:var(--sp-4)">
+        <summary>Show the worked analysis</summary>
+        <div class="disclosure__body">
+          <div class="tags" style="margin-bottom:var(--sp-3)">
+            <ProvenanceTag kind="aa-framework" />
+          </div>
+          <div class="analysis">
+            <div class="analysis__step">
+              <p class="analysis__label">Data<span>What the exhibits say</span></p>
+              <ul>{cs.analysis.data.map((x) => <li set:html={inline(x)} />)}</ul>
+            </div>
+            <div class="analysis__step">
+              <p class="analysis__label">Insight<span>What it means</span></p>
+              <ul>{cs.analysis.insight.map((x) => <li set:html={inline(x)} />)}</ul>
+            </div>
+            <div class="analysis__step">
+              <p class="analysis__label">Options<span>What each choice does</span></p>
+              <ul>{cs.analysis.options.map((x) => <li set:html={inline(x)} />)}</ul>
+            </div>
+            <div class="analysis__step">
+              <p class="analysis__label">Recommendation<span>One defensible answer</span></p>
+              <div class="prose" set:html={rich(cs.analysis.recommendation)} />
+            </div>
+            <div class="analysis__step">
+              <p class="analysis__label">Caveat<span>When it would change</span></p>
+              <div class="prose" set:html={rich(cs.analysis.caveat)} />
+            </div>
+          </div>
+        </div>
+      </details>
+      {
+        cs.decisionRoom && (
+          <p style="margin-top:var(--sp-5)">
+            <a class="btn btn--primary" href={href.decision(cs.decisionRoom)}>
+              Make the decision in the Decision Room
+            </a>
+          </p>
+        )
+      }
+    </section>
+
+    <section aria-labelledby="links-h">
+      <SectionHead no={7} title="Use this case" id="links-h" />
+      <div class="connections">
+        <div>
+          <h3 class="label label--ink">Briefs</h3>
+          <ul class="link-list">
+            {
+              cs.topics.map((t) => (
+                <li>
+                  <a href={href.topic(t)}>
+                    {c.topics[t]?.code} {c.topics[t]?.title}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        {
+          tools.length > 0 && (
+            <div>
+              <h3 class="label label--ink">Tools to apply</h3>
+              <ul class="link-list">
+                {tools.map((t) => {
+                  const link = t.data ? href.tool(t.id, t.data) : null;
+                  return <li>{link ? <a href={link}>{t.data?.name}</a> : <span>{t.data?.name} (guide in preparation)</span>}</li>;
+                })}
+              </ul>
+            </div>
+          )
+        }
+        {
+          questions.length > 0 && (
+            <div>
+              <h3 class="label label--ink">Practice questions</h3>
+              <ul class="link-list">
+                {questions.map((q) => (
+                  <li>
+                    <a href={href.question(q.id)}>{q.data?.title}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+        {
+          cs.concepts.length > 0 && (
+            <div>
+              <h3 class="label label--ink">Concepts</h3>
+              <ul class="link-list link-list--inline">
+                {cs.concepts.map((k) => (
+                  <li>
+                    <a href={href.concept(k)}>{CONCEPT_NAMES[k]}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      </div>
+      <aside class="callout callout--note" style="margin-top:var(--sp-6)">
+        <span class="callout__kicker">How this case was made</span>
+        <div class="prose small" set:html={rich(cs.method)} />
+      </aside>
+    </section>
+  </div>
+</BaseLayout>

@@ -1,0 +1,149 @@
+---
+/** How the platform is organized and built, what is live, and what is planned. */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageIntro from '../components/layout/PageIntro.astro';
+import SectionHead from '../components/layout/SectionHead.astro';
+import StatusTag from '../components/ui/StatusTag.astro';
+import ProvenanceTag from '../components/ui/ProvenanceTag.astro';
+import { corpus, modulesInOrder } from '../lib/content';
+
+const modules = await modulesInOrder();
+const c = await corpus();
+const interactions = Object.entries(c.interactives).sort((a, b) => a[1].title.localeCompare(b[1].title, 'en'));
+const CHAINS = [
+  { name: 'Situation, decision, consequence', steps: ['Situation', 'Decision', 'Consequence'], where: 'Every topic brief and Decision Room' },
+  { name: 'Data, insight, option, recommendation', steps: ['Data', 'Insight', 'Option', 'Recommendation'], where: 'The worked analysis in every case file' },
+  { name: 'Problem, cause, strategy, implementation, evaluation', steps: ['Problem', 'Cause', 'Strategy', 'Implementation', 'Evaluation'], where: 'The order of sections in each brief and the Decision Room debriefs' },
+];
+---
+
+<BaseLayout title="The platform" description="How The Business Brief is organized: its modules, its learning architecture, its interactions and how its content is governed." section="platform">
+  <PageIntro
+    trail={[{ label: 'Platform' }]}
+    kicker="The platform"
+    title="How The Business Brief works"
+    lead="One platform with fourteen modules, three chains of reasoning that run through all of them, and rules for evidence that every page follows. This page says what is live in this release and what is not."
+  />
+  <div class="wrap page-body">
+    <section aria-labelledby="arch-h">
+      <SectionHead no={1} title="The learning architecture" id="arch-h" />
+      <div class="tags" style="margin-top:var(--sp-3)"><ProvenanceTag kind="aa-framework" /></div>
+      <div class="grid grid--3" style="margin-top:var(--sp-4)">
+        {
+          CHAINS.map((ch) => (
+            <div class="arch">
+              <h3>{ch.name}</h3>
+              <ol class="arch__steps">{ch.steps.map((s) => <li>{s}</li>)}</ol>
+              <p class="small muted">{ch.where}</p>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+    <section aria-labelledby="mod-h">
+      <SectionHead no={2} title="The modules" dek="A module is linked only when something in it works." id="mod-h" />
+      <div class="modules">
+        {
+          modules.map((m) => (
+            <article class={`module module--${m.data.status}`}>
+              <h3>{m.data.href ? <a href={m.data.href}>{m.data.name}</a> : m.data.name}</h3>
+              <StatusTag status={m.data.status} />
+              <p>{m.data.purpose}</p>
+              {m.data.contains.length > 0 && <p class="small">{m.data.contains.join('. ')}.</p>}
+            </article>
+          ))
+        }
+      </div>
+    </section>
+    <section aria-labelledby="ix-h">
+      <SectionHead no={3} title="The interactions" dek="Each one asks the learner to decide or infer something, gives feedback on it, and targets a known misconception." id="ix-h" />
+      <div class="table-scroll" role="region" aria-label="Interactions" tabindex="0" style="margin-top:var(--sp-4)">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Interaction</th>
+              <th scope="col">What the learner does, and why</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              interactions.map(([, ix]) => (
+                <tr>
+                  <th scope="row">{ix.title}</th>
+                  <td class="small">{ix.purpose}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section aria-labelledby="gov-h">
+      <SectionHead no={4} title="Evidence and honesty" id="gov-h" />
+      <div class="honesty">
+        <div>
+          <h3>Every claim has a source</h3>
+          <p>Statements about the IB course carry a verification status and appear in the <a href="/sources/">claims register</a>. Until the Guide is supplied, nothing is marked as checked against it.</p>
+        </div>
+        <div>
+          <h3>Fictional means fictional</h3>
+          <p>The three cases are fictional and their data simulated, which lets every figure be complete and consistent. Real organizations appear only as cited, dated facts, kept apart from interpretation.</p>
+        </div>
+        <div>
+          <h3>Practice is labelled as practice</h3>
+          <p>Every question is original. Mark schemes and level descriptors are the platform's own, and are never presented as IB markschemes or markbands.</p>
+        </div>
+      </div>
+    </section>
+    <section aria-labelledby="tech-h">
+      <SectionHead no={5} title="How it is built" id="tech-h" />
+      <div class="grid grid--2" style="margin-top:var(--sp-4)">
+        <div class="prose">
+          <p>
+            A static site, built with Astro from structured content in YAML. Every page is complete HTML before any script runs; the
+            interactions add behaviour on top, and each one still teaches without JavaScript. The build checks every relationship between
+            topics, cases, tools, calculations and questions, and fails if any reference is broken.
+          </p>
+        </div>
+        <div class="prose">
+          <p>
+            All arithmetic is done by one set of tested functions, used by the worked examples, the live calculators, the cases and the
+            answers to practice questions, so they cannot disagree. Fonts are served from the site itself. There are no accounts, no
+            analytics and no cookies; see <a href="/privacy/">privacy</a>.
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .arch {
+    padding-top: var(--sp-3);
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .arch h3 {
+    font-size: 1.0625rem;
+  }
+
+  .arch__steps {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: var(--sp-3) 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .arch__steps li {
+    padding: 0.3rem 0.5rem;
+    background: var(--surface-ink);
+    color: var(--text-on-ink);
+  }
+</style>

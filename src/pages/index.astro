@@ -1,0 +1,188 @@
+---
+/**
+ * The home page. Its signature object is the decision memo: a real decision
+ * from one of the cases, waiting for the reader to make it.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHead from '../components/layout/SectionHead.astro';
+import StatusTag from '../components/ui/StatusTag.astro';
+import { corpus, href, modulesInOrder, pathwaysInOrder, topicsInOrder } from '../lib/content';
+
+const c = await corpus();
+const topics = await topicsInOrder();
+const modules = await modulesInOrder();
+const pathways = await pathwaysInOrder();
+const memo = c.decisions['marigold-growth'];
+const memoCase = memo ? c.cases[memo.case] : undefined;
+const cur = c.curricula['ib-dp-bm'];
+const subtopics = cur?.units.reduce((n, u) => n + u.subtopics.length, 0) ?? 0;
+const CHAINS = [
+  { name: 'Every brief', steps: ['Situation', 'Decision', 'Consequence'] },
+  { name: 'Every case analysis', steps: ['Data', 'Insight', 'Option', 'Recommendation'] },
+  { name: 'Every recommendation', steps: ['Problem', 'Cause', 'Strategy', 'Implementation', 'Evaluation'] },
+];
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Arjun Agrawal | The Business Brief',
+  description: 'Business management learned through decisions. Strategy. Leadership. Decisions.',
+  inLanguage: 'en-GB',
+  author: { '@type': 'Person', name: 'Arjun Agrawal' },
+};
+---
+
+<BaseLayout title="home" description="The Business Brief by Arjun Agrawal: business management learned through decisions. Topic briefs, case files, Decision Rooms and a Finance Desk for IB DP Business Management and beyond." jsonLd={jsonLd}>
+  <section class="hero" aria-labelledby="hero-h">
+    <div class="wrap hero__grid">
+      <div>
+        <p class="hero__kicker"><b>Arjun Agrawal</b> <span aria-hidden="true">·</span> The Business Brief</p>
+        <h1 id="hero-h">Learn business by making the decision.</h1>
+        <p class="hero__tag">Strategy. Leadership. Decisions.</p>
+        <p class="lead hero__lead">
+          Every topic starts with a business in a situation and ends with a decision you make, defend and live with. Built for IB Diploma
+          Programme Business Management, with pathways for teachers, university students, entrepreneurs and anyone learning on their own.
+        </p>
+        <p class="cluster hero__actions">
+          <a class="btn btn--primary" href="/topics/">Start with a topic</a>
+          <a class="btn" href="/decision-room/">Enter the Decision Room</a>
+        </p>
+      </div>
+      {
+        memo && memoCase && (
+          <aside class="memo" aria-labelledby="memo-h">
+            <div class="memo__head">
+              <span id="memo-h">Decision memo</span>
+              <span>Case 01</span>
+            </div>
+            <dl class="memo__rows">
+              <div>
+                <dt>To</dt>
+                <dd>Meera Rao, founder, {memoCase.title}</dd>
+              </div>
+              <div>
+                <dt>From</dt>
+                <dd>You</dd>
+              </div>
+              <div>
+                <dt>Re</dt>
+                <dd class="memo__q">{memoCase.decision}</dd>
+              </div>
+              <div>
+                <dt>Options</dt>
+                <dd>{memo.rounds[0]?.choices.map((ch) => ch.label).join(', ')}</dd>
+              </div>
+              <div>
+                <dt>Evidence</dt>
+                <dd>{memoCase.exhibits.length} exhibits, {memoCase.stakeholders.length} stakeholders</dd>
+              </div>
+            </dl>
+            <div class="memo__foot">
+              <span class="memo__stamp">Awaiting your decision</span>
+              <a class="btn btn--ink btn--small" href={href.decision('marigold-growth')}>
+                Make the decision
+              </a>
+            </div>
+          </aside>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="band band--ink chain-band" aria-labelledby="method-h">
+    <div class="wrap">
+      <SectionHead no="01" title="One way of thinking, everywhere" id="method-h" dek="The same reasoning runs through every brief, case and Decision Room, so that it becomes a habit." />
+      <div class="chains">
+        {
+          CHAINS.map((ch) => (
+            <div>
+              <h3>{ch.name}</h3>
+              <ol>{ch.steps.map((s) => <li>{s}</li>)}</ol>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="briefs-h">
+    <div class="wrap">
+      <SectionHead no="02" title="Three complete briefs" id="briefs-h" dek={`A strategic topic, a quantitative one and a people one, each with a case, interactions, practice and a revision page. ${subtopics - topics.length} more subtopics are mapped and planned.`} />
+      <div class="feature-briefs">
+        {
+          topics.map(([id, t]) => {
+            const cs = c.cases[t.related.cases[0] ?? ''];
+            return (
+              <article class="feature">
+                <span class="feature__code">Brief {t.code}</span>
+                <h3>
+                  <a href={href.topic(id)}>{t.title}</a>
+                </h3>
+                <p class="feature__q">{t.decisionQuestion}</p>
+                <p class="feature__meta">
+                  <span>Case: {cs?.title}</span>
+                  <span>{t.related.questions.length} practice questions</span>
+                </p>
+              </article>
+            );
+          })
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="band band--sunk" aria-labelledby="modules-h">
+    <div class="wrap">
+      <SectionHead no="03" title="One platform, fourteen rooms" id="modules-h" dek="Each module is linked only when something in it works. The rest are marked as planned." />
+      <div class="modules" style="background:var(--surface-page)">
+        {
+          modules.map((m) => (
+            <article class={`module module--${m.data.status}`}>
+              <h3>{m.data.href ? <a href={m.data.href}>{m.data.name}</a> : m.data.name}</h3>
+              <StatusTag status={m.data.status} />
+              <p>{m.data.purpose}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="paths-h">
+    <div class="wrap">
+      <SectionHead no="04" title="Who it is for" id="paths-h" dek="One foundation, with a way in for each kind of learner." />
+      <ul class="pathway-strip">
+        {
+          pathways.map((p) => (
+            <li>
+              <a href={href.pathway(p.id)}>
+                <strong>{p.data.name}</strong>
+                <span class="small">{p.data.promise}</span>
+                <StatusTag status={p.data.status} />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="band band--sunk" aria-labelledby="honest-h">
+    <div class="wrap">
+      <SectionHead no="05" title="How far to trust it" id="honest-h" />
+      <div class="honesty">
+        <div>
+          <h3>Every claim is sourced</h3>
+          <p>Statements about the IB course show where they come from and how far they have been checked, in a public <a href="/sources/">claims register</a>.</p>
+        </div>
+        <div>
+          <h3>Fiction is labelled</h3>
+          <p>The cases are fictional, with simulated data that adds up. Real organizations appear only as cited, dated facts.</p>
+        </div>
+        <div>
+          <h3>Practice is practice</h3>
+          <p>Every question is original and labelled as such. Nothing is presented as an IB question, markscheme or markband.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

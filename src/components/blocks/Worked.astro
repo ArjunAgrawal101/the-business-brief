@@ -1,0 +1,36 @@
+---
+/**
+ * The eight-part worked calculation: given, formula, substitution, working,
+ * answer, unit, interpretation, business implication. The first six come from
+ * the finance functions; the last two are written judgement. The markup comes
+ * from src/lib/render.ts, which the live calculators use too.
+ */
+import { buildWorking, type Labels } from '../../lib/finance';
+import { rich } from '../../lib/markup';
+import { workingHtml } from '../../lib/render';
+
+interface Props {
+  calculation: string;
+  inputs: Record<string, number>;
+  currency?: string;
+  labels?: Labels;
+  interpretation: string;
+  implication: string;
+  title?: string;
+  id?: string;
+}
+const { calculation, inputs, currency = '', labels, interpretation, implication, title, id } = Astro.props;
+const w = buildWorking(calculation, inputs, currency, labels);
+---
+
+<section class="worked" id={id} aria-label={title ? `Worked calculation: ${title}` : 'Worked calculation'}>
+  {title && <h3 class="worked__title">{title}</h3>}
+  <Fragment set:html={workingHtml(w, rich(interpretation), rich(implication))} />
+</section>
+
+<style>
+  .worked__title {
+    font-size: var(--fs-h4);
+    margin-bottom: var(--sp-3);
+  }
+</style>

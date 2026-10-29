@@ -1,0 +1,218 @@
+# Decision Room: Atelier Barro. Every figure is computed from Exhibit 1 of the
+# case with src/lib/finance.ts; tests/unit/cases.test.ts recomputes them.
+# Figures are euros a month.
+
+title: 'Atelier Barro: price, cost and a half-price order'
+case: atelier-barro
+dek: Respond to an energy price rise, then decide whether to make 300 mugs at half the shop price.
+role: You are Rui Mendes, the studio manager. Inês has asked you to recommend what to do about prices and about the hotel's order.
+briefing: >
+  From 1 November the studio's electricity costs rise. You will choose how to respond on price, and see what your
+  choice does to contribution, the break-even quantity, the margin of safety and profit. Then a hotel group's order
+  arrives. Every figure is calculated from the cost ledger in Exhibit 1, so you can check each one on the Finance Desk.
+objectives:
+  - Keep the studio profitable after the energy price rise.
+  - Keep Atelier Barro's position as a maker of premium, hand-made mugs.
+  - Keep enough margin of safety to survive a slow month.
+evidence: [ex-1, ex-3, ex-4, ex-5]
+metrics:
+  - { id: price, label: Shop price per mug, unit: €, better: context }
+  - { id: sales, label: Mugs sold a month (estimate), better: context }
+  - { id: contribution, label: Contribution per mug, unit: €, better: higher }
+  - { id: beq, label: Break-even quantity, unit: mugs a month, better: lower }
+  - { id: mos, label: Margin of safety, unit: mugs a month, better: higher }
+  - { id: profit, label: Profit a month, unit: €, better: higher }
+  - { id: orderGain, label: Change in November profit from the hotel order, unit: €, better: higher }
+  - { id: brandRisk, label: Risk to the price position, better: context }
+baseline:
+  price: 22
+  sales: 640
+  contribution: 15.12
+  beq: 534
+  mos: 106
+  profit: 1616.80
+  orderGain: 0
+  brandRisk: Low
+rounds:
+  - id: price
+    title: Respond to the cost rise
+    question: How will Atelier Barro respond to the new electricity tariff?
+    help: >
+      From November, firing costs €0.75 a mug instead of €0.45, and the standing charge is €340 a month instead of €260.
+      The card and platform fee is 4% of the price, so it rises if the price does. The figures in "Now" are before the
+      new tariff.
+    choices:
+      - id: absorb
+        label: Keep the price at €22
+        detail: Absorb the higher costs and keep customers happy.
+        outcome:
+          headline: The price holds, and the margin shrinks
+          narrative: >
+            Variable cost per mug rises to €7.18 and monthly costs to €8,140. Contribution per mug falls from €15.12 to
+            €14.82, so the studio now needs 550 mugs a month to break even instead of 534 (€8,140 ÷ €14.82 = 549.26,
+            rounded up). Sales stay at 640, the margin of safety narrows to 90 mugs, and profit falls from €1,616.80 to
+            €1,344.80 a month.
+          metrics: { price: 22, sales: 640, contribution: 14.82, beq: 550, mos: 90, profit: 1344.80, brandRisk: Low }
+          stakeholders:
+            - { name: "Customers", reaction: "See no change.", mood: positive }
+            - { name: "Inês Carvalho", reaction: "Has a thinner cushion against a slow month.", mood: negative }
+            - { name: "The throwers", reaction: "Keep making 640 mugs a month.", mood: positive }
+          risks:
+            - A margin of safety of 90 mugs, 14% of sales, leaves little room for a slow month.
+          theory: >
+            A rise in variable cost per unit lowers contribution per unit and raises the break-even quantity. A rise in
+            fixed costs raises it further. Holding the price means the business absorbs both.
+      - id: raise-24
+        label: Raise the price to €24
+        detail: The price tested on the website for two weeks.
+        outcome:
+          headline: A modest rise that most customers accept
+          narrative: >
+            At €24 the card and platform fee is €0.96 a mug, so variable cost is €7.26 and contribution is €16.74. The
+            survey and price test suggest about 590 mugs a month. The break-even quantity falls to 487 mugs, the margin
+            of safety is 103 mugs, and profit rises to €1,736.60, above where it was before the energy rise. Fifty fewer
+            mugs are made each month, which also saves clay, labour and kiln time.
+          metrics: { price: 24, sales: 590, contribution: 16.74, beq: 487, mos: 103, profit: 1736.60, brandRisk: Low }
+          stakeholders:
+            - { name: "Customers", reaction: "Most keep buying; about fifty a month stop.", mood: mixed }
+            - { name: "The throwers", reaction: "Make fifty fewer mugs a month and earn €120 less between them.", mood: negative }
+            - { name: "Inês Carvalho", reaction: "Has profit and a margin of safety back where she wants them.", mood: positive }
+          risks:
+            - The estimate of 590 mugs comes from a survey and a two-week test. If sales fall further, so does the gain.
+          theory: >
+            Raising the price raises contribution per unit and lowers the break-even quantity. Whether profit rises
+            depends on how many sales are lost, which is a question about demand, not about costs.
+      - id: premium-25
+        label: Raise the price to €25 with premium packaging
+        detail: New gift packaging at €0.60 a mug more, and a new way of presenting the mugs.
+        outcome:
+          headline: The best result on paper, resting on an untested assumption
+          narrative: >
+            With packaging at €1.45 and a 4% fee of €1.00, variable cost is €7.90 and contribution is €17.10. The
+            break-even quantity falls to 477. The survey suggested 560 mugs at €25 without new packaging; Inês assumed
+            the packaging would hold sales at 580, and in this simulation it does. Profit is €1,778.00 a month, the
+            highest of the four. If sales had been the survey's 560, profit would have been €1,436.00, below the €24 option.
+          metrics: { price: 25, sales: 580, contribution: 17.10, beq: 477, mos: 103, profit: 1778.00, brandRisk: Low }
+          stakeholders:
+            - { name: "Gift buyers", reaction: "Like the new packaging.", mood: positive }
+            - { name: "Regular customers", reaction: "Some feel the mugs have become a luxury.", mood: mixed }
+            - { name: "Inês Carvalho", reaction: "Likes the premium position; knows she was lucky with the estimate.", mood: mixed }
+          risks:
+            - The gain over €24 depends entirely on the untested estimate of 580 mugs.
+          theory: >
+            A decision that is best only under its most favourable assumption is a risky decision. Sensitivity
+            analysis asks what happens to the result if the assumption is wrong.
+      - id: cut-marketing
+        label: Keep €22 and cut marketing
+        detail: Reduce social media advertising from €480 to €200 a month.
+        outcome:
+          headline: A lower break-even quantity, and lower profit
+          narrative: >
+            Cutting €280 of advertising lowers monthly costs to €7,860 and the break-even quantity to 531 mugs. But
+            online sales depend on the advertising, and over the following quarter they fall to 610 mugs a month. The
+            margin of safety shrinks to 79 mugs and profit falls to €1,180.20, the lowest of the four.
+          metrics: { price: 22, sales: 610, contribution: 14.82, beq: 531, mos: 79, profit: 1180.20, brandRisk: Low }
+          stakeholders:
+            - { name: "Online customers", reaction: "See the studio less often in their feeds.", mood: mixed }
+            - { name: "The throwers", reaction: "Make thirty fewer mugs a month.", mood: negative }
+            - { name: "Inês Carvalho", reaction: "Saves money and loses sales.", mood: negative }
+          risks:
+            - The fall in sales was larger than the saving. Marketing is a fixed cost that brings in revenue.
+          theory: >
+            Cutting a fixed cost lowers the break-even quantity only if sales hold. When the cost drives sales, cutting
+            it can lower the break-even quantity and profit at the same time.
+
+  - id: order
+    title: The hotel's order
+    question: Casa Alfama Hotels offers to buy 300 mugs at €11 each, for delivery in November. What do you do?
+    help: >
+      Each hotel mug has a variable cost of €5.85: clay and glaze €2.30, the piece rate €2.40, bulk packaging €0.40 and
+      firing €0.75, with no card or platform fee on an invoiced order. The stamp costs €150, once. November sales are
+      usually about 830 mugs, and the kiln can fire 1,200 a month.
+    choices:
+      - id: accept
+        label: Accept at €11.00
+        detail: Make the 300 mugs at the hotel's price.
+        outcome:
+          headline: €1,395 of extra profit from mugs at half the shop price
+          narrative: >
+            Each hotel mug adds €5.15 of contribution (€11.00 − €5.85). Three hundred add €1,545, and after the €150
+            stamp the order raises November's profit by €1,395. The order is profitable even though €11 is well below
+            the average cost of a shop mug, about €20 to €22 depending on your pricing decision, because the studio's
+            monthly costs are already covered by its regular sales. The hotel order only has to cover its own
+            variable costs. The kiln runs at 94% of capacity in November.
+          metrics: { orderGain: 1395, brandRisk: Medium }
+          stakeholders:
+            - { name: "Casa Alfama Hotels", reaction: "Gets its mugs on time.", mood: positive }
+            - { name: "The throwers", reaction: "Earn €720 more between them in November.", mood: positive }
+            - { name: "Inês Carvalho", reaction: "Welcomes the cash; worries about her mugs in hotel rooms at half the price.", mood: mixed }
+            - { name: "Shop customers", reaction: "A few notice the hotel mugs and ask about trade prices.", mood: mixed }
+          risks:
+            - Customers who see the mugs in hotel rooms may wonder why they pay twice as much.
+            - At 94% of capacity in November, a failed firing leaves no slack.
+          theory: >
+            Contribution analysis: with spare capacity, accept an order whose price is above its variable cost, unless
+            it harms regular sales or uses capacity needed for more profitable work. Average cost is the wrong benchmark
+            when the fixed costs are already covered.
+      - id: negotiate
+        label: Counter-offer at €13.50
+        detail: Ask for more, and risk the order.
+        outcome:
+          headline: The hotel meets you at €12.50
+          narrative: >
+            The hotel's buyer replies with €12.50. At that price each mug adds €6.65 of contribution, and the order raises
+            November's profit by €1,845. In this simulation the order survived the negotiation, but it could have gone
+            the other way. If you had thought there was a one-in-three chance of losing the order, the expected gain from
+            negotiating would have been two-thirds of €1,845, which is €1,230, less than the €1,395 from accepting.
+          metrics: { orderGain: 1845, brandRisk: Medium }
+          stakeholders:
+            - { name: "Casa Alfama Hotels", reaction: "Agrees, and will remember the negotiation next year.", mood: mixed }
+            - { name: "Inês Carvalho", reaction: "Pleased with the higher price.", mood: positive }
+          risks:
+            - The simulation shows one outcome of a negotiation. Another buyer might simply have bought elsewhere.
+          theory: >
+            An expected value weighs a certain gain against an uncertain larger one. Here (2/3 × €1,845) + (1/3 × €0) =
+            €1,230, so negotiating was worth it only if the risk of losing the order was smaller than one in three.
+      - id: decline
+        label: Decline the order
+        detail: Sell mugs only at the studio's own prices.
+        outcome:
+          headline: The price position holds, and so does November's profit
+          narrative: >
+            Atelier Barro declines, explaining that its mugs are sold only at its own prices. November's profit is
+            unchanged and the kiln has spare capacity for the Christmas rush. The decision gives up €1,395 of certain
+            profit to protect a price position that Inês has spent five years building.
+          metrics: { orderGain: 0, brandRisk: Low }
+          stakeholders:
+            - { name: "Casa Alfama Hotels", reaction: "Buys mugs elsewhere.", mood: negative }
+            - { name: "Inês Carvalho", reaction: "Is confident in the decision.", mood: positive }
+            - { name: "The throwers", reaction: "Miss out on extra work.", mood: negative }
+          risks:
+            - The hotel may not ask again, and a competitor may take the relationship.
+          theory: >
+            Declining a profitable order can be right when the order threatens the price position that earns the
+            business its regular contribution. The cost of the decision is the contribution given up.
+
+debrief:
+  tradeoffs:
+    - Price against volume. A higher price raises contribution per mug but sells fewer mugs. The best price depends on how sales respond, and the survey's estimate is itself uncertain.
+    - Fixed costs against revenue. Cutting marketing lowers the break-even quantity but can lower sales by more.
+    - Contribution now against the price position later. The hotel order adds profit this month and may cost some of the brand's ability to charge €22 or more.
+  evidenceThatMatters:
+    - Exhibit 3, the estimated sales at each price. Every pricing outcome rests on it, and it is an estimate from a survey and a short price test.
+    - Exhibit 1, where the card and platform fee is 4% of the price. Leaving it out overstates the gain from a price rise.
+    - Exhibit 5, the season. In November there is spare capacity; in December there would not be.
+  changeYourMind:
+    - If the survey had shown sales of 520 a month at €24, would you still raise the price?
+    - If the hotel had wanted its mugs in December, when the kiln is nearly full, what would accepting cost?
+    - If the hotel offered to order 300 mugs every quarter at €11, would your answer change, and why?
+  misconceptions:
+    - Rounding the break-even quantity down. €8,140 ÷ €14.82 is 549.26; at 549 mugs there is a small loss, so the answer is 550.
+    - Rejecting the hotel order because €11 is below the average cost of a mug. With spare capacity and fixed costs already covered, the comparison is with variable cost.
+    - Treating the margin of safety as a sum of money. It is a number of mugs, or a share of sales.
+  examLink: >
+    This is Paper 2 reasoning: calculate, then interpret, then judge. Try the break-even and HL special order practice
+    questions on the Exam Desk, and check each answer in the Finance Desk's workspace.
+topics: [costs-and-revenues]
+questions: [q-costs-p2-beq, q-costs-p2-mos, q-costs-p2-price, q-costs-hl-special]
+updated: 2026-10-29

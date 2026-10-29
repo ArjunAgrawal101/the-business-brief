@@ -1,0 +1,153 @@
+---
+/** A tool guide: purpose, construction, evidence, what it reveals and hides, a case application, and the interaction that applies it. */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import Interactive from '../../components/interactive/Interactive.astro';
+import CalcCard from '../../components/finance/CalcCard.astro';
+import LevelTag from '../../components/ui/LevelTag.astro';
+import VerifyTag from '../../components/ui/VerifyTag.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import { corpus, href, longDate, toolsInOrder } from '../../lib/content';
+import { inline, rich } from '../../lib/markup';
+import type { Tool } from '../../lib/schemas';
+
+type CompleteTool = Extract<Tool, { status: 'complete' }>;
+export async function getStaticPaths() {
+  return (await toolsInOrder()).filter(([, t]) => t.status === 'complete').map(([id, tool]) => ({ params: { id }, props: { id, tool } }));
+}
+interface Props {
+  id: string;
+  tool: CompleteTool;
+}
+const { id, tool: t } = Astro.props;
+const c = await corpus();
+const ix = t.interactive ? c.interactives[t.interactive] : undefined;
+const calcs = Object.entries(c.calculations).filter(([, k]) => k.page === `/toolkit/${id}/`);
+const theCase = c.cases[t.application.case];
+const lists = [
+  { key: 'when', title: 'When to use it', items: t.whenToUse },
+  { key: 'construct', title: 'How to build it', items: t.construct, ordered: true },
+  { key: 'evidence', title: 'The evidence it needs', items: t.evidence },
+];
+---
+
+<BaseLayout title={`${t.name}: Toolkit`} description={t.summary} section="toolkit">
+  <PageIntro trail={[{ label: 'Toolkit', href: '/toolkit/' }, { label: t.name }]} kicker="Toolkit" title={t.name} lead={t.summary}>
+    <div class="tags">
+      <LevelTag level={t.level} always />
+      <VerifyTag status={t.verification} />
+      <span class="tag tag--plain">{t.ibStatus === 'ib-toolkit' ? 'In the IB toolkit' : t.ibStatus === 'enrichment' ? 'Enrichment' : 'Teaching framework'}</span>
+      <span class="tag tag--plain">Updated {longDate(t.updated)}</span>
+    </div>
+  </PageIntro>
+  <div class="wrap page-body">
+    <section aria-labelledby="purpose-h">
+      <SectionHead no={1} title="What it is for" id="purpose-h" />
+      <div class="prose lead" style="margin-top:var(--sp-4)" set:html={rich(t.purpose)} />
+      {t.verificationNote && <p class="small muted" set:html={inline(t.verificationNote)} />}
+      <div class="grid grid--3" style="margin-top:var(--sp-5)">
+        {
+          lists.map((l) => (
+            <div class="tool-list">
+              <h3 class="label label--ink">{l.title}</h3>
+              {l.ordered ? <ol class="prose">{l.items.map((x) => <li set:html={inline(x)} />)}</ol> : <ul class="prose">{l.items.map((x) => <li set:html={inline(x)} />)}</ul>}
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section aria-labelledby="reveal-h">
+      <SectionHead no={2} title="What it shows, and what it hides" id="reveal-h" />
+      <div class="fact-interp" style="margin-top:var(--sp-4)">
+        <div>
+          <span class="label">It reveals</span>
+          <ul class="prose">{t.reveals.map((x) => <li set:html={inline(x)} />)}</ul>
+        </div>
+        <div>
+          <span class="label">It does not reveal</span>
+          <ul class="prose">{t.doesNotReveal.map((x) => <li set:html={inline(x)} />)}</ul>
+        </div>
+      </div>
+      <h3 class="label label--ink" style="display:block;margin-top:var(--sp-5)">Limitations</h3>
+      <ul class="prose">{t.limitations.map((x) => <li set:html={inline(x)} />)}</ul>
+    </section>
+
+    <section aria-labelledby="apply-h">
+      <SectionHead no={3} title={`Applied: ${t.application.title}`} id="apply-h" dek={theCase ? `From the case ${theCase.title}.` : undefined} />
+      <div class="stack" style="margin-top:var(--sp-4)">
+        <div class="tags"><ProvenanceTag kind="simulated-data" /></div>
+        <div class="prose narrative" set:html={rich(t.application.body)} />
+        <div class="commentary-box">
+          <span class="label">What it showed</span>
+          <div class="prose" set:html={rich(t.application.result)} />
+        </div>
+        {theCase && <p class="small"><a href={href.case(t.application.case)}>Read the case file: {theCase.title}</a></p>}
+      </div>
+      {
+        ix && t.interactive && (
+          <div style="margin-top:var(--sp-6)">
+            <Interactive component={ix.component} refId={t.interactive} title={ix.title} provenance={ix.provenance} level={t.level === 'HL' ? 'HL' : 'SL/HL'} headingLevel={3} />
+          </div>
+        )
+      }
+    </section>
+
+    {
+      calcs.length > 0 && (
+        <section aria-labelledby="calc-h">
+          <SectionHead no={4} title="The calculation" id="calc-h" />
+          <div class="stack stack-lg" style="margin-top:var(--sp-5)">
+            {calcs.map(([cid, k]) => <CalcCard id={cid} calc={k} headingLevel={3} />)}
+          </div>
+        </section>
+      )
+    }
+
+    <section aria-labelledby="exam-h">
+      <SectionHead no={calcs.length ? 5 : 4} title="In the exam" id="exam-h" />
+      <div class="grid grid--2" style="margin-top:var(--sp-4)">
+        <div class="prose" set:html={rich(t.examRelevance)} />
+        <div>
+          <h3 class="label label--ink">Common errors</h3>
+          <ul class="prose traps">{t.commonErrors.map((x) => <li set:html={inline(x)} />)}</ul>
+        </div>
+      </div>
+      <div class="connections" style="margin-top:var(--sp-5)">
+        <div>
+          <h3 class="label label--ink">Used in</h3>
+          <ul class="link-list">
+            {t.topics.map((x) => <li><a href={href.topic(x)}>{c.topics[x]?.code} {c.topics[x]?.title}</a></li>)}
+            {t.cases.map((x) => <li><a href={href.case(x)}>Case: {c.cases[x]?.title}</a></li>)}
+          </ul>
+        </div>
+        <div>
+          <h3 class="label label--ink">Sources</h3>
+          <ul class="link-list">{t.sources.map((x) => <li><a href={href.source(x)}>{c.sources[x]?.title}</a></li>)}</ul>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .tool-list ol,
+  .tool-list ul {
+    margin-top: var(--sp-2);
+    padding-left: 1.2em;
+  }
+
+  .commentary-box {
+    padding: var(--sp-4);
+    border-left: 3px solid var(--bb-cobalt);
+    background: var(--surface-sheet);
+    max-width: var(--text-max);
+  }
+
+  .commentary-box .label {
+    display: block;
+    margin-bottom: var(--sp-1);
+    color: var(--cobalt-text);
+  }
+</style>

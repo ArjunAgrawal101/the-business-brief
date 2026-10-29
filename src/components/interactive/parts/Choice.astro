@@ -1,0 +1,35 @@
+---
+/** A group of radio buttons for one question about one item. */
+interface Option {
+  value: string;
+  label: string;
+  kicker?: string;
+}
+interface Props {
+  uid: string;
+  itemId: string;
+  name: string;
+  legend: string;
+  options: Option[];
+  layout?: 'seg' | 'lines' | 'grid';
+  showLegend?: boolean;
+}
+const { uid, itemId, name, legend, options, layout = 'seg', showLegend = true } = Astro.props;
+---
+
+<fieldset class={`choice choice--${layout}`} data-group={name}>
+  <legend class={showLegend ? 'choice__legend' : 'sr-only'}>{legend}</legend>
+  <div class="choice__opts">
+    {
+      options.map((o) => (
+        <label class="opt" data-value={o.value}>
+          <input type="radio" name={`${uid}-${itemId}-${name}`} value={o.value} />
+          <span class="opt__body">
+            {o.kicker && <span class="opt__kicker">{o.kicker}</span>}
+            <span class="opt__text">{o.label}</span>
+          </span>
+        </label>
+      ))
+    }
+  </div>
+</fieldset>

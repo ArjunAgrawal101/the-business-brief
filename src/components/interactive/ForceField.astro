@@ -1,0 +1,100 @@
+---
+/**
+ * Force field builder: weigh each force from 1 to 5, see the totals as the
+ * learner's own judgement, then choose a restraining force to weaken.
+ */
+import { summarize } from '../../lib/force-field';
+import { jsonForScript, rich } from '../../lib/markup';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'force-field-builder' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const s = summarize(data.driving, data.restraining);
+const config = { uid, driving: data.driving, restraining: data.restraining };
+const sides = [
+  { key: 'driving', title: 'Driving forces', hint: 'Pushing for the change', forces: data.driving },
+  { key: 'restraining', title: 'Restraining forces', hint: 'Holding it back', forces: data.restraining },
+] as const;
+---
+
+<div class="ffb" data-ix="force-field" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The builder could not start. The strengths below are the suggested ones.</p>
+  <p class="ffb__change"><span class="label">The change</span> <strong>{data.change}</strong></p>
+
+  <form class="ffb__field" data-form aria-label="Weigh the forces" novalidate>
+    {
+      sides.map((side) => (
+        <fieldset class={`ffb__side ffb__side--${side.key}`}>
+          <legend>
+            <span class="ffb__title">{side.title}</span> <span class="ffb__hint">{side.hint}</span>
+          </legend>
+          <ol class="ffb__forces" role="list">
+            {side.forces.map((f, k) => (
+              <li class="ffb__force">
+                <label class="ffb__label" for={`${uid}-${side.key}-${k}`}>{f.label}</label>
+                <div class="ffb__control">
+                  <input
+                    id={`${uid}-${side.key}-${k}`}
+                    type="range"
+                    min="1"
+                    max="5"
+                    step="1"
+                    value={String(f.strength)}
+                    data-side={side.key}
+                    data-index={k}
+                    aria-valuetext={`Strength ${f.strength} of 5`}
+                  />
+                  <output class="ffb__value num" data-out={`${side.key}-${k}`}>{f.strength}</output>
+                </div>
+                <div class="ffb__bar" aria-hidden="true">
+                  <span class="ffb__arrow" style={`--w:${f.strength * 20}%`} data-bar={`${side.key}-${k}`} />
+                </div>
+              </li>
+            ))}
+          </ol>
+          <p class="ffb__total">
+            Total <span class="num" data-total={side.key}>{side.key === 'driving' ? s.driving : s.restraining}</span>
+          </p>
+        </fieldset>
+      ))
+    }
+  </form>
+
+  <p class="ffb__balance" data-balance>{s.sentence}</p>
+
+  <fieldset class="ffb__weaken">
+    <legend class="label label--ink">Which restraining force could be weakened?</legend>
+    <div class="choice__opts choice--lines">
+      {
+        data.restraining.map((f, k) => (
+          <label class="opt" data-value={String(k)}>
+            <input type="radio" name={`${uid}-weaken`} value={String(k)} />
+            <span class="opt__body">
+              <span class="opt__text">{f.label}</span>
+            </span>
+          </label>
+        ))
+      }
+    </div>
+    <div class="feedback js-only" data-weaken-feedback hidden></div>
+    <div class="field">
+      <label for={`${uid}-how`}>How could it be weakened, and at what cost?</label>
+      <textarea class="textarea" id={`${uid}-how`} rows="3" data-note></textarea>
+      <span class="field__hint js-only">Saved on this device only.</span>
+    </div>
+  </fieldset>
+
+  <aside class="callout callout--caution">
+    <span class="callout__kicker">Read the totals with care</span>
+    <div class="prose" set:html={rich(data.caution)} />
+  </aside>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/force-field';
+</script>

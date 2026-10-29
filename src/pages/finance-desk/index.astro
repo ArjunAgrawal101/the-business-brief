@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import LevelTag from '../../components/ui/LevelTag.astro';
+import { corpus, href } from '../../lib/content';
+
+const c = await corpus();
+const calcs = Object.entries(c.calculations).sort((a, b) => a[1].order - b[1].order);
+const DESKS = [
+  { href: '/finance-desk/costs-and-revenue/', title: 'Costs and revenue', body: 'Classify costs by behaviour and by traceability, then calculate revenue, total cost and profit.', ix: 'Cost classifier' },
+  { href: '/finance-desk/break-even/', title: 'Break-even', body: 'Contribution, break-even quantity and revenue, margin of safety, and the output or price for a target profit, with a live chart.', ix: 'Break-even workspace and error diagnosis' },
+  { href: '/finance-desk/contribution/', title: 'Contribution decisions', body: 'Judge a special order on contribution, and see when the rule of thumb fails because capacity runs out.', ix: 'Special order panel', hl: true },
+];
+---
+
+<BaseLayout title="Finance Desk" description="Business calculations worked in eight parts: given, formula, substitution, working, answer, unit, interpretation and business implication." section="finance-desk">
+  <PageIntro
+    trail={[{ label: 'Finance Desk' }]}
+    kicker="Finance Desk"
+    title="The numbers, and what they mean"
+    lead="Every calculation on the platform is done by one set of tested functions and shown in eight parts: given, formula, substitution, working, answer, unit, interpretation and business implication. The last two are where marks for judgement are earned."
+  />
+  <div class="wrap page-body">
+    <div class="feature-briefs">
+      {
+        DESKS.map((d) => (
+          <article class="feature">
+            <span class="feature__code">Desk {d.hl && <span class="tag tag--hl">HL</span>}</span>
+            <h2 style="margin:0;font-size:var(--fs-h3)">
+              <a href={d.href} style="color:var(--text-strong);text-decoration:none">{d.title}</a>
+            </h2>
+            <p>{d.body}</p>
+            <p class="feature__meta">Interaction: {d.ix}</p>
+          </article>
+        ))
+      }
+    </div>
+
+    <section aria-labelledby="register-h">
+      <SectionHead no={1} title="The calculation register" dek="Every calculation, its formula, and where it is worked." id="register-h" />
+      <div class="table-scroll" role="region" aria-label="Calculation register" tabindex="0" style="margin-top:var(--sp-4)">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Calculation</th>
+              <th scope="col">Formula</th>
+              <th scope="col">Level</th>
+              <th scope="col">IB</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              calcs.map(([id, k]) => (
+                <tr>
+                  <th scope="row">
+                    <a href={href.calculation(id, k.page)}>{k.name}</a>
+                  </th>
+                  <td class="small" style="font-family:var(--font-mono)">
+                    {k.formula}
+                  </td>
+                  <td>
+                    <LevelTag level={k.level} always />
+                  </td>
+                  <td class="num">{k.syllabus.map((s) => s.code).join(', ')}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted" style="margin-top:var(--sp-3)">
+        The formulas are standard business arithmetic. Where a calculation sits in the IB syllabus is marked with its verification status on each card.
+      </p>
+    </section>
+
+    <aside class="callout callout--framework">
+      <span class="callout__kicker">Arjun Agrawal framework</span>
+      <div class="prose">
+        <p>
+          <strong>Given, formula, substitution, working, answer, unit, interpretation, business implication.</strong> Writing all
+          eight is slower than writing the answer alone, and it is how a calculation question is answered well: the method
+          earns marks when the arithmetic slips, the unit shows what the number is, and the last two lines turn the number into
+          a reason for a decision.
+        </p>
+      </div>
+    </aside>
+  </div>
+</BaseLayout>

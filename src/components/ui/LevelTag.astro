@@ -1,0 +1,12 @@
+---
+import { LEVEL_LABELS } from '../../lib/labels';
+interface Props {
+  level: keyof typeof LEVEL_LABELS;
+  /** Show the tag for SL and HL content too (by default only HL-only content is tagged). */
+  always?: boolean;
+}
+const { level, always = false } = Astro.props;
+const show = always || level !== 'SL/HL';
+---
+
+{show && <span class={`tag ${level === 'HL' ? 'tag--hl' : 'tag--sl'}`}>{LEVEL_LABELS[level]}</span>}

@@ -1,0 +1,126 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import QuestionCard from '../../components/assess/QuestionCard.astro';
+import LevelSwitch from '../../components/ui/LevelSwitch.astro';
+import { questionsInOrder, topicsInOrder } from '../../lib/content';
+
+
+const questions = await questionsInOrder();
+const topics = await topicsInOrder();
+const PAPERS = { 'paper-1': 'Paper 1 style', 'paper-2': 'Paper 2 style', 'paper-3': 'Paper 3 style', 'ia-skill': 'IA skill', general: 'Practice' } as const;
+const papers = [...new Set(questions.map(([, q]) => q.paperStyle))];
+const terms = [...new Set(questions.map(([, q]) => q.commandTerm))].sort();
+
+---
+
+<BaseLayout title="Practice questions: Exam Desk" description="Original practice questions in the style of each IB Business Management paper, with mark schemes, self-checks and common errors." section="exam-desk">
+  <PageIntro
+    trail={[{ label: 'Exam Desk', href: '/exam-desk/' }, { label: 'Practice' }]}
+    kicker="Exam Desk"
+    title="Practice questions"
+    lead="Every question here is original, written for the platform's cases in the style of each paper. Write your answer first, then open the mark scheme and check your answer against it. Your answers stay on this device."
+  >
+    <LevelSwitch id="lvl-practice" />
+  </PageIntro>
+  <div class="wrap page-body">
+    <form class="filters js-only-block" data-filters aria-label="Filter the questions" hidden>
+      <div class="field">
+        <label for="f-paper">Paper style</label>
+        <select class="select" id="f-paper" name="paper">
+          <option value="">All</option>
+          {papers.map((p) => <option value={p}>{PAPERS[p]}</option>)}
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-term">Command term</label>
+        <select class="select" id="f-term" name="term">
+          <option value="">All</option>
+          {terms.map((t) => <option value={t}>{t}</option>)}
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-calc">Type</label>
+        <select class="select" id="f-calc" name="kind">
+          <option value="">All</option>
+          <option value="calc">Calculation</option>
+          <option value="eval">Evaluation</option>
+        </select>
+      </div>
+      <p class="filters__count" data-count aria-live="polite">{questions.length} questions</p>
+    </form>
+    {
+      topics.map(([tid, t], k) => {
+        const qs = questions.filter(([, q]) => q.topic === tid);
+        if (!qs.length) return null;
+        return (
+          <section aria-labelledby={`pt-${tid}`} data-filter-group>
+            <SectionHead no={k + 1} title={`${t.code} ${t.title}`} id={`pt-${tid}`} />
+            <div class="stack" style="margin-top:var(--sp-5)">
+              {qs.map(([id, q]) => (
+                <div data-filter-item data-paper={q.paperStyle} data-term={q.commandTerm} data-calc={String(q.requiresCalculation)} data-eval={String(q.requiresEvaluation)}>
+                  <QuestionCard id={id} question={q} />
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      })
+    }
+    <p class="state" data-empty hidden>No questions match these filters.</p>
+  </div>
+</BaseLayout>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-filters]');
+  if (form) {
+    form.hidden = false;
+    const count = form.querySelector<HTMLElement>('[data-count]');
+    const empty = document.querySelector<HTMLElement>('[data-empty]');
+    const apply = () => {
+      const paper = (form.elements.namedItem('paper') as HTMLSelectElement).value;
+      const term = (form.elements.namedItem('term') as HTMLSelectElement).value;
+      const kind = (form.elements.namedItem('kind') as HTMLSelectElement).value;
+      let shown = 0;
+      document.querySelectorAll<HTMLElement>('[data-filter-item]').forEach((el) => {
+        const ok =
+          (!paper || el.dataset.paper === paper) &&
+          (!term || el.dataset.term === term) &&
+          (!kind || (kind === 'calc' ? el.dataset.calc === 'true' : el.dataset.eval === 'true'));
+        el.hidden = !ok;
+        if (ok) shown++;
+      });
+      document.querySelectorAll<HTMLElement>('[data-filter-group]').forEach((g) => {
+        g.hidden = !g.querySelector('[data-filter-item]:not([hidden])');
+      });
+      if (count) count.textContent = `${shown} ${shown === 1 ? 'question' : 'questions'}`;
+      if (empty) empty.hidden = shown > 0;
+    };
+    form.addEventListener('change', apply);
+    form.addEventListener('submit', (e) => e.preventDefault());
+  }
+</script>
+
+<style>
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--sp-3) var(--sp-5);
+    padding: var(--sp-4);
+    background: var(--surface-sunk);
+    border-left: 3px solid var(--bb-ink);
+  }
+
+  .filters .field {
+    min-width: 12rem;
+  }
+
+  .filters__count {
+    margin: 0 0 0.6rem auto;
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    font-weight: 600;
+  }
+</style>

@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import FactList from '../../components/assess/FactList.astro';
+import QuestionCard from '../../components/assess/QuestionCard.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import { corpus } from '../../lib/content';
+import { inline } from '../../lib/markup';
+import type { Assessment } from '../../lib/schemas';
+
+export async function getStaticPaths() {
+  const c = await corpus();
+  return Object.entries(c.assessment)
+    .filter(([id]) => id !== 'internal-assessment')
+    .map(([id, a]) => ({ params: { paper: id }, props: { id, a } }));
+}
+interface Props {
+  id: string;
+  a: Assessment;
+}
+const { a } = Astro.props;
+const c = await corpus();
+const questions = a.questions.map((q) => ({ id: q, data: c.questions[q] })).filter((q) => q.data);
+---
+
+<BaseLayout title={`${a.name}: Exam Desk`} description={a.summary} section="exam-desk">
+  <PageIntro trail={[{ label: 'Exam Desk', href: '/exam-desk/' }, { label: a.name }]} kicker={`Exam Desk · ${a.levels}`} title={a.name} lead={a.summary} />
+  <div class="wrap page-body">
+    <section aria-labelledby="known-h">
+      <SectionHead no={1} title="What is known" dek="Each statement shows how far it has been checked, and where it comes from." id="known-h" />
+      <div style="margin-top:var(--sp-4)"><FactList facts={a.facts} /></div>
+      <div class="callout callout--caution" style="margin-top:var(--sp-5)">
+        <span class="callout__kicker">Not stated here</span>
+        <ul class="prose">{a.notStated.map((x) => <li>{x}</li>)}</ul>
+      </div>
+    </section>
+    <section aria-labelledby="prep-h">
+      <SectionHead no={2} title="How to prepare" id="prep-h" />
+      <div class="tags" style="margin-top:var(--sp-3)"><ProvenanceTag kind="aa-framework" /></div>
+      <p class="small muted">The platform's teaching, based on the published structure. These are not examiner observations.</p>
+      <div class="grid grid--3" style="margin-top:var(--sp-4)">
+        <div>
+          <h3 class="label label--ink">What tends to earn credit</h3>
+          <ul class="prose">{a.rewards.map((x) => <li set:html={inline(x)} />)}</ul>
+        </div>
+        <div>
+          <h3 class="label label--ink">Preparation</h3>
+          <ol class="prose">{a.preparation.map((x) => <li set:html={inline(x)} />)}</ol>
+        </div>
+        <div>
+          <h3 class="label label--ink">Errors to avoid</h3>
+          <ul class="prose traps">{a.errors.map((x) => <li set:html={inline(x)} />)}</ul>
+        </div>
+      </div>
+    </section>
+    {
+      questions.length > 0 && (
+        <section aria-labelledby="q-h">
+          <SectionHead no={3} title="Practice in this style" dek="Original practice questions. They are not IB questions." id="q-h" />
+          <div class="stack" style="margin-top:var(--sp-5)">
+            {questions.map((q) => q.data && <QuestionCard id={q.id} question={q.data} />)}
+          </div>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>

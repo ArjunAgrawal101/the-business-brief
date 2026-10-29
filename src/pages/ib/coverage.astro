@@ -1,0 +1,132 @@
+---
+/**
+ * The coverage matrix: for every subtopic, what the platform has. Computed
+ * from the content's relationships, so it cannot claim coverage that does not
+ * exist.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import LevelTag from '../../components/ui/LevelTag.astro';
+import VerifyTag from '../../components/ui/VerifyTag.astro';
+import { corpus, href } from '../../lib/content';
+
+const c = await corpus();
+const cur = c.curricula['ib-dp-bm'];
+const rows = (cur?.units ?? []).flatMap((u) =>
+  u.subtopics.map((s) => {
+    const topic = s.topic ? c.topics[s.topic] : undefined;
+    const cases = s.topic ? Object.entries(c.cases).filter(([, cs]) => cs.topics.includes(s.topic ?? '')) : [];
+    const decisions = s.topic ? Object.entries(c.decisions).filter(([, d]) => d.topics.includes(s.topic ?? '')) : [];
+    const calcs = Object.entries(c.calculations).filter(([, k]) => k.syllabus.some((x) => x.code === s.code));
+    const questions = Object.entries(c.questions).filter(([, q]) => q.syllabus.includes(s.code));
+    const tools = s.tools.map((t) => ({ id: t, data: c.tools[t] }));
+    return { u, s, topic, cases, decisions, calcs, questions, tools };
+  }),
+);
+const covered = rows.filter((r) => r.topic).length;
+---
+
+<BaseLayout title="Syllabus coverage" description="What the platform has for each subtopic of IB DP Business Management, including the gaps." section="pathways">
+  <PageIntro
+    trail={[{ label: 'IB course', href: '/ib/' }, { label: 'Coverage' }]}
+    kicker="IB Diploma Programme"
+    title="Syllabus coverage"
+    lead={`${covered} of ${rows.length} subtopics have a complete brief in this release. This table is generated from the content itself, so a subtopic shows coverage only when the material exists.`}
+  />
+  <div class="wrap page-body">
+    <div class="table-scroll" role="region" aria-label="Coverage by subtopic" tabindex="0">
+      <table class="table coverage">
+        <thead>
+          <tr>
+            <th scope="col">Subtopic</th>
+            <th scope="col">Level and status</th>
+            <th scope="col">Brief</th>
+            <th scope="col">Cases and decisions</th>
+            <th scope="col">Calculations</th>
+            <th scope="col" class="n">Practice</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows.map((r) => (
+              <tr>
+                <th scope="row">
+                  <span class="num">{r.s.code}</span> {r.s.title}
+                </th>
+                <td>
+                  <span class="tags">
+                    <LevelTag level={r.s.level} always />
+                    <VerifyTag status={r.s.verification} />
+                  </span>
+                </td>
+                <td>{r.topic && r.s.topic ? <a href={href.topic(r.s.topic)}>Complete</a> : <span class="muted">Planned</span>}</td>
+                <td>
+                  {r.cases.length || r.decisions.length ? (
+                    <ul class="plain-list">
+                      {r.cases.map(([id, cs]) => (
+                        <li>
+                          <a href={href.case(id)}>{cs.title}</a>
+                        </li>
+                      ))}
+                      {r.decisions.map(([id]) => (
+                        <li>
+                          <a href={href.decision(id)}>Decision Room</a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <span class="muted">None yet</span>
+                  )}
+                </td>
+                <td>
+                  {r.calcs.length ? (
+                    <ul class="plain-list">
+                      {r.calcs.map(([id, k]) => (
+                        <li>
+                          <a href={href.calculation(id, k.page)}>{k.name}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <span class="muted">None</span>
+                  )}
+                </td>
+                <td class="n">{r.questions.length || <span class="muted">0</span>}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <aside class="callout callout--note">
+      <span class="callout__kicker">Why so few briefs</span>
+      <div class="prose">
+        <p>
+          The first release builds three subtopics completely (a strategic one, a quantitative one and a people one) rather than all of
+          them thinly. Each brief has a case, interactions, a Decision Room or workspace, practice questions and a revision page.
+          The same structure will be used for the rest.
+        </p>
+      </div>
+    </aside>
+  </div>
+</BaseLayout>
+
+<style>
+  .plain-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.875rem;
+  }
+
+  .plain-list li + li {
+    margin-top: 0.25rem;
+  }
+
+  /* WCAG 2.2 target size: at least 24 by 24 pixels for each link. */
+  .plain-list a {
+    display: inline-block;
+    min-height: 24px;
+    line-height: 24px;
+  }
+</style>

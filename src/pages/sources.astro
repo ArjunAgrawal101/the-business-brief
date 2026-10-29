@@ -1,0 +1,130 @@
+---
+/** The source register and the claims register: where every claim about the IB course and every real-world fact comes from. */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageIntro from '../components/layout/PageIntro.astro';
+import SectionHead from '../components/layout/SectionHead.astro';
+import VerifyTag from '../components/ui/VerifyTag.astro';
+import { corpus, href } from '../lib/content';
+import { PROVENANCE_LABELS, VERIFICATION_LABELS } from '../lib/labels';
+import { rich } from '../lib/markup';
+
+const c = await corpus();
+const sources = Object.entries(c.sources).sort((a, b) => a[1].title.localeCompare(b[1].title, 'en'));
+const claims = Object.entries(c.claims);
+const KINDS = {
+  'ib-official': 'IB official document',
+  'ib-record': 'IB document, as recorded',
+  'ib-other-subject': 'IB document for another subject',
+  creator: 'The creator',
+  academic: 'Academic source',
+  organization: 'Organization',
+  press: 'Press',
+  'secondary-education': 'Secondary education provider',
+  method: 'Method note',
+} as const;
+const AVAIL = {
+  supplied: 'Supplied',
+  'not-available': 'Not available to this release',
+  referenced: 'Referenced, not reproduced',
+  'web-search': 'Found by web search',
+  repository: 'In the creator\'s repository',
+} as const;
+---
+
+<BaseLayout title="Sources and claims" description="The source register and the claims register: where every statement about the IB course and every real-world fact on the platform comes from, and how far it has been checked." section="platform">
+  <PageIntro
+    trail={[{ label: 'Sources' }]}
+    kicker="Source governance"
+    title="Sources and claims"
+    lead="Every statement about the IB course, and every fact about a real organization, is recorded here with its source, where in the source it is, when it was checked and how sure it is. When the Guide is supplied, each claim will be checked against it and updated."
+  />
+  <div class="wrap page-body">
+    <section aria-labelledby="labels-h">
+      <SectionHead no={1} title="How to read the labels" id="labels-h" />
+      <div class="grid grid--2" style="margin-top:var(--sp-4)">
+        <div>
+          <h3 class="label label--ink">What kind of content it is</h3>
+          <dl class="glossary-list">
+            {Object.values(PROVENANCE_LABELS).map((l) => (
+              <div>
+                <dt><span class={`tag ${l.css}`}>{l.label}</span></dt>
+                <dd class="small">{l.description}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+        <div>
+          <h3 class="label label--ink">How far it has been checked</h3>
+          <dl class="glossary-list">
+            {Object.entries(VERIFICATION_LABELS).map(([k, l]) => (
+              <div>
+                <dt><VerifyTag status={k as keyof typeof VERIFICATION_LABELS} /></dt>
+                <dd class="small">{l.description}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="claims-h">
+      <SectionHead no={2} title="The claims register" dek={`${claims.length} claims about the course, the assessment and real organizations.`} id="claims-h" />
+      <div class="table-scroll" role="region" aria-label="Claims register" tabindex="0" style="margin-top:var(--sp-4)">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Claim</th>
+              <th scope="col">Status</th>
+              <th scope="col">Source and location</th>
+              <th scope="col">Checked</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              claims.map(([id, k]) => (
+                <tr id={`claim-${id}`}>
+                  <td>
+                    {k.statement}
+                    {k.note && <span class="small muted" style="display:block;margin-top:0.25rem">{k.note}</span>}
+                  </td>
+                  <td>
+                    <VerifyTag status={k.status} />
+                  </td>
+                  <td class="small">
+                    {k.sources.map((s, i) => (
+                      <>
+                        {i > 0 && '; '}
+                        <a href={href.source(s)}>{c.sources[s]?.title ?? s}</a>
+                      </>
+                    ))}
+                    {k.location && `, ${k.location}`}
+                  </td>
+                  <td class="num small">{k.checked}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="sources-h">
+      <SectionHead no={3} title="The source register" dek={`${sources.length} sources.`} id="sources-h" />
+      <ol class="source-list" style="margin-top:var(--sp-4)">
+        {
+          sources.map(([id, s]) => (
+            <li id={`src-${id}`}>
+              <h3>{s.url ? <a href={s.url} rel="noopener">{s.title}</a> : s.title}</h3>
+              <p class="small muted">
+                {[s.author, s.publisher, s.year].filter(Boolean).join(', ')}
+                {(s.author || s.publisher || s.year) && '. '}
+                {KINDS[s.kind]}. {AVAIL[s.availability]}.{s.accessed && ` Accessed ${s.accessed}.`}
+              </p>
+              <div class="prose small" set:html={rich(s.note)} />
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+  </div>
+</BaseLayout>

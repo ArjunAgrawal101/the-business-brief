@@ -1,0 +1,34 @@
+component: decision-tree-lab
+title: "Expected value: organic growth, franchising or staying focused?"
+purpose: >
+  The learner predicts which route has the highest expected value, then computes it, and can change the
+  probabilities and values to see when the ranking changes. It diagnoses probabilities that do not add up to one,
+  forgetting the cost of an option, and treating the highest expected value as the decision.
+provenance: simulated-data
+currency: '₹'
+unit: m
+question: Which route has the highest expected value, and should Meera choose it?
+options:
+  - id: organic
+    label: Organic growth
+    cost: 72
+    outcomes:
+      - { label: Strong demand, probability: 0.6, payoff: 150 }
+      - { label: Weak demand, probability: 0.4, payoff: 60 }
+  - id: franchise
+    label: Franchising
+    cost: 10
+    outcomes:
+      - { label: Strong demand, probability: 0.6, payoff: 95 }
+      - { label: Weak demand, probability: 0.4, payoff: 30 }
+  - id: stay
+    label: Stay focused
+    cost: 3
+    outcomes:
+      - { label: Strong demand, probability: 0.6, payoff: 40 }
+      - { label: Weak demand, probability: 0.4, payoff: 25 }
+caution: >
+  An expected value is the average result over many repetitions of the same decision, and Meera makes this one once.
+  It ignores what the numbers leave out: control of the kitchens, the risk to the brand, the founder's aims. On these
+  estimates franchising has the highest expected value; the case evidence on franchisees and quality is the reason the
+  answer is still open.

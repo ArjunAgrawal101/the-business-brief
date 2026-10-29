@@ -1,0 +1,179 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageIntro from '../components/layout/PageIntro.astro';
+import SectionHead from '../components/layout/SectionHead.astro';
+import VerifyTag from '../components/ui/VerifyTag.astro';
+import ProvenanceTag from '../components/ui/ProvenanceTag.astro';
+import { corpus, href, slug } from '../lib/content';
+import { inline, rich } from '../lib/markup';
+
+const c = await corpus();
+const terms = Object.entries(c.commandTerms).sort((a, b) => a[1].order - b[1].order);
+const AOS = [
+  { id: 'AO1', name: 'Knowledge and understanding' },
+  { id: 'AO2', name: 'Application and analysis' },
+  { id: 'AO3', name: 'Synthesis and evaluation' },
+  { id: 'AO4', name: 'Selecting and using skills' },
+];
+const aoClaim = c.claims['command-term-aos'];
+const calcErrors = Object.values(c.calculations).flatMap((k) => k.errors.map((e) => ({ e, from: k.name })));
+const toolErrors = Object.entries(c.tools).flatMap(([, t]) => (t.status === 'complete' ? t.commonErrors.map((e) => ({ e, from: t.name })) : []));
+const answerErrors = Object.values(c.questions)
+  .filter((q) => q.requiresEvaluation || !q.requiresCalculation)
+  .flatMap((q) => q.errors.map((e) => ({ e, from: `${q.commandTerm}: ${q.title}` })));
+---
+
+<BaseLayout title="Examiner Lens" description="Command terms for IB Business Management: what each asks an answer to do, where its definition comes from, and how to answer to it." section="exam-desk">
+  <PageIntro
+    trail={[{ label: 'Exam Desk', href: '/exam-desk/' }, { label: 'Examiner Lens' }]}
+    kicker="Examiner Lens"
+    title="What the question is asking for"
+    lead="The command term decides what an answer must do. Each term below has its definition, where that definition comes from, how to answer to it, an example in the style of the course, and the pitfall that costs the most marks."
+  />
+  <div class="wrap page-body">
+    <aside class="callout callout--caution">
+      <span class="callout__kicker">Sources and limits</span>
+      <div class="prose">
+        <p>
+          Where a term also appears in the IB Economics guide, its definition is quoted from that guide and marked <strong>Recorded</strong>.
+          Where it does not, the definition is the platform's own explanation, marked <strong>Teaching choice</strong>, and the official
+          wording should be checked in the Business management guide. The grouping of terms under assessment objectives is the
+          platform's reading. {aoClaim && <VerifyTag status={aoClaim.status} />}
+        </p>
+        <p>
+          <strong>Examiner observations.</strong> No subject reports were available when this release was written, so nothing on this
+          page reports what examiners have said. Observations will be added, each cited to its report, when reports are supplied.
+        </p>
+      </div>
+    </aside>
+    <nav aria-label="Command terms" class="az">
+      {terms.map(([, t]) => <a href={`#ct-${slug(t.term)}`} style="padding:0 0.5rem">{t.term}</a>)}
+    </nav>
+    {
+      AOS.map((ao, k) => {
+        const list = terms.filter(([, t]) => t.ao === ao.id);
+        if (!list.length) return null;
+        return (
+          <section aria-labelledby={`ao-${ao.id}`}>
+            <SectionHead no={k + 1} title={`${ao.id}: ${ao.name}`} id={`ao-${ao.id}`} />
+            <div class="ct-list">
+              {list.map(([, t]) => (
+                <article class="ct" id={`ct-${slug(t.term)}`} aria-labelledby={`ct-${slug(t.term)}-h`}>
+                  <div class="ct__head">
+                    <h3 id={`ct-${slug(t.term)}-h`}>{t.term}</h3>
+                    <div class="tags">
+                      <VerifyTag status={t.definitionStatus} />
+                      {t.definitionSource === 'platform' && <ProvenanceTag kind="aa-framework" />}
+                    </div>
+                  </div>
+                  <p class="ct__def">{t.definition}</p>
+                  {t.definitionSource !== 'platform' && (
+                    <p class="small muted ct__src">
+                      Definition from <a href={href.source(t.definitionSource)}>{c.sources[t.definitionSource]?.title ?? t.definitionSource}</a>
+                    </p>
+                  )}
+                  <div class="ct__grid">
+                    <div>
+                      <span class="label">How to answer</span>
+                      <div class="prose small" set:html={rich(t.guidance)} />
+                    </div>
+                    <div>
+                      <span class="label">In the style of the course</span>
+                      <p class="narrative small">{t.stem}</p>
+                      <span class="label">The pitfall</span>
+                      <div class="prose small" set:html={rich(t.pitfall)} />
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        );
+      })
+    }
+    <section aria-labelledby="errors-h">
+      <SectionHead no={AOS.length + 1} title="The errors that cost marks" dek="Gathered from every calculation, tool and practice question on the platform. These are the platform's teaching, not examiner observations." id="errors-h" />
+      <div class="grid grid--3" style="margin-top:var(--sp-4)">
+        {
+          [
+            { title: 'In calculations', list: calcErrors },
+            { title: 'In using the tools', list: toolErrors },
+            { title: 'In written answers', list: answerErrors },
+          ].map((g) => (
+            <div>
+              <h3 class="label label--ink">{g.title}</h3>
+              <ul class="prose small errors-list">
+                {g.list.map((x) => (
+                  <li>
+                    <span set:html={inline(x.e)} /> <span class="muted">({x.from})</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .ct-list {
+    margin-top: var(--sp-4);
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .ct {
+    display: grid;
+    gap: var(--sp-3);
+    padding: var(--sp-5) 0;
+    border-bottom: 1px solid var(--rule-hair);
+    scroll-margin-top: calc(var(--header-h) + var(--sp-3));
+  }
+
+  .ct:target {
+    background: var(--surface-cobalt-wash);
+    box-shadow: -0.75rem 0 0 var(--surface-cobalt-wash), 0.75rem 0 0 var(--surface-cobalt-wash);
+  }
+
+  .ct__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-2) var(--sp-4);
+  }
+
+  .ct__head h3 {
+    margin: 0;
+    font-size: var(--fs-h3);
+  }
+
+  .ct__src {
+    margin: 0;
+  }
+
+  .ct__def {
+    margin: 0;
+    max-width: var(--text-max);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .ct__grid {
+    display: grid;
+    gap: var(--sp-4) var(--sp-6);
+  }
+
+  @media (min-width: 56rem) {
+    .ct__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .ct__grid .label {
+    display: block;
+    margin: var(--sp-2) 0 var(--sp-1);
+  }
+</style>

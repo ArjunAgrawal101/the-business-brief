@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import { corpus, decisionsInOrder, href } from '../../lib/content';
+
+const c = await corpus();
+const decisions = await decisionsInOrder();
+---
+
+<BaseLayout title="Decision Room" description="Make a business decision, commit to it, and follow its consequences through the business and its stakeholders." section="decision-room">
+  <PageIntro
+    trail={[{ label: 'Decision Room' }]}
+    kicker="Decision Room"
+    title="Decide, then live with it"
+    lead="Read the situation, commit to a choice, and see what it does to the business, its numbers and its people. Then decide how to make it work. The debrief opens only after you have committed, so you cannot read the answer first."
+  />
+  <div class="wrap page-body">
+    <ol class="index-list">
+      {
+        decisions.map(([id, d]) => {
+          const cs = c.cases[d.case];
+          return (
+            <li class="index-item">
+              <span class="index-item__code">{d.rounds.length} rounds</span>
+              <div class="index-item__body">
+                <p class="label">Case: {cs?.title}</p>
+                <h2 class="index-item__title">
+                  <a href={href.decision(id)}>{d.title}</a>
+                </h2>
+                <p>{d.dek}</p>
+                <p class="narrative small">{d.role}</p>
+              </div>
+              <div class="index-item__side">
+                <span class="muted">{d.rounds[0]?.choices.length} first choices, {d.metrics.length} measures on the board pack</span>
+                {d.topics.map((t) => c.topics[t] && <a href={href.topic(t)}>Brief {c.topics[t]?.code} {c.topics[t]?.title}</a>)}
+              </div>
+            </li>
+          );
+        })
+      }
+    </ol>
+    <aside class="callout callout--framework">
+      <span class="callout__kicker">Arjun Agrawal framework</span>
+      <div class="prose">
+        <p>
+          <strong>Situation, decision, consequence.</strong> Every room follows the same path: understand the situation, commit
+          to a decision with a reason, see its consequences, decide how to implement it, and debrief against the trade-offs.
+          The outcomes are one simulation of how each choice might go, calculated from the case's figures, not a prediction.
+        </p>
+      </div>
+    </aside>
+  </div>
+</BaseLayout>

@@ -1,0 +1,38 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import Interactive from '../../components/interactive/Interactive.astro';
+import CalcCard from '../../components/finance/CalcCard.astro';
+import { corpus } from '../../lib/content';
+
+const PATH = '/finance-desk/costs-and-revenue/';
+const c = await corpus();
+const calcs = Object.entries(c.calculations)
+  .filter(([, k]) => k.page === PATH)
+  .sort((a, b) => a[1].order - b[1].order);
+---
+
+<BaseLayout title="Costs and revenue: Finance Desk" description="Classify costs by how they behave and whether they can be traced to a unit, then calculate revenue, total cost and profit." section="finance-desk">
+  <PageIntro
+    trail={[{ label: 'Finance Desk', href: '/finance-desk/' }, { label: 'Costs and revenue' }]}
+    kicker="Finance Desk"
+    title="Costs and revenue"
+    lead="Before any calculation, sort the costs. How a cost behaves when output changes decides where it goes in every formula that follows. The figures come from the Atelier Barro case, a fictional studio with simulated data."
+  />
+  <div class="wrap page-body">
+    <section aria-labelledby="classify-h">
+      <SectionHead no={1} title="Sort the costs" id="classify-h" />
+      <div style="margin-top:var(--sp-5)">
+        <Interactive component="cost-classifier" refId="costs-classifier-atelier" title="Classify Atelier Barro's costs" provenance="subject-knowledge" headingLevel={3} />
+      </div>
+    </section>
+    <section aria-labelledby="calcs-h">
+      <SectionHead no={2} title="The calculations" dek="Each with a worked example from the case." id="calcs-h" />
+      <div class="stack stack-lg" style="margin-top:var(--sp-5)">
+        {calcs.map(([id, k]) => <CalcCard id={id} calc={k} headingLevel={3} />)}
+      </div>
+    </section>
+    <p><a class="btn" href="/finance-desk/break-even/">Next: break-even</a></p>
+  </div>
+</BaseLayout>

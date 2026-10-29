@@ -1,0 +1,12 @@
+---
+import { VERIFICATION_LABELS } from '../../lib/labels';
+import type { Verification } from '../../lib/schemas';
+interface Props {
+  status: Verification;
+}
+const { status } = Astro.props;
+const l = VERIFICATION_LABELS[status];
+const solid = status === 'primary' || status === 'recorded' || status === 'pedagogical';
+---
+
+<span class={`tag ${solid ? 'tag--ib' : 'tag--verify'}`} title={l.description}><span class="sr-only">Verification: </span>{l.label}</span>

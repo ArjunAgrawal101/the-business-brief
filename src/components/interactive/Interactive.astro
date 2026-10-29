@@ -1,0 +1,62 @@
+---
+/**
+ * The frame every interaction shares: a kicker, a title, its labels, an intro,
+ * a status line for screen readers and an error message shown only if the
+ * script fails. The body comes from the specific component.
+ */
+import ProvenanceTag from '../ui/ProvenanceTag.astro';
+import LevelTag from '../ui/LevelTag.astro';
+import CostClassifier from './CostClassifier.astro';
+import BreakEvenWorkspace from './BreakEvenWorkspace.astro';
+import ErrorDiagnosis from './ErrorDiagnosis.astro';
+import AnsoffPlacer from './AnsoffPlacer.astro';
+import DecisionTreeLab from './DecisionTreeLab.astro';
+import ForceField from './ForceField.astro';
+import StyleMatcher from './StyleMatcher.astro';
+import FunctionsSorter from './FunctionsSorter.astro';
+import ScaleExplorer from './ScaleExplorer.astro';
+import SpecialOrder from './SpecialOrder.astro';
+import { corpus } from '../../lib/content';
+import { rich } from '../../lib/markup';
+import type { Interactive as InteractiveData, Level, Provenance } from '../../lib/schemas';
+
+interface Props {
+  component: string;
+  refId: string;
+  title: string;
+  intro?: string;
+  level?: Level;
+  provenance: Provenance;
+  headingLevel?: 2 | 3;
+}
+const { component, refId, title, intro, level = 'SL/HL', provenance, headingLevel = 3 } = Astro.props;
+const c = await corpus();
+const data = c.interactives[refId] as unknown as InteractiveData;
+if (!data || data.component !== component) throw new Error(`Interaction ${refId} is not a ${component}`);
+const uid = `ix-${refId}`;
+const H = headingLevel === 2 ? 'h2' : 'h3';
+---
+
+<section class="ix" aria-labelledby={`${uid}-title`} data-level={level === 'HL' ? 'HL' : undefined}>
+  <header class="ix__head">
+    <p class="ix__kicker">Interaction</p>
+    <H class="ix__title" id={`${uid}-title`}>{title}</H>
+    <div class="tags">
+      <ProvenanceTag kind={provenance} />
+      {level === 'HL' && <LevelTag level="HL" />}
+    </div>
+    {intro && <div class="ix__intro prose" set:html={rich(intro)} />}
+  </header>
+  <div class="ix__body">
+    {data.component === 'cost-classifier' && <CostClassifier data={data} uid={uid} />}
+    {data.component === 'break-even-workspace' && <BreakEvenWorkspace data={data} uid={uid} />}
+    {data.component === 'error-diagnosis' && <ErrorDiagnosis data={data} uid={uid} />}
+    {data.component === 'ansoff-placer' && <AnsoffPlacer data={data} uid={uid} />}
+    {data.component === 'decision-tree-lab' && <DecisionTreeLab data={data} uid={uid} />}
+    {data.component === 'force-field-builder' && <ForceField data={data} uid={uid} />}
+    {data.component === 'style-matcher' && <StyleMatcher data={data} uid={uid} />}
+    {data.component === 'functions-sorter' && <FunctionsSorter data={data} uid={uid} />}
+    {data.component === 'scale-explorer' && <ScaleExplorer data={data} uid={uid} />}
+    {data.component === 'special-order' && <SpecialOrder data={data} uid={uid} />}
+  </div>
+</section>

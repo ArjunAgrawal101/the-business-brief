@@ -1,0 +1,93 @@
+---
+import { jsonForScript } from '../lib/markup';
+import '../styles/fonts.css';
+import '../styles/tokens.css';
+import '../styles/base.css';
+import '../styles/components.css';
+import '../styles/interactive.css';
+import '../styles/decision.css';
+import '../styles/assess.css';
+import '../styles/pages.css';
+import '../styles/print.css';
+import SiteHeader from '../components/layout/SiteHeader.astro';
+import SiteFooter from '../components/layout/SiteFooter.astro';
+import { corpus } from '../lib/content';
+
+interface Props {
+  /** Page title without the site name. Use "home" for the home page. */
+  title: string;
+  description: string;
+  /** Which primary navigation item is current. */
+  section?: string;
+  /** Structured data for search engines. */
+  jsonLd?: Record<string, unknown>;
+  noindex?: boolean;
+}
+
+const { title, description, section, jsonLd, noindex = false } = Astro.props;
+
+// The integrity gate: building any page loads and checks every relationship.
+await corpus();
+
+const SITE_NAME = 'The Business Brief';
+const fullTitle = title === 'home' ? 'Arjun Agrawal | The Business Brief: Strategy. Leadership. Decisions.' : `${title} | ${SITE_NAME}`;
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+const ogImage = Astro.site ? new URL('/brand/social-card.png', Astro.site).href : undefined;
+---
+
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="author" content="Arjun Agrawal" />
+    <meta name="theme-color" content="#f4f1ea" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-tight-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Arjun Agrawal | The Business Brief" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    {ogImage && <meta property="og:image:width" content="1200" />}
+    {ogImage && <meta property="og:image:height" content="630" />}
+    <meta property="og:image:alt" content="The Business Brief by Arjun Agrawal. Strategy. Leadership. Decisions." />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {jsonLd && <script type="application/ld+json" set:html={jsonForScript(jsonLd)} />}
+
+    <!-- Apply the reader's SL or HL choice before the page paints. -->
+    <script is:inline>
+      try {
+        var l = localStorage.getItem('bb:level');
+        if (l === 'SL' || l === 'HL') document.documentElement.setAttribute('data-level', l);
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <SiteHeader current={section} />
+    <main id="main" tabindex="-1">
+      <slot />
+      <p class="print-attribution">
+        Arjun Agrawal | The Business Brief{canonical ? `, ${canonical}` : `, ${Astro.url.pathname}`}. Original teaching material, not an IB publication.
+        The organizations in the teaching cases are fictional unless a case says otherwise.
+      </p>
+    </main>
+    <SiteFooter />
+    <p id="level-live" class="sr-only" aria-live="polite"></p>
+    <script>
+      import '../scripts/print';
+    </script>
+  </body>
+</html>

@@ -1,0 +1,154 @@
+---
+/**
+ * Decision tree lab: predict the route with the highest expected value, then
+ * see the tree, the expected values and the working, and change the
+ * estimates to test how sensitive the ranking is.
+ */
+import { evaluateTree, leaderRanges, sharedStates } from '../../lib/decision-tree';
+import { decisionTreeSvg } from '../../lib/charts';
+import { jsonForScript, rich } from '../../lib/markup';
+import { rangesText, treeReading, treeTableHtml, treeWorkingsHtml } from '../../lib/tree-view';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'decision-tree-lab' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const cur = data.currency;
+const unit = data.unit;
+const options = data.options;
+const tree = evaluateTree(options);
+const shared = sharedStates(options);
+const reading = treeReading(options, tree, cur, unit);
+const ranges = shared ? leaderRanges(options) : [];
+const firstState = options[0]?.outcomes[0]?.label ?? 'the first outcome';
+const p0 = options[0]?.outcomes[0]?.probability ?? 0.5;
+const config = { uid, currency: cur, unit, options, shared };
+---
+
+<div class="dtl" data-ix="tree" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The lab could not start. The tree and expected values below are for the case's estimates.</p>
+
+  <fieldset class="dtl__predict js-only" data-predict>
+    <legend class="label label--ink">1. Predict first</legend>
+    <p class="dtl__q">{data.question} Before you calculate, which route do you expect to have the highest expected value?</p>
+    <div class="choice__opts choice--seg">
+      {
+        options.map((op) => (
+          <label class="opt" data-value={op.id}>
+            <input type="radio" name={`${uid}-predict`} value={op.id} />
+            <span class="opt__body">
+              <span class="opt__text">{op.label}</span>
+            </span>
+          </label>
+        ))
+      }
+    </div>
+    <div class="cluster">
+      <button type="button" class="btn btn--primary btn--small" data-check-prediction>Check my prediction</button>
+      <button type="button" class="btn btn--small" data-skip>Show the results without predicting</button>
+    </div>
+    <div class="feedback" data-prediction-feedback hidden></div>
+  </fieldset>
+
+  <div class="dtl__lab" data-lab>
+    <h4 class="label label--ink" tabindex="-1" data-lab-head><span class="js-only">2. </span>The tree</h4>
+    <figure class="dtl__tree">
+      <div class="chart-scroll" role="region" aria-label="Decision tree" tabindex="0" data-chart set:html={decisionTreeSvg(options, tree.options, { currency: cur, unit, id: `${uid}-chart` })} />
+      <figcaption class="exhibit__source">
+        <b>Tree</b> The square is the decision, each circle a chance node. Payoffs are before the cost of each route. Simulated teaching data.
+      </figcaption>
+    </figure>
+
+    <div class="dtl__results" data-results>
+      <div class="table-scroll" role="region" aria-label="Expected values" tabindex="0">
+        <table class="table">
+          <caption class="sr-only">Expected value of each route</caption>
+          <thead>
+            <tr>
+              <th scope="col">Route</th>
+              <th scope="col" class="n">Expected payoff</th>
+              <th scope="col" class="n">Cost</th>
+              <th scope="col" class="n">Expected value</th>
+              <th scope="col" class="n">Worst case</th>
+              <th scope="col" class="n">Best case</th>
+            </tr>
+          </thead>
+          <tbody data-table set:html={treeTableHtml(tree, options, cur, unit)} />
+        </table>
+      </div>
+      <div class="dtl__reading">
+        <p><strong>Reading.</strong> <span data-reading>{reading}</span></p>
+        {
+          shared && ranges.length > 0 && (
+            <p class="muted">
+              <strong>Sensitivity.</strong> <span data-ranges>{rangesText(ranges, firstState)}</span>
+            </p>
+          )
+        }
+      </div>
+    </div>
+
+    <details class="disclosure dtl__edit" data-edit>
+      <summary>Change the estimates</summary>
+      <form class="disclosure__body dtl__form" data-form novalidate aria-label="Decision tree estimates">
+        {
+          shared && (
+            <div class="field dtl__shared">
+              <label for={`${uid}-p`}>
+                Probability of {firstState.toLowerCase()}, for every route: <output class="num" data-p-out for={`${uid}-p`}>{p0}</output>
+              </label>
+              <input id={`${uid}-p`} type="range" min="0" max="1" step="0.05" value={String(p0)} data-shared />
+              <span class="field__hint">The probability of the other outcome is set to 1 minus this, so they always add up to 1.</span>
+            </div>
+          )
+        }
+        <div class="dtl__options">
+          {
+            options.map((op) => (
+              <fieldset class="dtl__option" data-option={op.id}>
+                <legend>{op.label}</legend>
+                <div class="field">
+                  <label for={`${uid}-${op.id}-cost`}>Cost, {cur}{unit}</label>
+                  <input class="input input--num" id={`${uid}-${op.id}-cost`} name={`${op.id}-cost`} type="number" step="any" inputmode="decimal" value={String(op.cost)} />
+                </div>
+                {op.outcomes.map((o, k) => (
+                  <div class="dtl__outcome">
+                    <p class="dtl__outname">{o.label}</p>
+                    <div class="field">
+                      <label for={`${uid}-${op.id}-p${k}`}>Probability</label>
+                      <input class="input input--num" id={`${uid}-${op.id}-p${k}`} name={`${op.id}-p${k}`} type="number" min="0" max="1" step="0.05" inputmode="decimal" value={String(o.probability)} />
+                    </div>
+                    <div class="field">
+                      <label for={`${uid}-${op.id}-x${k}`}>Payoff, {cur}{unit}</label>
+                      <input class="input input--num" id={`${uid}-${op.id}-x${k}`} name={`${op.id}-x${k}`} type="number" step="any" inputmode="decimal" value={String(o.payoff)} />
+                    </div>
+                  </div>
+                ))}
+                <p class="field__error" data-problems={op.id} />
+              </fieldset>
+            ))
+          }
+        </div>
+        <button type="button" class="btn btn--small btn--ink" data-reset>Reset to the case</button>
+      </form>
+    </details>
+
+    <section class="dtl__workings" aria-label="Workings">
+      <h4 class="label label--ink">The workings</h4>
+      <div data-workings set:html={treeWorkingsHtml(options, tree, cur, unit)} />
+    </section>
+  </div>
+
+  <aside class="callout callout--caution dtl__caution">
+    <span class="callout__kicker">Before you decide</span>
+    <div class="prose" set:html={rich(data.caution)} />
+  </aside>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/decision-tree';
+</script>

@@ -1,0 +1,257 @@
+# Halden Distribution. A fictional organization; every figure is simulated.
+# Labour turnover in Exhibit 2 is calculated from the leavers and average
+# employees in the same exhibit; tests/unit/cases.test.ts recomputes it.
+
+title: Halden Distribution
+dek: A new site manager has four months to turn round a warehouse whose staff were led one way for fifteen years.
+kind: fictional
+dataStatus: simulated
+organization:
+  name: Halden Distribution
+  sector: Warehousing and order fulfilment for online retailers
+  location: Leeds, United Kingdom
+  size: One warehouse, 140 employees on a day shift and a night shift
+  legalForm: Private limited company
+currency:
+  code: GBP
+  symbol: '£'
+  unit: pounds sterling (£)
+decision: How should the new site manager lead in her first ninety days, and should she lead both shifts the same way?
+brief: >
+  Halden's warehouse was run for fifteen years by a founder who decided everything himself and looked after his
+  staff. Since a new scanning system arrived, dispatch has fallen, errors have doubled and nearly half the night
+  shift has left. The largest client has set a deadline. The new site manager must decide how to lead.
+
+narrative:
+  - >
+    For fifteen years Halden Distribution's warehouse on the edge of Leeds was run by the man who founded it. Graham
+    Pell knew every picker by name, decided everything himself, handed out a bonus before Christmas and was, by most
+    accounts, liked. When he retired in the spring, Halden's owners did not promote anyone from inside. They hired
+    Amara Osei, an operations manager from a national retailer's distribution centre, who started in July.
+  - >
+    She inherited a problem that had begun before her. In February, under pressure from its largest client, Halden had
+    introduced a warehouse management system with handheld scanners that tell pickers what to pick and in what order.
+    The day shift, most of whom had been at Halden for years, were trained for six hours each and adapted. The night
+    shift, younger, newer and led by two team leaders promoted in the spring, were trained for two. Since February,
+    on-time dispatch has fallen from 98% to 91.4%, picking errors have more than doubled, and over half of the night
+    shift has left within the year.
+  - >
+    In September, Lumen Home, an online homeware retailer whose orders fill a third of the warehouse, set a deadline:
+    on-time dispatch back above 97% by the first week of November, when its peak season begins, or it will move its
+    contract when the current year ends. That gives Amara about four months.
+  - >
+    Her own experience is of large sites where targets were set centrally and enforced. The team leaders she inherited
+    expect something closer to Graham. The survey she ran in her third week (Exhibit 3) suggests that the night
+    shift's problem is not effort. It is that nobody asked them how the system should work, and nobody showed them.
+  - >
+    Amara has to decide how to lead: what to decide herself, what to delegate, whom to consult and how much, and
+    whether to lead both shifts in the same way.
+
+exhibits:
+  - id: ex-1
+    title: Site performance over the last year
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Month }
+      - { label: On-time dispatch (%), numeric: true, format: d1 }
+      - { label: 'Picking errors per 1,000 orders', numeric: true, format: d1 }
+      - { label: Absence rate (%), numeric: true, format: d1 }
+    rows:
+      - [October 2025, 98.1, 2.1, 3.1]
+      - [December 2025, 97.6, 2.3, 3.4]
+      - [February 2026, 96.0, 3.4, 4.2]
+      - [April 2026, 94.2, 4.0, 4.9]
+      - [June 2026, 92.7, 4.6, 5.3]
+      - [August 2026, 91.4, 5.2, 5.8]
+    note: The warehouse management system went live in February 2026.
+    source: Simulated teaching data, from the site's monthly reports.
+
+  - id: ex-2
+    title: People, by shift, over the last twelve months
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Measure }
+      - { label: Day shift, numeric: true }
+      - { label: Night shift, numeric: true }
+      - { label: Whole site, numeric: true }
+    rows:
+      - [Employees now, 82, 58, 140]
+      - [Average number of employees in the year, 81, 54, 135]
+      - [Employees who left in the year, 18, 28, 46]
+      - [Labour turnover (%), 22.2, 51.9, 34.1]
+      - [Average length of service (years), 7.4, 2.9, 5.5]
+      - [Team leaders' average experience as team leaders (years), 9.1, 0.6, '']
+      - [Training on the new system (hours per person), 6, 2, '']
+    note: Labour turnover is the number of employees who left divided by the average number of employees, multiplied by 100. Two years ago it was 18.9% for the whole site.
+    source: Simulated teaching data, from the site's personnel records.
+
+  - id: ex-3
+    title: Staff survey, September 2026 (112 of 140 responded)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Statement }
+      - { label: Day shift agreeing (%), numeric: true }
+      - { label: Night shift agreeing (%), numeric: true }
+    rows:
+      - [I know what is expected of me, 81, 54]
+      - [I am consulted about changes that affect my work, 38, 21]
+      - [I have had the training I need to use the new system, 72, 33]
+      - [My team leader helps me solve problems, 74, 48]
+      - [I would recommend Halden as a place to work, 58, 29]
+    note: 66 day-shift and 46 night-shift employees responded. Across both shifts, the average share agreeing with the five statements is 53%, the engagement score used in the Decision Room.
+    source: Simulated teaching data.
+
+  - id: ex-4
+    title: The client's deadline
+    kind: quote
+    provenance: simulated-data
+    quote:
+      text: >
+        Our customers were promised next-day delivery. Since the spring, nearly one order in eleven from your site has
+        missed its truck. We need on-time dispatch back above 97% by the first week of November, when our peak season
+        starts. If it is not, we will move our contract when the current year ends.
+      attribution: Claire Hendry, operations director, Lumen Home
+    source: Fictional email, written for this case.
+
+  - id: ex-5
+    title: Why night-shift leavers left (exit interviews with 24 of the 28)
+    kind: kpis
+    provenance: simulated-data
+    items:
+      - { label: Nobody explained the new scanners properly, value: '11' }
+      - { label: Targets changed without warning, value: '7' }
+      - { label: Better pay elsewhere, value: '4' }
+      - { label: The shift pattern, value: '2' }
+    source: Simulated teaching data, from exit interview notes. Each leaver gave one main reason.
+
+  - id: ex-6
+    title: How the previous manager led
+    kind: quote
+    provenance: simulated-data
+    quote:
+      text: >
+        Graham knew everyone's kids' names. He decided everything himself, but you always felt looked after. When the
+        scanners came in, he just told us they were coming.
+      attribution: Dev Kaur, day-shift team leader, fourteen years at Halden
+    source: Fictional interview, written for this case.
+
+constraints:
+  - Four months to the client's deadline.
+  - Pay is set by the owners and can change only at the annual review in April.
+  - The system's supplier will train up to twenty people a week on site, at no extra cost under the contract.
+  - Recruiting a new team leader takes about two months.
+
+stakeholders:
+  - name: Amara Osei, site manager
+    interest: Restoring performance, keeping the client and establishing her authority.
+    influence: high
+    stake: high
+    concern: Failing in her first role at Halden, in front of owners who hired her from outside.
+  - name: Night-shift pickers (58)
+    interest: Being trained, consulted and treated fairly.
+    influence: medium
+    stake: high
+    concern: More pressure without more support.
+  - name: Day-shift pickers (82)
+    interest: Stability and fair treatment.
+    influence: medium
+    stake: medium
+    concern: Being blamed or burdened for the night shift's problems.
+  - name: Team leaders
+    interest: Authority to run their teams, and support when they need it.
+    influence: medium
+    stake: high
+    concern: Being bypassed by the new manager, or left alone with problems they cannot solve.
+  - name: Lumen Home
+    interest: On-time dispatch above 97%.
+    influence: high
+    stake: medium
+    concern: Its own customers' next-day promise.
+  - name: Halden's owners
+    interest: Keeping the client and the site's profitability.
+    influence: high
+    stake: high
+    concern: A third of the warehouse's work leaving at the end of the year.
+
+options:
+  - id: autocratic
+    label: Autocratic turnaround
+    summary: Set targets, enforce the system and discipline repeated errors; decide everything centrally.
+    requires: Clear standards, daily monitoring and the authority to enforce them.
+    upside: Fast, visible change in effort and compliance.
+    risks: Treats a skills gap as a discipline problem; more night-shift staff may leave.
+    evidence: [ex-2, ex-5]
+  - id: paternalistic
+    label: Paternalistic care
+    summary: Restore the founder's approach, with personal care, welfare and loyalty, while deciding herself.
+    requires: Time on the floor and the trust of long-serving staff.
+    upside: Rebuilds morale and loyalty quickly among those who valued the founder's style.
+    risks: Does not by itself build the skills the new system needs.
+    evidence: [ex-3, ex-6]
+  - id: democratic
+    label: Democratic redesign
+    summary: Involve staff in redesigning how the system is used, and act on their proposals.
+    requires: Working groups, time, and a commitment to act on what they find.
+    upside: Uses the knowledge of the people doing the work; builds commitment to the result.
+    risks: Slow at first, with a deadline four months away.
+    evidence: [ex-3, ex-5]
+  - id: laissez-faire
+    label: Laissez-faire delegation
+    summary: Give each team leader full authority over their own area.
+    requires: Capable, experienced team leaders.
+    upside: Frees the experienced day-shift team leaders to use their judgement.
+    risks: Leaves the night shift's new team leaders without support.
+    evidence: [ex-2]
+  - id: situational
+    label: Situational leadership
+    summary: Lead each team according to its readiness, with direction and training for nights, delegation for days and consultation on the system.
+    requires: A clear reading of each team's needs, and a willingness to explain the difference.
+    upside: Matches the style to the problem where it is.
+    risks: Different treatment of the two shifts can look unfair until it is explained.
+    evidence: [ex-2, ex-3]
+
+analysis:
+  data:
+    - On-time dispatch has fallen from 98.1% to 91.4% since the system went live, and errors have risen from 2.1 to 5.2 per 1,000 orders (Exhibit 1).
+    - Labour turnover is 34.1% for the site, but 51.9% on nights against 22.2% on days (Exhibit 2).
+    - Night-shift staff had two hours of training on the system against six on days, and their team leaders have less than a year's experience (Exhibit 2).
+    - Only 21% of the night shift feel consulted and 33% feel trained (Exhibit 3). Eleven of the twenty-four leavers interviewed blamed the scanners (Exhibit 5).
+  insight:
+    - The problem is concentrated on one shift. It is mainly a problem of skill and of how the change was introduced, not of effort. That points away from a single style for the whole site.
+    - The day shift is capable and settled. The night shift is new to its work, and its leaders are new to theirs. The two need different things from a leader.
+    - The deadline is four months away. That is long enough to consult and train, and too short to let things drift.
+  options:
+    - Autocratic control would raise effort quickly, but it leaves the skills gap and loses more night-shift staff.
+    - Paternalistic care would rebuild loyalty, but not capability.
+    - A democratic redesign uses the night shift's knowledge of the system's faults, but starts slowly.
+    - Laissez-faire suits the day shift and fails the night shift.
+    - A situational approach combines direction and training for nights, delegation for days and consultation on the system.
+  recommendation: >
+    One defensible recommendation: lead situationally. Be directive with the night shift for the first six weeks, with
+    daily coaching on the floor and full training on the system for every picker. Delegate to the experienced
+    day-shift team leaders. Run a joint working group on how the system is used, and promise to act on what it finds.
+    Explain openly why the two shifts are being led differently, and move the night shift towards more consultation
+    as its skills grow.
+  caveat: >
+    The recommendation rests on reading the problem as one of skill rather than effort. If the exit interviews and the
+    survey had pointed mainly to pay or to the shift pattern, the answer would be different: no leadership style fixes
+    a wage that is below the market.
+
+method: >
+  Halden Distribution, Lumen Home and everyone in this case are fictional, and every figure is simulated. The figures
+  are built to be consistent with one another. Labour turnover, for example, is calculated from the leavers and
+  average employees in Exhibit 2, and the tests in the repository recompute it. The outcomes in the Decision Room are
+  one plausible simulation of each approach, built on the reading of the evidence in the analysis. They are not
+  predictions, and a different reading of the evidence would produce different outcomes.
+
+topics: [leadership-and-management]
+tools: [force-field-analysis]
+concepts: [change, creativity, ethics, sustainability]
+calculations: [labour-turnover]
+questions: [q-lead-p1-define, q-lead-p1-distinguish, q-lead-p1-explain, q-lead-p2-turnover, q-lead-p2-comment, q-lead-p1-recommend, q-lead-hl-decisions]
+decisionRoom: halden-leadership
+sources: [method-simulated]
+updated: 2026-10-29

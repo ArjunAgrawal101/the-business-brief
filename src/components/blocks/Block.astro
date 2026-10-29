@@ -1,0 +1,318 @@
+---
+/**
+ * Renders one teaching block from a topic's YAML. Every block shows its
+ * provenance label; HL-only blocks carry data-level="HL", which the SL and HL
+ * switch uses to hide them for SL readers (with a visible notice, never silently).
+ */
+import ProvenanceTag from '../ui/ProvenanceTag.astro';
+import LevelTag from '../ui/LevelTag.astro';
+import Exhibit from './Exhibit.astro';
+import Worked from './Worked.astro';
+import Interactive from '../interactive/Interactive.astro';
+import { corpus, href } from '../../lib/content';
+import { inline, rich } from '../../lib/markup';
+import type { Block } from '../../lib/schemas';
+
+interface Props {
+  block: Block;
+  index: number;
+  sectionId: string;
+  /** An extra anchor for the block, such as calc-labour-turnover, when other pages link to it. */
+  anchor?: string;
+}
+const { block: b, index, sectionId, anchor } = Astro.props;
+const c = await corpus();
+const id = b.id ?? `${sectionId}-${index + 1}`;
+const isHL = b.level === 'HL';
+const titled = 'title' in b && b.title ? b.title : undefined;
+
+const KICKERS = { note: 'Note', exam: 'Exam technique', caution: 'Caution', enrichment: 'Enrichment', framework: 'Arjun Agrawal framework' } as const;
+
+const exhibitCase = b.type === 'exhibit' ? c.cases[b.case] : undefined;
+const exhibit = b.type === 'exhibit' ? exhibitCase?.exhibits.find((e) => e.id === b.exhibit) : undefined;
+const sourceLinks = b.sources.map((s) => ({ id: s, title: c.sources[s]?.title ?? s }));
+---
+
+<div class={`block block--${b.type}`} id={id} data-level={isHL ? 'HL' : undefined}>
+  {anchor && <span id={anchor} class="block__anchor" />}
+  {
+    b.type !== 'callout' && b.type !== 'interactive' && b.type !== 'exhibit' && (
+      <div class="block__head">
+        {titled && b.type !== 'worked' && <h3 class="block__title">{titled}</h3>}
+        <div class="block__tags">
+          <ProvenanceTag kind={b.provenance} />
+          {isHL && <LevelTag level="HL" />}
+        </div>
+      </div>
+    )
+  }
+
+  {b.type === 'prose' && <div class="prose" set:html={rich(b.body)} />}
+
+  {
+    b.type === 'definition' && (
+      <dl class="definition">
+        <dt>{b.term}</dt>
+        <dd set:html={rich(b.body)} />
+        {b.note && <dd class="small muted" set:html={rich(b.note)} />}
+      </dl>
+    )
+  }
+
+  {
+    b.type === 'list' && (
+      <div class="stack">
+        {b.intro && <div class="prose" set:html={rich(b.intro)} />}
+        {b.style === 'pairs' ? (
+          <dl class="pairs">
+            {b.items.map((it) => (
+              <div>
+                <dt>{it.label}</dt>
+                <dd set:html={inline(it.body)} />
+              </div>
+            ))}
+          </dl>
+        ) : b.style === 'numbered' ? (
+          <ol class="numbered">
+            {b.items.map((it) => (
+              <li>
+                {it.label && <strong>{it.label}. </strong>}
+                <span set:html={inline(it.body)} />
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <ul class="prose bullets">
+            {b.items.map((it) => (
+              <li>
+                {it.label && <strong>{it.label}. </strong>}
+                <span set:html={inline(it.body)} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    )
+  }
+
+  {
+    b.type === 'comparison' && (
+      <div class="stack stack-sm">
+        {b.caption && <div class="small muted" set:html={rich(b.caption)} />}
+        <div class="table-scroll" role="region" aria-label={b.title} tabindex="0">
+          <table class="table compare">
+            <thead>
+              <tr>
+                <th scope="col">
+                  <span class="sr-only">Aspect</span>
+                </th>
+                {b.columns.map((col) => (
+                  <th scope="col">{col}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {b.rows.map((r) => (
+                <tr>
+                  <th scope="row">{r.label}</th>
+                  {r.cells.map((cell) => (
+                    <td set:html={inline(cell)} />
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )
+  }
+
+  {
+    b.type === 'mechanism' && (
+      <div class="stack">
+        {b.intro && <div class="prose" set:html={rich(b.intro)} />}
+        <ol class="chain">
+          {b.steps.map((s) => (
+            <li set:html={inline(s)} />
+          ))}
+        </ol>
+        {b.conclusion && <p class="chain__end" set:html={inline(b.conclusion)} />}
+      </div>
+    )
+  }
+
+  {
+    b.type === 'misconception' && (
+      <div class="misconception">
+        <div class="misconception__claim">
+          <span class="misconception__label">Misconception</span>
+          <p set:html={inline(b.claim)} />
+        </div>
+        <div class="misconception__fix">
+          <span class="misconception__label">Better reasoning</span>
+          <div class="prose" set:html={rich(b.correction)} />
+          {b.why && <div class="small muted" set:html={rich(b.why)} />}
+        </div>
+      </div>
+    )
+  }
+
+  {
+    b.type === 'callout' && (
+      <aside class={`callout callout--${b.tone}`} aria-label={b.title}>
+        <span class="callout__kicker">{KICKERS[b.tone]}</span>
+        <div class="block__head" style="margin-bottom:0.5rem">
+          <h3 class="block__title">{b.title}</h3>
+          <div class="block__tags">
+            <ProvenanceTag kind={b.provenance} />
+            {isHL && <LevelTag level="HL" />}
+          </div>
+        </div>
+        <div class="prose" set:html={rich(b.body)} />
+      </aside>
+    )
+  }
+
+  {
+    b.type === 'formula' && (
+      <div class="formula">
+        <p class="label">{b.name}</p>
+        <p class="formula__expr">{b.expression}</p>
+        {b.variables.length > 0 && (
+          <dl class="formula__vars">
+            {b.variables.map((v) => (
+              <>
+                <dt>{v.symbol}</dt>
+                <dd>{v.meaning}</dd>
+              </>
+            ))}
+          </dl>
+        )}
+        {b.note && <div class="small muted" set:html={rich(b.note)} />}
+      </div>
+    )
+  }
+
+  {
+    b.type === 'worked' && (
+      <Worked
+        calculation={b.calculation}
+        inputs={b.inputs}
+        currency={b.currency}
+        labels={b.labels}
+        interpretation={b.interpretation}
+        implication={b.implication}
+        title={b.title}
+        id={`${id}-working`}
+      />
+    )
+  }
+
+  {b.type === 'interactive' && b.ref && <Interactive component={b.component} refId={b.ref} title={b.title} intro={b.intro} level={b.level} provenance={b.provenance} />}
+
+  {
+    b.type === 'exhibit' && exhibit && exhibitCase && (
+      <div class="stack">
+        <Exhibit exhibit={exhibit} caseTitle={exhibitCase.title} caseHref={href.case(b.case)} />
+        {b.commentary && (
+          <div class="commentary">
+            <span class="label">Reading the exhibit</span>
+            <div class="prose" set:html={rich(b.commentary)} />
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  {b.type === 'example' && <div class="prose example" set:html={rich(b.body)} />}
+
+  {
+    sourceLinks.length > 0 && (
+      <p class="block__sources small">
+        <span class="label">Sources</span>{' '}
+        {sourceLinks.map((s, i) => (
+          <>
+            {i > 0 && '; '}
+            <a href={href.source(s.id)}>{s.title}</a>
+          </>
+        ))}
+      </p>
+    )
+  }
+</div>
+
+<style>
+  .pairs {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    border-top: 1px solid var(--rule-ink);
+    max-width: var(--text-max);
+  }
+
+  .pairs > div {
+    display: grid;
+    grid-template-columns: minmax(8rem, 13rem) 1fr;
+    gap: var(--sp-4);
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .pairs dt {
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .pairs dd {
+    margin: 0;
+  }
+
+  @media (max-width: 36rem) {
+    .pairs > div {
+      grid-template-columns: 1fr;
+      gap: var(--sp-1);
+    }
+  }
+
+  .numbered {
+    max-width: var(--text-max);
+    padding-left: 1.4em;
+  }
+
+  .numbered li + li {
+    margin-top: 0.6em;
+  }
+
+  .commentary {
+    padding-left: var(--sp-4);
+    border-left: 2px solid var(--bb-cobalt);
+    max-width: var(--text-max);
+  }
+
+  .commentary .label {
+    display: block;
+    margin-bottom: var(--sp-1);
+    color: var(--cobalt-text);
+  }
+
+  .example {
+    padding: var(--sp-4) var(--sp-5);
+    border: 1px solid var(--rule-hair);
+    border-left: 3px solid var(--bb-cobalt);
+    background: var(--surface-sheet);
+  }
+
+  .block__anchor {
+    display: block;
+    scroll-margin-top: calc(var(--header-h) + var(--sp-3));
+  }
+
+  .block__sources {
+    margin-top: var(--sp-3);
+    color: var(--text-muted);
+  }
+
+  .block__sources .label {
+    margin-right: 0.35rem;
+  }
+</style>

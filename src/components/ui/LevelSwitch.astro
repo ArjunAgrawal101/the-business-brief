@@ -1,0 +1,63 @@
+---
+/**
+ * The SL and HL switch. HL is the default: everything shows, with HL-only
+ * material labelled. Choosing SL hides HL-only material and leaves a visible
+ * notice wherever something was hidden. The choice is kept on this device.
+ */
+interface Props {
+  id?: string;
+}
+const { id = 'level' } = Astro.props;
+---
+
+<div class="lvl" data-level-switch>
+  <fieldset class="lvl__set">
+    <legend class="lvl__legend">Show content for</legend>
+    <label class="lvl__opt">
+      <input type="radio" name={`${id}-switch`} value="SL" />
+      <span>SL</span>
+    </label>
+    <label class="lvl__opt">
+      <input type="radio" name={`${id}-switch`} value="HL" checked />
+      <span>HL</span>
+    </label>
+  </fieldset>
+  <p class="lvl__note" data-level-note>Showing everything. HL-only material is marked HL.</p>
+  <noscript><p class="lvl__note">The switch needs JavaScript. All content is shown, with HL-only material marked HL.</p></noscript>
+</div>
+
+<script>
+  const NOTE = {
+    SL: 'Showing SL content. HL-only material is hidden, with a notice where it was.',
+    HL: 'Showing everything. HL-only material is marked HL.',
+  } as const;
+  function current(): 'SL' | 'HL' {
+    return document.documentElement.getAttribute('data-level') === 'SL' ? 'SL' : 'HL';
+  }
+  function sync() {
+    const level = current();
+    document.querySelectorAll<HTMLElement>('[data-level-switch]').forEach((sw) => {
+      sw.querySelectorAll<HTMLInputElement>('input[type="radio"]').forEach((r) => (r.checked = r.value === level));
+      const note = sw.querySelector<HTMLElement>('[data-level-note]');
+      if (note) note.textContent = NOTE[level];
+    });
+  }
+  document.querySelectorAll<HTMLElement>('[data-level-switch]').forEach((sw) => {
+    sw.addEventListener('change', (e) => {
+      const value = (e.target as HTMLInputElement).value === 'SL' ? 'SL' : 'HL';
+      document.documentElement.setAttribute('data-level', value);
+      try {
+        localStorage.setItem('bb:level', value);
+      } catch {
+        /* the choice lasts for this page only */
+      }
+      sync();
+      const live = document.getElementById('level-live');
+      if (live) {
+        live.textContent = '';
+        window.setTimeout(() => (live.textContent = NOTE[value]), 60);
+      }
+    });
+  });
+  sync();
+</script>

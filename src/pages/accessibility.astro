@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageIntro from '../components/layout/PageIntro.astro';
+import SectionHead from '../components/layout/SectionHead.astro';
+---
+
+<BaseLayout title="Accessibility" description="The accessibility standard The Business Brief aims for, how it was tested, and the known limits." section="platform">
+  <PageIntro trail={[{ label: 'Accessibility' }]} kicker="Accessibility" title="Accessibility" lead="The aim is that everyone can learn from every page, with any device, input or assistive technology. The target is the Web Content Accessibility Guidelines (WCAG) 2.2 at level AA." />
+  <div class="wrap page-body">
+    <section aria-labelledby="design-h">
+      <SectionHead no={1} title="How the pages are built" id="design-h" />
+      <ul class="prose" style="margin-top:var(--sp-4)">
+        <li>Every page is complete HTML. The interactions add behaviour on top, and each still works as a readable page without JavaScript.</li>
+        <li>Everything that can be clicked can be reached and used with a keyboard, with a visible focus outline.</li>
+        <li>Text meets a contrast of at least 4.5 to 1 against its background; large text and interface outlines meet at least 3 to 1.</li>
+        <li>Colour never carries meaning alone. Right and wrong answers, profit and loss, and SL and HL are also labelled in words.</li>
+        <li>Every chart has a text description and its figures in a table.</li>
+        <li>Results that change as you work are announced to screen readers through polite live regions.</li>
+        <li>Animation is limited, and turned off when your device asks for reduced motion.</li>
+        <li>Layouts reflow down to 320 pixels wide. Wide tables and charts scroll inside their own labelled region instead of the page.</li>
+      </ul>
+    </section>
+    <section aria-labelledby="tested-h">
+      <SectionHead no={2} title="How it was tested" id="tested-h" />
+      <div class="prose" style="margin-top:var(--sp-4)">
+        <p>
+          Each release is checked with automated tests: an accessibility scan of every page with axe-core, contrast checks of the colour
+          tokens, keyboard tests of the menu and the interactions, and screenshots at four widths. The results for this release are in
+          the repository's testing notes.
+        </p>
+        <p>
+          Automated tests find only some problems. This release has not yet been tested by people who use screen readers or other
+          assistive technology every day, and that testing is planned.
+        </p>
+      </div>
+    </section>
+    <section aria-labelledby="report-h">
+      <SectionHead no={3} title="Tell us about a problem" id="report-h" />
+      <div class="prose" style="margin-top:var(--sp-4)">
+        <p>
+          If something on the platform is hard to use, please report it through the contact options on the creator's other site,
+          <a href="https://ib-economics-pi.vercel.app/" rel="noopener">Arjun Agrawal Economics</a>, with the page address and what happened.
+          Problems that stop someone learning are fixed first.
+        </p>
+      </div>
+    </section>
+  </div>
+</BaseLayout>

@@ -1,0 +1,53 @@
+---
+/** Find the one wrong line in a worked solution, then see why and how to correct it. */
+import QuizShell from './parts/QuizShell.astro';
+import Choice from './parts/Choice.astro';
+import Key from './parts/Key.astro';
+import CheckRow from './parts/CheckRow.astro';
+import { rich } from '../../lib/markup';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'error-diagnosis' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const config = {
+  uid,
+  kind: 'errors',
+  labels: {},
+  items: data.items.map((it) => ({
+    id: it.id,
+    groups: [{ name: 'line', legend: 'The line with the error', right: [String(it.errorLine)], partial: [] }],
+  })),
+};
+---
+
+<QuizShell uid={uid} kind="errors" config={config} count={data.items.length}>
+  <p slot="before" class="quiz__lead">Each solution has exactly one wrong line. Choose it, then check.</p>
+  {
+    data.items.map((it, k) => (
+      <li class="quiz__item ed__item" data-item={it.id}>
+        <p class="label">
+          Solution <span data-short>{k + 1}</span> of {data.items.length}
+        </p>
+        <div class="ed__task prose" set:html={rich(it.task)} />
+        <Choice
+          uid={uid}
+          itemId={it.id}
+          name="line"
+          legend="Which line contains the error?"
+          layout="lines"
+          options={it.lines.map((l, n) => ({ value: String(n), label: l, kicker: `Line ${n + 1}` }))}
+        />
+        <CheckRow />
+        <Key answerLabel="The error is in" answer={`line ${it.errorLine + 1}.`} explanation={it.explanation}>
+          <div class="ed__fix">
+            <span class="label">Correction</span>
+            <div class="prose" set:html={rich(it.correction)} />
+          </div>
+        </Key>
+      </li>
+    ))
+  }
+</QuizShell>

@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import { casesInOrder, corpus, href } from '../../lib/content';
+
+const c = await corpus();
+const cases = await casesInOrder();
+---
+
+<BaseLayout title="Case Room" description="Case files for business decisions: a narrative, exhibits, stakeholders, options and a worked analysis." section="cases">
+  <PageIntro
+    trail={[{ label: 'Cases' }]}
+    kicker="Case Room"
+    title="Case files"
+    lead="Every case is a decision someone has to make, with the evidence they have. The cases in this release are fictional, so that every figure can be complete and internally consistent; each one says so, and real-world evidence elsewhere on the platform is cited and dated."
+  />
+  <div class="wrap page-body">
+    <ol class="index-list">
+      {
+        cases.map(([id, cs]) => (
+          <li class="index-item">
+            <span class="index-item__code">{cs.organization.sector.split(' ')[0]}</span>
+            <div class="index-item__body">
+              <p class="label">
+                {cs.organization.location} · {cs.organization.size}
+              </p>
+              <h2 class="index-item__title">
+                <a href={href.case(id)}>{cs.title}</a>
+              </h2>
+              <p>{cs.dek}</p>
+              <p class="narrative small">The decision: {cs.decision}</p>
+            </div>
+            <div class="index-item__side">
+              <div class="tags">
+                <ProvenanceTag kind={cs.dataStatus === 'simulated' ? 'simulated-data' : 'external-evidence'} />
+                <span class="tag tag--plain">{cs.kind === 'fictional' ? 'Fictional organization' : 'Real organization'}</span>
+              </div>
+              <span class="muted">{cs.exhibits.length} exhibits</span>
+              {cs.topics.map((t) => c.topics[t] && <a href={href.topic(t)}>Brief {c.topics[t]?.code} {c.topics[t]?.title}</a>)}
+              {cs.decisionRoom && <a href={href.decision(cs.decisionRoom)}>Make the decision</a>}
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</BaseLayout>

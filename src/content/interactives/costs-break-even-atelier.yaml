@@ -1,0 +1,36 @@
+component: break-even-workspace
+title: Atelier Barro's break-even workspace
+purpose: >
+  The learner changes price, costs and forecast sales and sees contribution, the break-even quantity, the margin of
+  safety, profit and the target profit output recalculated, with the break-even chart redrawn and every step of the
+  working shown. It diagnoses rounding the break-even quantity down, forgetting costs that are a share of the price,
+  and confusing the margin of safety with profit.
+provenance: simulated-data
+case: atelier-barro
+currency: '€'
+labels: { unit: mug, units: mugs, period: month }
+defaults:
+  price: 22
+  variableCost: 6.30
+  priceShare: 4
+  fixedCosts: 8140
+  quantity: 640
+  targetProfit: 2000
+  capacity: 1200
+scenarios:
+  - id: before
+    label: Before the new tariff
+    note: Firing at €0.45 a mug and a standing charge of €260.
+    set: { variableCost: 6.00, fixedCosts: 8060 }
+  - id: raise-24
+    label: Price €24, survey sales 590
+    note: The option tested on the website.
+    set: { price: 24, quantity: 590 }
+  - id: premium-25
+    label: Price €25 with premium packaging, sales 580
+    note: Packaging costs €0.60 a mug more; the sales figure is an untested assumption.
+    set: { price: 25, variableCost: 6.90, quantity: 580 }
+  - id: cut-marketing
+    label: Cut marketing to €200, sales 610
+    note: Fixed costs fall by €280; sales fall as advertising is reduced.
+    set: { fixedCosts: 7860, quantity: 610 }

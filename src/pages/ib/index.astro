@@ -1,0 +1,84 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import LevelTag from '../../components/ui/LevelTag.astro';
+import VerifyTag from '../../components/ui/VerifyTag.astro';
+import { corpus, href } from '../../lib/content';
+import { rich } from '../../lib/markup';
+import { CONCEPT_NAMES } from '../../lib/labels';
+
+const c = await corpus();
+const cur = c.curricula['ib-dp-bm'];
+const total = cur?.units.reduce((n, u) => n + u.subtopics.length, 0) ?? 0;
+const hlOnly = cur?.units.flatMap((u) => u.subtopics).filter((s) => s.level === 'HL').length ?? 0;
+---
+
+<BaseLayout title="IB DP Business Management: the course" description="The IB Diploma Programme Business Management course mapped unit by unit, with SL and HL marked and every line's verification status shown." section="pathways">
+  <PageIntro
+    trail={[{ label: 'IB course' }]}
+    kicker="IB Diploma Programme"
+    title="Business Management: the course"
+    lead={`Five units and ${total} subtopics, ${hlOnly} of them HL only. Each line shows how far it has been confirmed and links to what the platform has for it.`}
+  >
+    <div class="tags">
+      {cur && <VerifyTag status={cur.verification} />}
+      <span class="tag tag--plain">{cur?.guide}</span>
+    </div>
+  </PageIntro>
+  <div class="wrap page-body">
+    {
+      cur && (
+        <aside class="callout callout--caution">
+          <span class="callout__kicker">Read this first</span>
+          <div class="prose">
+            <p>
+              The Business management guide was not available when this map was made. It was assembled from secondary sources that agree with
+              each other, listed in the <a href="/sources/">source register</a>. Treat it as a well-supported map, not as the Guide, and check it
+              against the Guide before relying on it for planning.
+            </p>
+            <div set:html={rich(cur.note)} />
+          </div>
+        </aside>
+      )
+    }
+    <p class="cluster">
+      <a class="btn btn--primary" href="/ib/coverage/">What the platform covers, subtopic by subtopic</a>
+      <a class="btn" href="/ib/concepts/">The four concepts</a>
+      <a class="btn" href="/exam-desk/">The assessment</a>
+    </p>
+    {
+      cur?.units.map((u) => (
+        <section aria-labelledby={`unit-${u.number}`}>
+          <SectionHead no={u.number} title={u.title} id={`unit-${u.number}`} />
+          <ol class="subtopic-list" role="list">
+            {u.subtopics.map((s) => (
+              <li id={`st-${s.code.replace('.', '-')}`}>
+                <span class="num">{s.code}</span>
+                <span>{s.topic ? <a href={href.topic(s.topic)}>{s.title}</a> : s.title}</span>
+                <span class="tags">
+                  <LevelTag level={s.level} />
+                  <VerifyTag status={s.verification} />
+                  {s.topic && <span class="tag tag--live">Brief</span>}
+                </span>
+                {s.note && <span class="subtopic-note">{s.note}</span>}
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))
+    }
+    <section aria-labelledby="concepts-h">
+      <SectionHead no={6} title="The concepts" id="concepts-h" />
+      <p style="margin-top:var(--sp-3)">
+        {cur?.concepts.list.map((k, i) => (
+          <>
+            {i > 0 && ', '}
+            <a href={href.concept(k)}>{CONCEPT_NAMES[k]}</a>
+          </>
+        ))}
+        . {cur?.concepts.note} {cur && <VerifyTag status={cur.concepts.verification} />}
+      </p>
+    </section>
+  </div>
+</BaseLayout>

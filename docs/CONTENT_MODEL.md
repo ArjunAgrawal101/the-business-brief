@@ -1,0 +1,151 @@
+# Content model
+
+All teaching content is YAML in `src/content/`, validated by the Zod schemas in `src/lib/schemas.ts` and checked for broken references by `src/lib/integrity.ts` on every build and test run.
+
+## The relationship model
+
+```
+curriculum (ib-dp-bm)
+  unit
+    subtopic ──────────────► topic brief
+                               │  sections of blocks (prose, definitions, mechanisms,
+                               │  comparisons, misconceptions, worked calculations,
+                               │  exhibits, interactions)
+                               ├─► cases ──► exhibits
+                               │            └─► Decision Room (rounds, outcomes, debrief)
+                               ├─► tools ──► interaction, case application
+                               ├─► calculations ──► function in src/lib/finance.ts, worked example
+                               ├─► practice questions ──► command term, case, exhibits, mark scheme
+                               ├─► glossary terms
+                               ├─► concepts (the concept lens)
+                               ├─► pathway lenses
+                               └─► revision (key points, retrieval, traps)
+claims ──► sources                (every statement about the course)
+```
+
+Every arrow is an id that the integrity check resolves. A reference that does not resolve fails the build.
+
+## Labels every piece of content carries
+
+### Provenance: what kind of content it is
+
+The label column is what readers see on the page.
+
+| Label | Value in YAML | Meaning |
+| --- | --- | --- |
+| IB requirement | `ib-requirement` | Stated by an IB document available to the platform. Not used in this release, because the Guide was not available |
+| Subject knowledge | `subject-knowledge` | Established business knowledge, explained in the platform's own words |
+| Curriculum requirement | `curriculum-requirement` | Required by a non-IB curriculum that has been mapped. None mapped yet |
+| Source-derived | `source-derived` | Follows a named source closely (for example Fayol's functions of management) |
+| Examiner observation | `examiner-observation` | Reported by an examiner in a subject report. None available yet |
+| External evidence | `external-evidence` | A dated, cited fact about a real organization |
+| Simulated data | `simulated-data` | Invented for teaching; fictional cases and their exhibits |
+| Arjun Agrawal framework | `aa-framework` | The Arjun Agrawal pedagogical framework: the platform's teaching method, sequences and advice |
+| Original practice question | `original-practice` | Written for the platform; never an IB question |
+| Assessment explanation | `assessment-explanation` | The platform's mark scheme, guidance or level descriptors for its own questions |
+| Enrichment | `enrichment` | Beyond the course, for interest or for other pathways |
+
+### Verification: how far a claim about the course has been checked
+
+| Status | Value | Meaning |
+| --- | --- | --- |
+| Verified | `primary` | Checked against the IB document itself, with page number |
+| Recorded | `recorded` | Taken from an IB document as recorded in the creator's own files (for example Assessment procedures 2027) or from another IB subject's guide |
+| Corroborated, verify | `corroborated` | Two or more independent secondary sources agree; check against the Guide |
+| Sources conflict | `conflicting` | Sources disagree; the page says how |
+| Unverified | `unverified` | One source, or none; check before relying on it |
+| Teaching choice | `pedagogical` | A decision by the platform, not a claim about requirements |
+
+## Collections
+
+| Collection | Files | One entry is |
+| --- | --- | --- |
+| `topics` | `topics/<id>.yaml` | A complete topic brief |
+| `cases` | `cases/<id>.yaml` | A case file: narrative, exhibits, constraints, stakeholders, options, analysis, method |
+| `decisions` | `decisions/<id>.yaml` | A Decision Room |
+| `tools` | `tools/<id>.yaml` | A toolkit tool: `status: planned` (summary only) or `complete` (full guide) |
+| `interactives` | `interactives/<id>.yaml` | The data for one interaction, by `component` |
+| `curricula` | `curricula/<id>.yaml` | A syllabus spine (units, subtopics, concepts) |
+| `questions` | `questions/*.yaml` (lists) | An original practice question with its mark scheme |
+| `glossary` | `glossary/*.yaml` (lists) | A term and its definition |
+| `calculations` | `data/calculations.yaml` | A calculation: formula, variables, unit, interpretation, errors, worked example |
+| `assessment` | `data/assessment.yaml` | An assessment component: facts with sources, what is not stated, preparation |
+| `commandTerms` | `data/command-terms.yaml` | A command term, its definition and the source of the definition |
+| `concepts`, `pathways`, `modules` | `data/*.yaml` | The four concepts, the audience pathways, the platform's modules |
+| `sources`, `claims` | `data/sources.yaml`, `data/claims.yaml` | The source register and the claims register |
+
+## Topic briefs
+
+A topic has: `title`, `code` (such as `3.3`), `unit`, `level`, `summary`, `decisionQuestion`, `situation`, `whyItMatters`, a `syllabus` block (items with level and verification), `objectives`, at least four `sections`, a four-part `conceptLens`, optional pathway `lenses`, `teaching` notes, `revision` (key points, at least five retrieval questions, traps), `related` ids and `sources`.
+
+Section kinds follow PROBLEM, CAUSE, STRATEGY, IMPLEMENTATION, EVALUATION in practice: `situation`, `learn`, `evidence`, `tools`, `decide`, `evaluate`, `assess`, `teach`.
+
+### Blocks
+
+| Type | Fields |
+| --- | --- |
+| `prose` | `body` |
+| `definition` | `term`, `body`, `note` |
+| `list` | `style` (bullets, numbered, pairs), `items` |
+| `comparison` | `columns`, `rows` of `label` and `cells` |
+| `mechanism` | `steps` (a chain of cause and effect), `conclusion` |
+| `misconception` | `claim`, `correction`, `why` |
+| `callout` | `tone` (note, exam, caution, enrichment, framework), `title`, `body` |
+| `formula` | `name`, `expression`, `variables` |
+| `worked` | `calculation` (an id), `inputs`, `currency`, `labels`, `interpretation`, `implication` |
+| `interactive` | `component`, `ref` (an interaction id), `title`, `intro` |
+| `exhibit` | `case`, `exhibit`, `commentary` |
+| `example` | `body` |
+
+Every block has `provenance`, `level` (default `SL/HL`; `HL` hides it for SL readers) and `sources`.
+
+Markdown in YAML is deliberately small: paragraphs, `- ` lists, `1. ` lists, `**bold**`, `*italic*`, `` `code` `` and `[links](/path/)`. External links must be `https://` and are marked as external for screen readers.
+
+## Cases
+
+Fictional cases (`kind: fictional`, `dataStatus: simulated`) must label every exhibit `simulated-data`, and the `method` note must say how the figures were made. Exhibit tables declare `columns` (with `numeric` and `format`: plain, money, d1, d2) and `rows`; a `footer` marked `footerIsSum: true` is checked by the tests. `options` can be grouped (`group`) when a case has two decisions.
+
+The `analysis` block follows DATA, INSIGHT, OPTIONS, RECOMMENDATION, then a CAVEAT: when the recommendation would change.
+
+## Decision Rooms
+
+A decision has `metrics` (each `better: higher | lower | context`), a `baseline`, and one to three `rounds`. Each choice has an `outcome`: `headline`, `narrative`, `metrics`, `stakeholders` (with `mood`), `risks` and `theory`.
+
+- The board pack shows the baseline with each committed outcome's metrics applied in order: a later round overrides only the metrics it reports.
+- A later-round choice with `followsFrom` is offered only after that first-round choice; without it, it follows any first-round choice.
+- `debrief`: trade-offs, the evidence that matters, what would change your mind, misconceptions, and the exam link.
+
+## Interactions
+
+| `component` | Data |
+| --- | --- |
+| `cost-classifier` | `costObject`, `items` with `behaviour` and `directness` |
+| `break-even-workspace` | `case`, `currency`, `labels`, `defaults`, `scenarios` (each changes some inputs) |
+| `error-diagnosis` | `items` with `lines` and the `errorLine` |
+| `special-order` | `defaults` (including the contribution of a displaced regular sale), `scenarios`, `hints`, `questions` |
+| `ansoff-placer` | `items` with `answer` and `arguable` placements |
+| `decision-tree-lab` | `options` with `cost` and `outcomes` (probability, payoff), `caution` |
+| `force-field-builder` | `change`, `driving` and `restraining` forces with strengths 1 to 5, `caution` |
+| `style-matcher` | `scenarios` with `strong` and `defensible` styles |
+| `functions-sorter` | `items` with the function each belongs to |
+| `scale-explorer` | The parameters of the scale model and `marks` on the curve |
+
+Each interaction also has a `title`, a `purpose` (documented in [INTERACTIONS.md](INTERACTIONS.md)) and a `provenance`.
+
+## Practice questions
+
+A question has `paperStyle`, `commandTerm` (which must exist in the command term list), `ao`, `marks`, an optional `case` and `exhibits`, `prompt`, and a `markscheme` of kind `points` (marks must add up to the question's), `levels` (the top level must equal the marks) or `calculation` (must give an `answer`). `provenance` is always `original-practice`.
+
+## Calculations
+
+Each calculation's `id` matches a builder in `workings` (`src/lib/finance.ts`). Its `example` gives inputs from a case (or, for expected value, an option from a decision tree interaction); the integrity check works every example and fails on an error. `page` is where the calculation lives; the Finance Desk, tool and topic pages anchor it as `#calc-<id>`.
+
+## Adding a topic brief
+
+1. Check the subtopic in `curricula/ib-dp-bm.yaml` and its verification status. If the Guide is available, verify it first.
+2. Write or extend a case in `cases/`, with simulated data that adds up. Add its figures to `tests/unit/cases.test.ts`.
+3. Add any calculations to `data/calculations.yaml` with a function in `src/lib/finance.ts` and a worked example; add hand-checked tests to `tests/unit/finance.test.ts`.
+4. Write the topic in `topics/<id>.yaml`, with a misconception, a concept lens, revision and teaching notes. Label every block's provenance.
+5. Write practice questions in `questions/`, and glossary terms in `glossary/`.
+6. Link the subtopic to the topic in the curriculum file (`topic: <id>`), and record any new claims about the course in `data/claims.yaml` with their sources.
+7. Run `npm run qa`. The build fails on any broken reference; the content lint fails on dashes and placeholders.
