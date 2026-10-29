@@ -81,3 +81,31 @@ export function parseNumber(raw: string): number | null {
 export function inputValue(v: number, step: string): string {
   return step === '0.01' && !Number.isInteger(v) ? v.toFixed(2) : String(v);
 }
+
+/** True when the reader has asked for reduced motion. */
+export function prefersReducedMotion(): boolean {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+/**
+ * Run draw(t) on every frame as t eases from 0 to 1 over `duration` ms, for
+ * chart updates. Under reduced motion it draws the end state at once. Returns
+ * a function that cancels the animation.
+ */
+export function tween(duration: number, draw: (t: number) => void): () => void {
+  if (duration <= 0 || prefersReducedMotion()) {
+    draw(1);
+    return () => undefined;
+  }
+  const start = performance.now();
+  let raf = 0;
+  const step = (now: number) => {
+    const x = Math.min(1, (now - start) / duration);
+    draw(1 - Math.pow(1 - x, 3));
+    if (x < 1) raf = requestAnimationFrame(step);
+  };
+  raf = requestAnimationFrame(step);
+  return () => cancelAnimationFrame(raf);
+}
+
+export const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;

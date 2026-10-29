@@ -15,15 +15,19 @@ test('the current section is marked in the navigation', async ({ page, isMobile 
   await expect(page.locator('header a[aria-current="page"], header a[aria-current="true"]').first()).toHaveText(/Finance Desk/);
 });
 
-test('the menu opens, closes with Escape and returns focus', async ({ page, isMobile }) => {
-  test.skip(!isMobile, 'The menu button is for small screens; wide screens show the navigation.');
+test('the menu lists every room, opens, closes with Escape and returns focus', async ({ page, isMobile }) => {
   await page.goto('/');
   const toggle = page.locator('[data-menu-toggle]');
+  await expect(toggle).toHaveAccessibleName(isMobile ? 'Menu' : 'All rooms');
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await toggle.click();
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   const panel = page.locator('#menu-panel');
   await expect(panel).toBeVisible();
+  const rooms = panel.locator('.rooms-menu__item');
+  await expect(rooms).toHaveCount(14);
+  // A planned room is listed, but is not a link that leads nowhere.
+  await expect(panel.locator('.rooms-menu__item.is-planned a')).toHaveCount(0);
   await page.keyboard.press('Escape');
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await expect(panel).toBeHidden();

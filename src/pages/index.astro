@@ -6,7 +6,9 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHead from '../components/layout/SectionHead.astro';
 import StatusTag from '../components/ui/StatusTag.astro';
+import Icon from '../components/ui/Icon.astro';
 import { corpus, href, modulesInOrder, pathwaysInOrder, topicsInOrder } from '../lib/content';
+import { isIcon } from '../lib/icons';
 
 const c = await corpus();
 const topics = await topicsInOrder();
@@ -16,11 +18,30 @@ const memo = c.decisions['marigold-growth'];
 const memoCase = memo ? c.cases[memo.case] : undefined;
 const cur = c.curricula['ib-dp-bm'];
 const subtopics = cur?.units.reduce((n, u) => n + u.subtopics.length, 0) ?? 0;
-const CHAINS = [
-  { name: 'Every brief', steps: ['Situation', 'Decision', 'Consequence'] },
-  { name: 'Every case analysis', steps: ['Data', 'Insight', 'Option', 'Recommendation'] },
-  { name: 'Every recommendation', steps: ['Problem', 'Cause', 'Strategy', 'Implementation', 'Evaluation'] },
+const METHODS = [
+  {
+    letter: 'A',
+    name: 'Decide',
+    steps: ['Situation', 'Decision', 'Consequence'],
+    text: 'Commit to a choice, then live with what it does to the business and the people in it.',
+    where: { label: 'In every Decision Room', href: '/decision-room/' },
+  },
+  {
+    letter: 'B',
+    name: 'Analyse',
+    steps: ['Data', 'Insight', 'Option', 'Recommendation'],
+    text: 'From the exhibits to a recommendation you can defend, one supported step at a time.',
+    where: { label: 'In every case file', href: '/cases/' },
+  },
+  {
+    letter: 'C',
+    name: 'Diagnose',
+    steps: ['Problem', 'Cause', 'Strategy', 'Implementation', 'Evaluation'],
+    text: 'Find the cause before choosing the cure, then say how you would know it worked.',
+    where: { label: 'In every topic brief', href: '/topics/' },
+  },
 ];
+const liveRooms = modules.filter((m) => m.data.status !== 'planned').length;
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -34,7 +55,7 @@ const jsonLd = {
 <BaseLayout title="home" description="The Business Brief by Arjun Agrawal: business management learned through decisions. Topic briefs, case files, Decision Rooms and a Finance Desk for IB DP Business Management and beyond." jsonLd={jsonLd}>
   <section class="hero" aria-labelledby="hero-h">
     <div class="wrap hero__grid">
-      <div>
+      <div class="enter">
         <p class="hero__kicker"><b>Arjun Agrawal</b> <span aria-hidden="true">·</span> The Business Brief</p>
         <h1 id="hero-h">Learn business by making the decision.</h1>
         <p class="hero__tag">Strategy. Leadership. Decisions.</p>
@@ -49,7 +70,7 @@ const jsonLd = {
       </div>
       {
         memo && memoCase && (
-          <aside class="memo" aria-labelledby="memo-h">
+          <aside class="memo memo--enter" aria-labelledby="memo-h">
             <div class="memo__head">
               <span id="memo-h">Decision memo</span>
               <span>Case 01</span>
@@ -77,7 +98,7 @@ const jsonLd = {
               </div>
             </dl>
             <div class="memo__foot">
-              <span class="memo__stamp">Awaiting your decision</span>
+              <span class="memo__stamp stamp-in">Awaiting your decision</span>
               <a class="btn btn--ink btn--small" href={href.decision('marigold-growth')}>
                 Make the decision
               </a>
@@ -90,29 +111,40 @@ const jsonLd = {
 
   <section class="band band--ink chain-band" aria-labelledby="method-h">
     <div class="wrap">
-      <SectionHead no="01" title="One way of thinking, everywhere" id="method-h" dek="The same reasoning runs through every brief, case and Decision Room, so that it becomes a habit." />
-      <div class="chains">
+      <SectionHead no="01" title="Three ways of thinking, everywhere" id="method-h" dek="The same three chains of reasoning run through every brief, case and Decision Room, until they become a habit." />
+      <ol class="methods" role="list" data-reveal="group">
         {
-          CHAINS.map((ch) => (
-            <div>
-              <h3>{ch.name}</h3>
-              <ol>{ch.steps.map((s) => <li>{s}</li>)}</ol>
-            </div>
+          METHODS.map((m) => (
+            <li class="method">
+              <p class="method__head">
+                <span class="method__letter" aria-hidden="true">{m.letter}</span>
+                <span class="method__name">{m.name}</span>
+              </p>
+              <ol class="method__steps" aria-label={`${m.name}: ${m.steps.join(', ')}`}>
+                {m.steps.map((st) => (
+                  <li>{st}</li>
+                ))}
+              </ol>
+              <p class="method__text">{m.text}</p>
+              <a class="method__where" href={m.where.href}>
+                {m.where.label} <Icon id="arrow" size={16} />
+              </a>
+            </li>
           ))
         }
-      </div>
+      </ol>
     </div>
   </section>
 
   <section class="band" aria-labelledby="briefs-h">
     <div class="wrap">
       <SectionHead no="02" title="Three complete briefs" id="briefs-h" dek={`A strategic topic, a quantitative one and a people one, each with a case, interactions, practice and a revision page. ${subtopics - topics.length} more subtopics are mapped and planned.`} />
-      <div class="feature-briefs">
+      <div class="feature-briefs" data-reveal="group">
         {
           topics.map(([id, t]) => {
             const cs = c.cases[t.related.cases[0] ?? ''];
             return (
-              <article class="feature">
+              <article class="feature lift">
                 <span class="feature__code">Brief {t.code}</span>
                 <h3>
                   <a href={href.topic(id)}>{t.title}</a>
@@ -132,25 +164,26 @@ const jsonLd = {
 
   <section class="band band--sunk" aria-labelledby="modules-h">
     <div class="wrap">
-      <SectionHead no="03" title="One platform, fourteen rooms" id="modules-h" dek="Each module is linked only when something in it works. The rest are marked as planned." />
-      <div class="modules" style="background:var(--surface-page)">
+      <SectionHead no="03" title="Fourteen rooms, one platform" id="modules-h" dek={`${liveRooms} of the fourteen rooms have working material now. A room is linked only when something in it works; the rest say what is planned.`} />
+      <ul class="rooms" role="list" data-reveal="group">
         {
           modules.map((m) => (
-            <article class={`module module--${m.data.status}`}>
-              <h3>{m.data.href ? <a href={m.data.href}>{m.data.name}</a> : m.data.name}</h3>
+            <li class:list={['room', `room--${m.data.status}`, { lift: Boolean(m.data.href) }]}>
+              <span class="room__icon" aria-hidden="true">{isIcon(m.id) && <Icon id={m.id} size={28} />}</span>
+              <h3 class="room__name">{m.data.href ? <a href={m.data.href}>{m.data.name}</a> : m.data.name}</h3>
               <StatusTag status={m.data.status} />
-              <p>{m.data.purpose}</p>
-            </article>
+              <p class="room__purpose">{m.data.purpose}</p>
+            </li>
           ))
         }
-      </div>
+      </ul>
     </div>
   </section>
 
   <section class="band" aria-labelledby="paths-h">
     <div class="wrap">
       <SectionHead no="04" title="Who it is for" id="paths-h" dek="One foundation, with a way in for each kind of learner." />
-      <ul class="pathway-strip">
+      <ul class="pathway-strip" data-reveal="group">
         {
           pathways.map((p) => (
             <li>
@@ -169,7 +202,7 @@ const jsonLd = {
   <section class="band band--sunk" aria-labelledby="honest-h">
     <div class="wrap">
       <SectionHead no="05" title="How far to trust it" id="honest-h" />
-      <div class="honesty">
+      <div class="honesty" data-reveal="group">
         <div>
           <h3>Every claim is sourced</h3>
           <p>Statements about the IB course are checked against the Business management guide and give its page, in a public <a href="/sources/">claims register</a>.</p>

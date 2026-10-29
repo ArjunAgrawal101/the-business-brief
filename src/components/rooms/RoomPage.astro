@@ -1,0 +1,295 @@
+---
+/**
+ * A room's own page: its identity (icon, number, status), what it holds, the
+ * subtopics it serves and what is planned. Each room page passes its module id
+ * and puts any room-specific material in the default slot, which appears
+ * between the introduction and the list of what the room holds.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../layout/Breadcrumbs.astro';
+import SectionHead from '../layout/SectionHead.astro';
+import Icon from '../ui/Icon.astro';
+import StatusTag from '../ui/StatusTag.astro';
+import { corpus, modulesInOrder } from '../../lib/content';
+import { isIcon } from '../../lib/icons';
+import { rich } from '../../lib/markup';
+
+interface Props {
+  id: string;
+  /** Page description for search engines; defaults to the room's purpose. */
+  description?: string;
+  /** Which primary navigation item to mark as current. */
+  section?: string;
+  /** Number of the first section after the slot's own sections. */
+  firstSection?: number;
+}
+const { id, description, section, firstSection = 1 } = Astro.props;
+const all = await modulesInOrder();
+const room = all.find((m) => m.id === id);
+if (!room) throw new Error(`RoomPage: no module "${id}" in src/content/data/modules.yaml`);
+const r = room.data;
+const c = await corpus();
+const cur = c.curricula['ib-dp-bm'];
+const subs = (cur?.units ?? []).flatMap((u) => u.subtopics);
+const served = r.syllabus.map((code) => {
+  const s = subs.find((x) => x.code === code);
+  if (!s) throw new Error(`RoomPage ${id}: subtopic ${code} is not in the curriculum`);
+  return s;
+});
+const index = all.findIndex((m) => m.id === id) + 1;
+let n = firstSection;
+const itemsNo = r.items.length ? n++ : 0;
+const syllabusNo = served.length ? n++ : 0;
+const plannedNo = r.planned.length ? n++ : 0;
+---
+
+<BaseLayout title={r.name} description={description ?? r.purpose} section={section ?? id}>
+  <div class="wrap">
+    <header class="room-intro">
+      <Breadcrumbs trail={[{ label: 'All rooms', href: '/rooms/' }, { label: r.name }]} />
+      <div class="room-intro__grid">
+        <span class:list={['room-intro__icon', `room-intro__icon--${r.status}`]} aria-hidden="true">{isIcon(id) && <Icon id={id} size={40} />}</span>
+        <div class="room-intro__text">
+          <p class="room-intro__kicker">
+            <span class="label label--ink">Room {String(index).padStart(2, '0')} of {all.length}</span>
+            <StatusTag status={r.status} />
+          </p>
+          <h1>{r.name}</h1>
+          <div class="lead room-intro__lead" set:html={rich(r.lead ?? r.purpose)} />
+        </div>
+      </div>
+    </header>
+  </div>
+  <div class="wrap page-body">
+    <slot />
+    {
+      r.items.length > 0 && (
+        <section aria-labelledby={`${id}-items-h`}>
+          <SectionHead no={itemsNo} title="In this room" id={`${id}-items-h`} />
+          <ul class="room-items" role="list" data-reveal="group">
+            {r.items.map((it) => (
+              <li class="room-item lift">
+                <span class="room-item__kind">
+                  {it.kind}
+                  {it.level === 'HL' && <span class="tag tag--hl">HL</span>}
+                </span>
+                <h3 class="room-item__title">
+                  <a href={it.href}>{it.title}</a>
+                </h3>
+                <p class="room-item__text">{it.text}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+    {
+      served.length > 0 && (
+        <section aria-labelledby={`${id}-syl-h`}>
+          <SectionHead no={syllabusNo} title="The syllabus it serves" dek="IB DP Business Management subtopics with material in this room, checked against the guide." id={`${id}-syl-h`} />
+          <ul class="room-syllabus" role="list">
+            {served.map((s) => (
+              <li>
+                <a href={`/ib/#st-${s.code.replace('.', '-')}`}>
+                  <span class="num">{s.code}</span> {s.title}
+                </a>
+                {s.level === 'HL' && <span class="tag tag--hl">HL only</span>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+    {
+      r.planned.length > 0 && (
+        <section aria-labelledby={`${id}-plan-h`}>
+          <SectionHead no={plannedNo} title="Planned for this room" dek="Not built yet, so not linked." id={`${id}-plan-h`} />
+          <ul class="room-planned">
+            {r.planned.map((p) => (
+              <li>{p}</li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .room-intro {
+    padding-block: clamp(var(--sp-6), 5vw, var(--sp-8)) clamp(var(--sp-5), 4vw, var(--sp-7));
+  }
+
+  .room-intro__grid {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: var(--sp-4) var(--sp-5);
+    margin-top: var(--sp-5);
+  }
+
+  .room-intro__icon {
+    display: inline-grid;
+    place-items: center;
+    width: clamp(3.5rem, 8vw, 5.5rem);
+    height: clamp(3.5rem, 8vw, 5.5rem);
+    border: 1px solid var(--bb-ink);
+    background: var(--bb-ink);
+    color: var(--text-on-ink);
+    box-shadow: 6px 6px 0 var(--bb-brass);
+  }
+
+  .room-intro__icon--partial {
+    background: #fff;
+    color: var(--bb-ink);
+  }
+
+  .room-intro__icon :global(.icon) {
+    width: 55%;
+    height: 55%;
+  }
+
+  .room-intro__kicker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+    margin: 0;
+  }
+
+  .room-intro h1 {
+    margin-top: var(--sp-3);
+    max-width: 22ch;
+  }
+
+  .room-intro__lead {
+    margin-top: var(--sp-4);
+    max-width: 44rem;
+  }
+
+  @media (max-width: 36rem) {
+    .room-intro__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .room-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+    gap: var(--sp-3);
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .room-items > li {
+    margin: 0;
+  }
+
+  .room-item {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    gap: var(--sp-2);
+    padding: var(--sp-4) var(--sp-5) var(--sp-5);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--bb-ink);
+    background: #fff;
+  }
+
+  .room-item:hover {
+    border-color: var(--bb-ink);
+  }
+
+  .room-item:focus-within {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .room-item__kind {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .room-item__title {
+    margin: 0;
+    font-size: 1.1875rem;
+    line-height: var(--lh-snug);
+  }
+
+  .room-item__title a {
+    color: var(--text-strong);
+    text-decoration: none;
+  }
+
+  .room-item__title a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .room-item__title a:focus-visible {
+    outline: none;
+  }
+
+  .room-item__text {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--text-body);
+  }
+
+  .room-syllabus {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .room-syllabus li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--rule);
+    background: var(--surface-sheet);
+  }
+
+  .room-syllabus a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    min-height: 24px;
+    color: var(--text-strong);
+    font-size: 0.9375rem;
+    font-weight: 560;
+    text-decoration: none;
+  }
+
+  .room-syllabus a:hover {
+    color: var(--cobalt-text);
+    text-decoration: underline;
+  }
+
+  .room-syllabus .num {
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+
+  .room-planned {
+    display: grid;
+    gap: var(--sp-2);
+    max-width: var(--text-max);
+    margin: var(--sp-4) 0 0;
+    color: var(--text-muted);
+  }
+</style>

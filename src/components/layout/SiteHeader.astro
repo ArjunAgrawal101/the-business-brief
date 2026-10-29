@@ -1,10 +1,15 @@
 ---
 import BriefMark from '../brand/BriefMark.astro';
+import Icon from '../ui/Icon.astro';
+import { modulesInOrder } from '../../lib/content';
+import { isIcon } from '../../lib/icons';
+import { STATUS_LABELS } from '../../lib/labels';
 
 interface Props {
   current?: string;
 }
 const { current } = Astro.props;
+const rooms = (await modulesInOrder()).map((m) => ({ id: m.id, ...m.data }));
 
 const PRIMARY = [
   { id: 'topics', label: 'Topics', href: '/topics/' },
@@ -96,14 +101,40 @@ const GROUPS = [
         </svg>
         <span class="icon-link__text">Search</span>
       </a>
-      <a class="menu-toggle" href="#footer-nav" data-menu-toggle aria-controls="menu-panel">
+      <a class="menu-toggle" href="/rooms/" data-menu-toggle aria-controls="menu-panel">
         <span class="menu-toggle__bars" aria-hidden="true"><span></span><span></span></span>
-        <span class="menu-toggle__text">Menu</span>
+        <span class="menu-toggle__icon" aria-hidden="true"><Icon id="rooms" size={16} /></span>
+        <span class="menu-toggle__text menu-toggle__text--narrow">Menu</span>
+        <span class="menu-toggle__text menu-toggle__text--wide">All rooms</span>
       </a>
     </div>
   </div>
 
   <div class="menu-panel" id="menu-panel" data-menu-panel hidden>
+    <div class="wrap menu-panel__rooms">
+      <h2 class="label" id="menu-rooms">The rooms</h2>
+      <ul class="rooms-menu" aria-labelledby="menu-rooms">
+        {
+          rooms.map((r) => (
+            <li class:list={['rooms-menu__item', `is-${r.status}`]}>
+              {r.href ? (
+                <a href={r.href} class="rooms-menu__link" aria-current={current === r.id ? 'page' : undefined}>
+                  {isIcon(r.id) && <Icon id={r.id} size={22} />}
+                  <span class="rooms-menu__name">{r.name}</span>
+                  <span class="rooms-menu__status">{STATUS_LABELS[r.status].label}</span>
+                </a>
+              ) : (
+                <span class="rooms-menu__link">
+                  {isIcon(r.id) && <Icon id={r.id} size={22} />}
+                  <span class="rooms-menu__name">{r.name}</span>
+                  <span class="rooms-menu__status">{STATUS_LABELS[r.status].label}</span>
+                </span>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
     <div class="wrap menu-panel__inner">
       {
         GROUPS.map((g) => (
@@ -259,13 +290,36 @@ const GROUPS = [
   }
 
   .menu-toggle {
+    cursor: pointer;
+  }
+
+  .menu-toggle__icon {
+    display: inline-flex;
+  }
+
+  .menu-toggle__bars,
+  .menu-toggle__text--narrow {
     display: none;
   }
 
+  :global(.menu-open) .menu-toggle {
+    border-color: var(--rule-ink);
+    background: var(--surface-ink);
+    color: var(--text-on-ink);
+  }
+
   .menu-toggle__bars {
-    display: grid;
     gap: 4px;
     width: 16px;
+  }
+
+  /* Open, the button shows a close mark at every width. */
+  :global(.menu-open) .menu-toggle__icon {
+    display: none;
+  }
+
+  :global(.menu-open) .menu-toggle__bars {
+    display: grid;
   }
 
   .menu-toggle__bars span {
@@ -289,6 +343,96 @@ const GROUPS = [
     max-height: calc(100vh - var(--header-h));
     overflow-y: auto;
     box-shadow: 0 18px 30px -24px rgba(17, 20, 23, 0.45);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .menu-panel {
+      transition:
+        opacity var(--dur-slow) var(--ease-out),
+        transform var(--dur-slow) var(--ease-out),
+        display var(--dur-slow) allow-discrete;
+    }
+
+    .menu-panel[hidden] {
+      display: none;
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+
+    @starting-style {
+      .menu-panel:not([hidden]) {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+    }
+  }
+
+  .menu-panel__rooms {
+    padding-top: var(--sp-5);
+  }
+
+  .rooms-menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr));
+    gap: 0;
+    margin: var(--sp-2) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-ink);
+  }
+
+  .rooms-menu__item {
+    margin: 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .rooms-menu__link {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0 0.7rem;
+    min-height: 3.5rem;
+    padding: 0.55rem 0.75rem 0.55rem 0;
+    color: var(--text-strong);
+    text-decoration: none;
+  }
+
+  .rooms-menu__link :global(.icon) {
+    grid-row: span 2;
+    color: var(--text-strong);
+  }
+
+  .rooms-menu__name {
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .rooms-menu__status {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  a.rooms-menu__link:hover .rooms-menu__name,
+  a.rooms-menu__link[aria-current='page'] .rooms-menu__name {
+    color: var(--cobalt-text);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  a.rooms-menu__link:hover :global(.icon) {
+    color: var(--bb-cobalt);
+  }
+
+  .is-planned .rooms-menu__link {
+    color: var(--text-muted);
+  }
+
+  .is-planned .rooms-menu__link :global(.icon) {
+    color: var(--text-muted);
+    opacity: 0.7;
   }
 
   .menu-panel__inner {
@@ -327,8 +471,18 @@ const GROUPS = [
       display: none;
     }
 
-    .menu-toggle {
+    .menu-toggle__bars,
+    .menu-toggle__text--narrow {
       display: inline-flex;
+    }
+
+    .menu-toggle__bars {
+      display: grid;
+    }
+
+    .menu-toggle__icon,
+    .menu-toggle__text--wide {
+      display: none;
     }
 
     .site-header__tools {
@@ -396,8 +550,6 @@ const GROUPS = [
       const t = e.target as Node;
       if (!panel.hidden && !panel.contains(t) && !toggle.contains(t)) setOpen(false);
     });
-    window.matchMedia('(min-width: 75.0625rem)').addEventListener('change', (mq) => {
-      if (mq.matches) setOpen(false);
-    });
+    window.matchMedia('(min-width: 75.0625rem)').addEventListener('change', () => setOpen(false));
   }
 </script>

@@ -656,6 +656,24 @@ export const moduleSchema = z.object({
   href: z.string().optional(),
   contains: z.array(z.string()).default([]),
   order: z.number(),
+  /** A longer introduction for the room's own page. */
+  lead: z.string().optional(),
+  /** What the room holds, for its page: each item must be a working page or anchor. */
+  items: z
+    .array(
+      z.object({
+        kind: z.enum(['Brief', 'Case', 'Case lab', 'Decision Room', 'Interaction', 'Workspace', 'Guide', 'Calculation', 'Planner', 'Practice']),
+        title: z.string(),
+        href: z.string().startsWith('/'),
+        text: z.string(),
+        level: z.enum(['SL/HL', 'HL']).default('SL/HL'),
+      }),
+    )
+    .default([]),
+  /** Syllabus subtopics the room's material serves (codes in the IB curriculum). */
+  syllabus: z.array(z.string()).default([]),
+  /** What is planned for the room and not yet built. Never linked. */
+  planned: z.array(z.string()).default([]),
 });
 
 /* ------------------------------------------------------------------ */

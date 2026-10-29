@@ -3,7 +3,7 @@ import { breakEvenSvg } from '../lib/charts';
 import { buildWorking } from '../lib/finance';
 import { fmtNumber } from '../lib/format';
 import { breakEvenFiguresHtml, breakEvenTableHtml, workingHtml } from '../lib/render';
-import { announce, each, escapeHtml, inputValue, parseNumber, readConfig } from './ix';
+import { announce, each, escapeHtml, inputValue, lerp, parseNumber, readConfig, tween } from './ix';
 
 interface Config {
   defaults: BreakEvenInputs;
@@ -23,6 +23,19 @@ each('[data-ix="break-even"]', (root) => {
   if (!form) return;
   const input = (k: keyof BreakEvenInputs) => form.elements.namedItem(k) as HTMLInputElement;
   let timer = 0;
+  // The chart moves from the last figures drawn to the new ones, so a change can be followed by eye.
+  let drawn: BreakEvenInputs = { ...cfg.defaults };
+  let stop = () => undefined as void;
+  const drawChart = (to: BreakEvenInputs) => {
+    const from = drawn;
+    drawn = to;
+    stop();
+    stop = tween(320, (t) => {
+      const k = Object.fromEntries(KEYS.map((key) => [key, lerp(from[key], to[key], t)])) as unknown as BreakEvenInputs;
+      const chart = root.querySelector<HTMLElement>('[data-chart]');
+      if (chart) chart.innerHTML = breakEvenSvg(breakEvenModel(k), { currency: cfg.currency, unitsLabel: cfg.labels.units, periodLabel: cfg.labels.period, id: `${cfg.uid}-chart` });
+    });
+  };
 
   const read = () => Object.fromEntries(KEYS.map((k) => [k, parseNumber(input(k).value)])) as Record<keyof BreakEvenInputs, number | null>;
 
@@ -50,7 +63,7 @@ each('[data-ix="break-even"]', (root) => {
       if (el) el.innerHTML = html;
     };
     set('[data-figures]', breakEvenFiguresHtml(m, cfg.currency, L.units, L.unit));
-    set('[data-chart]', breakEvenSvg(m, { currency: cfg.currency, unitsLabel: L.units, periodLabel: L.period, id: `${cfg.uid}-chart` }));
+    drawChart(raw as BreakEvenInputs);
     set('[data-table]', breakEvenTableHtml(m, cfg.currency, L.units));
     set('[data-interp]', escapeHtml(reading.interpretation));
     set('[data-impl]', escapeHtml(reading.implication));

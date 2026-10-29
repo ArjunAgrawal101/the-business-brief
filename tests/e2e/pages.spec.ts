@@ -22,6 +22,11 @@ for (const path of PAGES) {
     });
     const res = await page.goto(path);
     expect(res?.status()).toBe(200);
+    // Let arrival animations finish, so the scan sees the page as a reader does after the first half-second.
+    await page.evaluate(async () => {
+      const running = document.getAnimations().filter((a) => a.effect?.getTiming().iterations !== Infinity);
+      await Promise.all(running.map((a) => a.finished.catch(() => undefined)));
+    });
     await expect(page.locator('h1')).toHaveCount(1);
     await expect(page.locator('main#main')).toHaveCount(1);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);

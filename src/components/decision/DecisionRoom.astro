@@ -104,7 +104,7 @@ const compare = (firstRound?.choices ?? []).map((ch) => ({ id: ch.id, label: ch.
         <p class="dr-locked js-only" data-locked hidden>
           {ri > 0 ? 'Commit your first decision to unlock this one.' : ''}
         </p>
-        <div class="dr-round__body" data-body>
+        <div class="dr-round__body arrive" data-body>
           <p class="dr-question">{round.question}</p>
           {round.help && <div class="prose small dr-help" set:html={rich(round.help)} />}
           <fieldset class="dr-choices">
@@ -122,7 +122,7 @@ const compare = (firstRound?.choices ?? []).map((ch) => ({ id: ch.id, label: ch.
                 <details class="dr-peek nojs-only">
                   <summary>See what happens</summary>
                   <div class="dr-peek__slot" data-home={ch.id}>
-                    <article class="dr-outcome" data-outcome={ch.id} aria-labelledby={`dr-${id}-${ch.id}-h`}>
+                    <article class="dr-outcome arrive" data-outcome={ch.id} aria-labelledby={`dr-${id}-${ch.id}-h`}>
                       <p class="dr-outcome__kicker">{ri === 0 ? 'Consequence' : 'Outcome'}</p>
                       <h3 class="dr-outcome__headline" id={`dr-${id}-${ch.id}-h`} tabindex="-1">
                         {ch.outcome.headline}
@@ -202,7 +202,7 @@ const compare = (firstRound?.choices ?? []).map((ch) => ({ id: ch.id, label: ch.
   <section class="dr-debrief" data-debrief aria-labelledby={`dr-${id}-debrief`} tabindex="-1">
     <SectionHead no={d.rounds.length + 2} title="Debrief" id={`dr-${id}-debrief`} />
     <p class="dr-locked js-only" data-debrief-locked>The debrief opens when you have made every decision.</p>
-    <div class="dr-debrief__body" data-debrief-body>
+    <div class="dr-debrief__body arrive" data-debrief-body>
       <div class="dr-yours js-only" data-yours />
       <div class="dr-debrief__grid">
         <section>

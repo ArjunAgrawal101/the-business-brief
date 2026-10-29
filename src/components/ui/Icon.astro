@@ -1,0 +1,30 @@
+---
+/** One of the platform's own icons (src/lib/icons.ts). Decorative unless a label is given. */
+import { ICONS, type IconId } from '../../lib/icons';
+
+interface Props {
+  id: IconId;
+  size?: number;
+  /** An accessible name, for an icon that stands alone. Omit when text beside it says the same. */
+  label?: string;
+  class?: string;
+}
+const { id, size = 24, label, class: cls } = Astro.props;
+---
+
+<svg
+  class:list={['icon', cls]}
+  viewBox="0 0 24 24"
+  width={size}
+  height={size}
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.75"
+  stroke-linecap="square"
+  stroke-linejoin="miter"
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  focusable="false"
+  set:html={ICONS[id]}
+/>

@@ -1,0 +1,195 @@
+/*
+ * Motion. One restrained language for the whole platform.
+ *
+ * - Feedback is quick (--dur-fast), state changes measured (--dur-base), and
+ *   arrivals and chart updates slower (--dur-slow, --dur-reveal), never more
+ *   than half a second, so motion never holds up reading.
+ * - Things arrive by rising a few pixels and fading in. Nothing slides across
+ *   the page, loops, bounces, or moves on its own once it has arrived. There is
+ *   no parallax and no scroll hijacking.
+ * - Objects you can pick up (cards, case files, the memo) lift towards the
+ *   pointer on a hard ink shadow; under reduced motion the shadow alone
+ *   answers the pointer.
+ * - Everything here is off under prefers-reduced-motion. Content is never
+ *   hidden unless the script that will reveal it is already running, and only
+ *   if it starts below the fold (src/scripts/motion.ts).
+ */
+
+/* ---------- Page to page ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition-old(root) {
+    animation: var(--dur-fast) var(--ease) both bb-fade-out;
+  }
+
+  ::view-transition-new(root) {
+    animation: var(--dur-slow) var(--ease-out) both bb-rise-in;
+  }
+
+  /* The header stays where it is while the page changes beneath it. */
+  .site-header {
+    view-transition-name: site-header;
+  }
+
+  ::view-transition-group(site-header) {
+    animation: none;
+  }
+}
+
+@keyframes bb-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes bb-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rise));
+  }
+}
+
+@keyframes bb-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rise));
+  }
+}
+
+@keyframes bb-draw {
+  from {
+    stroke-dashoffset: var(--path-length, 400);
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes bb-stamp {
+  0% {
+    opacity: 0;
+    transform: rotate(-2deg) scale(1.12);
+  }
+
+  60% {
+    opacity: 1;
+    transform: rotate(-2deg) scale(0.98);
+  }
+
+  100% {
+    opacity: 1;
+    transform: rotate(-2deg) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* ---------- Arrivals in place ---------- */
+
+  /* Anything that appears where it is: feedback, a revealed answer, a new stage. */
+  .arrive {
+    animation: bb-arrive var(--dur-slow) var(--ease-out) both;
+  }
+
+  /* Feedback and answer keys arrive where they are revealed. */
+  .feedback,
+  [data-key] {
+    animation: bb-arrive var(--dur-slow) var(--ease-out) both;
+  }
+
+  /* A group arriving on page load, item by item (the home page hero). */
+  .enter > * {
+    animation: bb-arrive var(--dur-reveal) var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * var(--stagger) + 60ms);
+  }
+
+  .enter > :nth-child(1) {
+    --i: 0;
+  }
+
+  .enter > :nth-child(2) {
+    --i: 1;
+  }
+
+  .enter > :nth-child(3) {
+    --i: 2;
+  }
+
+  .enter > :nth-child(4) {
+    --i: 3;
+  }
+
+  .enter > :nth-child(5) {
+    --i: 4;
+  }
+
+  .enter > :nth-child(6) {
+    --i: 5;
+  }
+
+  /* ---------- Scroll reveals (marked pending by the script) ---------- */
+
+  [data-reveal].is-pending:not([data-reveal="group"]),
+  [data-reveal="group"].is-pending > * {
+    opacity: 0;
+    transform: translateY(calc(var(--rise) * 1.2));
+  }
+
+  [data-reveal].is-pending.is-in:not([data-reveal="group"]),
+  [data-reveal="group"].is-pending.is-in > * {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity var(--dur-reveal) var(--ease-out),
+      transform var(--dur-reveal) var(--ease-out);
+    transition-delay: calc(var(--i, 0) * var(--stagger));
+  }
+
+  /* ---------- Objects you can pick up ---------- */
+
+  .lift {
+    transition:
+      transform var(--dur-base) var(--ease),
+      box-shadow var(--dur-base) var(--ease),
+      border-color var(--dur-fast) var(--ease);
+  }
+
+  .lift:hover,
+  .lift:focus-within {
+    transform: translate(-3px, -3px);
+    box-shadow: 4px 4px 0 var(--bb-ink);
+  }
+
+  /* ---------- Lines that draw themselves once ---------- */
+
+  .draw-in.is-in path,
+  .draw-in.is-in line,
+  .draw-in.is-in polyline {
+    stroke-dasharray: var(--path-length, 400);
+    animation: bb-draw var(--dur-reveal) var(--ease-in-out) both;
+  }
+
+  /* A committed decision is stamped. */
+  .stamp-in {
+    animation: bb-stamp var(--dur-slow) var(--ease-out) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lift:hover,
+  .lift:focus-within {
+    box-shadow: 4px 4px 0 var(--bb-ink);
+  }
+}
+
+@media print {
+  [data-reveal],
+  [data-reveal] > * {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

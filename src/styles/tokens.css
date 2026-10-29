@@ -90,10 +90,16 @@
   --radius-1: 2px;
   --radius-2: 4px;
 
-  /* Motion */
-  --dur-fast: 120ms;
-  --dur-base: 200ms;
-  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  /* Motion: one restrained language (see src/styles/motion.css and docs/DESIGN_SYSTEM.md) */
+  --dur-fast: 120ms; /* pointer feedback: hover, press, colour */
+  --dur-base: 200ms; /* small state changes: toggles, ticks, underlines */
+  --dur-slow: 320ms; /* panels, stage changes, chart updates */
+  --dur-reveal: 460ms; /* a section arriving as it scrolls into view */
+  --stagger: 55ms; /* delay between items arriving together */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1); /* default: quick start, soft landing */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* arrivals */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1); /* movement from one state to another */
+  --rise: 10px; /* how far an arriving element travels */
 
   /* Focus */
   --focus-ring: 3px solid var(--bb-cobalt);

@@ -1,0 +1,130 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import Icon from '../../components/ui/Icon.astro';
+import StatusTag from '../../components/ui/StatusTag.astro';
+import { modulesInOrder } from '../../lib/content';
+import { isIcon } from '../../lib/icons';
+
+const rooms = await modulesInOrder();
+const counts = {
+  live: rooms.filter((r) => r.data.status === 'live').length,
+  partial: rooms.filter((r) => r.data.status === 'partial').length,
+  planned: rooms.filter((r) => r.data.status === 'planned').length,
+};
+---
+
+<BaseLayout title="All rooms" description="The fourteen rooms of The Business Brief, what each is for, what works in it now and what is planned." section="rooms">
+  <PageIntro
+    trail={[{ label: 'All rooms' }]}
+    kicker="The platform"
+    title="All rooms"
+    lead={`One platform, fourteen rooms, each with one job. ${counts.live} are live, ${counts.partial} are partly built and ${counts.planned} are planned. A room is linked only when something in it works.`}
+  />
+  <div class="wrap page-body">
+    <ol class="room-list" role="list">
+      {
+        rooms.map((m, i) => (
+          <li class:list={['room-row', `room-row--${m.data.status}`]} id={`room-${m.id}`}>
+            <span class="room-row__no num">{String(i + 1).padStart(2, '0')}</span>
+            <span class="room-row__icon" aria-hidden="true">{isIcon(m.id) && <Icon id={m.id} size={26} />}</span>
+            <div class="room-row__body">
+              <h2 class="room-row__name">{m.data.href ? <a href={m.data.href}>{m.data.name}</a> : m.data.name}</h2>
+              <p class="room-row__purpose">{m.data.purpose}</p>
+              {m.data.contains.length > 0 && <p class="room-row__contains small">{m.data.contains.join(' · ')}</p>}
+            </div>
+            <span class="room-row__status">
+              <StatusTag status={m.data.status} />
+            </span>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</BaseLayout>
+
+<style>
+  .room-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .room-row {
+    display: grid;
+    grid-template-columns: 2.25rem 3rem minmax(0, 1fr) auto;
+    align-items: start;
+    gap: var(--sp-2) var(--sp-4);
+    margin: 0;
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .room-row__no {
+    padding-top: 0.7rem;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .room-row__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border: 1px solid var(--bb-ink);
+    background: var(--bb-ink);
+    color: var(--text-on-ink);
+  }
+
+  .room-row--partial .room-row__icon {
+    background: #fff;
+    color: var(--bb-ink);
+  }
+
+  .room-row--planned .room-row__icon {
+    border-style: dashed;
+    border-color: var(--rule-control);
+    background: transparent;
+    color: var(--text-muted);
+  }
+
+  .room-row__name {
+    margin: 0;
+    font-size: var(--fs-h4);
+  }
+
+  .room-row--planned .room-row__name {
+    color: var(--text-muted);
+  }
+
+  .room-row__purpose {
+    margin: var(--sp-1) 0 0;
+    max-width: var(--text-max);
+  }
+
+  .room-row__contains {
+    margin: var(--sp-2) 0 0;
+    color: var(--text-muted);
+  }
+
+  .room-row__status {
+    padding-top: 0.5rem;
+  }
+
+  @media (max-width: 40rem) {
+    .room-row {
+      grid-template-columns: 3rem minmax(0, 1fr);
+    }
+
+    .room-row__no {
+      display: none;
+    }
+
+    .room-row__status {
+      grid-column: 2;
+      padding-top: 0;
+    }
+  }
+</style>
