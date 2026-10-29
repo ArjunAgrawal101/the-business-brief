@@ -54,6 +54,8 @@ export const href = {
   case: (id: string) => `/cases/${id}/`,
   decision: (id: string) => `/decision-room/${id}/`,
   tool: (id: string, tool?: Tool) => (tool && tool.status !== 'complete' ? null : `/toolkit/${id}/`),
+  /** A tool's guide when it has one, otherwise its entry in the toolkit index. */
+  toolEntry: (id: string, tool?: Tool) => (tool && tool.status !== 'complete' ? `/toolkit/#tool-${id}` : `/toolkit/${id}/`),
   question: (id: string) => `/exam-desk/practice/#q-${id}`,
   glossary: (id: string) => `/glossary/#term-${id}`,
   commandTerm: (term: string) => `/examiner-lens/#ct-${slug(term)}`,

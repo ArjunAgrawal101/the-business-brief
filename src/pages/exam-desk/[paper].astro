@@ -4,6 +4,8 @@ import PageIntro from '../../components/layout/PageIntro.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import FactList from '../../components/assess/FactList.astro';
 import QuestionCard from '../../components/assess/QuestionCard.astro';
+import PaperStructure from '../../components/assess/PaperStructure.astro';
+import IbGuidance from '../../components/assess/IbGuidance.astro';
 import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
 import { corpus } from '../../lib/content';
 import { inline } from '../../lib/markup';
@@ -27,18 +29,32 @@ const questions = a.questions.map((q) => ({ id: q, data: c.questions[q] })).filt
 <BaseLayout title={`${a.name}: Exam Desk`} description={a.summary} section="exam-desk">
   <PageIntro trail={[{ label: 'Exam Desk', href: '/exam-desk/' }, { label: a.name }]} kicker={`Exam Desk · ${a.levels}`} title={a.name} lead={a.summary} />
   <div class="wrap page-body">
+    <section aria-labelledby="shape-h">
+      <SectionHead no={1} title="The shape of the paper" dek="From the Business management guide's assessment outlines." id="shape-h" />
+      <div style="margin-top:var(--sp-4)"><PaperStructure a={a} /></div>
+    </section>
     <section aria-labelledby="known-h">
-      <SectionHead no={1} title="What is known" dek="Each statement shows how far it has been checked, and where it comes from." id="known-h" />
+      <SectionHead no={2} title="What the guide says" dek="Each statement with its page in the guide." id="known-h" />
       <div style="margin-top:var(--sp-4)"><FactList facts={a.facts} /></div>
       <div class="callout callout--caution" style="margin-top:var(--sp-5)">
         <span class="callout__kicker">Not stated here</span>
         <ul class="prose">{a.notStated.map((x) => <li>{x}</li>)}</ul>
       </div>
     </section>
+    {
+      a.ibGuidance.length > 0 && (
+        <section aria-labelledby="ibg-h">
+          <SectionHead no={3} title="Advice from the IB" id="ibg-h" />
+          <div style="margin-top:var(--sp-4)">
+            <IbGuidance items={a.ibGuidance} />
+          </div>
+        </section>
+      )
+    }
     <section aria-labelledby="prep-h">
-      <SectionHead no={2} title="How to prepare" id="prep-h" />
+      <SectionHead no={4} title="How to prepare" id="prep-h" />
       <div class="tags" style="margin-top:var(--sp-3)"><ProvenanceTag kind="aa-framework" /></div>
-      <p class="small muted">The platform's teaching, based on the published structure. These are not examiner observations.</p>
+      <p class="small muted">The platform's own teaching, built on the structure above. These are not examiner observations.</p>
       <div class="grid grid--3" style="margin-top:var(--sp-4)">
         <div>
           <h3 class="label label--ink">What tends to earn credit</h3>
@@ -57,7 +73,7 @@ const questions = a.questions.map((q) => ({ id: q, data: c.questions[q] })).filt
     {
       questions.length > 0 && (
         <section aria-labelledby="q-h">
-          <SectionHead no={3} title="Practice in this style" dek="Original practice questions. They are not IB questions." id="q-h" />
+          <SectionHead no={5} title="Practice in this style" dek="Original practice questions. They are not IB questions." id="q-h" />
           <div class="stack" style="margin-top:var(--sp-5)">
             {questions.map((q) => q.data && <QuestionCard id={q.id} question={q.data} />)}
           </div>

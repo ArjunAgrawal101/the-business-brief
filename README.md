@@ -16,8 +16,8 @@ It is written first for IB Diploma Programme Business Management (SL and HL), wi
 | Interactions | 11: cost classifier, break-even workspace, error diagnosis, special order panel (HL), Ansoff placer, decision tree lab, scale explorer, two force field builders, style matcher, functions sorter |
 | Finance Desk | 13 calculations, each shown in eight parts (given, formula, substitution, working, answer, unit, interpretation, business implication) |
 | Toolkit | 15 tools listed (8 SL and HL, 7 HL), 6 with complete guides |
-| Exam Desk | Paper 1, 2 and 3 and the IA stated with sources and verification status; 22 original practice questions; 31 command terms |
-| IB mapping | 5 units and 37 subtopics, each with its level and verification status; a coverage matrix generated from the content |
+| Exam Desk | Paper 1, 2 and 3 and the IA as the guide sets them out, with page references; 22 original practice questions; the guide's 31 command terms at their AO levels |
+| IB mapping | 5 units, 37 subtopics and 143 content statements checked against the Business management guide, with depth of teaching, SL and HL and teaching hours; a coverage matrix generated from the content |
 | Pages | 54, all passing automated WCAG 2.2 AA checks at desktop and phone widths |
 
 What is not built yet, and why, is in [docs/RELEASE_REPORT.md](docs/RELEASE_REPORT.md) and [docs/ROADMAP.md](docs/ROADMAP.md).
@@ -101,7 +101,7 @@ docs/                Architecture, design system, content model and the rest
 
 ## Principles
 
-- **Accuracy before polish.** Every statement about the IB course carries a verification status and a source in the [claims register](src/content/data/claims.yaml). The IB Business management guide was not available for this release, so nothing is marked as checked against it.
+- **Accuracy before polish.** Every statement about the IB course is checked against the IB Business management guide (first assessment 2024), gives its page and is recorded in the [claims register](src/content/data/claims.yaml). Facts are stated in the platform's words; the guide's text, markbands and descriptors are not reproduced.
 - **Fiction is labelled.** The cases are fictional, their figures simulated and recomputed by the tests. Real organizations appear only as cited, dated facts kept apart from interpretation.
 - **Practice is practice.** Every question is original; mark schemes and level descriptors are the platform's own.
 - **Every page works without JavaScript.** Interactions add behaviour to complete, readable pages.

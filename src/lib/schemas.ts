@@ -394,9 +394,18 @@ export type Decision = z.infer<typeof decisionSchema>;
 /* Toolkit                                                             */
 /* ------------------------------------------------------------------ */
 
+export const TOOL_CLASSES = ['situational', 'planning', 'decision-making'] as const;
+
 const toolCommon = {
   name: z.string(),
-  family: z.enum(['strategic', 'quantitative', 'planning', 'people', 'sustainability']),
+  /** The TSM's classification (p. 26): situational, planning or decision-making. A tool can fit more than one. */
+  classes: z.array(z.enum(TOOL_CLASSES)).min(1),
+  /** "tsm" when the TSM classifies the tool itself; "platform" when the class is the platform's reading. */
+  classSource: z.enum(['tsm', 'platform']),
+  /** Units the guide suggests integrating the tool with (p. 14). */
+  units: z.array(z.number().int().min(1).max(5)).min(1),
+  /** What the guide says the tool includes, where it says. */
+  includes: z.array(z.string()).default([]),
   ibStatus: z.enum(['ib-toolkit', 'pedagogical-framework', 'enrichment']),
   level,
   verification,
@@ -437,7 +446,7 @@ export type Tool = z.infer<typeof toolSchema>;
 export const calculationSchema = z.object({
   name: z.string(),
   status: z.enum(['complete', 'planned']),
-  group: z.enum(['costs-revenue', 'break-even', 'contribution', 'decision', 'scale']),
+  group: z.enum(['costs-revenue', 'break-even', 'contribution', 'decision', 'scale', 'people', 'ratios', 'cash-flow', 'investment', 'operations', 'marketing']),
   syllabus: z.array(z.object({ code: z.string(), note: z.string().optional() })).min(1),
   verification,
   level,
@@ -506,6 +515,8 @@ export type Question = z.infer<typeof questionSchema>;
 /* Curriculum, assessment structure, command terms                     */
 /* ------------------------------------------------------------------ */
 
+const hours = z.object({ sl: z.number().int().nonnegative(), hl: z.number().int().nonnegative() });
+
 export const curriculumSchema = z.object({
   name: z.string(),
   shortName: z.string(),
@@ -513,6 +524,8 @@ export const curriculumSchema = z.object({
   guide: z.string(),
   verification,
   note: md,
+  /** Recommended teaching hours outside the units (toolkit, paper 1 research, IA) and in total. */
+  hours: z.object({ toolkit: hours, paper1Research: hours, internalAssessment: hours, total: hours }).optional(),
   units: z
     .array(
       z.object({
@@ -520,6 +533,11 @@ export const curriculumSchema = z.object({
         number: z.number().int(),
         title: z.string(),
         verification,
+        hours: hours.optional(),
+        /** The guide page where the unit's content begins. */
+        page: z.number().int().positive().optional(),
+        /** Toolkit tools the guide suggests integrating with this unit. */
+        tools: ids,
         subtopics: z
           .array(
             z.object({
@@ -527,10 +545,15 @@ export const curriculumSchema = z.object({
               title: z.string(),
               level: topicLevel,
               verification,
+              page: z.number().int().positive().optional(),
               note: z.string().optional(),
               topic: z.string().optional(),
               tools: ids,
               calculations: ids,
+              /** Content statements in the platform's words, with the guide's depth of teaching and HL status. */
+              content: z
+                .array(z.object({ text: z.string(), ao: z.array(ao).min(1), level: level.default('SL/HL') }))
+                .default([]),
             }),
           )
           .min(1),
@@ -549,6 +572,22 @@ export const assessmentSchema = z.object({
   order: z.number(),
   summary: z.string(),
   facts: z.array(z.object({ text: z.string(), status: verification, sources: ids, location: z.string().optional() })).min(1),
+  /** Duration, marks and weighting at each level, from the guide's assessment outlines (pp. 39 to 40). */
+  outline: z
+    .object({
+      sl: z.object({ duration: z.string(), marks: z.number().int(), weight: z.number() }).optional(),
+      hl: z.object({ duration: z.string(), marks: z.number().int(), weight: z.number() }).optional(),
+    })
+    .optional(),
+  /** Sections or questions of the component, from the guide. */
+  sections: z
+    .array(z.object({ name: z.string(), marks: z.string(), task: md, aos: z.array(ao).min(1) }))
+    .default([]),
+  /** Assessment criteria by name and maximum mark (descriptors are not reproduced). */
+  criteria: z.array(z.object({ id: z.string(), name: z.string(), marks: z.number().int().positive() })).default([]),
+  requirements: z.array(md).default([]),
+  /** Advice from the IB teacher support material, paraphrased, with its page. */
+  ibGuidance: z.array(z.object({ text: md, location: z.string() })).default([]),
   notStated: z.array(z.string()).min(1),
   rewards: z.array(md).min(2),
   preparation: z.array(md).min(3),
@@ -561,9 +600,13 @@ export const commandTermSchema = z.object({
   term: z.string(),
   ao,
   aoStatus: verification,
+  /** The platform's explanation of the term. */
   definition: z.string(),
+  /** "platform" when the wording is the platform's; otherwise a source id. */
   definitionSource: z.string(),
   definitionStatus: verification,
+  /** The guide page with the official definition. */
+  officialPage: z.number().int().positive().optional(),
   guidance: md,
   stem: z.string(),
   pitfall: md,

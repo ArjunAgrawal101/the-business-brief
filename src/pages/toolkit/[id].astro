@@ -45,7 +45,11 @@ const lists = [
     <section aria-labelledby="purpose-h">
       <SectionHead no={1} title="What it is for" id="purpose-h" />
       <div class="prose lead" style="margin-top:var(--sp-4)" set:html={rich(t.purpose)} />
-      {t.verificationNote && <p class="small muted" set:html={inline(t.verificationNote)} />}
+      <dl class="tool-facts">
+        <div><dt>Class</dt><dd>{t.classes.map((k) => ({ situational: 'Situational', planning: 'Planning', 'decision-making': 'Decision-making' })[k]).join(' and ')}{t.classSource === 'platform' ? ' (the platform\'s reading; the TSM does not classify this tool)' : ' (IB teacher support material, p. 26)'}</dd></div>
+        <div><dt>Suggested units</dt><dd>{t.units.map((u) => `Unit ${u}`).join(', ')} (guide, p. 14)</dd></div>
+        {t.includes.length > 0 && <div><dt>The guide includes</dt><dd>{t.includes.join('; ')}</dd></div>}
+      </dl>
       <div class="grid grid--3" style="margin-top:var(--sp-5)">
         {
           lists.map((l) => (
@@ -136,6 +140,43 @@ const lists = [
   .tool-list ul {
     margin-top: var(--sp-2);
     padding-left: 1.2em;
+  }
+
+  .tool-facts {
+    display: grid;
+    gap: 0;
+    margin: var(--sp-5) 0 0;
+    max-width: 48rem;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .tool-facts > div {
+    display: grid;
+    grid-template-columns: 11rem 1fr;
+    gap: var(--sp-3);
+    padding: var(--sp-2) 0;
+    border-bottom: 1px solid var(--rule-hair);
+    font-size: var(--fs-small);
+  }
+
+  .tool-facts dt {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding-top: 0.15rem;
+  }
+
+  .tool-facts dd {
+    margin: 0;
+  }
+
+  @media (max-width: 36rem) {
+    .tool-facts > div {
+      grid-template-columns: 1fr;
+      gap: var(--sp-1);
+    }
   }
 
   .commentary-box {

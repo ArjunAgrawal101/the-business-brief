@@ -1,0 +1,145 @@
+---
+/**
+ * The structure of an assessment component, from the guide: duration, marks
+ * and weighting at each level, its sections or questions with the assessment
+ * objectives they assess, and its criteria by name and maximum mark.
+ */
+import type { AssessmentComponent } from '../../lib/schemas';
+
+interface Props {
+  a: AssessmentComponent;
+}
+const { a } = Astro.props;
+const levels = (['sl', 'hl'] as const).filter((l) => a.outline?.[l]);
+const total = a.criteria.reduce((n, k) => n + k.marks, 0);
+---
+
+<div class="pstruct">
+  {
+    levels.length > 0 && (
+      <div class="table-scroll" role="region" aria-label={`${a.name} at a glance`} tabindex="0">
+        <table class="table">
+          <caption class="sr-only">{a.name}: duration, marks and weighting</caption>
+          <thead>
+            <tr>
+              <th scope="col">Level</th>
+              <th scope="col">Time</th>
+              <th scope="col" class="n">Marks</th>
+              <th scope="col" class="n">Share of the final mark</th>
+            </tr>
+          </thead>
+          <tbody>
+            {levels.map((l) => (
+              <tr>
+                <th scope="row">{l.toUpperCase()}</th>
+                <td>{a.outline?.[l]?.duration}</td>
+                <td class="n">{a.outline?.[l]?.marks}</td>
+                <td class="n">{a.outline?.[l]?.weight}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+  {
+    a.sections.length > 0 && (
+      <ol class="pstruct__sections" role="list">
+        {a.sections.map((s) => (
+          <li class="pstruct__section">
+            <span class="pstruct__name">{s.name}</span>
+            <span class="pstruct__marks num">{s.marks} {s.marks === '1' ? 'mark' : 'marks'}</span>
+            <p class="pstruct__task">{s.task}</p>
+            <span class="pstruct__aos">
+              {s.aos.map((x) => (
+                <span class="tag tag--plain">{x}</span>
+              ))}
+            </span>
+          </li>
+        ))}
+      </ol>
+    )
+  }
+  {
+    a.criteria.length > 0 && (
+      <div class="table-scroll" role="region" aria-label={`${a.name} criteria`} tabindex="0">
+        <table class="table">
+          <caption class="sr-only">{a.name}: assessment criteria and maximum marks</caption>
+          <thead>
+            <tr>
+              <th scope="col">Criterion</th>
+              <th scope="col" class="n">Maximum</th>
+            </tr>
+          </thead>
+          <tbody>
+            {a.criteria.map((k) => (
+              <tr>
+                <th scope="row">
+                  <span class="num">{k.id}</span> {k.name}
+                </th>
+                <td class="n">{k.marks}</td>
+              </tr>
+            ))}
+            <tr class="is-total">
+              <th scope="row">Total</th>
+              <td class="n">
+                <strong>{total}</strong>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .pstruct {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .pstruct__sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pstruct__section {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-content: start;
+    gap: var(--sp-2) var(--sp-3);
+    padding: var(--sp-4);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--bb-ink);
+    background: #fff;
+  }
+
+  .pstruct__name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  .pstruct__marks {
+    font-weight: 600;
+    color: var(--cobalt-text);
+  }
+
+  .pstruct__task {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  .pstruct__aos {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1);
+  }
+</style>

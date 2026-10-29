@@ -20,7 +20,19 @@ interface Props {
 const { id, calc: k, headingLevel = 2 } = Astro.props;
 const c = await corpus();
 const H = headingLevel === 2 ? 'h2' : 'h3';
-const GROUPS = { 'costs-revenue': 'Costs and revenue', 'break-even': 'Break-even', contribution: 'Contribution', decision: 'Decisions', scale: 'Scale' } as const;
+const GROUPS = {
+  'costs-revenue': 'Costs and revenue',
+  'break-even': 'Break-even',
+  contribution: 'Contribution',
+  decision: 'Decisions',
+  scale: 'Scale',
+  people: 'People',
+  ratios: 'Ratio analysis',
+  'cash-flow': 'Cash flow',
+  investment: 'Investment appraisal',
+  operations: 'Operations',
+  marketing: 'Marketing',
+} as const;
 const ex = k.example;
 let treeHtml: string | undefined;
 if (ex?.tree) {

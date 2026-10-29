@@ -186,6 +186,51 @@ test.describe('Exam Desk', () => {
   });
 });
 
+test.describe('IA Studio', () => {
+  test('the planner checks supporting documents, totals the marks and keeps the plan', async ({ page }) => {
+    await page.goto('/ia-studio/');
+    await ready(page, '[data-ix="ia-plan"]');
+    const plan = page.locator('[data-ix="ia-plan"]');
+    await plan.locator('#ia-submission').fill('2027-04');
+    await expect(plan.locator('[data-tl-earliest]')).toContainText('April 2024');
+    await plan.locator('#ia-deadline').fill('2027-03-05');
+    await expect(plan.locator('[data-tl-selfmark]')).toContainText('19 February 2027');
+    const rows = plan.locator('tr[data-doc]');
+    const docs: Array<[string, string, string, string]> = [
+      ['Annual report', 'Firm', '2026-02', 'secondary'],
+      ['Press article', 'Paper', '2023-11', 'secondary'],
+      ['Interview', 'Me', '2026-09', 'transcript'],
+      ['Podcast', 'Radio', '2026-01', 'transcript'],
+    ];
+    for (const [i, [title, publisher, date, kind]] of docs.entries()) {
+      const r = rows.nth(i);
+      await r.locator('[data-f="selected"]').check();
+      await r.locator('[data-f="title"]').fill(title);
+      await r.locator('[data-f="publisher"]').fill(publisher);
+      await r.locator('[data-f="published"]').fill(date);
+      await r.locator('[data-f="kind"]').selectOption(kind);
+    }
+    const findings = plan.locator('[data-findings]');
+    await expect(findings).toContainText('4 selected, within three to five');
+    await expect(findings).toContainText('Press article: published more than three years before submission');
+    await expect(findings).toContainText('At most one supporting document may be a transcript');
+    await expect(rows.nth(1)).toHaveClass(/is-problem/);
+    await plan.locator('#ia-words').fill('1850');
+    await expect(plan.locator('[data-words-status]')).toContainText('50 words over');
+    await plan.locator('select[name="mark-A"]').selectOption('4');
+    await plan.locator('select[name="mark-C"]').selectOption('3');
+    await expect(plan.locator('[data-mark-total]')).toHaveText('7');
+    await plan.locator('input[name="done-1"]').check();
+    await expect(plan.locator('[data-progress-text]')).toHaveText('1 of 10 steps done');
+    await expect(plan.locator('[data-saved]')).toHaveText('Saved on this device.');
+    await page.reload();
+    await ready(page, '[data-ix="ia-plan"]');
+    await expect(plan.locator('tr[data-doc]').nth(1).locator('[data-f="title"]')).toHaveValue('Press article');
+    await expect(plan.locator('[data-mark-total]')).toHaveText('7');
+    await expect(plan.locator('[data-findings]')).toContainText('At most one supporting document may be a transcript');
+  });
+});
+
 test.describe('Privacy', () => {
   test('clearing removes everything the site stored', async ({ page }) => {
     await page.goto('/privacy/');

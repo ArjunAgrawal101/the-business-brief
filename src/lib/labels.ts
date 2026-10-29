@@ -10,7 +10,7 @@ export const PROVENANCE_LABELS: Record<Provenance, { label: string; css: string;
     label: 'IB requirement',
     css: 'tag--ib',
     description:
-      'A requirement of the IB Diploma Programme Business management course. Because the Business management guide was not available when this release was written, every such statement also carries a verification status.',
+      'A requirement of the IB Diploma Programme Business management course, from the Business management guide (first assessment 2024). Each such statement also shows how far it has been checked and gives the page.',
   },
   'subject-knowledge': {
     label: 'Subject knowledge',

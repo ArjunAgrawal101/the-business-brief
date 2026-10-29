@@ -1,0 +1,63 @@
+---
+/** Advice from the IB teacher support material, paraphrased, each item with its page. */
+import { href } from '../../lib/content';
+import { inline } from '../../lib/markup';
+
+interface Props {
+  items: Array<{ text: string; location: string }>;
+}
+const { items } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <div class="ibg">
+      <p class="ibg__head">
+        <span class="tag tag--source">From IB guidance</span>
+        <span class="small muted">
+          Paraphrased from the <a href={href.source('ib-bm-tsm-2022')}>Business management teacher support material</a> (2022). It is guidance for
+          teachers, not a report of what examiners have said.
+        </span>
+      </p>
+      <ul class="ibg__list">
+        {items.map((g) => (
+          <li>
+            <span set:html={inline(g.text)} /> <span class="ibg__loc">{g.location}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+<style>
+  .ibg {
+    padding: var(--sp-4) var(--sp-5);
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--bb-cobalt);
+    background: var(--surface-sheet);
+  }
+
+  .ibg__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--sp-2) var(--sp-3);
+    margin: 0 0 var(--sp-3);
+  }
+
+  .ibg__list {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding-left: 1.1em;
+    max-width: var(--text-max);
+  }
+
+  .ibg__loc {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+</style>

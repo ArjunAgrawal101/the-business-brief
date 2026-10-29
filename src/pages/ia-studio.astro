@@ -3,100 +3,69 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/layout/PageIntro.astro';
 import SectionHead from '../components/layout/SectionHead.astro';
 import FactList from '../components/assess/FactList.astro';
-import ProvenanceTag from '../components/ui/ProvenanceTag.astro';
+import PaperStructure from '../components/assess/PaperStructure.astro';
+import IbGuidance from '../components/assess/IbGuidance.astro';
+import IaPlanner from '../components/ia/IaPlanner.astro';
+import VerifyTag from '../components/ui/VerifyTag.astro';
 import { corpus, href } from '../lib/content';
-import { CONCEPT_NAMES } from '../lib/labels';
 import { inline } from '../lib/markup';
 
 const c = await corpus();
 const ia = c.assessment['internal-assessment'];
-const FIELDS = [
-  { key: 'org', label: 'The organization', hint: 'A real organization you can get evidence about. Name it, and say how you will reach its information.', rows: 2 },
-  { key: 'issue', label: 'The issue it faces now', hint: 'A decision or a problem, narrow enough to answer in the word limit.', rows: 3 },
-  { key: 'question', label: 'Your research question', hint: 'Written as a question the organization would want answered.', rows: 2 },
-  { key: 'evidence', label: 'The evidence you will use', hint: 'Documents, data and interviews. Note where each comes from and when.', rows: 4 },
-  { key: 'tools', label: 'The tools you will apply', hint: 'From the toolkit. Say what each will tell you that the others will not.', rows: 3 },
-  { key: 'risks', label: 'What could go wrong', hint: 'Evidence you might not get, and what you would do instead.', rows: 3 },
-];
 ---
 
-<BaseLayout title="IA Studio" description="What is known about the IB Business Management internal assessment, with a planning framework for the research project." section="exam-desk">
+<BaseLayout title="IA Studio" description="The IB Business Management internal assessment as the guide sets it out, with the IB's own guidance and a ten-step planner that checks your supporting documents." section="exam-desk">
   <PageIntro
     trail={[{ label: 'Exam Desk', href: '/exam-desk/' }, { label: 'IA Studio' }]}
     kicker="IA Studio"
-    title="The research project"
-    lead="What is known about the internal assessment, stated with its sources, and a planner for choosing an organization, an issue and a question you can actually answer. The assessment criteria are not reproduced here; check them in the Guide with your teacher."
+    title="The business research project"
+    lead="The internal assessment as the Business management guide sets it out, the IB's own advice for preparing it, and a planner that takes you through ten steps and checks your supporting documents against the rules."
   />
   <div class="wrap page-body">
     {
       ia && (
-        <section aria-labelledby="known-h">
-          <SectionHead no={1} title="What is known" id="known-h" />
-          <div style="margin-top:var(--sp-4)">
-            <FactList facts={ia.facts} />
-          </div>
-          <div class="callout callout--caution" style="margin-top:var(--sp-5)">
-            <span class="callout__kicker">Not stated here</span>
-            <ul class="prose">{ia.notStated.map((x) => <li>{x}</li>)}</ul>
-          </div>
-        </section>
+        <>
+          <section aria-labelledby="task-h">
+            <SectionHead no={1} title="The task" dek={ia.summary} id="task-h" />
+            <div style="margin-top:var(--sp-4)">
+              <PaperStructure a={ia} />
+            </div>
+            <p class="small muted" style="margin-top:var(--sp-3)">
+              Criteria and maximum marks: Business management guide, pp. 56 to 58. The level descriptors are not reproduced here; read them in the guide
+              with your teacher.
+            </p>
+            <div style="margin-top:var(--sp-5)">
+              <FactList facts={ia.facts} />
+            </div>
+          </section>
+          <section aria-labelledby="req-h">
+            <SectionHead no={2} title="The requirements" dek="What the project must do, from the guide, in the platform's words." id="req-h" />
+            <ol class="req-list">
+              {ia.requirements.map((r) => (
+                <li set:html={inline(r)} />
+              ))}
+            </ol>
+            <p class="small muted">
+              Business management guide, pp. 53 to 56. <VerifyTag status="primary" />
+            </p>
+          </section>
+          <section aria-labelledby="ibg-h">
+            <SectionHead no={3} title="Advice from the IB" id="ibg-h" />
+            <div style="margin-top:var(--sp-4)">
+              <IbGuidance items={ia.ibGuidance} />
+            </div>
+          </section>
+        </>
       )
     }
     <section aria-labelledby="plan-h">
-      <SectionHead no={2} title="Plan your project" dek="Work through the questions in order. Your notes are saved on this device only, and you can print them for a meeting with your teacher." id="plan-h" />
-      <div class="tags" style="margin-top:var(--sp-3)"><ProvenanceTag kind="aa-framework" /></div>
-      <form class="ia-plan" data-ia-plan aria-label="Research project planner" novalidate>
-        {
-          FIELDS.slice(0, 3).map((f, k) => (
-            <div class="field">
-              <label for={`ia-${f.key}`}>
-                <span class="num">{String(k + 1).padStart(2, '0')}</span> {f.label}
-              </label>
-              <textarea class="textarea" id={`ia-${f.key}`} name={f.key} rows={f.rows} aria-describedby={`ia-${f.key}-hint`} />
-              <span class="field__hint" id={`ia-${f.key}-hint`}>{f.hint}</span>
-            </div>
-          ))
-        }
-        <fieldset class="ia-lens">
-          <legend><span class="num">04</span> The concept you will use as a lens</legend>
-          <div class="choice__opts">
-            {
-              Object.entries(CONCEPT_NAMES).map(([id, name]) => (
-                <label class="opt">
-                  <input type="radio" name="lens" value={id} />
-                  <span class="opt__body">
-                    <span class="opt__text">{name}</span>
-                  </span>
-                </label>
-              ))
-            }
-          </div>
-          <span class="field__hint">
-            A lens changes how you read the evidence. <a href="/ib/concepts/">What each concept asks of an organization</a>.
-          </span>
-        </fieldset>
-        {
-          FIELDS.slice(3).map((f, k) => (
-            <div class="field">
-              <label for={`ia-${f.key}`}>
-                <span class="num">{String(k + 5).padStart(2, '0')}</span> {f.label}
-              </label>
-              <textarea class="textarea" id={`ia-${f.key}`} name={f.key} rows={f.rows} aria-describedby={`ia-${f.key}-hint`} />
-              <span class="field__hint" id={`ia-${f.key}-hint`}>{f.hint}</span>
-            </div>
-          ))
-        }
-        <div class="cluster">
-          <button type="button" class="btn btn--primary" data-print>Print my plan</button>
-          <button type="button" class="btn" data-clear>Clear the planner</button>
-          <span class="small muted" data-saved aria-live="polite"></span>
-        </div>
-      </form>
+      <SectionHead no={4} title="Plan your project" dek="Work through the ten steps in order. Your plan is saved on this device only, and you can print it for a meeting with your teacher." id="plan-h" />
+      {ia && <IaPlanner criteria={ia.criteria} />}
     </section>
     {
       ia && (
         <section aria-labelledby="advice-h">
-          <SectionHead no={3} title="What makes a project work" id="advice-h" />
+          <SectionHead no={5} title="What makes a project work" id="advice-h" />
           <div class="grid grid--3" style="margin-top:var(--sp-4)">
             <div>
               <h3 class="label label--ink">What tends to earn credit</h3>
@@ -111,9 +80,14 @@ const FIELDS = [
               <ul class="prose traps">{ia.errors.map((x) => <li set:html={inline(x)} />)}</ul>
             </div>
           </div>
+          <div class="callout callout--caution" style="margin-top:var(--sp-5)">
+            <span class="callout__kicker">Not on this page</span>
+            <ul class="prose">{ia.notStated.map((x) => <li>{x}</li>)}</ul>
+          </div>
           <p class="small" style="margin-top:var(--sp-4)">
             Practise the analysis on the platform's cases first: a <a href={href.case('halden-distribution')}>people problem</a>, a{' '}
-            <a href={href.case('atelier-barro')}>costing problem</a> and a <a href={href.case('marigold-kitchens')}>growth decision</a>.
+            <a href={href.case('atelier-barro')}>costing problem</a> and a <a href={href.case('marigold-kitchens')}>growth decision</a>. They are
+            fictional, so they cannot be the organization for your project.
           </p>
         </section>
       )
@@ -121,81 +95,18 @@ const FIELDS = [
   </div>
 </BaseLayout>
 
-<script>
-  const KEY = 'bb:ia-plan';
-  const form = document.querySelector<HTMLFormElement>('[data-ia-plan]');
-  if (form) {
-    const saved = form.querySelector<HTMLElement>('[data-saved]');
-    try {
-      const data = JSON.parse(localStorage.getItem(KEY) ?? '{}') as Record<string, string>;
-      Object.entries(data).forEach(([k, v]) => {
-        const el = form.elements.namedItem(k);
-        if (el instanceof RadioNodeList) {
-          el.forEach((r) => {
-            if (r instanceof HTMLInputElement) r.checked = r.value === v;
-          });
-        } else if (el instanceof HTMLTextAreaElement) el.value = v;
-      });
-    } catch {
-      /* storage unavailable */
-    }
-    let timer = 0;
-    const save = () => {
-      const data: Record<string, string> = {};
-      new FormData(form).forEach((v, k) => (data[k] = String(v)));
-      try {
-        localStorage.setItem(KEY, JSON.stringify(data));
-        if (saved) saved.textContent = 'Saved on this device.';
-      } catch {
-        if (saved) saved.textContent = 'This browser is not saving, so print or copy your plan before you leave.';
-      }
-    };
-    form.addEventListener('input', () => {
-      window.clearTimeout(timer);
-      timer = window.setTimeout(save, 500);
-    });
-    form.addEventListener('change', save);
-    form.querySelector('[data-print]')?.addEventListener('click', () => window.print());
-    form.querySelector('[data-clear]')?.addEventListener('click', () => {
-      if (!window.confirm('Clear everything in the planner?')) return;
-      form.reset();
-      try {
-        localStorage.removeItem(KEY);
-      } catch {
-        /* ignore */
-      }
-      if (saved) saved.textContent = 'Cleared.';
-    });
-  }
-</script>
-
 <style>
-  .ia-plan {
+  .req-list {
     display: grid;
-    gap: var(--sp-5);
-    max-width: 48rem;
-    margin-top: var(--sp-5);
+    gap: var(--sp-3);
+    max-width: var(--text-max);
+    margin: var(--sp-4) 0 var(--sp-3);
+    padding-left: 1.4em;
   }
 
-  .ia-plan label .num,
-  .ia-lens legend .num {
-    margin-right: 0.35rem;
-    color: var(--text-muted);
-  }
-
-  .ia-lens {
-    display: grid;
-    gap: var(--sp-2);
-    margin: 0;
-    padding: 0;
-    border: 0;
-  }
-
-  .ia-lens legend {
-    margin-bottom: var(--sp-2);
-    padding: 0;
-    font-size: var(--fs-small);
+  .req-list li::marker {
+    font-family: var(--font-mono);
     font-weight: 600;
-    color: var(--text-strong);
+    color: var(--text-muted);
   }
 </style>

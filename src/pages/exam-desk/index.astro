@@ -2,7 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
-import FactList from '../../components/assess/FactList.astro';
+import VerifyTag from '../../components/ui/VerifyTag.astro';
 import { corpus, href, questionsInOrder } from '../../lib/content';
 
 const c = await corpus();
@@ -16,7 +16,7 @@ const weightClaim = c.claims['assessment-weightings'];
     trail={[{ label: 'Exam Desk' }]}
     kicker="Exam Desk"
     title="The assessment, and how to prepare"
-    lead="What is known about each component, where it comes from and how sure it is, followed by original practice. Nothing here is an IB examination question, and no mark allocation is stated that a source does not establish."
+    lead="Each component as the Business management guide describes it, with page references, followed by original practice. Nothing here is an IB examination question, and every mark allocation shown is either the guide's or clearly labelled as the platform's own."
   />
   <div class="wrap page-body">
     <section aria-labelledby="comp-h">
@@ -42,11 +42,68 @@ const weightClaim = c.claims['assessment-weightings'];
       </ol>
     </section>
     <section aria-labelledby="w-h">
-      <SectionHead no={2} title="Weightings and timings" dek="As reported by secondary sources that agree with each other. The Guide was not available to confirm them." id="w-h" />
-      <div style="margin-top:var(--sp-4)">
-        <FactList facts={comps.flatMap(([, a]) => a.facts.filter((f) => /%|hour|minute/.test(f.text)))} />
+      <SectionHead no={2} title="Weightings and timings" dek="From the guide's assessment outlines. SL and HL sit different combinations of the same components." id="w-h" />
+      <div class="table-scroll" role="region" aria-label="Weightings and timings by component" tabindex="0" style="margin-top:var(--sp-4)">
+        <table class="table outline">
+          <caption class="sr-only">Duration, marks and weighting of each component at SL and HL</caption>
+          <thead>
+            <tr>
+              <th scope="col" rowspan="2">Component</th>
+              <th scope="colgroup" colspan="3">SL</th>
+              <th scope="colgroup" colspan="3">HL</th>
+            </tr>
+            <tr>
+              <th scope="col">Time</th>
+              <th scope="col" class="n">Marks</th>
+              <th scope="col" class="n">Weight</th>
+              <th scope="col">Time</th>
+              <th scope="col" class="n">Marks</th>
+              <th scope="col" class="n">Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              comps.map(([id, a]) => (
+                <tr>
+                  <th scope="row">
+                    <a href={href.assessment(id)}>{a.name}</a>
+                  </th>
+                  {(['sl', 'hl'] as const).map((l) => {
+                    const o = a.outline?.[l];
+                    return o ? (
+                      <>
+                        <td>{o.duration}</td>
+                        <td class="n">{o.marks}</td>
+                        <td class="n">{o.weight}%</td>
+                      </>
+                    ) : (
+                      <td colspan="3" class="muted">Not taken at {l.toUpperCase()}</td>
+                    );
+                  })}
+                </tr>
+              ))
+            }
+            <tr class="is-total">
+              <th scope="row">Total</th>
+              {(['sl', 'hl'] as const).map((l) => (
+                <>
+                  <td colspan="2" />
+                  <td class="n">
+                    <strong>{comps.reduce((n, [, a]) => n + (a.outline?.[l]?.weight ?? 0), 0)}%</strong>
+                  </td>
+                </>
+              ))}
+            </tr>
+          </tbody>
+        </table>
       </div>
-      {weightClaim && <p class="small muted" style="margin-top:var(--sp-3)">Claims register entry: {weightClaim.statement}</p>}
+      {
+        weightClaim && (
+          <p class="small muted" style="margin-top:var(--sp-3)">
+            {weightClaim.statement} Business management guide, {weightClaim.location}. <VerifyTag status={weightClaim.status} />
+          </p>
+        )
+      }
     </section>
     <section aria-labelledby="p-h">
       <SectionHead no={3} title="Practice" id="p-h" />
@@ -54,14 +111,14 @@ const weightClaim = c.claims['assessment-weightings'];
         <div class="prose">
           <p>
             {questions.length} original practice questions, written for the cases on this platform in the style of each paper. Each
-            has a mark scheme or level descriptors of its own, labelled as the platform's, and the errors that most often cost marks.
+            has a mark scheme or levels of its own, labelled as the platform's, and the errors that most often cost marks.
           </p>
           <p><a class="btn btn--primary" href="/exam-desk/practice/">Open the practice set</a></p>
         </div>
         <div class="prose">
           <p>
-            Command terms decide what an answer must do. The <a href="/examiner-lens/">Examiner Lens</a> lists each term with its
-            definition, where the definition comes from, and how to answer to it.
+            Command terms decide what an answer must do. The <a href="/examiner-lens/">Examiner Lens</a> lists the guide's 31 terms at
+            their assessment objective levels, explains each in the platform's words, and shows how to answer to it.
           </p>
         </div>
       </div>

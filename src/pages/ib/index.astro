@@ -10,34 +10,45 @@ import { CONCEPT_NAMES } from '../../lib/labels';
 
 const c = await corpus();
 const cur = c.curricula['ib-dp-bm'];
-const total = cur?.units.reduce((n, u) => n + u.subtopics.length, 0) ?? 0;
-const hlOnly = cur?.units.flatMap((u) => u.subtopics).filter((s) => s.level === 'HL').length ?? 0;
+const subs = cur?.units.flatMap((u) => u.subtopics) ?? [];
+const hlOnly = subs.filter((s) => s.level === 'HL').length;
+const hlContent = subs.filter((s) => s.level === 'SL/HL with HL-only content').length;
+const statements = subs.reduce((n, s) => n + s.content.length, 0);
+const hoursClaim = c.claims['course-hours'];
+const ruleClaim = c.claims['command-term-rule'];
+const hourRows = cur
+  ? [
+      ...cur.units.map((u) => ({ label: `Unit ${u.number}: ${u.title}`, h: u.hours })),
+      { label: 'Toolkit, taught across the units', h: cur.hours?.toolkit },
+      { label: 'Research for the paper 1 pre-released statement', h: cur.hours?.paper1Research },
+      { label: 'Internal assessment', h: cur.hours?.internalAssessment },
+    ]
+  : [];
 ---
 
-<BaseLayout title="IB DP Business Management: the course" description="The IB Diploma Programme Business Management course mapped unit by unit, with SL and HL marked and every line's verification status shown." section="pathways">
+<BaseLayout title="IB DP Business Management: the course" description="The IB Diploma Programme Business Management course unit by unit, checked against the Business management guide: subtopics, content statements, depth of teaching, SL and HL, and teaching hours." section="pathways">
   <PageIntro
     trail={[{ label: 'IB course' }]}
     kicker="IB Diploma Programme"
     title="Business Management: the course"
-    lead={`Five units and ${total} subtopics, ${hlOnly} of them HL only. Each line shows how far it has been confirmed and links to what the platform has for it.`}
+    lead={`Five units, ${subs.length} subtopics and ${statements} content statements. ${hlOnly} subtopics are HL only and ${hlContent} more contain HL-only content. Each line links to what the platform has for it.`}
   >
     <div class="tags">
       {cur && <VerifyTag status={cur.verification} />}
-      <span class="tag tag--plain">{cur?.guide}</span>
+      <span class="small muted">{cur?.guide}</span>
     </div>
   </PageIntro>
   <div class="wrap page-body">
     {
       cur && (
-        <aside class="callout callout--caution">
-          <span class="callout__kicker">Read this first</span>
+        <aside class="callout callout--note">
+          <span class="callout__kicker">Checked against the guide</span>
           <div class="prose">
-            <p>
-              The Business management guide was not available when this map was made. It was assembled from secondary sources that agree with
-              each other, listed in the <a href="/sources/">source register</a>. Treat it as a well-supported map, not as the Guide, and check it
-              against the Guide before relying on it for planning.
-            </p>
             <div set:html={rich(cur.note)} />
+            <p class="small">
+              The content statements are shortened. The guide is the authority, and it is published to schools: read it with your teacher before
+              planning a course or a revision timetable from this page.
+            </p>
           </div>
         </aside>
       )
@@ -47,10 +58,88 @@ const hlOnly = cur?.units.flatMap((u) => u.subtopics).filter((s) => s.level === 
       <a class="btn" href="/ib/concepts/">The four concepts</a>
       <a class="btn" href="/exam-desk/">The assessment</a>
     </p>
+    <section aria-labelledby="hours-h">
+      <SectionHead no={1} title="Teaching hours" dek="The guide's recommended teaching time. Schools plan their own calendars within it." id="hours-h" />
+      <div class="table-scroll" role="region" aria-label="Recommended teaching hours" tabindex="0" style="margin-top:var(--sp-4)">
+        <table class="table hours">
+          <caption class="sr-only">Recommended teaching hours at SL and HL</caption>
+          <thead>
+            <tr>
+              <th scope="col">Part of the course</th>
+              <th scope="col" class="n">SL</th>
+              <th scope="col" class="n">HL</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              hourRows.map((r) => (
+                <tr>
+                  <th scope="row">{r.label}</th>
+                  <td class="n">{r.h?.sl ?? ''}</td>
+                  <td class="n">{r.h?.hl ?? ''}</td>
+                </tr>
+              ))
+            }
+            <tr class="is-total">
+              <th scope="row">Total</th>
+              <td class="n"><strong>{cur?.hours?.total.sl}</strong></td>
+              <td class="n"><strong>{cur?.hours?.total.hl}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      {
+        hoursClaim && (
+          <p class="small muted" style="margin-top:var(--sp-3)">
+            Business management guide, {hoursClaim.location}. <VerifyTag status={hoursClaim.status} />
+          </p>
+        )
+      }
+    </section>
+    <section aria-labelledby="read-h">
+      <SectionHead no={2} title="How to read the units" id="read-h" />
+      <div class="grid grid--2" style="margin-top:var(--sp-4)">
+        <div class="prose">
+          <p>
+            Each content statement carries a <strong>depth of teaching</strong>: the assessment objective it is taught to. An examination
+            question on it may use any command term at that level, or a less demanding term from a lower one.
+            {ruleClaim && <span class="small muted">({ruleClaim.location}.)</span>}
+          </p>
+          <p class="small">
+            <a href="/examiner-lens/">The Examiner Lens</a> lists the command terms at each level.
+          </p>
+        </div>
+        <dl class="ao-key">
+          <div><dt><span class="tag tag--plain">AO1</span></dt><dd>Knowledge and understanding</dd></div>
+          <div><dt><span class="tag tag--plain">AO2</span></dt><dd>Application and analysis</dd></div>
+          <div><dt><span class="tag tag--plain">AO3</span></dt><dd>Synthesis and evaluation</dd></div>
+          <div><dt><span class="tag tag--plain">AO4</span></dt><dd>Use and application of appropriate skills</dd></div>
+        </dl>
+      </div>
+    </section>
     {
       cur?.units.map((u) => (
         <section aria-labelledby={`unit-${u.number}`}>
-          <SectionHead no={u.number} title={u.title} id={`unit-${u.number}`} />
+          <SectionHead no={u.number + 2} title={`Unit ${u.number}: ${u.title}`} id={`unit-${u.number}`} />
+          <p class="unit-meta small">
+            {u.hours && (
+              <span>
+                {u.hours.sl} hours at SL, {u.hours.hl} at HL
+              </span>
+            )}
+            {u.page && <span>Guide, from p. {u.page}</span>}
+            {u.tools.length > 0 && (
+              <span>
+                Toolkit:{' '}
+                {u.tools.map((t, i) => (
+                  <>
+                    {i > 0 && ', '}
+                    <a href={href.toolEntry(t, c.tools[t])}>{c.tools[t]?.name ?? t}</a>
+                  </>
+                ))}
+              </span>
+            )}
+          </p>
           <ol class="subtopic-list" role="list">
             {u.subtopics.map((s) => (
               <li id={`st-${s.code.replace('.', '-')}`}>
@@ -61,6 +150,27 @@ const hlOnly = cur?.units.flatMap((u) => u.subtopics).filter((s) => s.level === 
                   <VerifyTag status={s.verification} />
                   {s.topic && <span class="tag tag--live">Brief</span>}
                 </span>
+                {s.content.length > 0 && (
+                  <details class="statements">
+                    <summary>
+                      {s.content.length} content {s.content.length === 1 ? 'statement' : 'statements'}
+                      {s.page && <span class="muted">, guide p. {s.page}</span>}
+                    </summary>
+                    <ul role="list">
+                      {s.content.map((st) => (
+                        <li>
+                          <span>{st.text}</span>
+                          <span class="tags">
+                            {st.ao.map((a) => (
+                              <span class="tag tag--plain">{a}</span>
+                            ))}
+                            {st.level === 'HL' && <span class="tag tag--hl">HL only</span>}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
                 {s.note && <span class="subtopic-note">{s.note}</span>}
               </li>
             ))}
@@ -69,7 +179,7 @@ const hlOnly = cur?.units.flatMap((u) => u.subtopics).filter((s) => s.level === 
       ))
     }
     <section aria-labelledby="concepts-h">
-      <SectionHead no={6} title="The concepts" id="concepts-h" />
+      <SectionHead no={8} title="The concepts" id="concepts-h" />
       <p style="margin-top:var(--sp-3)">
         {cur?.concepts.list.map((k, i) => (
           <>
@@ -82,3 +192,73 @@ const hlOnly = cur?.units.flatMap((u) => u.subtopics).filter((s) => s.level === 
     </section>
   </div>
 </BaseLayout>
+
+<style>
+  .hours {
+    max-width: 40rem;
+  }
+
+  .unit-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-5);
+    margin: var(--sp-3) 0 0;
+    color: var(--text-muted);
+  }
+
+  .ao-key {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+  }
+
+  .ao-key div {
+    display: grid;
+    grid-template-columns: 3.5rem 1fr;
+    align-items: baseline;
+  }
+
+  .ao-key dd {
+    margin: 0;
+  }
+
+  .statements {
+    grid-column: 2 / -1;
+    font-size: 0.875rem;
+  }
+
+  .statements summary {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    cursor: pointer;
+    color: var(--cobalt-text);
+    font-weight: 600;
+  }
+
+  .statements summary .muted {
+    font-weight: 400;
+  }
+
+  .statements ul {
+    display: grid;
+    gap: 0;
+    margin: var(--sp-2) 0 0;
+    padding: 0;
+    list-style: none;
+    border-left: 2px solid var(--rule);
+  }
+
+  .statements li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-1) var(--sp-3);
+    padding: var(--sp-2) 0 var(--sp-2) var(--sp-3);
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .statements li:last-child {
+    border-bottom: 0;
+  }
+</style>

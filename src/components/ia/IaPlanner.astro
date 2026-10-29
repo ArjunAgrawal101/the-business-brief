@@ -1,0 +1,875 @@
+---
+/**
+ * IA Studio: the research project planner. Ten steps that follow the IB
+ * teacher support material's guidance for the IA (pp. 69 to 72), with checks
+ * that apply the guide's requirements (pp. 53 to 56) through src/lib/ia.ts.
+ * Without JavaScript every field can still be filled in and printed; with it,
+ * the plan is saved on this device and checked as the student types.
+ */
+import ProvenanceTag from '../ui/ProvenanceTag.astro';
+import { CONCEPT_NAMES } from '../../lib/labels';
+import { IA_LIMITS } from '../../lib/ia';
+import { jsonForScript } from '../../lib/markup';
+
+interface Props {
+  criteria: Array<{ id: string; name: string; marks: number }>;
+}
+const { criteria } = Astro.props;
+
+/** The platform's own questions for self-marking. The IB's level descriptors are in the guide, pp. 56 to 58. */
+const PROMPTS: Record<string, string> = {
+  A: 'Is the concept named on the title page, and does it change how you read the evidence in every section, not only in the introduction?',
+  B: 'Are there three to five of your own documents, all recent and relevant to the question, giving more than one point of view between them?',
+  C: 'Is each tool or theory chosen for a reason, and applied to this organization’s evidence rather than explained in general?',
+  D: 'Do you weigh the evidence, including its limits, and the strengths and weaknesses of each position, rather than describe it?',
+  E: 'Does the conclusion answer the research question directly, using only arguments made earlier, and say what is still uncertain?',
+  F: 'Is there an introduction (the organization, the issue, the method), a main body and a conclusion, in that order?',
+  G: 'Title page, accurate contents page, headings, numbered pages, citations in the text and a bibliography?',
+};
+
+const FINAL = [
+  { key: 'title', text: 'The key concept is stated on the title page.', source: 'Guide, p. 53' },
+  { key: 'count', text: 'The word count is on the cover page, and the words that count are within 1,800.', source: 'Guide, p. 56' },
+  { key: 'docs', text: 'Three to five supporting documents are attached, labelled “Supporting document 1” and so on, with the relevant parts highlighted and translated where needed.', source: 'Guide, p. 55' },
+  { key: 'refs', text: 'Every source is cited in the text and listed in a bibliography.', source: 'Guide, p. 55' },
+  { key: 'pres', text: 'Title page, accurate table of contents, headings and sub-headings, numbered pages.', source: 'Guide, p. 55' },
+  { key: 'concl', text: 'The conclusion answers the research question and introduces no new facts or arguments.', source: 'Guide, p. 55' },
+];
+
+const DOC_ROWS = 6;
+const KINDS = [
+  { v: 'secondary', l: 'Secondary' },
+  { v: 'primary', l: 'Primary' },
+  { v: 'transcript', l: 'Transcript' },
+  { v: 'textbook', l: 'Textbook or notes' },
+];
+const STEP_COUNT = 10;
+---
+
+<div class="iap" data-ix="ia-plan">
+  <script type="application/json" data-config set:html={jsonForScript({ criteria, steps: STEP_COUNT, rows: DOC_ROWS })} />
+  <p class="state state--error" data-error hidden>The planner could not start. You can still write in it and print it, but nothing is saved or checked.</p>
+  <p class="nojs-only small muted">With JavaScript off, you can write in the planner and print it, but it is not saved and nothing is checked.</p>
+
+  <div class="iap__head">
+    <div class="tags">
+      <ProvenanceTag kind="aa-framework" />
+      <span class="tag tag--source">From IB guidance</span>
+    </div>
+    <p class="small muted">
+      The ten steps follow the IB teacher support material's guidance for the internal assessment (TSM, pp. 69 to 72), in the platform's words. The checks
+      apply the guide's requirements. Your teacher approves the question and has the final word on every requirement.
+    </p>
+    <div class="iap__progress js-only">
+      <span class="small" data-progress-text>0 of {STEP_COUNT} steps done</span>
+      <span class="iap__meter" aria-hidden="true"><span data-progress-bar></span></span>
+    </div>
+  </div>
+
+  <form class="iap__form" data-form novalidate aria-label="Research project planner">
+    <ol class="iap__steps" role="list">
+      <li class="iap__step" data-step="1">
+        <div class="iap__step-head">
+          <span class="iap__no">01</span>
+          <h3>Set the timeline</h3>
+          <label class="iap__done js-only"><input type="checkbox" name="done-1" /> Done</label>
+        </div>
+        <p class="iap__why">Start early enough to finish by your school's deadline. On a two-year course, aim to finish steps 1 to 5 by the end of the first year. <span class="iap__src">TSM, p. 69</span></p>
+        <div class="iap__pair">
+          <div class="field">
+            <label for="ia-submission">Month you submit to the IB</label>
+            <input class="input" id="ia-submission" name="submission" type="month" placeholder="YYYY-MM" aria-describedby="ia-submission-hint" />
+            <span class="field__hint" id="ia-submission-hint">April or October of your final year, depending on your examination session. Ask your teacher. (Guide, p. 54)</span>
+          </div>
+          <div class="field">
+            <label for="ia-deadline">Your school's internal deadline</label>
+            <input class="input" id="ia-deadline" name="deadline" type="date" placeholder="YYYY-MM-DD" />
+          </div>
+        </div>
+        <ul class="iap__out js-only" aria-live="polite" data-timeline>
+          <li data-tl-earliest>Add the submission month to see the oldest publication date a supporting document can have.</li>
+          <li data-tl-selfmark>Add the internal deadline to see when to mark your penultimate draft.</li>
+        </ul>
+      </li>
+
+      <li class="iap__step" data-step="2">
+        <div class="iap__step-head">
+          <span class="iap__no">02</span>
+          <h3>Read the requirements and the criteria</h3>
+          <label class="iap__done js-only"><input type="checkbox" name="done-2" /> Done</label>
+        </div>
+        <p class="iap__why">
+          Read the requirements above and the criteria in the guide with your teacher. Common ways to lose marks: supporting documents missing, more than
+          five of them, presentation not to the standard. <span class="iap__src">TSM, p. 69</span>
+        </p>
+        <p class="small"><a href="#req-h">The requirements</a> · <a href="#task-h">The criteria and their maximum marks</a></p>
+      </li>
+
+      <li class="iap__step" data-step="3">
+        <div class="iap__step-head">
+          <span class="iap__no">03</span>
+          <h3>Choose the organization, the issue and the question</h3>
+          <label class="iap__done js-only"><input type="checkbox" name="done-3" /> Done</label>
+        </div>
+        <p class="iap__why">
+          A narrower question can be answered in more depth, but makes good documents harder to find: refine the question and the documents together.
+          The best questions are ones you cannot answer before you start. <span class="iap__src">TSM, pp. 69 to 70</span>
+        </p>
+        <div class="field">
+          <label for="ia-org">The organization</label>
+          <textarea class="textarea textarea--short" id="ia-org" name="org" rows="2" aria-describedby="ia-org-hint"></textarea>
+          <span class="field__hint" id="ia-org-hint">One real organization. Industry-wide issues may come in where they affect it. (Guide, p. 53)</span>
+        </div>
+        <div class="field">
+          <label for="ia-issue">The issue or problem it faces</label>
+          <textarea class="textarea textarea--short" id="ia-issue" name="issue" rows="3" aria-describedby="ia-issue-hint"></textarea>
+          <span class="field__hint" id="ia-issue-hint">From any part of the syllabus. Narrow enough to answer in 1,800 words.</span>
+        </div>
+        <div class="field">
+          <label for="ia-question">The research question</label>
+          <textarea class="textarea textarea--short" id="ia-question" name="question" rows="2" aria-describedby="ia-question-hint"></textarea>
+          <span class="field__hint" id="ia-question-hint">The guide's own examples ask whether a company should change how it makes its product, and how an airline can target a segment. (Guide, p. 54)</span>
+        </div>
+        <fieldset class="iap__choice">
+          <legend>The question looks</legend>
+          <div class="choice__opts">
+            <label class="opt"><input type="radio" name="direction" value="forward" /><span class="opt__body"><span class="opt__text">Forward: what should it do?</span></span></label>
+            <label class="opt"><input type="radio" name="direction" value="backward" /><span class="opt__body"><span class="opt__text">Backward: why did it happen?</span></span></label>
+          </div>
+          <span class="field__hint">Either is allowed (guide, p. 53). Mostly primary research tends to suit a forward-looking question, mostly secondary a backward-looking one; this is advice, not a rule (TSM, p. 70).</span>
+        </fieldset>
+        <div class="field">
+          <label for="ia-tools">The tools and theories you will apply</label>
+          <textarea class="textarea textarea--short" id="ia-tools" name="tools" rows="3" aria-describedby="ia-tools-hint"></textarea>
+          <span class="field__hint" id="ia-tools-hint">Choose a few on purpose and apply them in depth. Many tools used thinly weaken a project. (TSM, p. 70) <a href="/toolkit/">The toolkit</a></span>
+        </div>
+      </li>
+
+      <li class="iap__step" data-step="4">
+        <div class="iap__step-head">
+          <span class="iap__no">04</span>
+          <h3>Frame it with one key concept</h3>
+          <label class="iap__done js-only"><input type="checkbox" name="done-4" /> Done</label>
+        </div>
+        <p class="iap__why">Use only one of the four concepts as the lens, and state it on the title page. It does not have to be in the question. <span class="iap__src">Guide, p. 53</span></p>
+        <fieldset class="iap__choice">
+          <legend>The concept</legend>
+          <div class="choice__opts">
+            {
+              Object.entries(CONCEPT_NAMES).map(([id, name]) => (
+                <label class="opt">
+                  <input type="radio" name="lens" value={id} />
+                  <span class="opt__body">
+                    <span class="opt__text">{name}</span>
+                  </span>
+                </label>
+              ))
+            }
+          </div>
+          <span class="field__hint"><a href="/ib/concepts/">What each concept asks of an organization</a></span>
+        </fieldset>
+        <div class="field">
+          <label for="ia-lensuse">How the concept will change the way you read the evidence</label>
+          <textarea class="textarea textarea--short" id="ia-lensuse" name="lensuse" rows="3" aria-describedby="ia-lensuse-hint"></textarea>
+          <span class="field__hint" id="ia-lensuse-hint">The TSM's example: a make-or-buy analysis answers whether to outsource, and change as the lens asks what else would have to change either way. (TSM, p. 70)</span>
+        </div>
+      </li>
+
+      <li class="iap__step" data-step="5">
+        <div class="iap__step-head">
+          <span class="iap__no">05</span>
+          <h3>Write an initial proposal</h3>
+          <label class="iap__done js-only"><input type="checkbox" name="done-5" /> Done</label>
+        </div>
+        <p class="iap__why">Not a formal requirement, but it lets you and your teacher check that you agree on steps 3 and 4 before the research starts. <span class="iap__src">TSM, pp. 70 to 71</span></p>
+        <div class="iap__proposal js-only" data-proposal aria-live="polite">
+          <p class="muted small">Your proposal appears here as you fill in steps 3 and 4.</p>
+        </div>
+        <p class="cluster js-only">
+          <button type="button" class="btn btn--small" data-print>Print the plan</button>
+        </p>
+      </li>
+
+      <li class="iap__step" data-step="6">
+        <div class="iap__step-head">
+          <span class="iap__no">06</span>
+          <h3>Choose the supporting documents</h3>
+          <label class="iap__done js-only"><input type="checkbox" name="done-6" /> Done</label>
+        </div>
+        <p class="iap__why">
+          Find more than five candidates, then cut to five: drop any published more than three years before submission, keep the ones that best answer the
+          question, then check that together they give a range of ideas and views. Documents you drop can still be cited as sources. <span class="iap__src">TSM, p. 71</span>
+        </p>
+        <div class="table-scroll" role="region" aria-label="Candidate supporting documents" tabindex="0">
+          <table class="table iap__docs">
+            <caption class="sr-only">Candidate supporting documents. Select three to five.</caption>
+            <thead>
+              <tr>
+                <th scope="col">Use</th>
+                <th scope="col">Document</th>
+                <th scope="col">Publisher or author</th>
+                <th scope="col">Published</th>
+                <th scope="col">Kind</th>
+                <th scope="col" class="n">A4 pages</th>
+                <th scope="col" class="js-only"><span class="sr-only">Remove</span></th>
+              </tr>
+            </thead>
+            <tbody data-docs>
+              {
+                Array.from({ length: DOC_ROWS }, (_, i) => (
+                  <tr data-doc>
+                    <td data-label="Use"><input type="checkbox" data-f="selected" aria-label={`Use document ${i + 1} as a supporting document`} /></td>
+                    <td data-label="Document"><input class="input" type="text" data-f="title" aria-label={`Document ${i + 1}: title`} /></td>
+                    <td data-label="Publisher or author"><input class="input" type="text" data-f="publisher" aria-label={`Document ${i + 1}: publisher or author`} /></td>
+                    <td data-label="Published"><input class="input" type="month" data-f="published" placeholder="YYYY-MM" aria-label={`Document ${i + 1}: month published`} /></td>
+                    <td data-label="Kind">
+                      <select class="select" data-f="kind" aria-label={`Document ${i + 1}: kind`}>
+                        {KINDS.map((k) => <option value={k.v}>{k.l}</option>)}
+                      </select>
+                    </td>
+                    <td data-label="A4 pages"><input class="input input--num" type="number" min="0" step="1" inputmode="numeric" data-f="pages" aria-label={`Document ${i + 1}: length in A4 pages`} /></td>
+                    <td class="js-only iap__rm"><button type="button" class="btn btn--small btn--quiet" data-remove aria-label={`Remove document ${i + 1}`}>Remove</button></td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        <template data-doc-template>
+          <tr data-doc>
+            <td data-label="Use"><input type="checkbox" data-f="selected" /></td>
+            <td data-label="Document"><input class="input" type="text" data-f="title" /></td>
+            <td data-label="Publisher or author"><input class="input" type="text" data-f="publisher" /></td>
+            <td data-label="Published"><input class="input" type="month" data-f="published" placeholder="YYYY-MM" /></td>
+            <td data-label="Kind">
+              <select class="select" data-f="kind">
+                {KINDS.map((k) => <option value={k.v}>{k.l}</option>)}
+              </select>
+            </td>
+            <td data-label="A4 pages"><input class="input input--num" type="number" min="0" step="1" inputmode="numeric" data-f="pages" /></td>
+            <td class="iap__rm"><button type="button" class="btn btn--small btn--quiet" data-remove>Remove</button></td>
+          </tr>
+        </template>
+        <p class="small muted iap__kinds">
+          <strong>Kinds.</strong> Secondary: press articles, accounts, business plans, company web pages, reports, statistics, market research. Primary: your
+          own survey, interview or focus group, with the questions and a summary of the responses. Transcript: of a video or audio file from a reliable
+          organization. Textbooks and class notes can be cited, but are not supporting documents. (Guide, pp. 54 to 55)
+        </p>
+        <p class="cluster js-only">
+          <button type="button" class="btn btn--small" data-add-doc>Add a candidate</button>
+          <span class="small muted">Dates are checked to the month. Check exact dates with your teacher.</span>
+        </p>
+        <div class="iap__checks js-only">
+          <h4 class="label label--ink">Checks</h4>
+          <ul class="iap__findings" data-findings aria-live="polite"></ul>
+        </div>
+      </li>
+
+      <li class="iap__step" data-step="7">
+        <div class="iap__step-head">
+          <span class="iap__no">07</span>
+          <h3>Research and draft</h3>
+          <label class="iap__done js-only"><input type="checkbox" name="done-7" /> Done</label>
+        </div>
+        <p class="iap__why">Keep talking to your teacher as you work: it improves the project and shows the work is your own. <span class="iap__src">Guide, p. 54; TSM, p. 71</span></p>
+        <div class="iap__pair">
+          <div class="field">
+            <label for="ia-words">Words that count, so far</label>
+            <input class="input input--num" id="ia-words" name="words" type="number" min="0" step="1" inputmode="numeric" aria-describedby="ia-words-hint ia-words-status" />
+            <span class="field__hint" id="ia-words-hint">
+              Not counted: acknowledgments, contents page, tables of statistical data, diagrams or figures, equations, formulae and calculations, supporting
+              documents, citations, footnote or endnote references, bibliography. Definitions and quotations count. (Guide, p. 56)
+            </span>
+          </div>
+          <div class="iap__wordbox js-only">
+            <span class="iap__meter iap__meter--words" aria-hidden="true"><span data-words-bar></span></span>
+            <span class="small" id="ia-words-status" data-words-status aria-live="polite">Enter the count of the words that count.</span>
+          </div>
+        </div>
+      </li>
+
+      <li class="iap__step" data-step="8">
+        <div class="iap__step-head">
+          <span class="iap__no">08</span>
+          <h3>Act on feedback on the first draft</h3>
+          <label class="iap__done js-only"><input type="checkbox" name="done-8" /> Done</label>
+        </div>
+        <p class="iap__why">Make the first draft as good as you can on your own: the better it is, the more useful the comments. Your teacher can suggest, but cannot rewrite. <span class="iap__src">TSM, p. 71</span></p>
+        <div class="field">
+          <label for="ia-feedback">What the feedback said, and what you will change</label>
+          <textarea class="textarea" id="ia-feedback" name="feedback" rows="4"></textarea>
+        </div>
+      </li>
+
+      <li class="iap__step" data-step="9">
+        <div class="iap__step-head">
+          <span class="iap__no">09</span>
+          <h3>Mark your penultimate draft</h3>
+          <label class="iap__done js-only"><input type="checkbox" name="done-9" /> Done</label>
+        </div>
+        <p class="iap__why">
+          At least two weeks before the deadline, mark your own draft against the criteria, strictly. Wherever you are short of the top mark, ask what would
+          earn one more. <span class="iap__src">TSM, p. 72</span>
+        </p>
+        <p class="small muted">
+          The questions below are the platform's prompts, not the IB's level descriptors. Mark against the descriptors in the guide (pp. 56 to 58).
+        </p>
+        <ol class="iap__marks" role="list">
+          {
+            criteria.map((k) => (
+              <li class="iap__mark">
+                <div class="iap__mark-head">
+                  <span class="num">{k.id}</span>
+                  <span class="iap__mark-name">{k.name}</span>
+                  <label class="iap__mark-sel">
+                    <span class="sr-only">Your mark for criterion {k.id}, out of {k.marks}</span>
+                    <select class="select" name={`mark-${k.id}`}>
+                      <option value="">Not marked</option>
+                      {Array.from({ length: k.marks + 1 }, (_, m) => (
+                        <option value={String(m)}>{m}</option>
+                      ))}
+                    </select>
+                    <span class="small muted">of {k.marks}</span>
+                  </label>
+                </div>
+                <p class="small">{PROMPTS[k.id]}</p>
+                <label class="sr-only" for={`ia-more-${k.id}`}>What would earn one more mark on criterion {k.id}</label>
+                <textarea class="textarea textarea--short" id={`ia-more-${k.id}`} name={`more-${k.id}`} rows="2" placeholder="What would earn one more mark?"></textarea>
+              </li>
+            ))
+          }
+        </ol>
+        <p class="iap__total js-only" aria-live="polite">
+          Your total: <strong data-mark-total>0</strong> of {IA_LIMITS.totalMarks} <span class="small muted" data-mark-count></span>
+        </p>
+      </li>
+
+      <li class="iap__step" data-step="10">
+        <div class="iap__step-head">
+          <span class="iap__no">10</span>
+          <h3>Revise and submit</h3>
+          <label class="iap__done js-only"><input type="checkbox" name="done-10" /> Done</label>
+        </div>
+        <p class="iap__why">Make the final revisions and give the project to your teacher by the school's internal deadline. <span class="iap__src">TSM, p. 72</span></p>
+        <ul class="iap__final" role="list">
+          {
+            FINAL.map((f) => (
+              <li>
+                <label class="check">
+                  <input type="checkbox" name={`final-${f.key}`} />
+                  <span>
+                    {f.text} <span class="iap__src">{f.source}</span>
+                  </span>
+                </label>
+              </li>
+            ))
+          }
+        </ul>
+      </li>
+    </ol>
+    <div class="cluster iap__actions js-only">
+      <button type="button" class="btn btn--primary" data-print>Print my plan</button>
+      <button type="button" class="btn" data-clear>Clear the planner</button>
+      <span class="small muted" data-saved aria-live="polite"></span>
+    </div>
+  </form>
+</div>
+
+<script>
+  import '../../scripts/ia-plan';
+</script>
+
+<style>
+  .iap {
+    display: grid;
+    gap: var(--sp-5);
+    margin-top: var(--sp-5);
+  }
+
+  .iap__head {
+    display: grid;
+    gap: var(--sp-3);
+    max-width: 48rem;
+  }
+
+  .iap__head p {
+    margin: 0;
+  }
+
+  .iap__progress {
+    display: grid;
+    gap: var(--sp-1);
+    max-width: 24rem;
+  }
+
+  .iap__meter {
+    display: block;
+    height: 6px;
+    overflow: hidden;
+    background: var(--surface-sunk);
+  }
+
+  .iap__meter > span {
+    display: block;
+    height: 100%;
+    background: var(--bb-cobalt);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--dur-base) var(--ease);
+  }
+
+  .iap__meter--words > span[data-over="true"] {
+    background: var(--bb-signal);
+  }
+
+  .iap__steps {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .iap__step {
+    display: grid;
+    gap: var(--sp-3);
+    padding: var(--sp-5) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .iap__step > * {
+    min-width: 0;
+    max-width: 60rem;
+  }
+
+  .iap__step-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--sp-2) var(--sp-3);
+  }
+
+  .iap__step-head h3 {
+    flex: 1 1 14rem;
+    margin: 0;
+    font-size: var(--fs-h4);
+  }
+
+  .iap__no {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .iap__step.is-done .iap__no {
+    color: var(--green-text);
+  }
+
+  .iap__step.is-done .iap__no::after {
+    content: " ✓";
+  }
+
+  .iap__done,
+  .check {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    min-height: 24px;
+    font-size: var(--fs-small);
+  }
+
+  .iap__done {
+    align-items: center;
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .iap__done input,
+  .check input {
+    width: 1.125rem;
+    height: 1.125rem;
+    margin: 0.1rem 0 0;
+    accent-color: var(--bb-cobalt);
+    flex: none;
+  }
+
+  .iap__why {
+    margin: 0;
+    max-width: var(--text-max);
+  }
+
+  .iap__src {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .iap__pair {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    gap: var(--sp-4);
+    align-items: start;
+  }
+
+  .iap__out {
+    display: grid;
+    gap: var(--sp-1);
+    margin: 0;
+    padding-left: 1.1em;
+    font-size: 0.9375rem;
+  }
+
+  .textarea--short {
+    min-height: 4.25rem;
+  }
+
+  .iap__choice {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .iap__choice legend {
+    margin-bottom: var(--sp-2);
+    padding: 0;
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .iap__proposal {
+    padding: var(--sp-4) var(--sp-5);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--bb-ink);
+    background: #fff;
+  }
+
+  .iap__proposal :global(.iap__dl) {
+    display: grid;
+    gap: var(--sp-2);
+    margin: var(--sp-3) 0 0;
+  }
+
+  .iap__proposal :global(.iap__dl > div) {
+    display: grid;
+    grid-template-columns: minmax(8rem, 12rem) minmax(0, 1fr);
+    gap: var(--sp-3);
+    padding-bottom: var(--sp-2);
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .iap__proposal :global(dt) {
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .iap__proposal :global(dd) {
+    margin: 0;
+  }
+
+  @media (max-width: 36rem) {
+    .iap__proposal :global(.iap__dl > div) {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sp-1);
+    }
+  }
+
+  .iap__docs {
+    min-width: 50rem;
+  }
+
+  .iap__docs th:nth-child(2) {
+    width: 30%;
+  }
+
+  .iap__docs th:nth-child(3) {
+    width: 22%;
+  }
+
+  .iap__kinds {
+    margin: 0;
+    max-width: var(--text-max);
+  }
+
+  .iap__docs td {
+    padding: var(--sp-1) var(--sp-2);
+    vertical-align: middle;
+  }
+
+  .iap__docs td:first-child {
+    width: 3rem;
+    text-align: center;
+  }
+
+  .iap__docs td:first-child input {
+    width: 1.25rem;
+    height: 1.25rem;
+    accent-color: var(--bb-cobalt);
+  }
+
+  .iap__docs .input,
+  .iap__docs .select {
+    min-height: 2.5rem;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.9375rem;
+  }
+
+  .iap__docs [data-f="pages"] {
+    width: 5rem;
+  }
+
+  .iap__docs [data-f="published"] {
+    min-width: 9.5rem;
+  }
+
+  .iap__docs [data-f="kind"] {
+    min-width: 9.5rem;
+  }
+
+  .iap__docs tr:global(.is-selected) td {
+    background: var(--surface-cobalt-wash);
+  }
+
+  .iap__docs tr:global(.is-problem) td {
+    background: var(--surface-wrong);
+  }
+
+  /* Narrow screens: each candidate document becomes a card. */
+  @media (max-width: 47.99rem) {
+    .iap__docs {
+      min-width: 0;
+    }
+
+    .iap__docs thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .iap__docs,
+    .iap__docs tbody,
+    .iap__docs td {
+      display: block;
+    }
+
+    .iap__docs tr {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--sp-2) var(--sp-3);
+      padding: var(--sp-3) 0;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .iap__docs td {
+      padding: 0;
+      border: 0;
+    }
+
+    .iap__docs td[data-label="Document"],
+    .iap__docs td[data-label="Publisher or author"] {
+      grid-column: 1 / -1;
+    }
+
+    .iap__docs td:first-child {
+      width: auto;
+      text-align: left;
+    }
+
+    .iap__docs td[data-label]::before {
+      content: attr(data-label);
+      display: block;
+      margin-bottom: 0.2rem;
+      font-size: var(--fs-label);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .iap__docs td[data-label="Use"] {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+
+    .iap__docs td[data-label="Use"]::before {
+      content: "Use as a supporting document";
+      margin: 0;
+    }
+
+    .iap__docs .iap__rm {
+      align-self: end;
+      text-align: right;
+    }
+
+    .iap__docs [data-f="pages"] {
+      width: 100%;
+    }
+
+    .iap__docs [data-f="published"],
+    .iap__docs [data-f="kind"] {
+      min-width: 0;
+    }
+  }
+
+  .btn--quiet {
+    border-color: transparent;
+    color: var(--text-muted);
+    text-decoration: underline;
+  }
+
+  .iap__checks {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .iap__findings {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .iap__findings :global(.iap__finding) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.6rem;
+    padding: var(--sp-2) var(--sp-3);
+    border-left: 4px solid var(--rule);
+    background: #fff;
+    font-size: 0.9375rem;
+  }
+
+  .iap__findings :global(.iap__finding--problem) {
+    border-left-color: var(--bb-signal);
+    background: var(--surface-wrong);
+  }
+
+  .iap__findings :global(.iap__finding--advice) {
+    border-left-color: var(--bb-brass);
+    background: var(--surface-partial);
+  }
+
+  .iap__findings :global(.iap__finding--ok) {
+    border-left-color: var(--bb-green);
+    background: var(--surface-right);
+  }
+
+  .iap__findings :global(.iap__src) {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .iap__findings :global(.iap__sev) {
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-strong);
+  }
+
+  .iap__wordbox {
+    display: grid;
+    gap: var(--sp-2);
+    padding-top: 1.75rem;
+  }
+
+  [data-words-status][data-severity="problem"] {
+    font-weight: 600;
+    color: var(--signal-text);
+  }
+
+  .iap__marks {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .iap__mark {
+    display: grid;
+    gap: var(--sp-2);
+    padding: var(--sp-3) var(--sp-4);
+    border: 1px solid var(--rule-hair);
+    background: #fff;
+  }
+
+  .iap__mark p {
+    margin: 0;
+  }
+
+  .iap__mark-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+  }
+
+  .iap__mark-head .num {
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  .iap__mark-name {
+    flex: 1 1 12rem;
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .iap__mark-sel {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .iap__mark-sel .select {
+    width: auto;
+    min-width: 8.5rem;
+  }
+
+  .iap__total {
+    margin: 0;
+    font-size: 1.0625rem;
+  }
+
+  .iap__final {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .iap__actions {
+    padding-top: var(--sp-4);
+  }
+
+  @media print {
+    .iap__done,
+    .iap__actions,
+    [data-add-doc],
+    [data-remove],
+    [data-print] {
+      display: none !important;
+    }
+
+    .iap__step {
+      break-inside: avoid;
+    }
+  }
+</style>

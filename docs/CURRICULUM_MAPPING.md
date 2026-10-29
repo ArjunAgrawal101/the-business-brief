@@ -2,123 +2,150 @@
 
 ## Status of the IB mapping
 
-The IB Business management guide (first assessment 2024) was **not available** when this release was written. The mapping was therefore built from:
+The IB mapping was checked against the **Business management guide** (first assessment 2024, published February 2022, updated May 2022) on 29 October 2026, after the creator supplied it. Every unit, subtopic, content statement, depth of teaching, HL-only marking, teaching hour, assessment outline, internal assessment requirement, formula and command term level on the platform now carries the status **Verified** (`primary`) and the guide's printed page.
 
-1. **IB documents in the creator's own files**: *Assessment procedures 2027*, sections D3.2 (internal assessment) and D3.3 (Paper 1 pre-release), recorded from the creator's repository. Status: Recorded.
-2. **The IB Economics guide** (first assessment 2022), for the wording of command terms that the two subjects share. Status: Recorded for Economics; not checked against the Business management guide.
-3. **Secondary sources found with a web search on 29 October 2026**: course book listings, school department pages and revision sites. Where two or more independent sources agree, a line is Corroborated; where they disagree, Sources conflict; where only one source or none supports it, Unverified.
+How each document was used is recorded in [audit/RESOURCE_INVENTORY.md](audit/RESOURCE_INVENTORY.md). In short:
 
-Every one of these statements is in the claims register (`src/content/data/claims.yaml`) with its sources, and the site shows the status beside each line. **Nothing is marked Verified**, because nothing has yet been checked against the Guide.
+| Document | Role |
+| --- | --- |
+| Business management guide (2024) | The controlling authority. Every statement about the course is checked against it |
+| Business management teacher support material (2022) | Official IB guidance for teachers. Paraphrased, attributed with its page, and shown as "From IB guidance". It is not treated as a subject report |
+| Hodder coursebook extracts (2022) | Used only to check conventions where the guide is silent. Not a curriculum authority; nothing reproduced |
+| *Assessment procedures 2027*, as recorded in the creator's repository | Recorded; consistent with the guide where they overlap |
+| Secondary sources found by web search for 0.1.0 | Superseded by the guide; kept in the source register for the record |
 
-The platform does not state: the Guide's own wording of any content statement, assessment criteria, markbands, the number or structure of examination questions, mark allocations, or how often a topic has appeared in past papers.
+The guide's notice says commercial use of IB publications by curriculum mapping or teacher resource platforms needs a written licence from the IB. The platform therefore states facts with page references, in its own words, and does **not** reproduce the guide's text, its markbands, its criteria descriptors or its command term definitions. If the platform becomes commercial, the creator should ask the IB about a licence.
+
+## What changed when the guide arrived
+
+| Before (0.1.0, secondary sources) | After (checked against the guide) |
+| --- | --- |
+| 1.1 titled "Introduction to business management" | 1.1 is "What is a business?" (p. 23) |
+| 3.6 "Debt/equity ratio analysis", sources in conflict | 3.6 is "Efficiency ratio analysis", HL only (p. 29) |
+| 2.2, 2.7, 4.6, 5.7, 5.8 unverified or in conflict | All confirmed with their levels and pages |
+| Labour turnover taught at SL in the leadership brief | Labour turnover is HL-only content in 2.4 (p. 26); the brief, its practice questions and the glossary now mark it HL |
+| Contribution and break-even taught under 3.3 without comment | Break-even is 5.5 (p. 34) and contribution costing is an HL toolkit item (p. 14); the costs brief says so. Semi-variable costs are not in the guide's list of cost types and are labelled as an extension |
+| Critical path analysis "sources conflict" | An HL toolkit item: completing and analysing a network, not drawing one; critical path, free and total float (p. 14) |
+| Command terms: "Interpret" included, "List" missing, "Identify" at AO2 | The guide's 31 terms at its AO levels (pp. 19 to 20, 67 to 68); every term explained in the platform's own words |
+| An HL question in the style of paper 1; a 6-mark evaluation in the style of paper 2 | Paper 1 excludes HL-only content (p. 43); questions restyled. The integrity check now blocks both mistakes |
+| Paper and IA structures not stated | Durations, marks, weights, sections, the AOs each assesses and criteria names with maximum marks, from pp. 39 to 58 |
 
 ## Numbering
 
-Some revision sites renumber subtopics on their SL pages by leaving out the HL-only ones (showing Location as 5.3, for example). The platform keeps the full numbering for SL and HL alike, so that a code always means the same subtopic.
+Some revision sites renumber subtopics on their SL pages by leaving out the HL-only ones. The platform keeps the guide's numbering for SL and HL alike, so that a code always means the same subtopic.
 
 ## Units and subtopics
 
-Thirty-seven subtopics in five units: 23 for SL and HL, 3 for SL and HL with HL-only content, and 11 HL only. Status: 31 corroborated, 3 conflicting, 3 unverified.
+Thirty-seven subtopics in five units, with 143 content statements: 19 subtopics for SL and HL, 7 for SL and HL with HL-only content (2.2, 2.3, 2.4, 3.4, 3.8, 4.1, 4.5), and 11 HL only (2.5, 2.7, 3.6, 3.9, 4.3, 4.6, 5.3, 5.6, 5.7, 5.8, 5.9). The content statements are kept in `src/content/curricula/ib-dp-bm.yaml`, shortened and in the platform's words, each with its depth of teaching (AO1 to AO4) and level. That file is generated by `scripts/content/build_curriculum.py`; edit the script, not the YAML.
+
+Recommended teaching hours: 150 at SL and 240 at HL, including the toolkit (10 and 35), research for the paper 1 pre-released statement (5 and 5) and the internal assessment (20 and 20). Guide, pp. 3, 7 and 21 to 22.
 
 ### Unit 1: Introduction to business management
 
-| Code | Subtopic | Level | Status | On the platform |
-| --- | --- | --- | --- | --- |
-| 1.1 | Introduction to business management | SL and HL | Corroborated | Planned |
-| 1.2 | Types of business entities | SL and HL | Corroborated | Planned |
-| 1.3 | Business objectives | SL and HL | Corroborated | Planned |
-| 1.4 | Stakeholders | SL and HL | Corroborated | Planned |
-| 1.5 | Growth and evolution | SL and HL | Corroborated | Complete brief, `/topics/growth-and-evolution/` |
-| 1.6 | Multinational companies (MNCs) | SL and HL | Corroborated | Planned |
+20 hours at SL, 20 at HL. Guide, from p. 23.
+
+| Code | Subtopic | Level | Statements (HL only) | Guide page | On the platform |
+| --- | --- | --- | --- | --- | --- |
+| 1.1 | What is a business? | SL and HL | 4 | 23 | Planned |
+| 1.2 | Types of business entities | SL and HL | 4 | 23 | Planned |
+| 1.3 | Business objectives | SL and HL | 4 | 23 | Planned |
+| 1.4 | Stakeholders | SL and HL | 2 | 24 | Planned |
+| 1.5 | Growth and evolution | SL and HL | 5 | 24 | Complete brief, `/topics/growth-and-evolution/` |
+| 1.6 | Multinational companies (MNCs) | SL and HL | 1 | 24 | Planned |
 
 ### Unit 2: Human resource management
 
-| Code | Subtopic | Level | Status | On the platform |
-| --- | --- | --- | --- | --- |
-| 2.1 | Introduction to human resource management | SL and HL | Corroborated | Planned |
-| 2.2 | Organizational structure | SL and HL | Unverified: Title not confirmed by a source in this session. Whether part of the content is HL only has not been checked. | Planned |
-| 2.3 | Leadership and management | SL and HL, with HL-only content | Corroborated: Secondary sources mark part of this subtopic as HL only. Which part is HL only must be checked against the Guide. | Complete brief, `/topics/leadership-and-management/` |
-| 2.4 | Motivation and demotivation | SL and HL | Corroborated: Whether any motivation theory is HL only has not been checked. | Planned |
-| 2.5 | Organizational (corporate) culture | HL only | Corroborated | Planned |
-| 2.6 | Communication | SL and HL | Corroborated | Planned |
-| 2.7 | Industrial/employee relations | HL only | Unverified | Planned |
+20 hours at SL, 35 at HL. Guide, from p. 25.
+
+| Code | Subtopic | Level | Statements (HL only) | Guide page | On the platform |
+| --- | --- | --- | --- | --- | --- |
+| 2.1 | Introduction to human resource management | SL and HL | 4 | 25 | Planned |
+| 2.2 | Organizational structure | SL and HL, with HL-only content | 4 (1) | 25 | Planned |
+| 2.3 | Leadership and management | SL and HL, with HL-only content | 3 (1) | 26 | Complete brief, `/topics/leadership-and-management/` |
+| 2.4 | Motivation and demotivation | SL and HL, with HL-only content | 9 (5) | 26 | Planned |
+| 2.5 | Organizational (corporate) culture | HL only | 3 (3) | 27 | Planned |
+| 2.6 | Communication | SL and HL | 2 | 27 | Planned |
+| 2.7 | Industrial/employee relations | HL only | 3 (3) | 27 | Planned |
 
 ### Unit 3: Finance and accounts
 
-| Code | Subtopic | Level | Status | On the platform |
-| --- | --- | --- | --- | --- |
-| 3.1 | Introduction to finance | SL and HL | Corroborated | Planned |
-| 3.2 | Sources of finance | SL and HL | Corroborated | Planned |
-| 3.3 | Costs and revenues | SL and HL | Corroborated | Complete brief, `/topics/costs-and-revenues/` |
-| 3.4 | Final accounts | SL and HL, with HL-only content | Corroborated: A secondary source lists the appropriateness of depreciation methods as HL only. | Planned |
-| 3.5 | Profitability and liquidity ratio analysis | SL and HL | Corroborated | Planned |
-| 3.6 | Debt/equity ratio analysis | HL only | Sources conflict: One source titles 3.6 Efficiency ratio analysis (the title used in the previous course). Both describe HL-only ratio analysis. Check the title against the Guide. | Planned |
-| 3.7 | Cash flow | SL and HL | Corroborated | Planned |
-| 3.8 | Investment appraisal | SL and HL, with HL-only content | Corroborated: Secondary sources mark part of investment appraisal as HL only (net present value). | Planned |
-| 3.9 | Budgets | HL only | Corroborated | Planned |
+30 hours at SL, 45 at HL. Guide, from p. 28.
+
+| Code | Subtopic | Level | Statements (HL only) | Guide page | On the platform |
+| --- | --- | --- | --- | --- | --- |
+| 3.1 | Introduction to finance | SL and HL | 1 | 28 | Planned |
+| 3.2 | Sources of finance | SL and HL | 3 | 28 | Planned |
+| 3.3 | Costs and revenues | SL and HL | 2 | 28 | Complete brief, `/topics/costs-and-revenues/` |
+| 3.4 | Final accounts | SL and HL, with HL-only content | 5 (2) | 29 | Planned |
+| 3.5 | Profitability and liquidity ratio analysis | SL and HL | 4 | 29 | Planned |
+| 3.6 | Efficiency ratio analysis | HL only | 3 (3) | 29 | Planned |
+| 3.7 | Cash flow | SL and HL | 6 | 29 | Planned |
+| 3.8 | Investment appraisal | SL and HL, with HL-only content | 2 (1) | 30 | Planned |
+| 3.9 | Budgets | HL only | 5 (5) | 30 | Planned |
 
 ### Unit 4: Marketing
 
-| Code | Subtopic | Level | Status | On the platform |
-| --- | --- | --- | --- | --- |
-| 4.1 | Introduction to marketing | SL and HL | Corroborated | Planned |
-| 4.2 | Marketing planning | SL and HL | Corroborated | Planned |
-| 4.3 | Sales forecasting | HL only | Corroborated | Planned |
-| 4.4 | Market research | SL and HL | Corroborated | Planned |
-| 4.5 | The seven Ps of the marketing mix | SL and HL | Corroborated | Planned |
-| 4.6 | International marketing | HL only | Sources conflict: Numbered 4.6 by a source listing the 2024 syllabus and 4.7 by sources describing the previous course. | Planned |
+30 hours at SL, 35 at HL. Guide, from p. 30.
+
+| Code | Subtopic | Level | Statements (HL only) | Guide page | On the platform |
+| --- | --- | --- | --- | --- | --- |
+| 4.1 | Introduction to marketing | SL and HL, with HL-only content | 4 (1) | 31 | Planned |
+| 4.2 | Marketing planning | SL and HL | 5 | 31 | Planned |
+| 4.3 | Sales forecasting | HL only | 1 (1) | 31 | Planned |
+| 4.4 | Market research | SL and HL | 5 | 31 | Planned |
+| 4.5 | The seven Ps of the marketing mix | SL and HL, with HL-only content | 13 (1) | 31 | Planned |
+| 4.6 | International marketing | HL only | 1 (1) | 32 | Planned |
 
 ### Unit 5: Operations management
 
-| Code | Subtopic | Level | Status | On the platform |
-| --- | --- | --- | --- | --- |
-| 5.1 | Introduction to operations management | SL and HL | Corroborated | Planned |
-| 5.2 | Operations methods | SL and HL | Corroborated | Planned |
-| 5.3 | Lean production and quality management | HL only | Corroborated | Planned |
-| 5.4 | Location | SL and HL | Corroborated | Planned |
-| 5.5 | Break-even analysis | SL and HL | Corroborated: Worked in the Finance Desk break-even workspace and used throughout the costs and revenues brief. A dedicated topic brief is planned. | Planned |
-| 5.6 | Production planning | HL only | Corroborated | Planned |
-| 5.7 | Crisis management and contingency planning | HL only | Sources conflict: Listed as HL only by a course book listing; one revision site lists it without the HL label. | Planned |
-| 5.8 | Research and development | HL only | Unverified | Planned |
-| 5.9 | Management information systems | HL only | Corroborated | Planned |
+15 hours at SL, 45 at HL. Guide, from p. 33.
 
+| Code | Subtopic | Level | Statements (HL only) | Guide page | On the platform |
+| --- | --- | --- | --- | --- | --- |
+| 5.1 | Introduction to operations management | SL and HL | 1 | 33 | Planned |
+| 5.2 | Operations methods | SL and HL | 1 | 33 | Planned |
+| 5.3 | Lean production and quality management | HL only | 7 (7) | 34 | Planned |
+| 5.4 | Location | SL and HL | 2 | 34 | Planned |
+| 5.5 | Break-even analysis | SL and HL | 4 | 34 | Taught in the costs and revenues brief and the Finance Desk break-even workspace |
+| 5.6 | Production planning | HL only | 7 (7) | 34 | Planned |
+| 5.7 | Crisis management and contingency planning | HL only | 3 (3) | 35 | Planned |
+| 5.8 | Research and development | HL only | 4 (4) | 35 | Planned |
+| 5.9 | Management information systems | HL only | 6 (6) | 35 | Planned |
 
 ## Concepts
 
-Change, creativity, ethics and sustainability. Corroborated by several independent sources. The descriptions and questions for each concept on the site are the platform's own (Arjun Agrawal framework), not the IB's wording.
+Change, creativity, ethics and sustainability (guide, pp. 6 and 12 to 13). The internal assessment uses exactly one of them as its lens (p. 53). The descriptions and questions for each concept on the site are the platform's own (Arjun Agrawal framework), not the IB's wording.
 
 ## Toolkit
 
-Fifteen tools are listed by secondary sources that agree with each other (corroborated):
+The guide lists the tools on pp. 13 to 15 and says they are taught and assessed at AO2 and AO4, integrated with the units.
 
-- **SL and HL**: SWOT analysis, Ansoff matrix, STEEPLE analysis, Boston Consulting Group matrix, business plan, decision trees, descriptive statistics, circular business models.
-- **HL only**: force field analysis, Gantt chart, Hofstede's cultural dimensions, Porter's generic strategies, contribution (as a decision tool), critical path analysis, simple linear regression.
+- **SL and HL**: SWOT analysis, Ansoff matrix, STEEPLE analysis, Boston Consulting Group matrix, business plan, decision trees, descriptive statistics (mean, mode, median, bar charts, pie charts, infographics, quartiles, standard deviation), circular business models (circular supply, resource recovery, product life extension, sharing, product service system).
+- **HL only**: force field analysis, Gantt chart, Hofstede's cultural dimensions, Porter's generic strategies, contribution (make or buy, contribution costing, absorption costing), critical path analysis (completing and analysing, not drawing; critical path, free and total float), simple linear regression (scatter diagrams, line of best fit, correlation and extrapolation).
 
-Critical path analysis is marked **Sources conflict**: most listings include it as HL only, and one states it was removed from the syllabus.
+The toolkit pages group the tools as the teacher support material does (situational, planning, decision-making; TSM, p. 26), and mark the grouping as the platform's reading where the TSM does not classify a tool.
 
 ## Assessment
 
-| Component | Levels | What is stated, and how sure |
-| --- | --- | --- |
-| Paper 1 | SL and HL | Pre-released statement about three months before the examination, giving the context and about the first 200 words of an unseen case: **Recorded** (Assessment procedures 2027, D3.3, p. 194). 1 hour 30 minutes; 35% at SL, 25% at HL: **Corroborated** |
-| Paper 2 | SL and HL | Separate SL and HL papers, 1 hour 30 minutes and 1 hour 45 minutes; 35% at SL, 30% at HL: **Corroborated**. Unseen stimulus with a quantitative focus: **Unverified** |
-| Paper 3 | HL only | A case study of a social enterprise; 1 hour 15 minutes; 25% of the HL mark: **Corroborated** |
-| Internal assessment | SL and HL | A research project of at most 1,800 words on an issue facing an organization, through a conceptual lens; sampled once across SL and HL: **Recorded** (Assessment procedures 2027, D3.2, p. 192). 30% at SL, 20% at HL: **Corroborated** |
+| Component | SL | HL | Sections |
+| --- | --- | --- | --- |
+| Paper 1 | 1 h 30, 30 marks, 35% | 1 h 30, 30 marks, 25% | A: structured questions, 20 marks. B: one of two extended responses, 10 marks. Pre-released statement three months before; excludes HL-only content |
+| Paper 2 | 1 h 30, 40 marks, 35% | 1 h 45, 50 marks, 30% | A: structured, quantitative, 20 marks (SL) or 30 (HL). B: one of two questions, structured parts (10) and an extended response (10) |
+| Paper 3 | Not taken | 1 h 15, 25 marks, 25% | A social enterprise. Question 1 (2 marks), question 2 (6), question 3 (17, marked on criteria A to D: 4, 4, 6, 3) |
+| Internal assessment | 25 marks, 30% | 25 marks, 20% | A business research project, at most 1,800 words, three to five supporting documents, one key concept; criteria A to G (5, 4, 4, 5, 3, 2, 2) |
+
+Guide, pp. 39 to 58. The platform gives criteria and markbands by name, level range and maximum mark only.
 
 ## Command terms
 
-Thirty-one command terms. Twenty-six definitions quote the IB Economics guide's glossary (Recorded); five terms not in that glossary (Demonstrate, Interpret, Annotate, Complete, Prepare) have the platform's own explanation, labelled as such. The grouping of terms under assessment objectives AO1 to AO4 is the platform's reading and is **Unverified**.
+The guide's 31 command terms, at the AO levels it gives them (pp. 19 to 20 and 67 to 68): six at AO1, seven at AO2, nine at AO3 and nine at AO4. A question may use a term at the subtopic's depth of teaching or a less demanding one (p. 42); the integrity check rejects a practice question whose command term and AO do not match the guide. The explanations on the Examiner Lens are the platform's own wording, with the page of the official definition.
 
-## Verifying against the Guide
+## Keeping the mapping right
 
-When the Guide is supplied:
-
-1. For each subtopic in `src/content/curricula/ib-dp-bm.yaml`, compare the title, level and content with the Guide. Set `verification: primary` and record the page in the matching claim in `src/content/data/claims.yaml`.
-2. Resolve the conflicting lines (3.6, 4.6, 5.7, critical path analysis) and the unverified ones (2.2, 2.7, 5.8).
-3. Rewrite each topic's `syllabus` block against the Guide's content statements, in the platform's own words, and mark it primary.
-4. Check the command term definitions against the Business management glossary, and the AO grouping.
-5. Add assessment criteria and markband guidance to the Exam Desk and IA Studio **only** in the platform's own words with page references; do not reproduce them.
-6. Run `npm run qa`, then update this document and `CHANGELOG.md`.
+1. When a new edition or update of the guide is published, update `scripts/content/build_curriculum.py` from it, run `python3 scripts/content/build_curriculum.py`, and compare the diff of `src/content/curricula/ib-dp-bm.yaml`.
+2. Update the matching claims in `src/content/data/claims.yaml` with the new pages and the date checked.
+3. Run `npm run qa`. The integrity check fails the build on a broken reference, an HL question in the style of paper 1, a paper 3 question that is not HL, or a command term at the wrong AO.
+4. Record the change in `CHANGELOG.md`.
 
 ## Other curricula
 

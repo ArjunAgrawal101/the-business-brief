@@ -1134,7 +1134,7 @@
   border-top: 2px solid var(--rule-ink);
 }
 
-.subtopic-list li {
+.subtopic-list > li {
   display: grid;
   gap: var(--sp-1) var(--sp-4);
   padding: var(--sp-3) 0;
@@ -1142,18 +1142,18 @@
 }
 
 @media (min-width: 52rem) {
-  .subtopic-list li {
+  .subtopic-list > li {
     grid-template-columns: 3.5rem minmax(0, 1fr) auto;
     align-items: baseline;
   }
 }
 
-.subtopic-list .num {
+.subtopic-list > li > .num {
   font-weight: 600;
   color: var(--text-strong);
 }
 
-.subtopic-list .tags {
+.subtopic-list > li > .tags {
   justify-content: flex-start;
 }
 

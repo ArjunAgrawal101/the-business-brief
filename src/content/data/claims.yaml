@@ -1,201 +1,413 @@
 # The claims register: each factual claim the platform makes about a
 # requirement, an institution or a real organization, the sources behind it,
 # where in the source, how far it is verified, and where it is used.
-# Status values: primary, recorded, corroborated, conflicting, unverified.
+# Status values: primary, recorded, corroborated, conflicting, unverified,
+# pedagogical. Course claims were checked against the Business management
+# guide (first assessment 2024) on 29 October 2026.
 
 - id: course-units
-  statement: The IB DP Business Management course first assessed in 2024 is organized in five units, from Introduction to business management to Operations management.
-  sources: [sme-bm-2024, tutopiya-bm-hl, acs-bm-2024, ib-bm-guide-2024]
-  status: corroborated
+  statement: 'The course has five units: Introduction to business management, Human resource management, Finance and accounts, Marketing, and Operations management.'
+  sources:
+  - ib-bm-guide-2024
+  location: Syllabus outline, pp. 21 to 22
+  status: primary
   checked: '2026-10-29'
-  usedIn: [/ib/, /ib/coverage/]
-
+  usedIn:
+  - /ib/
+  - /ib/coverage/
+- id: course-hours
+  statement: The recommended teaching time is 150 hours at SL and 240 at HL, including the toolkit (10 and 35 hours), research for the paper 1 pre-released statement (5 and 5) and the internal assessment
+    (20 and 20).
+  sources:
+  - ib-bm-guide-2024
+  location: pp. 3, 7 and 21 to 22
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /ib/
 - id: course-subtopic-count
-  statement: The HL course has thirty-seven subtopics.
-  sources: [tutopiya-bm-hl]
-  status: corroborated
+  statement: The syllabus has thirty-seven subtopics.
+  sources:
+  - ib-bm-guide-2024
+  location: Syllabus outline, pp. 21 to 22
+  status: primary
   checked: '2026-10-29'
-  usedIn: [/ib/, /ib/coverage/]
-  note: One source gives the count; it matches the thirty-seven subtopics assembled independently from the other listings.
-
+  usedIn:
+  - /ib/
+  - /ib/coverage/
 - id: course-hl-only-subtopics
-  statement: Eleven subtopics are HL only (2.5, 2.7, 3.6, 3.9, 4.3, 4.6, 5.3, 5.6, 5.7, 5.8 and 5.9), and some subtopics taken at both levels contain HL-only content (2.3, 3.4 and 3.8 among them).
-  sources: [acs-bm-2024, revisiondojo-bm, thinkib-bm, oup-bm-coursebook]
-  status: corroborated
+  statement: Eleven subtopics are HL only (2.5, 2.7, 3.6, 3.9, 4.3, 4.6, 5.3, 5.6, 5.7, 5.8 and 5.9), and seven subtopics taken at both levels contain HL-only content (2.2, 2.3, 2.4, 3.4, 3.8, 4.1 and 4.5).
+  sources:
+  - ib-bm-guide-2024
+  location: Syllabus content, pp. 23 to 36
+  status: primary
   checked: '2026-10-29'
-  usedIn: [/ib/, /ib/coverage/]
-  note: The status of 2.7, 5.7 and 5.8 and the title of 3.6 are less well supported; see the notes on each subtopic.
-
+  usedIn:
+  - /ib/
+  - /ib/coverage/
+- id: course-3-6-title
+  statement: Subtopic 3.6 is titled "Efficiency ratio analysis" and is HL only.
+  sources:
+  - ib-bm-guide-2024
+  location: p. 21 and p. 29
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /ib/
+  note: Some secondary sources call it "Debt/equity ratio analysis".
 - id: course-concepts
-  statement: The course has four concepts, change, creativity, ethics and sustainability, which replaced the previous course's concepts.
-  sources: [clastify-bm, acs-bm-2024]
-  status: corroborated
+  statement: 'The course has four key concepts: change, creativity, ethics and sustainability.'
+  sources:
+  - ib-bm-guide-2024
+  location: pp. 6 and 12 to 13
+  status: primary
   checked: '2026-10-29'
-  usedIn: [/ib/, /ib/concepts/]
-
+  usedIn:
+  - /ib/concepts/
+  - /ib/
+- id: course-aims
+  statement: The course has four aims, including developing students as confident, creative and compassionate business leaders, entrepreneurs, social entrepreneurs and change agents, and engaging with decision-making
+    as a process and a skill.
+  sources:
+  - ib-bm-guide-2024
+  location: p. 17
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /platform/
 - id: course-toolkit
-  statement: The course has a business management toolkit of fifteen tools, some of them HL only.
-  sources: [sme-bm-2024, revisiondojo-bm]
-  status: corroborated
+  statement: 'The toolkit has fifteen tools: eight at SL and HL (SWOT analysis, Ansoff matrix, STEEPLE analysis, Boston Consulting Group matrix, business plan, decision trees, descriptive statistics and
+    circular business models) and seven HL only (force field analysis, Gantt chart, Hofstede''s cultural dimensions, Porter''s generic strategies, contribution, critical path analysis and simple linear
+    regression). All must be taught at AO2 and AO4 alongside the syllabus content.'
+  sources:
+  - ib-bm-guide-2024
+  location: Business management toolkit, pp. 13 to 15
+  status: primary
   checked: '2026-10-29'
-  usedIn: [/toolkit/]
-
-- id: toolkit-hl-tools
-  statement: Eight toolkit tools are taken at SL and HL (SWOT analysis, Ansoff matrix, STEEPLE analysis, Boston Consulting Group matrix, business plan, decision trees, descriptive statistics and circular business models) and seven are HL only (force field analysis, Gantt chart, Hofstede's cultural dimensions, Porter's generic strategies, contribution, critical path analysis and simple linear regression).
-  sources: [revisiondojo-bm, ibbm-toolkit, excel-econ-toolkit]
-  status: corroborated
-  checked: '2026-10-29'
-  usedIn: [/toolkit/]
-  note: Two listings found by web search give the same eight SL and HL tools and the same seven HL-only tools; another marks five of the seven HL only and is silent on the other two.
-
+  usedIn:
+  - /toolkit/
 - id: toolkit-cpa
-  statement: Critical path analysis is an HL-only toolkit tool.
-  sources: [revisiondojo-bm, excel-econ-toolkit]
-  status: conflicting
+  statement: Critical path analysis is an HL-only tool covering the completion and analysis of a critical path diagram (drawing one is not expected), identification of the critical path, and calculation
+    of free and total float.
+  sources:
+  - ib-bm-guide-2024
+  location: pp. 14 to 15
+  status: primary
   checked: '2026-10-29'
-  usedIn: [/toolkit/]
-  note: Most listings include it as HL only; one source states that it was removed from the syllabus. Check against the Guide.
-
-- id: assessment-weightings
-  statement: At SL, Paper 1 and Paper 2 each carry 35% and the internal assessment 30%; at HL, Paper 1 carries 25%, Paper 2 30%, Paper 3 25% and the internal assessment 20%.
-  sources: [clastify-bm, revisiondojo-bm, thinkib-bm]
-  status: corroborated
+  usedIn:
+  - /toolkit/
+- id: toolkit-classification
+  statement: Toolkit tools can be classified as situational (for example SWOT and STEEPLE analysis), planning (for example the business plan, critical path analysis and Gantt charts) and decision-making
+    tools (for example decision trees, the BCG matrix and the Ansoff matrix); a tool can fit more than one class.
+  sources:
+  - ib-bm-tsm-2022
+  location: p. 26
+  status: primary
   checked: '2026-10-29'
-  usedIn: [/exam-desk/, /exam-desk/paper-1/, /exam-desk/paper-2/, /exam-desk/paper-3/, /ia-studio/]
-  note: Some sites still give the previous course's weightings, which differ.
-
-- id: assessment-durations
-  statement: Paper 1 is common to SL and HL and lasts 1 hour 30 minutes; Paper 2 lasts 1 hour 30 minutes at SL and 1 hour 45 minutes at HL; Paper 3 (HL only) lasts 1 hour 15 minutes.
-  sources: [clastify-bm, revisiondojo-bm]
-  status: corroborated
+  usedIn:
+  - /toolkit/
+  note: The TSM classifies these eight tools by example. The class of the other seven is the platform's reading and is marked as such.
+- id: aos
+  statement: 'The course has four assessment objectives: knowledge and understanding (AO1), application and analysis (AO2), synthesis and evaluation (AO3), and use and application of appropriate skills
+    (AO4).'
+  sources:
+  - ib-bm-guide-2024
+  location: p. 18
+  status: primary
   checked: '2026-10-29'
-  usedIn: [/exam-desk/, /exam-desk/paper-1/, /exam-desk/paper-2/, /exam-desk/paper-3/]
-
-- id: paper1-prerelease
-  statement: Paper 1 is based on a pre-released statement, issued about three months before the examination (in the first week of February for May sessions and of August for November sessions), giving a small number of topics as context and roughly the first 200 words of the case study.
-  sources: [ib-ap-2027-record]
-  location: Assessment procedures 2027, section D3.3, page 194
-  status: recorded
-  checked: '2026-10-29'
-  usedIn: [/exam-desk/paper-1/]
-
-- id: paper2-quantitative
-  statement: Paper 2 is based on unseen stimulus material with a quantitative focus.
-  sources: [thinkib-bm]
-  status: unverified
-  checked: '2026-10-29'
-  usedIn: [/exam-desk/paper-2/]
-  note: Only one secondary source in this session described Paper 2's focus.
-
-- id: paper3-social-enterprise
-  statement: Paper 3 is taken at HL only and is based on a case study of a social enterprise.
-  sources: [acs-bm-2024, revisiondojo-bm]
-  status: corroborated
-  checked: '2026-10-29'
-  usedIn: [/exam-desk/paper-3/]
-
-- id: ia-research-project
-  statement: The internal assessment is a research project of at most 1,800 words on an issue facing an organization, investigated through a conceptual lens; Business management is sampled once across SL and HL for moderation.
-  sources: [ib-ap-2027-record]
-  location: Assessment procedures 2027, section D3.2, page 192
-  status: recorded
-  checked: '2026-10-29'
-  usedIn: [/ia-studio/]
-
-- id: ia-concept-lens
-  statement: The conceptual lens of the research project is one of the course's four concepts.
-  sources: [clastify-bm]
-  status: corroborated
-  checked: '2026-10-29'
-  usedIn: [/ia-studio/]
-
-- id: command-term-wording
-  statement: The definitions of command terms the course shares with IB Economics use the wording of the IB Economics guide's glossary.
-  sources: [ib-econ-guide-2022]
-  status: recorded
-  checked: '2026-10-29'
-  usedIn: [/examiner-lens/]
-  note: The wording is primary for Economics. That the Business management guide uses identical wording is expected, because IB command terms are shared, but it has not been checked.
-
+  usedIn:
+  - /exam-desk/
+  - /examiner-lens/
 - id: command-term-aos
-  statement: The grouping of Business management command terms under AO1 to AO4.
-  sources: [ib-bm-guide-2024]
-  status: unverified
+  statement: 'The guide lists thirty-one command terms: six at AO1, seven at AO2, nine at AO3 and nine at AO4.'
+  sources:
+  - ib-bm-guide-2024
+  location: pp. 19 to 20 and 67 to 68
+  status: primary
   checked: '2026-10-29'
-  usedIn: [/examiner-lens/]
-  note: The grouping shown is the platform's reading and must be checked against the Guide's glossary. The four objectives carry the same names as in the Economics guide.
-
+  usedIn:
+  - /examiner-lens/
+- id: command-term-rule
+  statement: An examination question may use a command term from the depth of teaching set for the topic or from a lower level, but not from a higher one.
+  sources:
+  - ib-bm-guide-2024
+  location: p. 42
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /examiner-lens/
+  - /exam-desk/
+- id: command-term-wording
+  statement: The platform explains each command term in its own words. The official definitions are in the guide's glossary of command terms.
+  sources:
+  - ib-bm-guide-2024
+  location: pp. 67 to 68
+  status: pedagogical
+  checked: '2026-10-29'
+  usedIn:
+  - /examiner-lens/
+- id: assessment-weightings
+  statement: At SL, paper 1 and paper 2 each carry 35% and the internal assessment 30%. At HL, paper 1 carries 25%, paper 2 30%, paper 3 25% and the internal assessment 20%.
+  sources:
+  - ib-bm-guide-2024
+  location: Assessment outlines, pp. 39 to 40
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /exam-desk/
+  - /exam-desk/paper-1/
+  - /exam-desk/paper-2/
+  - /exam-desk/paper-3/
+  - /ia-studio/
+- id: assessment-durations
+  statement: Paper 1 lasts 1 hour 30 minutes at both levels; paper 2 lasts 1 hour 30 minutes at SL and 1 hour 45 minutes at HL; paper 3 (HL only) lasts 1 hour 15 minutes. Every paper begins with five minutes
+    of reading time.
+  sources:
+  - ib-bm-guide-2024
+  location: pp. 39 to 41
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /exam-desk/
+  - /exam-desk/paper-1/
+  - /exam-desk/paper-2/
+  - /exam-desk/paper-3/
+- id: paper1-structure
+  statement: Paper 1 (30 marks) has section A, structured questions worth 20 marks, and section B, one of two extended-response questions worth 10 marks. It is the same paper at SL and HL and excludes HL
+    extension material.
+  sources:
+  - ib-bm-guide-2024
+  location: pp. 39 to 40 and 43 to 46
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /exam-desk/paper-1/
+- id: paper1-prerelease
+  statement: Three months before paper 1, the IB releases a statement with a small number of topics to research (about five hours, building on but not in the syllabus) and roughly the first 200 words of
+    an unseen case study of about 800 to 1,000 words. Most questions are qualitative; some minor calculations are possible.
+  sources:
+  - ib-bm-guide-2024
+  - ib-ap-2027-record
+  location: p. 41; Assessment procedures 2027, D3.3, p. 194
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /exam-desk/paper-1/
+- id: paper2-structure
+  statement: Paper 2 is based on unseen stimulus material with a quantitative focus, presented in parts. Section A (20 marks at SL, 30 at HL) is structured questions; section B (20 marks) is one of two
+    questions combining structured parts with a 10-mark extended response. SL and HL sit different papers; HL includes the HL extension material.
+  sources:
+  - ib-bm-guide-2024
+  location: pp. 39 to 42 and 43 to 47
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /exam-desk/paper-2/
+- id: paper2-sl-social-enterprise
+  statement: At SL, one of the stimulus options in paper 2 section B may be about a social enterprise.
+  sources:
+  - ib-bm-guide-2024
+  location: p. 42
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /exam-desk/paper-2/
+- id: paper3-structure
+  statement: 'Paper 3 (HL only, 25 marks) is about a social enterprise. Its stimulus is a short introduction to the organization, a visual of a product and five or six excerpts from documents. There are
+    three compulsory questions: describing a human need (2 marks, AO1), explaining the challenges facing the social entrepreneur (6 marks, AO2) and recommending a plan of action (17 marks), marked against
+    four criteria.'
+  sources:
+  - ib-bm-guide-2024
+  location: pp. 7, 42 and 47 to 50
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /exam-desk/paper-3/
+- id: markbands-structure
+  statement: The 10-mark extended responses in section B of papers 1 and 2 are marked with markbands of five levels (1 to 2, 3 to 4, 5 to 6, 7 to 8, 9 to 10) that judge understanding of the question, use
+    of tools and theories, use of the stimulus and the balance of the argument. Paper 3 question 3 is marked against criteria A to D (4, 4, 6 and 3 marks).
+  sources:
+  - ib-bm-guide-2024
+  location: pp. 44 to 50
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /exam-desk/
+  - /examiner-lens/
+  note: The platform summarizes the markbands and criteria; it does not reproduce their wording.
+- id: calculators
+  statement: Every calculation can be done with a four-function calculator; graphic display calculators are allowed.
+  sources:
+  - ib-bm-guide-2024
+  location: p. 43
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /exam-desk/paper-2/
+  - /finance-desk/
+- id: ia-research-project
+  statement: 'The internal assessment is the same at SL and HL: a business research project of at most 1,800 words about a real issue or problem facing a single organization, with a forward- or backward-looking
+    research question, three to five supporting documents and one key concept as its lens (25 marks).'
+  sources:
+  - ib-bm-guide-2024
+  - ib-ap-2027-record
+  location: pp. 51 to 56; Assessment procedures 2027, D3.2, p. 192
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /ia-studio/
+- id: ia-supporting-documents
+  statement: Supporting documents must be chosen by the student, published within three years of submission, highlighted where relevant, and labelled; at most one may be a transcript of audio or video,
+    and no one document should be longer than about five A4 pages.
+  sources:
+  - ib-bm-guide-2024
+  location: pp. 54 to 55
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /ia-studio/
+- id: ia-criteria
+  statement: 'The research project is marked against seven criteria: A integration of a key concept (5 marks), B supporting documents (4), C selection and application of tools and theories (4), D analysis
+    and evaluation (5), E conclusions (3), F structure (2) and G presentation (2).'
+  sources:
+  - ib-bm-guide-2024
+  location: pp. 56 to 58
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /ia-studio/
+- id: ia-word-count
+  statement: The 1,800-word limit excludes the contents page, tables of statistical data, diagrams, calculations, supporting documents, citations, references in footnotes and the bibliography; definitions
+    and quotations in the body count. Moderators do not read beyond 1,800 words.
+  sources:
+  - ib-bm-guide-2024
+  location: p. 56
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /ia-studio/
+- id: formulae
+  statement: The formulae for gross profit margin, profit margin, ROCE, the current and acid test ratios, stock turnover, debtor and creditor days, gearing, ARR, NPV, capacity utilization rate and productivity
+    rate are given in the guide and supplied in the examination; HL discount tables are provided where needed.
+  sources:
+  - ib-bm-guide-2024
+  location: pp. 64 to 66
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /finance-desk/
+- id: statement-formats
+  statement: In assessment, the profit and loss account is called the statement of profit or loss and the balance sheet the statement of financial position; statements, cash flow forecasts and budgets follow
+    set layouts with negative figures in brackets.
+  sources:
+  - ib-bm-guide-2024
+  location: pp. 59 to 63
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /finance-desk/
 - id: growth-content
-  statement: Subtopic 1.5 covers internal and external economies and diseconomies of scale, the difference between internal and external growth, reasons for businesses to grow and to stay small, and external growth methods (mergers and acquisitions, takeovers, joint ventures, strategic alliances and franchising).
-  sources: [revisiondojo-bm, sme-bm-2024]
-  status: corroborated
+  statement: 'Subtopic 1.5 covers internal and external economies and diseconomies of scale (AO2), internal versus external growth (AO2), reasons to grow and to stay small (AO3), and external growth methods:
+    mergers and acquisitions, takeovers, joint ventures, strategic alliances and franchising (AO3).'
+  sources:
+  - ib-bm-guide-2024
+  location: p. 24
+  status: primary
   checked: '2026-10-29'
-  usedIn: [/topics/growth-and-evolution/]
-
+  usedIn:
+  - /topics/growth-and-evolution/
 - id: leadership-content
-  statement: Subtopic 2.3 covers the functions of management, management versus leadership, and the autocratic, paternalistic, democratic, laissez-faire and situational leadership styles; part of the subtopic is HL only.
-  sources: [revisiondojo-bm, sme-bm-2024]
-  status: corroborated
+  statement: Subtopic 2.3 covers management and leadership (AO2), the autocratic, paternalistic, democratic, laissez-faire and situational styles (AO3), and, at HL only, scientific and intuitive thinking
+    and management (AO2).
+  sources:
+  - ib-bm-guide-2024
+  location: p. 26
+  status: primary
   checked: '2026-10-29'
-  usedIn: [/topics/leadership-and-management/]
-
-- id: leadership-hl-decisions
-  statement: Scientific and intuitive decision-making is HL-only content within subtopic 2.3.
-  sources: [revisiondojo-bm]
-  status: unverified
+  usedIn:
+  - /topics/leadership-and-management/
+- id: labour-turnover-hl
+  statement: Labour turnover is HL-only content in subtopic 2.4 (AO2 and AO4).
+  sources:
+  - ib-bm-guide-2024
+  location: p. 26
+  status: primary
   checked: '2026-10-29'
-  usedIn: [/topics/leadership-and-management/]
-  note: One secondary source places it in 2.3 with an HL label.
-
+  usedIn:
+  - /topics/leadership-and-management/
+  - /finance-desk/
 - id: costs-content
-  statement: Subtopic 3.3 covers types of cost (fixed, variable, semi-variable, direct and indirect or overhead) and total revenue and revenue streams.
-  sources: [ib-bm-guide-2024]
-  status: unverified
+  statement: Subtopic 3.3 covers types of cost (fixed, variable, direct and indirect or overhead) and total revenue and revenue streams, at AO2.
+  sources:
+  - ib-bm-guide-2024
+  location: pp. 28 to 29
+  status: primary
   checked: '2026-10-29'
-  usedIn: [/topics/costs-and-revenues/]
-  note: No source found in this session listed the content of 3.3 in detail.
-
+  usedIn:
+  - /topics/costs-and-revenues/
+  note: Semi-variable costs are not in the guide's list; the platform uses them because real cost ledgers contain them, and says so.
 - id: breakeven-content
-  statement: Subtopic 5.5 covers contribution, break-even quantity and revenue, margin of safety, target profit output and target price, and the effect of changes in price or cost.
-  sources: [sme-bm-2024, tutorchase-bm]
-  status: corroborated
+  statement: Subtopic 5.5 covers total contribution and contribution per unit, the break-even chart (break-even quantity, profit or loss, margin of safety, target profit output, target profit and target
+    price), the effects of changes in price or cost, and the limitations of break-even analysis.
+  sources:
+  - ib-bm-guide-2024
+  location: p. 34
+  status: primary
   checked: '2026-10-29'
-  usedIn: [/finance-desk/break-even/, /topics/costs-and-revenues/]
-  note: Target price was not mentioned explicitly in the sources found.
-
+  usedIn:
+  - /finance-desk/break-even/
+  - /topics/costs-and-revenues/
+- id: contribution-hl
+  statement: Contribution is an HL-only toolkit tool that includes make or buy analysis, contribution costing and absorption costing.
+  sources:
+  - ib-bm-guide-2024
+  location: p. 14
+  status: primary
+  checked: '2026-10-29'
+  usedIn:
+  - /finance-desk/contribution/
+  - /toolkit/contribution/
 - id: mcd-franchised-2025
   statement: About 95% of McDonald's 45,356 restaurants were franchised at the end of 2025.
-  sources: [mcd-10k-2025]
+  sources:
+  - mcd-10k-2025
   location: Form 10-K for 2025, business section
   status: corroborated
   checked: '2026-10-29'
-  usedIn: [/topics/growth-and-evolution/]
-
+  usedIn:
+  - /topics/growth-and-evolution/
 - id: tata-starbucks-jv
-  statement: Tata Starbucks is a 50:50 joint venture between Starbucks and Tata Global Beverages (now Tata Consumer Products), announced in January 2012; its first store opened on 19 October 2012 at Horniman Circle, Mumbai.
-  sources: [tata-starbucks-2012]
+  statement: Tata Starbucks is a 50:50 joint venture between Starbucks and Tata Global Beverages (now Tata Consumer Products), announced in January 2012; its first store opened on 19 October 2012 at Horniman
+    Circle, Mumbai.
+  sources:
+  - tata-starbucks-2012
   status: corroborated
   checked: '2026-10-29'
-  usedIn: [/topics/growth-and-evolution/]
-
+  usedIn:
+  - /topics/growth-and-evolution/
 - id: disney-fox-acquisition
   statement: Disney completed its acquisition of 21st Century Fox's film and television assets on 20 March 2019, in a deal valued at $71.3 billion.
-  sources: [disney-fox-2019]
+  sources:
+  - disney-fox-2019
   status: corroborated
   checked: '2026-10-29'
-  usedIn: [/topics/growth-and-evolution/]
-
+  usedIn:
+  - /topics/growth-and-evolution/
 - id: star-alliance-founding
   statement: Star Alliance was founded on 14 May 1997 by Air Canada, Lufthansa, Scandinavian Airlines, Thai Airways International and United Airlines.
-  sources: [star-alliance-1997]
+  sources:
+  - star-alliance-1997
   status: corroborated
   checked: '2026-10-29'
-  usedIn: [/topics/growth-and-evolution/]
-
+  usedIn:
+  - /topics/growth-and-evolution/
 - id: creator-facts
-  statement: Arjun Agrawal studied Economics at St. Stephen's College, University of Delhi; taught undergraduate Economics as an Assistant Professor at Fergusson College, Pune; has taught IB Diploma Programme Economics, Business Management and Global Politics, including at BLISS International School, Pune and Symbiosis International School, Pune; and mentors UPSC Civil Services aspirants in Economics.
-  sources: [creator-profile]
+  statement: Arjun Agrawal studied Economics at St. Stephen's College, University of Delhi; taught undergraduate Economics as an Assistant Professor at Fergusson College, Pune; has taught IB Diploma Programme
+    Economics, Business Management and Global Politics, including at BLISS International School, Pune and Symbiosis International School, Pune; and mentors UPSC Civil Services aspirants in Economics.
+  sources:
+  - creator-profile
   status: recorded
   checked: '2026-10-29'
-  usedIn: [/about/]
+  usedIn:
+  - /about/
   note: None of these is described as a current post.

@@ -3,19 +3,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/layout/PageIntro.astro';
 import SectionHead from '../components/layout/SectionHead.astro';
 import VerifyTag from '../components/ui/VerifyTag.astro';
-import ProvenanceTag from '../components/ui/ProvenanceTag.astro';
 import { corpus, href, slug } from '../lib/content';
 import { inline, rich } from '../lib/markup';
 
 const c = await corpus();
 const terms = Object.entries(c.commandTerms).sort((a, b) => a[1].order - b[1].order);
+// Names from the guide (p. 18); what each level asks, in the platform's words (after pp. 19 to 20).
 const AOS = [
-  { id: 'AO1', name: 'Knowledge and understanding' },
-  { id: 'AO2', name: 'Application and analysis' },
-  { id: 'AO3', name: 'Synthesis and evaluation' },
-  { id: 'AO4', name: 'Selecting and using skills' },
+  { id: 'AO1', name: 'Knowledge and understanding', asks: 'Know and understand what something means.' },
+  { id: 'AO2', name: 'Application and analysis', asks: 'Use what you know on the case: break ideas into parts and show how the parts relate.' },
+  { id: 'AO3', name: 'Synthesis and evaluation', asks: 'Bring ideas together into a new whole and make a judgement on evidence or criteria.' },
+  { id: 'AO4', name: 'Use and application of appropriate skills', asks: 'Select and use the subject\'s skills and techniques, such as calculating or drawing.' },
 ];
 const aoClaim = c.claims['command-term-aos'];
+const ruleClaim = c.claims['command-term-rule'];
 const calcErrors = Object.values(c.calculations).flatMap((k) => k.errors.map((e) => ({ e, from: k.name })));
 const toolErrors = Object.entries(c.tools).flatMap(([, t]) => (t.status === 'complete' ? t.commonErrors.map((e) => ({ e, from: t.name })) : []));
 const answerErrors = Object.values(c.questions)
@@ -31,18 +32,20 @@ const answerErrors = Object.values(c.questions)
     lead="The command term decides what an answer must do. Each term below has its definition, where that definition comes from, how to answer to it, an example in the style of the course, and the pitfall that costs the most marks."
   />
   <div class="wrap page-body">
-    <aside class="callout callout--caution">
-      <span class="callout__kicker">Sources and limits</span>
+    <aside class="callout callout--note">
+      <span class="callout__kicker">Checked against the guide</span>
       <div class="prose">
         <p>
-          Where a term also appears in the IB Economics guide, its definition is quoted from that guide and marked <strong>Recorded</strong>.
-          Where it does not, the definition is the platform's own explanation, marked <strong>Teaching choice</strong>, and the official
-          wording should be checked in the Business management guide. The grouping of terms under assessment objectives is the
-          platform's reading. {aoClaim && <VerifyTag status={aoClaim.status} />}
+          {aoClaim?.statement} {aoClaim && <VerifyTag status={aoClaim.status} />} {ruleClaim?.statement}{' '}
+          {ruleClaim && <VerifyTag status={ruleClaim.status} />} <span class="small muted">(Business management guide, pp. 19 to 20, 42 and 67 to 68.)</span>
         </p>
         <p>
-          <strong>Examiner observations.</strong> No subject reports were available when this release was written, so nothing on this
-          page reports what examiners have said. Observations will be added, each cited to its report, when reports are supplied.
+          Each definition below is <strong>in the platform's words</strong>, with the page of the guide where the official definition is
+          printed. The guide is copyright and its glossary is not reproduced here.
+        </p>
+        <p>
+          <strong>Examiner observations.</strong> No subject reports have been supplied, so nothing on this page reports what examiners have
+          said. Advice from the IB's teacher support material is shown on each paper's page, labelled as such.
         </p>
       </div>
     </aside>
@@ -55,23 +58,22 @@ const answerErrors = Object.values(c.questions)
         if (!list.length) return null;
         return (
           <section aria-labelledby={`ao-${ao.id}`}>
-            <SectionHead no={k + 1} title={`${ao.id}: ${ao.name}`} id={`ao-${ao.id}`} />
+            <SectionHead no={k + 1} title={`${ao.id}: ${ao.name}`} dek={ao.asks} id={`ao-${ao.id}`} />
             <div class="ct-list">
               {list.map(([, t]) => (
                 <article class="ct" id={`ct-${slug(t.term)}`} aria-labelledby={`ct-${slug(t.term)}-h`}>
                   <div class="ct__head">
                     <h3 id={`ct-${slug(t.term)}-h`}>{t.term}</h3>
                     <div class="tags">
-                      <VerifyTag status={t.definitionStatus} />
-                      {t.definitionSource === 'platform' && <ProvenanceTag kind="aa-framework" />}
+                      <span class="tag tag--plain">{t.ao}</span>
+                      <VerifyTag status={t.aoStatus} />
                     </div>
                   </div>
                   <p class="ct__def">{t.definition}</p>
-                  {t.definitionSource !== 'platform' && (
-                    <p class="small muted ct__src">
-                      Definition from <a href={href.source(t.definitionSource)}>{c.sources[t.definitionSource]?.title ?? t.definitionSource}</a>
-                    </p>
-                  )}
+                  <p class="small muted ct__src">
+                    In the platform's words. Official definition: <a href={href.source('ib-bm-guide-2024')}>Business management guide</a>
+                    {t.officialPage && `, p. ${t.officialPage}`}.
+                  </p>
                   <div class="ct__grid">
                     <div>
                       <span class="label">How to answer</span>
