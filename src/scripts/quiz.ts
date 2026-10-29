@@ -188,6 +188,15 @@ each('[data-ix="quiz"]', (root) => {
     root.querySelectorAll<HTMLElement>('[data-after-all]').forEach((el) => (el.hidden = done < total));
   };
 
+  // Tell anything around the quiz (a case lab, for example) how far the learner has got.
+  const progress = () =>
+    root.dispatchEvent(
+      new CustomEvent('quiz:progress', {
+        bubbles: true,
+        detail: { uid: cfg.uid, done: results.size, total: cfg.items.length, results: Object.fromEntries(results) },
+      }),
+    );
+
   restore();
   board();
   renderSummary();
@@ -203,6 +212,7 @@ each('[data-ix="quiz"]', (root) => {
     save();
     board();
     renderSummary();
+    progress();
   });
 
   root.addEventListener('click', (e) => {
@@ -231,5 +241,6 @@ each('[data-ix="quiz"]', (root) => {
     } else return;
     board();
     renderSummary();
+    progress();
   });
 });

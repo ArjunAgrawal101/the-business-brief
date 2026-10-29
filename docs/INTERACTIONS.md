@@ -199,3 +199,16 @@ On the IA Studio page.
 | **Misconception diagnosed** | A profitable business cannot run out of cash; buying an asset is an expense; asking customers to pay sooner solves any cash problem; a bigger overdraft is a free answer |
 | **Objective** | Construct and interpret a cash flow forecast, and evaluate strategies for dealing with cash flow problems (3.7) |
 
+## 16. Case lab: diagnose before you decide
+
+`halden-diagnosis`, the Case Room's staged lab.
+
+| | |
+| --- | --- |
+| **The learner does** | Works through five stages on Halden Distribution: sorts symptoms from the problem and chooses a problem statement; rates the evidence for six possible causes; chooses a strategy; decides which activities must come before the pilot and sees the plan scheduled week by week against the deadline, changing how long retraining takes; chooses measures of success and judges a simulated check-in. Writes one sentence at each stage |
+| **Must understand** | The diagnosis chain: a cure chosen before the cause is found treats symptoms; the strongest evidence, not the longest list, decides the strategy; the critical path sets the finish; results are judged against the objective, the trend and the time left |
+| **Decides or infers** | Every classification and choice, the cause to act on first, the biggest risk to the timetable, the judgement at week 10 |
+| **Feedback** | Each answer is checked with its explanation and the exhibits behind it; the next stage opens only when every answer in the stage is checked; the plan redraws with its critical path, float and finish against the deadline; the memo sets the learner's sentences beside the platform's reasoning |
+| **Misconception diagnosed** | The target is the problem; more causes make a better answer; the expensive or forceful option is the serious one; a plan is a list rather than a sequence; one number on one day shows success or failure |
+| **Objective** | Diagnose a business problem from evidence and carry the reasoning through to a plan and its evaluation (Arjun Agrawal framework C) |
+

@@ -1,0 +1,521 @@
+---
+/**
+ * Case Room: a staged case lab. Each stage of a chain of reasoning (problem,
+ * cause, strategy, implementation, evaluation) is a panel with its prompt,
+ * the evidence to read, tasks checked by the shared quiz engine, a plan where
+ * the stage needs one, and a sentence for the learner to write. With
+ * JavaScript, the stages open one at a time as each is completed and the
+ * learner's sentences are compiled into a memo beside the platform's
+ * reasoning; without it, every stage is open and every answer can be opened.
+ */
+import LabSort from './lab/LabSort.astro';
+import LabChoose from './lab/LabChoose.astro';
+import LabPlan from './lab/LabPlan.astro';
+import LabExhibit from './lab/LabExhibit.astro';
+import Exhibit from '../blocks/Exhibit.astro';
+import { corpus, href } from '../../lib/content';
+import { jsonForScript, rich } from '../../lib/markup';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'case-lab' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const c = await corpus();
+const cs = c.cases[data.case];
+if (!cs) throw new Error(`Case lab ${uid}: no case ${data.case}`);
+const exhibitsUsed = [...new Set(data.stages.flatMap((st) => st.evidence))];
+const exhibits = cs.exhibits.filter((e) => exhibitsUsed.includes(e.id));
+const exNo = (id: string) => id.replace(/^ex-/, '');
+const config = {
+  uid,
+  stages: data.stages.map((st) => ({
+    id: st.id,
+    step: st.step,
+    title: st.title,
+    quizzes: st.tasks.filter((t) => t.kind === 'sort' || t.kind === 'choose').map((t) => `${uid}-${t.id}`),
+    choose: st.tasks.filter((t) => t.kind === 'choose').map((t) => ({ quiz: `${uid}-${t.id}`, item: t.id, options: t.kind === 'choose' ? t.options : [] })),
+    reflection: st.reflection?.label ?? null,
+  })),
+  plans: data.stages.flatMap((st) => st.tasks.filter((t) => t.kind === 'plan')),
+};
+---
+
+<div class="lab" data-ix="case-lab" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The lab could not start. Every stage is open below, and each answer can be opened under its question.</p>
+
+  <div class="lab__brief">
+    <p class="lab__role">{data.role}</p>
+    <div class="prose" set:html={rich(data.brief)} />
+    <ol class="lab__rail" role="list" aria-label="The stages">
+      {
+        data.stages.map((st, i) => (
+          <li data-rail={st.id}>
+            <a href={`#${uid}-${st.id}`}>
+              <span class="lab__rail-no">{String(i + 1).padStart(2, '0')}</span>
+              <span class="lab__rail-step">{st.step}</span>
+              <span class="lab__rail-state js-only" data-rail-state>
+                {i === 0 ? 'Now' : 'Locked'}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="lab__progress js-only" aria-live="polite" data-progress>Stage 1 of {data.stages.length}.</p>
+  </div>
+
+  <details class="lab__pack" data-pack>
+    <summary>
+      <span class="label label--ink">The evidence</span>
+      <span class="small muted">{exhibits.length} exhibits from the {cs.title} case file. Fictional; simulated data.</span>
+    </summary>
+    <div class="lab__exhibits">
+      <p class="small muted">The full case, with its narrative and stakeholders: <a href={href.case(data.case)}>{cs.title}</a>.</p>
+      {
+        exhibits.map((e) => (
+          <div class="lab__exhibit" id={`${uid}-${e.id}`} tabindex="-1">
+            <Exhibit exhibit={e} caseTitle={`${uid} lab`} headingLevel={4} />
+          </div>
+        ))
+      }
+    </div>
+  </details>
+
+  <ol class="lab__stages" role="list">
+    {
+      data.stages.map((st, i) => {
+        const next = data.stages[i + 1];
+        return (
+          <li class="lab__stage" data-stage={st.id} id={`${uid}-${st.id}`} tabindex="-1">
+            <div class="lab__stage-head">
+              <span class="lab__stage-no">
+                {String(i + 1).padStart(2, '0')} <span>{st.step}</span>
+              </span>
+              <h4 class="lab__stage-title">{st.title}</h4>
+              <span class="lab__stage-done js-only" data-done hidden>
+                Done
+                <button type="button" class="btn btn--small lab__toggle" data-toggle aria-expanded="false" aria-controls={`${uid}-${st.id}-body`}>
+                  Review
+                </button>
+              </span>
+            </div>
+            <p class="lab__locked js-only" data-locked hidden>
+              Finish stage {String(i).padStart(2, '0')} first. Each stage builds on the one before.
+            </p>
+            <div class="lab__stage-body" data-body id={`${uid}-${st.id}-body`}>
+              <div class="prose lab__prompt" set:html={rich(st.prompt)} />
+              {st.evidence.length > 0 && (
+                <p class="lab__ev">
+                  <span class="small muted">Read:</span>
+                  {st.evidence.map((id) => (
+                    <a class="lab__ev-link" href={`#${uid}-${id}`} data-ev={id}>
+                      Exhibit {exNo(id)}
+                    </a>
+                  ))}
+                </p>
+              )}
+              {st.tasks.map((t) => (
+                <div class="lab__task">
+                  {t.kind === 'sort' && <LabSort task={t} uid={`${uid}-${t.id}`} />}
+                  {t.kind === 'choose' && <LabChoose task={t} uid={`${uid}-${t.id}`} />}
+                  {t.kind === 'plan' && <LabPlan task={t} uid={`${uid}-${t.id}`} />}
+                  {t.kind === 'exhibit' && <LabExhibit task={t} uid={`${uid}-${t.id}`} />}
+                </div>
+              ))}
+              {st.reflection && (
+                <div class="field lab__reflect">
+                  <label for={`${uid}-${st.id}-r`}>{st.reflection.label}</label>
+                  <textarea class="textarea textarea--short" id={`${uid}-${st.id}-r`} data-reflect={st.id} rows="3" aria-describedby={`${uid}-${st.id}-rh`} />
+                  <span class="field__hint" id={`${uid}-${st.id}-rh`}>
+                    {st.reflection.hint} Kept on this device for your memo.
+                  </span>
+                </div>
+              )}
+              <div class="lab__next js-only">
+                <button type="button" class="btn btn--primary" data-next disabled>
+                  {next ? `Continue to ${next.step.toLowerCase()}` : 'Write the memo'}
+                </button>
+                <span class="small muted" data-gate>
+                  Check every answer in this stage to continue.
+                </span>
+              </div>
+            </div>
+          </li>
+        );
+      })
+    }
+  </ol>
+
+  <section class="lab__memo" aria-labelledby={`${uid}-memo-h`} data-memo tabindex="-1">
+    <div class="lab__memo-head">
+      <span class="label label--ink">{data.memo.title}</span>
+      <h4 id={`${uid}-memo-h`}>To {data.memo.to}</h4>
+      <p class="small muted">Your sentences from each stage, beside the platform's reasoning. Compare them, then improve yours.</p>
+    </div>
+    <ol class="lab__memo-list" role="list">
+      {
+        data.stages.map((st) => (
+          <li data-memo-stage={st.id}>
+            <span class="lab__memo-step">{st.step}</span>
+            <div class="lab__memo-cols">
+              <div>
+                <span class="label">Yours</span>
+                <p class="lab__memo-yours" data-memo-yours>
+                  <span class="muted">Not written yet.</span>
+                </p>
+                <p class="small muted" data-memo-choice />
+              </div>
+              <div>
+                <span class="label">The platform's reasoning</span>
+                <div class="small" set:html={rich(st.model)} />
+              </div>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="cluster js-only">
+      <button type="button" class="btn" data-print>Print the memo</button>
+      <button type="button" class="btn btn--small" data-restart>Start the lab again</button>
+    </p>
+  </section>
+  <p class="sr-only" aria-live="polite" data-lab-status></p>
+</div>
+
+<script>
+  import '../../scripts/case-lab';
+</script>
+
+<style>
+  .lab {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .lab > *,
+  .lab__stage-body > * {
+    min-width: 0;
+  }
+
+  .lab__brief {
+    display: grid;
+    gap: var(--sp-3);
+  }
+
+  .lab__role {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    color: var(--text-strong);
+  }
+
+  .lab__rail {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+    gap: 0;
+    margin: var(--sp-2) 0 0;
+    padding: 0;
+    list-style: none;
+    border: 1px solid var(--bb-ink);
+  }
+
+  .lab__rail li {
+    margin: 0;
+    border-right: 1px solid var(--rule);
+  }
+
+  .lab__rail li:last-child {
+    border-right: 0;
+  }
+
+  .lab__rail a {
+    display: grid;
+    gap: 0.1rem;
+    padding: var(--sp-2) var(--sp-3);
+    color: var(--text-strong);
+    text-decoration: none;
+    transition: background var(--dur-base) var(--ease), color var(--dur-base) var(--ease);
+  }
+
+  .lab__rail-no {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--text-muted);
+  }
+
+  .lab__rail-step {
+    font-family: var(--font-display);
+    font-weight: 700;
+  }
+
+  .lab__rail-state {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .lab__rail li:global(.is-current) a {
+    background: var(--bb-ink);
+    color: var(--text-on-ink);
+  }
+
+  .lab__rail li:global(.is-current) .lab__rail-no,
+  .lab__rail li:global(.is-current) .lab__rail-state {
+    color: var(--bb-brass);
+  }
+
+  .lab__rail li:global(.is-done) .lab__rail-state {
+    color: var(--green-text);
+  }
+
+  .lab__progress {
+    margin: 0;
+    font-size: var(--fs-small);
+    color: var(--text-muted);
+  }
+
+  .lab__pack {
+    border: 1px solid var(--rule);
+    background: var(--surface-sheet);
+  }
+
+  .lab__pack > summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--sp-2) var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    cursor: pointer;
+  }
+
+  .lab__exhibits {
+    display: grid;
+    gap: var(--sp-5);
+    padding: 0 var(--sp-4) var(--sp-4);
+  }
+
+  .lab__exhibit:focus {
+    outline: var(--focus-ring);
+    outline-offset: 4px;
+  }
+
+  .lab__stages {
+    display: grid;
+    gap: var(--sp-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .lab__stages > li {
+    margin: 0;
+  }
+
+  .lab__stage {
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--bb-ink);
+    background: #fff;
+  }
+
+  .lab__stage:focus {
+    outline: none;
+  }
+
+  .lab__stage-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--sp-2) var(--sp-4);
+    padding: var(--sp-4) var(--sp-5);
+  }
+
+  .lab__stage-no {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .lab__stage-no span {
+    color: var(--cobalt-text);
+  }
+
+  .lab__stage-title {
+    flex: 1 1 16rem;
+    margin: 0;
+    font-size: var(--fs-h3);
+  }
+
+  .lab__stage-done[hidden] {
+    display: none;
+  }
+
+  .lab__stage-done {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--green-text);
+  }
+
+  .lab__toggle {
+    font-family: var(--font-body);
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .lab__locked {
+    margin: 0;
+    padding: 0 var(--sp-5) var(--sp-4);
+    color: var(--text-muted);
+  }
+
+  .lab__stage-body {
+    display: grid;
+    gap: var(--sp-4);
+    padding: 0 var(--sp-5) var(--sp-5);
+  }
+
+  .lab__stage:global(.is-locked) {
+    border-top-color: var(--rule);
+    background: transparent;
+  }
+
+  .lab__stage:global(.is-locked) .lab__stage-title {
+    color: var(--text-muted);
+  }
+
+  .lab__stage:global(.is-done):not(:global(.is-open)) .lab__stage-body {
+    display: none;
+  }
+
+  .lab__prompt {
+    max-width: var(--text-max);
+  }
+
+  .lab__ev {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    margin: 0;
+  }
+
+  .lab__ev-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 0.1rem 0.5rem;
+    border: 1px solid var(--rule);
+    background: var(--surface-sheet);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-strong);
+    text-decoration: none;
+  }
+
+  .lab__ev-link:hover {
+    border-color: var(--bb-ink);
+  }
+
+    .lab :global(.choice--lines .opt__text) {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+  }
+
+    .lab__next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-3);
+    padding-top: var(--sp-2);
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .lab__memo {
+    padding: var(--sp-5);
+    border: 1px solid var(--bb-ink);
+    background: #fff;
+    box-shadow: 6px 6px 0 var(--bb-ink);
+  }
+
+  .lab__memo:focus {
+    outline: var(--focus-ring);
+    outline-offset: 4px;
+  }
+
+  .lab__memo-head h4 {
+    margin: var(--sp-2) 0 0;
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .lab__memo-head p {
+    margin: var(--sp-2) 0 0;
+  }
+
+  .lab__memo-list {
+    display: grid;
+    gap: 0;
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .lab__memo-list > li {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .lab__memo-step {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--cobalt-text);
+  }
+
+  .lab__memo-cols {
+    display: grid;
+    gap: var(--sp-3) var(--sp-6);
+  }
+
+  @media (min-width: 52rem) {
+    .lab__memo-cols {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .lab__memo-yours {
+    margin: var(--sp-1) 0 0;
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    color: var(--text-strong);
+    white-space: pre-line;
+  }
+
+  @media print {
+    .lab__rail,
+    .lab__pack,
+    .lab__next {
+      display: none !important;
+    }
+  }
+</style>

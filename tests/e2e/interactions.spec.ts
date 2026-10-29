@@ -222,6 +222,50 @@ test.describe('Cash flow lab', () => {
   });
 });
 
+test.describe('Case lab', () => {
+  test('stages open in turn, the plan moves with a duration, and the memo keeps the sentences', async ({ page }) => {
+    await page.goto('/case-room/halden-diagnosis/');
+    await ready(page, '[data-ix="case-lab"]');
+    const lab = page.locator('[data-ix="case-lab"]');
+    const stage = (id: string) => lab.locator(`[data-stage="${id}"]`);
+    await expect(stage('cause')).toHaveClass(/is-locked/);
+    await expect(stage('problem').locator('[data-next]')).toBeDisabled();
+    const finish = async (id: string, sentence: string) => {
+      const s = stage(id);
+      const quizzes = s.locator('[data-ix="quiz"]');
+      for (let i = 0; i < (await quizzes.count()); i++) {
+        const q = quizzes.nth(i);
+        const items = q.locator('[data-item]');
+        for (let j = 0; j < (await items.count()); j++) await items.nth(j).locator('label.opt').first().click();
+        await q.locator('[data-check-all]').click();
+      }
+      await s.locator('textarea[data-reflect]').fill(sentence);
+      await expect(s.locator('[data-next]')).toBeEnabled();
+      await s.locator('[data-next]').click();
+      await expect(s).toHaveClass(/is-done/);
+    };
+    await finish('problem', 'The night shift cannot yet use the system.');
+    await expect(stage('cause')).toHaveClass(/is-open/);
+    await finish('cause', 'Training first.');
+    await finish('strategy', 'Retrain and redesign.');
+    const plan = stage('implementation').locator('[data-plan]');
+    await expect(plan.locator('[data-plan-read]')).toContainText('13 weeks: 1 week inside the deadline');
+    await plan.locator('[data-vary]').selectOption('5');
+    await expect(plan.locator('[data-plan-read]')).toContainText('15 weeks: 1 week after the deadline');
+    await finish('implementation', 'Retraining has no room to slip.');
+    await finish('evaluation', 'Go back to the causes.');
+    const memo = lab.locator('[data-memo]');
+    await expect(memo.locator('[data-memo-stage="problem"] [data-memo-yours]')).toHaveText('The night shift cannot yet use the system.');
+    await page.reload();
+    await ready(page, '[data-ix="case-lab"]');
+    await expect(stage('evaluation')).toHaveClass(/is-done/);
+    await expect(memo.locator('[data-memo-stage="evaluation"] [data-memo-yours]')).toHaveText('Go back to the causes.');
+    await stage('problem').locator('[data-toggle]').click();
+    await expect(stage('problem')).toHaveClass(/is-open/);
+    await expect(stage('problem').locator('[data-toggle]')).toHaveAttribute('aria-expanded', 'true');
+  });
+});
+
 test.describe('IA Studio', () => {
   test('the planner checks supporting documents, totals the marks and keeps the plan', async ({ page }) => {
     await page.goto('/ia-studio/');

@@ -1,0 +1,37 @@
+---
+/** A case lab task: one question with options, checked by the quiz engine. */
+import QuizShell from '../parts/QuizShell.astro';
+import Choice from '../parts/Choice.astro';
+import Key from '../parts/Key.astro';
+import CheckRow from '../parts/CheckRow.astro';
+import type { LabTask } from '../../../lib/schemas';
+
+interface Props {
+  task: Extract<LabTask, { kind: 'choose' }>;
+  uid: string;
+}
+const { task: t, uid } = Astro.props;
+const config = {
+  uid,
+  kind: 'check',
+  labels: Object.fromEntries(t.options.map((k) => [k.value, k.label])),
+  items: [{ id: t.id, groups: [{ name: 'a', legend: 'An answer', right: t.right, partial: t.partial }] }],
+};
+---
+
+<QuizShell uid={uid} kind="check" config={config} count={1}>
+  <li class="quiz__item" data-item={t.id}>
+    <p class="lab-question">{t.question}</p>
+    <Choice uid={uid} itemId={t.id} name="a" legend={t.question} options={t.options} layout="lines" showLegend={false} />
+    <CheckRow />
+    <Key answerLabel="Answer:" answer={t.answer} explanation={t.explanation} />
+  </li>
+</QuizShell>
+
+<style>
+  .lab-question {
+    margin: 0;
+    font-weight: 560;
+    color: var(--text-strong);
+  }
+</style>

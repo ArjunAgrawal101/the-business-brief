@@ -727,6 +727,57 @@ export const ANSOFF = ['market-penetration', 'product-development', 'market-deve
 export const STYLES = ['autocratic', 'paternalistic', 'democratic', 'laissez-faire', 'situational'] as const;
 export const FUNCTIONS = ['planning', 'organizing', 'commanding', 'coordinating', 'controlling'] as const;
 
+/** A task inside a case lab stage. */
+const labOption = z.object({ value: z.string(), label: z.string() });
+const labTask = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('sort'),
+    id: z.string(),
+    question: z.string(),
+    categories: z.array(labOption).min(2),
+    items: z
+      .array(
+        z.object({
+          id: z.string(),
+          text: z.string(),
+          right: z.array(z.string()).min(1),
+          partial: z.array(z.string()).default([]),
+          explanation: md,
+          evidence: ids,
+        }),
+      )
+      .min(2),
+  }),
+  z.object({
+    kind: z.literal('choose'),
+    id: z.string(),
+    question: z.string(),
+    options: z.array(labOption).min(2),
+    right: z.array(z.string()).min(1),
+    partial: z.array(z.string()).default([]),
+    answer: z.string(),
+    explanation: md,
+  }),
+  z.object({
+    kind: z.literal('plan'),
+    id: z.string(),
+    question: z.string(),
+    deadline: z.object({ week: z.number().int().positive(), label: z.string() }),
+    activities: z.array(z.object({ id: z.string(), label: z.string(), weeks: z.number().int().positive(), after: ids })).min(3),
+    /** One activity whose duration the learner can change. */
+    vary: z.object({ activity: z.string(), label: z.string(), weeks: z.array(z.number().int().positive()).min(2) }),
+  }),
+  z.object({
+    kind: z.literal('exhibit'),
+    id: z.string(),
+    title: z.string(),
+    columns: z.array(z.string()).min(2),
+    rows: z.array(z.array(z.union([z.string(), z.number()]))).min(1),
+    note: z.string().optional(),
+  }),
+]);
+export type LabTask = z.infer<typeof labTask>;
+
 export const interactiveSchema = z.discriminatedUnion('component', [
   z.object({
     component: z.literal('cost-classifier'),
@@ -967,6 +1018,33 @@ export const interactiveSchema = z.discriminatedUnion('component', [
         }),
       )
       .min(1),
+  }),
+  z.object({
+    component: z.literal('case-lab'),
+    ...interactiveBase,
+    case: z.string(),
+    /** Which of the platform's chains of reasoning the stages follow. */
+    framework: z.enum(['diagnose', 'analyse']),
+    role: z.string(),
+    brief: md,
+    stages: z
+      .array(
+        z.object({
+          id: z.string(),
+          /** The step of the chain: Problem, Cause, Strategy, Implementation, Evaluation (or Data, Insight, Option, Recommendation). */
+          step: z.string(),
+          title: z.string(),
+          prompt: md,
+          /** Case exhibits to read for this stage. */
+          evidence: ids,
+          tasks: z.array(labTask).min(1),
+          reflection: z.object({ label: z.string(), hint: z.string() }).optional(),
+          /** The platform's own reasoning for the stage, shown beside the learner's in the memo. */
+          model: md,
+        }),
+      )
+      .min(3),
+    memo: z.object({ title: z.string(), to: z.string() }),
   }),
 ]);
 export type Interactive = z.infer<typeof interactiveSchema>;

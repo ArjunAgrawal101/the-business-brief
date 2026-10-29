@@ -8,6 +8,7 @@
  * fails on any problem (see src/lib/content.ts), and so do the unit tests.
  */
 import type { AssessmentComponent, Block, Calculation, CaseEntry, Claim, CommandTerm, Concept, Curriculum, Decision, GlossaryEntry, Interactive, Question, Source, Topic, Tool } from './schemas';
+import { topoOrder } from './plan';
 import { buildWorking, workings } from './finance';
 
 type Dict<T> = Record<string, T>;
@@ -260,6 +261,45 @@ export function checkIntegrity(c: Corpus): Problem[] {
   /* Interactions that work on a case */
   for (const [id, it] of Object.entries(c.interactives)) {
     if ('case' in it && it.case) need(c.cases, it.case, `interactives/${id}`, 'case');
+  }
+
+  /* Case labs: evidence from the case, answers among the options, a plan without loops */
+  for (const [id, it] of Object.entries(c.interactives)) {
+    if (it.component !== 'case-lab') continue;
+    const exhibits = new Set((c.cases[it.case]?.exhibits ?? []).map((e) => e.id));
+    for (const st of it.stages) {
+      const w = `interactives/${id}#${st.id}`;
+      st.evidence.forEach((e) => {
+        if (!exhibits.has(e)) problems.push({ where: w, message: `exhibit "${e}" is not in the case` });
+      });
+      for (const t of st.tasks) {
+        if (t.kind === 'sort') {
+          const cats = new Set(t.categories.map((k) => k.value));
+          t.items.forEach((item) => {
+            [...item.right, ...item.partial].forEach((v) => {
+              if (!cats.has(v)) problems.push({ where: `${w}/${t.id}/${item.id}`, message: `"${v}" is not one of the categories` });
+            });
+            item.evidence.forEach((e) => {
+              if (!exhibits.has(e)) problems.push({ where: `${w}/${t.id}/${item.id}`, message: `exhibit "${e}" is not in the case` });
+            });
+          });
+        }
+        if (t.kind === 'choose') {
+          const opts = new Set(t.options.map((o) => o.value));
+          [...t.right, ...t.partial].forEach((v) => {
+            if (!opts.has(v)) problems.push({ where: `${w}/${t.id}`, message: `"${v}" is not one of the options` });
+          });
+        }
+        if (t.kind === 'plan') {
+          try {
+            topoOrder(t.activities);
+          } catch (err) {
+            problems.push({ where: `${w}/${t.id}`, message: String((err as Error).message) });
+          }
+          if (!t.activities.some((a) => a.id === t.vary.activity)) problems.push({ where: `${w}/${t.id}`, message: `the activity to vary, "${t.vary.activity}", is not in the plan` });
+        }
+      }
+    }
   }
 
   /* Assessment, claims, glossary */

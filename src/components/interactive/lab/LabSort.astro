@@ -1,0 +1,57 @@
+---
+/** A case lab task: sort each item into one of the categories, checked by the quiz engine. */
+import QuizShell from '../parts/QuizShell.astro';
+import Choice from '../parts/Choice.astro';
+import Key from '../parts/Key.astro';
+import CheckRow from '../parts/CheckRow.astro';
+import type { LabTask } from '../../../lib/schemas';
+
+interface Props {
+  task: Extract<LabTask, { kind: 'sort' }>;
+  uid: string;
+}
+const { task: t, uid } = Astro.props;
+const config = {
+  uid,
+  kind: 'check',
+  labels: Object.fromEntries(t.categories.map((k) => [k.value, k.label])),
+  items: t.items.map((it) => ({ id: it.id, groups: [{ name: 'a', legend: 'An answer', right: it.right, partial: it.partial }] })),
+};
+const label = (v: string) => t.categories.find((k) => k.value === v)?.label ?? v;
+const exNo = (id: string) => `Exhibit ${id.replace(/^ex-/, '')}`;
+---
+
+<QuizShell uid={uid} kind="check" config={config} count={t.items.length}>
+  <p slot="before" class="quiz__lead">{t.question}</p>
+  {
+    t.items.map((it, k) => (
+      <li class="quiz__item" data-item={it.id}>
+        <div class="lab-q">
+          <span class="quiz__no" aria-hidden="true">
+            {String(k + 1).padStart(2, '0')}
+          </span>
+          <p data-short>{it.text}</p>
+        </div>
+        <Choice uid={uid} itemId={it.id} name="a" legend={t.question} options={t.categories} showLegend={false} />
+        <CheckRow />
+        <Key answerLabel="Answer:" answer={`${it.right.map(label).join(' or ')}.`} explanation={it.explanation}>
+          {it.evidence.length > 0 && <p class="small muted">Evidence: {it.evidence.map(exNo).join(', ')}.</p>}
+        </Key>
+      </li>
+    ))
+  }
+</QuizShell>
+
+<style>
+  .lab-q {
+    display: flex;
+    gap: var(--sp-3);
+    align-items: baseline;
+  }
+
+  .lab-q p {
+    margin: 0;
+    font-weight: 560;
+    color: var(--text-strong);
+  }
+</style>

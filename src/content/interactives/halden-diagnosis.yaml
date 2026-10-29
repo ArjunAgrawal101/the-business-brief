@@ -1,0 +1,339 @@
+# Case lab: Halden Distribution, diagnosed. A fictional organization; every
+# figure is simulated. Stages 1 to 4 use only the case's exhibits; the results
+# in stage 5 are a simulated check-in written for this lab and labelled so. The
+# plan in stage 4 is scheduled by src/lib/plan.ts and checked by
+# tests/unit/plan.test.ts.
+
+component: case-lab
+title: "Halden Distribution: diagnose before you decide"
+purpose: >
+  The learner works through the Arjun Agrawal diagnosis chain, problem, cause, strategy, implementation and
+  evaluation, on one case. At each stage they commit to a reading of the evidence, get feedback with the exhibits
+  behind it, and write one sentence of their own; the lab compiles the sentences into a memo beside the platform's
+  reasoning. It diagnoses treating symptoms as the problem, choosing a cure before finding the cause, plans that
+  ignore what must come first, and judging a plan on one number or too early.
+provenance: aa-framework
+case: halden-distribution
+framework: diagnose
+role: You are advising Amara Osei, Halden's new site manager, at the end of July, once her staff survey is in.
+brief: >
+  Since a warehouse management system arrived last December, on-time dispatch has fallen from 98.1% to 91.4%,
+  picking errors have more than doubled and over half of the night shift has left within the year. Lumen Home, a
+  third of the warehouse's work, wants dispatch above 97% by the first week of November. Before Amara chooses how to
+  lead, she wants the problem diagnosed. Work through the five stages in order; each one starts from the last.
+stages:
+  - id: problem
+    step: Problem
+    title: What is the problem?
+    prompt: >
+      A diagnosis starts by separating what can be seen (symptoms) from what has to be solved (the problem) and from
+      what will happen if it is not (consequences). A good problem statement is specific, rests on evidence and does
+      not contain its own solution.
+    evidence: [ex-1, ex-2, ex-4]
+    tasks:
+      - kind: sort
+        id: problem-sort
+        question: Is each of these a symptom, the problem, or a consequence?
+        categories:
+          - { value: symptom, label: Symptom }
+          - { value: problem, label: Problem }
+          - { value: consequence, label: Consequence }
+        items:
+          - id: dispatch
+            text: On-time dispatch has fallen from 98.1% to 91.4% since the new system went live.
+            right: [symptom]
+            explanation: A measure of what is going wrong, not the reason. Fixing the number directly, by holding trucks back for example, would leave the cause in place.
+            evidence: [ex-1]
+          - id: errors
+            text: Picking errors have risen from 2.1 to 5.2 per 1,000 orders.
+            right: [symptom]
+            explanation: Another measure of the same trouble, and a clue to it, because errors are what an untrained picker makes.
+            evidence: [ex-1]
+          - id: leavers
+            text: Over half of the night shift left within the year (labour turnover of 51.9%).
+            right: [symptom]
+            partial: [problem]
+            explanation: >
+              A symptom, though one that feeds the problem: each leaver is replaced by someone even less familiar with the
+              system. Arguing that it is part of the problem is reasonable; it is still a result of something else.
+            evidence: [ex-2]
+          - id: core
+            text: The night shift was given the new system with a third of the day shift's training and almost no say, and cannot yet work with it.
+            right: [problem]
+            explanation: This is what has to be solved. It explains the symptoms, it is specific about who and what, and it does not yet say what to do.
+            evidence: [ex-2]
+          - id: contract
+            text: Lumen Home will move its contract if dispatch is not above 97% by November.
+            right: [consequence]
+            explanation: What happens if the problem is not solved. It sets the deadline and the stakes, but it is not the problem itself.
+            evidence: [ex-4]
+      - kind: choose
+        id: problem-statement
+        question: Which is the best statement of the problem?
+        options:
+          - { value: target, label: On-time dispatch must be back above 97% by the first week of November. }
+          - { value: effort, label: The night shift is not working hard enough. }
+          - { value: skill, label: 'Since the new system arrived, the night shift, trained for two hours and not consulted, cannot pick quickly and accurately enough with it, and is leaving.' }
+          - { value: system, label: The new scanners do not work properly. }
+        right: [skill]
+        partial: [target]
+        answer: The night shift cannot yet work with the new system.
+        explanation: >
+          The first option is the objective, the result the problem is preventing: useful, but it says nothing about why.
+          Nothing in the exhibits suggests a lack of effort, and the survey points elsewhere. The scanners are the same on
+          both shifts, and the day shift, trained for six hours, adapted. The third statement names who, what and the
+          evidence, and leaves the cure open.
+    reflection:
+      label: The problem, in one sentence of your own
+      hint: Who, what, since when, and the evidence. No solution yet.
+    model: >
+      Since the system went live in December, the night shift, trained for two hours against the day shift's six and
+      consulted less, has not been able to work with it: dispatch and accuracy have fallen and over half the shift has
+      left. Lumen Home's deadline makes this urgent, but it is the consequence, not the problem.
+
+  - id: cause
+    step: Cause
+    title: What is causing it?
+    prompt: >
+      Several causes can be suggested for any problem. Weigh each by its evidence before choosing what to act on. A
+      cause with strong evidence and a large effect is worth more than three with a little of each.
+    evidence: [ex-2, ex-3, ex-5, ex-6]
+    tasks:
+      - kind: sort
+        id: cause-sort
+        question: How strong is the evidence for each possible cause?
+        categories:
+          - { value: strong, label: Strong evidence }
+          - { value: some, label: Some evidence }
+          - { value: none, label: No evidence }
+        items:
+          - id: training
+            text: Too little training on the new system
+            right: [strong]
+            explanation: >
+              Two hours of training on the night shift against six on the day shift (Exhibit 2); 33% of the night shift say
+              they have had the training they need, against 72% of the day shift (Exhibit 3); and 11 of the 24 leavers
+              interviewed said nobody explained the scanners properly (Exhibit 5).
+            evidence: [ex-2, ex-3, ex-5]
+          - id: consultation
+            text: Changes made without consulting the people who do the work
+            right: [strong]
+            explanation: >
+              21% of the night shift feel consulted about changes that affect them (38% of the day shift); 7 of 24 leavers
+              left because targets changed without warning; and the founder "just told us" the scanners were coming
+              (Exhibits 3, 5 and 6).
+            evidence: [ex-3, ex-5, ex-6]
+          - id: leaders
+            text: Inexperienced night-shift team leaders
+            right: [some]
+            partial: [strong]
+            explanation: >
+              The night team leaders have 0.6 years' experience in the role against 9.1 on days, and 48% of the night shift
+              say their team leader helps them solve problems (74% on days). It is a contributing cause: it explains why
+              nobody filled the training gap on the floor.
+            evidence: [ex-2, ex-3]
+          - id: pay
+            text: Pay is lower than elsewhere
+            right: [some]
+            explanation: Four of the 24 leavers gave better pay elsewhere as their main reason. That is real but minor, one leaver in six, and it says nothing about errors or dispatch.
+            evidence: [ex-5]
+          - id: scanners
+            text: The scanners or the software are faulty
+            right: [none]
+            explanation: Nothing in the exhibits points to a fault, and the day shift adapted to the same system after six hours' training.
+            evidence: [ex-2, ex-3]
+          - id: care
+            text: The night shift does not care about the work
+            right: [none]
+            explanation: The exhibits point the other way. The night shift's answers and the exit interviews are about training and being heard, not about effort.
+            evidence: [ex-3, ex-5]
+    reflection:
+      label: The cause you would act on first, and why
+      hint: Name the evidence, and say how much of the problem it explains.
+    model: >
+      Two causes have strong evidence and explain most of the problem: too little training on the new system and changes
+      made without the night shift's involvement. Inexperienced team leaders made both worse. Pay matters to a few
+      leavers; nothing suggests faulty scanners or a lack of effort.
+
+  - id: strategy
+    step: Strategy
+    title: What should Halden do?
+    prompt: >
+      A strategy should act on the strongest causes, fit the time and money available, and not create a new problem.
+      Judge each option against all three.
+    evidence: [ex-2, ex-4, ex-5]
+    tasks:
+      - kind: choose
+        id: strategy-choice
+        question: Which strategy should Amara recommend to the owners?
+        options:
+          - { value: bonus, label: 'A £1,000 retention bonus for every night-shift picker' }
+          - { value: retrain, label: 'Retrain the night shift and redesign night picking with the pickers, with day-shift buddies and coaching for the two team leaders' }
+          - { value: replace, label: Replace the warehouse management system }
+          - { value: targets, label: Daily targets for every zone and formal warnings for repeated errors }
+        right: [retrain]
+        partial: [targets]
+        answer: Retrain and redesign with the night shift.
+        explanation: >
+          It acts on both strong causes and the contributing one, and it can be done before November. The bonus would cost
+          about £58,000 for the 58 night-shift employees and addresses a cause behind 4 of 24 departures, leaving the skill
+          gap where it is. Replacing a system there is no evidence against would take longer than the three months left
+          and repeat the kind of change that caused the problem. Targets and warnings bring clear standards fast, which is why the
+          option is partly right, but they treat a skill problem as an effort problem: in the Decision Room, that route
+          raises turnover and misses the deadline.
+    reflection:
+      label: Your recommendation, with its main condition
+      hint: What must be true for it to work?
+    model: >
+      Retrain the night shift on the system and redesign night picking with the people who do it, supported by day-shift
+      buddies and coaching for the night team leaders. It acts on the causes with the strongest evidence, costs far less
+      than a bonus or a new system, and fits the three months left, provided the training is finished early enough to leave
+      time for a pilot.
+
+  - id: implementation
+    step: Implementation
+    title: Plan it in the time available
+    prompt: >
+      A plan is a sequence: some activities cannot start until others finish. The longest chain of dependent activities
+      sets the earliest finish. The plan starts in the first week of August; Lumen Home's deadline, the first week of
+      November, is 14 weeks away.
+    evidence: []
+    tasks:
+      - kind: sort
+        id: before-pilot
+        question: Must each of these finish before the pilot in two zones can start?
+        categories:
+          - { value: 'yes', label: Must finish first }
+          - { value: 'no', label: Need not }
+        items:
+          - id: listen
+            text: Listening sessions with the night shift
+            right: ['yes']
+            explanation: The redesign is built on what the night shift says, and the retraining on the redesign, so listening comes first in the chain that leads to the pilot.
+            evidence: []
+          - id: coach
+            text: Coaching for the two night team leaders
+            right: ['no']
+            explanation: Coaching runs alongside and must be finished before the full roll-out, when the team leaders take over. The pilot can start without it.
+            evidence: []
+          - id: redesign
+            text: Redesigning the night pick routes with a group of pickers
+            right: ['yes']
+            explanation: The pilot tests the redesigned routes, so they must exist first.
+            evidence: []
+          - id: retrain
+            text: Retraining the night shift on the scanners and the new routes
+            right: ['yes']
+            explanation: Piloting with untrained pickers would repeat the original mistake.
+            evidence: []
+          - id: buddies
+            text: Day-shift buddies for night pickers
+            right: ['no']
+            explanation: Buddying follows the retraining and runs alongside the pilot and roll-out; it must be finished only before the readiness check.
+            evidence: []
+      - kind: plan
+        id: plan
+        question: The plan, week by week
+        deadline: { week: 14, label: "Lumen Home's deadline" }
+        activities:
+          - { id: listen, label: Listen to the night shift, weeks: 1, after: [] }
+          - { id: coach, label: Coach the night team leaders, weeks: 6, after: [] }
+          - { id: redesign, label: Redesign night pick routes, weeks: 3, after: [listen] }
+          - { id: retrain, label: Retrain the night shift, weeks: 3, after: [redesign] }
+          - { id: buddies, label: Day-shift buddies, weeks: 4, after: [retrain] }
+          - { id: pilot, label: Pilot in two zones, weeks: 2, after: [retrain] }
+          - { id: rollout, label: Roll out and review weekly, weeks: 3, after: [pilot, coach] }
+          - { id: readiness, label: Peak readiness check, weeks: 1, after: [rollout, buddies] }
+        vary: { activity: retrain, label: How long does retraining take?, weeks: [2, 3, 4, 5, 6, 7] }
+    reflection:
+      label: The biggest risk to the timetable, and what you would do about it
+      hint: Which activity has no room to slip?
+    model: >
+      Listening, redesign, retraining, the pilot, the roll-out and the readiness check form the critical path: thirteen
+      weeks, one week inside the deadline. Coaching and buddying have float. The risk is retraining: every extra week it
+      takes moves the finish by a week, so at four weeks the plan only just meets the deadline and at five it misses it.
+      Train in small groups from the first week the routes are ready, and keep the coaching going alongside.
+
+  - id: evaluation
+    step: Evaluation
+    title: Is it working, and how would you know?
+    prompt: >
+      Decide how success will be measured before the results arrive, then judge the results against the objective, the
+      trend and the time left, not one number on one day.
+    evidence: [ex-1, ex-4]
+    tasks:
+      - kind: sort
+        id: measures
+        question: Is each of these a good measure of whether the plan is working?
+        categories:
+          - { value: good, label: Good measure }
+          - { value: partly, label: Partly }
+          - { value: poor, label: Poor measure }
+        items:
+          - id: dispatch-shift
+            text: On-time dispatch each week, by shift
+            right: [good]
+            explanation: The client's own test, measured often enough to steer by, and by shift so that the night shift's progress is visible.
+            evidence: [ex-1, ex-4]
+          - id: errors-shift
+            text: Picking errors per 1,000 orders, by shift
+            right: [good]
+            explanation: Errors are the most direct sign of whether pickers can use the system, and they move before dispatch does.
+            evidence: [ex-1]
+          - id: turnover-roll
+            text: Night-shift leavers, counted over each rolling three months
+            right: [good]
+            explanation: It shows whether the shift is stabilizing, sooner than an annual labour turnover figure would.
+            evidence: []
+          - id: hours
+            text: Hours of training delivered
+            right: [partly]
+            explanation: It shows the plan is being carried out, not that it works. Useful as a check on progress, poor as a measure of success.
+            evidence: []
+          - id: profit
+            text: Halden's profit for the year
+            right: [poor]
+            explanation: 'Too late and too broad: it will not be known until after the deadline, and it depends on far more than the night shift.'
+            evidence: []
+      - kind: exhibit
+        id: check-in
+        title: Simulated check-in, week 10 of the plan
+        columns: [Measure, Before the plan, Week 10]
+        rows:
+          - [On-time dispatch (%), 91.4, 95.6]
+          - ['Picking errors per 1,000 orders', 5.2, 3.3]
+          - [Night-shift leavers in the last ten weeks, '', 3]
+          - [Night shift agreeing they have had the training they need (%), 33, 71]
+          - [Night shift agreeing they are consulted about changes (%), 21, 58]
+        note: >
+          Simulated for this lab, to practise judging results. Week 10 is four weeks before Lumen Home's deadline.
+          Three leavers in ten weeks from about 56 night-shift employees is an annual rate of about 28%, against 51.9% a
+          year ago.
+      - kind: choose
+        id: judgement
+        question: What is the most defensible judgement at week 10?
+        options:
+          - { value: failed, label: 'The plan has failed: dispatch is still below 97%.' }
+          - { value: continue, label: 'The plan is working: keep going, and check each week whether dispatch is rising fast enough to pass 97% by the deadline.' }
+          - { value: succeeded, label: 'The plan has succeeded: errors have fallen by more than a third.' }
+          - { value: switch, label: Switch to daily targets and warnings to gain the last 1.4 points faster. }
+        right: [continue]
+        partial: [succeeded]
+        answer: It is working; keep going and watch the trend.
+        explanation: >
+          Dispatch has risen 4.2 points in ten weeks, about 0.42 a week. At that pace it would pass 97% in three to four more
+          weeks, just inside the deadline, though improvements often slow as the easy gains are taken, so the weekly figure
+          matters more than the projection. Errors have fallen and the night shift feels trained and heard, so the causes
+          are being treated. Calling it a success is premature, because the client's test is dispatch; switching to warnings
+          would put at risk the trust the plan has built.
+    reflection:
+      label: What you would do if dispatch stalled at 95.6%
+      hint: Go back down the chain. Which cause might not have been treated?
+    model: >
+      At week 10 the plan is working but has not yet succeeded. Dispatch is 95.6% and rising by about 0.4 points a week,
+      errors are down by more than a third, and the night shift reports the training and consultation it lacked. Keep
+      going, review weekly by shift, and if dispatch stalls, go back to the causes: check the team leaders' coaching and
+      whether the redesigned routes are being used.
+memo:
+  title: Diagnosis memo
+  to: the owners of Halden Distribution

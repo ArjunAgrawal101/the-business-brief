@@ -17,6 +17,7 @@ import FunctionsSorter from './FunctionsSorter.astro';
 import ScaleExplorer from './ScaleExplorer.astro';
 import SpecialOrder from './SpecialOrder.astro';
 import CashFlowLab from './CashFlowLab.astro';
+import CaseLab from './CaseLab.astro';
 import { corpus } from '../../lib/content';
 import { rich } from '../../lib/markup';
 import type { Interactive as InteractiveData, Level, Provenance } from '../../lib/schemas';
@@ -60,5 +61,6 @@ const H = headingLevel === 2 ? 'h2' : 'h3';
     {data.component === 'scale-explorer' && <ScaleExplorer data={data} uid={uid} />}
     {data.component === 'special-order' && <SpecialOrder data={data} uid={uid} />}
     {data.component === 'cash-flow-lab' && <CashFlowLab data={data} uid={uid} />}
+    {data.component === 'case-lab' && <CaseLab data={data} uid={uid} />}
   </div>
 </section>

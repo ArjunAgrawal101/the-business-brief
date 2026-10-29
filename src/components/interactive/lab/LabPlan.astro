@@ -1,0 +1,103 @@
+---
+/** A case lab task: the plan scheduled by critical path analysis, with one duration the learner can change. */
+import { schedule } from '../../../lib/plan';
+import { planSvg, planTableHtml } from '../../../lib/plan-chart';
+import type { LabTask } from '../../../lib/schemas';
+
+interface Props {
+  task: Extract<LabTask, { kind: 'plan' }>;
+  uid: string;
+}
+const { task: t, uid } = Astro.props;
+const s = schedule(t.activities);
+const varied = t.activities.find((a) => a.id === t.vary.activity);
+const spare = t.deadline.week - s.finish;
+---
+
+<div class="lab-plan" data-plan={t.id}>
+  <h5 class="label label--ink">{t.question}</h5>
+  <div class="lab-plan__controls js-only">
+    <label class="field lab-plan__vary">
+      <span>{t.vary.label}</span>
+      <select class="select" data-vary>
+        {
+          t.vary.weeks.map((w) => (
+            <option value={String(w)} selected={w === varied?.weeks}>
+              {w} {w === 1 ? 'week' : 'weeks'}
+            </option>
+          ))
+        }
+      </select>
+    </label>
+    <p class="lab-plan__read" aria-live="polite" data-plan-read>
+      The plan takes {s.finish} weeks: {spare} {spare === 1 ? 'week' : 'weeks'} inside the deadline.
+    </p>
+  </div>
+  <figure class="lab-plan__fig">
+    <div class="chart-scroll" role="region" aria-label="The plan, week by week" tabindex="0" data-plan-chart set:html={planSvg(s, { deadline: t.deadline.week, deadlineLabel: t.deadline.label, id: `${uid}-chart` })} />
+    <figcaption class="exhibit__source">
+      <b>Plan</b> Black bars are the critical path; blue bars have float, shown as a dotted line to the latest finish. The dashed red line is the deadline. This
+      is a Gantt chart: Gantt charts and critical path analysis, with its float, are HL toolkit content (guide, p. 14).
+    </figcaption>
+  </figure>
+  <details class="disclosure">
+    <summary>The plan as a table</summary>
+    <div class="disclosure__body table-scroll" role="region" aria-label="The plan as a table" tabindex="0">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Activity</th>
+            <th scope="col" class="n">Weeks</th>
+            <th scope="col" class="n">Starts in week</th>
+            <th scope="col" class="n">Ends with week</th>
+            <th scope="col" class="n">Total float</th>
+            <th scope="col">Path</th>
+          </tr>
+        </thead>
+        <tbody data-plan-table set:html={planTableHtml(s)} />
+      </table>
+    </div>
+  </details>
+</div>
+
+<style>
+  .lab-plan {
+    display: grid;
+    gap: var(--sp-3);
+  }
+
+  .lab-plan__controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--sp-3) var(--sp-5);
+  }
+
+  .lab-plan__vary {
+    max-width: 18rem;
+  }
+
+  .lab-plan__vary span {
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .lab-plan__read {
+    margin: 0;
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .lab-plan__read:global(.is-late) {
+    color: var(--signal-text);
+  }
+
+  .lab-plan__fig {
+    margin: 0;
+  }
+
+  .lab-plan :global(tr.is-critical th) {
+    font-weight: 700;
+  }
+</style>

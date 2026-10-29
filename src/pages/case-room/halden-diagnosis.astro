@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import Interactive from '../../components/interactive/Interactive.astro';
+import { href } from '../../lib/content';
+---
+
+<BaseLayout title="Halden Distribution: diagnose before you decide | Case Room" description="A staged case lab: diagnose a fictional warehouse's problem from the evidence, find its causes, choose a strategy, plan it against a deadline and judge the results." section="case-room">
+  <PageIntro
+    trail={[{ label: 'All rooms', href: '/rooms/' }, { label: 'Case Room', href: '/case-room/' }, { label: 'Halden diagnosis' }]}
+    kicker="Case Room · Case lab"
+    title="Diagnose before you decide"
+    lead="Five stages, one case. Find the real problem behind the symptoms, weigh the evidence for each cause, choose a strategy that acts on the strongest, plan it against the client's deadline, and judge the results when they come in. Each stage opens when the one before is done."
+  >
+    <p class="small muted">
+      Uses the <a href={href.case('halden-distribution')}>Halden Distribution case file</a> (fictional; simulated data). Afterwards, try the
+      <a href={href.decision('halden-leadership')}>Decision Room</a> on the same case, which asks how to lead.
+    </p>
+  </PageIntro>
+  <div class="wrap page-body">
+    <Interactive
+      component="case-lab"
+      refId="halden-diagnosis"
+      title="Halden Distribution: problem, cause, strategy, implementation, evaluation"
+      provenance="aa-framework"
+      headingLevel={2}
+    />
+  </div>
+</BaseLayout>

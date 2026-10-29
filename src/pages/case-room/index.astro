@@ -1,0 +1,57 @@
+---
+import RoomPage from '../../components/rooms/RoomPage.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+---
+
+<RoomPage id="case-room" section="cases" firstSection={2}>
+  <section aria-labelledby="cr-method-h">
+    <SectionHead no={1} title="How a case lab works" id="cr-method-h" />
+    <ol class="cr-chain" role="list">
+      <li><b>Problem</b> Separate the symptoms from what has to be solved.</li>
+      <li><b>Cause</b> Weigh the evidence for each possible cause.</li>
+      <li><b>Strategy</b> Choose what acts on the strongest causes, within time and money.</li>
+      <li><b>Implementation</b> Plan it: what must come first, and what sets the finish.</li>
+      <li><b>Evaluation</b> Decide how to measure success, then judge the results.</li>
+    </ol>
+    <p class="small muted">The Arjun Agrawal diagnosis chain. Each stage is checked against the case's exhibits and ends with a sentence of your own, compiled into a memo.</p>
+  </section>
+</RoomPage>
+
+<style>
+  .cr-chain {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: 0;
+    margin: var(--sp-4) 0 var(--sp-3);
+    padding: 0;
+    list-style: none;
+    border: 1px solid var(--bb-ink);
+    counter-reset: chain;
+  }
+
+  .cr-chain li {
+    margin: 0;
+    padding: var(--sp-3) var(--sp-4);
+    border-right: 1px solid var(--rule);
+    font-size: 0.9375rem;
+    counter-increment: chain;
+  }
+
+  .cr-chain li:last-child {
+    border-right: 0;
+  }
+
+  .cr-chain b {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    color: var(--text-strong);
+  }
+
+  .cr-chain b::before {
+    content: counter(chain, decimal-leading-zero) " ";
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--cobalt-text);
+  }
+</style>

@@ -1,0 +1,39 @@
+---
+/** A case lab task: a simulated exhibit written for the lab, such as results after a plan has run. */
+import ProvenanceTag from '../../ui/ProvenanceTag.astro';
+import type { LabTask } from '../../../lib/schemas';
+
+interface Props {
+  task: Extract<LabTask, { kind: 'exhibit' }>;
+  uid: string;
+}
+const { task: t, uid } = Astro.props;
+const cellText = (v: string | number) => (typeof v === 'number' ? v.toLocaleString('en-GB', { maximumFractionDigits: 1 }) : v);
+---
+
+<figure class="exhibit" aria-labelledby={`${uid}-t`}>
+  <div class="exhibit__head">
+    <span class="exhibit__no">Check-in</span>
+    <h5 class="exhibit__title" id={`${uid}-t`}>{t.title}</h5>
+    <ProvenanceTag kind="simulated-data" />
+  </div>
+  <div class="table-scroll" role="region" aria-labelledby={`${uid}-t`} tabindex="0">
+    <table class="table">
+      <thead>
+        <tr>
+          {
+            t.columns.map((col, k) => (
+              <th scope="col" class={k > 0 ? 'n' : undefined}>
+                {col}
+              </th>
+            ))
+          }
+        </tr>
+      </thead>
+      <tbody>
+        {t.rows.map((r) => <tr>{r.map((v, k) => (k === 0 ? <th scope="row">{v}</th> : <td class="n">{cellText(v)}</td>))}</tr>)}
+      </tbody>
+    </table>
+  </div>
+  {t.note && <figcaption class="exhibit__source">{t.note}</figcaption>}
+</figure>
