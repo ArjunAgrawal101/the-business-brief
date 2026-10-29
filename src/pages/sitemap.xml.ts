@@ -7,7 +7,8 @@ export const GET: APIRoute = async ({ site }) => {
   const c = await corpus();
   const paths = new Set<string>();
   for (const key of Object.keys(pages)) {
-    if (key.includes('[') || key.endsWith('404.astro')) continue;
+    // Skip routes with parameters (added below), the 404 page and the progress page, which only shows what one browser has kept.
+    if (key.includes('[') || key.endsWith('404.astro') || key.endsWith('progress.astro')) continue;
     const p = key.replace(/^\.\//, '/').replace(/index\.astro$/, '').replace(/\.astro$/, '/');
     paths.add(p);
   }
