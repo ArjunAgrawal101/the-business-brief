@@ -172,3 +172,16 @@ Every topic and revision brief.
 | **Feedback** | The answer, and a running count of got it, partly and not yet |
 | **Misconception diagnosed** | Rereading is revising |
 | **Objective** | Long-term retention through retrieval practice |
+
+## 14. Ratio desk (efficiency ratios HL)
+
+`finance-ratios-halden`, on the Finance Desk ratio analysis page (`/finance-desk/ratios/`). Logic in `src/lib/ratios.ts`, markup in `src/lib/ratio-view.ts`.
+
+| | |
+| --- | --- |
+| **The learner does** | Reads two years of Halden Distribution's accounts laid out with the guide's line items, chooses a ratio, works out the 2026 figure and checks it, then applies one of six strategies to the 2026 accounts |
+| **Must understand** | Each ratio as the guide defines it (capital employed is non-current liabilities plus equity; average stock is opening plus closing, halved), and that a ratio says what changed while the case says why |
+| **Decides or infers** | The ratio's value; whether a change is better or worse, or a matter of judgement (creditor days, gearing); which ratios a strategy moves and which it leaves alone |
+| **Feedback** | Right (within rounding to one decimal place) or Not yet, naming the slip when the answer matches a known one: equity alone or total assets as capital employed, the wrong profit line, closing instead of average stock, the current ratio for the acid test, a ratio upside down, a missing × 100 or × 365. Every ratio for both years, the change, an "other things equal" verdict in words, the eight-part working for each year, and the statements re-drawn with a strategy's changed figures marked |
+| **Misconception diagnosed** | Collecting debts improves the current ratio (it does not: cash replaces debtors); a ratio above 1 means the business has cash; longer creditor days are simply good; every ratio matters equally (stock turnover tells a warehouse little) |
+| **Objective** | Calculate the profitability, liquidity and (HL) efficiency ratios, interpret them in context and evaluate strategies to improve them |

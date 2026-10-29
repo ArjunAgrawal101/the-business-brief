@@ -9,6 +9,7 @@
  */
 import type { AssessmentComponent, Block, Calculation, CaseEntry, Claim, CommandTerm, Concept, Curriculum, Decision, GlossaryEntry, Interactive, Question, Source, Topic, Tool } from './schemas';
 import { buildWorking, workings } from './finance';
+import { applyAdjustments, balances, derive, type Statement } from './ratios';
 
 type Dict<T> = Record<string, T>;
 
@@ -260,6 +261,21 @@ export function checkIntegrity(c: Corpus): Problem[] {
   /* Interactions that work on a case */
   for (const [id, it] of Object.entries(c.interactives)) {
     if ('case' in it && it.case) need(c.cases, it.case, `interactives/${id}`, 'case');
+    // Accounts must balance, link the two years, and stay balanced under every strategy.
+    if (it.component === 'ratio-desk') {
+      const w = `interactives/${id}`;
+      const [s1, s2] = it.statements as [Statement, Statement];
+      const links = (prev: Statement, s: Statement) => Math.abs(prev.retainedEarnings + derive(s).retainedProfit - s.retainedEarnings) < 1e-6;
+      it.statements.forEach((s, k) => {
+        if (!balances(s)) problems.push({ where: w, message: `the statement of financial position for ${it.years[k]?.short ?? k} does not balance` });
+      });
+      if (!links(s1, s2)) problems.push({ where: w, message: 'retained earnings do not equal last year’s plus this year’s retained profit' });
+      for (const st of it.strategies) {
+        const after = applyAdjustments(s2, st.adjust);
+        if (!balances(after)) problems.push({ where: w, message: `strategy "${st.id}" leaves the statement of financial position unbalanced` });
+        if (!links(s1, after)) problems.push({ where: w, message: `strategy "${st.id}" breaks the link between retained profit and retained earnings` });
+      }
+    }
   }
 
   /* Assessment, claims, glossary */

@@ -247,3 +247,36 @@ test.describe('Privacy', () => {
     expect(await page.evaluate(() => localStorage.getItem('other-site'))).toBe('keep');
   });
 });
+
+test.describe('Finance Desk: ratio analysis', () => {
+  test('a ratio is checked, a strategy changes the accounts, and SL hides the efficiency ratios', async ({ page }) => {
+    await page.goto('/finance-desk/ratios/');
+    await ready(page, '[data-ix="ratio-desk"]');
+    const desk = page.locator('[data-ix="ratio-desk"]');
+    await desk.locator('label:has(input[value="roce"])').click();
+    const panel = desk.locator('[data-panel="roce"]');
+    await expect(panel).toBeVisible();
+    await expect(desk.locator('[data-panel="gross-profit-margin"]')).toBeHidden();
+    await panel.locator('[data-try="roce"]').fill('11.43');
+    await panel.locator('[data-check="roce"]').click();
+    await expect(panel.locator('[data-feedback="roce"]')).toContainText('equity alone');
+    await panel.locator('[data-try="roce"]').fill('7.66');
+    await panel.locator('[data-check="roce"]').click();
+    await expect(panel.locator('[data-feedback="roce"]')).toContainText('Right');
+    await expect(panel.locator('[data-figs="roce"]')).toContainText('24.08%');
+    await desk.locator('[data-strategy="price-rise"]').click();
+    await expect(desk.locator('[data-strategy="price-rise"]')).toHaveAttribute('aria-pressed', 'true');
+    await expect(panel.locator('[data-figs="roce"]')).toContainText('12.86%');
+    await expect(desk.locator('[data-statements]')).toContainText('2026 with the strategy');
+    await expect(desk.locator('[data-statements] td.is-changed').first()).toBeVisible();
+    await desk.locator('[data-reset]').click();
+    await expect(desk.locator('[data-statements]')).not.toContainText('with the strategy');
+    await desk.locator('label:has(input[value="debtor-days"])').click();
+    await expect(desk.locator('[data-panel="debtor-days"]')).toBeVisible();
+    await page.locator('[data-level-switch] label:has(input[value="SL"])').first().click();
+    await expect(desk.locator('[data-panel="debtor-days"]')).toBeHidden();
+    await expect(desk.locator('[data-panel="gross-profit-margin"]')).toBeVisible();
+    await expect(desk.locator('label:has(input[value="debtor-days"])')).toBeHidden();
+    await page.locator('[data-level-switch] label:has(input[value="HL"])').first().click();
+  });
+});

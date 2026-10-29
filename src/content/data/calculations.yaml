@@ -364,3 +364,279 @@
     implication: It has the highest expected value of the three routes, but the decision also depends on control, quality and the founder's aims, which the number leaves out.
   provenance: aa-framework
   order: 13
+
+# Ratio analysis (3.5; 3.6 HL). Formulas from the guide's formula sheet, p. 64.
+# The examples use Halden Distribution's accounts for the year to 31 August 2026,
+# in £000, from src/content/interactives/finance-ratios-halden.yaml.
+
+- id: gross-profit-margin
+  name: Gross profit margin
+  status: complete
+  group: ratios
+  syllabus: [{ code: '3.5', note: 'Formula: guide, p. 64' }]
+  verification: primary
+  level: SL/HL
+  formula: Gross profit margin = (gross profit ÷ sales revenue) × 100
+  variables:
+    - { symbol: "GP", meaning: "Gross profit: sales revenue minus cost of sales", unit: "currency" }
+    - { symbol: "S", meaning: "Sales revenue", unit: "currency" }
+  unit: per cent of sales revenue
+  interpretation: The share of each unit of sales revenue left after the direct costs of making the goods or providing the service. Compare it with the business's own past and with similar businesses, not with an ideal figure.
+  errors:
+    - Using profit before interest and tax instead of gross profit. That gives the profit margin.
+    - Forgetting to multiply by 100.
+  page: /finance-desk/ratios/
+  example:
+    title: "Halden Distribution: gross profit margin, year to 31 August 2026"
+    case: halden-distribution
+    currency: '£000'
+    inputs: { grossProfit: 1920, salesRevenue: 9600 }
+    interpretation: Each pound of revenue left 20p after cost of sales, down from 25p a year earlier.
+    implication: Cost of sales rose faster than revenue. For a warehouse that cost is mostly people, so the margin measures how well the site is staffed and run.
+  provenance: aa-framework
+  order: 14
+
+- id: profit-margin
+  name: Profit margin
+  status: complete
+  group: ratios
+  syllabus: [{ code: '3.5', note: 'Formula: guide, p. 64' }]
+  verification: primary
+  level: SL/HL
+  formula: Profit margin = (profit before interest and tax ÷ sales revenue) × 100
+  variables:
+    - { symbol: "PBIT", meaning: "Profit before interest and tax", unit: "currency" }
+    - { symbol: "S", meaning: "Sales revenue", unit: "currency" }
+  unit: per cent of sales revenue
+  interpretation: The share of each unit of sales revenue left after all the costs of running the business, before interest and tax. The gap between the gross profit margin and the profit margin is the weight of the business's expenses.
+  errors:
+    - Using profit before tax or the profit for the period. The guide uses profit before interest and tax.
+    - Comparing margins across industries without asking how their costs differ.
+  page: /finance-desk/ratios/
+  example:
+    title: "Halden Distribution: profit margin, year to 31 August 2026"
+    case: halden-distribution
+    currency: '£000'
+    inputs: { pbit: 384, salesRevenue: 9600 }
+    interpretation: Four pence in each pound of revenue was left as profit before interest and tax, down from ten pence.
+    implication: There is little room for error. A loss of work or a further rise in costs could turn the profit into a loss.
+  provenance: aa-framework
+  order: 15
+
+- id: roce
+  name: Return on capital employed (ROCE)
+  status: complete
+  group: ratios
+  syllabus: [{ code: '3.5', note: 'Formula and the definition of capital employed: guide, p. 64' }]
+  verification: primary
+  level: SL/HL
+  formula: ROCE = (profit before interest and tax ÷ capital employed) × 100, where capital employed = non-current liabilities + equity
+  variables:
+    - { symbol: "PBIT", meaning: "Profit before interest and tax", unit: "currency" }
+    - { symbol: "NCL", meaning: "Non-current liabilities", unit: "currency" }
+    - { symbol: "E", meaning: "Equity", unit: "currency" }
+  unit: per cent of capital employed, per year
+  interpretation: The profit earned on the long-term finance invested in the business by lenders and owners together. Compare it with the return the same money could earn elsewhere, and with the interest rate on the business's borrowing.
+  errors:
+    - Dividing by equity alone, or by total assets. Capital employed is non-current liabilities plus equity.
+    - Using profit after interest or after tax.
+  page: /finance-desk/ratios/
+  example:
+    title: "Halden Distribution: ROCE, year to 31 August 2026"
+    case: halden-distribution
+    currency: '£000'
+    inputs: { pbit: 384, nonCurrentLiabilities: 1650, equity: 3360 }
+    interpretation: The long-term finance in the business earned 7.66% in the year, down from 24.08%.
+    implication: The capital raised for the new system is in place; the profit it was meant to earn is not yet.
+  provenance: aa-framework
+  order: 16
+
+- id: current-ratio
+  name: Current ratio
+  status: complete
+  group: ratios
+  syllabus: [{ code: '3.5', note: 'Formula: guide, p. 64' }]
+  verification: primary
+  level: SL/HL
+  formula: Current ratio = current assets ÷ current liabilities
+  variables:
+    - { symbol: "CA", meaning: "Current assets: cash, debtors and stock", unit: "currency" }
+    - { symbol: "CL", meaning: "Current liabilities: debts due within a year", unit: "currency" }
+  unit: a ratio
+  interpretation: How many times the assets that turn into cash within a year cover the debts due within a year. Too low is a risk to paying debts on time; too high can mean cash or stock lying idle.
+  errors:
+    - Putting current liabilities on top.
+    - Reading a high ratio as always good. Idle cash and slow-moving stock raise it too.
+  page: /finance-desk/ratios/
+  example:
+    title: "Halden Distribution: current ratio at 31 August 2026"
+    case: halden-distribution
+    currency: '£000'
+    inputs: { currentAssets: 1727, currentLiabilities: 1307 }
+    interpretation: Current assets cover current liabilities 1.32 times, down from 2.08 a year earlier.
+    implication: The cover rests on money owed by clients. Halden had only £17k in the bank.
+  provenance: aa-framework
+  order: 17
+
+- id: acid-test-ratio
+  name: Acid test (quick) ratio
+  status: complete
+  group: ratios
+  syllabus: [{ code: '3.5', note: 'Formula: guide, p. 64' }]
+  verification: primary
+  level: SL/HL
+  formula: Acid test (quick) ratio = (current assets − stock) ÷ current liabilities
+  variables:
+    - { symbol: "CA", meaning: "Current assets", unit: "currency" }
+    - { symbol: "St", meaning: "Stock", unit: "currency" }
+    - { symbol: "CL", meaning: "Current liabilities", unit: "currency" }
+  unit: a ratio
+  interpretation: The cover the current ratio gives, without stock, which is the current asset slowest and least certain to turn into cash.
+  errors:
+    - Taking stock away from current liabilities instead of from current assets.
+    - Forgetting that the ratio still relies on debtors paying.
+  page: /finance-desk/ratios/
+  example:
+    title: "Halden Distribution: acid test ratio at 31 August 2026"
+    case: halden-distribution
+    currency: '£000'
+    inputs: { currentAssets: 1727, stock: 290, currentLiabilities: 1307 }
+    interpretation: Without stock, liquid assets still just cover the debts due within a year, at 1.10 times.
+    implication: That depends on clients paying. More than a third of Halden's debtors is one client, Lumen Home.
+  provenance: aa-framework
+  order: 18
+
+- id: stock-turnover-times
+  name: Stock turnover (number of times)
+  status: complete
+  group: ratios
+  syllabus: [{ code: '3.6', note: 'HL only. Formula and the definition of average stock: guide, p. 64' }]
+  verification: primary
+  level: HL
+  formula: Stock turnover (number of times) = cost of sales ÷ average stock, where average stock = (opening stock + closing stock) ÷ 2
+  variables:
+    - { symbol: "CoS", meaning: "Cost of sales", unit: "currency" }
+    - { symbol: "AS", meaning: "Average stock: (opening + closing) ÷ 2", unit: "currency" }
+  unit: times a year
+  interpretation: How many times in the year the business uses up and replaces its average stock. What is good depends on what the stock is; fresh food turns over far faster than furniture.
+  errors:
+    - Using closing stock instead of average stock.
+    - Dividing sales revenue, instead of cost of sales, by average stock.
+  page: /finance-desk/ratios/
+  example:
+    title: "Halden Distribution: stock turnover, year to 31 August 2026"
+    case: halden-distribution
+    currency: '£000'
+    inputs: { costOfSales: 7680, openingStock: 230, closingStock: 290 }
+    interpretation: Halden used up and replaced its average stock of packaging about thirty times in the year.
+    implication: Halden does not own its clients' goods, so its stock is a small cost and this ratio says little about its problem.
+  provenance: aa-framework
+  order: 19
+
+- id: stock-turnover-days
+  name: Stock turnover (number of days)
+  status: complete
+  group: ratios
+  syllabus: [{ code: '3.6', note: 'HL only. Formula: guide, p. 64' }]
+  verification: primary
+  level: HL
+  formula: Stock turnover (number of days) = (average stock ÷ cost of sales) × 365
+  variables:
+    - { symbol: "AS", meaning: "Average stock: (opening + closing) ÷ 2", unit: "currency" }
+    - { symbol: "CoS", meaning: "Cost of sales", unit: "currency" }
+  unit: days
+  interpretation: How many days, on average, stock is held before it is used or sold. Fewer days ties up less cash, until stock runs short.
+  errors:
+    - Using closing stock instead of average stock.
+    - Forgetting to multiply by 365.
+  page: /finance-desk/ratios/
+  example:
+    title: "Halden Distribution: stock turnover in days, year to 31 August 2026"
+    case: halden-distribution
+    currency: '£000'
+    inputs: { costOfSales: 7680, openingStock: 230, closingStock: 290 }
+    interpretation: Packaging was held for about twelve days on average.
+    implication: Holding less would release a little cash, but stock is not where Halden's cash has gone.
+  provenance: aa-framework
+  order: 20
+
+- id: debtor-days
+  name: Debtor days
+  status: complete
+  group: ratios
+  syllabus: [{ code: '3.6', note: 'HL only. Formula: guide, p. 64' }]
+  verification: primary
+  level: HL
+  formula: Debtor days = (debtors ÷ total sales revenue) × 365
+  variables:
+    - { symbol: "D", meaning: "Debtors: money owed by customers", unit: "currency" }
+    - { symbol: "S", meaning: "Total sales revenue", unit: "currency" }
+  unit: days
+  interpretation: How many days, on average, customers take to pay. Compare it with the credit terms the business offers.
+  errors:
+    - Dividing by cost of sales instead of total sales revenue.
+    - Blaming customers for a rise without asking why they are paying later.
+  page: /finance-desk/ratios/
+  example:
+    title: "Halden Distribution: debtor days at 31 August 2026"
+    case: halden-distribution
+    currency: '£000'
+    inputs: { debtors: 1420, salesRevenue: 9600 }
+    interpretation: Clients took about 54 days to pay, nine days longer than a year earlier.
+    implication: Nine days of revenue is about £237k of cash, much of it in invoices Lumen Home disputes after late dispatches.
+  provenance: aa-framework
+  order: 21
+
+- id: creditor-days
+  name: Creditor days
+  status: complete
+  group: ratios
+  syllabus: [{ code: '3.6', note: 'HL only. Formula: guide, p. 64' }]
+  verification: primary
+  level: HL
+  formula: Creditor days = (creditors ÷ cost of sales) × 365
+  variables:
+    - { symbol: "Cr", meaning: "Creditors: money owed to suppliers", unit: "currency" }
+    - { symbol: "CoS", meaning: "Cost of sales", unit: "currency" }
+  unit: days
+  interpretation: How many days, on average, the business takes to pay its suppliers. Longer keeps cash in the business; too long costs suppliers' goodwill and can cost discounts or credit.
+  errors:
+    - Dividing by sales revenue instead of cost of sales.
+    - Treating longer creditor days as simply good. Suppliers can shorten terms or stop giving credit.
+  page: /finance-desk/ratios/
+  example:
+    title: "Halden Distribution: creditor days at 31 August 2026"
+    case: halden-distribution
+    currency: '£000'
+    inputs: { creditors: 1157, costOfSales: 7680 }
+    interpretation: Halden took about 55 days to pay its suppliers, ten days longer than a year earlier.
+    implication: Paying later protected Halden's cash, at the cost of its suppliers' goodwill.
+  provenance: aa-framework
+  order: 22
+
+- id: gearing-ratio
+  name: Gearing ratio
+  status: complete
+  group: ratios
+  syllabus: [{ code: '3.6', note: 'HL only. Formula and the definition of capital employed: guide, p. 64' }]
+  verification: primary
+  level: HL
+  formula: Gearing ratio = (non-current liabilities ÷ capital employed) × 100, where capital employed = non-current liabilities + equity
+  variables:
+    - { symbol: "NCL", meaning: "Non-current liabilities: long-term borrowing", unit: "currency" }
+    - { symbol: "CE", meaning: "Capital employed: non-current liabilities + equity", unit: "currency" }
+  unit: per cent of capital employed
+  interpretation: The share of the long-term finance that is borrowed. Higher gearing means more interest to pay whatever happens to profit, so more risk, and more reward for the owners when profit is high.
+  errors:
+    - Using total liabilities instead of non-current liabilities.
+    - Dividing by equity instead of capital employed.
+  page: /finance-desk/ratios/
+  example:
+    title: "Halden Distribution: gearing at 31 August 2026"
+    case: halden-distribution
+    currency: '£000'
+    inputs: { nonCurrentLiabilities: 1650, equity: 3360 }
+    interpretation: A third of Halden's long-term finance is borrowed, twice the share of a year earlier.
+    implication: Interest must now be paid on £1,650k of long-term loans while profit is falling.
+  provenance: aa-framework
+  order: 23

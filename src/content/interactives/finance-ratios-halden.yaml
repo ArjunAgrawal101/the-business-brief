@@ -1,0 +1,142 @@
+# Halden Distribution's accounts. Fictional, every figure simulated, built to
+# agree with the case file (src/content/cases/halden-distribution.yaml): the
+# warehouse management system went live in February 2026, the night shift's
+# turnover rose, and Lumen Home set a deadline. The statements balance, the
+# retained earnings link the two years, and every strategy keeps them
+# balanced; src/lib/integrity.ts and tests/unit/ratios.test.ts check all three.
+
+component: ratio-desk
+title: Halden Distribution's accounts
+purpose: >
+  The learner calculates the guide's ratios from two years of accounts laid out as the guide lays them out, checks an answer
+  of their own against the working, reads what each change means for the business, and tries strategies that would improve
+  the ratios, to see which ratios they move and which they leave alone.
+provenance: simulated-data
+case: halden-distribution
+entity: Halden Distribution Ltd
+unit: '£000'
+years:
+  - { label: 'Year to 31 August 2025', short: '2025' }
+  - { label: 'Year to 31 August 2026', short: '2026' }
+yearEnd: 31 August
+openingStock: 210
+statements:
+  - salesRevenue: 9200
+    costOfSales: 6900
+    expenses: 1380
+    interest: 20
+    tax: 225
+    dividends: 300
+    propertyPlantEquipment: 4600
+    accumulatedDepreciation: 1700
+    cash: 406
+    debtors: 1134
+    stock: 230
+    bankOverdraft: 0
+    tradeCreditors: 850
+    otherShortTermLoans: 0
+    longTermBorrowings: 600
+    shareCapital: 1000
+    retainedEarnings: 2220
+  - salesRevenue: 9600
+    costOfSales: 7680
+    expenses: 1536
+    interest: 64
+    tax: 80
+    dividends: 100
+    propertyPlantEquipment: 6850
+    accumulatedDepreciation: 2260
+    cash: 17
+    debtors: 1420
+    stock: 290
+    bankOverdraft: 0
+    tradeCreditors: 1157
+    otherShortTermLoans: 150
+    longTermBorrowings: 1650
+    shareCapital: 1000
+    retainedEarnings: 2360
+notes:
+  - Halden Distribution and every figure here are fictional, simulated to agree with the rest of the case. Figures are in thousands of pounds (£000). Tax is a quarter of profit before tax in both years.
+  - In the year to 31 August 2026 Halden spent £2,250k on equipment, most of it the warehouse management system, scanners and conveyor changes that went live in February 2026. A bank loan of £1,200k paid for part of it; the £150k repayable within a year is in other short-term loans.
+  - Debtors at 31 August 2026 include £520k owed by Lumen Home, of which £300k is for invoices it disputes after late dispatches.
+  - Stock is packaging and consumables. Halden stores its clients' goods but does not own them. Stock at 1 September 2024 was £210k.
+readings:
+  gross-profit-margin:
+    why: Revenue rose by 4.3%, from £9,200k to £9,600k, but cost of sales rose by 11.3%. Agency staff covered the night shift's leavers, overtime grew, and orders picked wrongly had to be picked again.
+    matters: Each pound of revenue now leaves 20p rather than 25p for everything else. For a warehouse, cost of sales is mostly people, so the margin measures how well the site is staffed and run.
+  profit-margin:
+    why: Gross profit fell by £380k and expenses rose by £156k, much of it recruitment and the new system's support contract, so profit before interest and tax fell from £920k to £384k.
+    matters: With 4p of operating profit in each pound of revenue there is little room for error. Losing Lumen Home, a third of the work, could turn it into a loss unless costs fell as fast.
+  roce:
+    why: Two things happened at once. Profit before interest and tax fell by more than half, and capital employed rose by £1,190k, mainly the bank loan that paid for the new system.
+    matters: The system was meant to raise returns. So far it has lowered them, because the capital is in place but the profit it was meant to earn is not.
+  current-ratio:
+    why: Current liabilities rose by £457k, mostly unpaid supplier bills and the part of the new loan due within a year, while current assets fell slightly as cash was spent.
+    matters: Current assets still cover current liabilities, but most of them are money owed by clients. The ratio looks comfortable; the cash behind it does not.
+  acid-test-ratio:
+    why: Taking out stock changes little for a warehouse whose stock is packaging. The fall has the same cause as the current ratio's, more owed to suppliers and the bank, and only £17k of cash.
+    matters: Above 1, Halden could in principle meet its short-term debts without selling stock, but only if its clients pay. More than a third of what it is owed comes from one client.
+  stock-turnover-times:
+    why: Halden used up its packaging and consumables about thirty times in the year. Closing stock rose to £290k because extra packaging was bought for re-sends.
+    matters: A small change, and not where Halden's problem lies. A ratio repays analysis only when it bears on the business's real problem.
+  stock-turnover-days:
+    why: Packaging was held for about twelve days on average, a little longer than the year before.
+    matters: Holding less would release a little cash, but at £290k stock is a small part of Halden's current assets.
+  debtor-days:
+    why: Clients took nine days longer to pay. Lumen Home owes £520k, of which £300k is for invoices it disputes after late dispatches.
+    matters: At £9,600k of revenue a year, each day of debtor days is about £26k of cash. Nine extra days is about £237k, far more than the £17k Halden has in the bank.
+  creditor-days:
+    why: Halden paid its suppliers about ten days more slowly, which kept about £210k more cash in the business.
+    matters: It protected the cash position, but slow payment uses up suppliers' goodwill. They can shorten their terms or ask for payment in advance, especially if they hear a large client may leave.
+  gearing-ratio:
+    why: The bank loan for the new system took long-term borrowing from £600k to £1,650k.
+    matters: A third of the long-term finance is now borrowed. That is manageable while profit covers the interest, but interest rose from £20k to £64k as profit fell, and the owners took a smaller dividend.
+strategies:
+  - id: collect-disputed
+    label: Collect the £300k Lumen Home disputes
+    level: SL/HL
+    note: Resolve the disputed invoices and collect the cash. Debtors fall by £300k and cash rises by the same amount.
+    adjust: { debtors: -300, cash: 300 }
+  - id: less-stock
+    label: Hold £60k less packaging
+    level: SL/HL
+    note: Order packaging closer to when it is needed. Stock falls by £60k and cash rises by the same amount.
+    adjust: { stock: -60, cash: 60 }
+  - id: pay-suppliers
+    label: Pay suppliers within 45 days
+    level: SL/HL
+    note: Pay £210k of supplier bills to bring creditor days back to about 45. With £17k in the bank, the rest comes from a bank overdraft.
+    adjust: { tradeCreditors: -210, cash: -210 }
+  - id: price-rise
+    label: Raise prices by 3%
+    level: SL/HL
+    note: >
+      Charge every client 3% more, with no loss of work. The extra £288k of revenue, less £72k of tax, adds £216k to cash
+      and to retained earnings. Whether clients would accept it, with Lumen Home's deadline close, is the real question.
+    adjust: { salesRevenue: 288, tax: 72, cash: 216, retainedEarnings: 216 }
+  - id: cut-agency
+    label: Cut agency staff and overtime by £240k
+    level: SL/HL
+    note: >
+      Keep and train the night shift, so that fewer agency staff and overtime hours are needed. Cost of sales falls by £240k;
+      after £60k of tax, £180k more reaches cash and retained earnings. In the case this is a question of leadership, not
+      accounting.
+    adjust: { costOfSales: -240, tax: 60, cash: 180, retainedEarnings: 180 }
+  - id: equity-for-debt
+    label: Owners swap £500k of the loan for shares
+    level: HL
+    note: The owners repay £500k of the bank loan in return for new shares. Long-term borrowing falls and share capital rises by the same amount.
+    adjust: { longTermBorrowings: -500, shareCapital: 500 }
+prompts:
+  profitability:
+    - Halden's gross profit margin fell because cost of sales rose faster than revenue. Which of those costs could it cut without making the dispatch problem worse?
+    - A 3% price rise would lift every profitability ratio on paper. How might Lumen Home respond, and what would that do to revenue?
+    - ROCE will rise if the new system starts to earn the profit it was bought for. What would have to change on the night shift for that to happen?
+  liquidity:
+    - Collecting the disputed invoices leaves the current ratio exactly where it was. Why, and why might it still be the most urgent step?
+    - Halden's current ratio is above 1, yet it has £17k in the bank. Which matters more to a supplier deciding whether to keep giving credit?
+    - Paying suppliers sooner barely moves the ratios but costs £210k of cash. When would it be worth doing anyway?
+  efficiency:
+    - Debtor days rose by nine. Is the cause Halden's credit control or its service to Lumen Home? What would you need to know to decide?
+    - Swapping £500k of the loan for shares lowers gearing but leaves ROCE where it was. Why, and who gains and who loses from the swap?
+    - Which of the efficiency ratios tells you least about Halden's problem, and why is that itself a useful finding?

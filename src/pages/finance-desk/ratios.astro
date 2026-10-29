@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import Interactive from '../../components/interactive/Interactive.astro';
+import CalcCard from '../../components/finance/CalcCard.astro';
+import LevelSwitch from '../../components/ui/LevelSwitch.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import { corpus, href } from '../../lib/content';
+
+const PATH = '/finance-desk/ratios/';
+const c = await corpus();
+const calcs = Object.entries(c.calculations)
+  .filter(([, k]) => k.page === PATH)
+  .sort((a, b) => a[1].order - b[1].order);
+const sl = calcs.filter(([, k]) => k.level === 'SL/HL');
+const hl = calcs.filter(([, k]) => k.level === 'HL');
+---
+
+<BaseLayout title="Ratio analysis: Finance Desk" description="Profitability, liquidity and (HL) efficiency ratios calculated from two years of accounts in the IB layout, with every working in full, a check on your own answers and strategies to try." section="finance-desk">
+  <PageIntro
+    trail={[{ label: 'Finance Desk', href: '/finance-desk/' }, { label: 'Ratio analysis' }]}
+    kicker="Finance Desk"
+    title="Ratio analysis"
+    lead="Ratios turn a year's accounts into questions: why did the margin fall, where has the cash gone, how much of the business is borrowed? Work out each ratio from Halden Distribution's accounts, check your answer against the full working, then try the strategies that would improve the ratios and see which ones they actually move."
+  >
+    <div class="tags"><span class="tag tag--plain">IB 3.5 and 3.6</span><span class="tag tag--hl">Efficiency ratios: HL only</span></div>
+  </PageIntro>
+  <div class="wrap page-body">
+    <aside class="callout callout--note">
+      <span class="callout__kicker">Checked against the guide</span>
+      <div class="prose">
+        <p>
+          The formulas are the ones on the Business management guide's formula sheet (p. 64), including its definitions of capital employed (non-current
+          liabilities plus equity) and of average stock. Profitability and liquidity ratios are subtopic 3.5, for SL and HL; efficiency ratios and gearing are
+          subtopic 3.6, HL only. The accounts use the line items of the guide's statement of profit or loss and statement of financial position (pp. 59
+          and 61).
+        </p>
+      </div>
+    </aside>
+    <LevelSwitch id="lvl-ratios" />
+    <section aria-labelledby="desk-h">
+      <SectionHead no={1} title="The ratio desk" id="desk-h" dek="The case: a warehouse whose new system has gone live, whose night shift is leaving and whose largest client has set a deadline." />
+      <p class="small" style="margin-top:var(--sp-3)">
+        Read the <a href={href.case('halden-distribution')}>Halden Distribution case file</a> first if you can: the accounts tell you what happened, the case
+        tells you why.
+      </p>
+      <div style="margin-top:var(--sp-5)">
+        <Interactive
+          component="ratio-desk"
+          refId="finance-ratios-halden"
+          title="Halden Distribution's accounts, years to 31 August 2025 and 2026"
+          intro="Choose a ratio, work out the 2026 figure yourself, then check it. Every ratio is shown for both years, with the working, a reading of what changed and why it matters. HL students can also try the efficiency ratios and the strategy that changes gearing."
+          provenance="simulated-data"
+          headingLevel={3}
+        />
+      </div>
+    </section>
+    <section aria-labelledby="calcs-h">
+      <SectionHead no={2} title="The calculations" dek="Each ratio's formula, what it measures, a worked example from the accounts and the errors that cost marks." id="calcs-h" />
+      <div class="stack stack-lg" style="margin-top:var(--sp-5)">
+        {sl.map(([id, k]) => <CalcCard id={id} calc={k} headingLevel={3} />)}
+      </div>
+      <div class="stack stack-lg" data-level="HL" style="margin-top:var(--sp-6)">
+        {hl.map(([id, k]) => <CalcCard id={id} calc={k} headingLevel={3} />)}
+      </div>
+      <p class="hl-notice"><span class="tag tag--hl">HL</span> The efficiency ratios and gearing are HL-only material, hidden while you are viewing SL content. Switch to HL above to see them.</p>
+    </section>
+    <section aria-labelledby="insolvency-h" data-level="HL">
+      <SectionHead no={3} title="Insolvency and bankruptcy" id="insolvency-h" dek="Subtopic 3.6 also asks for the difference (HL)." />
+      <div class="grid grid--2" style="margin-top:var(--sp-4)">
+        <div class="prose">
+          <div class="tags"><ProvenanceTag kind="subject-knowledge" /></div>
+          <p>
+            <strong>Insolvency</strong> is a financial state: a business cannot pay its debts as they fall due, or owes more than all its assets are worth. It
+            can be temporary, and an insolvent business may recover if it finds cash in time, for example by selling assets or agreeing new terms with its
+            lenders.
+          </p>
+          <p>
+            <strong>Bankruptcy</strong> is a legal process: a court declares that a debtor cannot pay, and the debtor's assets are taken over and used to pay
+            creditors. The words are used differently from one country to another. In the United Kingdom, for example, only people are made bankrupt; an
+            insolvent company goes into administration or liquidation instead.
+          </p>
+        </div>
+        <div class="prose">
+          <p>
+            <strong>Halden in August 2026.</strong> Halden is not insolvent: its current assets cover its current liabilities, and its net assets are positive.
+            But it has £17k in the bank. If Lumen Home left, or stopped paying, the business could become unable to pay its debts on time while still
+            showing a profit, which is why liquidity, not profit, is what decides whether a business survives the next few months.
+          </p>
+        </div>
+      </div>
+    </section>
+    <p class="cluster">
+      <a class="btn" href="/finance-desk/contribution/">Back: contribution decisions (HL)</a>
+      <a class="btn" href="/finance-desk/">The Finance Desk</a>
+    </p>
+  </div>
+</BaseLayout>

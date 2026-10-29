@@ -112,6 +112,17 @@ describe('the eight-part workings', () => {
       'labour-turnover': { leavers: 28, averageEmployees: 54 },
       'special-order': { orderPrice: 11, variableCost: 5.85, quantity: 300, extraFixedCosts: 150 },
       'expected-value': { cost: 10, p1: 0.6, x1: 95, p2: 0.4, x2: 30 },
+      // Ratio analysis: checked in full in ratios.test.ts.
+      'gross-profit-margin': { grossProfit: 1920, salesRevenue: 9600 },
+      'profit-margin': { pbit: 384, salesRevenue: 9600 },
+      roce: { pbit: 384, nonCurrentLiabilities: 1650, equity: 3360 },
+      'current-ratio': { currentAssets: 1727, currentLiabilities: 1307 },
+      'acid-test-ratio': { currentAssets: 1727, stock: 290, currentLiabilities: 1307 },
+      'stock-turnover-times': { costOfSales: 7680, openingStock: 230, closingStock: 290 },
+      'stock-turnover-days': { costOfSales: 7680, openingStock: 230, closingStock: 290 },
+      'debtor-days': { debtors: 1420, salesRevenue: 9600 },
+      'creditor-days': { creditors: 1157, costOfSales: 7680 },
+      'gearing-ratio': { nonCurrentLiabilities: 1650, equity: 3360 },
     };
     expect(Object.keys(samples).sort()).toEqual(Object.keys(workings).sort());
     for (const [id, inputs] of Object.entries(samples)) {
