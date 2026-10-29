@@ -19,7 +19,7 @@ The Business Brief deploys as a **separate Vercel project** from Arjun Agrawal E
 
 ## First deployment
 
-1. Push the repository to GitHub (see the release report for its status).
+1. The source is at https://github.com/ArjunAgrawal101/the-business-brief (branch `main`).
 2. In Vercel, choose **Add New, Project**, and import the `the-business-brief` repository. Do not use or change the Economics project.
 3. Framework preset: Astro (detected from `vercel.json`). Leave the build settings as configured.
 4. Node.js version: 22.x for Astro 6.4.8. After the Astro 7.4 upgrade in SECURITY.md, choose 24.x.
