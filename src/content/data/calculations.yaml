@@ -364,3 +364,61 @@
     implication: It has the highest expected value of the three routes, but the decision also depends on control, quality and the founder's aims, which the number leaves out.
   provenance: aa-framework
   order: 13
+
+- id: net-cash-flow
+  name: Net cash flow
+  status: complete
+  group: cash-flow
+  syllabus: [{ code: '3.7', note: "Cash flow forecasts (AO2, AO4); the forecast's layout is the guide's figure 10 (p. 63)" }]
+  verification: primary
+  level: SL/HL
+  formula: Net cash flow = total cash inflows − total cash outflows
+  variables:
+    - { symbol: "NCF", meaning: "Net cash flow", unit: "currency per month" }
+    - { symbol: "CI", meaning: "Total cash inflows", unit: "currency per month" }
+    - { symbol: "CO", meaning: "Total cash outflows", unit: "currency per month" }
+  unit: currency per month
+  interpretation: Whether more cash came in than went out in the month. A negative net cash flow is not a loss; it can come from buying an asset or from customers paying late.
+  errors:
+    - Counting a sale made on credit as a cash inflow in the month of the sale.
+    - Leaving an asset purchase out of the forecast because it is not an expense.
+    - Writing a negative figure with a minus sign in a forecast laid out in the IB format, which uses brackets.
+  page: /finance-desk/cash-flow/
+  example:
+    title: "Atelier Barro: January, with the second kiln bought outright"
+    case: atelier-barro
+    currency: '€'
+    inputs: { inflows: 13420, outflows: 29442.80 }
+    interpretation: In January €16,022.80 more leaves the bank than comes in, because the €18,000 kiln is paid in a quiet month.
+    implication: The studio needs finance matched to the kiln's long life, or the balance breaks the overdraft limit.
+  provenance: aa-framework
+  order: 14
+
+- id: closing-balance
+  name: Closing balance
+  status: complete
+  group: cash-flow
+  syllabus: [{ code: '3.7', note: "Cash flow forecasts (AO2, AO4); the forecast's layout is the guide's figure 10 (p. 63)" }]
+  verification: primary
+  level: SL/HL
+  formula: Closing balance = opening balance + net cash flow
+  variables:
+    - { symbol: "CB", meaning: "Closing balance", unit: "currency at the end of the month" }
+    - { symbol: "OB", meaning: "Opening balance", unit: "currency at the start of the month" }
+    - { symbol: "NCF", meaning: "Net cash flow", unit: "currency per month" }
+  unit: currency at the end of the month
+  interpretation: The cash the business has at the end of the month, which becomes the next month's opening balance. A negative closing balance means the account is overdrawn.
+  errors:
+    - Starting each month from the same opening balance instead of carrying the previous closing balance forward.
+    - Adding a negative net cash flow as if it were positive.
+  page: /finance-desk/cash-flow/
+  example:
+    title: "Atelier Barro: January, with the second kiln bought outright"
+    case: atelier-barro
+    currency: '€'
+    inputs: { opening: 10732, inflows: 13420, outflows: 29442.80 }
+    interpretation: The account ends January overdrawn by €5,290.80, which is €3,290.80 beyond the €2,000 limit.
+    implication: Payments due in January could be refused, though the studio is profitable over the winter.
+  provenance: aa-framework
+  order: 15
+

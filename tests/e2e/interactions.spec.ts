@@ -186,6 +186,42 @@ test.describe('Exam Desk', () => {
   });
 });
 
+test.describe('Cash flow lab', () => {
+  test('the forecast changes with the way the kiln is paid for, and keeps the choice', async ({ page }) => {
+    await page.goto('/finance-desk/cash-flow/');
+    await ready(page, '[data-ix="cash-flow"]');
+    const lab = page.locator('[data-ix="cash-flow"]');
+    const closing = lab.locator('tr.cff__closing td');
+    await expect(closing.nth(2)).toHaveText('(5,290.80)');
+    await expect(lab.locator('[data-headline]')).toContainText('January');
+    await lab.locator('label:has(input[name="finance"][value="lease"])').click();
+    await expect(closing.nth(2)).toHaveText('12,189.20');
+    await expect(lab.locator('[data-figures]')).toContainText('€10,496.00');
+    await expect(lab.locator('[data-headline]')).toContainText('stays in credit');
+    await lab.locator('label:has(input[name="finance"][value="delay"])').click();
+    await expect(closing.nth(5)).toHaveText('(3,924.00)');
+    await expect(lab.locator('[data-headline]')).toContainText('April');
+    await lab.locator('label:has(input[name="measure"][value="overdraft"])').click();
+    await expect(lab.locator('tr.cff__status td').nth(5)).toHaveText('Overdrawn, within the limit');
+    await page.reload();
+    await ready(page, '[data-ix="cash-flow"]');
+    await expect(lab.locator('input[name="finance"][value="delay"]')).toBeChecked();
+    await expect(closing.nth(5)).toHaveText('(3,924.00)');
+    await lab.locator('[data-plan-reset]').click();
+    await expect(closing.nth(2)).toHaveText('(5,290.80)');
+  });
+
+  test('the questions check the reading of the forecast', async ({ page }) => {
+    await page.goto('/finance-desk/cash-flow/');
+    await ready(page, '[data-ix="quiz"]');
+    const item = page.locator('[data-item="why-differ"]');
+    await item.locator('label:has(input[value="kiln"])').click();
+    await item.locator('[data-check]').click();
+    await expect(item.locator('[data-key]')).toBeVisible();
+    await expect(item.locator('[data-verdict]')).toHaveText('Right');
+  });
+});
+
 test.describe('IA Studio', () => {
   test('the planner checks supporting documents, totals the marks and keeps the plan', async ({ page }) => {
     await page.goto('/ia-studio/');

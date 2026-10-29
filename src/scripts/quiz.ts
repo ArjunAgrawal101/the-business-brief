@@ -24,7 +24,7 @@ interface Item {
 
 interface Config {
   uid: string;
-  kind: 'cost' | 'errors' | 'ansoff' | 'styles' | 'functions';
+  kind: 'cost' | 'errors' | 'ansoff' | 'styles' | 'functions' | 'check';
   items: Item[];
   /** Labels for every option value, used in the board and the summary. */
   labels: Record<string, string>;
@@ -36,6 +36,7 @@ const VERDICTS: Record<Config['kind'], Record<Verdict, string>> = {
   ansoff: { right: 'Right', partial: 'Arguable', wrong: 'Not this one' },
   styles: { right: 'Strong fit', partial: 'Defensible', wrong: 'Weak fit' },
   functions: { right: 'Right', partial: 'Partly right', wrong: 'Not this one' },
+  check: { right: 'Right', partial: 'Partly right', wrong: 'Not this one' },
 };
 
 each('[data-ix="quiz"]', (root) => {

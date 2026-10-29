@@ -1,0 +1,123 @@
+# Atelier Barro's cash flow, November to April. A fictional business; every
+# figure is simulated. The costs are Exhibit 1 of the case (the rates from
+# November); November and December sales are Exhibit 5's seasonal figures; the
+# hotel order is Exhibits 4 and 5. tests/unit/cashflow.test.ts works the whole
+# forecast, every strategy and the profit reconciliation by hand.
+
+component: cash-flow-lab
+title: "Atelier Barro: will the cash last the winter?"
+purpose: >
+  The learner reads a six-month cash flow forecast in the guide's layout, finds the month the balance breaks the
+  overdraft limit, explains why a profitable business runs short of cash, then chooses how to pay for a new kiln and
+  which working capital measures to take, and sees the forecast, the chart and the profit reconciliation change. It
+  diagnoses treating profit as cash, treating an asset purchase as an expense, and expecting timing measures to fix
+  a structural shortfall.
+provenance: simulated-data
+case: atelier-barro
+scenario:
+  months: [November, December, January, February, March, April]
+  currency: '€'
+  opening: 1500
+  overdraftLimit: 2000
+  price: 22
+  sold: [830, 1020, 460, 500, 600, 640]
+  cardShare: 4
+  perUnit: { firing: 0.75, materials: 2.30, pieceRate: 2.40, packaging: 0.85 }
+  fixed: { rent: 1900, lease: 450, salaries: 4700, marketing: 480, overheads: 270, standingCharge: 340 }
+  order: { label: Casa Alfama Hotels order, units: 300, price: 11, packaging: 0.40, setup: 150, month: 0, paidMonth: 2 }
+  investment: { label: Second kiln, cost: 18000, month: 2, lifeYears: 10 }
+finance:
+  - id: buy
+    kind: buy
+    label: Buy it outright in January
+    note: Pay the €18,000 from the bank account, as Inês plans.
+  - id: lease
+    kind: lease
+    label: Lease it instead
+    note: €520 a month from January. No large payment, but a cost every month for as long as the lease runs.
+    monthly: 520
+  - id: loan
+    kind: loan
+    label: Borrow to buy it
+    note: A three-year bank loan of €18,000, repaid at €560 a month from February, of which about €60 is interest.
+    amount: 18000
+    repayment: 560
+    interest: 60
+  - id: delay
+    kind: delay
+    label: Buy it in April
+    note: Wait until after the quiet months, and pay the €18,000 in April.
+    month: 5
+  - id: none
+    kind: none
+    label: Do not buy it this winter
+    note: Keep one kiln, and turn away work above 1,200 mugs a month.
+measures:
+  - id: deposit
+    kind: deposit
+    label: Ask the hotel for a deposit
+    note: Half the €3,300 when the order is placed in November, the rest on its 60-day terms.
+    share: 50
+  - id: credit
+    kind: credit
+    label: Ask the clay supplier for 30 days' credit
+    note: Each month's clay and glaze is paid for a month later.
+    months: 1
+  - id: cut
+    kind: cut-marketing
+    label: Cut marketing to €200 a month from January
+    note: Saves €280 a month, if online sales hold up without it.
+    value: 200
+    from: 2
+  - id: overdraft
+    kind: overdraft
+    label: Ask the bank to raise the overdraft limit to €7,000
+    note: The balance does not change; the limit does, at the bank's interest rate.
+    limit: 7000
+questions:
+  - id: first-month
+    prompt: In the forecast as it stands, in which month does the closing balance first go beyond the overdraft limit?
+    options:
+      - { value: '0', label: November }
+      - { value: '1', label: December }
+      - { value: '2', label: January }
+      - { value: '3', label: February }
+    right: ['2']
+    answer: January, at (5,290.80) against a limit of 2,000.
+    explanation: >
+      January's net cash flow is (16,022.80): the €18,000 kiln is paid in the same month as the quietest sales of the
+      winter. The hotel's €3,300 arrives in January too, but it is far too small to cover the kiln. February is the lowest
+      point, at (6,020.80), because sales are still low and nothing is left to absorb the shortfall.
+  - id: why-differ
+    prompt: >
+      Over the six months the studio makes a profit of €11,976, yet its net cash flow is a negative €5,424. What
+      explains most of the difference?
+    options:
+      - { value: hotel, label: The hotel pays 60 days after delivery. }
+      - { value: kiln, label: 'The kiln is paid for in cash, but as an asset it is not an expense; only its depreciation is.' }
+      - { value: fees, label: Card and platform fees are taken from every sale. }
+      - { value: wages, label: The throwers are paid for every mug they make. }
+    right: [kiln]
+    answer: The kiln.
+    explanation: >
+      The €18,000 leaves the bank in January, but the statement of profit or loss charges only depreciation, €150 a
+      month over a ten-year life, so €600 for January to April. 18,000 minus 600 is 17,400, exactly the gap between a
+      profit of €11,976 and a net cash flow of (5,424). The hotel's late payment matters within the winter (the money
+      arrives in January, not November), but by April it has been received, so it explains none of the six-month gap.
+      Fees and piece rates are real costs that reduce profit and cash equally.
+  - id: right-finance
+    prompt: Which way of paying for the kiln deals with the problem, rather than moving it?
+    options:
+      - { value: lease-loan, label: Leasing it or borrowing to buy it }
+      - { value: delay, label: Buying it in April instead }
+      - { value: deposit, label: Asking the hotel for a deposit }
+      - { value: overdraft, label: Raising the overdraft limit }
+    right: [lease-loan]
+    partial: [overdraft]
+    answer: Leasing or borrowing.
+    explanation: >
+      Both spread the cost of an asset that will earn money for ten years over the years it is used, which is the
+      match between the source of finance and its use that the problem needed. Buying in April only moves the shortfall
+      to April. A deposit changes when €1,650 arrives, not the €18,000 outflow. A larger overdraft keeps the bank
+      paying, at a short-term interest rate, for four months of a long-term purchase: it works, but it is the most
+      expensive and least secure answer.

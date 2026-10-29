@@ -1,0 +1,439 @@
+---
+/**
+ * Finance Desk: the cash flow lab. The default forecast is rendered on the
+ * server from src/lib/cashflow.ts; the script recalculates the forecast, the
+ * chart, the figures, the profit reconciliation and the working as the
+ * learner changes how the kiln is paid for and which measures are taken.
+ */
+import QuizShell from './parts/QuizShell.astro';
+import Choice from './parts/Choice.astro';
+import Key from './parts/Key.astro';
+import CheckRow from './parts/CheckRow.astro';
+import { forecast, readForecast, type FinanceOption, type Measure } from '../../lib/cashflow';
+import { cashFlowSvg } from '../../lib/cashflow-chart';
+import { cashFiguresHtml, closingWorking, forecastBodyHtml, profitToCashHtml } from '../../lib/cashflow-render';
+import { workingHtml } from '../../lib/render';
+import { esc, inline, jsonForScript } from '../../lib/markup';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'cash-flow-lab' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const S = data.scenario;
+const cur = S.currency;
+const base = forecast(S, data.finance[0] as FinanceOption, []);
+// One scale for every combination, so the bars move while the axis stays put.
+const subsets = (xs: Measure[]): Measure[][] => xs.reduce<Measure[][]>((acc, m) => [...acc, ...acc.map((a) => [...a, m])], [[]]);
+const all = data.finance.flatMap((fo) => subsets(data.measures as Measure[]).map((ms) => forecast(S, fo as FinanceOption, ms)));
+const scaleMin = Math.min(...all.flatMap((f) => [...f.closing, -f.limit]));
+const scaleMax = Math.max(...all.flatMap((f) => f.closing));
+const reading = readForecast(base, cur);
+const wMonth = base.firstBeyond ?? base.lowest.month;
+const w = closingWorking(base, wMonth, cur);
+const config = { uid, scenario: S, finance: data.finance, measures: data.measures, scaleMin, scaleMax };
+const quiz = {
+  uid: `${uid}-q`,
+  kind: 'check',
+  labels: Object.fromEntries(data.questions.flatMap((q) => q.options.map((o) => [o.value, o.label]))),
+  items: data.questions.map((q) => ({ id: q.id, groups: [{ name: 'a', legend: 'An answer', right: q.right, partial: q.partial }] })),
+};
+---
+
+<div class="cfl" data-ix="cash-flow" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The lab could not start. The forecast below is the one before any change.</p>
+
+  <section class="cfl__part" aria-labelledby={`${uid}-q-h`}>
+    <h4 class="label label--ink" id={`${uid}-q-h`}>1. Read the forecast</h4>
+    <p class="small">Answer from the forecast as it stands, before changing anything.</p>
+    <QuizShell uid={`${uid}-q`} kind="check" config={quiz} count={data.questions.length}>
+      {
+        data.questions.map((q, k) => (
+          <li class="quiz__item" data-item={q.id}>
+            <div class="cfl__qhead">
+              <span class="quiz__no" aria-hidden="true">{String(k + 1).padStart(2, '0')}</span>
+              <p set:html={inline(q.prompt)} />
+            </div>
+            <Choice uid={`${uid}-q`} itemId={q.id} name="a" legend="An answer" options={q.options} layout="lines" showLegend={false} />
+            <CheckRow />
+            <Key answerLabel="Answer:" answer={q.answer} explanation={q.explanation} />
+          </li>
+        ))
+      }
+    </QuizShell>
+  </section>
+
+  <section class="cfl__part" aria-labelledby={`${uid}-f-h`}>
+    <h4 class="label label--ink" id={`${uid}-f-h`}>2. The forecast</h4>
+    <div class="cfl__reading" data-reading aria-live="polite">
+      <p class="cfl__headline" data-headline>{reading.headline}</p>
+      <p class="small" data-detail>{reading.detail}</p>
+    </div>
+    <div class="cfl__grid">
+      <figure class="cfl__chart">
+        <div class="chart-scroll" role="region" aria-label="Closing balance chart" tabindex="0" data-chart set:html={cashFlowSvg(base, { currency: cur, id: `${uid}-chart`, scaleMin, scaleMax })} />
+        <figcaption class="exhibit__source">
+          <b>Chart</b> Closing balance each month: blue in credit, brass overdrawn within the limit, red beyond it; the dashed line is the overdraft limit. Simulated teaching data; the forecast table below has every figure.
+        </figcaption>
+      </figure>
+      <dl class="figs cfl__figs" data-figures set:html={cashFiguresHtml(base, cur)} />
+    </div>
+    <div class="table-scroll cfl__table" role="region" aria-label="Cash flow forecast" tabindex="0">
+      <table class="table cff">
+        <caption>
+          Cash flow forecast for Atelier Barro, {S.months[0]} to {S.months[S.months.length - 1]}. <span class="muted">Simulated data. Negative figures in brackets.</span>
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col" class="cff__unit">All figures in {cur}</th>
+            {S.months.map((m) => <th scope="col" class="n">{m}</th>)}
+          </tr>
+        </thead>
+        <tbody data-table set:html={forecastBodyHtml(base)} />
+      </table>
+    </div>
+  </section>
+
+  <section class="cfl__part" aria-labelledby={`${uid}-s-h`}>
+    <h4 class="label label--ink" id={`${uid}-s-h`}>3. Change the plan</h4>
+    <form class="cfl__form" data-form aria-label="Cash flow strategies">
+      <fieldset class="cfl__set">
+        <legend>Pay for the second kiln</legend>
+        {
+          data.finance.map((fo, k) => (
+            <label class="cfl__opt">
+              <input type="radio" name="finance" value={fo.id} checked={k === 0} />
+              <span>
+                <span class="cfl__opt-label">{fo.label}</span>
+                <span class="cfl__opt-note">{fo.note}</span>
+              </span>
+            </label>
+          ))
+        }
+      </fieldset>
+      <fieldset class="cfl__set">
+        <legend>Working capital measures <span class="small muted">(any number)</span></legend>
+        {
+          data.measures.map((m) => (
+            <label class="cfl__opt">
+              <input type="checkbox" name="measure" value={m.id} />
+              <span>
+                <span class="cfl__opt-label">{m.label}</span>
+                <span class="cfl__opt-note">{m.note}</span>
+              </span>
+            </label>
+          ))
+        }
+      </fieldset>
+      <p class="cluster js-only">
+        <button type="button" class="btn btn--small" data-plan-reset>Back to the original plan</button>
+        <span class="small muted" data-change aria-live="polite"></span>
+      </p>
+      <p class="nojs-only small muted">With JavaScript off, the forecast shows the original plan only. The answers to the questions above explain what each choice would do.</p>
+    </form>
+  </section>
+
+  <section class="cfl__part" aria-labelledby={`${uid}-p-h`}>
+    <h4 class="label label--ink" id={`${uid}-p-h`}>4. Profit is not cash</h4>
+    <p class="small">
+      Profit counts revenue when it is earned and costs when they are incurred. The forecast counts cash when it moves. The reconciliation explains every
+      euro of the difference.
+    </p>
+    <div data-p2c set:html={profitToCashHtml(base, cur)} />
+  </section>
+
+  <section class="cfl__part" aria-labelledby={`${uid}-w-h`}>
+    <h4 class="label label--ink" id={`${uid}-w-h`}>5. The working: <span data-w-month>{S.months[wMonth]}</span>'s closing balance</h4>
+    <div data-working set:html={workingHtml(w.working, esc(w.interpretation), esc(w.implication))} />
+  </section>
+  <p class="sr-only" aria-live="polite" data-cf-status></p>
+</div>
+
+<script>
+  import '../../scripts/cash-flow';
+</script>
+
+<style>
+  .cfl {
+    display: grid;
+    gap: var(--sp-6);
+  }
+
+  .cfl__part {
+    display: grid;
+    gap: var(--sp-3);
+    min-width: 0;
+  }
+
+  .cfl__part > * {
+    min-width: 0;
+  }
+
+  .cfl__qhead {
+    display: flex;
+    gap: var(--sp-3);
+    align-items: baseline;
+  }
+
+  .cfl__qhead p {
+    margin: 0;
+    font-weight: 560;
+    color: var(--text-strong);
+  }
+
+  .cfl__reading {
+    padding: var(--sp-3) var(--sp-4);
+    border-left: 4px solid var(--bb-ink);
+    background: #fff;
+  }
+
+  .cfl__headline {
+    margin: 0;
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .cfl__reading .small {
+    margin: var(--sp-1) 0 0;
+  }
+
+  .cfl__grid {
+    display: grid;
+    gap: var(--sp-4) var(--sp-5);
+    align-items: start;
+  }
+
+  @media (min-width: 60rem) {
+    .cfl__grid {
+      grid-template-columns: minmax(0, 1.6fr) minmax(14rem, 1fr);
+    }
+  }
+
+  .cfl__chart {
+    margin: 0;
+  }
+
+  .cfl__figs {
+    margin: 0;
+  }
+
+  .cfl__table {
+    margin-top: var(--sp-2);
+  }
+
+  .cff {
+    min-width: 46rem;
+    table-layout: fixed;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cff thead th:first-child {
+    width: 15.5rem;
+  }
+
+  .cff caption {
+    padding-bottom: var(--sp-2);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .cff th[scope="col"] {
+    white-space: nowrap;
+  }
+
+  .cff__unit {
+    font-style: italic;
+  }
+
+  .cff :global(td.n) {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    padding-left: var(--sp-3);
+  }
+
+  .cff :global(tr.cff__head th) {
+    padding-top: var(--sp-3);
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  .cff :global(tr.cff__key th),
+  .cff :global(tr.cff__total th) {
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  .cff :global(tr.cff__total td),
+  .cff :global(tr.cff__key td) {
+    font-weight: 600;
+  }
+
+  .cff :global(tr.cff__total td) {
+    border-top: 1px solid var(--rule-ink);
+  }
+
+  .cff :global(tr.cff__gap td) {
+    height: 0.5rem;
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  .cff :global(tr.cff__closing td) {
+    border-top: 1px solid var(--rule-ink);
+    border-bottom: 2px solid var(--rule-ink);
+  }
+
+  .cff :global(td.cff__close--overdraft) {
+    background: var(--surface-partial);
+  }
+
+  .cff :global(td.cff__close--beyond) {
+    background: var(--surface-wrong);
+    color: var(--signal-text);
+  }
+
+  .cff :global(tr.cff__status td) {
+    font-size: 0.75rem;
+    line-height: 1.3;
+    color: var(--text-muted);
+  }
+
+  .cff :global(td.cff__st--beyond) {
+    font-weight: 700;
+    color: var(--signal-text);
+  }
+
+  .cff :global(tr.cff__status th) {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .cff :global(td[data-changed]) {
+      animation: cff-flash 1.2s var(--ease-out) both;
+    }
+
+    .cff :global(tr[data-new] th) {
+      animation: bb-arrive var(--dur-slow) var(--ease-out) both;
+    }
+  }
+
+  @keyframes cff-flash {
+    from {
+      box-shadow: inset 0 0 0 999px rgba(49, 92, 255, 0.16);
+    }
+
+    to {
+      box-shadow: inset 0 0 0 999px rgba(49, 92, 255, 0);
+    }
+  }
+
+  .cfl__form {
+    display: grid;
+    gap: var(--sp-4);
+  }
+
+  @media (min-width: 60rem) {
+    .cfl__form {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+
+    .cfl__form > p {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .cfl__set {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .cfl__set legend {
+    margin-bottom: var(--sp-2);
+    padding: 0;
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .cfl__opt {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--sp-3);
+    align-items: start;
+    padding: var(--sp-3);
+    border: 1px solid var(--rule);
+    background: #fff;
+    cursor: pointer;
+  }
+
+  .cfl__opt:hover {
+    border-color: var(--bb-ink);
+  }
+
+  .cfl__opt:has(input:checked) {
+    border-color: var(--bb-cobalt);
+    box-shadow: inset 3px 0 0 var(--bb-cobalt);
+  }
+
+  .cfl__opt:has(input:focus-visible) {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .cfl__opt input {
+    width: 1.125rem;
+    height: 1.125rem;
+    margin: 0.15rem 0 0;
+    accent-color: var(--bb-cobalt);
+  }
+
+  .cfl__opt-label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .cfl__opt-note {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .cfl :global(.p2c) {
+    display: grid;
+    gap: var(--sp-4) var(--sp-6);
+  }
+
+  @media (min-width: 60rem) {
+    .cfl :global(.p2c) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .cfl :global(.p2c__table td.n) {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
+
+  .cfl :global(.p2c__table th) {
+    font-weight: 500;
+  }
+
+  .cfl :global(.p2c__total th),
+  .cfl :global(.p2c__total td) {
+    border-top: 1px solid var(--rule-ink);
+    border-bottom: 2px solid var(--rule-ink);
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+</style>

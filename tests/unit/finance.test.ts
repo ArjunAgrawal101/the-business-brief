@@ -112,6 +112,8 @@ describe('the eight-part workings', () => {
       'labour-turnover': { leavers: 28, averageEmployees: 54 },
       'special-order': { orderPrice: 11, variableCost: 5.85, quantity: 300, extraFixedCosts: 150 },
       'expected-value': { cost: 10, p1: 0.6, x1: 95, p2: 0.4, x2: 30 },
+      'net-cash-flow': { inflows: 13420, outflows: 29442.8 },
+      'closing-balance': { opening: 10732, inflows: 13420, outflows: 29442.8 },
     };
     expect(Object.keys(samples).sort()).toEqual(Object.keys(workings).sort());
     for (const [id, inputs] of Object.entries(samples)) {
@@ -124,6 +126,14 @@ describe('the eight-part workings', () => {
       expect(w.unit, id).not.toBe('');
       expect(w.error, id).toBeUndefined();
     }
+  });
+
+  it('net cash flow and closing balance follow the forecast for January', () => {
+    // 13,420 - 29,442.80 = -16,022.80; 10,732 - 16,022.80 = -5,290.80
+    expect(buildWorking('net-cash-flow', { inflows: 13420, outflows: 29442.8 }, '€').value).toBe(-16022.8);
+    const w = buildWorking('closing-balance', { opening: 10732, inflows: 13420, outflows: 29442.8 }, '€');
+    expect(w.value).toBe(-5290.8);
+    expect(w.answer).toBe('−€5,290.80');
   });
 
   it('break-even quantity explains the rounding with the loss one unit short', () => {

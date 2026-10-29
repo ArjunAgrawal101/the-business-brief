@@ -1,0 +1,111 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import Interactive from '../../components/interactive/Interactive.astro';
+import CalcCard from '../../components/finance/CalcCard.astro';
+import VerifyTag from '../../components/ui/VerifyTag.astro';
+import { corpus, href } from '../../lib/content';
+
+const PATH = '/finance-desk/cash-flow/';
+const c = await corpus();
+const calcs = Object.entries(c.calculations)
+  .filter(([, k]) => k.page === PATH)
+  .sort((a, b) => a[1].order - b[1].order);
+const sub = c.curricula['ib-dp-bm']?.units.flatMap((u) => u.subtopics).find((s) => s.code === '3.7');
+---
+
+<BaseLayout title="Cash flow: Finance Desk" description="A six-month cash flow forecast in the IB layout for a fictional ceramics studio: find the month the cash runs out, see why profit is not cash, and test ways of paying for a new kiln." section="finance-desk">
+  <PageIntro
+    trail={[{ label: 'Finance Desk', href: '/finance-desk/' }, { label: 'Cash flow' }]}
+    kicker="Finance Desk"
+    title="Will the cash last the winter?"
+    lead="A profitable business can still run out of cash. Read a six-month forecast laid out as the IB lays it out, find the month the money runs short, explain why the profit does not help, then change the plan and watch the forecast change with it."
+  />
+  <div class="wrap page-body">
+    <section aria-labelledby="sit-h">
+      <SectionHead no={1} title="The situation" id="sit-h" />
+      <div class="grid grid--2" style="margin-top:var(--sp-4)">
+        <div class="prose">
+          <p>
+            It is the end of October at <a href={href.case('atelier-barro')}>Atelier Barro</a>, the fictional ceramics studio in Porto. Inês has accepted the hotel
+            group's order of 300 mugs at €11, to be made in November and paid for on the hotel's usual terms, 60 days after delivery. The busy season is
+            coming: about 830 mugs in November and 1,020 in December.
+          </p>
+          <p>
+            With the hotel likely to order again next year, Inês plans to buy a second kiln in January, for €18,000, and pay for it from the bank account. Her
+            accountant has asked to see a cash flow forecast first. The studio has €1,500 in the bank and an agreed overdraft of €2,000.
+          </p>
+        </div>
+        <aside class="cfl-assume" aria-labelledby="assume-h">
+          <h3 class="label label--ink" id="assume-h">What the forecast assumes</h3>
+          <div>
+            <ul class="small">
+              <li>Prices and costs are those of the case's cost ledger from November: €22 a mug; per mug, €2.40 piece rate, €2.30 clay and glaze, €0.75 firing and €0.85 packaging; a 4% card and platform fee.</li>
+              <li>Monthly costs: rent €1,900, kiln lease €450, salaries €4,700, marketing €480, insurance, website and software €270, electricity standing charge €340.</li>
+              <li>The hotel's mugs cost €5.85 each to make (bulk packaging at €0.40, no card fee) and need a €150 stamp.</li>
+              <li>Sales of 460, 500, 600 and 640 mugs from January to April, after the season. Workshop and firing income is left out, as Inês leaves it out.</li>
+              <li>Every cost is paid in the month it arises, and the forecast ignores overdraft interest.</li>
+              <li>For the profit comparison, the kiln is depreciated over ten years with no residual value: €150 a month.</li>
+              <li>All of it is simulated teaching data.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+      {
+        sub && (
+          <p class="small muted" style="margin-top:var(--sp-3)">
+            Subtopic 3.7, Cash flow (guide, pp. 29 to 30): {sub.content.map((x) => x.text.toLowerCase()).join('; ')}. The forecast follows
+            the layout of the guide's cash flow forecast (figure 10, p. 63). <VerifyTag status="primary" />
+          </p>
+        )
+      }
+    </section>
+    <section aria-labelledby="lab-h">
+      <SectionHead no={2} title="The lab" id="lab-h" />
+      <div style="margin-top:var(--sp-5)">
+        <Interactive
+          component="cash-flow-lab"
+          refId="finance-cashflow-atelier"
+          title="Atelier Barro's cash flow, November to April"
+          intro="Answer three questions from the forecast as it stands. Then choose how to pay for the kiln, add any working capital measures, and compare the results."
+          provenance="simulated-data"
+          headingLevel={3}
+        />
+      </div>
+    </section>
+    <section aria-labelledby="calcs-h">
+      <SectionHead no={3} title="The calculations" dek="Each with a worked example from the forecast." id="calcs-h" />
+      <div class="stack stack-lg" style="margin-top:var(--sp-5)">
+        {calcs.map(([id, k]) => <CalcCard id={id} calc={k} headingLevel={3} />)}
+      </div>
+    </section>
+    <aside class="callout callout--exam">
+      <span class="callout__kicker">In an answer</span>
+      <div class="prose">
+        <p>
+          Strategies for cash flow problems are evaluated (AO3), so a list is not enough. For each one, say what it does to inflows or outflows, whether it
+          fixes the cause or only the timing, what it costs, and what could go wrong. Here, the cause is a long-lived asset paid for from working capital.
+        </p>
+      </div>
+    </aside>
+    <p class="cluster">
+      <a class="btn" href="/finance-desk/break-even/">Back: break-even</a>
+      <a class="btn" href="/finance-desk/">The Finance Desk</a>
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .cfl-assume {
+    padding: var(--sp-4) var(--sp-5);
+    border: 1px solid var(--rule);
+    background: var(--surface-sheet);
+  }
+
+  .cfl-assume ul {
+    display: grid;
+    gap: var(--sp-2);
+    margin: var(--sp-3) 0 0;
+  }
+</style>

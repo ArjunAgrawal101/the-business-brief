@@ -172,3 +172,30 @@ Every topic and revision brief.
 | **Feedback** | The answer, and a running count of got it, partly and not yet |
 | **Misconception diagnosed** | Rereading is revising |
 | **Objective** | Long-term retention through retrieval practice |
+
+## 14. IA planner
+
+On the IA Studio page.
+
+| | |
+| --- | --- |
+| **The learner does** | Works through ten steps that follow the IB teacher support material's guidance for the IA: timeline, requirements, question, concept, proposal, supporting documents, drafting, feedback, self-marking, submission |
+| **Must understand** | The guide's requirements for the research project, and why the supporting documents decide so much of the mark |
+| **Decides or infers** | The organization, issue, question and lens; which candidate documents to keep; a self-assessed mark for each criterion and what would earn one more |
+| **Feedback** | Checks on the selected documents (three to five, at most one transcript, no textbooks, published within three years of the submission month, about five A4 pages, more than one publisher), the earliest allowed publication month, the date to self-mark by, words left or over, a running total of self-marks, steps done; every check gives its page in the guide or the TSM |
+| **Misconception diagnosed** | More documents are better (more than five limits criterion B to 1); any article will do whatever its age; the concept can be added at the end |
+| **Objective** | A plan that meets the requirements before the writing starts |
+
+## 15. Cash flow lab
+
+`finance-cashflow-atelier`, on the Finance Desk cash flow page.
+
+| | |
+| --- | --- |
+| **The learner does** | Reads a six-month forecast for Atelier Barro in the guide's layout, answers three questions on it, then chooses how to pay for a €18,000 kiln (buy, lease, borrow, delay, do not buy) and any of four working capital measures |
+| **Must understand** | Profit and cash are different; an asset bought from working capital can break a profitable business's overdraft; timing measures move cash, finance matched to the asset's life fixes the shortfall |
+| **Decides or infers** | The first month beyond the limit, the main reason profit and cash differ, the way of paying that deals with the problem rather than moving it |
+| **Feedback** | The table (opening balance, inflows, outflows, net cash flow, closing balance, negatives in brackets), a status for every month against the overdraft limit, the chart easing to the new balances, changed cells marked, a reading, the profit for the period and a reconciliation of profit to net cash flow, and the eight-part working for the critical month |
+| **Misconception diagnosed** | A profitable business cannot run out of cash; buying an asset is an expense; asking customers to pay sooner solves any cash problem; a bigger overdraft is a free answer |
+| **Objective** | Construct and interpret a cash flow forecast, and evaluate strategies for dealing with cash flow problems (3.7) |
+

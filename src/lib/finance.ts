@@ -513,6 +513,44 @@ export const workings: Record<string, WorkingBuilder> = {
   },
 
   /** Inputs: cost, then p1 and x1, p2 and x2, and so on, for the outcomes at the chance node. */
+  'net-cash-flow': (inputs, s) => {
+    const [cin, cout] = need(inputs, 'inflows', 'outflows');
+    const net = round(cin - cout, 2);
+    return {
+      given: [
+        { label: 'Total cash inflows in the month', value: m2(cin, s) },
+        { label: 'Total cash outflows in the month', value: m2(cout, s) },
+      ],
+      formula: 'Net cash flow = total cash inflows − total cash outflows',
+      substitution: `= ${m2(cin, s)} − ${m2(cout, s)}`,
+      steps: [`${m2(cin, s)} − ${m2(cout, s)} = ${m2(net, s)}`],
+      answer: m2(net, s),
+      value: net,
+      unit: 'currency per month',
+      note: net < 0 ? 'A negative net cash flow is written in brackets in a forecast.' : undefined,
+    };
+  },
+
+  'closing-balance': (inputs, s) => {
+    const [open, cin, cout] = need(inputs, 'opening', 'inflows', 'outflows');
+    const net = round(cin - cout, 2);
+    const close = round(open + net, 2);
+    return {
+      given: [
+        { label: 'Opening balance', value: m2(open, s) },
+        { label: 'Total cash inflows', value: m2(cin, s) },
+        { label: 'Total cash outflows', value: m2(cout, s) },
+      ],
+      formula: 'Closing balance = opening balance + net cash flow',
+      substitution: `= ${m2(open, s)} + (${m2(cin, s)} − ${m2(cout, s)})`,
+      steps: [`${m2(cin, s)} − ${m2(cout, s)} = ${m2(net, s)}`, `${m2(open, s)} + (${m2(net, s)}) = ${m2(close, s)}`],
+      answer: m2(close, s),
+      value: close,
+      unit: 'currency at the end of the month',
+      note: 'The closing balance is the next month’s opening balance.',
+    };
+  },
+
   'expected-value': (inputs, s) => {
     const [cost] = need(inputs, 'cost');
     const outcomes = [];

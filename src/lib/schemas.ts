@@ -912,6 +912,62 @@ export const interactiveSchema = z.discriminatedUnion('component', [
     hints: z.record(z.string(), z.string()).default({}),
     questions: z.array(z.string()).min(2),
   }),
+  z.object({
+    component: z.literal('cash-flow-lab'),
+    ...interactiveBase,
+    case: z.string(),
+    /** The months, the opening balance and every assumption behind the forecast (see src/lib/cashflow.ts). */
+    scenario: z.object({
+      months: z.array(z.string()).min(3).max(12),
+      currency: z.string(),
+      opening: z.number(),
+      overdraftLimit: z.number().nonnegative(),
+      price: z.number().positive(),
+      sold: z.array(z.number().int().nonnegative()),
+      cardShare: z.number().min(0).max(100),
+      perUnit: z.object({ firing: z.number(), materials: z.number(), pieceRate: z.number(), packaging: z.number() }),
+      fixed: z.object({ rent: z.number(), lease: z.number(), salaries: z.number(), marketing: z.number(), overheads: z.number(), standingCharge: z.number() }),
+      order: z.object({ label: z.string(), units: z.number().int().positive(), price: z.number().positive(), packaging: z.number(), setup: z.number(), month: z.number().int().nonnegative(), paidMonth: z.number().int().nonnegative() }),
+      investment: z.object({ label: z.string(), cost: z.number().positive(), month: z.number().int().nonnegative(), lifeYears: z.number().positive() }),
+    }),
+    /** Ways of paying for the investment: the learner chooses one. */
+    finance: z
+      .array(
+        z.discriminatedUnion('kind', [
+          z.object({ id: z.string(), kind: z.literal('buy'), label: z.string(), note: z.string() }),
+          z.object({ id: z.string(), kind: z.literal('lease'), label: z.string(), note: z.string(), monthly: z.number().positive() }),
+          z.object({ id: z.string(), kind: z.literal('loan'), label: z.string(), note: z.string(), amount: z.number().positive(), repayment: z.number().positive(), interest: z.number().nonnegative() }),
+          z.object({ id: z.string(), kind: z.literal('delay'), label: z.string(), note: z.string(), month: z.number().int().nonnegative() }),
+          z.object({ id: z.string(), kind: z.literal('none'), label: z.string(), note: z.string() }),
+        ]),
+      )
+      .min(2),
+    /** Working capital measures: the learner may combine any of them. */
+    measures: z
+      .array(
+        z.discriminatedUnion('kind', [
+          z.object({ id: z.string(), kind: z.literal('deposit'), label: z.string(), note: z.string(), share: z.number().min(0).max(100) }),
+          z.object({ id: z.string(), kind: z.literal('credit'), label: z.string(), note: z.string(), months: z.number().int().min(1).max(3) }),
+          z.object({ id: z.string(), kind: z.literal('cut-marketing'), label: z.string(), note: z.string(), value: z.number().nonnegative(), from: z.number().int().nonnegative() }),
+          z.object({ id: z.string(), kind: z.literal('overdraft'), label: z.string(), note: z.string(), limit: z.number().positive() }),
+        ]),
+      )
+      .default([]),
+    /** Questions on the default forecast, checked with the shared quiz engine. */
+    questions: z
+      .array(
+        z.object({
+          id: z.string(),
+          prompt: md,
+          options: z.array(z.object({ value: z.string(), label: z.string() })).min(2),
+          right: z.array(z.string()).min(1),
+          partial: z.array(z.string()).default([]),
+          answer: z.string(),
+          explanation: md,
+        }),
+      )
+      .min(1),
+  }),
 ]);
 export type Interactive = z.infer<typeof interactiveSchema>;
 export type Assessment = AssessmentComponent;
