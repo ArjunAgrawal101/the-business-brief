@@ -28,7 +28,9 @@ for (const [id, g] of Object.entries(c.glossary)) entries.push({ kind: 'Glossary
 for (const [, ct] of Object.entries(c.commandTerms)) entries.push({ kind: 'Command term', title: ct.term, url: href.commandTerm(ct.term), text: ct.definition });
 for (const [id, k] of Object.entries(c.concepts)) entries.push({ kind: 'Concept', title: k.name, url: href.concept(id), text: plain(k.summary) });
 for (const p of await pathwaysInOrder()) entries.push({ kind: 'Pathway', title: p.data.name, url: href.pathway(p.id), text: p.data.promise });
-for (const m of await modulesInOrder()) if (m.data.href) entries.push({ kind: 'Module', title: m.data.name, url: m.data.href, text: m.data.purpose });
+for (const m of await modulesInOrder()) if (m.data.href) entries.push({ kind: 'Room', title: m.data.name, url: m.data.href, text: m.data.purpose });
+for (const [id, it] of Object.entries(c.interactives))
+  if (it.page) entries.push({ kind: it.component === 'case-lab' ? 'Case lab' : 'Interaction', title: it.title, url: `${it.page}#ix-${id}`, text: plain(it.purpose) });
 const cur = c.curricula['ib-dp-bm'];
 cur?.units.forEach((u) =>
   u.subtopics.forEach((s) =>

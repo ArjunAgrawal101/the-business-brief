@@ -23,7 +23,7 @@
 | P0 accuracy | Labour turnover is HL-only content (2.4) but was taught and practised at SL in the leadership brief |
 | P0 accuracy | The costs brief taught contribution and break-even (5.5) under 3.3 without saying so; semi-variable costs are not in the guide's list of cost types |
 | P0 accuracy | Command term definitions were quoted from the IB Economics guide; the guide's notice on use by resource platforms makes the platform's own wording the safer course |
-| P0 security | Astro 6.4.8 has published advisories (low exposure for a static site; see SECURITY.md). The fix, Astro 7.4, needs Node 22.23.4 or later, which this environment does not have. Unchanged; documented |
+| P0 security | Astro 6.4.8 has published advisories (low exposure for a static site; see SECURITY.md). The fix, Astro 7.4, needs Node 22.23.4 or later, which this environment does not have. Unchanged; documented, and still open |
 | P1 experience | No motion system: no page transitions, no considered reveals, charts redraw without transition |
 | P1 experience | The home page is text-led; environments have no visual identity of their own; the desktop header has no route to the full list of rooms |
 | P1 experience | Five environments (Market Studio, Operations Floor, Boardroom, People and Culture, Strategy Studio) are planned or thin |
@@ -51,12 +51,12 @@ The enhancement keeps these differences: no serif display headlines, no burgundy
 
 | Priority | Work | Status |
 | --- | --- | --- |
-| P0 | Verify the whole IB mapping against the guide and correct the content (section 1) | This phase |
-| P0 | State assessment facts from the guide with page references; rewrite command terms in the platform's words at the right AO levels | This phase |
-| P1 | Motion system: native page transitions, restrained reveals, animated chart updates, all off under reduced motion | This phase |
-| P1 | Icon set and section identities for each environment; home page and navigation refinement | This phase |
-| P1 | One complete staged case lab | This phase |
-| P1 | One polished quantitative experience: a cash flow forecast lab in the IB layout | This phase |
-| P2 | Finance Desk: ratios and investment appraisal; Market Studio, Operations Floor, People and Culture with working tools | This phase, as far as quality allows |
-| P2 | Progress on this device; a course map | This phase, as far as quality allows |
+| P0 | Verify the whole IB mapping against the guide and correct the content (section 1) | Done in 0.2.0 |
+| P0 | State assessment facts from the guide with page references; rewrite command terms in the platform's words at the right AO levels | Done in 0.2.0 |
+| P1 | Motion system: native page transitions, restrained reveals, animated chart updates, all off under reduced motion | Done in 0.2.0 |
+| P1 | Icon set and section identities for each environment; home page and navigation refinement | Done in 0.2.0 |
+| P1 | One complete staged case lab | Done in 0.2.0: the Halden diagnosis lab (problem, cause, strategy, implementation, evaluation). An analysis-chain lab is next |
+| P1 | One polished quantitative experience: a cash flow forecast lab in the IB layout | Done in 0.2.0 |
+| P2 | Finance Desk: ratios and investment appraisal; Market Studio, Operations Floor, People and Culture with working tools | Done in 0.2.0, except a new People and Culture tool (the organization chart explorer is planned) |
+| P2 | Progress on this device; a course map | Done in 0.2.0 |
 | P3 | Boardroom simulations, recommendations across topics, accounts, analytics | Later, after testing with learners |

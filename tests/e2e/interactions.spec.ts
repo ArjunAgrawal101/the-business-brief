@@ -194,7 +194,7 @@ test.describe('Exam Desk', () => {
   test('the filters narrow the practice set', async ({ page }) => {
     await page.goto('/exam-desk/practice/');
     await page.selectOption('#f-paper', 'paper-3');
-    await expect(page.locator('[data-count]')).toHaveText('1 question');
+    await expect(page.locator('[data-count]')).toHaveText('3 questions');
     await page.selectOption('#f-paper', '');
     await page.selectOption('#f-calc', 'calc');
     await expect(page.locator('[data-filter-item]:visible')).toHaveCount(6);

@@ -19,27 +19,33 @@ runs, in order: `astro check`, ESLint and the content lint, the unit tests, the 
 | Finance | `tests/unit/finance.test.ts` | Every calculation against values worked by hand; rounding of break-even and target output; formatting; every eight-part working builder |
 | Models | `tests/unit/models.test.ts` | The break-even workspace and its scenarios, the special order (including displaced sales), decision trees and the exact crossover point, the scale model, force fields, and the Decision Room's formatting |
 | Cases | `tests/unit/cases.test.ts` | Every exhibit total; every Decision Room board pack for every choice, recomputed from the exhibits; the practice question answers |
+| Cash flow | `tests/unit/cashflow.test.ts` | Atelier Barro's forecast month by month, every way of paying for the kiln and every measure, and the reconciliation of profit to cash, against figures worked by hand |
+| Ratios and investment | `tests/unit/ratios.test.ts`, `investment.test.ts` | Every guide ratio for both years, the statements balancing, every strategy; payback, ARR and NPV with the guide's printed discount factors |
+| Plans | `tests/unit/plan.test.ts` | Critical path analysis worked by hand: earliest and latest times, total and free float, the critical path, and the case lab's plan |
+| Studio tools | `tests/unit/market.test.ts`, `operations.test.ts`, `studio-integrity.test.ts` | Market share and growth, position maps, capacity utilization and productivity, stock control, location scores, and the studio data's own checks |
+| IA planner | `tests/unit/ia.test.ts` | The supporting document rules, dates counted back from submission, the word count and the self-mark total |
 | Links | `scripts/qa/link-check.mjs` | Every internal link, asset and `#fragment` in the built site exists; internal links end with a slash |
 | Contrast | `scripts/qa/contrast.mjs` | WCAG contrast of the token pairs used for text and outlines |
 | Pages | `tests/e2e/pages.spec.ts` | Every built page returns 200, has no script errors, one `h1`, a main landmark, no horizontal scrolling, and no axe-core violations (WCAG 2.2 A and AA), at desktop and phone sizes; unknown addresses get the 404 page |
-| Navigation | `tests/e2e/navigation.spec.ts` | Skip link, current section, the menu and Escape, the SL and HL switch and its memory, search |
-| Interactions | `tests/e2e/interactions.spec.ts` | Each interaction driven as a learner would: right and wrong answers, validation messages, scenarios, persistence after reload, the Decision Room from commit to debrief, the practice self-check and filters, clearing stored data |
-| Without JavaScript | `tests/e2e/nojs.spec.ts` | Topic briefs, Decision Rooms and search work with JavaScript off |
-| Screenshots | `scripts/qa/screens.mjs` | Key pages at 1440, 1024, 768 and 390 px, for visual review, with a check for horizontal scrolling |
+| Navigation | `tests/e2e/navigation.spec.ts` | Skip link, current section, the All rooms menu at both sizes (every room listed, planned rooms not linked) and Escape, the SL and HL switch and its memory, search |
+| Motion | `tests/e2e/motion.spec.ts` | Groups below the fold wait for the reader and then arrive; nothing on screen at load is hidden; nothing is held back under reduced motion |
+| Interactions | `tests/e2e/interactions.spec.ts` | Each interaction driven as a learner would: right and wrong answers, validation messages, scenarios, persistence after reload, the Decision Room from commit to debrief, the case lab from the first stage to the memo, the cash flow lab, the ratio and appraisal desks, the studio tools, the IA planner, the paper 3 criteria self-check, the progress page, the practice filters, clearing stored data |
+| Without JavaScript | `tests/e2e/nojs.spec.ts` | Topic briefs, Decision Rooms, search, the cash flow lab and the case lab work with JavaScript off, and no page shows a button that needs a script |
+| Screenshots | `scripts/qa/screens.mjs` | Sixteen key pages at 1440, 1024, 768 and 390 px, for visual review, with a check for horizontal scrolling; taken with reduced motion so every section shows |
 
-## Results for this release (29 October 2026)
+## Results for this release (0.2.0, 29 October 2026)
 
 | Suite | Result |
 | --- | --- |
-| `astro check` | 0 errors, 0 warnings, 0 hints |
+| `astro check` | 0 errors, 0 warnings, 0 hints (189 files) |
 | ESLint | No problems |
-| Content lint | No problems (184 source files, 54 built pages) |
-| Unit tests | 47 passed |
-| Build | 54 pages |
-| Link check | 5,259 internal links and assets, none broken; 16 external links listed, not fetched |
+| Content lint | No problems (255 source files, 66 built pages) |
+| Unit tests | 146 passed in 12 files |
+| Build | 66 pages |
+| Link check | 7,717 internal links and assets, none broken; 16 external links listed, not fetched |
 | Contrast | 23 pairs, all pass |
-| Browser tests | 147 passed, 2 skipped by design (the menu test on desktop, the current-section test on mobile) |
-| Screenshots | 32 (8 pages at 4 widths), no horizontal scrolling; reviewed by eye at all four widths for the home page, a topic page, the break-even workspace and a Decision Room |
+| Browser tests | 205 passed, 1 skipped by design (the current-section test on mobile, where the navigation is in the menu) |
+| Screenshots | 64 (16 pages at 4 widths), no horizontal scrolling; reviewed by eye at phone, tablet and desktop widths for the home page, the case lab, the cash flow lab, the ratio and appraisal desks, the studios, the course map, the IA planner and the menu |
 
 ## What is not tested
 
@@ -47,7 +53,8 @@ runs, in order: `astro check`, ESLint and the content lint, the unit tests, the 
 - **Real devices and assistive technology.** See [ACCESSIBILITY.md](ACCESSIBILITY.md#known-gaps).
 - **The deployed site.** No deployment was made from this environment; see [DEPLOYMENT.md](DEPLOYMENT.md).
 - **External links.** They are listed by the link check but not fetched, because the environment's network policy blocks most outside sites.
-- **Performance on slow networks.** Page weight is small (one shared stylesheet, about 72 KB of scripts in total, loaded per component) but was not measured under throttling.
+- **Performance on slow networks.** Page weight is modest (about 260 KB of scripts in total across 30 files, each page loading only its own, and about 130 KB of CSS) but was not measured under throttling.
+- **Page transitions in other browsers.** Cross-document view transitions run in Chromium; other browsers navigate without them, which is the intended fallback, but this was not checked.
 - **Visual regression.** Screenshots are produced for review; no baseline is stored for automatic comparison.
 - **The Astro 7.4 upgrade.** See SECURITY.md.
 

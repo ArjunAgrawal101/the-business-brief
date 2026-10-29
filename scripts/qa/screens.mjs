@@ -24,12 +24,16 @@ const server = createServer((req, res) => {
 }).listen(0);
 const base = `http://127.0.0.1:${server.address().port}`;
 
-const PAGES = (process.argv[2] ?? '/,/topics/costs-and-revenues/,/cases/marigold-kitchens/,/decision-room/halden-leadership/,/finance-desk/break-even/,/toolkit/decision-trees/,/exam-desk/practice/,/ib/coverage/').split(',');
+const PAGES = (
+  process.argv[2] ??
+  '/,/topics/costs-and-revenues/,/cases/marigold-kitchens/,/decision-room/halden-leadership/,/case-room/halden-diagnosis/,/finance-desk/break-even/,/finance-desk/cash-flow/,/finance-desk/ratios/,/finance-desk/investment-appraisal/,/market-studio/,/operations-floor/,/toolkit/decision-trees/,/exam-desk/paper-3/,/ia-studio/,/ib/map/,/rooms/'
+).split(',');
 const WIDTHS = [1440, 1024, 768, 390];
 const browser = await chromium.launch();
 try {
   for (const w of WIDTHS) {
-    const page = await browser.newPage({ viewport: { width: w, height: 900 } });
+    // Reduced motion, so that a full-page capture shows every section rather than ones waiting to be scrolled into view.
+    const page = await browser.newPage({ viewport: { width: w, height: 900 }, reducedMotion: 'reduce' });
     for (const p of PAGES) {
       await page.goto(base + p, { waitUntil: 'networkidle' });
       const name = p === '/' ? 'home' : p.replace(/^\/|\/$/g, '').replace(/\//g, '_');

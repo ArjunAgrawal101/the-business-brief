@@ -130,9 +130,11 @@ The serif face is the case's voice: anything a person in a case says, or anythin
 
 ## Charts
 
-Charts are SVG drawn by `src/lib/charts.ts`:
+Charts are SVG drawn by `src/lib/charts.ts` and the modules beside it (`cashflow-chart.ts`, `plan-chart.ts`, `charts-studio.ts`):
 
 - Total revenue is cobalt, total cost ink, fixed costs dashed slate; profit and loss regions are tinted and labelled in words.
+- Cash flow: closing balances as bars from zero, blue in credit, brass overdrawn within the limit, red beyond it, with the overdraft limit dashed; the status of each month is also written in the table.
+- Plans: one bar per activity, the critical path in ink, other activities in cobalt with their float dotted to the latest finish, and the deadline dashed in red.
 - Every chart has a `<title>` and a `<desc>` that states its result, and its figures in a table beside it.
 - Labels carry a paper-coloured halo so they stay legible where they cross a line.
 - A truncated axis is stated in the description and the caption.
@@ -140,7 +142,59 @@ Charts are SVG drawn by `src/lib/charts.ts`:
 
 ## Motion
 
-Short (120 to 200 ms) and functional: disclosure arrows and bar widths. Everything respects `prefers-reduced-motion`.
+One restrained language, defined in `src/styles/motion.css` and `src/scripts/motion.ts`, with tokens in `src/styles/tokens.css`. Motion explains a change; it never decorates, loops, bounces or holds up reading.
+
+| Token | Value | Use |
+| --- | --- | --- |
+| `--dur-fast` | 120 ms | Pointer feedback: hover, press, colour |
+| `--dur-base` | 200 ms | Small state changes: toggles, ticks, underlines |
+| `--dur-slow` | 320 ms | Panels, stage changes, chart updates |
+| `--dur-reveal` | 460 ms | A section arriving as it scrolls into view |
+| `--stagger` | 55 ms | Delay between items arriving together |
+| `--ease`, `--ease-out`, `--ease-in-out` | cubic-bezier curves | Default, arrivals, movement between states |
+| `--rise` | 10 px | How far an arriving element travels |
+
+| Pattern | Where | How |
+| --- | --- | --- |
+| Page to page | Every navigation | Native cross-document view transitions: the page fades out quickly and rises in; the header holds still |
+| Arrival | Feedback, answer keys, Decision Room outcomes and debrief, new table rows | `.arrive`: a short rise and fade when an element appears |
+| Entrance | The home page hero | `.enter`: the hero's lines arrive one after another on load, the memo after them, then its stamp |
+| Scroll reveal | Home sections, room contents, the course map | `[data-reveal]` and `[data-reveal="group"]`: only elements that start below the fold are held back, and only once the script that reveals them is running |
+| Lift | Objects you can pick up: cards, rooms, case files | `.lift`: towards the pointer on a hard ink shadow; under reduced motion the shadow alone answers |
+| Chart update | Break-even, cash flow | `tween()` in `src/scripts/ix.ts` eases the chart from the last figures to the new ones in about a third of a second; the cash flow chart keeps one scale for every plan so the bars move and the axis does not |
+| Changed figures | Cash flow forecast | Cells that changed flash a cobalt wash once |
+| Stamp | The decision memo | A committed or awaited decision is stamped once |
+
+Rules: nothing is hidden unless the script that will reveal it is running; nothing on screen at load is hidden; there is no parallax and no scroll hijacking; every pattern is off under `prefers-reduced-motion`, which also turns the page transitions off. `tests/e2e/motion.spec.ts` checks the reveal rules, and the accessibility scan waits for arrivals to finish.
+
+## Icons
+
+An original set in `src/lib/icons.ts`, drawn for the platform on a 24 by 24 grid with a 1.75 stroke, square line ends and mitred corners, to match the identity's square corners. One icon per room and a few for the interface (search, all rooms, arrow, check, progress, map). `src/components/ui/Icon.astro` renders them; they are decorative unless given a label, and the text beside an icon always says the same thing.
+
+| Room | Drawing |
+| --- | --- |
+| The Business Brief | A page with a folded corner and lines of text |
+| Case Room | An open case folder |
+| Decision Room | A path that forks towards two choices, one taken |
+| Strategy Studio | A two-by-two matrix with one cell marked |
+| Finance Desk | Rising bars on a base line |
+| Market Studio | A target with an arrow |
+| People and Culture | Two people |
+| Operations Floor | Goods moving along a line |
+| Boardroom | A table with seats |
+| Case Vault | An archive box |
+| Exam Desk | A clipboard with a tick |
+| Examiner Lens | A magnifying glass over lines |
+| IA Studio | A notebook with a bookmark |
+| Revision Brief | Stacked cards |
+
+## Rooms
+
+Each room has the same identity on its own page (`src/components/rooms/RoomPage.astro`), in the menu and on the home page: its icon in a square tile with a brass offset shadow, its number of fourteen, and its status in words. A live room's tile is ink, a partly built room's is paper, a planned room's is dashed and is never a link. The header's All rooms panel lists all fourteen at every width; without JavaScript the same button goes to the All rooms page.
+
+## The course map
+
+`/ib/map/` draws the course as five columns of subtopic tiles. A complete brief is an ink tile, working tools a white tile with a cobalt edge, planned a dashed tile; HL is marked in words; each tile shows the icons of the rooms that serve it, with their names for screen readers. It is generated from the content, so a tile is filled only when the material exists.
 
 ## Print
 

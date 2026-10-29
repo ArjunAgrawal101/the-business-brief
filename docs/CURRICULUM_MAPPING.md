@@ -50,7 +50,7 @@ Recommended teaching hours: 150 at SL and 240 at HL, including the toolkit (10 a
 | 1.2 | Types of business entities | SL and HL | 4 | 23 | Planned |
 | 1.3 | Business objectives | SL and HL | 4 | 23 | Planned |
 | 1.4 | Stakeholders | SL and HL | 2 | 24 | Planned |
-| 1.5 | Growth and evolution | SL and HL | 5 | 24 | Complete brief, `/topics/growth-and-evolution/` |
+| 1.5 | Growth and evolution | SL and HL | 5 | 24 | Complete brief, `/topics/growth-and-evolution/`; 4 interactions; 1 calculation |
 | 1.6 | Multinational companies (MNCs) | SL and HL | 1 | 24 | Planned |
 
 ### Unit 2: Human resource management
@@ -61,8 +61,8 @@ Recommended teaching hours: 150 at SL and 240 at HL, including the toolkit (10 a
 | --- | --- | --- | --- | --- | --- |
 | 2.1 | Introduction to human resource management | SL and HL | 4 | 25 | Planned |
 | 2.2 | Organizational structure | SL and HL, with HL-only content | 4 (1) | 25 | Planned |
-| 2.3 | Leadership and management | SL and HL, with HL-only content | 3 (1) | 26 | Complete brief, `/topics/leadership-and-management/` |
-| 2.4 | Motivation and demotivation | SL and HL, with HL-only content | 9 (5) | 26 | Planned |
+| 2.3 | Leadership and management | SL and HL, with HL-only content | 3 (1) | 26 | Complete brief, `/topics/leadership-and-management/`; 4 interactions |
+| 2.4 | Motivation and demotivation | SL and HL, with HL-only content | 9 (5) | 26 | 1 calculation |
 | 2.5 | Organizational (corporate) culture | HL only | 3 (3) | 27 | Planned |
 | 2.6 | Communication | SL and HL | 2 | 27 | Planned |
 | 2.7 | Industrial/employee relations | HL only | 3 (3) | 27 | Planned |
@@ -75,12 +75,12 @@ Recommended teaching hours: 150 at SL and 240 at HL, including the toolkit (10 a
 | --- | --- | --- | --- | --- | --- |
 | 3.1 | Introduction to finance | SL and HL | 1 | 28 | Planned |
 | 3.2 | Sources of finance | SL and HL | 3 | 28 | Planned |
-| 3.3 | Costs and revenues | SL and HL | 2 | 28 | Complete brief, `/topics/costs-and-revenues/` |
+| 3.3 | Costs and revenues | SL and HL | 2 | 28 | Complete brief, `/topics/costs-and-revenues/`; 1 interaction; 3 calculations |
 | 3.4 | Final accounts | SL and HL, with HL-only content | 5 (2) | 29 | Planned |
-| 3.5 | Profitability and liquidity ratio analysis | SL and HL | 4 | 29 | Planned |
-| 3.6 | Efficiency ratio analysis | HL only | 3 (3) | 29 | Planned |
-| 3.7 | Cash flow | SL and HL | 6 | 29 | Planned |
-| 3.8 | Investment appraisal | SL and HL, with HL-only content | 2 (1) | 30 | Planned |
+| 3.5 | Profitability and liquidity ratio analysis | SL and HL | 4 | 29 | 1 interaction; 5 calculations |
+| 3.6 | Efficiency ratio analysis | HL only | 3 (3) | 29 | 1 interaction; 5 calculations |
+| 3.7 | Cash flow | SL and HL | 6 | 29 | 1 interaction; 2 calculations |
+| 3.8 | Investment appraisal | SL and HL, with HL-only content | 2 (1) | 30 | 1 interaction; 3 calculations |
 | 3.9 | Budgets | HL only | 5 (5) | 30 | Planned |
 
 ### Unit 4: Marketing
@@ -89,8 +89,8 @@ Recommended teaching hours: 150 at SL and 240 at HL, including the toolkit (10 a
 
 | Code | Subtopic | Level | Statements (HL only) | Guide page | On the platform |
 | --- | --- | --- | --- | --- | --- |
-| 4.1 | Introduction to marketing | SL and HL, with HL-only content | 4 (1) | 31 | Planned |
-| 4.2 | Marketing planning | SL and HL | 5 | 31 | Planned |
+| 4.1 | Introduction to marketing | SL and HL, with HL-only content | 4 (1) | 31 | 1 interaction |
+| 4.2 | Marketing planning | SL and HL | 5 | 31 | 1 interaction |
 | 4.3 | Sales forecasting | HL only | 1 (1) | 31 | Planned |
 | 4.4 | Market research | SL and HL | 5 | 31 | Planned |
 | 4.5 | The seven Ps of the marketing mix | SL and HL, with HL-only content | 13 (1) | 31 | Planned |
@@ -105,9 +105,9 @@ Recommended teaching hours: 150 at SL and 240 at HL, including the toolkit (10 a
 | 5.1 | Introduction to operations management | SL and HL | 1 | 33 | Planned |
 | 5.2 | Operations methods | SL and HL | 1 | 33 | Planned |
 | 5.3 | Lean production and quality management | HL only | 7 (7) | 34 | Planned |
-| 5.4 | Location | SL and HL | 2 | 34 | Planned |
-| 5.5 | Break-even analysis | SL and HL | 4 | 34 | Taught in the costs and revenues brief and the Finance Desk break-even workspace |
-| 5.6 | Production planning | HL only | 7 (7) | 34 | Planned |
+| 5.4 | Location | SL and HL | 2 | 34 | 1 interaction |
+| 5.5 | Break-even analysis | SL and HL | 4 | 34 | Taught in the costs and revenues brief; 3 interactions; 9 calculations |
+| 5.6 | Production planning | HL only | 7 (7) | 34 | 2 interactions |
 | 5.7 | Crisis management and contingency planning | HL only | 3 (3) | 35 | Planned |
 | 5.8 | Research and development | HL only | 4 (4) | 35 | Planned |
 | 5.9 | Management information systems | HL only | 6 (6) | 35 | Planned |

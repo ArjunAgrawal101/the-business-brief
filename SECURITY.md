@@ -6,13 +6,13 @@ The Business Brief is a static site: HTML, CSS, a few small scripts and images, 
 
 Please report a security problem privately to the maintainer rather than in a public issue. Until a dedicated address is set up, use the contact options on [Arjun Agrawal Economics](https://ib-economics-pi.vercel.app/).
 
-## Dependency advisories (checked 29 October 2026)
+## Dependency advisories (checked 29 October 2026, unchanged in 0.2.0)
 
 `npm audit` reports advisories against the build tooling:
 
 | Package | Version here | Advisories | Exposure on this site |
 | --- | --- | --- | --- |
-| astro | 6.4.8 | Several, fixed in 7.4.x: cross-site scripting through spread attribute names, `transition:*` directives, View Transition properties and script or style content in JSX/MDX; a base-path authorization bypass; remote code execution through AVIF image optimization | Low. The site is built from trusted content in the repository, uses no spread attributes from data, no transitions, no islands, no MDX, no server routes and no image optimization. Data embedded in pages is escaped (`jsonForScript` in `src/lib/markup.ts`). |
+| astro | 6.4.8 | Several, fixed in 7.4.x: cross-site scripting through spread attribute names, `transition:*` directives, View Transition properties and script or style content in JSX/MDX; a base-path authorization bypass; remote code execution through AVIF image optimization | Low. The site is built from trusted content in the repository, uses no spread attributes from data, no Astro `transition:*` directives or client router (its page transitions are the browser's native CSS `@view-transition`), no islands, no MDX, no server routes and no image optimization. Data embedded in pages is escaped (`jsonForScript` in `src/lib/markup.ts`). |
 | esbuild | 0.27.7 | Arbitrary file read by the development server on Windows | Development only. Do not run `npm run dev` on an untrusted network. |
 | sharp | 0.34.5 | Vulnerabilities in libvips, libheif and librsvg | Not used: the site does not process images at build time. Installed as an optional dependency of Astro. |
 
@@ -28,4 +28,4 @@ Then set `"engines": { "node": ">=22.23.4" }` in `package.json` and choose Node 
 
 ## Headers
 
-`vercel.json` sets `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` and `X-Frame-Options`. A Content Security Policy is not yet set: the pages use inline JSON data blocks and one small inline script (the SL and HL switch before first paint), so a policy needs hashes for those. Adding one is on the roadmap.
+`vercel.json` sets `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` and `X-Frame-Options`. A Content Security Policy is not yet set: the pages use inline JSON data blocks and one small inline script (which applies the SL and HL choice and marks that scripts run, before first paint), so a policy needs hashes for those. Adding one is on the roadmap.

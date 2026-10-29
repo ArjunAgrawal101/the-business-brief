@@ -14,8 +14,8 @@
 | Charts | Inline SVG with `role="img"`, a title and a description that states the result; the figures in a table beside every chart; chart regions scroll on narrow screens and can be focused |
 | Tables | Header cells with `scope`; wide tables scroll inside a labelled, focusable region |
 | Targets | Main buttons, inputs and options are at least 44 px tall and small buttons 36 px; every target meets the WCAG 2.2 minimum of 24 px, including dense link lists |
-| Motion | Short transitions only, and none when the device asks for reduced motion |
-| Without JavaScript | Every page is complete; answers sit in disclosures; Decision Room choices show what happens; search lists every entry |
+| Motion | Restrained and functional: page transitions, arrivals, reveals and chart updates of at most half a second, none of which loop or delay reading. Under reduced motion all of it stops, page transitions included, and nothing is held back. Reveals never hide content that is on screen at load, or anything at all without the script that reveals it |
+| Without JavaScript | Every page is complete; answers sit in disclosures; Decision Room choices show what happens; every case lab stage is open; search lists every entry; no page shows a button that needs a script |
 | SL and HL | Hidden HL material always leaves a visible notice; the choice is announced |
 
 ## Test results for this release (29 October 2026)
@@ -27,7 +27,8 @@
 | Horizontal scrolling at 1440, 1024, 768 and 390 px, eight key pages | `npm run qa:screens` | None |
 | Colour contrast of 23 token pairs | `npm run qa:contrast` | All pass |
 | Skip link, menu keyboard behaviour, focus after decisions, SL and HL switch | Playwright | Pass |
-| Interactions without JavaScript | Playwright with JavaScript disabled | Pass |
+| Interactions without JavaScript | Playwright with JavaScript disabled, including a check of every page for buttons that cannot work | Pass |
+| Motion rules | Playwright, with and without reduced motion | Pass |
 
 Problems found and fixed during QA:
 
