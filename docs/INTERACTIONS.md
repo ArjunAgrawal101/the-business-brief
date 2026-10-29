@@ -185,3 +185,16 @@ Every topic and revision brief.
 | **Feedback** | Right (within rounding to one decimal place) or Not yet, naming the slip when the answer matches a known one: equity alone or total assets as capital employed, the wrong profit line, closing instead of average stock, the current ratio for the acid test, a ratio upside down, a missing × 100 or × 365. Every ratio for both years, the change, an "other things equal" verdict in words, the eight-part working for each year, and the statements re-drawn with a strategy's changed figures marked |
 | **Misconception diagnosed** | Collecting debts improves the current ratio (it does not: cash replaces debtors); a ratio above 1 means the business has cash; longer creditor days are simply good; every ratio matters equally (stock turnover tells a warehouse little) |
 | **Objective** | Calculate the profitability, liquidity and (HL) efficiency ratios, interpret them in context and evaluate strategies to improve them |
+
+## 15. Investment appraisal desk (NPV HL)
+
+`finance-investment-halden`, on the Finance Desk investment appraisal page (`/finance-desk/investment-appraisal/`). Logic in `src/lib/investment.ts`, markup and chart in `src/lib/investment-view.ts`.
+
+| | |
+| --- | --- |
+| **The learner does** | Changes the capital cost and yearly net cash flows of two projects and, at HL, the discount rate (only the rates in the guide's table) |
+| **Must understand** | Payback, ARR as the guide defines it, and NPV with the guide's printed discount factors; that the methods measure different things and can disagree |
+| **Decides or infers** | Which project each method prefers, why they differ, and what the figures leave out |
+| **Feedback** | A methods table with the preferred project for each, readings in words (including "the methods disagree" and "neither project is worth its cost" at 20%), a cumulative cash flow chart with a key in words and a data table, the present values year by year, and the eight-part working for every method and project. Invalid inputs are named beside the field |
+| **Misconception diagnosed** | The fastest payback is the best project; a higher ARR means the money arrives sooner; the capital cost is discounted; NPV settles the decision on its own |
+| **Objective** | Appraise investment opportunities by payback and ARR (and NPV at HL), and judge between them when the methods disagree |

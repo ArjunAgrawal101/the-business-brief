@@ -1,0 +1,107 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import Interactive from '../../components/interactive/Interactive.astro';
+import CalcCard from '../../components/finance/CalcCard.astro';
+import LevelSwitch from '../../components/ui/LevelSwitch.astro';
+import { corpus, href } from '../../lib/content';
+import { DISCOUNT_TABLE, MAX_YEARS, RATES } from '../../lib/investment';
+
+const PATH = '/finance-desk/investment-appraisal/';
+const c = await corpus();
+const calcs = Object.entries(c.calculations)
+  .filter(([, k]) => k.page === PATH)
+  .sort((a, b) => a[1].order - b[1].order);
+const years = Array.from({ length: MAX_YEARS }, (_, i) => i + 1);
+---
+
+<BaseLayout title="Investment appraisal: Finance Desk" description="Payback period, average rate of return and (HL) net present value with the guide's discount factors, on two projects you can change, with the workings in full and what each method leaves out." section="finance-desk">
+  <PageIntro
+    trail={[{ label: 'Finance Desk', href: '/finance-desk/' }, { label: 'Investment appraisal' }]}
+    kicker="Finance Desk"
+    title="Investment appraisal"
+    lead="Two projects, three methods, and not always the same answer. Appraise Halden Distribution's two projects by payback, average rate of return and, at HL, net present value; change the estimates and the rate, and see when the methods agree, when they disagree and what none of them can tell you."
+  >
+    <div class="tags"><span class="tag tag--plain">IB 3.8</span><span class="tag tag--hl">NPV: HL only</span></div>
+  </PageIntro>
+  <div class="wrap page-body">
+    <aside class="callout callout--note">
+      <span class="callout__kicker">Checked against the guide</span>
+      <div class="prose">
+        <p>
+          Investment appraisal is subtopic 3.8: payback period and average rate of return for SL and HL, net present value for HL only (Business management
+          guide, p. 30). ARR and NPV use the formulas on the guide's formula sheet (p. 65), and NPV uses the guide's own discount factors (p. 66), so every
+          answer here matches one worked with the table in an examination. The formula sheet gives no formula for payback; the method used is the standard
+          one.
+        </p>
+      </div>
+    </aside>
+    <LevelSwitch id="lvl-investment" />
+    <section aria-labelledby="desk-h">
+      <SectionHead no={1} title="The appraisal desk" id="desk-h" dek="The case: the same warehouse as the ratio desk, a year later, choosing what to invest in." />
+      <p class="small" style="margin-top:var(--sp-3)">
+        The projects belong to the <a href={href.case('halden-distribution')}>Halden Distribution case</a>. Its accounts are on the
+        <a href="/finance-desk/ratios/">ratio desk</a>.
+      </p>
+      <div style="margin-top:var(--sp-5)">
+        <Interactive
+          component="investment-appraisal"
+          refId="finance-investment-halden"
+          title="Two projects for 2027"
+          intro="Change any estimate or, at HL, the discount rate. The results, the chart, the tables and the workings all follow."
+          provenance="simulated-data"
+          headingLevel={3}
+        />
+      </div>
+    </section>
+    <section aria-labelledby="calcs-h">
+      <SectionHead no={2} title="The calculations" dek="Each method's formula, a worked example from the case and the errors that cost marks." id="calcs-h" />
+      <div class="stack stack-lg" style="margin-top:var(--sp-5)">
+        {calcs.map(([id, k]) => <CalcCard id={id} calc={k} headingLevel={3} />)}
+      </div>
+      <p class="hl-notice"><span class="tag tag--hl">HL</span> Net present value is HL-only material, hidden while you are viewing SL content. Switch to HL above to see it.</p>
+    </section>
+    <section aria-labelledby="table-h" data-level="HL">
+      <SectionHead no={3} title="The discount table" dek="As printed in the Business management guide, p. 66. A table like it is given in the examination when a question needs it." id="table-h" />
+      <div class="table-scroll" role="region" aria-label="Discount factors by year and rate" tabindex="0" style="margin-top:var(--sp-4)">
+        <table class="table dtab">
+          <caption class="sr-only">Discount factors for years 1 to 10 at 4, 6, 8, 10 and 20 per cent</caption>
+          <thead>
+            <tr>
+              <th scope="col">Year</th>
+              {RATES.map((r) => <th scope="col" class="n">{r}%</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {
+              years.map((y) => (
+                <tr>
+                  <th scope="row">{y}</th>
+                  {RATES.map((r) => (
+                    <td class="n">{DISCOUNT_TABLE[r][y - 1]?.toFixed(4)}</td>
+                  ))}
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted" style="margin-top:var(--sp-3)">
+        Each factor is the present value of one unit of money received at the end of that year. Multiply a year's net cash flow by its factor to find its
+        present value. One factor in the guide's table differs from the formula: 6% in year 8 is printed as 0.6271, where 1 ÷ 1.06<sup>8</sup> gives 0.6274.
+        The platform uses the printed figure, because that is the table an examination provides; check with your teacher if a question uses it.
+      </p>
+    </section>
+    <p class="cluster">
+      <a class="btn" href="/finance-desk/ratios/">Back: ratio analysis</a>
+      <a class="btn" href="/finance-desk/">The Finance Desk</a>
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .dtab {
+    max-width: 40rem;
+  }
+</style>

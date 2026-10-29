@@ -640,3 +640,90 @@
     implication: Interest must now be paid on £1,650k of long-term loans while profit is falling.
   provenance: aa-framework
   order: 23
+
+# Investment appraisal (3.8; NPV HL only). ARR and NPV from the guide's formula
+# sheet (p. 65), discount factors from p. 66. The examples use Project A in
+# src/content/interactives/finance-investment-halden.yaml.
+
+- id: payback-period
+  name: Payback period
+  status: complete
+  group: investment
+  syllabus: [{ code: '3.8', note: 'Payback is in the syllabus (p. 30); the guide''s formula sheet gives no formula for it, so the method here is the standard one.' }]
+  verification: primary
+  level: SL/HL
+  formula: Payback period = years before the cost is recovered + (amount still to recover ÷ net cash flow in the payback year) × 12 months
+  variables:
+    - { symbol: "C", meaning: "Capital cost, paid in year 0", unit: "currency" }
+    - { symbol: "R", meaning: "Net cash flow in each year of use", unit: "currency" }
+  unit: years and months
+  interpretation: How long the project takes to return its cost in cash. Quicker payback means less time exposed to risk and earlier cash, which matters most to a business that is short of it.
+  errors:
+    - Working out the months without assuming the year's cash arrives evenly, or without saying so.
+    - Choosing between projects on payback alone, ignoring the returns after payback.
+  page: /finance-desk/investment-appraisal/
+  example:
+    title: "Halden Distribution: payback on the pack-and-label line (Project A)"
+    case: halden-distribution
+    currency: '£'
+    inputs: { cost: 600000, r1: 90000, r2: 150000, r3: 180000, r4: 180000, r5: 180000, r6: 150000 }
+    interpretation: The line pays for itself in exactly four years, two years before the end of its expected life.
+    implication: Four years is a long wait for a business with £17,000 in the bank, which is why voice picking's faster payback is tempting.
+  provenance: aa-framework
+  order: 24
+
+- id: average-rate-of-return
+  name: Average rate of return (ARR)
+  status: complete
+  group: investment
+  syllabus: [{ code: '3.8', note: 'Formula: guide, p. 65' }]
+  verification: primary
+  level: SL/HL
+  formula: ARR = ((total returns − capital cost) ÷ years of use) ÷ capital cost × 100
+  variables:
+    - { symbol: "ΣR", meaning: "Total returns over the project's life", unit: "currency" }
+    - { symbol: "C", meaning: "Capital cost", unit: "currency" }
+    - { symbol: "n", meaning: "Years of use", unit: "years" }
+  unit: per cent of the capital cost, per year
+  interpretation: The average yearly profit from the project as a share of its cost. Compare it with the interest rate on borrowing and with other uses of the money.
+  errors:
+    - Dividing total profit by the capital cost without first dividing by the years of use.
+    - Using total returns instead of total returns minus the capital cost.
+  page: /finance-desk/investment-appraisal/
+  example:
+    title: "Halden Distribution: ARR on the pack-and-label line (Project A)"
+    case: halden-distribution
+    currency: '£'
+    inputs: { cost: 600000, r1: 90000, r2: 150000, r3: 180000, r4: 180000, r5: 180000, r6: 150000 }
+    interpretation: On average the line earns 9.17% of its cost a year over its six years.
+    implication: That is above voice picking's 6.25%, but it says nothing about when the money arrives.
+  provenance: aa-framework
+  order: 25
+
+- id: net-present-value
+  name: Net present value (NPV)
+  status: complete
+  group: investment
+  syllabus: [{ code: '3.8', note: 'HL only. Formula: guide, p. 65; discount factors: guide, p. 66' }]
+  verification: primary
+  level: HL
+  formula: NPV = sum of the present values of the returns − original cost
+  variables:
+    - { symbol: "R", meaning: "Net cash flow in each year of use", unit: "currency" }
+    - { symbol: "DF", meaning: "Discount factor for the year and the chosen rate, from the guide's table", unit: "a number below 1" }
+    - { symbol: "C", meaning: "Original (capital) cost, paid now", unit: "currency" }
+  unit: currency, in today's money
+  interpretation: What the project's future returns are worth in today's money, less what it costs now. A positive NPV means the project earns more than the discount rate; the higher the rate, the less later returns count.
+  errors:
+    - Discounting the capital cost, which is paid now and is not discounted.
+    - Taking a factor from the wrong row (year) or column (rate) of the table.
+  page: /finance-desk/investment-appraisal/
+  example:
+    title: "Halden Distribution: NPV of the pack-and-label line at 10% (Project A)"
+    case: halden-distribution
+    currency: '£'
+    inputs: { cost: 600000, rate: 10, r1: 90000, r2: 150000, r3: 180000, r4: 180000, r5: 180000, r6: 150000 }
+    interpretation: At 10%, the line's returns are worth £60,390 more in today's money than its cost.
+    implication: On this test it is worth doing. At 20%, the highest rate in the guide's table, it is not.
+  provenance: aa-framework
+  order: 26

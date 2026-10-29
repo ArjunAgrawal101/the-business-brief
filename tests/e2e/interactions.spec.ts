@@ -280,3 +280,29 @@ test.describe('Finance Desk: ratio analysis', () => {
     await page.locator('[data-level-switch] label:has(input[value="HL"])').first().click();
   });
 });
+
+test.describe('Finance Desk: investment appraisal', () => {
+  test('the methods disagree, the rate changes NPV, and an edited estimate moves payback', async ({ page }) => {
+    await page.goto('/finance-desk/investment-appraisal/');
+    await ready(page, '[data-ix="investment"]');
+    const desk = page.locator('[data-ix="investment"]');
+    const methods = desk.locator('[data-methods]');
+    await expect(methods).toContainText('4 years');
+    await expect(methods).toContainText('2 years and 6 months');
+    await expect(methods).toContainText('9.17%');
+    await expect(methods).toContainText('£60,390');
+    await expect(desk.locator('[data-read="agreement"]')).toContainText('The methods disagree');
+    await desk.locator('label:has(input[name="rate"][value="20"])').click();
+    await expect(methods).toContainText('−£107,286');
+    await expect(desk.locator('[data-read="npv"]')).toContainText('neither project is worth its cost');
+    await expect(desk.locator('[data-rate-label]')).toHaveText('20');
+    await desk.locator('input[name="voice-picking-r1"]').fill('150000');
+    await expect(methods).toContainText('1 year and 10.8 months');
+    await expect(desk.locator('[data-key]')).toContainText('1 year and 10.8 months');
+    await desk.locator('input[name="pack-line-cost"]').fill('');
+    await expect(desk.locator('[data-err="pack-line-cost"]')).toContainText('Enter a number');
+    await desk.locator('[data-reset]').click();
+    await expect(methods).toContainText('£60,390');
+    await expect(desk.locator('[data-err="pack-line-cost"]')).toHaveText('');
+  });
+});

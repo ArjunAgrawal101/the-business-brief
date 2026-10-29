@@ -947,6 +947,30 @@ export const interactiveSchema = z.discriminatedUnion('component', [
       .min(2),
     prompts: z.object({ profitability: z.array(md).min(2), liquidity: z.array(md).min(2), efficiency: z.array(md).min(2) }),
   }),
+  z.object({
+    component: z.literal('investment-appraisal'),
+    ...interactiveBase,
+    case: z.string(),
+    currency: z.string(),
+    /** The discount rate shown first: one of the rates in the guide's table. */
+    rate: z.union([z.literal(4), z.literal(6), z.literal(8), z.literal(10), z.literal(20)]).default(10),
+    context: md,
+    projects: z
+      .array(
+        z.object({
+          id: z.string(),
+          label: z.string(),
+          name: z.string(),
+          summary: md,
+          capitalCost: z.number().positive(),
+          returns: z.array(z.number()).min(1).max(10),
+        }),
+      )
+      .length(2),
+    /** What the three methods leave out, for the judgement. */
+    limits: z.array(md).min(2),
+    questions: z.array(z.string()).min(2),
+  }),
 ]);
 export type Interactive = z.infer<typeof interactiveSchema>;
 export type Assessment = AssessmentComponent;

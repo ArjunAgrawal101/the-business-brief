@@ -1,0 +1,48 @@
+# Two investment projects at Halden Distribution. Fictional; every figure is a
+# simulated estimate, written to fit the case file and the ratio desk's
+# accounts. The payback, ARR and NPV figures are checked by hand in
+# tests/unit/investment.test.ts.
+
+component: investment-appraisal
+title: Two projects for 2027
+purpose: >
+  The learner appraises two projects by payback, average rate of return and (at HL) net present value with the guide's
+  discount factors, changes the estimates and the rate, and sees when the methods agree, when they disagree and what all
+  three leave out.
+provenance: simulated-data
+case: halden-distribution
+currency: '£'
+rate: 10
+context: >
+  Halden's owners want to win back Lumen Home's confidence and cut the cost of errors before next year's peak. The finance
+  manager has estimated the net cash flows of two projects, each starting in 2027. Every figure is a simulated estimate,
+  and the further ahead an estimate looks, the less reliable it is.
+projects:
+  - id: pack-line
+    label: Project A
+    name: Automated pack-and-label line
+    summary: >
+      A machine line that bags, weighs and labels orders. It replaces six packing roles and most labelling errors. The
+      returns start slowly while staff learn to run it, as they did with the scanners, and the line is expected to last six
+      years.
+    capitalCost: 600000
+    returns: [90000, 150000, 180000, 180000, 180000, 150000]
+  - id: voice-picking
+    label: Project B
+    name: Voice picking for the night shift
+    summary: >
+      Headsets that read out each pick, so that pickers keep their hands and eyes free. It cuts errors at once, which is
+      worth most now, while the night shift is new; the returns fall as the shift gains experience and the equipment ages.
+      It is expected to be replaced after four years.
+    capitalCost: 240000
+    returns: [110000, 100000, 60000, 30000]
+limits:
+  - Payback ignores everything after the cost is recovered, so Project A's last two years count for nothing. It also treats a pound in year 3 as worth the same as a pound today.
+  - The average rate of return ignores timing. A return of £150,000 in year 6 counts for as much as one in year 1.
+  - Net present value turns timing into money, but the answer depends on the rate chosen and on estimates that grow less reliable each year. It does not measure risk, except through the rate.
+  - None of the three counts what the figures leave out. Project B arrives in time for the peak that decides Lumen Home's contract; Project A removes six jobs from a workforce that is already unsettled.
+questions:
+  - Halden had £17,000 in the bank at 31 August 2026 (see the ratio desk). How should that affect the weight you give to payback?
+  - At which rate in the guide's table does neither project add value? What would choosing that rate say about how risky the owners think the projects are?
+  - Project A removes six packing roles. Which stakeholders would judge that differently from the owners, and how would you include it in a recommendation?
+  - If Halden could afford only one project in 2027, which would you recommend, and on what conditions?
