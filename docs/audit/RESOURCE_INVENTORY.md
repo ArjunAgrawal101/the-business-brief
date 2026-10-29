@@ -74,8 +74,9 @@ Audit of the four documents supplied with the enhancement brief, 29 October 2026
 | Guide assessment outlines and external assessment (pp. 39 to 50) | Exam Desk paper pages: marks, sections, timings, which AOs each section assesses |
 | Guide IA (pp. 51 to 58), TSM IA guidance (pp. 68 to 72) | IA Studio: requirements, criteria A to G with maximum marks, supporting-document checks, a planner that follows the TSM's steps |
 | Guide command terms (pp. 19 to 20, 67 to 68) | Examiner Lens: 31 terms at the correct AO levels, explained in the platform's words |
-| TSM paper guidance (pp. 54 to 67) | Examiner Lens: "Guidance from the IB teacher support material", attributed |
-| Guide formulae and discount table (pp. 64 to 66) | Finance Desk: ratio analysis, investment appraisal with the published discount factors, capacity utilization and productivity |
-| Guide financial statement formats (pp. 59 to 63) | Cash flow forecast lab and statements in the exact IB layout and terms (statement of profit or loss, statement of financial position, brackets for negatives) |
+| TSM paper guidance (pp. 54 to 67) | Each Exam Desk paper page: "Advice from the IB", paraphrased and attributed with pages; the Examiner Lens points to it |
+| TSM IA guidance (pp. 68 to 72) | IA Studio: the ten steps of the planner, each citing its page, and "Advice from the IB" |
+| Guide formulae and discount table (pp. 64 to 66) | Finance Desk: ratio analysis, investment appraisal with the published discount factors (including the printed 6% factor for year 8, 0.6271, where the formula gives 0.6274); Operations Floor: capacity utilization and productivity |
+| Guide financial statement formats (pp. 59 to 63) | The ratio desk's statement of profit or loss and statement of financial position, and the cash flow lab's forecast, in the guide's layout and terms, with negatives in brackets |
 | Guide paper 3 description (pp. 7, 42, 47 to 50), TSM paper 3 (pp. 62 to 67) | Paper 3 practice shaped as three questions of 2, 6 and 17 marks |
 | Guide key concepts (pp. 12 to 13) | Concept pages and the IA concept lens |
