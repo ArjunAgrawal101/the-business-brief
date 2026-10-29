@@ -1,0 +1,151 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageIntro from '../components/layout/PageIntro.astro';
+import SectionHead from '../components/layout/SectionHead.astro';
+import Interactive from '../components/interactive/Interactive.astro';
+import LevelSwitch from '../components/ui/LevelSwitch.astro';
+import LevelTag from '../components/ui/LevelTag.astro';
+import { corpus, href } from '../lib/content';
+
+const c = await corpus();
+const unit = c.curricula['ib-dp-bm']?.units.find((u) => u.number === 5);
+/** What this room has for each subtopic of unit 5, and where else on the platform a subtopic is worked. */
+const HERE: Record<string, string> = {
+  '5.4': 'Weighted scoring of locations',
+  '5.6': 'Capacity utilization and productivity; the stock control chart (both HL)',
+};
+const ELSEWHERE: Record<string, { label: string; href: string }> = {
+  '5.5': { label: 'Worked on the Finance Desk', href: '/finance-desk/break-even/' },
+};
+---
+
+<BaseLayout title="Operations Floor" description="Location scoring, capacity utilization, productivity and stock control charts for IB Business Management unit 5, with live charts, workings and feedback.">
+  <PageIntro
+    trail={[{ label: 'Operations Floor' }]}
+    kicker="Operations Floor"
+    title="Capacity, stock and location"
+    lead="Three working tools for unit 5, operations management: choosing a location (5.4), and, for HL, capacity utilization and productivity, and stock control charts (5.6). They use two of the platform's fictional cases: Atelier Barro's ceramics studio and Marigold Kitchens' restaurants."
+  />
+  <div class="wrap page-body">
+    <section aria-labelledby="of-serves">
+      <SectionHead no={1} title="What this room covers" dek="Unit 5 subtopic by subtopic. Tools for the rest of the unit are planned; nothing is linked until it works." id="of-serves" />
+      <ul class="room-cover" role="list">
+        {
+          unit?.subtopics.map((s) => (
+            <li>
+              <span class="num">{s.code}</span>
+              <span>{s.title}</span>
+              <span class="tags">
+                <LevelTag level={s.level} />
+                {HERE[s.code] ? (
+                  <span class="tag tag--live">Tool here</span>
+                ) : ELSEWHERE[s.code] ? (
+                  <span class="tag tag--live">Elsewhere</span>
+                ) : (
+                  <span class="tag tag--planned">Planned</span>
+                )}
+              </span>
+              {HERE[s.code] && <span class="room-cover__note small">{HERE[s.code]}</span>}
+              {ELSEWHERE[s.code] && (
+                <span class="room-cover__note small">
+                  <a href={ELSEWHERE[s.code]?.href}>{ELSEWHERE[s.code]?.label}</a>
+                </span>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+      <p class="small muted">
+        The organizations are fictional, and every figure is simulated. The cases: <a href={href.case('atelier-barro')}>Atelier Barro</a> and{' '}
+        <a href={href.case('marigold-kitchens')}>Marigold Kitchens</a>.
+      </p>
+    </section>
+
+    <section aria-labelledby="of-location">
+      <SectionHead no={2} title="Choosing a location" dek="Subtopic 5.4, AO2. Weigh the factors yourself, and see how much the answer depends on the weights." id="of-location" />
+      <div style="margin-top:var(--sp-5)">
+        <Interactive
+          component="location-scoring"
+          refId="ops-location-marigold"
+          title="Where should the first Mumbai restaurant go?"
+          intro="Weighted scoring turns a location decision into numbers you can argue about. The scores are given; the weights are yours."
+          provenance="simulated-data"
+          headingLevel={3}
+        />
+      </div>
+    </section>
+
+    <LevelSwitch id="lvl-operations" />
+
+    <section aria-labelledby="of-capacity" data-level="HL">
+      <SectionHead no={3} title="Capacity utilization and productivity" dek="Subtopic 5.6, HL only, AO2 and AO4." id="of-capacity" />
+      <div style="margin-top:var(--sp-5)">
+        <Interactive
+          component="capacity-productivity"
+          refId="ops-capacity-atelier"
+          title="How hard is the kiln working?"
+          intro="Atelier Barro's kiln can fire 1,200 mugs a month. Compare a quiet October with a November that includes the hotel's order, and see what happens to each measure."
+          level="HL"
+          provenance="simulated-data"
+          headingLevel={3}
+        />
+      </div>
+    </section>
+
+    <section aria-labelledby="of-stock" data-level="HL">
+      <SectionHead no={4} title="Stock control" dek="Subtopic 5.6, HL only, AO2 and AO4." id="of-stock" />
+      <div style="margin-top:var(--sp-5)">
+        <Interactive
+          component="stock-control"
+          refId="ops-stock-control-atelier"
+          title="When should the studio order more clay?"
+          intro="A stock control chart shows when to reorder, how much to keep in reserve and what happens when usage or a delivery does not go to plan."
+          level="HL"
+          provenance="simulated-data"
+          headingLevel={3}
+        />
+      </div>
+    </section>
+    <p class="hl-notice"><span class="tag tag--hl">HL</span> Capacity utilization, productivity and stock control are HL-only material, hidden while you are viewing SL content. Switch to HL above to see them.</p>
+  </div>
+</BaseLayout>
+
+<style>
+  .room-cover {
+    margin: var(--sp-4) 0 var(--sp-3);
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .room-cover li {
+    display: grid;
+    gap: var(--sp-1) var(--sp-4);
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  @media (min-width: 52rem) {
+    .room-cover li {
+      grid-template-columns: 3.5rem minmax(0, 1fr) auto;
+      align-items: baseline;
+    }
+  }
+
+  .room-cover .num {
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .room-cover__note {
+    grid-column: 2 / -1;
+    color: var(--text-muted);
+  }
+
+  /* WCAG 2.2 target size: at least 24 by 24 pixels. */
+  .room-cover__note a {
+    display: inline-block;
+    min-height: 24px;
+    line-height: 24px;
+  }
+</style>

@@ -1,0 +1,282 @@
+---
+/**
+ * Operations Floor: the stock control chart (5.6, HL). The planned saw-tooth is
+ * drawn on the server from src/lib/operations.ts; the script redraws it as the
+ * learner changes the plan or runs a scenario, and checks the three questions
+ * against the plan on screen.
+ */
+import { bufferUse, maxStock, readStock, reorderLevel, simulateStock } from '../../lib/operations';
+import { stockChartSvg } from '../../lib/charts-studio';
+import { stockFiguresHtml, stockTableHtml } from '../../lib/render-studio';
+import { jsonForScript } from '../../lib/markup';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'stock-control' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const plan = { ...data.defaults, weeks: data.weeks };
+const run = simulateStock(plan);
+const L = data.labels;
+const reading = readStock(run, null, L);
+const rush = data.scenarios.find((s) => s.id === data.rushScenario);
+const rushRun = rush ? simulateStock(plan, { usage: rush.usage, late: rush.late }) : null;
+const config = { uid, defaults: data.defaults, weeks: data.weeks, scenarios: data.scenarios, labels: L, rushScenario: data.rushScenario };
+const fields = [
+  { key: 'usage', label: `Usage a week`, suffix: L.many, step: '0.5' },
+  { key: 'leadTime', label: 'Lead time', suffix: 'weeks', step: '0.5' },
+  { key: 'buffer', label: 'Buffer stock', suffix: L.many, step: '1' },
+  { key: 'reorderQty', label: 'Reorder quantity', suffix: L.many, step: '1' },
+] as const;
+const USE = {
+  none: 'None of it',
+  some: 'Some of it, but not all',
+  all: 'All of it: the studio runs out',
+} as const;
+const USE_KEYS = Object.keys(USE) as Array<keyof typeof USE>;
+const values = data.defaults as Record<string, number>;
+---
+
+<div class="stk" data-ix="stock-control" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The chart could not start. It is shown below for the planned figures.</p>
+  <p class="stk__item"><span class="label">In stock</span> {data.item}.</p>
+
+  <div class="bew__grid">
+    <form class="bew__inputs" data-form novalidate aria-label="Stock plan">
+      <fieldset class="bew__fields">
+        <legend class="label label--ink">The plan</legend>
+        {
+          fields.map((f) => (
+            <div class="field">
+              <label for={`${uid}-${f.key}`}>{f.label}</label>
+              <div class="affix">
+                <input
+                  class="input input--num"
+                  id={`${uid}-${f.key}`}
+                  name={f.key}
+                  type="number"
+                  inputmode="decimal"
+                  min="0"
+                  step={f.step}
+                  value={String(values[f.key] ?? 0)}
+                  aria-describedby={`${uid}-${f.key}-err`}
+                />
+                <span class="affix__post" aria-hidden="true">{f.suffix}</span>
+              </div>
+              <span class="field__error" id={`${uid}-${f.key}-err`} data-err={f.key} />
+            </div>
+          ))
+        }
+      </fieldset>
+      <fieldset class="bew__scenarios js-only">
+        <legend class="label label--ink">Run a scenario</legend>
+        <div class="cluster">
+          <button type="button" class="btn btn--small" data-scenario="" aria-pressed="true">As planned</button>
+          {
+            data.scenarios.map((s) => (
+              <button type="button" class="btn btn--small" data-scenario={s.id} aria-pressed="false">
+                {s.label}
+              </button>
+            ))
+          }
+          <button type="button" class="btn btn--small btn--ink" data-reset>Reset the plan</button>
+        </div>
+        <p class="small muted" data-scenario-note>The plan as entered, with usage and lead time exactly as expected.</p>
+      </fieldset>
+    </form>
+
+    <div class="bew__results">
+      <h4 class="label label--ink">Results</h4>
+      <dl class="figs" data-figures set:html={stockFiguresHtml(run, L)} />
+      <div class="bew__reading">
+        <p><strong>Reading.</strong> <span data-interp>{reading.reading}</span></p>
+        <p class="muted"><strong>Implication.</strong> <span data-impl>{reading.implication}</span></p>
+      </div>
+    </div>
+  </div>
+
+  <figure class="bew__chart">
+    <div class="chart-scroll" role="region" aria-label="Stock control chart" tabindex="0" data-chart set:html={stockChartSvg(run, { id: `${uid}-chart`, unit: L })} />
+    <figcaption class="exhibit__source">
+      <b>Chart</b> Stock week by week (black). Orders are placed at the reorder level (dashed blue) and arrive after the lead time; the green line is the buffer, and the shaded band below it is the buffer in use. In a scenario, the planned line is shown dotted. Simulated teaching data.
+    </figcaption>
+    <details class="disclosure">
+      <summary>The chart's figures as a table</summary>
+      <div class="disclosure__body table-scroll" role="region" aria-label="Stock by week" tabindex="0">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Week</th>
+              <th scope="col" class="n">Stock at the start</th>
+              <th scope="col" class="n">Used</th>
+              <th scope="col" class="n">Delivered</th>
+              <th scope="col" class="n">Stock at the end</th>
+              <th scope="col">Note</th>
+            </tr>
+          </thead>
+          <tbody data-table set:html={stockTableHtml(run)} />
+        </table>
+      </div>
+    </details>
+  </figure>
+
+  <aside class="callout callout--note">
+    <span class="callout__kicker">Where the formulas come from</span>
+    <div class="prose small">
+      <p>
+        <strong>Reorder level</strong> = buffer stock + usage a week × lead time in weeks. <strong>Maximum stock</strong> = buffer stock + reorder
+        quantity. Stock control charts, with lead time, buffer stock, reorder level and reorder quantity, are HL content in subtopic 5.6 (guide, p. 34);
+        these two formulas are standard definitions, not in the guide's formula list. The model allows one order at a time.
+      </p>
+    </div>
+  </aside>
+
+  <section class="stk__qs" aria-labelledby={`${uid}-qs`}>
+    <h4 class="label label--ink" id={`${uid}-qs`}>Check your understanding</h4>
+    <ol class="stk__list" role="list">
+      <li class="stk__q" data-q="rol">
+        <label for={`${uid}-q-rol`}>1. With the plan above, at what stock level should the studio place an order?</label>
+        <div class="cluster">
+          <div class="affix">
+            <input class="input input--num stk__answer" id={`${uid}-q-rol`} type="number" inputmode="decimal" step="0.5" min="0" />
+            <span class="affix__post" aria-hidden="true">{L.many}</span>
+          </div>
+          <button type="button" class="btn btn--small btn--primary js-only" data-check="rol">Check</button>
+        </div>
+        <div class="feedback js-only" data-feedback="rol" hidden></div>
+        <details class="disclosure nojs-only">
+          <summary>Answer</summary>
+          <div class="disclosure__body"><p>{reorderLevel(plan)} {L.many}: buffer {plan.buffer} + {plan.usage} a week × {plan.leadTime} weeks.</p></div>
+        </details>
+      </li>
+      <li class="stk__q" data-q="max">
+        <label for={`${uid}-q-max`}>2. What is the most stock the studio should ever hold?</label>
+        <div class="cluster">
+          <div class="affix">
+            <input class="input input--num stk__answer" id={`${uid}-q-max`} type="number" inputmode="decimal" step="0.5" min="0" />
+            <span class="affix__post" aria-hidden="true">{L.many}</span>
+          </div>
+          <button type="button" class="btn btn--small btn--primary js-only" data-check="max">Check</button>
+        </div>
+        <div class="feedback js-only" data-feedback="max" hidden></div>
+        <details class="disclosure nojs-only">
+          <summary>Answer</summary>
+          <div class="disclosure__body"><p>{maxStock(plan)} {L.many}: buffer {plan.buffer} + reorder quantity {plan.reorderQty}.</p></div>
+        </details>
+      </li>
+      {
+        rush && (
+          <li class="stk__q" data-q="buffer">
+            <fieldset>
+              <legend>3. {rush.label}. {rush.note} With the plan above, how much of the buffer stock is used?</legend>
+              <div class="choice__opts choice--lines">
+                {USE_KEYS.map((k) => (
+                  <label class="opt" data-value={k}>
+                    <input type="radio" name={`${uid}-q-buffer`} value={k} />
+                    <span class="opt__body">
+                      <span class="opt__text">{USE[k]}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            <p class="cluster js-only">
+              <button type="button" class="btn btn--small btn--primary" data-check="buffer">Check</button>
+            </p>
+            <div class="feedback js-only" data-feedback="buffer" hidden></div>
+            {rushRun && (
+              <details class="disclosure nojs-only">
+                <summary>Answer</summary>
+                <div class="disclosure__body">
+                  <p>{USE[bufferUse(rushRun)]}. The lowest point is {rushRun.minStock} {L.many}.</p>
+                </div>
+              </details>
+            )}
+          </li>
+        )
+      }
+    </ol>
+  </section>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/stock-control';
+</script>
+
+<style>
+  .stk {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .stk__item {
+    margin: 0;
+  }
+
+  .stk__item .label {
+    margin-right: var(--sp-2);
+  }
+
+  .stk__qs {
+    display: grid;
+    gap: var(--sp-3);
+    max-width: 48rem;
+  }
+
+  .stk__list {
+    display: grid;
+    gap: var(--sp-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .stk__q {
+    display: grid;
+    gap: var(--sp-2);
+    padding: var(--sp-4);
+    border: 1px solid var(--rule-hair);
+    background: #fff;
+  }
+
+  .stk__q > label,
+  .stk__q legend {
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .stk__q fieldset {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .stk__q legend {
+    margin-bottom: var(--sp-2);
+    padding: 0;
+  }
+
+  .stk__q .cluster {
+    margin: 0;
+  }
+
+  .stk__answer {
+    width: 7rem;
+  }
+
+  .stk__q .opt__text {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+  }
+
+  .stk :global(tr.is-low) td,
+  .stk :global(tr.is-low) th {
+    background: var(--surface-partial);
+  }
+</style>

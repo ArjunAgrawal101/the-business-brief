@@ -1,0 +1,200 @@
+---
+/**
+ * Market Studio: the position map builder (4.2). The default axes are drawn on
+ * the server from src/lib/market.ts; the script redraws the map when the
+ * learner chooses other attributes, and checks the gap they identify.
+ */
+import { gapNote, mapModel, quadrantLabel, QUADRANTS } from '../../lib/market';
+import { positionMapSvg } from '../../lib/charts-studio';
+import { mapTableHtml } from '../../lib/render-studio';
+import { jsonForScript, rich } from '../../lib/markup';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'position-map' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const attr = (id: string) => data.attributes.find((a) => a.id === id) ?? data.attributes[0];
+const xa = attr(data.defaults.x);
+const ya = attr(data.defaults.y);
+if (!xa || !ya) throw new Error(`Position map ${uid} has no attributes`);
+const m = mapModel(data.brands, xa.id, ya.id, data.scale);
+// The answer for the default axes, for readers without JavaScript.
+const defaultAnswer = m.empty.length
+  ? `On these axes the empty part is: ${m.empty.map((q) => quadrantLabel(q, xa, ya).toLowerCase()).join('; ')}. ${m.empty.map((q) => gapNote(q, xa.id, ya.id, data.gaps)).filter(Boolean).join(' ')}`
+  : 'On these axes every part of the map has at least one seller.';
+const config = { uid, attributes: data.attributes, brands: data.brands, scale: data.scale, focus: data.focus, defaults: data.defaults, gaps: data.gaps };
+---
+
+<div class="pmap" data-ix="position-map" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The map could not start. It is shown below on its default axes.</p>
+  <p class="small muted pmap__survey">{data.survey}</p>
+
+  <div class="pmap__axes js-only">
+    <div class="field">
+      <label for={`${uid}-x`}>Across (horizontal axis)</label>
+      <select class="select" id={`${uid}-x`} data-axis="x">
+        {data.attributes.map((a) => <option value={a.id} selected={a.id === xa.id}>{a.label}: {a.low} to {a.high}</option>)}
+      </select>
+    </div>
+    <div class="field">
+      <label for={`${uid}-y`}>Up (vertical axis)</label>
+      <select class="select" id={`${uid}-y`} data-axis="y">
+        {data.attributes.map((a) => <option value={a.id} selected={a.id === ya.id}>{a.label}: {a.low} to {a.high}</option>)}
+      </select>
+    </div>
+    <p class="small muted pmap__swap" data-swap aria-live="polite"></p>
+  </div>
+  <p class="nojs-only small muted">With JavaScript on, you can choose the two attributes on the axes.</p>
+
+  <div class="pmap__grid">
+    <figure class="pmap__figure">
+      <div class="chart-scroll" role="region" aria-label="Position map" tabindex="0" data-chart set:html={positionMapSvg(m, xa, ya, { id: `${uid}-chart`, focus: data.focus, scale: data.scale })} />
+      <figcaption class="exhibit__source">
+        <b>Map</b> Average scores from the simulated survey. The dashed lines mark the middle of the scale. Atelier Barro is the blue point.
+      </figcaption>
+    </figure>
+    <div class="pmap__side">
+      <div class="table-scroll" role="region" aria-label="Scores on the chosen axes" tabindex="0">
+        <table class="table">
+          <caption class="sr-only">Each seller's scores on the two chosen attributes</caption>
+          <thead>
+            <tr>
+              <th scope="col">Seller</th>
+              <th scope="col" class="n" data-head-x>{xa.label}</th>
+              <th scope="col" class="n" data-head-y>{ya.label}</th>
+              <th scope="col">Part of the map</th>
+            </tr>
+          </thead>
+          <tbody data-table set:html={mapTableHtml(m, xa, ya, data.focus)} />
+        </table>
+      </div>
+
+      <fieldset class="pmap__gap">
+        <legend class="label label--ink">Which part of the map is empty?</legend>
+        <div class="choice__opts choice--lines" data-options>
+          {
+            QUADRANTS.map((q) => (
+              <label class="opt" data-value={q}>
+                <input type="radio" name={`${uid}-gap`} value={q} />
+                <span class="opt__body">
+                  <span class="opt__text" data-qlabel={q}>{quadrantLabel(q, xa, ya)}</span>
+                </span>
+              </label>
+            ))
+          }
+          <label class="opt" data-value="none">
+            <input type="radio" name={`${uid}-gap`} value="none" />
+            <span class="opt__body">
+              <span class="opt__text">No part is empty</span>
+            </span>
+          </label>
+        </div>
+        <p class="cluster js-only">
+          <button type="button" class="btn btn--small btn--primary" data-check>Check</button>
+        </p>
+        <div class="feedback js-only" data-feedback hidden></div>
+        <details class="disclosure nojs-only">
+          <summary>The answer for these axes</summary>
+          <div class="disclosure__body"><p>{defaultAnswer}</p></div>
+        </details>
+      </fieldset>
+    </div>
+  </div>
+
+  <div class="field pmap__reflect">
+    <label for={`${uid}-why`}>Is the gap worth filling? Think about demand, whether the business could deliver it, the fit with its brand, and how rivals would respond.</label>
+    <textarea class="textarea" id={`${uid}-why`} rows="3" data-note></textarea>
+    <span class="field__hint js-only">Saved on this device only.</span>
+  </div>
+
+  <aside class="callout callout--caution">
+    <span class="callout__kicker">Read the map with care</span>
+    <div class="prose" set:html={rich(data.caution)} />
+  </aside>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/position-map';
+</script>
+
+<style>
+  .pmap {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .pmap__survey {
+    margin: 0;
+    max-width: var(--text-max);
+  }
+
+  .pmap__axes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: var(--sp-3) var(--sp-4);
+    max-width: 48rem;
+  }
+
+  .pmap__swap {
+    grid-column: 1 / -1;
+    margin: 0;
+    min-height: 1.2em;
+  }
+
+  .pmap__grid {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  @media (min-width: 64rem) {
+    .pmap__grid {
+      grid-template-columns: minmax(0, 11fr) minmax(0, 9fr);
+      align-items: start;
+    }
+  }
+
+  .pmap__figure {
+    margin: 0;
+  }
+
+  .pmap__figure :global(.chart) {
+    min-width: 26rem;
+  }
+
+  .pmap__side {
+    display: grid;
+    gap: var(--sp-4);
+    min-width: 0;
+  }
+
+  .pmap__gap {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .pmap__gap > legend {
+    margin-bottom: var(--sp-2);
+    padding: 0;
+  }
+
+  .pmap__gap .cluster {
+    margin: 0;
+  }
+
+  .pmap__gap .opt__text {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+  }
+
+  .pmap__reflect {
+    max-width: 48rem;
+  }
+</style>

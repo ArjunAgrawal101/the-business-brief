@@ -1,0 +1,233 @@
+---
+/**
+ * Market Studio: market share and market growth (4.1). The default state is
+ * rendered on the server from src/lib/market.ts; the script recalculates the
+ * figures, chart, table, reading and working as the learner edits the sales.
+ */
+import LevelTag from '../ui/LevelTag.astro';
+import { growthReading, growthWorking, marketModel, readMarket, shareWorking } from '../../lib/market';
+import { marketShareSvg } from '../../lib/charts-studio';
+import { marketFiguresHtml, marketTableHtml } from '../../lib/render-studio';
+import { workingHtml } from '../../lib/render';
+import { esc, inline, jsonForScript } from '../../lib/markup';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'market-share-workspace' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const m = marketModel(data.firms);
+const reading = readMarket(m, data.focus, data.periods, data.unit);
+const growth = growthReading(m);
+const focus = data.firms.find((f) => f.id === data.focus);
+const config = { uid, firms: data.firms, focus: data.focus, periods: data.periods, unit: data.unit, scenarios: data.scenarios };
+---
+
+<div class="msw" data-ix="market-share" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The workspace could not start. The figures below are for the case's sales.</p>
+  <p class="msw__market"><span class="label">The market</span> {data.market}. Measured by {data.basis}, in {data.unit} a year.</p>
+
+  <div class="bew__grid">
+    <form class="bew__inputs" data-form novalidate aria-label="Sales by seller">
+      <fieldset class="bew__fields msw__fields">
+        <legend class="label label--ink">Sales, in {data.unit}</legend>
+        <div class="table-scroll" role="region" aria-label="Sales inputs" tabindex="0">
+          <table class="table msw__in">
+            <thead>
+              <tr>
+                <th scope="col">Seller</th>
+                <th scope="col" class="n">{data.periods.last}</th>
+                <th scope="col" class="n">{data.periods.now}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                data.firms.map((f) => (
+                  <tr class={f.id === data.focus ? 'is-focus' : undefined}>
+                    <th scope="row">{f.name}</th>
+                    {(['last', 'now'] as const).map((k) => (
+                      <td class="n">
+                        <input
+                          class="input input--num msw__num"
+                          type="number"
+                          min="0"
+                          step="1"
+                          inputmode="numeric"
+                          name={`${f.id}-${k}`}
+                          id={`${uid}-${f.id}-${k}`}
+                          value={String(f[k])}
+                          aria-label={`${f.name}, sales in ${data.periods[k]}`}
+                          aria-describedby={`${uid}-${f.id}-${k}-err`}
+                        />
+                        <span class="field__error" id={`${uid}-${f.id}-${k}-err`} data-err={`${f.id}-${k}`} />
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </fieldset>
+      {
+        data.scenarios.length > 0 && (
+          <fieldset class="bew__scenarios js-only">
+            <legend class="label label--ink">Try a scenario</legend>
+            <div class="cluster">
+              {data.scenarios.map((s) => (
+                <button type="button" class="btn btn--small" data-scenario={s.id} aria-pressed="false">
+                  {s.label}
+                </button>
+              ))}
+              <button type="button" class="btn btn--small btn--ink" data-reset>
+                Reset to the case
+              </button>
+            </div>
+            <p class="small muted" data-scenario-note>
+              Each scenario changes only the figures it names, starting from the case.
+            </p>
+          </fieldset>
+        )
+      }
+    </form>
+
+    <div class="bew__results">
+      <h4 class="label label--ink">Results</h4>
+      <dl class="figs" data-figures set:html={marketFiguresHtml(m, data.focus, data.periods, data.unit)} />
+      <div class="bew__reading">
+        <p><strong>Reading.</strong> <span data-interp>{reading.reading}</span></p>
+        <p class="muted"><strong>Implication.</strong> <span data-impl>{reading.implication}</span></p>
+      </div>
+    </div>
+  </div>
+
+  <figure class="bew__chart">
+    <div class="chart-scroll" role="region" aria-label="Market share chart" tabindex="0" data-chart set:html={marketShareSvg(m, { id: `${uid}-chart`, focus: data.focus, periods: data.periods })} />
+    <figcaption class="exhibit__source">
+      <b>Chart</b> Each seller's share of the market: {data.periods.last} as an outlined bar, {data.periods.now} as a solid one, {focus?.name} in blue. Simulated teaching data; the chart is redrawn from the sales above.
+    </figcaption>
+    <details class="disclosure">
+      <summary>The chart's figures as a table</summary>
+      <div class="disclosure__body table-scroll" role="region" aria-label="Market share figures" tabindex="0">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Seller</th>
+              <th scope="col" class="n">Sales {data.periods.last}</th>
+              <th scope="col" class="n">Share {data.periods.last}</th>
+              <th scope="col" class="n">Sales {data.periods.now}</th>
+              <th scope="col" class="n">Share {data.periods.now}</th>
+              <th scope="col" class="n">Change in share (points)</th>
+              <th scope="col" class="n">Sales growth</th>
+              <th scope="col" class="n">Rank</th>
+            </tr>
+          </thead>
+          <tbody data-table set:html={marketTableHtml(m, data.focus)} />
+        </table>
+        <p class="small muted">Shares are rounded, so they may not add to exactly 100%. "Other studios and makers" groups many small sellers, so it is not ranked.</p>
+      </div>
+    </details>
+  </figure>
+
+  <aside class="callout callout--note msw__formula">
+    <span class="callout__kicker">Standard definitions</span>
+    <div class="prose small">
+      <p>
+        <strong>Market share</strong> = the firm's sales ÷ total market sales × 100. <strong>Market growth</strong> = (sales this period − sales last
+        period) ÷ sales last period × 100. The guide's formula list (pp. 64 to 65) does not include either; the IB teacher support material's glossary
+        describes both, and notes that share can be measured by value or by volume (TSM, p. 86).
+      </p>
+    </div>
+  </aside>
+
+  <section class="bew__working" aria-label={`Working for ${focus?.name ?? 'the firm'}'s market share`}>
+    <h4 class="label label--ink">The working: {focus?.name}'s market share in {data.periods.now}</h4>
+    <div data-working-share set:html={workingHtml(shareWorking(m, data.focus, data.periods.now, data.unit), esc(reading.reading), esc(reading.implication))} />
+  </section>
+  <details class="disclosure">
+    <summary>The working: market growth</summary>
+    <div class="disclosure__body" data-working-growth set:html={workingHtml(growthWorking(m, data.periods, data.unit), esc(growth.interpretation), esc(growth.implication))} />
+  </details>
+
+  <div class="block msw__hl" data-level="HL">
+    <div class="tags"><LevelTag level="HL" /> <span class="tag tag--plain">AO3</span></div>
+    <h4 class="msw__hl-q" set:html={inline(data.hlPrompt.question.trim())} />
+    <div class="field">
+      <label for={`${uid}-hl`}>Your answer, in a few sentences</label>
+      <textarea class="textarea" id={`${uid}-hl`} rows="4" data-note></textarea>
+      <span class="field__hint js-only">Saved on this device only.</span>
+    </div>
+    <details class="disclosure">
+      <summary>Points a strong answer weighs</summary>
+      <div class="disclosure__body prose">
+        <ul>{data.hlPrompt.points.map((p) => <li set:html={inline(p)} />)}</ul>
+        <p class="small muted">The importance of market share and market leadership is HL-only content in subtopic 4.1 (guide, p. 31).</p>
+      </div>
+    </details>
+  </div>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/market-share';
+</script>
+
+<style>
+  .msw {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .msw__market {
+    margin: 0;
+    max-width: var(--text-max);
+  }
+
+  .msw__market .label {
+    margin-right: var(--sp-2);
+  }
+
+  .msw__fields {
+    display: block;
+  }
+
+  .msw__in {
+    min-width: 0;
+  }
+
+  .msw__in th,
+  .msw__in td {
+    vertical-align: middle;
+  }
+
+  .msw__num {
+    width: 7.5rem;
+    min-height: 2.5rem;
+    text-align: right;
+  }
+
+  .msw :global(tr.is-focus) th {
+    color: var(--cobalt-text);
+  }
+
+  .msw__formula {
+    margin: 0;
+  }
+
+  /* Keep the bars at a readable size on wide screens. */
+  .msw .bew__chart > .chart-scroll {
+    max-width: 46rem;
+  }
+
+  .msw__hl {
+    display: grid;
+    gap: var(--sp-3);
+  }
+
+  .msw__hl-q {
+    margin: 0;
+    font-size: var(--fs-h4);
+  }
+</style>
