@@ -1,0 +1,323 @@
+# Notes: 5.6 Production planning (HL only). Written in the platform's own words
+# from the guide's seven content statements (pp. 34 to 35). The capacity
+# utilization and productivity rate formulas are the guide's (p. 65). The guide
+# gives no formula for the other measures, so the standard forms used across
+# the site (src/lib/operations.ts and the glossary) are given and labelled as
+# such; for operating leverage the note uses the degree of operating leverage,
+# as the glossary does. The supplied coursebook chapter (Hodder, pp. 519 to 533)
+# was read to check coverage; no passage, figure, table or case from it is
+# reproduced, and its operating leverage formula is not followed. Wrenhurst
+# Cycles and Hollowmere Bikes are fictional; the stock figures match the site's
+# stock control chart, and every worked figure was checked by script.
+code: '5.6'
+title: Production planning
+level: HL
+introduction: |
+  A business that makes things has to get the right materials to the right place at the right time, use its capacity well, keep faults to a minimum and decide what to make itself and what to buy in. **Production planning** is the set of tools for those decisions.
+
+  This HL subtopic covers the supply chain that feeds production, the choice between holding stock **just in case** and receiving it **just in time**, the stock control chart, and the measures managers use to judge operations: capacity utilization, the defect rate, productivity and operating leverage. It ends with the choice between making and buying. Several of these are calculations (AO4), but each result needs interpreting: a number on its own decides nothing.
+objectives:
+  - '**Explain** how a local and a global supply chain work, and the risks of each.'
+  - '**Evaluate** just-in-time and just-in-case stock control, and judge which suits a given business.'
+  - '**Construct** and interpret a stock control chart using lead time, buffer stock, reorder level and reorder quantity.'
+  - '**Calculate** capacity utilization, the defect rate, labour and capital productivity, the productivity rate and operating leverage, and comment on the results.'
+  - '**Recommend** whether to make or buy, using the cost to make and the cost to buy alongside non-financial factors.'
+sections:
+  - id: supply-chain
+    title: The local and global supply chain
+    kind: concept
+    level: HL
+    body: |
+      A **supply chain** is the sequence of businesses and activities that turns raw materials into a product in a customer's hands: growing or extracting the materials, making components, assembling the product, storing and transporting it, and selling it. Goods flow forward along the chain; information, such as orders, sales data and complaints, flows back.
+
+      **Supply chain management** is the work of coordinating that chain: choosing suppliers; agreeing prices, quality standards and delivery dates, often with penalties for late delivery; deciding what to make and what to buy; organizing transport and storage; and checking that suppliers meet the business's standards on working conditions and the environment. Customers judge a business by the whole chain, not only by its own part of it. A late component, a faulty part or a supplier's unsafe factory becomes its problem.
+
+      A **local** supply chain keeps most of its stages in one country or region. A **global** one spreads them across the world to reach lower costs, scarce materials or specialist skills.
+    diagram: supply-chain
+    points:
+      - term: Strengths of a local chain
+        text: Short lead times; easy communication in one language and time zone; closer checks on quality and working conditions; lower transport costs and emissions; and a "made locally" story for marketing.
+      - term: Weaknesses of a local chain
+        text: Often higher costs, especially of labour; a smaller choice of suppliers; and some materials or skills may not be available locally at all.
+      - term: Strengths of a global chain
+        text: Lower costs from cheaper labour and suppliers' economies of scale; access to materials and expertise found elsewhere; and a wider choice of suppliers.
+      - term: Weaknesses of a global chain
+        text: Long lead times and high transport costs; exposure to disruption from storms, conflict, blocked shipping routes or pandemics; changes in exchange rates and tariffs; and harder checks on how suppliers treat their workers and the environment.
+      - term: Managing the chain well
+        text: Brings reliable deliveries, lower costs, flexibility when demand changes, consistent quality and a reputation for ethical sourcing. Technology helps, because shared data and tracking show where every order is.
+      - term: Building resilience
+        text: After a disruption, many businesses spread their orders across more suppliers, hold more stock of critical parts, or bring some production closer to home (reshoring, subtopic 5.4), accepting some extra cost in return for a chain that is harder to break.
+    example:
+      title: Wrenhurst Cycles' supply chain
+      fictional: true
+      text: |
+        Wrenhurst Cycles, a fictional bicycle maker, assembles about 200 bikes a week. Its aluminium frames are welded by a partner factory overseas and take eight weeks to arrive by sea; its gear sets come from a supplier in a neighbouring country, two weeks away; tyres, saddles and boxes come from local firms that deliver within two days. Finished bikes go to independent bike shops and to customers who order on its website, and the shops' orders and the website's sales data flow back, telling Wrenhurst what to build next.
+
+        The overseas frames are the cheapest part of the chain and the riskiest: one delayed ship could stop the whole assembly line.
+  - id: jit-and-jic
+    title: Just-in-time versus just-in-case
+    kind: types
+    level: HL
+    body: |
+      Businesses hold three kinds of **stock**: raw materials and components waiting to be used, work in progress, and finished goods waiting to be sold. How much to hold is a trade-off. Too little and production stops; too much ties up cash and space in goods sitting on shelves. The two approaches the guide names sit at either end.
+
+      **Just-in-case (JIC)** holds generous stocks, including a buffer, as insurance against late deliveries, faults or a sudden rise in demand. **Just-in-time (JIT)** holds as little as possible: materials arrive just as they are needed and products are made to order, so stock is used almost as soon as it arrives. JIT is a method of lean production (subtopic 5.3), because stock that sits waiting is a form of waste.
+
+      Neither is right for every business. The choice depends on how reliable the suppliers are, how predictable demand is, how costly a stock-out would be compared with the cost of holding stock, and the nature of the product: perishable or fashion goods favour JIT, while critical spare parts favour JIC.
+    diagram: jit-jic
+    points:
+      - term: JIT gains
+        text: Lower storage, insurance and security costs; cash and space freed for other uses; less waste from damage, theft and goods going out of date; and problems are exposed quickly instead of being hidden behind piles of stock.
+      - term: JIT risks
+        text: Production stops if a single delivery is late; there is no stock to meet a sudden surge in demand; more frequent, smaller orders lose bulk discounts and raise ordering and delivery costs; and the whole system depends on suppliers being reliable.
+      - term: What JIT needs
+        text: Reliable suppliers, often close by; good communication and shared data with them; a flexible, multi-skilled workforce; and quality that is right first time, because there is no spare stock to replace faulty parts.
+      - term: JIC gains
+        text: Production and sales continue when deliveries are late or demand jumps; buying in bulk earns discounts and means fewer orders; and customers can be served at once from stock.
+      - term: JIC costs
+        text: Cash tied up in stock that could be used elsewhere, an opportunity cost that also weakens liquidity; storage, insurance and handling costs; and the risk of stock perishing, being stolen or going out of fashion.
+      - term: Mixing the two
+        text: Many businesses use JIT for cheap, easily replaced items from nearby suppliers and keep buffer stocks of critical parts with long or uncertain lead times.
+    example:
+      title: Wrenhurst's mix
+      fictional: true
+      text: |
+        Wrenhurst takes tyres and boxes just in time, delivered by local suppliers twice a week: a late delivery would cost it a day at most. But it holds about six weeks of frames just in case, about 1,200 frames worth $108,000 at $90 each. That stock ties up cash the business could use elsewhere, and it needs a warehouse; but with an eight-week sea crossing and a single supplier, running out would halt the line for weeks.
+  - id: stock-control-charts
+    title: Stock control charts
+    kind: method
+    level: HL
+    body: |
+      A **stock control chart** plots the level of one stock item over time and is used to plan when to reorder and how much. Stock falls steadily as it is used, then jumps when a delivery arrives, giving a saw-tooth pattern. The guide names four terms the chart uses:
+
+      - **Lead time**: the time between placing an order and the goods arriving, ready to use.
+      - **Buffer stock**: the minimum stock kept in reserve for late deliveries or unexpectedly high usage. In a normal cycle each delivery arrives just as stock reaches this level.
+      - **Reorder level**: the stock level at which a new order is placed, high enough to cover usage during the lead time on top of the buffer.
+      - **Reorder quantity**: how much is ordered each time, which is the height of each jump on the chart.
+
+      The top of each tooth is the **maximum stock level**, the buffer plus the reorder quantity. The slope of the falling line shows the usage rate: the steeper the line, the faster stock is used.
+
+      To construct one, put time on the horizontal axis and units of stock on the vertical. Draw horizontal lines for the maximum stock, the reorder level and the buffer stock. Then draw the saw-tooth, falling at the usage rate from the maximum to the buffer and jumping back up by the reorder quantity, and mark where each order is placed and the lead time that follows. The [Operations Floor](/operations-floor/#of-stock) lets you test a stock plan against late deliveries.
+    formulas:
+      - name: Reorder level
+        expression: Reorder level = buffer stock + (usage per period × lead time in periods)
+        note: The standard form; the guide gives no formula. Measure usage and lead time in the same periods, for example weeks.
+      - name: Maximum stock level
+        expression: Maximum stock level = buffer stock + reorder quantity
+        note: The standard form. It holds when each delivery arrives just as stock reaches the buffer.
+    diagram: stock-control-chart
+    points:
+      - term: What sets the buffer stock
+        text: How reliable suppliers are, how much usage varies, the length of the lead time, the cost of running out, the storage space available and how perishable the stock is. Businesses using JIT keep very little.
+      - term: What sets the reorder quantity
+        text: Bulk discounts and the cost of placing orders, which favour large orders, against storage space, holding costs, the cash tied up and shelf life, which favour small ones.
+      - term: What a stock-out costs
+        text: Lost sales and perhaps lost customers, idle workers and machines, and the extra cost of rush deliveries. The buffer stock exists to make a stock-out unlikely, not impossible.
+      - term: A common confusion
+        text: The reorder level says **when** to order; the reorder quantity says **how much**.
+    example:
+      title: Gear sets at Wrenhurst
+      fictional: true
+      text: |
+        Wrenhurst uses 200 gear sets a week, one per bike. The supplier's lead time is 2 weeks, and Wrenhurst keeps a buffer of 200. So its **reorder level** is 200 + (200 × 2) = **600 gear sets**. Each order is for 800, its **reorder quantity**, so stock peaks at 200 + 800 = **1,000**. Stock falls from 1,000; the order goes in at 600, two weeks later; and the delivery arrives two weeks after that, just as stock reaches the buffer, so the cycle repeats every four weeks. These are the figures in the chart above.
+
+        - **A delivery one week late:** Wrenhurst uses its 200-set buffer and reaches zero just as the order arrives. The buffer covers exactly one week's delay at normal usage; a two-week delay would stop production for a week.
+        - **Usage rises to 250 a week:** during the 2-week lead time Wrenhurst now uses 500, so stock falls to 100 before the delivery arrives and half the buffer is gone. To protect the buffer, the reorder level should rise to 200 + (250 × 2) = 700.
+        - **The lead time lengthens to 3 weeks:** the reorder level must rise to 200 + (200 × 3) = 800.
+    advantages:
+      - Shows at a glance when to order and how much, and how long the business can last if a delivery is late.
+      - Makes the trade-off between the cost of holding stock and the risk of running out visible and easy to discuss.
+    limitations:
+      - Assumes stock is used at a steady rate, although demand varies by day and by season.
+      - Assumes the lead time is fixed and every delivery complete, which one late or short delivery breaks.
+      - Shows one item at a time, so a business with thousands of items needs software that reorders automatically.
+  - id: capacity-utilization
+    title: Capacity utilization
+    kind: method
+    level: HL
+    body: |
+      **Productive capacity** is the most a business can produce in a period with the resources it has now: its buildings, machines and staff. It is measured in units that suit the business, such as bikes a week, seats a night or patients a day. The **capacity utilization rate** shows how much of that capacity is actually being used.
+
+      The rate matters because fixed costs have to be paid whatever the output. The more of its capacity a business uses, the more units share the fixed costs, so the lower its cost per unit and the better its margins.
+
+      That does not make 100% the goal. A business working flat out has no room for maintenance, breakdowns or a rush order from a good customer; staff may be overstretched and quality may slip. Most businesses aim for a high rate with some room to spare. Explore the effect of output on cost per unit on the [Operations Floor](/operations-floor/#of-capacity).
+    formulas:
+      - name: Capacity utilization rate
+        expression: Capacity utilization rate = actual output ÷ productive capacity × 100
+        note: As in the guide's formula list (p. 65).
+    points:
+      - term: Low utilization
+        text: Idle machines and staff push up the fixed cost of each unit. The business can try to boost demand through marketing or lower prices; use the spare capacity to make products for other businesses, or rent it out; or, if the fall in demand looks permanent, **rationalize** by closing sites, selling equipment or cutting staff.
+      - term: Demand above capacity
+        text: Customers have to wait or go elsewhere. The business can add overtime or extra shifts; subcontract work to other firms, at some risk to quality and margins; raise its price to ration demand; or invest in more capacity if the demand looks likely to last.
+      - term: Temporary or lasting?
+        text: A short dip or a seasonal peak may need no response at all; only a lasting change justifies changing the capacity itself.
+    example:
+      title: Wrenhurst's assembly line
+      fictional: true
+      text: |
+        Wrenhurst's line can assemble 250 bikes a week and is building 200, so its capacity utilization rate is 200 ÷ 250 × 100 = **80%**. Its fixed costs are $30,000 a week, which is **$150 a bike** at 200 bikes. At full capacity the fixed cost per bike would fall to $120; if a slump cut output to 150 bikes a week (60%), it would rise to $200.
+
+        The spare capacity of 50 bikes a week also gives Wrenhurst room to accept a large order, or to make parts it now buys in.
+  - id: quality-and-productivity
+    title: Defect rate and productivity
+    kind: method
+    level: HL
+    body: |
+      Four more measures show how well operations turn inputs into good output: the defect rate and three measures of productivity.
+
+      The **defect rate** is the share of the units made that fail to meet the required quality standard. Defects cost money twice: once to scrap or rework the faulty units, and again if any reach customers, through returns, complaints, recalls and damage to the brand. Cutting the defect rate is a main aim of quality management (subtopic 5.3).
+
+      **Productivity** measures output against the inputs used to produce it. **Labour productivity** is output per worker, or per hour worked; **capital productivity** is output per unit of capital, such as per machine or per machine hour. The guide's **productivity rate** compares total output with total input and multiplies by 100. For the percentage to mean something, value both in the same currency: output at its selling price and inputs at their cost.
+
+      Higher productivity lowers the cost of each unit and can pay for higher wages without higher prices. It can be raised through training, better equipment and technology, better methods and better motivation. Pushing it too hard has costs: rushed work can raise the defect rate, and long hours and pressure raise stress and labour turnover, which is an ethical question as well as a practical one. Each measure means most when it is compared over time or with competitors.
+    formulas:
+      - name: Defect rate
+        expression: Defect rate = units that fail to meet the quality standard ÷ units made × 100
+        note: The standard form; the guide gives no formula.
+      - name: Labour productivity
+        expression: Labour productivity = total output ÷ number of workers (or labour hours)
+        note: The standard form; the guide gives no formula.
+      - name: Capital productivity
+        expression: Capital productivity = total output ÷ capital input (such as machine hours)
+        note: The standard form; the guide gives no formula.
+      - name: Productivity rate
+        expression: Productivity rate = total output ÷ total input × 100
+        note: As in the guide's formula list (p. 65).
+    example:
+      title: A month at Wrenhurst
+      fictional: true
+      text: |
+        In a four-week month Wrenhurst assembles 800 bikes. Inspection rejects 16 of them, which are reworked before sale.
+
+        - **Defect rate:** 16 ÷ 800 × 100 = **2%**.
+        - **Labour productivity:** with 25 assembly workers, 800 ÷ 25 = **32 bikes per worker** a month.
+        - **Capital productivity:** the line's machines run for 400 hours in the month, so 800 ÷ 400 = **2 bikes per machine hour**.
+        - **Productivity rate:** the bikes sell for $500 each, so the output is worth $400,000; all the inputs (materials, labour, energy and the fixed costs of the factory) cost $360,000. 400,000 ÷ 360,000 × 100 = **111.1%**, so each $100 of inputs produces about $111 of output.
+
+        Halving the defects would save the time and parts spent reworking eight bikes a month, raising productivity without a single extra worker or machine.
+  - id: operating-leverage
+    title: Operating leverage
+    kind: concept
+    level: HL
+    body: |
+      **Operating leverage** is the extent to which a business's costs are fixed rather than variable. It decides how sharply profit responds when sales change.
+
+      A business with **high operating leverage**, typically capital-intensive, with expensive machinery or premises, has high fixed costs and low variable costs, so each unit sold brings a large contribution. Once its fixed costs are covered, profit climbs quickly as sales rise; but when sales fall the fixed costs remain, and profit falls just as quickly. A business with **low operating leverage**, typically labour-intensive or paying for resources only when it uses them, has low fixed costs and high variable costs, so its profit is steadier in both directions but grows more slowly in good times.
+
+      The guide names operating leverage but gives no formula, and textbooks measure it in different ways; some simply compare fixed costs with variable costs. The most widely used measure, used here, is the **degree of operating leverage**: total contribution divided by operating profit. A result of 4 means that a 1% change in sales changes operating profit by 4%. Whichever measure you use, state it and show your working.
+    formulas:
+      - name: Degree of operating leverage
+        expression: Degree of operating leverage = total contribution ÷ operating profit
+        note: The standard form; the guide gives no formula. Operating profit here is total contribution − fixed costs.
+    points:
+      - term: The link to break-even
+        text: |
+          High operating leverage usually comes with a higher break-even quantity and a smaller margin of safety. In fact the degree of operating leverage equals 1 ÷ the margin of safety as a fraction of sales: Wrenhurst, below, breaks even at 600 bikes and sells 800, a margin of safety of 25% of sales, and its degree of operating leverage is 1 ÷ 0.25 = 4.
+      - term: Why it matters
+        text: It shows how much risk a cost structure carries. A business facing unstable demand may prefer lower operating leverage, for example by leasing equipment, outsourcing or paying staff partly by output, even if that raises its cost per unit.
+    example:
+      title: Two ways to build a bike
+      fictional: true
+      text: |
+        Wrenhurst, with its automated line, and a fictional rival, Hollowmere Bikes, which builds by hand, each sell 800 bikes a month at $500.
+
+        - **Wrenhurst:** variable cost $300 a bike and fixed costs of $120,000 a month. Total contribution is 800 × $200 = $160,000 and operating profit $40,000, so its degree of operating leverage is 160,000 ÷ 40,000 = **4**.
+        - **Hollowmere:** variable cost $400 a bike and fixed costs of $40,000 a month. Total contribution is 800 × $100 = $80,000 and operating profit $40,000, so its degree of operating leverage is 80,000 ÷ 40,000 = **2**.
+
+        Same sales, same profit, different risk. If sales fall 10% to 720 bikes, Wrenhurst's profit falls 40% to $24,000 and Hollowmere's 20% to $32,000. If sales rise 10% to 880 bikes, Wrenhurst's profit rises 40% to $56,000 and Hollowmere's 20% to $48,000.
+  - id: make-or-buy
+    title: Cost to buy versus cost to make
+    kind: application
+    level: HL
+    body: |
+      Should a business make a product or component itself, or buy it from a supplier? On cost alone, compare the **cost to buy (CTB)**, what the supplier would charge for the quantity needed, with the **cost to make (CTM)**, the fixed and variable costs of making that quantity in-house. If CTM is higher than CTB, buying is cheaper on financial grounds; if it is lower, making is.
+
+      Because making carries fixed costs and buying usually does not, the answer depends on the **quantity**. The more units are needed, the more widely the fixed costs of making are spread, so making tends to win at high volumes and buying at low ones. Spare capacity matters too: if machines and staff would otherwise stand idle, some of the costs of making are being paid already.
+
+      The guide sets CTB and CTM at AO3 as well as AO4, so the cost comparison is the start of an answer, not the end of it.
+    formulas:
+      - name: Cost to buy (CTB)
+        expression: Cost to buy = supplier price per unit × quantity
+        note: The standard form; the guide gives no formula. Add delivery charges or import duties if the buyer pays them.
+      - name: Cost to make (CTM)
+        expression: Cost to make = total fixed costs of making + (variable cost per unit × quantity)
+        note: The standard form; the guide gives no formula.
+    points:
+      - term: Reasons to make, even at a higher cost
+        text: Control over quality and delivery dates; protecting designs and know-how from rivals; using spare capacity and keeping skilled staff busy; not depending on one supplier; and avoiding suppliers whose labour or environmental standards could damage the brand.
+      - term: Reasons to buy, even at a higher cost
+        text: A specialist supplier may offer better quality or newer technology; buying frees capacity, cash and management time for the business's core activities; it avoids investing in equipment; and it is easier to change the quantity, or the supplier, if demand changes.
+    example:
+      title: Should Wrenhurst make its own rear racks?
+      fictional: true
+      text: |
+        Wrenhurst fits a rear rack to every bike, 9,600 a year. A supplier quotes $14 a rack, so **CTB** = 9,600 × $14 = **$134,400**. Making them would need a bending and welding machine and a supervisor, fixed costs of $48,000 a year, plus $8 a rack in steel tube, paint and labour, so **CTM** = $48,000 + (9,600 × $8) = **$124,800**. Making saves $9,600 a year.
+
+        But the saving depends on volume. The two costs are equal at 48,000 ÷ (14 − 8) = 8,000 racks a year; if sales fell to 7,000 bikes, CTB would be $98,000 and CTM $104,000, and buying would be cheaper. Wrenhurst would also weigh the use of its spare capacity, the risk of a new process and whether racks deserve management time at all. A decision tree, a toolkit method, could set out the two options and their likely outcomes.
+evaluation:
+  - JIT and JIC trade efficiency against resilience. JIT cuts costs and waste when suppliers are reliable and demand is steady, but a single disruption, from a storm to a blocked shipping route, shows why many businesses keep buffers of their most critical parts.
+  - Supply chain and stock decisions cannot be separated. A global chain may lower costs, but its longer lead times raise the reorder level and the buffer stock needed, and with them the cash tied up in stock.
+  - The measures are most useful together and over time. One capacity utilization rate or productivity figure says little, while a trend, or a comparison with a rival, says much more. They also interact, because pushing utilization or productivity too hard can raise the defect rate.
+  - High operating leverage is not a weakness in itself. It magnifies profit when sales grow as well as losses when they fall, so the right cost structure depends on how stable demand is and how much risk the owners can bear.
+  - A cost comparison rarely settles a make-or-buy decision. The result depends on the quantity and on whether spare capacity exists, and quality, reliability, control and ethics, which the numbers leave out, can outweigh a small saving.
+  - In an examination, write the formula before substituting, give units or a percentage with every answer, state which measure of operating leverage you use, and interpret each result in the case before recommending.
+connections:
+  - code: '5.3'
+    text: Just-in-time is a lean production method, and the defect rate is what quality management sets out to cut.
+  - code: '5.4'
+    text: Outsourcing, offshoring, insourcing and reshoring reshape the supply chain, and each is a decision to make or to buy on a larger scale.
+  - code: '5.5'
+    text: Contribution and the margin of safety underpin operating leverage, and capacity limits the output any break-even target can ask for.
+  - code: '3.6'
+    text: Stock turnover measures how quickly stock moves, which JIT sets out to speed up.
+  - code: '3.7'
+    text: Stock ties up working capital, so stock control decisions affect cash flow.
+  - code: '5.7'
+    text: Contingency planning prepares for the supply chain failures to which JIT is most exposed.
+terms:
+  - supply-chain
+  - just-in-time
+  - just-in-case
+  - lead-time
+  - buffer-stock
+  - reorder-level
+  - reorder-quantity
+  - capacity-utilization-rate
+  - defect-rate
+  - productivity-rate
+  - labour-productivity
+  - capital-productivity
+  - operating-leverage
+  - cost-to-buy
+  - cost-to-make
+retrieval:
+  - q: Give two advantages and two risks of a global supply chain.
+    a: Advantages, for example lower costs and access to materials or skills found elsewhere. Risks, for example long lead times, disruption from storms, conflict or pandemics, changes in exchange rates or tariffs, and harder checks on suppliers' ethics.
+  - q: Why does just-in-time depend on reliable suppliers?
+    a: Because it holds little or no buffer stock, so one late or faulty delivery stops production.
+  - q: A business uses 50 units a day, its lead time is 4 days and its buffer stock is 100 units. What is its reorder level?
+    a: 100 + (50 × 4) = 300 units.
+  - q: What is the difference between the reorder level and the reorder quantity?
+    a: The reorder level is the stock level at which an order is placed (when to order); the reorder quantity is the amount ordered each time (how much).
+  - q: A factory can make 12,000 units a month and makes 9,000. What is its capacity utilization rate, and how could it raise it?
+    a: 9,000 ÷ 12,000 × 100 = 75%. For example by boosting demand, using the spare capacity to make products for other firms, or rationalizing to cut capacity.
+  - q: Of 1,500 units made, 45 fail inspection. What is the defect rate?
+    a: 45 ÷ 1,500 × 100 = 3%.
+  - q: Total contribution is $90,000 and fixed costs are $60,000. What is the degree of operating leverage, and what does it mean?
+    a: Operating profit is $30,000, so 90,000 ÷ 30,000 = 3. A 1% change in sales changes operating profit by 3%.
+  - q: Give two reasons why a business might make a component even though its cost to make is above its cost to buy.
+    a: For example control over quality and supply, protecting its know-how, using spare capacity, or avoiding dependence on a single supplier or on suppliers with poor ethical standards.
+questions: []
+basis:
+  - source: ib-bm-guide-2024
+    pages: 34 to 35, 65
+    note: The seven content statements and their assessment objectives; the capacity utilization and productivity rate formulas
+  - source: hodder-bm-2022
+    pages: 519 to 533
+    note: Read to check coverage; nothing reproduced
+  - source: ib-bm-tsm-2022
+    pages: 81 and 83
+    note: The glossary's definitions of capacity utilization and the defect rate, checked
+verification: primary
+updated: '2026-11-02'

@@ -1,0 +1,263 @@
+# Notes: 5.5 Break-even analysis. Written in the platform's own words from the
+# guide's four content statements (p. 34). The guide's formula list (pp. 64 to
+# 65) gives no break-even formulas, so the standard forms used across the site
+# (src/lib/finance.ts, the calculation register and the glossary) are given and
+# labelled as such. The supplied end of the coursebook chapter (Hodder, pp. 511
+# to 518; its opening pages were not supplied) was read to check coverage; no
+# passage, figure, table or case from it is reproduced. Tarnbeck Bottles is
+# fictional and uses the figures of the site's break-even diagrams (price $25,
+# variable cost $15 a unit, fixed costs $20,000); every worked figure was
+# checked by script.
+code: '5.5'
+title: Break-even analysis
+level: SL/HL
+introduction: |
+  Every business needs to know how much it must sell before it stops losing money. **Break-even analysis** answers that question and several more: how far sales can fall before a loss, how many units would deliver a target profit, what price would, and what happens to all of these when a price or a cost changes.
+
+  It rests on one idea, **contribution**: what each sale adds towards the fixed costs and then towards profit. With contribution and a break-even chart you can answer the calculations this subtopic brings, which are typical of Paper 2 and its quantitative focus. The guide also asks you to judge the tool (AO3), because its answers are only as good as its assumptions.
+objectives:
+  - '**Distinguish** between contribution per unit and total contribution, and use each in the right calculation.'
+  - '**Construct** a break-even chart and annotate the break-even point, profit or loss and the margin of safety.'
+  - '**Calculate** the break-even quantity, profit or loss, margin of safety, target profit output and target price.'
+  - '**Analyse** how a change in price or costs affects the break-even quantity, profit and margin of safety, on a chart and by calculation.'
+  - '**Evaluate** break-even analysis as a tool for making decisions.'
+sections:
+  - id: contribution
+    title: Contribution per unit and total contribution
+    kind: concept
+    body: |
+      Break-even analysis sorts costs into two kinds. **Fixed costs**, such as rent, salaries and insurance, stay the same whatever the output in the short run. **Variable costs**, such as materials and packaging, rise with every unit made. Subtopic 3.3 covers both.
+
+      **Contribution per unit** is the selling price minus the variable cost of one unit: what each extra sale adds once its own variable cost is paid. It is not profit. Until the fixed costs are covered, each unit's contribution goes towards paying them; only after that does contribution become profit.
+
+      **Total contribution** is the contribution from all the units sold: contribution per unit times the number sold, or total revenue minus total variable costs. Profit is total contribution minus fixed costs, so a business breaks even at the output where its total contribution exactly equals its fixed costs.
+    points:
+      - term: Use contribution per unit
+        text: To work out how many units are needed to break even or to reach a target, because fixed costs are covered one unit at a time.
+      - term: Use total contribution
+        text: To work out the profit or loss at a given level of sales, and to compare how much different products earn overall.
+      - term: A common mistake
+        text: Calling contribution per unit "profit per unit". A unit sold below the break-even point still has a positive contribution, yet the business is making a loss.
+    formulas:
+      - name: Contribution per unit
+        expression: Contribution per unit = selling price per unit − variable cost per unit
+      - name: Total contribution
+        expression: Total contribution = contribution per unit × quantity sold
+        note: Equivalently, total revenue − total variable costs.
+      - name: Profit or loss
+        expression: Profit = total contribution − total fixed costs
+        note: The guide's formula list includes none of the break-even formulas; these are the standard forms used across this site.
+    diagram: costs-and-revenue-lines
+    example:
+      title: Tarnbeck Bottles
+      fictional: true
+      text: |
+        Tarnbeck Bottles, a fictional business, makes insulated steel bottles. Each sells for $25 and costs $15 in steel, lids, packaging and delivery, so the **contribution per bottle is $10**. Rent, salaries and insurance are fixed at $20,000 a month. The workshop can make up to 4,000 bottles a month, and it currently sells 3,000.
+
+        At 3,000 bottles, **total contribution** is $10 × 3,000 = $30,000 (check: revenue of $75,000 minus variable costs of $45,000). Profit is $30,000 − $20,000 = **$10,000** a month. These are the figures in the diagrams on this page.
+  - id: break-even-chart
+    title: The break-even chart
+    kind: method
+    body: |
+      A **break-even chart** shows costs and revenue against output on one graph. Output goes on the horizontal axis (the chart assumes that everything made is sold), and costs and revenue in money go on the vertical axis. Three straight lines are drawn:
+
+      - **Fixed costs**: a horizontal line at the level of fixed costs.
+      - **Total costs**: starting at the fixed costs on the vertical axis and rising by the variable cost of each unit.
+      - **Total revenue**: starting at zero and rising by the price of each unit.
+
+      The **break-even point** is where total revenue crosses total costs. Read down to the horizontal axis for the **break-even quantity**, and across to the vertical axis for break-even revenue. To the left of the break-even point, total costs are above total revenue and the vertical gap between them is the **loss**; to the right, the gap is the **profit**. Profit or loss is one of the aspects of the chart the guide lists, so practise reading it at several outputs.
+
+      To construct a chart in an examination, work out the break-even quantity first so that you can choose sensible scales. Plot two points for each straight line, at zero output and at the maximum output or capacity. Label both axes, every line and the break-even point, and give the chart a title. The [break-even workspace](/finance-desk/break-even/) lets you draw and change one.
+    formulas:
+      - name: Break-even quantity
+        expression: Break-even quantity = total fixed costs ÷ contribution per unit
+        note: If the answer is not a whole number, round **up**, because one unit fewer would leave a small loss.
+      - name: Break-even revenue
+        expression: Break-even revenue = break-even quantity × selling price per unit
+        note: Not named in the guide, but it follows from the break-even quantity and can be read from the chart's vertical axis.
+      - name: Profit or loss at any output
+        expression: Profit or loss = total revenue − total costs
+        note: On the chart, the vertical gap between the two lines.
+    diagram: break-even-chart
+    example:
+      title: Reading Tarnbeck's chart
+      fictional: true
+      text: |
+        - Break-even quantity: $20,000 ÷ $10 = **2,000 bottles** a month.
+        - Break-even revenue: 2,000 × $25 = **$50,000** a month.
+        - At 1,000 bottles: revenue $25,000, total costs $20,000 + $15,000 = $35,000, a **loss of $10,000**.
+        - At 3,000 bottles: revenue $75,000, total costs $20,000 + $45,000 = $65,000, a **profit of $10,000**.
+
+        Each of these is a point on the chart or a gap between its lines, which makes the chart a useful check on the arithmetic.
+  - id: margin-of-safety
+    title: The margin of safety
+    kind: method
+    body: |
+      The **margin of safety** is how far actual or forecast sales are above the break-even quantity: how much sales could fall before the business starts to make a loss. On the chart it is the horizontal distance between the break-even quantity and the current level of output.
+
+      It is usually given in units, and it is often more telling as a percentage of sales, because a cushion of 500 units is large for a business selling 1,000 and thin for one selling 50,000. It can also be given in revenue, by multiplying the units by the price.
+
+      A large margin of safety means a business can absorb a bad month, a new competitor or a price war. A small one, or a negative one (sales below break-even), is a warning and a reason to look again at prices, costs and the sales forecast. Because the forecast is an estimate, so is the margin of safety built on it.
+    formulas:
+      - name: Margin of safety
+        expression: Margin of safety = actual or forecast output − break-even quantity
+      - name: Margin of safety as a percentage
+        expression: Margin of safety (%) = margin of safety ÷ actual or forecast output × 100
+        note: Standard forms; the guide gives no formula.
+    example:
+      title: How safe is Tarnbeck?
+      fictional: true
+      text: |
+        Tarnbeck sells 3,000 bottles a month and breaks even at 2,000, so its margin of safety is 3,000 − 2,000 = **1,000 bottles**, or 1,000 ÷ 3,000 × 100 = **33.3%** of sales. In revenue, that is 1,000 × $25 = $25,000. Sales could fall by a third before the business made a loss.
+  - id: targets
+    title: Target profit, target profit output and target price
+    kind: method
+    body: |
+      Break-even analysis can also work backwards from a **target profit**, the profit a business sets out to make in a period. There are two ways to reach it.
+
+      The **target profit output** is how many units must be sold, at the current price, to make the target profit. The units must cover the fixed costs and the target profit, one contribution at a time. On the chart it is the output at which the gap between total revenue and total costs equals the target.
+
+      The **target price** is what must be charged, at the expected level of sales, to make the target profit. The fixed costs and the target profit are shared over the expected sales, and the variable cost of each unit is added on top. On the chart, it is the price whose revenue line, at the expected sales, sits exactly the target profit above total costs. Rounding a target output up to the next whole unit, and a target price up to the next cent, makes sure the target is reached rather than just missed.
+
+      Both answers need a reality check. A target output above capacity cannot be produced without investment, and a target price above what customers will pay will not deliver the expected sales.
+    formulas:
+      - name: Target profit output
+        expression: Target profit output = (total fixed costs + target profit) ÷ contribution per unit
+      - name: Target price
+        expression: Target price = ((total fixed costs + target profit) ÷ expected sales) + variable cost per unit
+        note: Standard forms; the guide's formula list does not include them.
+    example:
+      title: Tarnbeck wants $15,000 a month
+      fictional: true
+      text: |
+        **Target profit output** at $25: ($20,000 + $15,000) ÷ $10 = **3,500 bottles** a month. That is within the workshop's capacity of 4,000, but 500 more than it sells now.
+
+        **Target price** at the current 3,000 bottles: ($20,000 + $15,000) ÷ 3,000 = $11.666…, and adding the $15 variable cost gives $26.666…, rounded up to **$26.67** a bottle. Check: 3,000 × ($26.67 − $15) − $20,000 = $15,010.
+
+        At $25 the most Tarnbeck could earn is at full capacity: 4,000 × $10 − $20,000 = $20,000 a month. Any target above that is out of reach at today's price, however hard it sells.
+  - id: changes-in-price-or-cost
+    title: When price or costs change
+    kind: application
+    body: |
+      The guide asks you to show the effect of a change in price or cost in two ways: on the chart (graphically) and by recalculating (quantitatively). Start with contribution per unit, because almost everything else follows from it.
+
+      On the chart, a **change in price** pivots the total revenue line around the origin. A **change in variable cost per unit** pivots the total cost line around its starting point, the fixed costs on the vertical axis. A **change in fixed costs** shifts the fixed cost and total cost lines up or down in parallel. Wherever the revenue and total cost lines now cross is the new break-even point.
+
+      The catch is price. A higher price lowers the break-even quantity, but customers may buy less, so profit can fall; a lower price raises the break-even quantity, but it may win enough extra sales to raise profit. Break-even analysis cannot say which will happen. That depends on how customers respond, which needs market research or past evidence.
+    points:
+      - term: Higher price
+        text: Revenue line steeper. Contribution per unit rises and the break-even quantity falls. If sales hold, the margin of safety and profit rise; if sales fall far enough, profit falls.
+      - term: Lower price
+        text: Revenue line flatter. Contribution per unit falls and the break-even quantity rises. Profit and the margin of safety fall unless sales rise enough to make up for it.
+      - term: Higher variable cost per unit
+        text: Total cost line steeper, from the same starting point. Contribution per unit falls, the break-even quantity rises, and at unchanged sales the margin of safety and profit fall. A lower variable cost does the reverse.
+      - term: Higher fixed costs
+        text: Fixed and total cost lines shift up by the amount of the rise. Contribution per unit is unchanged, the break-even quantity rises, and at unchanged sales the margin of safety and profit fall. Lower fixed costs do the reverse.
+    diagram: break-even-price-change
+    example:
+      title: Four changes at Tarnbeck
+      fictional: true
+      text: |
+        Starting point: price $25, variable cost $15 a bottle, fixed costs $20,000, sales of 3,000 bottles a month; break-even 2,000 bottles, margin of safety 1,000 bottles, profit $10,000.
+
+        - **Price up to $30** (the diagram): contribution $15, so break-even is 20,000 ÷ 15 = 1,333.3, rounded up to 1,334 bottles. If sales hold at 3,000, the margin of safety is 1,666 bottles and profit $25,000. But if the higher price cut sales below 2,000 bottles, profit would fall below today's $10,000.
+        - **Price down to $22**: contribution $7, so break-even is 2,857.1, rounded up to 2,858 bottles. At 3,000 bottles the margin of safety is 142 bottles and profit $1,000. Even at full capacity, 4,000 bottles, profit would be only $8,000, so no rise in sales could restore today's profit.
+        - **Variable cost up to $17** (dearer steel): contribution $8, break-even 2,500 bottles, margin of safety 500 bottles, profit $4,000.
+        - **Fixed costs up to $24,000** (a larger workshop): contribution still $10, break-even 2,400 bottles, margin of safety 600 bottles, profit $6,000.
+  - id: limitations
+    title: Break-even as a decision-making tool
+    kind: evaluation
+    body: |
+      Break-even analysis is popular because it is simple, quick and visual. It suits a start-up writing a business plan or asking a bank for a loan, a business testing a new product, and a manager asking *what if* the price or a cost changes.
+
+      But it simplifies the real world in ways that limit how far its answers can be trusted. The guide asks you to evaluate those limitations (AO3), which means saying why each one matters for the business in the case, not just listing it.
+    advantages:
+      - Simple to calculate and to understand, even without financial training.
+      - The chart shows at a glance how profit or loss changes with output.
+      - A quick way to test the effect of a change in price or cost before making it.
+      - Sets clear targets, such as the sales needed to break even or to reach a target profit.
+      - Supports a business plan or a loan application by showing how the plan covers its costs.
+    limitations:
+      - Assumes that everything produced is sold, with no unsold stock, although output and sales often differ.
+      - Assumes a single selling price, although businesses give discounts, charge different customers different prices and hold sales.
+      - Assumes the variable cost per unit stays the same, although bulk-buying discounts lower it and overtime or waste can raise it, so the lines are rarely straight.
+      - Assumes fixed costs stay fixed, although they step up when output outgrows capacity and the business needs more space or machines.
+      - Assumes every cost is either fixed or variable, although many, such as energy bills, are semi-variable and have to be split between the two.
+      - Hard to use for a business that sells many products, because the fixed costs must be shared between them in a way that is partly arbitrary.
+      - Static, showing a single period while prices and costs keep changing, so a chart soon goes out of date.
+      - Only as good as its data, especially the sales forecast, and it cannot say whether customers will actually buy the quantity it calls for.
+      - Ignores qualitative factors, and measures profit rather than cash, so a business above break-even can still run short of cash.
+    example:
+      title: Is break-even enough for Tarnbeck?
+      fictional: true
+      text: |
+        Tarnbeck is weighing the price rise to $30. Break-even analysis shows the benefit clearly: the break-even quantity falls from 2,000 to 1,334 bottles. But it cannot say how many customers would leave at $30, and that is the question that decides whether profit rises. Its steel supplier also offers a lower price on orders above 3,500 bottles, so the variable cost per bottle is not really constant. The analysis is a good first test of the price rise, but the decision needs evidence on how customers would react.
+evaluation:
+  - Break-even analysis is most useful as a planning tool before money is spent, such as for a start-up, a new product or a proposed price change. It is less useful for running a complex business with many products and changing costs.
+  - Its answers are only as reliable as its inputs. Fixed and variable costs are usually known, but the sales forecast behind the margin of safety is an estimate, and often the weakest figure in the analysis.
+  - The straight-line assumption is reasonable over the range of output a business normally works in, but not far beyond it, where bulk discounts, overtime and new premises bend or step the lines.
+  - For a price change, break-even shows what must be sold, not what will be sold. Judging whether profit will rise needs evidence of how customers respond to price.
+  - Breaking even is about profit, not cash. A business above its break-even point can still run short of cash if customers pay late or stock builds up, which is why break-even analysis is used alongside a cash flow forecast.
+  - In an examination, work out contribution per unit first, round break-even and target outputs up, give units with every answer, and interpret each result in the case, for example by checking whether a target output is within capacity.
+connections:
+  - code: '3.3'
+    text: Fixed and variable costs and total revenue are the building blocks of every break-even calculation.
+  - code: '4.5'
+    text: Price is one of the seven Ps. Break-even shows what a price change does to contribution, but not how customers will respond.
+  - code: '4.4'
+    text: Market research estimates the sales a price will achieve, the figure break-even analysis cannot supply.
+  - code: '3.7'
+    text: Break-even is about profit; cash flow is about timing, and a business needs both.
+  - code: '5.6'
+    text: At HL, capacity limits the output any target can ask for, operating leverage builds on contribution and the margin of safety, and contribution also drives the choice between making and buying.
+terms:
+  - break-even-analysis
+  - contribution
+  - contribution-per-unit
+  - total-contribution
+  - fixed-cost
+  - variable-cost
+  - total-cost
+  - total-revenue
+  - break-even-chart
+  - break-even-quantity
+  - break-even-revenue
+  - margin-of-safety
+  - target-profit
+  - target-profit-output
+  - target-price
+retrieval:
+  - q: What is the difference between contribution per unit and total contribution?
+    a: Contribution per unit is the price minus the variable cost of one unit, what one more sale adds. Total contribution is contribution per unit times the number sold (or total revenue minus total variable costs), what all the sales add towards fixed costs and profit.
+  - q: Fixed costs are $12,000 a month, the price is $8 and the variable cost is $5 a unit. What is the break-even quantity?
+    a: 12,000 ÷ (8 − 5) = 4,000 units a month.
+  - q: Why is a break-even quantity that is not a whole number rounded up?
+    a: Because one unit fewer would leave a small loss, so the business must sell the next whole unit to cover all its costs.
+  - q: The same business sells 5,000 units a month. What is its margin of safety?
+    a: 5,000 − 4,000 = 1,000 units, or 1,000 ÷ 5,000 × 100 = 20% of sales.
+  - q: How does a rise in fixed costs appear on a break-even chart, and what happens to the break-even quantity?
+    a: The fixed cost and total cost lines shift up in parallel and the revenue line does not move, so they cross further to the right. The break-even quantity rises, and at unchanged sales the margin of safety and profit fall.
+  - q: A price rise lowers the break-even quantity. Why might profit still fall?
+    a: Customers may buy fewer units at the higher price. If sales fall far enough, the extra contribution on each unit does not make up for the units lost.
+  - q: How is the target price worked out?
+    a: Add the fixed costs and the target profit, divide by the expected sales, then add the variable cost per unit.
+  - q: Give three limitations of break-even analysis.
+    a: For example, it assumes everything made is sold, that price and variable cost per unit stay constant, and that fixed costs stay fixed; it is hard to apply to several products; and it is only as good as the sales forecast.
+questions:
+  - q-costs-p2-beq
+  - q-costs-p2-mos
+  - q-costs-p2-price
+  - q-costs-p2-evaluate
+  - q-costs-hl-special
+basis:
+  - source: ib-bm-guide-2024
+    pages: '34'
+    note: The four content statements and their assessment objectives; the formula list on pp. 64 to 65 has no break-even formulas
+  - source: hodder-bm-2022
+    pages: 511 to 518
+    note: The end of the chapter (its opening pages were not supplied), read to check coverage; nothing reproduced
+  - source: ib-bm-tsm-2022
+    pages: '86'
+    note: The glossary's definition of the margin of safety, checked
+verification: primary
+updated: '2026-11-02'

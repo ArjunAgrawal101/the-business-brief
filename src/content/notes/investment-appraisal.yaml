@@ -1,0 +1,262 @@
+# Notes: 3.8 Investment appraisal. Written in the platform's own words from the
+# guide's content statement (p. 30), its formula sheet (p. 65) and its discount
+# table (p. 66). ARR and NPV are written as the formula sheet gives them; the
+# guide gives no payback formula, so the standard method used by the platform's
+# calculator (src/lib/investment.ts) is shown and labelled. No coursebook
+# chapter for unit 3 was supplied, so nothing here rests on one. Every business
+# named is fictional. Project A uses the figures of the payback-arr and
+# npv-discounting diagrams; every worked figure was checked by script.
+code: '3.8'
+title: Investment appraisal
+level: SL/HL with HL-only content
+introduction: |
+  Buying a machine, opening a branch or launching a website means spending a large sum now in the hope of returns spread over several years. Once the money is spent it is hard to get back, so managers need a disciplined way to decide whether a project is worth its cost, and which of several projects to choose.
+
+  **Investment appraisal** provides it. All students use two methods: the **payback period**, which asks how quickly the money comes back, and the **average rate of return (ARR)**, which asks how profitable the project is on average. HL students add **net present value (NPV)**, which allows for the fact that money received later is worth less than money today. The guide asks for judgement (AO3) as well as calculation (AO4), so working out the numbers is only half the task: you must also weigh how far to trust them.
+objectives:
+  - '**Calculate** the payback period and the average rate of return (ARR) from a project''s capital cost and net cash flows.'
+  - '**Calculate** net present value (NPV) using the guide''s discount table (HL only).'
+  - '**Explain** what each method measures, and what each leaves out.'
+  - '**Compare** investment opportunities using more than one method, including why the methods can rank them differently.'
+  - '**Evaluate** an investment decision, weighing the results against the reliability of the forecasts and the qualitative factors.'
+sections:
+  - id: appraising-an-investment
+    title: What investment appraisal does
+    kind: concept
+    body: |
+      An **investment** here means capital expenditure on a project that will last for more than a year: new machinery, a fleet of vans, an IT system, a new outlet or a new product line. Investment appraisal compares what the project costs now with the **returns** it is expected to bring in over its life, and uses the comparison to accept or reject it, or to rank several projects competing for the same money.
+
+      The returns are the project's **net cash flows**: the extra cash it brings in each year minus the extra cash it costs to run. They are forecasts, and that is the weakness every method shares. The figures for year five are guesses made today.
+
+      Businesses appraise investments with care for three reasons. The sums are large, often a big share of what the business has. The decision is hard to reverse, because specialist equipment sells for far less than it cost. And money spent on one project cannot be spent on another, so every choice has an opportunity cost.
+    points:
+      - term: Capital cost
+        text: What the project costs at the start. It is paid now, so in calculations it sits in "year 0".
+      - term: Returns
+        text: The project's net cash flow in each year of use, the extra cash inflows it brings minus the extra cash outflows it causes.
+      - term: Years of use
+        text: The expected life of the project, which is the number of years of returns the calculation includes.
+      - term: Cumulative net cash flow
+        text: The running total of the capital cost (a negative figure) and the returns so far. It turns positive in the year the project pays for itself.
+    example:
+      title: Two ways to spend $100,000
+      fictional: true
+      text: |
+        Quillmoor Print, a fictional printing business, has $100,000 to invest and two options, each expected to last five years.
+
+        - **Project A**, a new digital press: net cash flows of $30,000, $35,000, $40,000, $40,000 and $30,000 in years 1 to 5.
+        - **Project B**, a print-on-demand website: $50,000, $40,000, $20,000, $10,000 and $10,000, falling as rivals copy the idea.
+
+        Project B brings its cash in early; Project A brings in more in total. The sections below appraise both. Project A's figures are the ones in the diagrams on this page.
+  - id: payback-period
+    title: The payback period
+    kind: method
+    body: |
+      The **payback period** is the time a project takes for its net cash flows to add up to its capital cost. It answers one question: how long is the money at risk?
+
+      To find it, keep a running total of the cash flows, starting with the capital cost as a negative figure. The project pays back in the year the running total turns positive. To find how far into that year, divide the amount still to recover at the start of the year by that year's net cash flow, and multiply by 12 to turn the fraction into months. This assumes that the year's cash arrives evenly, month by month, so say so in your answer.
+
+      Many businesses set a maximum payback, such as three years, and reject projects that take longer. A short payback matters most to a business that is short of cash, borrowing at a high rate of interest, or selling in a market where products or technology go out of date quickly. You can test your own figures on the [investment appraisal desk](/finance-desk/investment-appraisal/).
+    formulas:
+      - name: Payback period
+        expression: Payback period = years before the cost is recovered + (amount still to recover ÷ net cash flow in the payback year) × 12 months
+        note: The guide's formula sheet gives no formula for payback; this is the standard method. The answer can also be given as a decimal of years, for example 2.875 years.
+    diagram: payback-arr
+    example:
+      title: Payback at Quillmoor Print
+      fictional: true
+      text: |
+        **Project A.** Cumulative net cash flow: −$100,000 at the start, −$70,000 after year 1, −$35,000 after year 2 and +$5,000 after year 3. The cost is recovered during year 3, with $35,000 still to recover at its start: 35,000 ÷ 40,000 × 12 = 10.5 months. Payback is **2 years and 10.5 months** (2.875 years).
+
+        **Project B.** Cumulative net cash flow: −$100,000, −$50,000, −$10,000, then +$10,000 after year 3. During year 3, 10,000 ÷ 20,000 × 12 = 6 months. Payback is **2 years and 6 months** (2.5 years).
+
+        On payback, Project B is better: its money comes back four and a half months sooner.
+    advantages:
+      - Quick to calculate and easy for managers, owners and lenders to understand.
+      - Favours projects that return cash quickly, which helps liquidity and suits a business that is short of cash.
+      - Limits risk, because the sooner the cost is recovered, the less the decision depends on distant and unreliable forecasts.
+      - Suits markets where products or technology date quickly and later returns are doubtful.
+    limitations:
+      - Ignores every return after the payback point, so it says nothing about a project's total profitability.
+      - Treats a dollar received in year 3 as worth the same as a dollar today, ignoring the time value of money.
+      - The months figure depends on assuming that cash arrives evenly through the year.
+      - A maximum payback is a judgement, and it can reject long-term projects, such as research or new premises, that would earn far more in the end.
+  - id: average-rate-of-return
+    title: The average rate of return (ARR)
+    kind: method
+    body: |
+      The **average rate of return** measures a project's average yearly profit as a percentage of its capital cost. Unlike payback, it uses every year's returns, so it measures profitability rather than speed. Work it in four steps:
+
+      1. Add up the returns over the project's life (the total returns).
+      2. Subtract the capital cost to find the total net return, the project's profit over its life.
+      3. Divide by the years of use to find the average net return a year.
+      4. Divide by the capital cost and multiply by 100.
+
+      An ARR means little on its own. Compare it with a **benchmark**: the interest rate the business would pay to borrow the money, what the money would earn in a bank account, the ARR of other projects, or a minimum rate the owners have set. A project whose ARR is below the cost of borrowing would leave the business worse off once the interest is paid.
+
+      Some textbooks and accountants use a different ARR, based on accounting profit after depreciation or on the average amount invested. For the IB, use the guide's formula, which divides the average yearly net return by the capital cost.
+    formulas:
+      - name: Average rate of return (ARR)
+        expression: ARR = ((total returns − capital cost) ÷ years of use) ÷ capital cost × 100
+        note: As on the guide's formula sheet (p. 65). The answer is a percentage a year.
+    example:
+      title: ARR at Quillmoor Print
+      fictional: true
+      text: |
+        **Project A.** Total returns are $175,000. Total net return: 175,000 − 100,000 = $75,000. Average a year: 75,000 ÷ 5 = $15,000. ARR = 15,000 ÷ 100,000 × 100 = **15%**.
+
+        **Project B.** Total returns are $130,000. Total net return: 130,000 − 100,000 = $30,000. Average a year: 30,000 ÷ 5 = $6,000. ARR = 6,000 ÷ 100,000 × 100 = **6%**.
+
+        Quillmoor's bank would lend it the money at 8% a year. Project A clears that comfortably; Project B does not. On ARR the ranking is the reverse of payback: Project A is better.
+    advantages:
+      - Uses the returns over the whole life of the project, so it measures profitability.
+      - A percentage is easy to compare with interest rates, with other projects and with a target rate of return.
+      - Easy to explain to owners and lenders, who are used to judging returns as percentages.
+    limitations:
+      - Ignores when the returns arrive, so a project whose returns come in year 5 can score as well as one whose returns come in year 1, although early cash is worth more and is less risky.
+      - Depends on forecasts for every year of the project's life, including the distant years, which are the least reliable.
+      - An average can hide years of losses or a long wait before any return.
+      - Other definitions of ARR exist, so results from different sources may not be comparable.
+  - id: net-present-value
+    title: Net present value (NPV)
+    kind: method
+    level: HL
+    body: |
+      Payback and ARR treat a dollar received in year 5 as worth the same as a dollar today. It is not. Money held today can be invested to earn interest, future returns are less certain, and inflation erodes what money will buy. This is the **time value of money**.
+
+      **Net present value** allows for it by **discounting**: converting each future return into its **present value**, the sum that would be worth the same to the business today. Each year's return is multiplied by a **discount factor**, read from a table for the chosen rate and year. The further away the return and the higher the rate, the smaller the factor, so later returns count for less. The present values are then added and the original cost is subtracted. The cost is paid now, so it is already in today's money and is not discounted.
+
+      The **discount rate** is a decision in itself. Businesses often use the interest rate they pay to borrow, or the return they could earn elsewhere, with an allowance for risk. A positive NPV means the project earns more than that rate and adds value; a negative NPV means it earns less and, on financial grounds, should be rejected; an NPV of zero means it earns exactly the rate.
+
+      The guide's discount table, supplied in the examination when a question needs it, gives factors to four decimal places for rates of 4%, 6%, 8%, 10% and 20% over years 1 to 10. Use the printed factors. One of them, 6% in year 8, is printed as 0.6271, slightly different from the 0.6274 the formula gives; the table is what the examination uses.
+    formulas:
+      - name: Present value
+        expression: Present value = return in a year × discount factor for that year and rate
+        note: The standard form. Read the factor from the guide's table (p. 66), and do not discount the original cost.
+      - name: Net present value (NPV)
+        expression: NPV = ∑ present values of return − original cost
+        note: As on the guide's formula sheet (p. 65). ∑ means "the sum of".
+      - name: Discount factor
+        expression: Discount factor = 1 ÷ (1 + r)ⁿ
+        note: Where r is the discount rate as a decimal and n is the number of years. Shown so that you can see where the table comes from; in the examination, use the table.
+    diagram: npv-discounting
+    example:
+      title: NPV at Quillmoor Print
+      fictional: true
+      text: |
+        Quillmoor uses a 10% discount rate, a little above its 8% cost of borrowing to allow for risk. The guide's factors at 10% are 0.9091, 0.8264, 0.7513, 0.6830 and 0.6209 for years 1 to 5.
+
+        - **Project A:** 30,000 × 0.9091 = $27,273; then $28,924, $30,052, $27,320 and $18,627. The present values total $132,196, so NPV = 132,196 − 100,000 = **+$32,196**.
+        - **Project B:** 50,000 × 0.9091 = $45,455; then $33,056, $15,026, $6,830 and $6,209. The present values total $106,576, so NPV = **+$6,576**.
+
+        Both projects earn more than 10%, but Project A adds far more value in today's money. At 20%, the highest rate in the table, Project A's NPV falls to +$3,800 and Project B's to −$10,143. The higher the rate, the lower every NPV, so the choice of rate can decide whether a project passes.
+
+        **When ARR and NPV disagree.** A third option, Project C, also costs $100,000, but its returns build slowly: $10,000, $20,000, $30,000, $50,000 and $70,000. Its total returns of $180,000 give it an ARR of 16%, above Project A's 15%. Yet at 10% its present values total $125,771, so its NPV is $25,771, below Project A's $32,196, because so much of its return arrives late. Its payback, 3 years and 9.6 months, is also the slowest of the three. ARR would choose C; NPV would choose A.
+    advantages:
+      - Allows for the time value of money, so early returns count for more than late ones.
+      - Uses all the returns over the project's life.
+      - Gives an answer in money, the value the project adds in today's terms, which links directly to the owners' wealth.
+      - The discount rate can be raised for riskier projects, so risk is built into the result.
+    limitations:
+      - The result depends heavily on the discount rate, which is a judgement.
+      - Harder to calculate and to explain to non-specialists than payback or ARR.
+      - Still rests on forecasts of every year's returns, and treats each year's return as arriving at the end of the year.
+      - An NPV in money does not show the return on each dollar invested, so it can mislead when projects differ greatly in size.
+  - id: comparing-the-methods
+    title: Comparing the methods
+    kind: evaluation
+    body: |
+      Each method answers a different question, so the methods can rank the same projects differently. Payback asks **how fast**: it rewards early cash and low risk. ARR asks **how profitable**: it rewards high total returns, whenever they arrive. At HL, NPV asks **how much value in today's money**: it rewards high returns, and early ones more than late ones.
+
+      Quillmoor Print shows the clash. Project B pays back sooner (2 years 6 months, against 2 years 10.5 months), but Project A has the far higher ARR (15%, against 6%). Which matters more depends on the business. If Quillmoor were short of cash, or expected its market to change fast, the quicker payback might win; if it can afford to wait, Project A's profitability should. At HL, ARR and NPV can disagree as well, as Project C in the NPV section shows.
+
+      In practice businesses use the methods together: a maximum payback as a first screen for risk, then ARR (and NPV at HL) to judge profitability. A strong examination answer does the same. It calculates, compares each result with a benchmark from the case, and says which result matters most for this business.
+    points:
+      - term: Payback first
+        text: When cash is short, the market or technology is changing quickly, or the owners are cautious about risk.
+      - term: ARR first
+        text: When the business can afford to wait for its returns and wants the most profitable use of its funds, or has to beat a target rate of return.
+      - term: When the methods agree
+        text: If one project wins on every measure, the numbers point one way, and the decision turns on the qualitative factors and on whether the business can finance the project.
+  - id: risk-and-qualitative-factors
+    title: Qualitative factors and risk
+    kind: evaluation
+    body: |
+      Investment appraisal turns a decision into numbers, but the numbers rest on forecasts and leave out much of what matters. Before deciding, managers weigh how reliable the forecasts are and the **qualitative factors**: the effects that cannot easily be measured in money.
+
+      Forecasts are least reliable for new products, new markets and distant years. One way to test them is to ask *what if*: what if the returns are 20% lower, or arrive a year late? A project that still passes is a safer choice than one that only works if every forecast comes true.
+    points:
+      - term: Objectives and strategy
+        text: Does the project fit what the business is trying to achieve? A project with a lower return may still be chosen because it supports growth, quality or the brand.
+      - term: Employees
+        text: Automation may cut costs but bring redundancies, retraining and lower morale. A project that needs new skills needs staff who have them, or time and money to train them.
+      - term: Ethics and the environment
+        text: Effects on pollution, energy use, waste and the local community matter to stakeholders, to the business's reputation and, increasingly, to the law.
+      - term: Finance and cash flow
+        text: A profitable project still has to be paid for. The availability and cost of finance, and the strain on cash while the business waits for the returns, can rule a project out.
+      - term: The external environment
+        text: Changes in interest rates, inflation, exchange rates, technology, the law or competitors' actions can all make the forecasts wrong. A rise in interest rates also raises the benchmark a project must beat.
+      - term: Risk and flexibility
+        text: A project that can be scaled back, sold or adapted if things go wrong carries less risk than one that cannot.
+    example:
+      title: Quillmoor's decision
+      fictional: true
+      text: |
+        On the numbers, Project A, the digital press, is the stronger choice: a much higher ARR and, at HL, a far higher NPV. But the press would replace two older machines and the jobs of the two people who run them, and the owners are proud of never having made anyone redundant. Project B, the website, needs digital skills nobody at the business yet has, and its falling returns assume that rivals will copy it within two years, a forecast nobody can check.
+
+        A sound recommendation might be Project A, with the two operators retrained to run the new press, provided the bank lends at the expected 8%. The numbers start the decision; the qualitative factors finish it.
+evaluation:
+  - No method is complete on its own. Payback measures speed and risk, ARR measures profitability and, at HL, NPV measures value in today's money. The best answers use more than one and explain why they disagree.
+  - Every result is only as reliable as the forecasts behind it, and forecasts become less reliable the further ahead they look. A long project whose returns come mostly in its later years carries the most forecasting risk.
+  - The benchmark matters as much as the result. An ARR of 9% is attractive when loans cost 5% and poor when they cost 10%; at HL, raising the discount rate can turn a positive NPV negative.
+  - A project can pass every test and still be wrong for the business, because of its effects on staff, the environment, the brand or the business's objectives, or because it cannot be financed without straining cash flow.
+  - In an examination answer, show every step, state the assumption that cash arrives evenly when you give payback in months, compare each result with a benchmark from the case, and end with a judgement that weighs the numbers against at least one qualitative factor.
+connections:
+  - code: '3.1'
+    text: Capital expenditure, spending on assets that last more than a year, is what investment appraisal judges.
+  - code: '3.2'
+    text: A worthwhile project still has to be financed, and the interest rate on a loan is a benchmark its return must beat.
+  - code: '3.7'
+    text: Payback is about cash. A project can be profitable over its life and still strain cash flow in its early years.
+  - code: '1.3'
+    text: Objectives, ethics and corporate social responsibility shape the qualitative side of an investment decision.
+  - code: '1.5'
+    text: Internal growth usually means investment, so appraisal sits behind most decisions to grow.
+terms:
+  - investment-appraisal
+  - investment
+  - capital-expenditure
+  - net-cash-flow
+  - cash-flow
+  - payback-period
+  - average-rate-of-return
+  - time-value-of-money
+  - net-present-value
+  - present-value
+  - discount-factor
+  - opportunity-cost
+  - interest
+retrieval:
+  - q: What does the payback period measure, and what does the usual method assume?
+    a: How long a project takes for its net cash flows to add up to its capital cost. Working out the months assumes that each year's cash arrives evenly through the year.
+  - q: A $60,000 machine returns $20,000, $25,000 and $30,000 in years 1 to 3. What is its payback period?
+    a: After two years $15,000 is still to recover. 15,000 ÷ 30,000 × 12 = 6 months, so payback is 2 years and 6 months.
+  - q: A $50,000 project has total returns of $70,000 over four years. What is its ARR?
+    a: (70,000 − 50,000) ÷ 4 = $5,000 a year; 5,000 ÷ 50,000 × 100 = 10%.
+  - q: Give two limitations of payback and one of ARR.
+    a: Payback ignores the returns after payback and the time value of money, so it says nothing about profitability. ARR ignores when the returns arrive, and relies on forecasts for every year of the project's life.
+  - q: Why might a business choose the project with the shorter payback, even though its ARR is lower?
+    a: For example because it is short of cash, its market or technology changes quickly, or its owners are cautious, so getting the money back quickly matters more than the highest average return.
+  - q: HL only. Why is the original cost not discounted in an NPV calculation?
+    a: It is paid at the start, so it is already in today's money. Only the future returns are discounted.
+  - q: HL only. What does a negative NPV at a 10% discount rate tell a business?
+    a: The present value of the returns is less than the cost, so the project earns less than 10% a year and, on financial grounds, should be rejected at that rate.
+  - q: Name four qualitative factors in an investment decision.
+    a: For example fit with the business's objectives, the effect on employees, ethical and environmental effects, the brand, the reliability of the forecasts, the availability of finance and competitors' reactions.
+questions: []
+basis:
+  - source: ib-bm-guide-2024
+    pages: 30, 65 and 66
+    note: The content statement and its assessment objectives; the ARR and NPV formulas; the discount table
+verification: primary
+updated: '2026-11-02'
