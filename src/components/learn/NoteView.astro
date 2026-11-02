@@ -15,6 +15,9 @@ interface Props {
 }
 const { note: n, start } = Astro.props;
 const no = (i: number) => String(start + i).padStart(2, '0');
+// Notes for an HL-only subtopic are HL throughout: the page's own level says so, so sections are not hidden one by one.
+const mixed = n.level !== 'HL';
+const hl = (level: string) => mixed && level === 'HL';
 ---
 
 <section class="nv-intro" aria-labelledby="nv-intro-h">
@@ -33,23 +36,23 @@ const no = (i: number) => String(start + i).padStart(2, '0');
 {
   n.sections.map((s, i) => (
     <>
-    {s.level === 'HL' && (
+    {hl(s.level) && (
       <p class="hl-notice nv-hl-gap">
         <span class="tag tag--hl">HL</span> Section {no(i + 1)}, {s.title}, is HL only and is hidden while you are viewing SL content. Switch to HL at the top of the page to see it.
       </p>
     )}
-    <section class:list={['nv-section', `nv-section--${s.kind}`]} aria-labelledby={`nv-${s.id}`} data-level={s.level === 'HL' ? 'HL' : undefined} id={s.id}>
+    <section class:list={['nv-section', `nv-section--${s.kind}`]} aria-labelledby={`nv-${s.id}`} data-level={hl(s.level) ? 'HL' : undefined} id={s.id}>
       <SectionHead no={no(i + 1)} title={s.title} id={`nv-${s.id}`}>
-        {s.level === 'HL' && <span class="tag tag--hl">HL only</span>}
+        {hl(s.level) && <span class="tag tag--hl">HL only</span>}
       </SectionHead>
       <div class="nv-body">
         <div class="prose" set:html={rich(s.body)} />
         {s.points.length > 0 && (
           <dl class="nv-points">
             {s.points.map((p) => (
-              <div class:list={{ 'nv-point--hl': p.level === 'HL' }} data-level={p.level === 'HL' ? 'HL' : undefined}>
+              <div class:list={{ 'nv-point--hl': hl(p.level) }} data-level={hl(p.level) ? 'HL' : undefined}>
                 <dt>
-                  {p.term} {p.level === 'HL' && <span class="tag tag--hl">HL</span>}
+                  {p.term} {hl(p.level) && <span class="tag tag--hl">HL</span>}
                 </dt>
                 <dd set:html={rich(p.text)} />
               </div>

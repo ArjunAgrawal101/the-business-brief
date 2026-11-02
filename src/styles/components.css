@@ -542,8 +542,9 @@ a.entry:hover .entry__title {
   border-left: 3px double var(--rule-ink);
 }
 
+/* Wins over any component's own display rule: HL material never shows in the SL view. */
 html[data-level="SL"] [data-level="HL"] {
-  display: none;
+  display: none !important;
 }
 
 .hl-notice {

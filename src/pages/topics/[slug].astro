@@ -78,6 +78,13 @@ const num = () => {
         {terms.length > 0 && <a class="tag tag--plain" href="#terms">{terms.length} key terms</a>}
         {hasHL && <LevelSwitch />}
       </div>
+      {
+        s.level === 'HL' && (
+          <p class="hl-notice">
+            <span class="tag tag--hl">HL</span> This subtopic is HL only. You are viewing SL content, so treat this page as extension material; switch to HL to set it as part of your course.
+          </p>
+        )
+      }
     </header>
   </div>
 
@@ -98,14 +105,14 @@ const num = () => {
     }
 
     <section aria-labelledby="sh-ib-h">
-      <SectionHead no={num()} title="What the IB course asks" id="sh-ib-h" dek={`The content statements for ${s.code}, in the platform's words, with the depth of teaching the guide sets${s.page ? ` (guide, p. ${s.page})` : ''}.`} />
+      <SectionHead no={num()} title="What the IB course asks" id="sh-ib-h" dek={`The content statements for ${s.code}, in the platform's words, with the depth of teaching the guide sets${s.page ? ` (guide, from p. ${s.page})` : ''}.`} />
       <ul class="sh-cs">
         {
           s.content.map((cs) => (
-            <li class:list={{ 'sh-cs--hl': cs.level === 'HL' }} data-level={cs.level === 'HL' ? 'HL' : undefined}>
+            <li class:list={{ 'sh-cs--hl': cs.level === 'HL' }} data-level={cs.level === 'HL' && s.level !== 'HL' ? 'HL' : undefined}>
               <span class="sh-cs__text">{cs.text}</span>
               <span class="sh-cs__ao">{cs.ao.join(', ')}</span>
-              {cs.level === 'HL' && <span class="tag tag--hl">HL</span>}
+              {cs.level === 'HL' && s.level !== 'HL' && <span class="tag tag--hl">HL</span>}
             </li>
           ))
         }
@@ -146,8 +153,10 @@ const num = () => {
         <section id="diagrams" aria-labelledby="sh-dg-h" class="sh-sec">
           <SectionHead no={num()} title={note ? 'More diagrams' : 'Diagrams'} id="sh-dg-h" dek="Original diagrams from the platform's library, each with a text description and an SVG download." />
           <div class="sh-dg">
-            {diagrams.map(([did]) => (
-              <Diagram id={did} download />
+            {diagrams.map(([did, d]) => (
+              <div data-level={d.level === 'HL' && s.level !== 'HL' ? 'HL' : undefined}>
+                <Diagram id={did} download />
+              </div>
             ))}
           </div>
         </section>

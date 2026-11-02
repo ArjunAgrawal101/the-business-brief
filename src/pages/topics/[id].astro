@@ -177,8 +177,10 @@ const nav = [
           <section class="brief-section" id="diagrams" aria-labelledby="diagrams-h">
             <SectionHead no={n + 1} title="Diagrams" dek="Original diagrams from the platform's library for this subtopic, each with a text description." id="diagrams-h" />
             <div class="brief-diagrams">
-              {diagrams.map(([did]) => (
-                <Diagram id={did} />
+              {diagrams.map(([did, d]) => (
+                <div data-level={d.level === 'HL' && t.level !== 'HL' ? 'HL' : undefined}>
+                  <Diagram id={did} />
+                </div>
               ))}
             </div>
             <p class="small"><a href="/diagrams/">Every diagram in the library</a></p>
