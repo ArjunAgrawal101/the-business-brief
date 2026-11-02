@@ -6,7 +6,7 @@ import { expect, test } from '@playwright/test';
 
 test('below the fold, groups wait until they are scrolled into view', async ({ page }) => {
   await page.goto('/');
-  const rooms = page.locator('.rooms[data-reveal]');
+  const rooms = page.locator('.hr[data-reveal]');
   await expect(rooms).toHaveClass(/is-pending/);
   await expect(rooms).not.toHaveClass(/is-in/);
   await rooms.scrollIntoViewIfNeeded();
@@ -19,9 +19,9 @@ test('nothing is held back under reduced motion', async ({ browser }) => {
   const page = await context.newPage();
   await page.goto('/');
   await expect(page.locator('.is-pending')).toHaveCount(0);
-  await expect(page.locator('.rooms > li').last()).toHaveCSS('opacity', '1');
+  await expect(page.locator('.hr > li').last()).toHaveCSS('opacity', '1');
   // The hero arrives at once.
-  await expect(page.locator('.hero .btn--primary')).toHaveCSS('opacity', '1');
+  await expect(page.locator('.hh .btn--primary').first()).toHaveCSS('opacity', '1');
   await context.close();
 });
 

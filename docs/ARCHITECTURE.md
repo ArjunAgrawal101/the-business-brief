@@ -29,9 +29,11 @@ The platform has no accounts and stores nothing on a server. A static site is th
 
 | Collection | Source | Loader |
 | --- | --- | --- |
-| topics, cases, decisions, tools, interactives, curricula | one YAML file per entry | Astro `glob` |
+| topics, cases, decisions, tools, interactives, curricula, mindmaps, notes | one YAML file per entry | Astro `glob` |
 | questions, glossary | several YAML files, each a list of entries with ids | custom `yamlList` loader (checks for duplicate ids) |
-| calculations, assessment, commandTerms, concepts, pathways, modules, sources, claims | one YAML file of entries in `src/content/data/` | Astro `file` |
+| calculations, assessment, commandTerms, concepts, pathways, modules, sources, claims, resources | one YAML file of entries in `src/content/data/` | Astro `file` |
+
+Two kinds of material are code rather than content, because they are drawn or computed: the diagram library (`src/lib/diagrams.ts`, with the drawings in `src/lib/figures/`) and the Resources Library catalogue (`src/lib/resources.ts`), which joins the curated `resources.yaml` with entries generated from the content (mindmaps, notes, briefs, revision briefs, cases, Decision Rooms, tools, practice and the diagram groups).
 
 Schemas live in `src/lib/schemas.ts`. Every content block, exhibit and interaction carries a `provenance` label; every claim about the IB course carries a `verification` status. See [CONTENT_MODEL.md](CONTENT_MODEL.md).
 
@@ -49,7 +51,9 @@ Schemas live in `src/lib/schemas.ts`. Every content block, exhibit and interacti
 - practice question mark schemes add up to the question's marks, and their command terms exist at the guide's AO level;
 - no HL question is in the style of paper 1 (which excludes HL-only content), a paper 3 question is HL, and a paper 3 question marked on criteria uses the guide's criteria A to D;
 - every interaction names subtopics that exist; a case lab's evidence comes from its case, its answers are among its options, and its plan has no loops;
-- the ratio desk's statements balance and link across the two years, and every strategy keeps them balanced; the Market Studio and Operations Floor data pass their own checks (`src/lib/integrity-studio.ts`).
+- the ratio desk's statements balance and link across the two years, and every strategy keeps them balanced; the Market Studio and Operations Floor data pass their own checks (`src/lib/integrity-studio.ts`);
+- for the 2.0 learning collections (`src/lib/integrity-learning.ts`): every mindmap names a real subtopic in the right unit (one map each), is marked HL exactly when its subtopic is HL only, has enough nodes to revise from (16 or more), gives every branch at least two children and a core node for the revision view, gives every formula node its formula, links only to glossary terms that exist and gives the sources it was checked against; every set of notes carries the guide's exact subtopic title, is marked HL when its subtopic is, and names only glossary terms, questions, subtopics, sources and diagrams that exist; every glossary entry names a real subtopic, has a name no other entry uses, is not related to itself, and is marked HL when all its subtopics are HL only;
+- a resource is offered as a download only when its file exists in `public/` or is one the build writes (`/downloads/glossary.csv`, `/downloads/mindmaps/*.svg`, `/downloads/diagrams/*.svg`).
 
 The same checks run in the unit tests (`tests/unit/integrity.test.ts`), which load the YAML directly without Astro.
 
@@ -100,23 +104,37 @@ The quiz engine (`src/scripts/quiz.ts`) dispatches a bubbling `quiz:progress` ev
 | Route | Page |
 | --- | --- |
 | `/` | Home |
-| `/topics/`, `/topics/[id]/` | Topic briefs |
+| `/topics/` | The topic library: all 37 subtopics by unit |
+| `/topics/[id]/` | Topic briefs (1.5, 2.3, 3.3) |
+| `/topics/[slug]/` | A page for every other subtopic: what the course asks, notes, mindmap, diagrams, key terms, tools, recall, connections |
+| `/mindmaps/`, `/mindmaps/[id]/` | Mindmaps for every subtopic and unit |
+| `/diagrams/` | The diagram library |
+| `/glossary/`, `/glossary/[id]/` | The glossary, and a page for every term |
+| `/assessment/`, `/assessment/internal-assessment/`, `/assessment/paper-1/`, `/assessment/paper-2/`, `/assessment/paper-3/` | The Assessment Centre |
+| `/resources/`, `/resources/[id]/`, `/resources/formula-sheet/` | The Resources Library, details pages, the formula sheet |
+| `/downloads/glossary.csv`, `/downloads/mindmaps/[id].svg`, `/downloads/diagrams/[id].svg`, `/downloads/guides/*.pdf` | Downloads (the PDFs are files in `public/`; the rest are written by the build) |
 | `/cases/`, `/cases/[id]/` | Case files |
 | `/decision-room/`, `/decision-room/[id]/` | Decision Rooms |
 | `/finance-desk/`, `/finance-desk/costs-and-revenue/`, `/finance-desk/break-even/`, `/finance-desk/contribution/`, `/finance-desk/ratios/`, `/finance-desk/cash-flow/`, `/finance-desk/investment-appraisal/` | Finance Desk |
 | `/rooms/`, `/case-room/`, `/case-room/halden-diagnosis/`, `/strategy-studio/`, `/market-studio/`, `/people-and-culture/`, `/operations-floor/` | All rooms; the rooms with pages of their own; the case lab |
 | `/progress/` | What this browser has kept |
 | `/toolkit/`, `/toolkit/[id]/` | Toolkit (guides for complete tools only) |
-| `/exam-desk/`, `/exam-desk/paper-1/`, `/exam-desk/paper-2/`, `/exam-desk/paper-3/`, `/exam-desk/practice/` | Exam Desk |
-| `/examiner-lens/`, `/ia-studio/` | Command terms; the research project |
+| `/exam-desk/practice/` | All practice questions, filterable (the other Exam Desk addresses redirect to the Assessment Centre) |
+| `/examiner-lens/`, `/ia-studio/` | Command terms; the IA planner |
 | `/revision/`, `/revision/[id]/` | Printable revision briefs |
 | `/ib/`, `/ib/map/`, `/ib/coverage/`, `/ib/concepts/` | The IB course, the course map, the coverage matrix, concepts |
-| `/glossary/`, `/search/`, `/sources/` | Reference |
+| `/search/`, `/sources/` | Search across everything; the sources and claims register |
 | `/pathways/`, `/pathways/[id]/` | Audience pathways |
 | `/about/`, `/platform/`, `/accessibility/`, `/privacy/` | About the creator and the platform |
 | `/sitemap.xml`, `/robots.txt`, `/404.html` | Generated |
 
 All internal links end with a slash (`trailingSlash: 'always'` in `astro.config.mjs` and `vercel.json`), and the link checker enforces it.
+
+Moved addresses (the Exam Desk paper pages) are listed under `redirects` in `astro.config.mjs`; the build writes a small redirect page for each.
+
+## Brand opening
+
+`BaseLayout.astro` adds the class `js` to `<html>` in an inline script before the first paint (controls marked `js-only` stay hidden without scripts), and on the home page a second inline script decides, before the first paint, whether the opening plays: not under reduced motion, and only when `bb:intro-seen` is not stored or `?intro` is in the address. `BrandIntro.astro` holds the markup, styles and script; see [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md#the-opening).
 
 ## The SL and HL switch
 

@@ -16,6 +16,8 @@ export default defineConfig({
   use: {
     baseURL: `http://127.0.0.1:${PORT}`,
     trace: 'retain-on-failure',
+    // A returning visitor: the brand opening has been seen, so pages are tested as they are used. tests/e2e/brand.spec.ts tests the opening itself.
+    storageState: { cookies: [], origins: [{ origin: `http://127.0.0.1:${PORT}`, localStorage: [{ name: 'bb:intro-seen', value: '2026-11-02' }] }] },
   },
   webServer: {
     command: `npx astro preview --host 127.0.0.1 --port ${PORT}`,

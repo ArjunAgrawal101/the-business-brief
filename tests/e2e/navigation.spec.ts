@@ -11,14 +11,18 @@ test('the skip link moves focus to the main content', async ({ page }) => {
 
 test('the current section is marked in the navigation', async ({ page, isMobile }) => {
   test.skip(isMobile, 'The primary navigation is in the menu on small screens.');
-  await page.goto('/finance-desk/break-even/');
-  await expect(page.locator('header a[aria-current="page"], header a[aria-current="true"]').first()).toHaveText(/Finance Desk/);
+  await page.goto('/mindmaps/');
+  await expect(page.locator('.primary-nav a[aria-current="page"]')).toHaveText('Mindmaps');
+  await page.goto('/assessment/paper-2/');
+  await expect(page.locator('.primary-nav a[aria-current="page"]')).toHaveText('Assessment');
+  await page.goto('/glossary/break-even-quantity/');
+  await expect(page.locator('.primary-nav a[aria-current="page"]')).toHaveText('Glossary');
 });
 
 test('the menu lists every room, opens, closes with Escape and returns focus', async ({ page, isMobile }) => {
   await page.goto('/');
   const toggle = page.locator('[data-menu-toggle]');
-  await expect(toggle).toHaveAccessibleName(isMobile ? 'Menu' : 'All rooms');
+  await expect(toggle).toHaveAccessibleName(isMobile ? 'Menu' : 'Explore');
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await toggle.click();
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');

@@ -177,7 +177,7 @@ test.describe('Exam Desk', () => {
   });
 
   test('a paper 3 plan is self-marked on the four criteria', async ({ page }) => {
-    await page.goto('/exam-desk/paper-3/');
+    await page.goto('/exam-desk/practice/');
     const q = page.locator('#q-q-growth-p3-plan');
     await ready(page, '#q-q-growth-p3-plan[data-ix="question"]');
     await q.locator('[data-ms] summary').click();
@@ -348,6 +348,8 @@ test.describe('Privacy', () => {
   test('clearing removes everything the site stored', async ({ page }) => {
     await page.goto('/privacy/');
     await page.evaluate(() => {
+      // Start from nothing: the test harness stores the "opening seen" flag for every page.
+      localStorage.clear();
       localStorage.setItem('bb:level', 'SL');
       localStorage.setItem('bb:q:test', '{}');
       localStorage.setItem('other-site', 'keep');

@@ -49,6 +49,18 @@ const PAIRS = [
   ['bb-cobalt', 'surface-page', 3, 'cobalt buttons and focus rings against paper'],
   ['rule-control', 'surface-page', 3, 'form control borders'],
   ['bb-ink', 'surface-page', 3, 'ink rules and outlines'],
+  // 2.0: the navy, ivory and gold identity.
+  ['navy-950', 'gold-400', 4.5, 'navy text on gold buttons'],
+  ['text-gold-on-ink', 'surface-ink', 4.5, 'gold labels and accents on navy'],
+  ['text-gold-on-ink', 'surface-ink-raised', 4.5, 'gold labels on raised navy panels'],
+  ['text-on-ink', 'surface-ink-raised', 4.5, 'text on raised navy panels'],
+  ['cobalt-on-ink', 'surface-ink', 4.5, 'links in cobalt on navy'],
+  ['brass-text', 'surface-sheet', 4.5, 'gold-brown labels on white sheets'],
+  ['brass-text', 'surface-gold-wash', 4.5, 'labels on the gold wash'],
+  ['brass-text', 'surface-sunk', 4.5, 'labels on the sunk band'],
+  ['text-muted', 'surface-gold-wash', 4.5, 'secondary text on the gold wash'],
+  ['gold-600', 'surface-page', 3, 'large gold numerals and state outlines on ivory'],
+  ['gold-600', 'surface-sunk', 3, 'large gold numerals on the sunk band'],
 ];
 let failed = 0;
 for (const [fg, bg, min, use] of PAIRS) {
