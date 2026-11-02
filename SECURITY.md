@@ -24,7 +24,7 @@ npm install --save-exact @astrojs/check@latest
 npm run qa
 ```
 
-Then set `"engines": { "node": ">=22.23.4" }` in `package.json` and choose Node 24 in the Vercel project settings.
+Then set `"engines": { "node": "24.x" }` in `package.json` and `24` in `.nvmrc`, so that Vercel and CI both build on Node 24. On Vercel the `engines` field overrides the Node.js version chosen in the project settings.
 
 ## Headers
 

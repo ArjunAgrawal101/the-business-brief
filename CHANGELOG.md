@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Node.js pinned to the 22 line in `package.json`, so that Vercel builds on the version CI tests (an open range would let Vercel choose its newest Node).
+- The deployment guide gives the Vercel steps in full, with the checks to run after deploying.
+
 ## 0.2.0: 29 October 2026
 
 The enhancement release: the IB mapping checked against the Business management guide, a motion system and room identities, and working rooms across the platform.

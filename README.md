@@ -28,7 +28,7 @@ What is not built yet, and why, is in [docs/RELEASE_REPORT.md](docs/RELEASE_REPO
 
 ## Quick start
 
-Requires Node.js 22.12 or later.
+Requires Node.js 22, version 22.12 or later (`.nvmrc`).
 
 ```bash
 npm ci
