@@ -5,23 +5,43 @@
  * coverage tracker.
  */
 import type { Corpus } from './integrity';
+import { DIAGRAMS } from './diagrams';
 import type { Curriculum } from './schemas';
 
 export type Subtopic = Curriculum['units'][number]['subtopics'][number];
 export type Unit = Curriculum['units'][number];
-export type CoverageState = 'brief' | 'tools' | 'planned';
+/**
+ * complete: full notes or a complete brief. partial: the subtopic's page has
+ * material (its mindmap, key terms, diagrams or tools) but its notes are still
+ * to be written. planned: nothing yet beyond the guide's statements.
+ */
+export type CoverageState = 'complete' | 'partial' | 'planned';
 
 export interface SubtopicCoverage {
   unit: Unit;
   subtopic: Subtopic;
   state: CoverageState;
+  /** A complete brief written for this subtopic. */
+  brief: boolean;
+  /** A brief for another subtopic that also teaches part of this one. */
+  inBrief?: string;
+  notes: boolean;
+  mindmap: boolean;
+  /** Glossary entries tagged to this subtopic. */
+  terms: number;
+  /** Library diagrams that serve this subtopic. */
+  diagrams: number;
   /** Interactions placed on a page and tagged to this subtopic. */
   interactions: number;
   /** Worked calculations tagged to this subtopic. */
   calculations: number;
   /** Original practice questions tagged to this subtopic. */
   questions: number;
+  /** The subtopic's statements were checked against the guide. */
+  verified: boolean;
 }
+
+export const STATE_LABEL: Record<CoverageState, string> = { complete: 'Complete', partial: 'Partly built', planned: 'Planned' };
 
 export function curriculumOf(c: Corpus): Curriculum {
   const cur = c.curricula['ib-dp-bm'];
@@ -33,11 +53,19 @@ export function subtopicCoverage(c: Corpus): SubtopicCoverage[] {
   const cur = curriculumOf(c);
   return cur.units.flatMap((unit) =>
     unit.subtopics.map((subtopic) => {
-      const interactions = Object.values(c.interactives).filter((it) => it.syllabus.includes(subtopic.code) && it.page).length;
-      const calculations = Object.values(c.calculations).filter((k) => k.syllabus.some((x) => x.code === subtopic.code)).length;
-      const questions = Object.values(c.questions).filter((q) => q.syllabus.includes(subtopic.code)).length;
-      const state: CoverageState = subtopic.topic ? 'brief' : interactions || calculations ? 'tools' : 'planned';
-      return { unit, subtopic, state, interactions, calculations, questions };
+      const code = subtopic.code;
+      const interactions = Object.values(c.interactives).filter((it) => it.syllabus.includes(code) && it.page).length;
+      const calculations = Object.values(c.calculations).filter((k) => k.syllabus.some((x) => x.code === code)).length;
+      const questions = Object.values(c.questions).filter((q) => q.syllabus.includes(code)).length;
+      const own = subtopic.topic ? c.topics[subtopic.topic] : undefined;
+      const brief = Boolean(own && own.code === code);
+      const inBrief = own && !brief ? subtopic.topic : undefined;
+      const notes = Object.values(c.notes).some((n) => n.code === code);
+      const mindmap = Object.values(c.mindmaps).some((m) => m.scope === 'subtopic' && m.code === code);
+      const terms = Object.values(c.glossary).filter((g) => g.subtopics.includes(code)).length;
+      const diagrams = Object.values(DIAGRAMS).filter((d) => d.syllabus.includes(code)).length;
+      const state: CoverageState = brief || notes ? 'complete' : mindmap || terms || diagrams || interactions || calculations ? 'partial' : 'planned';
+      return { unit, subtopic, state, brief, inBrief, notes, mindmap, terms, diagrams, interactions, calculations, questions, verified: subtopic.verification === 'primary' };
     }),
   );
 }

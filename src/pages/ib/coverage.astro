@@ -1,51 +1,58 @@
 ---
 /**
- * The coverage matrix: for every subtopic, what the platform has. Computed
- * from the content's relationships, so it cannot claim coverage that does not
- * exist.
+ * The coverage tracker: for every subtopic, what the platform has. Computed
+ * from the content's relationships (src/lib/coverage.ts), so it cannot claim
+ * coverage that does not exist. Four signals: complete (full notes or a
+ * brief), partly built, planned, and verified against the guide.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
 import LevelTag from '../../components/ui/LevelTag.astro';
 import VerifyTag from '../../components/ui/VerifyTag.astro';
 import { corpus, href } from '../../lib/content';
+import { STATE_LABEL, subtopicCoverage } from '../../lib/coverage';
+import { mindmapFor, subtopicHref } from '../../lib/learning';
 
 const c = await corpus();
-const cur = c.curricula['ib-dp-bm'];
-const rows = (cur?.units ?? []).flatMap((u) =>
-  u.subtopics.map((s) => {
-    const topic = s.topic ? c.topics[s.topic] : undefined;
-    const cases = s.topic ? Object.entries(c.cases).filter(([, cs]) => cs.topics.includes(s.topic ?? '')) : [];
-    const decisions = s.topic ? Object.entries(c.decisions).filter(([, d]) => d.topics.includes(s.topic ?? '')) : [];
-    const calcs = Object.entries(c.calculations).filter(([, k]) => k.syllabus.some((x) => x.code === s.code));
-    const questions = Object.entries(c.questions).filter(([, q]) => q.syllabus.includes(s.code));
-    const tools = s.tools.map((t) => ({ id: t, data: c.tools[t] }));
-    const ixs = Object.entries(c.interactives).filter(([, it]) => it.syllabus.includes(s.code) && it.page);
-    return { u, s, topic, cases, decisions, calcs, questions, tools, ixs };
-  }),
-);
-const covered = rows.filter((r) => r.topic).length;
-const withTools = rows.filter((r) => r.topic || r.ixs.length || r.calcs.length).length;
+const rows = subtopicCoverage(c).map((r) => {
+  const s = r.subtopic;
+  const ixs = Object.entries(c.interactives).filter(([, it]) => it.syllabus.includes(s.code) && it.page);
+  const calcs = Object.entries(c.calculations).filter(([, k]) => k.syllabus.some((x) => x.code === s.code));
+  const map = mindmapFor(c, s.code);
+  return { ...r, ixs, calcs, map, page: r.brief && s.topic ? href.topic(s.topic) : subtopicHref(c, s.code) };
+});
+const n = (st: string) => rows.filter((r) => r.state === st).length;
+const verified = rows.filter((r) => r.verified).length;
+const withNotes = rows.filter((r) => r.notes).length;
+const withBriefs = rows.filter((r) => r.brief).length;
 ---
 
-<BaseLayout title="Syllabus coverage" description="What the platform has for each subtopic of IB DP Business Management, including the gaps." section="pathways">
+<BaseLayout title="Coverage tracker" description="What the platform has for each subtopic of IB DP Business Management: complete, partly built or planned, and verified against the guide." section="topics">
   <PageIntro
     trail={[{ label: 'IB course', href: '/ib/' }, { label: 'Coverage' }]}
     kicker="IB Diploma Programme"
-    title="Syllabus coverage"
-    lead={`${covered} of ${rows.length} subtopics have a complete brief, and ${withTools} have a brief, an interaction or a worked calculation. This table is generated from the content itself, so a subtopic shows coverage only when the material exists.`}
+    title="Coverage tracker"
+    lead={`${n('complete')} of ${rows.length} subtopics are complete, with full notes (${withNotes}) or a complete brief (${withBriefs}); ${n('partial')} are partly built; ${n('planned')} are planned. ${verified} of ${rows.length} have their content statements verified against the guide. The table is generated from the content itself, so a subtopic shows material only when it exists.`}
   />
   <div class="wrap page-body">
+    <ul class="cov-key" aria-label="What the states mean">
+      <li><span class="cov-state cov-state--complete">Complete</span> Full notes or a complete brief, with its mindmap, terms and practice</li>
+      <li><span class="cov-state cov-state--partial">Partly built</span> A page with the mindmap, key terms, diagrams and any tools; notes still to come</li>
+      <li><span class="cov-state cov-state--planned">Planned</span> Nothing yet beyond the guide's statements</li>
+      <li><VerifyTag status="primary" /> Content statements checked against the guide</li>
+    </ul>
     <div class="table-scroll" role="region" aria-label="Coverage by subtopic" tabindex="0">
       <table class="table coverage">
         <thead>
           <tr>
             <th scope="col">Subtopic</th>
-            <th scope="col">Level and status</th>
-            <th scope="col">Brief</th>
-            <th scope="col">Interactions</th>
-            <th scope="col">Cases and decisions</th>
-            <th scope="col">Calculations</th>
+            <th scope="col">Level and verification</th>
+            <th scope="col">State</th>
+            <th scope="col">Notes or brief</th>
+            <th scope="col">Mindmap</th>
+            <th scope="col" class="n">Terms</th>
+            <th scope="col" class="n">Diagrams</th>
+            <th scope="col">Tools and calculations</th>
             <th scope="col" class="n">Practice</th>
           </tr>
         </thead>
@@ -54,49 +61,41 @@ const withTools = rows.filter((r) => r.topic || r.ixs.length || r.calcs.length).
             rows.map((r) => (
               <tr>
                 <th scope="row">
-                  <span class="num">{r.s.code}</span> {r.s.title}
+                  <a href={r.page}>
+                    <span class="num">{r.subtopic.code}</span> {r.subtopic.title}
+                  </a>
                 </th>
                 <td>
                   <span class="tags">
-                    <LevelTag level={r.s.level} always />
-                    <VerifyTag status={r.s.verification} />
+                    <LevelTag level={r.subtopic.level} always />
+                    <VerifyTag status={r.subtopic.verification} />
                   </span>
                 </td>
-                <td>{r.topic && r.s.topic ? <a href={href.topic(r.s.topic)}>Complete</a> : <span class="muted">Planned</span>}</td>
                 <td>
-                  {r.ixs.length ? (
+                  <span class:list={['cov-state', `cov-state--${r.state}`]}>{STATE_LABEL[r.state]}</span>
+                </td>
+                <td>
+                  {r.notes ? (
+                    <a href={r.page}>Full notes</a>
+                  ) : r.brief && r.subtopic.topic ? (
+                    <a href={href.topic(r.subtopic.topic)}>Complete brief</a>
+                  ) : r.inBrief ? (
+                    <a href={href.topic(r.inBrief)}>In part, in the {c.topics[r.inBrief]?.code} brief</a>
+                  ) : (
+                    <span class="muted">To come</span>
+                  )}
+                </td>
+                <td>{r.map ? <a href={href.mindmap(r.map[0])}>Mindmap</a> : <span class="muted">None yet</span>}</td>
+                <td class="n">{r.terms || <span class="muted">0</span>}</td>
+                <td class="n">{r.diagrams || <span class="muted">0</span>}</td>
+                <td>
+                  {r.ixs.length || r.calcs.length ? (
                     <ul class="plain-list">
                       {r.ixs.map(([id, it]) => (
                         <li>
                           <a href={`${it.page}#ix-${id}`}>{it.title}</a>
                         </li>
                       ))}
-                    </ul>
-                  ) : (
-                    <span class="muted">None yet</span>
-                  )}
-                </td>
-                <td>
-                  {r.cases.length || r.decisions.length ? (
-                    <ul class="plain-list">
-                      {r.cases.map(([id, cs]) => (
-                        <li>
-                          <a href={href.case(id)}>{cs.title}</a>
-                        </li>
-                      ))}
-                      {r.decisions.map(([id]) => (
-                        <li>
-                          <a href={href.decision(id)}>Decision Room</a>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <span class="muted">None yet</span>
-                  )}
-                </td>
-                <td>
-                  {r.calcs.length ? (
-                    <ul class="plain-list">
                       {r.calcs.map(([id, k]) => (
                         <li>
                           <a href={href.calculation(id, k.page)}>{k.name}</a>
@@ -104,10 +103,10 @@ const withTools = rows.filter((r) => r.topic || r.ixs.length || r.calcs.length).
                       ))}
                     </ul>
                   ) : (
-                    <span class="muted">None</span>
+                    <span class="muted">None yet</span>
                   )}
                 </td>
-                <td class="n">{r.questions.length || <span class="muted">0</span>}</td>
+                <td class="n">{r.questions || <span class="muted">0</span>}</td>
               </tr>
             ))
           }
@@ -115,13 +114,10 @@ const withTools = rows.filter((r) => r.topic || r.ixs.length || r.calcs.length).
       </table>
     </div>
     <aside class="callout callout--note">
-      <span class="callout__kicker">Why so few complete briefs</span>
+      <span class="callout__kicker">Why the notes come one at a time</span>
       <div class="prose">
         <p>
-          The platform builds a few subtopics completely rather than all of them thinly: each complete brief has a case, interactions, a
-          Decision Room or workspace, practice questions and a revision page. Between the briefs, the rooms add working tools for subtopics
-          that do not have a brief yet, such as cash flow, ratios, investment appraisal, market share and stock control. The same structure
-          will be used for the rest.
+          Every subtopic already has a page with what the course asks, its mindmap, its key terms and the diagrams and tools that serve it. Full notes are written one subtopic at a time, each complete, with sections, worked examples, evaluation and retrieval questions, rather than all at once and thin. This table updates itself as each set of notes is added.
         </p>
       </div>
     </aside>
@@ -129,6 +125,51 @@ const withTools = rows.filter((r) => r.topic || r.ixs.length || r.calcs.length).
 </BaseLayout>
 
 <style>
+  .cov-key {
+    list-style: none;
+    margin: 0 0 var(--sp-5);
+    padding: 0;
+    display: grid;
+    gap: var(--sp-2);
+    font-size: 0.9375rem;
+  }
+
+  .cov-key li {
+    display: flex;
+    gap: var(--sp-3);
+    align-items: baseline;
+  }
+
+  .cov-state {
+    display: inline-block;
+    min-width: 7.5rem;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border: 1px solid currentColor;
+    border-radius: 2px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .cov-state--complete {
+    color: var(--text-on-ink);
+    background: var(--navy-900);
+    border-color: var(--navy-900);
+  }
+
+  .cov-state--partial {
+    color: var(--brass-text);
+    background: var(--surface-gold-wash);
+  }
+
+  .cov-state--planned {
+    color: var(--text-muted);
+    border-style: dashed;
+  }
+
   .plain-list {
     margin: 0;
     padding: 0;
@@ -145,5 +186,12 @@ const withTools = rows.filter((r) => r.topic || r.ixs.length || r.calcs.length).
     display: inline-block;
     min-height: 24px;
     line-height: 24px;
+  }
+
+  @media (max-width: 40rem) {
+    .cov-key li {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
   }
 </style>

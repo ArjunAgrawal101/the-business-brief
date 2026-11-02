@@ -10,10 +10,13 @@ import PageIntro from '../../components/layout/PageIntro.astro';
 import Icon from '../../components/ui/Icon.astro';
 import { corpus, href, modulesInOrder } from '../../lib/content';
 import { isIcon } from '../../lib/icons';
+import { subtopicCoverage } from '../../lib/coverage';
+import { subtopicHref } from '../../lib/learning';
 
 const c = await corpus();
 const cur = c.curricula['ib-dp-bm'];
 const rooms = (await modulesInOrder()).filter((m) => m.data.href);
+const cov = subtopicCoverage(c);
 /** The room a page belongs to: the room whose address is the longest prefix of the page's. */
 const roomOf = (page: string) =>
   rooms
@@ -36,8 +39,8 @@ const units = (cur?.units ?? []).map((u) => ({
     rooms.forEach((r) => {
       if (r.data.syllabus.includes(s.code)) servedBy.set(r.id, { id: r.id, name: r.data.name });
     });
-    const state = s.topic ? 'brief' : ixs.length || calcs.length ? 'tools' : 'planned';
-    const link = s.topic ? href.topic(s.topic) : ixs[0] ? `${ixs[0][1].page}#ix-${ixs[0][0]}` : calcs[0] ? href.calculation(calcs[0][0], calcs[0][1].page) : `/ib/#st-${s.code.replace('.', '-')}`;
+    const state = cov.find((x) => x.subtopic.code === s.code)?.state ?? 'planned';
+    const link = s.topic && c.topics[s.topic]?.code === s.code ? href.topic(s.topic) : subtopicHref(c, s.code);
     return { s, ixs: ixs.length, calcs: calcs.length, questions, rooms: [...servedBy.values()], state, link };
   }),
 }));
@@ -50,12 +53,12 @@ const count = (st: string) => all.filter((t) => t.state === st).length;
     trail={[{ label: 'IB course', href: '/ib/' }, { label: 'Course map' }]}
     kicker="IB Diploma Programme"
     title="The course at a glance"
-    lead={`All ${all.length} subtopics in their five units. ${count('brief')} have a complete brief, ${count('tools')} more have working tools or worked calculations, and ${count('planned')} are planned. Each tile shows the rooms that serve it.`}
+    lead={`All ${all.length} subtopics in their five units. ${count('complete')} are complete, with full notes or a brief; ${count('partial')} are partly built, with a page holding their mindmap, key terms, diagrams and any tools; ${count('planned')} are planned. Each tile shows the rooms that serve it.`}
   />
   <div class="wrap page-body">
     <ul class="map-key" aria-label="Key">
-      <li><span class="map-swatch map-swatch--brief" aria-hidden="true"></span> Complete brief</li>
-      <li><span class="map-swatch map-swatch--tools" aria-hidden="true"></span> Working tools or calculations</li>
+      <li><span class="map-swatch map-swatch--complete" aria-hidden="true"></span> Complete: full notes or a brief</li>
+      <li><span class="map-swatch map-swatch--partial" aria-hidden="true"></span> Partly built: mindmap, terms, diagrams, tools</li>
       <li><span class="map-swatch map-swatch--planned" aria-hidden="true"></span> Planned</li>
       <li><span class="tag tag--hl">HL</span> HL only, or with HL-only content</li>
     </ul>
@@ -73,7 +76,7 @@ const count = (st: string) => all.filter((t) => t.state === st).length;
                     <span class="map-tile__code num">{t.s.code}</span>
                     <span class="map-tile__title">{t.s.title}</span>
                     <span class="sr-only">
-                      {t.state === 'brief' ? 'Complete brief.' : t.state === 'tools' ? 'Working tools.' : 'Planned.'}
+                      {t.state === 'complete' ? 'Complete.' : t.state === 'partial' ? 'Partly built.' : 'Planned.'}
                     </span>
                   </a>
                   <span class="map-tile__meta">
@@ -139,11 +142,11 @@ const count = (st: string) => all.filter((t) => t.state === st).length;
     border: 1px solid var(--bb-ink);
   }
 
-  .map-swatch--brief {
+  .map-swatch--complete {
     background: var(--bb-ink);
   }
 
-  .map-swatch--tools {
+  .map-swatch--partial {
     background: #fff;
     border-color: var(--bb-cobalt);
     box-shadow: inset 4px 0 0 var(--bb-cobalt);
@@ -266,26 +269,26 @@ const count = (st: string) => all.filter((t) => t.state === st).length;
     color: var(--text-strong);
   }
 
-  .map-tile--brief {
+  .map-tile--complete {
     border-color: var(--bb-ink);
     background: var(--bb-ink);
   }
 
-  .map-tile--brief .map-tile__link,
-  .map-tile--brief .map-tile__meta {
+  .map-tile--complete .map-tile__link,
+  .map-tile--complete .map-tile__meta {
     color: var(--text-on-ink);
   }
 
-  .map-tile--brief .map-tile__room {
+  .map-tile--complete .map-tile__room {
     border-color: var(--text-on-ink-muted);
     color: var(--text-on-ink);
   }
 
-  .map-tile--brief .tag--hl {
+  .map-tile--complete .tag--hl {
     border-color: var(--bb-brass);
   }
 
-  .map-tile--tools {
+  .map-tile--partial {
     border-color: var(--bb-cobalt);
     box-shadow: inset 4px 0 0 var(--bb-cobalt);
   }
@@ -303,7 +306,7 @@ const count = (st: string) => all.filter((t) => t.state === st).length;
     border-color: var(--bb-cobalt);
   }
 
-  .map-tile--brief:hover {
+  .map-tile--complete:hover {
     border-color: var(--bb-brass);
   }
 </style>

@@ -37,7 +37,7 @@ for (const [id, it] of Object.entries(c.interactives))
 const cur = c.curricula['ib-dp-bm'];
 cur?.units.forEach((u) =>
   u.subtopics.forEach((s) =>
-    entries.push({ kind: 'IB subtopic', title: `${s.code} ${s.title}`, url: s.topic ? href.topic(s.topic) : subtopicHref(c, s.code), text: s.topic ? 'Complete brief' : noteFor(c, s.code) ? 'Full notes, mindmap, terms and tools' : 'Subtopic page: mindmap, terms and tools' }),
+    entries.push({ kind: 'IB subtopic', title: `${s.code} ${s.title}`, url: s.topic && c.topics[s.topic]?.code === s.code ? href.topic(s.topic) : subtopicHref(c, s.code), text: s.topic && c.topics[s.topic]?.code === s.code ? 'Complete brief' : noteFor(c, s.code) ? 'Full notes, mindmap, terms and tools' : 'Subtopic page: mindmap, terms and tools' }),
   ),
 );
 for (const [id, m] of await mindmapsInOrder()) entries.push({ kind: 'Mindmap', title: m.scope === 'unit' ? `Unit ${m.unit}: ${m.title}` : `${m.code} ${m.title}`, url: href.mindmap(id), text: `${m.summary} ${m.branches.map((b) => b.label).join(' ')}` });

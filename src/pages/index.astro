@@ -30,8 +30,8 @@ const cases = await casesInOrder();
 const HERO_PATHS = ['ib-dp', 'teachers', 'undergraduate', 'independent'];
 const heroPaths = HERO_PATHS.map((id) => pathways.find((p) => p.id === id)).filter((p): p is NonNullable<typeof p> => Boolean(p));
 
-const briefs = coverage.filter((s) => s.state === 'brief').length;
-const withTools = coverage.filter((s) => s.state === 'tools').length;
+const complete = coverage.filter((s) => s.state === 'complete').length;
+const partial = coverage.filter((s) => s.state === 'partial').length;
 const interactions = Object.values(c.interactives).filter((it) => it.page).length;
 const questions = Object.keys(c.questions).length;
 const terms = Object.keys(c.glossary).length;
@@ -43,7 +43,7 @@ const LETTERS = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].filter((l) => Object.values(c.
 
 const INDEX = [
   { value: String(coverage.length), label: 'subtopics', note: 'the whole IB course, mapped' },
-  { value: String(briefs), label: 'subtopics with a full brief', note: `and ${withTools} more with working tools` },
+  { value: String(complete), label: complete === 1 ? 'subtopic complete' : 'subtopics complete', note: `full notes or a brief; ${partial} more partly built` },
   { value: String(interactions), label: 'interactive tools', note: 'labs, desks and simulations' },
   { value: String(questions), label: 'practice questions', note: 'original, with mark schemes' },
   { value: String(terms), label: 'glossary terms', note: 'defined, connected, searchable' },
@@ -201,7 +201,7 @@ const jsonLd = {
 
   <section class="band" aria-labelledby="course-h">
     <div class="wrap">
-      <SectionHead no="02" title="The course, unit by unit" id="course-h" dek={`All ${coverage.length} subtopics of IB DP Business Management in their five units. Each square is a subtopic: filled where a complete brief exists, outlined in gold where working tools exist, ruled where it is planned.`} />
+      <SectionHead no="02" title="The course, unit by unit" id="course-h" dek={`All ${coverage.length} subtopics of IB DP Business Management in their five units. Each square is a subtopic: filled where its full notes or a complete brief exist, outlined in gold where its page has a mindmap, key terms and diagrams but the notes are still to come, ruled where it is planned.`} />
       <ol class="hc" role="list" data-reveal="group">
         {
           cur.units.map((u) => {
@@ -221,7 +221,7 @@ const jsonLd = {
                     {subs.map((s) => (
                       <li class:list={['hc__tick', `hc__tick--${s.state}`]} title={`${s.subtopic.code} ${s.subtopic.title}`}>
                         <span class="sr-only">
-                          {s.subtopic.code} {s.subtopic.title}: {s.state === 'brief' ? 'complete brief' : s.state === 'tools' ? 'working tools' : 'planned'}
+                          {s.subtopic.code} {s.subtopic.title}: {s.state === 'complete' ? 'complete' : s.state === 'partial' ? 'partly built' : 'planned'}
                         </span>
                       </li>
                     ))}
@@ -856,12 +856,12 @@ const jsonLd = {
     border: 1px solid var(--rule);
   }
 
-  .hc__tick--brief {
+  .hc__tick--complete {
     background: var(--navy-900);
     border-color: var(--navy-900);
   }
 
-  .hc__tick--tools {
+  .hc__tick--partial {
     border-color: var(--gold-500);
     box-shadow: inset 0 0 0 2px var(--ivory-100), inset 0 0 0 20px rgba(179, 147, 80, 0.35);
   }
