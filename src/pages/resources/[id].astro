@@ -8,7 +8,8 @@ import { corpus } from '../../lib/content';
 
 export async function getStaticPaths() {
   const items = await library();
-  return items.filter((i) => i.curated && i.details === `/resources/${i.id}/`).map((item) => ({ params: { id: item.id }, props: { item } }));
+  // A resource whose own page is in /resources/ (the formula sheet) needs no separate details page.
+  return items.filter((i) => i.curated && !i.primary.href.startsWith('/resources/')).map((item) => ({ params: { id: item.id }, props: { item } }));
 }
 
 interface Props {

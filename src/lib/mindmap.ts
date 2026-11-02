@@ -96,8 +96,8 @@ export interface LayoutOptions {
 /* ---------- Text measure: an estimate tuned to the faces used ---------- */
 
 const STYLE = {
-  root: { size: 21, lh: 25, chars: 16, charW: 0.56, padX: 22, padY: 16, minW: 150 },
-  branch: { size: 15.5, lh: 19, chars: 21, charW: 0.55, padX: 14, padY: 10, minW: 110 },
+  root: { size: 21, lh: 25, chars: 16, charW: 0.58, padX: 22, padY: 16, minW: 150 },
+  branch: { size: 15.5, lh: 19, chars: 21, charW: 0.585, padX: 15, padY: 10, minW: 110 },
   node: { size: 13.5, lh: 17, chars: 28, charW: 0.535, padX: 4, padY: 6, minW: 40 },
   leaf: { size: 12.75, lh: 16, chars: 30, charW: 0.53, padX: 4, padY: 5, minW: 40 },
 } as const;
@@ -161,10 +161,12 @@ interface Tree {
 function build(map: Mindmap, opts: LayoutOptions): Tree[] {
   const collapsed = opts.collapsed ?? new Set<string>();
   const keep = (n: MindNode) => !opts.revision || n.core;
+  // On a map of an HL-only subtopic every node is HL: the map's own label says so, and the nodes carry no pill.
+  const shown = (level: 'SL/HL' | 'HL'): 'SL/HL' | 'HL' => (map.level === 'HL' ? 'SL/HL' : level);
   const toTree = (n: MindNode, id: string, depth: number, branch: BranchKind): Tree => {
     const kids = n.children.filter(keep);
     const isCollapsed = collapsed.has(id);
-    const m = measure(n.label, depth, { marker: MARKERS[n.kind]?.glyph, hl: n.level === 'HL', formula: n.formula });
+    const m = measure(n.label, depth, { marker: MARKERS[n.kind]?.glyph, hl: shown(n.level) === 'HL', formula: n.formula });
     return {
       id,
       depth,
@@ -173,7 +175,7 @@ function build(map: Mindmap, opts: LayoutOptions): Tree[] {
       branch,
       formula: n.formula,
       term: n.term,
-      level: n.level,
+      level: shown(n.level),
       note: n.note,
       parent: kids.length > 0,
       collapsed: isCollapsed && kids.length > 0,
@@ -188,14 +190,14 @@ function build(map: Mindmap, opts: LayoutOptions): Tree[] {
     const id = `b${i}`;
     const kids = b.children.filter(keep);
     const isCollapsed = collapsed.has(id);
-    const m = measure(b.label, 1, { hl: b.level === 'HL' });
+    const m = measure(b.label, 1, { hl: shown(b.level) === 'HL' });
     return {
       id,
       depth: 1,
       label: b.label,
       kind: b.kind,
       branch: b.kind,
-      level: b.level,
+      level: shown(b.level),
       note: b.note,
       parent: kids.length > 0,
       collapsed: isCollapsed && kids.length > 0,
