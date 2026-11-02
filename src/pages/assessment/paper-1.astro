@@ -1,0 +1,418 @@
+---
+/**
+ * The Paper 1 room: the case study paper, from the guide and the creator's
+ * Paper 1 guide (Juniper Juice is that guide's invented case), with practice.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import CentreHead from '../../components/centre/CentreHead.astro';
+import GuideLabel from '../../components/centre/GuideLabel.astro';
+import LabelKey from '../../components/centre/LabelKey.astro';
+import Scale from '../../components/centre/Scale.astro';
+import Sorter from '../../components/centre/Sorter.astro';
+import Checklist from '../../components/centre/Checklist.astro';
+import FactList from '../../components/assess/FactList.astro';
+import IbGuidance from '../../components/assess/IbGuidance.astro';
+import { corpus, href } from '../../lib/content';
+import { GUIDES } from '../../lib/guides';
+import '../../styles/centre.css';
+
+const c = await corpus();
+const p1 = c.assessment['paper-1'];
+const terms = Object.values(c.commandTerms).sort((a, b) => a.order - b.order);
+const byAo = (ao: string) => terms.filter((t) => t.ao === ao).map((t) => t.term.toLowerCase());
+const questions = Object.entries(c.questions).filter(([, q]) => q.paperStyle === 'paper-1');
+const FIVE = [
+  ['Define', 'The precise meaning', 'First-hand data gathered by a business to answer its own question.'],
+  ['Describe', 'A detailed account', 'Shoppers tried each new flavour in store and scored it.'],
+  ['Explain', 'Reasons or causes', "Designed around the launch decision, the tests show what Juniper's own target shoppers prefer."],
+  ['Analyse', 'Elements and links', "Beetroot's 6.2 average hides a split: over-50s liked it; the core 18 to 30 group did not."],
+  ['Evaluate', 'Strengths and limits weighed', 'Current and specific, but 120 shoppers in two city stores may not represent 140 stores.'],
+];
+const BANDS = [
+  ['The question', 'Little understanding', 'Some understanding', 'Understood, partly addressed', 'Mostly addressed', 'Clear focus on its demands'],
+  ['Tools and theories', 'Little use; irrelevant or inaccurate', 'Mostly inaccurate or irrelevant', 'Some relevant, accurate use', 'Mostly relevant and accurate', 'Relevant and accurate'],
+  ['The case study', 'Little or no reference', 'Superficial, often only names', 'Beyond names, not effectively in support', 'Generally supports the argument', 'Integrated effectively in support'],
+  ['Arguments', 'None made', 'Mostly unsubstantiated', 'Substantiated, mostly one-sided', 'Substantiated, some balance', 'Substantiated and balanced, with the limitations of the case explained'],
+];
+---
+
+<BaseLayout title="Paper 1: the case study paper" description="IB Business Management Paper 1, explained: the pre-released statement, Section A and Section B, command terms, application to the case, markbands and common mistakes, with practice." section="assessment">
+  <CentreHead
+    crumb="Paper 1"
+    kicker="Paper 1 · SL and HL"
+    title="The case study paper"
+    lead="One case study about a fictitious organization, part of it released months in advance. The same paper at SL and HL, for students assessed from May 2024 onwards."
+    stats={[
+      { value: '1 h 30', label: 'Duration', note: "plus 5 minutes' reading time" },
+      { value: '30', label: 'Marks', note: 'Section A 20 · Section B 10' },
+      { value: '35% | 25%', label: 'Weighting', note: 'of the final grade, SL | HL' },
+      { value: 'Pre-released', label: 'Case study', note: 'statement issued earlier' },
+    ]}
+  />
+
+  <div class="wrap page-body ce">
+    <LabelKey />
+
+    <section class="ce-sec" aria-labelledby="p1-how-h">
+      <SectionHead no="01" title="How Paper 1 works" id="p1-how-h" dek="What you receive before the examination, and what happens on the day." />
+      <p class="ce-labels"><GuideLabel kind="ib" /></p>
+      {p1 && <FactList facts={p1.facts} />}
+      <h3 class="ce-h3">From pre-release to examination day</h3>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="strategy" /></p>
+      <ol class="ce-flow">
+        <li><span class="label">About three months before</span><p>The pre-released statement: a few context topics that are not in the guide but build on it, to research for about five hours, and the opening of the case, about its first 200 words.</p></li>
+        <li><span class="label">The weeks before</span><p>Understand the organization and its situation; research each context topic as a live issue; practise applying syllabus tools to this organization rather than memorizing answers.</p></li>
+        <li><span class="label">The examination</span><p>The full case, about 800 to 1,000 words: the opening you studied, then new information. Every question is unseen.</p></li>
+        <li><span class="label">Afterwards</span><p>Section A is marked with an analytic markscheme; Section B with markbands, best fit, and a question-specific markscheme.</p></li>
+      </ol>
+      <h3 class="ce-h3">Two sections, drawn to scale</h3>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="strategy" /></p>
+      <Scale
+        caption="Paper 1's 30 marks"
+        total={30}
+        parts={[
+          { label: 'Section A · structured questions', marks: 20, note: 'about 54 minutes', tone: 'navy' },
+          { label: 'Section B · one of two', marks: 10, note: 'about 36 minutes', tone: 'gold' },
+        ]}
+      />
+      <div class="ce-split">
+        <div class="ce-card">
+          <h3>Section A · 20 marks</h3>
+          <p>Answer every structured question: six in the 2024 and 2025 papers, five in May 2026 (the guide does not fix the number). Marked with an analytic markscheme.</p>
+        </div>
+        <div class="ce-card">
+          <h3>Section B · 10 marks</h3>
+          <p>Answer one of two extended response questions, usually discuss or evaluate. Marked with markbands, best fit, and a question-specific markscheme.</p>
+        </div>
+      </div>
+      <p class="small muted">Suggested times follow the teacher support material's advice of about 60% for Section A; they are not an IB rule.</p>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p1-terms-h">
+      <SectionHead no="02" title="Understanding the questions" id="p1-terms-h" dek="What each command term asks you to demonstrate. The IB places each term at an assessment objective, and no question uses a term above the level of its content; the whole question and its markscheme decide what is rewarded." />
+      <p class="ce-labels"><GuideLabel kind="ib" /></p>
+      <div class="p1-aos">
+        <div><p class="p1-aos__k">AO1 · Knowledge and understanding</p><p class="small muted">Accurate knowledge of a term, theory or feature.</p><p class="p1-aos__t">{byAo('AO1').join(', ')}</p></div>
+        <div><p class="p1-aos__k">AO2 · Application and analysis</p><p class="small muted">Knowledge used on the case: reasons, effects, links.</p><p class="p1-aos__t">{byAo('AO2').join(', ')}</p></div>
+        <div><p class="p1-aos__k">AO3 · Synthesis and evaluation</p><p class="small muted">Arguments and evidence weighed into a judgement.</p><p class="p1-aos__t">{byAo('AO3').join(', ')}</p></div>
+        <div><p class="p1-aos__k">AO4 · Skills</p><p class="small muted">Calculating, constructing and presenting.</p><p class="p1-aos__t">{byAo('AO4').join(', ')}</p></div>
+      </div>
+      <p class="small muted">Each term, with what it asks and the page of its official definition, is in the <a href="/examiner-lens/">command terms guide</a>.</p>
+
+      <h3 class="ce-h3">Five terms, one topic</h3>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="example" /></p>
+      <p class="ce-p">Juniper Juice (invented) sells juice from three kiosks, plans to supply two chains with 140 stores, has taste-tested new flavours, and claims a new pressing machine would pay for itself within a year.</p>
+      <table class="ce-table">
+        <thead><tr><th scope="col">Term</th><th scope="col">Asks you to give</th><th scope="col">Applied to primary market research at Juniper</th></tr></thead>
+        <tbody>{FIVE.map(([t, a, x]) => <tr><th scope="row">{t}</th><td>{a}</td><td>{x}</td></tr>)}</tbody>
+      </table>
+
+      <h3 class="ce-h3">How the marks signal depth</h3>
+      <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+      <div class="ce-cols">
+        <div class="ce-col"><p class="label">2 marks</p><p>Often define or state. A definition needs two precise elements; over-concise ones miss a mark.</p></div>
+        <div class="ce-col"><p class="label">4 marks</p><p>Often describe two, marked 2 + 2 in recent papers: two features, each developed.</p></div>
+        <div class="ce-col"><p class="label">6 marks</p><p>Often explain two, marked 3 + 3 in recent papers, as in the annotated answer below.</p></div>
+      </div>
+      <p class="small muted">Patterns from recent subject reports, as cited in the Paper 1 guide; each paper's markscheme decides how marks divide.</p>
+
+      <div class="ce-practice">
+        <p class="ce-labels"><GuideLabel kind="strategy" /> <GuideLabel kind="example" /></p>
+        <h3 class="ce-h3">Practise: decode the question before you write</h3>
+        <Sorter
+          uid="p1-decode"
+          legend="What this part of the question tells you"
+          lead="Each fragment comes from one of two questions on Juniper. What does it tell you to do?"
+          options={[
+            { value: 'term', label: 'Command term' },
+            { value: 'number', label: 'How many' },
+            { value: 'focus', label: 'Focus' },
+            { value: 'context', label: 'Context' },
+          ]}
+          items={[
+            { id: 'd1', text: '"Explain two disadvantages for Juniper of selling through the supermarket chains." The word "Explain"', right: ['term'], explanation: 'Explain asks for reasons or causes, not a list.' },
+            { id: 'd2', text: 'The same question: "two"', right: ['number'], explanation: 'Two, kept distinct: a third earns nothing and two overlapping points earn less.' },
+            { id: 'd3', text: 'The same question: "disadvantages"', right: ['focus'], explanation: 'Disadvantages only: advantages, however good, are outside the question.' },
+            { id: 'd4', text: 'The same question: "for Juniper, of selling through the supermarket chains"', right: ['context'], explanation: 'For Juniper, through the chains: the points must be about this decision for this business.' },
+            { id: 'd5', text: '"Describe two features of the primary research Juniper carried out." The word "features"', right: ['focus'], explanation: 'Features of the research Juniper did, not benefits or drawbacks.' },
+            { id: 'd6', text: 'The same question: "Describe"', right: ['term'], explanation: 'Describe asks for a detailed account: each feature developed, not just named.' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p1-a-h">
+      <SectionHead no="03" title="Mastering Section A" id="p1-a-h" dek="Copying the case shows reading; stating theory shows memory. Application joins the two and follows the consequence for this business." />
+      <p class="ce-labels"><GuideLabel kind="examiner" /> <GuideLabel kind="example" /></p>
+      <table class="ce-table">
+        <thead><tr><th scope="col"></th><th scope="col">Case fact</th><th scope="col">Business knowledge</th><th scope="col">Consequence for Juniper</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Restates the case<br /><span class="small muted">shows reading only</span></th><td>Juniper's juices last five days.</td><td class="muted">Missing</td><td class="muted">Missing</td></tr>
+          <tr><th scope="row">Generic<br /><span class="small muted">fits any business</span></th><td class="muted">Missing</td><td>Retailers can return unsold stock to suppliers.</td><td class="muted">Missing</td></tr>
+          <tr><th scope="row">Applied<br /><span class="small muted">knowledge used on the case</span></th><td>Five-day shelf life.</td><td>Sale-or-return shifts unsold stock to the supplier.</td><td>Unsold bottles return at Juniper's cost.</td></tr>
+        </tbody>
+      </table>
+      <p class="small muted">The teacher support material notes that AO2 answers without appropriate application are typically limited to about half of the marks.</p>
+
+      <h3 class="ce-h3">An annotated 6-mark answer</h3>
+      <p class="ce-labels"><GuideLabel kind="examiner" /> <GuideLabel kind="example" /></p>
+      <p class="ce-p"><strong>Explain two disadvantages for Juniper of selling through the supermarket chains. [6]</strong> Illustrative markscheme: for each disadvantage, identify (1), explain with business knowledge (1), apply to Juniper (1).</p>
+      <table class="ce-table">
+        <thead><tr><th scope="col">Mark</th><th scope="col">Extract from the response</th><th scope="col">Why it scores</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Identify</th><td>One disadvantage is that the chains may insist on sale-or-return terms.</td><td>Names the point</td></tr>
+          <tr><th scope="row">Explain</th><td>Retailers with buying power can push the cost of unsold stock back onto suppliers.</td><td>Knowledge the case lacks</td></tr>
+          <tr><th scope="row">Apply</th><td>Juniper's juices last five days, so bottles not sold in time return at its cost.</td><td>This case, and its effect</td></tr>
+          <tr><th scope="row">Identify</th><td>A second is lower revenue per bottle, and so a lower margin.</td><td>A distinct point</td></tr>
+          <tr><th scope="row">Explain</th><td>The retailer's price must cover its own costs and profit, so the supplier receives only part.</td><td>Its own reasoning</td></tr>
+          <tr><th scope="row">Apply</th><td>At its kiosks Juniper receives the full $4 a bottle; through the chains it receives less.</td><td>Its own evidence</td></tr>
+        </tbody>
+      </table>
+      <p class="small muted">One question's markscheme, not a universal formula: each paper's markscheme decides. From May 2027 the case has no line numbers, and questions quote the text they need (May 2026 subject report, as cited in the Paper 1 guide).</p>
+
+      <div class="ce-split">
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+          <h3>Definitions that score</h3>
+          <ul>
+            <li>The full meaning in your own words; an example is not a definition.</li>
+            <li>Never define a term with the term itself.</li>
+            <li>State and identify need a line, not a paragraph.</li>
+          </ul>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+          <h3>Where marks are lost</h3>
+          <ul>
+            <li>Sentences lifted from the case ("reading comprehension").</li>
+            <li>Two points that overlap or share evidence.</li>
+            <li>Writing far beyond the marks, which costs Section B time.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="ce-practice">
+        <p class="ce-labels"><GuideLabel kind="strategy" /> <GuideLabel kind="example" /></p>
+        <h3 class="ce-h3">Practise: restated, generic or applied?</h3>
+        <Sorter
+          uid="p1-apply"
+          legend="What kind of point is it"
+          lead="Each sentence answers a question about Juniper's plan to supply the chains. Which kind of point is it?"
+          options={[
+            { value: 'restate', label: 'Restates the case' },
+            { value: 'generic', label: 'Generic' },
+            { value: 'applied', label: 'Applied' },
+          ]}
+          items={[
+            { id: 'a1', text: 'Juniper sells juice from three kiosks and plans to supply two chains with 140 stores.', right: ['restate'], explanation: 'Accurate, but it only repeats the case: no business knowledge and no consequence.' },
+            { id: 'a2', text: 'Larger orders let a business spread its fixed costs over more units, lowering average cost.', right: ['generic'], explanation: 'Sound knowledge, but it would fit any business: nothing ties it to Juniper.' },
+            { id: 'a3', text: "Supplying 140 stores spreads the new pressing machine's fixed cost over far more bottles than three kiosks sell, so Juniper's cost per bottle could fall.", right: ['applied'], explanation: "Knowledge (economies of scale) used on the case's facts, with the consequence for Juniper." },
+            { id: 'a4', text: 'Supermarkets have buying power over their suppliers.', right: ['generic'], explanation: 'True in general, but the effect on Juniper is missing.' },
+            { id: 'a5', text: "With a five-day shelf life, a chain's sale-or-return terms would leave Juniper paying for every bottle that does not sell in time.", right: ['applied'], explanation: 'A case fact (shelf life) joined to knowledge (sale-or-return) and its consequence for Juniper.' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p1-b-h">
+      <SectionHead no="04" title="Mastering Section B" id="p1-b-h" dek="The 10-mark response is read as a whole. Knowledge and application run through every argument, analysis carries each argument to its consequence, and evaluation grows from weighing the arguments into a judgement." />
+      <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+      <table class="ce-table p1-weave">
+        <thead><tr><th scope="col"></th><th scope="col">Frame the decision</th><th scope="col">Argument developed</th><th scope="col">Counter-argument developed</th><th scope="col">Weighing, case-specific</th><th scope="col">Judgement with a condition</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Knowledge AO1</th><td>&#9679;</td><td>&#9679;</td><td>&#9679;</td><td>&#9675;</td><td>&#9675;</td></tr>
+          <tr><th scope="row">Application AO2</th><td>&#9679;</td><td>&#9679;</td><td>&#9679;</td><td>&#9679;</td><td>&#9679;</td></tr>
+          <tr><th scope="row">Analysis AO2</th><td>&#9675;</td><td>&#9679;</td><td>&#9679;</td><td>&#9675;</td><td>&#9675;</td></tr>
+          <tr><th scope="row">Evaluation AO3</th><td></td><td>&#9675;</td><td>&#9675;</td><td>&#9679;</td><td>&#9679;</td></tr>
+        </tbody>
+      </table>
+      <p class="small muted">&#9679; central to this stage · &#9675; present in support · blank: not expected here. A recommended construction, not an IB template. When evaluating one option, the teacher support material suggests at least two arguments for and two against.</p>
+
+      <h3 class="ce-h3">An annotated response</h3>
+      <p class="ce-labels"><GuideLabel kind="example" /></p>
+      <p class="ce-p"><strong>Discuss whether Juniper should sell its juices through the two supermarket chains. [10]</strong> Extracts:</p>
+      <table class="ce-table">
+        <thead><tr><th scope="col">Stage</th><th scope="col">Extract</th><th scope="col">Skills shown</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Argument</th><td>The chains' 140 stores reach far more shoppers than three kiosks. Higher volume would spread the fixed cost of the new pressing machine over more bottles, lowering average cost, so profit could rise despite a lower price per bottle.</td><td>Knowledge, application, analysis</td></tr>
+          <tr><th scope="row">Counter-argument</th><td>However, the machine raises fixed costs before supermarket income arrives, and sale-or-return terms move the risk of a five-day shelf life onto Juniper: if bottles do not sell in time, returns could erase the volume gain.</td><td>Knowledge, application, analysis</td></tr>
+          <tr><th scope="row">Weighing</th><td>The volume gain is likely; its profit depends on bottles selling within five days, which the taste tests cannot show: 120 shoppers in two city stores are not 140 stores.</td><td>Evaluation, with a limitation</td></tr>
+          <tr><th scope="row">Judgement</th><td>Juniper should supply the chains, but trial a limited number of stores first and buy the machine only if bottles sell within their shelf life at the forecast rate.</td><td>A decision and its condition</td></tr>
+        </tbody>
+      </table>
+      <h3 class="ce-h3">When a final judgement is expected</h3>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="strategy" /></p>
+      <div class="ce-cols p1-four">
+        <div class="ce-col"><p class="label">Discuss</p><p>A balanced review, with conclusions presented clearly.</p></div>
+        <div class="ce-col"><p class="label">Evaluate</p><p>An appraisal of strengths and limitations.</p></div>
+        <div class="ce-col"><p class="label">To what extent</p><p>The merits or otherwise, with a supported conclusion.</p></div>
+        <div class="ce-col"><p class="label">Recommend</p><p>An advisable course of action, with evidence.</p></div>
+      </div>
+      <p class="small muted">Paraphrased from the IB glossary of command terms. The platform's reading: each expects a supported conclusion, and the strongest state the condition the decision depends on.</p>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p1-band-h">
+      <SectionHead no="05" title="Reaching the highest markband" id="p1-band-h" dek="What separates 7 or 8 marks from 9 or 10." />
+      <p class="ce-labels"><GuideLabel kind="ib" /></p>
+      <div class="p1-bands">
+        <table class="ce-table">
+          <thead><tr><th scope="col">Strand</th><th scope="col">1 to 2</th><th scope="col">3 to 4</th><th scope="col">5 to 6</th><th scope="col">7 to 8</th><th scope="col">9 to 10</th></tr></thead>
+          <tbody>{BANDS.map((row) => <tr><th scope="row">{row[0]}</th>{row.slice(1).map((x) => <td>{x}</td>)}</tr>)}</tbody>
+        </table>
+      </div>
+      <p class="small muted">Paraphrased from the IB markbands for the 10-mark response, applied best fit; zero when the first band is not reached. Read the markbands themselves in the guide with your teacher.</p>
+      <div class="ce-split">
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="examiner" /></p>
+          <h3>The step from 8 to 9</h3>
+          <p>Every strand rises from 7 to 8: clear focus, evidence integrated rather than generally supportive, full balance, and an explanation of the limitations of the case study. Subject reports (May 2024, November 2024) state that without it marks are limited to 8 out of 10, and later reports stress that it must show how the gap weakens the judgement, for this case.</p>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="example" /></p>
+          <h3>A limitation, too generic and then specific</h3>
+          <p><b>Too generic:</b> "We need more financial information."</p>
+          <p><b>Specific and explained:</b> "The case does not say how many bottles sell within five days, so the claim that the machine pays for itself within a year may be optimistic."</p>
+        </div>
+      </div>
+      <div class="ce-warn">
+        <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+        <h3>Common mistakes</h3>
+        <ul>
+          <li>A verdict in the introduction, then a one-sided answer.</li>
+          <li>Theory with no case evidence: never sufficient for full marks (November 2025, Section A).</li>
+          <li>SWOT or PEST on its own: typically the 3 to 4 band (May 2026 report).</li>
+          <li>A one-line conclusion that repeats earlier points.</li>
+        </ul>
+      </div>
+      {
+        p1 && p1.ibGuidance.length > 0 && (
+          <>
+            <h3 class="ce-h3">Advice from the IB's teacher support material</h3>
+            <p class="ce-labels"><GuideLabel kind="ib" /></p>
+            <IbGuidance items={p1.ibGuidance} />
+          </>
+        )
+      }
+      <div class="ce-practice">
+        <Checklist
+          id="p1-exam"
+          title="Examination checklist"
+          items={[
+            { id: 'q-first', text: 'Reading time: questions first, then the case', label: 'strategy' },
+            { id: 'match', text: 'Reading time: match each question to its evidence, and notice what the case omits', label: 'strategy' },
+            { id: 'marks', text: 'Section A: the command term and the marks respected', label: 'strategy' },
+            { id: 'applied', text: 'Section A: every explain point applied, with distinct evidence for each point', label: 'examiner' },
+            { id: 'sides', text: 'Section B: both sides developed', label: 'examiner' },
+            { id: 'limit', text: 'Section B: one limitation of the case explained', label: 'examiner' },
+            { id: 'judge', text: 'Section B: a judgement and its condition', label: 'strategy' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p1-prac-h">
+      <SectionHead no="06" title="Practice in the style of Paper 1" id="p1-prac-h" dek="Original questions on the platform's fictional cases, each with a mark scheme to check yourself against. None is an IB question." />
+      <ul class="p1-qs">
+        {
+          questions.map(([id, q]) => (
+            <li>
+              <a href={href.question(id)}>{q.title}</a>
+              <span class="small muted">
+                {q.commandTerm} · {q.marks} marks{q.level === 'HL' ? ' · HL' : ''}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="ce-cta">
+        <a class="btn btn--primary" href="/exam-desk/practice/">All practice questions <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+        <a class="btn" href={GUIDES['paper-1'].file} download>Download the Paper 1 guide (PDF, {GUIDES['paper-1'].pages} pages)</a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .p1-aos {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--sp-4);
+    margin: var(--sp-4) 0 var(--sp-3);
+  }
+
+  .p1-aos > div {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+    padding: var(--sp-4);
+    background: var(--surface-sheet);
+    border-top: 3px solid var(--navy-900);
+  }
+
+  .p1-aos > div:nth-child(3) {
+    border-top-color: var(--gold-500);
+  }
+
+  .p1-aos__k {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .p1-aos__t {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--brass-text);
+  }
+
+  .p1-weave td {
+    text-align: center;
+    color: var(--navy-900);
+    font-size: 1.1rem;
+  }
+
+  .p1-bands {
+    overflow-x: auto;
+  }
+
+  .p1-bands table {
+    min-width: 46rem;
+  }
+
+  .p1-four {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .p1-qs {
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--navy-900);
+    max-width: 52rem;
+  }
+
+  .p1-qs li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-2) var(--sp-4);
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  @media (max-width: 64rem) {
+    .p1-aos,
+    .p1-four {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .p1-aos,
+    .p1-four {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

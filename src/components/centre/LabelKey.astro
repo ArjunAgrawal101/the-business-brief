@@ -1,0 +1,54 @@
+---
+/** How to read the labels, and where the assessment content comes from. */
+import GuideLabel from './GuideLabel.astro';
+---
+
+<aside class="lk" aria-labelledby="lk-h">
+  <h2 id="lk-h" class="lk__h">How to read the labels</h2>
+  <dl class="lk__list">
+    <div><dt><GuideLabel kind="ib" /></dt><dd>From the IB Business management guide or the IB's examiner instructions.</dd></div>
+    <div><dt><GuideLabel kind="examiner" /></dt><dd>What IB subject reports (May 2024 to May 2026) say examiners reward or penalize, as cited in the assessment guides.</dd></div>
+    <div><dt><GuideLabel kind="strategy" /></dt><dd>A technique the platform recommends. It is not an IB rule.</dd></div>
+    <div><dt><GuideLabel kind="example" /></dt><dd>Invented for teaching: the businesses, figures and answers are fictional.</dd></div>
+  </dl>
+  <p class="lk__src">
+    Built from the Arjun Agrawal Knowledge Series assessment guides (IA, Paper 1, Paper 2, Paper 3), which cite the IB guide (first assessment 2024),
+    the IB teacher support material and IB subject reports. Facts about the IB course were checked against the guide itself, with its pages; the subject
+    reports were not supplied to this platform, so examiner emphasis is given as the guides state it. Nothing here predicts a grade or approves a piece of
+    work.
+  </p>
+</aside>
+
+<style>
+  .lk {
+    padding: var(--sp-5);
+    background: var(--surface-sheet);
+    border-top: 3px solid var(--navy-900);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .lk__h {
+    font-size: 1.25rem;
+  }
+
+  .lk__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: var(--sp-3) var(--sp-5);
+    margin: var(--sp-4) 0 0;
+  }
+
+  .lk__list dd {
+    margin: var(--sp-2) 0 0;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .lk__src {
+    margin-top: var(--sp-4);
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--rule-hair);
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+</style>

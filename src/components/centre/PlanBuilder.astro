@@ -1,0 +1,256 @@
+---
+/**
+ * The Paper 3 Boardroom: build a plan of action for the stimulus's social
+ * enterprise across marketing, operations, HR and finance, tie each action to
+ * the resources and tools behind it, sequence it, and review it against the
+ * four criteria of question 3. Prompts, never marks. Saved on this device.
+ */
+import GuideLabel from './GuideLabel.astro';
+import { FUNCTIONS, FN_LABEL, STAGES, STAGE_LABEL, TOOLS, TOOL_LABEL } from '../../lib/p3-plan';
+import { jsonForScript } from '../../lib/markup';
+
+interface Props {
+  resources: Array<{ id: string; title: string }>;
+}
+const { resources } = Astro.props;
+const DIRECTIONS = [
+  ['', 'Choose a direction'],
+  ['market-penetration', 'Market penetration: existing products, existing market'],
+  ['product-development', 'Product development: new products, existing market'],
+  ['market-development', 'Market development: existing products, new market'],
+  ['diversification', 'Diversification: new products, new market'],
+];
+---
+
+<div class="pb" data-ix="plan-builder">
+  <script type="application/json" data-config set:html={jsonForScript({ resources: resources.map((r) => r.id) })} />
+  <div class="pb__head">
+    <h3 class="pb__title">Build your plan of action</h3>
+    <GuideLabel kind="strategy" />
+    <GuideLabel kind="example" />
+  </div>
+  <p class="nojs-only state">The Boardroom needs JavaScript. On paper: one direction, then actions in each of the four functions, each tied to resources, evaluated with a trade-off, and placed First, Then or Later.</p>
+  <div class="js-only">
+    <div class="pb__dir">
+      <label>
+        <span>Direction for the whole organization</span>
+        <select data-direction>{DIRECTIONS.map(([v, l]) => <option value={v}>{l}</option>)}</select>
+      </label>
+      <label>
+        <span>Why this direction, from the resources</span>
+        <input type="text" data-why placeholder="For example: offices already ask for catering (R4), and the kitchens are quiet after 2 pm (R2)" />
+      </label>
+    </div>
+    <template data-action-template>
+      <fieldset class="pb__act" data-action>
+        <legend class="pb__n"></legend>
+        <label class="pb__wide"><span>The action</span><input type="text" data-k="text" placeholder="What Haven will do" /></label>
+        <label><span>Function</span><select data-k="fn">{FUNCTIONS.map((f) => <option value={f}>{FN_LABEL[f]}</option>)}</select></label>
+        <label><span>When</span><select data-k="stage">{STAGES.map((s) => <option value={s}>{STAGE_LABEL[s]}</option>)}</select></label>
+        <label><span>Tool that shaped it</span><select data-k="tool">{TOOLS.map((t) => <option value={t}>{TOOL_LABEL[t]}</option>)}</select></label>
+        <fieldset class="pb__res">
+          <legend>Resources it uses</legend>
+          {resources.map((r) => <label title={r.title}><input type="checkbox" data-r={r.id} /> {r.id}</label>)}
+        </fieldset>
+        <label class="pb__wide"><span>Expected impact</span><input type="text" data-k="gain" placeholder="What it gains, and for whom" /></label>
+        <label class="pb__wide"><span>Trade-off</span><input type="text" data-k="tradeoff" placeholder="What is gained in one area, given up in another, and why it is worth it" /></label>
+        <button type="button" class="pb__remove" data-remove aria-label="Remove this action">Remove</button>
+      </fieldset>
+    </template>
+    <div class="pb__acts" data-actions></div>
+    <div class="pb__bar">
+      <button type="button" class="btn btn--small" data-add>Add an action</button>
+      <button type="button" class="btn btn--small" data-print>Print my plan</button>
+      <button type="button" class="btn btn--small" data-clear>Start again</button>
+    </div>
+    <div class="pb__review" aria-live="polite">
+      <p class="label">Your plan against the four criteria</p>
+      <ul class="pb__prompts" data-review></ul>
+      <p class="small muted">Counting what a plan uses and covers is not marking it: the quality of the reasoning is what earns the marks. No plan is the single right answer; a feasible plan that serves the whole organization is credited on its merits.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .pb {
+    padding: var(--sp-5);
+    background: var(--surface-sheet);
+    border-top: 3px solid var(--gold-500);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .pb__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+  }
+
+  .pb__title {
+    font-size: 1.375rem;
+    margin-right: var(--sp-2);
+  }
+
+  .pb label,
+  .pb :global(.pb__act label) {
+    display: grid;
+    gap: 0.25rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .pb input[type='text'],
+  .pb select,
+  .pb :global(.pb__act input[type='text']),
+  .pb :global(.pb__act select) {
+    min-height: 2.4rem;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--rule-control);
+    border-radius: var(--radius-2);
+    background: #fff;
+    color: var(--text-strong);
+    font: 400 0.9375rem/1.3 var(--font-ui);
+  }
+
+  .pb__dir {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: var(--sp-4);
+    margin-top: var(--sp-4);
+  }
+
+  .pb__acts {
+    display: grid;
+    gap: var(--sp-4);
+    margin-top: var(--sp-5);
+  }
+
+  .pb :global(.pb__act) {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-3);
+    margin: 0;
+    padding: var(--sp-4);
+    border: 1px solid var(--rule-hair);
+    background: var(--ivory-50);
+  }
+
+  .pb :global(.pb__n) {
+    padding: 0 0.3rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--brass-text);
+  }
+
+  .pb :global(.pb__wide) {
+    grid-column: 1 / -1;
+  }
+
+  .pb :global(.pb__res) {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-4);
+    margin: 0;
+    padding: var(--sp-2) 0 0;
+    border: 0;
+  }
+
+  .pb :global(.pb__res legend) {
+    float: left;
+    margin-right: var(--sp-3);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .pb :global(.pb__res label) {
+    display: inline-flex;
+    gap: 0.3rem;
+    align-items: center;
+    font-weight: 500;
+  }
+
+  .pb :global(.pb__remove) {
+    position: absolute;
+    top: -0.75rem;
+    right: var(--sp-3);
+    padding: 0.1rem 0.6rem;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: #fff;
+    font: 600 0.75rem/1.4 var(--font-ui);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+
+  .pb__bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin-top: var(--sp-4);
+  }
+
+  .pb__review {
+    margin-top: var(--sp-5);
+    padding: var(--sp-4);
+    background: var(--ivory-50);
+    border-left: 3px solid var(--navy-900);
+  }
+
+  .pb__prompts {
+    display: grid;
+    gap: var(--sp-2);
+    margin: var(--sp-3) 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pb__prompts :global(li) {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    gap: var(--sp-2);
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  .pb__prompts :global(.pb__crit) {
+    display: inline-grid;
+    place-items: center;
+    height: 1.5rem;
+    background: var(--navy-900);
+    color: var(--gold-400);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .pb__prompts :global(.is-met .pb__crit) {
+    background: var(--green-text);
+    color: #fff;
+  }
+
+  .pb__prompts :global(.is-warn .pb__crit) {
+    background: var(--signal-text);
+    color: #fff;
+  }
+
+  @media (max-width: 48rem) {
+    .pb__dir,
+    .pb :global(.pb__act) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media print {
+    .pb__bar,
+    .pb :global(.pb__remove) {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/centre/plan-builder';
+</script>

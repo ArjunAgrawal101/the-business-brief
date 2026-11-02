@@ -19,5 +19,12 @@ export default defineConfig({
   },
   devToolbar: { enabled: false },
   prefetch: false,
+  // The Exam Desk became the Assessment Centre in 2.0; old addresses still work.
+  redirects: {
+    '/exam-desk': '/assessment/',
+    '/exam-desk/paper-1': '/assessment/paper-1/',
+    '/exam-desk/paper-2': '/assessment/paper-2/',
+    '/exam-desk/paper-3': '/assessment/paper-3/',
+  },
   server: { port: 4321 },
 });

@@ -1,0 +1,134 @@
+---
+/**
+ * A checklist the reader ticks for their own work. It counts what is ticked;
+ * it never awards marks. Ticks are kept on this device.
+ */
+interface Item {
+  id: string;
+  text: string;
+  label?: 'ib' | 'examiner' | 'strategy';
+}
+interface Props {
+  id: string;
+  title: string;
+  items: Item[];
+  note?: string;
+}
+const { id, title, items, note } = Astro.props;
+const TAG: Record<string, string> = { ib: 'IB requirement', examiner: 'Examiner emphasis', strategy: 'Recommended' };
+---
+
+<fieldset class="ck" data-ix="checklist" data-key={`ck:${id}`}>
+  <legend class="ck__title">{title}</legend>
+  <ul class="ck__list">
+    {
+      items.map((it) => (
+        <li>
+          <label class="ck__item">
+            <input type="checkbox" value={it.id} />
+            <span>
+              {it.text}
+              {it.label && <span class={`ck__tag ck__tag--${it.label}`}>{TAG[it.label]}</span>}
+            </span>
+          </label>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="ck__count js-only" aria-live="polite" data-count>0 of {items.length} ticked</p>
+  {note && <p class="small muted">{note}</p>}
+</fieldset>
+
+<style>
+  .ck {
+    margin: 0;
+    padding: var(--sp-4) var(--sp-5);
+    border: 1px solid var(--rule-hair);
+    background: var(--surface-sheet);
+  }
+
+  .ck__title {
+    padding: 0 0.35rem;
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .ck__list {
+    margin: var(--sp-2) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ck__list li {
+    margin: 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .ck__item {
+    display: flex;
+    gap: var(--sp-3);
+    align-items: flex-start;
+    padding: 0.55rem 0;
+    cursor: pointer;
+  }
+
+  .ck__item input {
+    flex: none;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-top: 0.2rem;
+    accent-color: var(--navy-900);
+  }
+
+  .ck__tag {
+    display: inline-block;
+    margin-left: 0.4rem;
+    padding: 0 0.4rem;
+    border-radius: 999px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    vertical-align: 0.1em;
+  }
+
+  .ck__tag--ib {
+    background: var(--navy-900);
+    color: var(--text-on-ink);
+  }
+
+  .ck__tag--examiner {
+    background: var(--surface-gold-wash);
+    color: var(--brass-text);
+  }
+
+  .ck__tag--strategy {
+    background: var(--surface-cobalt-wash);
+    color: var(--cobalt-deep);
+  }
+
+  .ck__count {
+    margin-top: var(--sp-3);
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+</style>
+
+<script>
+  import { each, store } from '../../scripts/ix';
+  each('[data-ix="checklist"]', (root) => {
+    const key = root.dataset.key ?? 'ck';
+    const boxes = [...root.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')];
+    const count = root.querySelector<HTMLElement>('[data-count]');
+    const saved = new Set(store.get<string[]>(key, []));
+    boxes.forEach((b) => (b.checked = saved.has(b.value)));
+    const update = () => {
+      const on = boxes.filter((b) => b.checked).map((b) => b.value);
+      store.set(key, on);
+      if (count) count.textContent = `${on.length} of ${boxes.length} ticked`;
+    };
+    boxes.forEach((b) => b.addEventListener('change', update));
+    update();
+  });
+</script>

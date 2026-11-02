@@ -1,0 +1,599 @@
+---
+/**
+ * The Paper 3 Boardroom (HL): the social enterprise paper, from the guide and
+ * the creator's Paper 3 guide. Haven Lunchbox and Northvale are that guide's
+ * invented organization and region; resources 1 and 5, which the guide does
+ * not show, are written here in the same spirit and labelled as illustrative.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import CentreHead from '../../components/centre/CentreHead.astro';
+import GuideLabel from '../../components/centre/GuideLabel.astro';
+import LabelKey from '../../components/centre/LabelKey.astro';
+import Scale from '../../components/centre/Scale.astro';
+import Checklist from '../../components/centre/Checklist.astro';
+import PlanBuilder from '../../components/centre/PlanBuilder.astro';
+import FactList from '../../components/assess/FactList.astro';
+import IbGuidance from '../../components/assess/IbGuidance.astro';
+import { corpus, href } from '../../lib/content';
+import { GUIDES } from '../../lib/guides';
+import '../../styles/centre.css';
+
+const c = await corpus();
+const p3 = c.assessment['paper-3'];
+const questions = Object.entries(c.questions).filter(([, q]) => q.paperStyle === 'paper-3');
+const RESOURCES = [
+  { id: 'R1', title: 'Introduction', kind: 'Text' },
+  { id: 'R2', title: 'Kitchen use through the day', kind: 'Visual' },
+  { id: 'R3', title: 'Café sales and lunch requests', kind: 'Table' },
+  { id: 'R4', title: 'An email from an office manager', kind: 'Email' },
+  { id: 'R5', title: 'Northvale Business Park grows', kind: 'Newspaper' },
+  { id: 'R6', title: "A volunteer's post", kind: 'Social media' },
+];
+// Resource 2: share of kitchen capacity in use, by period of the day (illustrative).
+const KITCHEN = [
+  ['6 to 8 am', 90, 'Café breakfast preparation'],
+  ['8 am to noon', 100, 'School lunches cooked and packed'],
+  ['Noon to 2 pm', 70, 'Café lunch service'],
+  ['2 to 6 pm', 15, 'Cleaning; mostly idle'],
+] as const;
+const R3 = [
+  ['Q1 2025', 42000, 900],
+  ['Q2 2025', 39000, 980],
+  ['Q3 2025', 35000, 1080],
+  ['Q4 2025', 31000, 1200],
+] as const;
+---
+
+<BaseLayout title="Paper 3 Boardroom (HL)" description="IB Business Management Paper 3 (HL): the social enterprise paper. The human need, the challenges, and a plan of action marked on criteria A to D, with an interactive Boardroom to build and review a plan." section="assessment">
+  <CentreHead
+    crumb="Paper 3 Boardroom"
+    kicker="Paper 3"
+    hl
+    title="The Paper 3 Boardroom"
+    lead="The social enterprise paper, on Units 1 to 5 including the HL extension material: describe a need, explain the challenges, recommend a plan."
+    stats={[
+      { value: '1 h 15', label: 'Duration', note: "plus 5 minutes' reading" },
+      { value: '25', label: 'Marks', note: 'Questions 1, 2 and 3: 2 · 6 · 17' },
+      { value: '25%', label: 'Weighting', note: 'of the final HL grade' },
+      { value: 'Unseen', label: 'Stimulus', note: 'a social enterprise' },
+    ]}
+  />
+
+  <div class="wrap page-body ce">
+    <LabelKey />
+
+    <section class="ce-sec" aria-labelledby="p3-how-h">
+      <SectionHead no="01" title="How Paper 3 works" id="p3-how-h" dek="Three questions, one direction. Question 3 alone is 68% of the paper." />
+      <p class="ce-labels"><GuideLabel kind="ib" /></p>
+      {p3 && <FactList facts={p3.facts} />}
+      <h3 class="ce-h3">The 25 marks, drawn to scale</h3>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="strategy" /></p>
+      <Scale
+        caption="Suggested times, about three minutes a mark, are the platform's suggestion"
+        total={25}
+        parts={[
+          { label: 'Q1 · describe the need', marks: 2, note: 'about 6 minutes', tone: 'slate' },
+          { label: 'Q2 · explain the challenges', marks: 6, note: 'about 18 minutes', tone: 'navy' },
+          { label: 'Q3 · recommend a plan of action', marks: 17, note: 'about 50 minutes, with planning', tone: 'gold' },
+        ]}
+      />
+      <p class="small muted">Questions 1 and 2 are marked with an analytic markscheme, question 3 with four criteria. The guide's summary table speaks of one compulsory question; its detailed outline, and every paper so far, sets three.</p>
+      <div class="ce-split">
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="examiner" /></p>
+          <h3>What the unseen stimulus contains</h3>
+          <p>A short introduction to the social enterprise and the need it meets; a visual of a product or service; then excerpts such as an email, a social media post, a newspaper article, a table or chart and another document, sometimes a sixth.</p>
+          <p class="small muted">The organization and its region are fictitious (teacher support material; November 2025 report), and the stimulus runs to no more than 750 words (May 2025 report).</p>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="ib" /></p>
+          <h3>Plan like a social enterprise</h3>
+          <dl class="ce-dl">
+            <div><dt>Mission first</dt><dd>Its impact on stakeholders drives its decisions.</dd></div>
+            <div><dt>It trades</dt><dd>Most income comes from trading, not donations or grants.</dd></div>
+            <div><dt>Surplus sustains it</dt><dd>Any profit is used to sustain the mission.</dd></div>
+          </dl>
+          <p class="small muted">Features as described in the IB teacher support material. A plan that leans on donations or grants ignores the second, which is one reason reports discourage it.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p3-stim-h">
+      <SectionHead no="02" title="The stimulus: Haven Lunchbox" id="p3-stim-h" dek="An invented social enterprise in Northvale, an invented town. Read all six resources: the Boardroom below uses them." />
+      <p class="ce-labels"><GuideLabel kind="example" /></p>
+      <div class="p3-res">
+        <article class="p3-r">
+          <p class="p3-r__id">R1 · Introduction</p>
+          <p>
+            Haven Lunchbox runs two cafés in Northvale and uses their surplus to provide free school lunches for children from low-income families at three
+            primary schools. A team of six paid kitchen staff, helped by volunteers, cooks café food in the morning and the school lunches before noon. Its
+            mission: no child in Northvale should learn on an empty stomach.
+          </p>
+        </article>
+        <article class="p3-r">
+          <p class="p3-r__id">R2 · Kitchen use through the day</p>
+          <figure class="p3-bars" aria-label="Share of kitchen capacity in use: 6 to 8 am 90%; 8 am to noon 100%; noon to 2 pm 70%; 2 to 6 pm 15%.">
+            {
+              KITCHEN.map(([t, v, note]) => (
+                <div class="p3-bar">
+                  <span class="p3-bar__t">{t}</span>
+                  <span class="p3-bar__track"><span class="p3-bar__fill" style={`width:${v}%`} /></span>
+                  <span class="p3-bar__v">{v}%</span>
+                  <span class="p3-bar__n">{note}</span>
+                </div>
+              ))
+            }
+          </figure>
+        </article>
+        <article class="p3-r">
+          <p class="p3-r__id">R3 · Café sales and lunch requests</p>
+          <table class="ce-table p3-t">
+            <thead><tr><th scope="col">Quarter</th><th scope="col">Café cash sales</th><th scope="col">Weekly lunch requests</th></tr></thead>
+            <tbody>{R3.map(([q, s, l]) => <tr><th scope="row">{q}</th><td>${s.toLocaleString('en-GB')}</td><td>{l.toLocaleString('en-GB')}</td></tr>)}</tbody>
+          </table>
+        </article>
+        <article class="p3-r p3-r--mail">
+          <p class="p3-r__id">R4 · An email from an office manager</p>
+          <p class="p3-mail__meta">From: the office manager, an accountancy firm, Northvale Business Park</p>
+          <p>
+            We hold team meetings most afternoons and our staff love your café. Could Haven cater for them? Usually around 30 people, three afternoons a week.
+            We would pay a fair price, and I know two other firms on the park asking the same question.
+          </p>
+        </article>
+        <article class="p3-r">
+          <p class="p3-r__id">R5 · Northvale Business Park grows</p>
+          <p class="p3-r__head">Two new offices bring 400 jobs to the park</p>
+          <p>
+            The park now employs more than 2,000 people, but staff say the nearest café is a 20-minute walk away. Food costs for local caterers rose sharply
+            this year, and one caterer warned that firms are "price-sensitive but loyal to good service".
+          </p>
+        </article>
+        <article class="p3-r p3-r--post">
+          <p class="p3-r__id">R6 · A volunteer's post</p>
+          <p>
+            Proud of our kitchen team, but they have worked unpaid overtime for two months to keep up with lunch requests. Something has to give before
+            someone burns out.
+          </p>
+        </article>
+      </div>
+      <p class="small muted">Resources 2, 3, 4 and 6 follow the facts the Paper 3 guide gives for Haven; resources 1 and 5, which the guide does not show, and the detail of every resource, are invented for this page.</p>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p3-q12-h">
+      <SectionHead no="03" title="Questions 1 and 2" id="p3-q12-h" dek="Describe the need, then explain the challenges." />
+      <h3 class="ce-h3">Question 1: the human need, 2 marks</h3>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="examiner" /> <GuideLabel kind="example" /></p>
+      <p class="ce-p"><strong>Describe the human need of the children that Haven meets. [2]</strong></p>
+      <ol class="ce-flow">
+        <li><span class="label">Start from</span><p>The stakeholder named: children from low-income families in Northvale.</p></li>
+        <li><span class="label">Describe · 1 mark</span><p>Their particular need: they may not otherwise eat a regular, nutritious midday meal; Haven provides one free at school.</p></li>
+        <li><span class="label">Identify · 1 mark</span><p>An appropriate theory: a physiological need in Maslow's hierarchy of needs.</p></li>
+        <li><span class="label">Examiner instructions (2026)</span><p>One mark for describing the particular human need, and one more for identifying an appropriate business management theory.</p></li>
+      </ol>
+      <div class="ce-split">
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+          <ul>
+            <li>Write about the stakeholder the question names.</li>
+            <li>Copying the stimulus earns at most one mark.</li>
+            <li>HL theories, such as McClelland or Deci and Ryan, are accepted where they fit.</li>
+          </ul>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+          <ul>
+            <li>"Psychological" or "physical" needs are not credited as the theory.</li>
+            <li>Herzberg's hygiene factors do not describe a human need; motivators can, where they fit.</li>
+            <li>Read the question: a paper may rule a theory out.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 class="ce-h3">Question 2: two challenges, 3 marks each</h3>
+      <p class="ce-labels"><GuideLabel kind="examiner" /> <GuideLabel kind="example" /></p>
+      <p class="ce-p"><strong>Explain two challenges Haven faces: one financial and one in human resources. [6]</strong></p>
+      <table class="ce-table">
+        <thead><tr><th scope="col"></th><th scope="col">Identify: the challenge, in the area named</th><th scope="col">Explain: why it is a challenge, with theory</th><th scope="col">Apply: with evidence from the stimulus</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Finance</th><td>Haven may not have enough cash to meet its payments.</td><td>An organization needs enough cash inflow to pay its bills when they fall due.</td><td>Quarterly café cash sales fell from $42,000 to $31,000 (R3) while weekly lunch requests rose from 900 to 1,200.</td></tr>
+          <tr><th scope="row">Human resources</th><td>Kitchen staff may become dissatisfied and leave.</td><td>In Herzberg's theory, poor working conditions are a hygiene factor that causes dissatisfaction.</td><td>A volunteer's post says staff have worked unpaid overtime for two months (R6).</td></tr>
+        </tbody>
+      </table>
+      <p class="small muted">The markscheme for each paper sets what earns the marks. Recent markschemes credited identification, explanation and application for each challenge; a lone copied figure, or a trend without figures, was not enough for application (subject reports, as cited in the Paper 3 guide).</p>
+      <div class="ce-warn">
+        <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+        <h3>Where question 2 marks are lost</h3>
+        <ul>
+          <li><b>Overlap:</b> two challenges that are really one, such as "cash flow" and "liquidity": the second earns little.</li>
+          <li><b>Wrong area:</b> a marketing challenge when the question asks for operations.</li>
+          <li><b>No theory:</b> a sensible explanation with no business management concept behind it.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p3-q3-h">
+      <SectionHead no="04" title="Understanding question 3" id="p3-q3-h" dek="Recommend: present an advisable course of action with supporting evidence. There is no single correct plan; a feasible plan that serves the whole organization is credited on its merits." />
+      <p class="ce-labels"><GuideLabel kind="ib" /></p>
+      <div class="p3-crit">
+        <div class="p3-crit__d"><span class="p3-crit__k">D</span><b>Sequencing of ideas and plan of action</b><span>3 marks · frames the whole response: a clear, coherent order</span></div>
+        <div class="p3-crit__row">
+          <div class="p3-crit__in">
+            <div><span class="p3-crit__k">A</span><b>Use of resource materials</b><span>4 marks · every resource used as evidence for an action</span></div>
+            <div><span class="p3-crit__k">B</span><b>Business management tools and theories</b><span>4 marks · tools applied to decide and shape the actions</span></div>
+          </div>
+          <div class="p3-crit__plan">
+            <p class="label">The plan of action</p>
+            <p>One forward-looking direction for the whole organization</p>
+            <ul><li>Finance</li><li>Marketing</li><li>Human resources</li><li>Operations</li></ul>
+          </div>
+          <div class="p3-crit__out"><span class="p3-crit__k">C</span><b>Evaluation</b><span>6 marks · the expected impact on the relevant areas of the business, and the trade-offs between them</span></div>
+        </div>
+      </div>
+      <table class="ce-table">
+        <thead><tr><th scope="col">Criterion</th><th scope="col">Top level, in the guide (paraphrased)</th><th scope="col">What reports warn against</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">A · Resource materials (4)</th><td>Reference to all the resource materials, effectively supporting the plan</td><td>Repeating the stimulus, for example through a SWOT</td></tr>
+          <tr><th scope="row">B · Tools and theories (4)</th><td>Appropriate tools and theories effectively applied</td><td>Naming a tool without using it</td></tr>
+          <tr><th scope="row">C · Evaluation (6)</th><td>The expected impact on the relevant areas of the business, and the trade-offs between them</td><td>Generic points; disadvantages called trade-offs</td></tr>
+          <tr><th scope="row">D · Sequencing (3)</th><td>Ideas and plan sequenced in a clear and coherent manner</td><td>Repeating question 2; actions that clash</td></tr>
+        </tbody>
+      </table>
+      <div class="ce-split">
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="strategy" /> <GuideLabel kind="example" /></p>
+          <h3>Tools that shape the plan</h3>
+          <dl class="ce-dl">
+            <div><dt>Ansoff matrix</dt><dd>Which direction of growth, and how risky. At Haven: market development, existing food for a new market of offices.</dd></div>
+            <div><dt>Force field analysis</dt><dd>Whether a change is likely to succeed: office demand (R4) against overtime (R6), with no invented weightings.</dd></div>
+            <div><dt>Gantt chart</dt><dd>The order and timing of the actions: the pilot runs before any hiring; hiring before expansion.</dd></div>
+          </dl>
+          <p class="small muted">All in the guide's toolkit, the last two HL only. Naming a tool earns at most 1 of the 4 marks for B (May 2026 report).</p>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+          <h3>A plan that only fixes the question 2 challenges</h3>
+          <p>Question 2 explains why the enterprise struggles now; question 3 plans what it does next. Responses that analysed only the question 2 challenges reached at most 2 of 6 for C (May 2025 report).</p>
+          <h3 class="p3-sub">Trade-off or disadvantage?</h3>
+          <p><b>Disadvantage:</b> "Opening a catering service will cost money and take time."</p>
+          <p><b>Trade-off:</b> "Cooking in the quiet afternoons raises capacity utilization (operations), but adds shifts for a team already on unpaid overtime (human resources), so catering cannot grow until new staff are paid for (finance)."</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p3-board-h">
+      <SectionHead no="05" title="The Boardroom" id="p3-board-h" dek="Recommend a plan of action for Haven Lunchbox to meet the growing need for free school lunches over the next two years. [17] An illustrative question: build your plan, then compare it with a model." />
+      <PlanBuilder resources={RESOURCES} />
+      <details class="p3-model">
+        <summary>Compare with a model plan</summary>
+        <div class="p3-model__body">
+          <p class="ce-labels"><GuideLabel kind="strategy" /> <GuideLabel kind="example" /></p>
+          <p><b>Recommendation:</b> launch a catering service for local offices, cooked in the kitchens' quiet afternoons. Ansoff: market development, existing products for a new market.</p>
+          <table class="ce-table">
+            <thead><tr><th scope="col"></th><th scope="col">Marketing</th><th scope="col">Operations</th><th scope="col">Human resources</th><th scope="col">Finance</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Gain</th><td>Offices already asking for catering (R4)</td><td>Idle afternoon capacity put to use (R2)</td><td>Jobs for Northvale parents; overtime ends (R6)</td><td>Trading income to offset the fall to $31,000 (R3)</td></tr>
+              <tr><th scope="row">Cost</th><td>Menus, prices and promotion to set up</td><td>Packaging, delivery and a tighter schedule</td><td>Recruitment and training time</td><td>Spending before the first income arrives</td></tr>
+              <tr><th scope="row">Depends on</th><td>Enquiries becoming regular orders</td><td>School-lunch slots fixed first</td><td>Catering income to pay two wages</td><td>Prices that cover costs on every order</td></tr>
+            </tbody>
+          </table>
+          <p><b>Trade-off:</b> offices most want lunchtime orders, but the lunch peak belongs to the school meals. Afternoon-only catering protects the mission and gives up the most valuable orders. <b>Trade-off:</b> hiring local parents deepens Haven's social impact, but output is slower while they train, which delays the income meant to pay them.</p>
+          <ol class="ce-flow">
+            <li><span class="label">First · pilot</span><p>Cater for two offices' afternoon events in the kitchens' quiet hours (R2). School-lunch slots are fixed first. Enables: evidence of demand and margin before any spending.</p></li>
+            <li><span class="label">Then · build capacity</span><p>Use pilot income to recruit and train two kitchen staff from Northvale families, ending the overtime (R6). Depends on: pilot income covering wages.</p></li>
+            <li><span class="label">Later · scale</span><p>Extend catering to more offices on the growing park (R5), and review whether a second kitchen is justified. Depends on: lunches protected and cash flow positive.</p></li>
+            <li><span class="label">Throughout</span><p>The mission (R1) sets the limit: no catering order may displace a school lunch.</p></li>
+          </ol>
+          <p class="small muted">First, Then, Later is a technique the platform recommends for criterion D, not an IB-prescribed structure. Any clear, coherent order can earn the marks.</p>
+        </div>
+      </details>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p3-ready-h">
+      <SectionHead no="06" title="Examination readiness" id="p3-ready-h" dek="What examiners look for, and what you can leave out." />
+      <div class="ce-split">
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+          <h3>Rewarded</h3>
+          <ul>
+            <li>A plan for the whole organization, not only the question 2 challenges.</li>
+            <li>Every resource used as evidence for an action.</li>
+            <li>Tools that change the plan: Ansoff to choose a direction, a Gantt chart to schedule it.</li>
+            <li>Each action evaluated, with trade-offs between areas.</li>
+            <li>A feasible plan the enterprise could afford and staff.</li>
+          </ul>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+          <h3>Discouraged</h3>
+          <ul>
+            <li>Repeating the stimulus, or a SWOT that only restates it.</li>
+            <li>Relying on donations or grants to solve the problem.</li>
+            <li>Naming tools without applying them.</li>
+            <li>Generic evaluation, and disadvantages relabelled as trade-offs.</li>
+            <li>Long introductions that restate questions 1 and 2.</li>
+          </ul>
+        </div>
+      </div>
+      <h3 class="ce-h3">What question 3 does not require</h3>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="examiner" /></p>
+      <table class="ce-table">
+        <tbody>
+          <tr><th scope="row">Limitations of the stimulus</th><td>Not required in Paper 3, unlike Papers 1 and 2: no criterion rewards it. Plan with what you are given. (The teacher support material's advice that higher marks acknowledge the further research a final judgement would need is listed below; it is guidance, not a criterion.)</td></tr>
+          <tr><th scope="row">A formal conclusion or summary</th><td>A clear, well-sequenced plan does not need to be repeated or summarized at the end (May 2026 report).</td></tr>
+          <tr><th scope="row">A fixed time horizon</th><td>Some papers have set five years, others none. Use the time frame the question gives; if none, set realistic timings yourself.</td></tr>
+          <tr><th scope="row">A set layout</th><td>The guide prescribes no layout for the plan. Planning notes are not marked, though reports encourage planning before writing.</td></tr>
+        </tbody>
+      </table>
+      {
+        p3 && p3.ibGuidance.length > 0 && (
+          <>
+            <h3 class="ce-h3">Advice from the IB's teacher support material</h3>
+            <p class="ce-labels"><GuideLabel kind="ib" /></p>
+            <IbGuidance items={p3.ibGuidance} />
+          </>
+        )
+      }
+      <div class="ce-practice">
+        <Checklist
+          id="p3-final"
+          title="Final checklist"
+          items={[
+            { id: 'q1-need', text: 'Question 1: the particular need, for the right stakeholder', label: 'examiner' },
+            { id: 'q1-theory', text: 'Question 1: an appropriate theory, named', label: 'ib' },
+            { id: 'q2-two', text: 'Question 2: two distinct challenges, in the areas asked', label: 'examiner' },
+            { id: 'q2-evidence', text: 'Question 2: theory and stimulus figures for each', label: 'examiner' },
+            { id: 'q3-res', text: 'Question 3: every resource used; tools applied', label: 'examiner' },
+            { id: 'q3-eval', text: 'Question 3: each action evaluated, with trade-offs', label: 'examiner' },
+            { id: 'q3-order', text: 'Question 3: actions in a clear, coherent order', label: 'ib' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p3-prac-h">
+      <SectionHead no="07" title="More practice" id="p3-prac-h" dek="Paper 3-style questions on another invented social enterprise, with question 3 self-marked on criteria A to D. None is an IB question." />
+      <ul class="p1-qs">
+        {
+          questions.map(([id, q]) => (
+            <li>
+              <a href={href.question(id)}>{q.title}</a>
+              <span class="small muted">{q.commandTerm} · {q.marks} marks</span>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="ce-cta">
+        <a class="btn btn--primary" href="/exam-desk/practice/">All practice questions <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+        <a class="btn" href={GUIDES['paper-3'].file} download>Download the Paper 3 guide (PDF, {GUIDES['paper-3'].pages} pages)</a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .p3-res {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-4);
+  }
+
+  .p3-r {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+    padding: var(--sp-4);
+    background: var(--surface-sheet);
+    border: 1px solid var(--rule-hair);
+    font-size: 0.9375rem;
+  }
+
+  .p3-r__id {
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .p3-r__head {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .p3-r--mail {
+    border-left: 3px solid var(--slate-500);
+  }
+
+  .p3-mail__meta {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  .p3-r--post {
+    border-left: 3px solid var(--bb-cobalt);
+    font-style: italic;
+  }
+
+  .p3-bars {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+  }
+
+  .p3-bar {
+    display: grid;
+    grid-template-columns: 6.5rem minmax(0, 1fr) 2.75rem;
+    gap: 0.15rem var(--sp-2);
+    align-items: center;
+    font-size: 0.8125rem;
+  }
+
+  .p3-bar__track {
+    height: 0.65rem;
+    background: var(--ivory-200);
+  }
+
+  .p3-bar__fill {
+    display: block;
+    height: 100%;
+    background: var(--navy-900);
+  }
+
+  .p3-bar__v {
+    font-weight: 600;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .p3-bar__n {
+    grid-column: 2 / -1;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+  }
+
+  .p3-t {
+    margin-top: 0;
+    font-size: 0.875rem;
+  }
+
+  .p3-crit {
+    display: grid;
+    gap: var(--sp-3);
+    margin: var(--sp-4) 0;
+    padding: var(--sp-4);
+    border: 2px solid var(--navy-900);
+  }
+
+  .p3-crit__d,
+  .p3-crit__in > div,
+  .p3-crit__out {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.15rem var(--sp-3);
+    align-items: baseline;
+    padding: var(--sp-3);
+    background: var(--surface-sheet);
+  }
+
+  .p3-crit__d span:last-child,
+  .p3-crit__in span:last-child,
+  .p3-crit__out span:last-child {
+    grid-column: 2;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .p3-crit__k {
+    grid-row: span 2;
+    display: inline-grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    background: var(--navy-900);
+    color: var(--gold-400);
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+  }
+
+  .p3-crit__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--sp-3);
+    align-items: stretch;
+  }
+
+  .p3-crit__in {
+    display: grid;
+    gap: var(--sp-3);
+  }
+
+  .p3-crit__plan {
+    display: grid;
+    align-content: center;
+    gap: var(--sp-2);
+    padding: var(--sp-4);
+    background: var(--surface-ink);
+    color: var(--text-on-ink);
+    text-align: center;
+  }
+
+  .p3-crit__plan .label {
+    color: var(--gold-400);
+  }
+
+  .p3-crit__plan ul {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-2);
+    margin: var(--sp-2) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .p3-crit__plan li {
+    margin: 0;
+    padding: 0.35rem;
+    border: 1px solid var(--rule-on-ink);
+    font-size: 0.875rem;
+  }
+
+  .p3-sub {
+    margin-top: var(--sp-4);
+    font-size: 1.125rem;
+  }
+
+  .p3-model {
+    margin-top: var(--sp-5);
+    border-top: 1px solid var(--navy-900);
+  }
+
+  .p3-model > summary {
+    padding: var(--sp-3) 0;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--navy-900);
+    cursor: pointer;
+  }
+
+  .p3-model__body > * + * {
+    margin-top: var(--sp-4);
+  }
+
+  .p1-qs {
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--navy-900);
+    max-width: 52rem;
+  }
+
+  .p1-qs li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-2) var(--sp-4);
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  @media (max-width: 64rem) {
+    .p3-res {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .p3-crit__row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .p3-res {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

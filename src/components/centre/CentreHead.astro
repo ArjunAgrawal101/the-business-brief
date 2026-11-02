@@ -1,0 +1,143 @@
+---
+/** The header of an assessment component: the figures that define it, then the intro. */
+import Breadcrumbs from '../layout/Breadcrumbs.astro';
+
+interface Stat {
+  value: string;
+  label: string;
+  note?: string;
+}
+interface Props {
+  title: string;
+  kicker: string;
+  lead: string;
+  stats: Stat[];
+  hl?: boolean;
+  crumb: string;
+}
+const { title, kicker, lead, stats, hl = false, crumb } = Astro.props;
+---
+
+<header class="ch">
+  <div class="wrap">
+    <Breadcrumbs trail={[{ label: 'Assessment Centre', href: '/assessment/' }, { label: crumb }]} />
+    <p class="ch__kicker">
+      {kicker}
+      {hl && <span class="ch__hl">Higher Level only</span>}
+    </p>
+    <h1 class="ch__title">{title}</h1>
+    <p class="ch__lead">{lead}</p>
+    <dl class="ch__stats">
+      {
+        stats.map((s) => (
+          <div>
+            <dt>{s.label}</dt>
+            <dd>
+              <span class="ch__v">{s.value}</span>
+              {s.note && <span class="ch__n">{s.note}</span>}
+            </dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</header>
+
+<style>
+  .ch {
+    padding-block: var(--sp-6) var(--sp-7);
+    background:
+      radial-gradient(ellipse at 90% 0%, rgba(44, 70, 117, 0.6), transparent 55%),
+      var(--surface-ink);
+    color: var(--text-on-ink);
+  }
+
+  .ch :global(.breadcrumbs a),
+  .ch :global(.breadcrumbs) {
+    color: var(--text-on-ink-muted);
+  }
+
+  .ch__kicker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-3);
+    margin-top: var(--sp-5);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--gold-400);
+  }
+
+  .ch__hl {
+    padding: 0.15rem 0.55rem;
+    border: 1px solid var(--gold-400);
+    border-radius: 999px;
+    letter-spacing: 0.08em;
+  }
+
+  .ch__title {
+    margin-top: var(--sp-3);
+    color: var(--text-on-ink);
+    font-size: clamp(2.5rem, 1.7rem + 3.2vw, 4.25rem);
+  }
+
+  .ch__lead {
+    margin-top: var(--sp-4);
+    max-width: 44rem;
+    font-family: var(--font-serif);
+    font-size: var(--fs-lead);
+    color: var(--text-on-ink-muted);
+  }
+
+  .ch__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+    margin-top: var(--sp-6);
+    border-top: 1px solid var(--rule-on-ink);
+  }
+
+  .ch__stats > div {
+    padding: var(--sp-4) var(--sp-4) 0 0;
+  }
+
+  .ch__stats > div + div {
+    padding-left: var(--sp-4);
+    border-left: 1px solid var(--rule-on-ink);
+  }
+
+  .ch__stats dt {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--gold-400);
+  }
+
+  .ch__stats dd {
+    display: grid;
+    gap: 0.2rem;
+    margin: 0.35rem 0 0;
+  }
+
+  .ch__v {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.5rem);
+    font-weight: 500;
+    line-height: 1.05;
+    color: var(--text-on-ink);
+  }
+
+  .ch__n {
+    font-size: 0.8125rem;
+    color: var(--text-on-ink-muted);
+  }
+
+  @media (max-width: 40rem) {
+    .ch__stats > div:nth-child(n) {
+      padding-left: 0;
+      border-left: 0;
+    }
+  }
+</style>

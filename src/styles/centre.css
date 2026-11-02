@@ -1,0 +1,485 @@
+/* The Assessment Centre's shared layout: sections, cards, tables and practice panels. */
+
+.ce > * + * {
+  margin-top: var(--sp-8);
+}
+
+.ce-sec {
+  scroll-margin-top: calc(var(--header-h) + var(--sp-4));
+}
+
+.ce-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin: var(--sp-4) 0 var(--sp-3);
+}
+
+.ce-h3 {
+  margin-top: var(--sp-7);
+  font-size: 1.5rem;
+}
+
+.ce-h3 + .ce-labels {
+  margin-top: var(--sp-2);
+}
+
+.ce-p {
+  max-width: 48rem;
+}
+
+.ce-note {
+  max-width: 52rem;
+  margin: var(--sp-4) 0 var(--sp-6);
+  padding: var(--sp-3) var(--sp-4);
+  border-left: 3px solid var(--gold-500);
+  background: var(--surface-gold-wash);
+}
+
+/* The project journey */
+.ce-journey {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0;
+  margin: var(--sp-4) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.ce-journey li {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.3rem;
+  margin: 0;
+  padding: var(--sp-4) var(--sp-3) var(--sp-4) 0;
+  border-top: 3px solid var(--navy-900);
+}
+
+.ce-journey li + li {
+  padding-left: var(--sp-3);
+}
+
+.ce-journey li::after {
+  content: '';
+  position: absolute;
+  top: -7px;
+  right: -6px;
+  width: 11px;
+  height: 11px;
+  border-top: 3px solid var(--navy-900);
+  border-right: 3px solid var(--navy-900);
+  transform: rotate(45deg);
+  background: var(--ivory-100);
+}
+
+.ce-journey li:last-child::after {
+  display: none;
+}
+
+.ce-journey__n {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.25rem;
+  color: var(--brass-text);
+}
+
+.ce-journey__step {
+  font-family: var(--font-display);
+  font-size: 1.1875rem;
+  font-weight: 600;
+  color: var(--navy-900);
+}
+
+.ce-journey__text {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.ce-journey__crit {
+  width: fit-content;
+  margin-top: 0.3rem;
+  padding: 0.1rem 0.5rem;
+  background: var(--navy-900);
+  color: var(--gold-400);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.ce-roles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-3);
+  margin: var(--sp-4) 0 var(--sp-3);
+}
+
+.ce-roles > div {
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--surface-sheet);
+  border: 1px solid var(--rule-hair);
+}
+
+/* Tables */
+.ce-table {
+  width: 100%;
+  margin-top: var(--sp-5);
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.ce-table th,
+.ce-table td {
+  padding: 0.7rem 0.8rem 0.7rem 0;
+  border-bottom: 1px solid var(--rule-hair);
+  text-align: left;
+  vertical-align: top;
+}
+
+.ce-table thead th {
+  border-bottom: 1px solid var(--navy-900);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.ce-table tbody th {
+  font-weight: 600;
+  color: var(--navy-900);
+}
+
+.ce-table td.num {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--navy-900);
+}
+
+.ce-crit {
+  display: inline-grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-right: 0.35rem;
+  background: var(--navy-900);
+  color: var(--gold-400);
+  font-size: 0.8125rem;
+}
+
+/* Cards and splits */
+.ce-split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-5);
+  margin-top: var(--sp-5);
+}
+
+.ce-card {
+  padding: var(--sp-5);
+  background: var(--surface-sheet);
+  border-top: 3px solid var(--navy-900);
+  box-shadow: var(--shadow-sheet);
+}
+
+.ce-card h3 {
+  margin-bottom: var(--sp-3);
+  font-size: 1.3125rem;
+}
+
+.ce-card ul {
+  padding-left: 1.1rem;
+}
+
+.ce-card .ce-labels {
+  margin-top: 0;
+}
+
+.ce-ladder {
+  display: grid;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ce-ladder li {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding: var(--sp-2) var(--sp-3);
+  border-left: 3px solid var(--rule);
+}
+
+.ce-ladder li:last-child {
+  border-left-color: var(--gold-500);
+  background: var(--ivory-50);
+}
+
+.ce-dl {
+  display: grid;
+  gap: var(--sp-3);
+  margin: 0;
+}
+
+.ce-dl > div {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr);
+  gap: var(--sp-3);
+}
+
+.ce-dl dt {
+  font-weight: 600;
+  color: var(--navy-900);
+}
+
+.ce-dl dd {
+  margin: 0;
+}
+
+.ce-dl--wide {
+  max-width: 54rem;
+  margin-top: var(--sp-3);
+}
+
+.ce-dl--wide > div {
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.ce-dl--wide dd {
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+}
+
+/* Key concepts */
+.ce-concepts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-4);
+  margin-top: var(--sp-3);
+}
+
+.ce-concept {
+  display: grid;
+  align-content: start;
+  gap: 0.3rem;
+  padding: var(--sp-4);
+  background: var(--surface-sheet);
+  border-top: 3px solid var(--gold-500);
+}
+
+.ce-concept h4 {
+  margin-bottom: var(--sp-2);
+  font-size: 1.25rem;
+}
+
+.ce-concept .label {
+  margin-top: var(--sp-2);
+}
+
+.ce-concept__q {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--navy-900);
+}
+
+/* Gates */
+.ce-gates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-4);
+  margin: var(--sp-5) 0 var(--sp-3);
+}
+
+.ce-gate {
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--surface-sheet);
+  border: 1px solid var(--rule-hair);
+}
+
+.ce-gate__n {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.25rem;
+  color: var(--brass-text);
+}
+
+.ce-gate h3 {
+  font-size: 1.25rem;
+}
+
+.ce-gate .ce-labels {
+  margin: var(--sp-2) 0;
+}
+
+.ce-gate ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.9375rem;
+}
+
+.ce-warn {
+  margin: var(--sp-6) 0;
+  padding: var(--sp-4) var(--sp-5);
+  border-left: 3px solid var(--gold-500);
+  background: var(--surface-gold-wash);
+}
+
+.ce-warn h3 {
+  font-size: 1.25rem;
+  margin-bottom: var(--sp-2);
+}
+
+.ce-warn ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+/* Three criteria side by side */
+.ce-three {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-4);
+}
+
+.ce-three > div {
+  display: grid;
+  align-content: start;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+  background: var(--surface-sheet);
+  border-top: 3px solid var(--navy-900);
+}
+
+.ce-three__k {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--navy-900);
+}
+
+.ce-three__k span {
+  color: var(--brass-text);
+}
+
+/* A four-step flow */
+.ce-flow {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ce-flow li {
+  margin: 0;
+  padding: var(--sp-4);
+  background: var(--surface-ink);
+  color: var(--text-on-ink-muted);
+}
+
+.ce-flow li .label {
+  color: var(--gold-400);
+}
+
+.ce-flow li p {
+  margin-top: var(--sp-2);
+  color: var(--text-on-ink);
+  font-size: 0.9375rem;
+}
+
+/* Practice panels */
+.ce-practice {
+  margin-top: var(--sp-5);
+}
+
+.ce-practice > .ce-labels {
+  margin-top: 0;
+}
+
+/* Three columns: must, recommended, not required */
+.ce-cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-4);
+}
+
+.ce-col {
+  padding: var(--sp-4);
+  background: var(--surface-sheet);
+  border-top: 3px solid var(--navy-900);
+}
+
+.ce-col--rec {
+  border-top-color: var(--bb-cobalt);
+}
+
+.ce-col--not {
+  border-top-color: var(--rule);
+}
+
+.ce-col ul {
+  margin: var(--sp-3) 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.9375rem;
+}
+
+.ce-self {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  gap: var(--sp-4);
+}
+
+.ce-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-5);
+}
+
+@media (max-width: 64rem) {
+  .ce-journey,
+  .ce-concepts,
+  .ce-flow {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ce-journey li::after {
+    display: none;
+  }
+
+  .ce-gates,
+  .ce-three,
+  .ce-cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 48rem) {
+  .ce-split,
+  .ce-roles,
+  .ce-journey,
+  .ce-concepts,
+  .ce-flow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ce-journey li + li {
+    padding-left: 0;
+  }
+
+  .ce-dl > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-1);
+  }
+
+  .ce-table {
+    font-size: 0.875rem;
+  }
+}

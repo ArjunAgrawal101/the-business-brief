@@ -1,0 +1,630 @@
+---
+/**
+ * The Paper 2 room: the quantitative paper, from the guide and the creator's
+ * Paper 2 guide (Kestrel Kayaks is that guide's invented business), with the
+ * answer builder and four constructions in IB format.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import CentreHead from '../../components/centre/CentreHead.astro';
+import GuideLabel from '../../components/centre/GuideLabel.astro';
+import LabelKey from '../../components/centre/LabelKey.astro';
+import Scale from '../../components/centre/Scale.astro';
+import Checklist from '../../components/centre/Checklist.astro';
+import AnswerBuilder from '../../components/centre/AnswerBuilder.astro';
+import FactList from '../../components/assess/FactList.astro';
+import IbGuidance from '../../components/assess/IbGuidance.astro';
+import { corpus, href } from '../../lib/content';
+import { GUIDES } from '../../lib/guides';
+import '../../styles/centre.css';
+
+const c = await corpus();
+const p2 = c.assessment['paper-2'];
+const questions = Object.entries(c.questions).filter(([, q]) => q.paperStyle === 'paper-2');
+// Break-even chart: 0 to 500 kayaks across 460 px from x = 60; $0 to $250,000 up 280 px from y = 300.
+const X = (q: number) => 60 + q * 0.92;
+const Y = (v: number) => 300 - (v / 1000) * 1.12;
+const LOSSES = [
+  ['Units and scale', 'Missing $ or % signs; a missing % has scored zero', 'Write the unit with every answer'],
+  ['Rounding', 'Rounding too early, or to the wrong place', 'Two decimal places unless told; round time periods up'],
+  ['Percentages', 'A rise from 20% to 25% called a 5% increase', '5 percentage points, or a 25% increase'],
+  ['Working', 'Only the final figure written where working was required (May 2026)', 'Calculate means showing the relevant stages'],
+  ['Formula', 'Wrong denominator; total present value given as NPV, or one year\'s depreciation for the total (both HL)', 'Write the formula before substituting'],
+];
+---
+
+<BaseLayout title="Paper 2: the quantitative paper" description="IB Business Management Paper 2, explained: SL and HL papers, reading the unseen stimulus, formulas, working and rounding, evaluation, and constructions in IB format, with an answer builder for every calculation." section="assessment">
+  <CentreHead
+    crumb="Paper 2"
+    kicker="Paper 2 · SL and HL"
+    title="The quantitative paper"
+    lead="Unseen stimulus material, presented in parts: read a part, answer its questions, then read the next. SL and HL sit different papers, similar in intent and form."
+    stats={[
+      { value: '1 h 30 | 1 h 45', label: 'Duration', note: "SL | HL, plus 5 minutes' reading" },
+      { value: '40 | 50', label: 'Marks', note: 'SL | HL' },
+      { value: '35% | 30%', label: 'Weighting', note: 'of the final grade, SL | HL' },
+      { value: 'Provided', label: 'Formulae', note: 'a copy is given in the examination' },
+    ]}
+  />
+
+  <div class="wrap page-body ce">
+    <LabelKey />
+
+    <section class="ce-sec" aria-labelledby="p2-how-h">
+      <SectionHead no="01" title="How Paper 2 works" id="p2-how-h" dek="Most questions are quantitative, the stimulus mixes text with tables, charts and infographics, and Section B assesses evaluation (AO3)." />
+      <p class="ce-labels"><GuideLabel kind="ib" /></p>
+      {p2 && <FactList facts={p2.facts} />}
+      <h3 class="ce-h3">The two papers, drawn to scale</h3>
+      <div class="p2-scales">
+        <div>
+          <p class="label">Standard Level · 40 marks · 1 h 30 min · 35%</p>
+          <Scale caption="SL: Section A, then one of two Section B questions" total={50} parts={[{ label: 'Section A · all questions', marks: 20, tone: 'navy' }, { label: 'B · structured', marks: 10, tone: 'slate' }, { label: 'B · extended', marks: 10, tone: 'gold' }]} />
+        </div>
+        <div>
+          <p class="label">Higher Level · 50 marks · 1 h 45 min · 30%</p>
+          <Scale caption="HL: a longer Section A, then the same Section B structure" total={50} parts={[{ label: 'Section A · all questions', marks: 30, tone: 'navy' }, { label: 'B · structured', marks: 10, tone: 'slate' }, { label: 'B · extended', marks: 10, tone: 'gold' }]} />
+        </div>
+      </div>
+      <table class="ce-table">
+        <thead><tr><th scope="col"></th><th scope="col">Standard Level</th><th scope="col">Higher Level</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Syllabus</th><td>Units 1 to 5, excluding HL extension topics</td><td>Units 1 to 5, including HL extension topics</td></tr>
+          <tr><th scope="row">Section A</th><td>All structured questions, 20 marks (two in recent papers)</td><td>All structured questions, 30 marks (three in recent papers)</td></tr>
+          <tr><th scope="row">Section B</th><td>One of two questions (20 marks), each with structured parts and a 10-mark extended response</td><td>The same structure, 20 marks</td></tr>
+          <tr><th scope="row">Social enterprise</th><td>One Section B option may be set on one</td><td>Assessed in Paper 3 instead</td></tr>
+        </tbody>
+      </table>
+      <p class="small muted"><GuideLabel kind="examiner" /> From May 2027, explain questions in Paper 2 carry 3 marks, or 6 when two things are explained, as in Paper 1 (May 2026 subject report, as cited in the Paper 2 guide).</p>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p2-read-h">
+      <SectionHead no="02" title="Reading the unseen stimulus" id="p2-read-h" dek="Marks are lost less often through hard arithmetic than through the wrong figure, unit or year." />
+      <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+      <ol class="p2-steps">
+        <li><span>1</span><b>Read the part</b> Who the business is, what is changing, what it must decide.</li>
+        <li><span>2</span><b>Decode the question</b> Command term, marks, and the exact figure or idea asked for.</li>
+        <li><span>3</span><b>Locate the data</b> The right table, row, column and year.</li>
+        <li><span>4</span><b>Check units and scale</b> $ or $000, units or %, a year or a quarter.</li>
+        <li><span>5</span><b>Connect the parts</b> Earlier figures, and your own earlier answers, as evidence.</li>
+      </ol>
+      <div class="ce-split">
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="example" /></p>
+          <h3>Part 1 of an invented stimulus</h3>
+          <p class="p2-stim">
+            Kestrel Kayaks builds touring kayaks. Each sells for $500; variable cost is $300 a kayak and fixed costs are $60,000 a year. Sales have risen
+            steadily (Table 1). The owners forecast 400 kayaks for 2026 and are considering a lower price to match a new rival.
+          </p>
+          <table class="ce-table p2-small">
+            <thead><tr><th scope="col">Table 1</th><th scope="col">2023</th><th scope="col">2024</th><th scope="col">2025</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Kayaks sold</th><td>340</td><td>360</td><td>380</td></tr>
+              <tr><th scope="row">Sales revenue ($000)</th><td>170</td><td>180</td><td>190</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+          <h3>What a careful reader notes</h3>
+          <ol>
+            <li><b>Who and what:</b> the organization, its market and the decision it faces.</li>
+            <li><b>Data you will need:</b> prices and costs, each with its unit.</li>
+            <li><b>Change over time:</b> describe it with figures: sales rose from 340 to 380 kayaks.</li>
+            <li><b>Pressure and stakeholders:</b> a rival, customers, owners: who gains and who loses.</li>
+            <li><b>Scale:</b> $000 means 190 is $190,000. Misreading the scale or the year costs marks.</li>
+          </ol>
+        </div>
+      </div>
+      <h3 class="ce-h3">Connecting the parts</h3>
+      <p class="ce-labels"><GuideLabel kind="examiner" /> <GuideLabel kind="example" /></p>
+      <p class="ce-p">Later questions, above all the extended response, should draw on all the relevant stimulus, not only the paragraph before them (November 2025 report). Your own earlier results count as evidence too.</p>
+      <table class="ce-table">
+        <thead><tr><th scope="col">Part</th><th scope="col">What it gives you</th><th scope="col">Where it is used again</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Part 1</th><td>Price, costs, the sales trend and the forecast</td><td>Break-even and margin of safety</td></tr>
+          <tr><th scope="row">Part 2</th><td>A rival cutting its price to $450</td><td>The price decision in Section B</td></tr>
+          <tr><th scope="row">Part 3</th><td>Current assets and liabilities before summer</td><td>Liquidity, and the cash flow forecast</td></tr>
+          <tr><th scope="row">Section B</th><td>Should Kestrel match the rival's price?</td><td>All three parts, and your answers</td></tr>
+        </tbody>
+      </table>
+      <div class="ce-card p2-room">
+        <p class="ce-labels"><GuideLabel kind="ib" /></p>
+        <h3>What you are given in the room</h3>
+        <p><b>The formulae copy.</b> SL and HL: gross profit margin, profit margin, ROCE, current ratio, acid test ratio, ARR. HL only: stock turnover, debtor days, creditor days, gearing, NPV, capacity utilization, productivity.</p>
+        <p><b>Also:</b> a discount table when an HL question needs one. Every calculation can be done with a four-function calculator. The copy is not exhaustive: learn the others, such as break-even, margin of safety, payback and working capital.</p>
+      </div>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p2-calc-h">
+      <SectionHead no="03" title="Mastering quantitative questions" id="p2-calc-h" dek="A four-stage pathway from data to a correct, fully credited answer." />
+      <p class="ce-labels"><GuideLabel kind="strategy" /> <GuideLabel kind="example" /></p>
+      <p class="ce-p"><strong>Worked example.</strong> Kestrel sells kayaks at $500; variable cost is $300 a kayak, fixed costs are $60,000 a year, and forecast sales are 400 kayaks. Calculate the margin of safety.</p>
+      <ol class="ce-flow">
+        <li><span class="label">Stage 1 · Decode</span><p>Margin of safety, in kayaks: it needs break-even first. $500, $300, $60,000, 400.</p></li>
+        <li><span class="label">Stage 2 · Set up</span><p>Break-even = fixed costs ÷ contribution per unit = $60,000 ÷ ($500 − $300)</p></li>
+        <li><span class="label">Stage 3 · Solve</span><p>= 300 kayaks; 400 − 300 = 100 kayaks</p></li>
+        <li><span class="label">Stage 4 · Interpret</span><p>Sales could fall by 100 kayaks, a quarter of the forecast, before Kestrel makes a loss.</p></li>
+      </ol>
+      <p class="small muted">Check: 60,000 ÷ 200 = 300; 400 − 300 = 100, a quarter of the forecast.</p>
+
+      <div class="ce-split">
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="examiner" /> <GuideLabel kind="example" /></p>
+          <h3>Presenting a numerical answer</h3>
+          <p>Calculate Kestrel's profit margin for 2025. Profit before interest and tax was $16,000 and sales revenue was $190,000.</p>
+          <dl class="ce-dl">
+            <div><dt>Formula</dt><dd>Profit margin = profit before interest and tax ÷ sales revenue × 100</dd></div>
+            <div><dt>Substitute</dt><dd>= $16,000 ÷ $190,000 × 100</dd></div>
+            <div><dt>Working</dt><dd>= 8.421...</dd></div>
+            <div><dt>Answer</dt><dd><b>Profit margin = 8.42%</b></dd></div>
+          </dl>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+          <h3>The own figure rule</h3>
+          <p>If a later part uses an earlier answer that was wrong, examiners can still credit a correct method, but only if your working shows the figure you used (teacher support material; May 2025 report).</p>
+          <dl class="ce-dl">
+            <div><dt>With working</dt><dd>$60,000 ÷ $250 = 240 kayaks: the method can be credited</dd></div>
+            <div><dt>Without</dt><dd>240 kayaks: nothing to trace, so nothing to credit</dd></div>
+          </dl>
+          <p class="small muted">Here contribution was wrongly found as $250 in an earlier part.</p>
+        </div>
+      </div>
+
+      <h3 class="ce-h3">Where calculation marks are lost</h3>
+      <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+      <table class="ce-table">
+        <thead><tr><th scope="col">Problem</th><th scope="col">What subject reports describe</th><th scope="col">Instead</th></tr></thead>
+        <tbody>{LOSSES.map(([a, b, x]) => <tr><th scope="row">{a}</th><td>{b}</td><td>{x}</td></tr>)}</tbody>
+      </table>
+
+      <div class="ce-practice">
+        <AnswerBuilder />
+      </div>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p2-eval-h">
+      <SectionHead no="04" title="From calculation to evaluation" id="p2-eval-h" dek="How a correct number becomes a business judgement." />
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="example" /></p>
+      <p class="ce-p">At the end of May 2026, Kestrel's current assets are $72,000 and its current liabilities $80,000, just before its summer season.</p>
+      <ol class="p2-levels">
+        <li><span class="label">Calculate · AO4</span><b>The number</b><p>$72,000 ÷ $80,000 = 0.90 : 1</p></li>
+        <li><span class="label">Comment · AO2</span><b>Its meaning</b><p>Below 1: current assets would not cover current liabilities.</p></li>
+        <li><span class="label">Explain · AO2</span><b>Its cause and consequence</b><p>Summer stock was bought on credit, so suppliers may need paying before kayaks sell.</p></li>
+        <li><span class="label">Evaluate · AO3</span><b>A weighed judgement</b><p>A seasonal strain, not a crisis, if summer sales meet the forecast: arrange an overdraft now.</p></li>
+      </ol>
+      <div class="ce-split">
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="strategy" /></p>
+          <h3>The 10-mark extended response</h3>
+          <p><b>Evidence</b> (figures from across the stimulus, and your own results), <b>theory</b> (tools that explain why the figures matter) and <b>stakeholders</b> (who gains, who loses, and by how much) feed the <b>weighing</b>: which effects matter most? Compare size, likelihood and timing, and say what the data cannot show. Then a <b>justified conclusion</b>: a decision where the question asks for one, and the condition it depends on.</p>
+          <p class="small muted"><GuideLabel kind="examiner" /> The 9 to 10 markband requires an explanation of the limitations of the stimulus material; subject reports (May 2024, November 2024) state that without it, marks are limited to 8 out of 10. A judgement is needed when the question asks you to choose; a discuss question needs a supported conclusion (May 2024, May 2026).</p>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="example" /></p>
+          <h3>A number is not an evaluation</h3>
+          <p><b>Discuss whether Kestrel should cut its price from $500 to $450 to match the rival. [10]</b></p>
+          <dl class="ce-dl">
+            <div><dt>Calculation only</dt><dd>"At $450, break-even rises to 400 kayaks, so Kestrel should not cut its price." Correct, but with no theory, no stakeholders and no weighing.</dd></div>
+            <div><dt>Evidence</dt><dd>Contribution falls from $200 to $150 a kayak, so break-even rises from 300 kayaks to 400: the whole forecast.</dd></div>
+            <div><dt>Theory</dt><dd>Target profit output: ($60,000 + $20,000) ÷ $150 = 534 kayaks to keep this year's forecast profit, a third more than forecast.</dd></div>
+            <div><dt>Stakeholders</dt><dd>Customers gain $50; owners lose their safety margin; staff hours depend on volume.</dd></div>
+            <div><dt>Weighing</dt><dd>Nothing in the stimulus shows whether customers would switch for $50, so the volume gain is uncertain while the lost margin is certain.</dd></div>
+            <div><dt>Conclusion</dt><dd>Hold the price and compete on quality, unless a trial shows sales can approach 534 kayaks.</dd></div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p2-con-h">
+      <SectionHead no="05" title="Constructions in IB format" id="p2-con-h" dek="What a fully credited construction looks like. Each uses Kestrel's figures." />
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="example" /></p>
+      <div class="p2-cons">
+        <figure class="p2-con">
+          <figcaption><b>Statement of profit or loss</b> Kestrel Kayaks, year ended 31 December 2025</figcaption>
+          <table class="p2-acc">
+            <tbody>
+              <tr><th scope="row">Sales revenue</th><td>190,000</td></tr>
+              <tr><th scope="row">Cost of sales</th><td>(114,000)</td></tr>
+              <tr class="is-sub"><th scope="row">Gross profit</th><td>76,000</td></tr>
+              <tr><th scope="row">Expenses</th><td>(60,000)</td></tr>
+              <tr class="is-sub"><th scope="row">Profit before interest and tax</th><td>16,000</td></tr>
+              <tr><th scope="row">Interest</th><td>(2,000)</td></tr>
+              <tr class="is-sub"><th scope="row">Profit before tax</th><td>14,000</td></tr>
+              <tr><th scope="row">Tax</th><td>(3,500)</td></tr>
+              <tr class="is-sub"><th scope="row">Profit for period</th><td>10,500</td></tr>
+              <tr><th scope="row">Dividends</th><td>(4,000)</td></tr>
+              <tr class="is-total"><th scope="row">Retained profit</th><td>6,500</td></tr>
+            </tbody>
+          </table>
+          <p class="small muted">All figures in $. Brackets for deductions and a subtotal at each stage. Cost of sales: 380 kayaks × $300.</p>
+        </figure>
+
+        <figure class="p2-con">
+          <figcaption><b>Break-even chart</b> Kestrel Kayaks, 2026</figcaption>
+          <svg class="p2-chart" viewBox="0 0 560 350" role="img" aria-labelledby="p2-be-t p2-be-d">
+            <title id="p2-be-t">Kestrel Kayaks break-even chart, 2026</title>
+            <desc id="p2-be-d">Total revenue rises from zero to $250,000 at 500 kayaks; total costs rise from $60,000 to $210,000; fixed costs are flat at $60,000. The lines cross at 300 kayaks and $150,000. Forecast output is 400 kayaks, so the margin of safety is 100 kayaks.</desc>
+            {[0, 50, 100, 150, 200, 250].map((v) => <><line x1="60" x2="520" y1={Y(v * 1000)} y2={Y(v * 1000)} class="p2-grid" /><text x="52" y={Y(v * 1000) + 4} text-anchor="end" class="p2-tick">{v}</text></>)}
+            {[0, 100, 200, 300, 400, 500].map((q) => <text x={X(q)} y="318" text-anchor="middle" class="p2-tick">{q}</text>)}
+            <line x1="60" x2="520" y1="300" y2="300" class="p2-axis" />
+            <line x1="60" x2="60" y1="20" y2="300" class="p2-axis" />
+            <line x1={X(0)} y1={Y(60000)} x2={X(500)} y2={Y(60000)} class="p2-fc" />
+            <line x1={X(0)} y1={Y(60000)} x2={X(500)} y2={Y(210000)} class="p2-tc" />
+            <line x1={X(0)} y1={Y(0)} x2={X(500)} y2={Y(250000)} class="p2-tr" />
+            <line x1={X(400)} y1="300" x2={X(400)} y2="26" class="p2-dash" />
+            <circle cx={X(300)} cy={Y(150000)} r="5" class="p2-bep" />
+            <text x={X(300) - 8} y={Y(150000) - 10} text-anchor="end" class="p2-lab">Break-even: 300 kayaks, $150,000</text>
+            <text x={X(500) - 4} y={Y(250000) - 6} text-anchor="end" class="p2-lab">Total revenue</text>
+            <text x={X(500) - 4} y={Y(210000) + 16} text-anchor="end" class="p2-lab">Total costs</text>
+            <text x={X(500) - 4} y={Y(60000) - 6} text-anchor="end" class="p2-lab">Fixed costs</text>
+            <text x={X(400) + 4} y="36" class="p2-lab">Forecast</text>
+            <path d={`M${X(300)} 290H${X(400)}`} class="p2-mos" />
+            <text x={(X(300) + X(400)) / 2} y="284" text-anchor="middle" class="p2-lab">Margin of safety: 100</text>
+            <text x="290" y="342" text-anchor="middle" class="p2-axis-t">Output (kayaks)</text>
+            <text x="16" y="160" text-anchor="middle" transform="rotate(-90 16 160)" class="p2-axis-t">Costs and revenue ($000)</text>
+          </svg>
+          <p class="small muted">A title, labelled axes with units, a proportional scale, named lines, and break-even and margin of safety marked. Without a correct scale, line marks are unavailable (reports).</p>
+        </figure>
+
+        <figure class="p2-con">
+          <figcaption><b>Cash flow forecast</b> All figures in $000</figcaption>
+          <table class="p2-acc p2-cf">
+            <thead><tr><th scope="col"></th><th scope="col">June</th><th scope="col">July</th><th scope="col">August</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Opening balance</th><td>4</td><td>(12)</td><td>18</td></tr>
+              <tr><th scope="row">Cash sales revenue</th><td>30</td><td>60</td><td>45</td></tr>
+              <tr class="is-sub"><th scope="row">Total cash inflows</th><td>30</td><td>60</td><td>45</td></tr>
+              <tr><th scope="row">Payments to suppliers</th><td>36</td><td>20</td><td>18</td></tr>
+              <tr><th scope="row">Wages, with seasonal staff</th><td>8</td><td>8</td><td>8</td></tr>
+              <tr><th scope="row">Rent and other costs</th><td>2</td><td>2</td><td>2</td></tr>
+              <tr class="is-sub"><th scope="row">Total cash outflows</th><td>46</td><td>30</td><td>28</td></tr>
+              <tr><th scope="row">Net cash flow</th><td>(16)</td><td>30</td><td>17</td></tr>
+              <tr class="is-total"><th scope="row">Closing balance</th><td>(12)</td><td>18</td><td>35</td></tr>
+            </tbody>
+          </table>
+          <p class="small muted">Each closing balance opens the next month. June's $12,000 deficit needs an overdraft or later supplier payments.</p>
+        </figure>
+
+        <figure class="p2-con">
+          <figcaption><b>Decision tree</b> Kestrel Kayaks: where to grow, 2026</figcaption>
+          <svg class="p2-chart" viewBox="0 0 560 280" role="img" aria-labelledby="p2-dt-t p2-dt-d">
+            <title id="p2-dt-t">Kestrel Kayaks decision tree</title>
+            <desc id="p2-dt-d">A decision between a rental hut costing $20,000 (success 0.6 for $50,000, failure 0.4 for $10,000: expected value $34,000, net $14,000), online sales costing $8,000 (high 0.5 for $25,000, low 0.5 for $5,000: expected value $15,000, net $7,000) and doing nothing ($0).</desc>
+            <path d="M50 150L230 60M50 150L230 170M50 150L140 250H440" class="p2-tree" />
+            <path d="M230 60L440 30M230 60L440 92M230 170L440 140M230 170L440 200" class="p2-tree" />
+            <path d="M134 165l6 -10M140 165l6 -10M297 255l6 -10M303 255l6 -10" class="p2-rej" />
+            <rect x="30" y="140" width="20" height="20" class="p2-node" />
+            <circle cx="230" cy="60" r="9" class="p2-node" />
+            <circle cx="230" cy="170" r="9" class="p2-node" />
+            <text x="60" y="84" class="p2-lab">Rental hut</text><text x="60" y="98" class="p2-sub">cost $20,000</text>
+            <text x="90" y="182" class="p2-lab">Online sales</text><text x="90" y="196" class="p2-sub">cost $8,000</text>
+            <text x="180" y="244" class="p2-lab">Do nothing</text>
+            <text x="230" y="44" text-anchor="middle" class="p2-ev">EV $34,000 · net $14,000</text>
+            <text x="230" y="154" text-anchor="middle" class="p2-ev">EV $15,000 · net $7,000</text>
+            <text x="340" y="34" class="p2-sub">Success 0.6</text><text x="446" y="34" class="p2-lab">$50,000</text>
+            <text x="340" y="92" class="p2-sub">Failure 0.4</text><text x="446" y="96" class="p2-lab">$10,000</text>
+            <text x="340" y="148" class="p2-sub">High 0.5</text><text x="446" y="144" class="p2-lab">$25,000</text>
+            <text x="340" y="205" class="p2-sub">Low 0.5</text><text x="446" y="204" class="p2-lab">$5,000</text>
+            <text x="446" y="254" class="p2-lab">$0</text>
+          </svg>
+          <p class="small muted">Square: decision · circle: chance · double stroke: rejected option. Hut: 0.6 × $50,000 + 0.4 × $10,000 = $34,000, less $20,000 cost = $14,000. Online: $15,000 less $8,000 = $7,000. The hut has the higher expected value, but a 40% chance of a $10,000 net loss.</p>
+        </figure>
+      </div>
+      {
+        p2 && p2.ibGuidance.length > 0 && (
+          <>
+            <h3 class="ce-h3">Advice from the IB's teacher support material</h3>
+            <p class="ce-labels"><GuideLabel kind="ib" /></p>
+            <IbGuidance items={p2.ibGuidance} />
+          </>
+        )
+      }
+      <div class="ce-practice">
+        <Checklist
+          id="p2-handin"
+          title="Before you hand in"
+          items={[
+            { id: 'stages', text: 'Formula, substitution, working, unit, for every calculation', label: 'examiner' },
+            { id: 'round', text: 'One rounding, at the end', label: 'examiner' },
+            { id: 'comment', text: 'Every comment says what the figure means', label: 'strategy' },
+            { id: 'format', text: 'Constructions in IB format, labelled', label: 'ib' },
+            { id: 'own', text: 'Section B uses your own results', label: 'examiner' },
+            { id: 'limit', text: 'A limitation explained, and a justified conclusion', label: 'examiner' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p2-prac-h">
+      <SectionHead no="06" title="Practice and tools" id="p2-prac-h" dek="Original Paper 2-style questions with mark schemes, and the Finance Desk's live workspaces. None of the questions is an IB question." />
+      <ul class="p1-qs">
+        {
+          questions.map(([id, q]) => (
+            <li>
+              <a href={href.question(id)}>{q.title}</a>
+              <span class="small muted">{q.commandTerm} · {q.marks} marks{q.level === 'HL' ? ' · HL' : ''}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="ce-cta">
+        <a class="btn btn--primary" href="/finance-desk/">Open the Finance Desk <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+        <a class="btn" href="/exam-desk/practice/">All practice questions</a>
+        <a class="btn" href={GUIDES['paper-2'].file} download>Download the Paper 2 guide (PDF, {GUIDES['paper-2'].pages} pages)</a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .p2-scales {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .p2-scales .label {
+    margin-bottom: var(--sp-2);
+  }
+
+  .p2-steps {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--sp-3);
+    margin: 0 0 var(--sp-5);
+    padding: 0;
+    list-style: none;
+  }
+
+  .p2-steps li {
+    display: grid;
+    gap: 0.3rem;
+    margin: 0;
+    padding: var(--sp-4);
+    background: var(--surface-sheet);
+    border-top: 3px solid var(--navy-900);
+    font-size: 0.9375rem;
+  }
+
+  .p2-steps span {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.375rem;
+    color: var(--brass-text);
+  }
+
+  .p2-steps b {
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    color: var(--navy-900);
+  }
+
+  .p2-stim {
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+  }
+
+  .p2-small {
+    margin-top: var(--sp-3);
+  }
+
+  .p2-room {
+    margin-top: var(--sp-5);
+  }
+
+  .p2-levels {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--sp-3);
+    margin: 0 0 var(--sp-5);
+    padding: 0;
+    list-style: none;
+  }
+
+  .p2-levels li {
+    display: grid;
+    align-content: start;
+    gap: 0.35rem;
+    margin: 0;
+    padding: var(--sp-4);
+    background: var(--surface-sheet);
+    border-top: 3px solid var(--navy-900);
+  }
+
+  .p2-levels li:nth-child(4) {
+    border-top-color: var(--gold-500);
+  }
+
+  .p2-levels b {
+    font-family: var(--font-display);
+    color: var(--navy-900);
+  }
+
+  .p2-cons {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-5);
+  }
+
+  .p2-con {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-3);
+    margin: 0;
+    padding: var(--sp-5);
+    background: var(--surface-sheet);
+    border: 1px solid var(--rule-hair);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .p2-con figcaption {
+    display: grid;
+    gap: 0.15rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .p2-con figcaption b {
+    font-family: var(--font-display);
+    font-size: 1.1875rem;
+    color: var(--navy-900);
+  }
+
+  .p2-acc {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .p2-acc th,
+  .p2-acc td {
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--rule-hair);
+    text-align: left;
+    font-weight: 400;
+  }
+
+  .p2-acc td {
+    text-align: right;
+  }
+
+  .p2-acc thead th {
+    text-align: right;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .p2-acc .is-sub th,
+  .p2-acc .is-sub td {
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .p2-acc .is-total th,
+  .p2-acc .is-total td {
+    font-weight: 700;
+    color: var(--navy-900);
+    border-bottom: 3px double var(--navy-900);
+  }
+
+  .p2-chart {
+    width: 100%;
+    height: auto;
+  }
+
+  .p2-chart .p2-grid {
+    stroke: var(--rule-hair);
+  }
+
+  .p2-chart .p2-axis {
+    stroke: var(--navy-900);
+    stroke-width: 1.2;
+  }
+
+  .p2-chart .p2-tick,
+  .p2-chart .p2-sub {
+    font: 400 11px var(--font-ui);
+    fill: var(--text-muted);
+  }
+
+  .p2-chart .p2-lab {
+    font: 600 11.5px var(--font-ui);
+    fill: var(--navy-900);
+  }
+
+  .p2-chart .p2-ev {
+    font: 700 11px var(--font-ui);
+    fill: var(--brass-text);
+  }
+
+  .p2-chart .p2-axis-t {
+    font: 600 11px var(--font-ui);
+    fill: var(--text-muted);
+  }
+
+  .p2-chart .p2-tr {
+    stroke: var(--navy-900);
+    stroke-width: 2.2;
+  }
+
+  .p2-chart .p2-tc {
+    stroke: var(--gold-500);
+    stroke-width: 2.2;
+  }
+
+  .p2-chart .p2-fc {
+    stroke: var(--slate-500);
+    stroke-width: 1.4;
+    stroke-dasharray: 6 4;
+  }
+
+  .p2-chart .p2-dash {
+    stroke: var(--slate-500);
+    stroke-dasharray: 3 4;
+  }
+
+  .p2-chart .p2-bep {
+    fill: var(--gold-500);
+    stroke: #fff;
+    stroke-width: 2;
+  }
+
+  .p2-chart .p2-mos {
+    stroke: var(--green-text);
+    stroke-width: 2.5;
+  }
+
+  .p2-chart .p2-tree {
+    fill: none;
+    stroke: var(--navy-900);
+    stroke-width: 1.6;
+  }
+
+  .p2-chart .p2-rej {
+    stroke: var(--signal-text);
+    stroke-width: 2;
+  }
+
+  .p2-chart .p2-node {
+    fill: #fff;
+    stroke: var(--navy-900);
+    stroke-width: 2;
+  }
+
+  .p1-qs {
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--navy-900);
+    max-width: 52rem;
+  }
+
+  .p1-qs li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-2) var(--sp-4);
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  @media (max-width: 64rem) {
+    .p2-steps,
+    .p2-levels {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .p2-cons {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .p2-steps,
+    .p2-levels {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

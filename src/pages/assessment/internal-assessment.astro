@@ -1,0 +1,456 @@
+---
+/**
+ * The internal assessment room: the business research project as the guide
+ * sets it out, the creator's IA guide (labelled requirement, emphasis,
+ * strategy, example), and tools to practise each part of the project.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import CentreHead from '../../components/centre/CentreHead.astro';
+import GuideLabel from '../../components/centre/GuideLabel.astro';
+import LabelKey from '../../components/centre/LabelKey.astro';
+import Scale from '../../components/centre/Scale.astro';
+import RqBuilder from '../../components/centre/RqBuilder.astro';
+import DocAnalyser from '../../components/centre/DocAnalyser.astro';
+import Sorter from '../../components/centre/Sorter.astro';
+import Checklist from '../../components/centre/Checklist.astro';
+import FactList from '../../components/assess/FactList.astro';
+import { corpus } from '../../lib/content';
+import { GUIDES } from '../../lib/guides';
+import '../../styles/centre.css';
+
+const c = await corpus();
+const ia = c.assessment['internal-assessment'];
+const criteria = ia?.criteria ?? [];
+const TOP: Record<string, string> = {
+  A: 'Its link to the organization, integrated throughout',
+  B: 'Relevant and in depth, with a range of ideas and views',
+  C: 'Selected and applied effectively, clearly relevant',
+  D: 'Document data used effectively; assumptions weighed',
+  E: 'Consistent with the evidence; explicitly answer the question',
+  F: 'An appropriate structure',
+  G: 'Title page, accurate contents, headings, numbered pages',
+};
+const JOURNEY = [
+  { step: 'Issue', text: 'A real issue or problem facing one organization', crit: '' },
+  { step: 'Question', text: 'Forward or backward looking, answerable', crit: '' },
+  { step: 'Concept', text: 'One of four, as an explicit lens', crit: 'A 5' },
+  { step: 'Documents', text: 'Three to five, your own selection', crit: 'B 4' },
+  { step: 'Analysis', text: 'Tools applied to document data, then evaluated', crit: 'C 4 · D 5' },
+  { step: 'Conclusion', text: 'An explicit answer, in at most 1,800 words', crit: 'E 3 · F 2 · G 2' },
+];
+const CONCEPTS = [
+  { name: 'Change', guide: 'Moving from one form or state to another: causes, processes, consequences.', lens: 'What does growing from one shop to two change, and is it worth it?', q: 'Should Crumb & Co. open a second shop in Eastgate?' },
+  { name: 'Creativity', guide: 'New ideas, or existing ideas from new perspectives, and their value.', lens: 'Has a new idea created value for the business?', q: "How effectively has Crumb's seasonal range attracted new customers?" },
+  { name: 'Ethics', guide: 'Moral principles that govern behaviour, and their consequences for stakeholders.', lens: 'Is the decision right, and who bears its cost?', q: 'Should Crumb & Co. switch to fair-trade cocoa despite the higher cost?' },
+  { name: 'Sustainability', guide: 'Meeting present needs without compromising future generations: people, planet, profit.', lens: 'Does it serve people, planet and profit together?', q: 'Should Crumb & Co. sell unsold bread through a food-waste app?' },
+];
+const SDS = [
+  ['SD1', 'Crumb & Co. accounts, 2025', 'The business', 'Average sale, ingredient costs, wages and overheads'],
+  ['SD2', 'Council footfall survey of Eastgate, 2025', 'Independent', 'About 9,000 shoppers a day'],
+  ['SD3', "Estate agent's listing for the site, 2026", 'Commercial', 'Rent of $36,000 a year'],
+  ['SD4', 'Own survey of 80 Eastgate shoppers: blank questionnaire and tally', 'Primary', '24 of 80 (30%) would visit weekly'],
+  ['SD5', 'Local newspaper report on two café closures, 2026', 'Sceptical', 'Evidence that demand may not last'],
+];
+const TOOLS = [
+  { q: 'Should the organization invest, expand or launch?', tools: 'Break-even analysis, investment appraisal, decision trees', decides: 'Whether the numbers support the move, and how much risk it carries' },
+  { q: 'How healthy is its finance, and why?', tools: 'Ratio analysis, cash flow forecast', decides: 'Where the strain is, and what would ease it' },
+  { q: 'Which direction should it grow in?', tools: 'Ansoff matrix, BCG matrix, STEEPLE', decides: 'The options, their risk, and the environment they face' },
+  { q: 'Will a change succeed with its people?', tools: 'Force field analysis (HL), motivation theory, leadership styles', decides: 'The forces for and against, and how to shift them' },
+  { q: 'How should it compete?', tools: "Porter's generic strategies (HL), position maps, the marketing mix", decides: 'The basis of its advantage, and whether its mix supports it' },
+];
+---
+
+<BaseLayout title="Internal assessment: the business research project" description="The IB Business Management internal assessment, step by step: the research question, the key concept, supporting documents, the seven criteria, word count and submission, with tools to practise each part." section="assessment">
+  <CentreHead
+    crumb="Internal assessment"
+    kicker="Internal assessment · SL and HL"
+    title="The business research project"
+    lead="A real issue facing one organization, analysed through one key concept. The same task at SL and HL, for students assessed from May 2024 onwards."
+    stats={[
+      { value: '1,800', label: 'Word limit', note: 'words at most' },
+      { value: '25', label: 'Marks', note: 'criteria A to G' },
+      { value: '30% | 20%', label: 'Weighting', note: 'of the grade, SL | HL' },
+      { value: '3 to 5', label: 'Documents', note: 'within three years' },
+      { value: '1 of 4', label: 'Key concept', note: 'on the title page' },
+    ]}
+  />
+
+  <div class="wrap page-body ce">
+    <LabelKey />
+
+    <section class="ce-sec" aria-labelledby="ia-how-h">
+      <SectionHead no="01" title="How the project works" id="ia-how-h" dek="What you produce, and where the 25 marks are earned." />
+      <p class="ce-labels"><GuideLabel kind="ib" /></p>
+      {ia && <FactList facts={ia.facts} />}
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="strategy" /></p>
+      <ol class="ce-journey">
+        {
+          JOURNEY.map((j, i) => (
+            <li>
+              <span class="ce-journey__n">{i + 1}</span>
+              <span class="ce-journey__step">{j.step}</span>
+              <span class="ce-journey__text">{j.text}</span>
+              {j.crit && <span class="ce-journey__crit">{j.crit}</span>}
+            </li>
+          ))
+        }
+      </ol>
+      <div class="ce-roles">
+        <div><p class="label">Your teacher</p><p>approves the question before work starts</p></div>
+        <div><p class="label">Your teacher</p><p>comments on your work plans and on one draft</p></div>
+        <div><p class="label">Your teacher</p><p>marks it, and the IB moderates</p></div>
+      </div>
+      <p class="small muted">Stages and the teacher's role come from the guide; the order of work is the platform's suggestion. Criteria are marked best fit.</p>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="ia-crit-h">
+      <SectionHead no="02" title="The seven criteria" id="ia-crit-h" dek="Twenty-five marks across seven criteria. The level descriptors are in the guide (pp. 56 to 58); here are their names, maxima and the top level in brief." />
+      <p class="ce-labels"><GuideLabel kind="ib" /></p>
+      <Scale
+        caption="The 25 marks, drawn to scale"
+        total={25}
+        parts={criteria.map((cr) => ({ label: `${cr.id}`, marks: cr.marks, tone: ['A', 'D'].includes(cr.id) ? 'navy' : ['B', 'C'].includes(cr.id) ? 'slate' : 'gold' }))}
+      />
+      <table class="ce-table">
+        <thead><tr><th scope="col">Criterion</th><th scope="col">Marks</th><th scope="col">The top level, in brief</th></tr></thead>
+        <tbody>
+          {
+            criteria.map((cr) => (
+              <tr>
+                <th scope="row"><span class="ce-crit">{cr.id}</span> {cr.name}</th>
+                <td class="num">{cr.marks}</td>
+                <td>{TOP[cr.id]}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="ia-rq-h">
+      <SectionHead no="03" title="Research question and key concept" id="ia-rq-h" dek="Frame a question your documents can answer, through one lens." />
+      <div class="ce-split">
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="strategy" /> <GuideLabel kind="example" /></p>
+          <h3>From topic to research question</h3>
+          <ol class="ce-ladder">
+            <li><span class="label">Syllabus area</span> Growth and evolution (Unit 1)</li>
+            <li><span class="label">Real issue, one organization</span> Crumb & Co.'s only bakery turns customers away at weekends</li>
+            <li><span class="label">Research question</span> <strong>Should Crumb & Co. open a second shop in Eastgate?</strong></li>
+          </ol>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="examiner" /></p>
+          <h3>Choosing the form of the question</h3>
+          <dl class="ce-dl">
+            <div><dt>Forward looking</dt><dd>"Should Crumb & Co. open a second shop in Eastgate?" A decision still to be made.</dd></div>
+            <div><dt>Backward looking</dt><dd>"How effectively has Crumb's seasonal range attracted new customers?" A decision already taken.</dd></div>
+            <div><dt>"To what extent...?"</dt><dd>Allowed, but it needs a precise judgement. Subject reports (May 2025, May 2026) warn that a vague "to some extent" cannot reach 3 marks in criterion E; a closed question can be easier to answer explicitly.</dd></div>
+          </dl>
+        </div>
+      </div>
+
+      <h3 class="ce-h3">The four key concepts, as lenses on one organization</h3>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="example" /></p>
+      <div class="ce-concepts">
+        {
+          CONCEPTS.map((k) => (
+            <article class="ce-concept">
+              <h4>{k.name}</h4>
+              <p class="label">In the guide</p>
+              <p>{k.guide}</p>
+              <p class="label">The lens asks</p>
+              <p>{k.lens}</p>
+              <p class="label">A question</p>
+              <p class="ce-concept__q">{k.q}</p>
+            </article>
+          ))
+        }
+      </div>
+      <p class="ce-note">
+        <strong>In the course,</strong> all four concepts underpin every unit. <strong>In your project,</strong> you choose one and use it explicitly as a lens, from question to conclusion; any other idea, such as globalization, scores 0 for criterion A.
+      </p>
+      <RqBuilder />
+    </section>
+
+    <section class="ce-sec" aria-labelledby="ia-sd-h">
+      <SectionHead no="04" title="Supporting documents" id="ia-sd-h" dek="Where most of your information must come from. Choose them in three passes." />
+      <div class="ce-gates">
+        <div class="ce-gate">
+          <p class="ce-gate__n">Gate 1</p>
+          <h3>Is it allowed?</h3>
+          <p class="ce-labels"><GuideLabel kind="ib" /></p>
+          <ul>
+            <li>Published within three years before submission</li>
+            <li>Chosen by you, not supplied by your teacher</li>
+            <li>At most one transcript of audio or video, from a reliable organization, traceable to its original</li>
+            <li>Primary research: the blank questionnaire and a tally, or interview questions and a summary</li>
+            <li>Not a textbook or class notes: reference those instead</li>
+          </ul>
+        </div>
+        <div class="ce-gate">
+          <p class="ce-gate__n">Gate 2</p>
+          <h3>Is it useful?</h3>
+          <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+          <ul>
+            <li><b>Relevant:</b> it speaks to your question, not just your topic</li>
+            <li><b>Data-rich:</b> figures or findings you can analyse with a tool</li>
+            <li><b>In depth:</b> more than a headline or a summary</li>
+            <li><b>Credible:</b> a known author, date and purpose</li>
+            <li><b>Focused:</b> the relevant part highlighted</li>
+          </ul>
+        </div>
+        <div class="ce-gate">
+          <p class="ce-gate__n">Gate 3</p>
+          <h3>Is the set balanced?</h3>
+          <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="strategy" /></p>
+          <ul>
+            <li>Three to five documents: any other number scores at most 1 for B</li>
+            <li>A range of ideas and views: needed for 4 marks in B, and strongly recommended</li>
+            <li>Inside and outside voices: the firm, independent data, your own research, a sceptic</li>
+            <li>Each one adds something the others do not</li>
+          </ul>
+        </div>
+      </div>
+      <p class="small muted">Recommended, not required: no document longer than the equivalent of five A4 pages. Highlight the parts you use, translate highlighted parts not in your registered language, and label each document (SD1, SD2).</p>
+
+      <h3 class="ce-h3">Crumb & Co.'s set</h3>
+      <p class="ce-labels"><GuideLabel kind="example" /></p>
+      <table class="ce-table">
+        <thead><tr><th scope="col"></th><th scope="col">Document</th><th scope="col">Voice</th><th scope="col">What it adds</th></tr></thead>
+        <tbody>{SDS.map(([id, d, v, a]) => <tr><th scope="row">{id}</th><td>{d}</td><td>{v}</td><td>{a}</td></tr>)}</tbody>
+      </table>
+      <p class="small muted">Five documents from Crumb's own website would lack balance, as would five surveys of similar people: the guide gives both as examples.</p>
+
+      <div class="ce-warn">
+        <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+        <h3>Where document sets go wrong</h3>
+        <ul>
+          <li>A "document" built from several sources, such as SD1.1 to SD1.4: treated as more than five SDs, usually B1, and an integrity concern.</li>
+          <li>Documents published more than three years before submission: the event can be older, but the publication date counts.</li>
+          <li>A list of links or summaries instead of the documents themselves.</li>
+          <li>Your own SWOT or calculations filed as a supporting document: they belong in your work or an appendix.</li>
+        </ul>
+      </div>
+      <DocAnalyser />
+    </section>
+
+    <section class="ce-sec" aria-labelledby="ia-bcd-h">
+      <SectionHead no="05" title="Criteria B, C and D" id="ia-bcd-h" dek="How the same documents earn three different sets of marks." />
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="example" /></p>
+      <div class="ce-three">
+        <div><p class="ce-three__k">B · Supporting documents <span>4</span></p><p>Are the three to five documents relevant, in depth, and varied in their views?</p><p class="small"><b>At Crumb:</b> accounts, council footfall data, a rent listing, a shopper survey, a report on two closures.</p><p class="small muted"><b>Not credited here:</b> how well you use them; that is D.</p></div>
+        <div><p class="ce-three__k">C · Tools and theories <span>4</span></p><p>Are the tools right for this question, and applied to its figures?</p><p class="small"><b>At Crumb:</b> break-even analysis for the new shop; a force field analysis of the change (HL).</p><p class="small muted"><b>Not credited here:</b> a SWOT that does not help answer the question.</p></div>
+        <div><p class="ce-three__k">D · Analysis and evaluation <span>5</span></p><p>Is document data selected and used to analyse, weigh and question the evidence?</p><p class="small"><b>At Crumb:</b> break-even needs under 1% of passers-by, but the survey was run only on Saturdays.</p><p class="small muted"><b>Not credited here:</b> statistics quoted without being used.</p></div>
+      </div>
+
+      <h3 class="ce-h3">From evidence to conclusion</h3>
+      <p class="ce-labels"><GuideLabel kind="strategy" /> <GuideLabel kind="example" /></p>
+      <ol class="ce-flow">
+        <li><span class="label">1 · Evidence</span><p>$8 a sale, $3 ingredients, $64,000 wages and overheads (SD1); $36,000 rent (SD3); 9,000 shoppers a day (SD2).</p></li>
+        <li><span class="label">2 · Analysis</span><p>($64,000 + $36,000) ÷ $5 = 20,000 sales a year: about 67 a day over 300 trading days, under 1% of passers-by.</p></li>
+        <li><span class="label">3 · Evaluation</span><p>SD1 costs are the current shop's; the survey ran on two Saturdays (SD4); two cafés closed (SD5).</p></li>
+        <li><span class="label">4 · Conclusion</span><p>Open, but only after a weekday trial confirms the demand that the costs require.</p></li>
+      </ol>
+      <p class="small muted">The change lens runs through every step: what the move from one shop to two changes in costs, staffing and risk, and whether that change is worth making now.</p>
+
+      <h3 class="ce-h3">Criterion D is not quoting statistics</h3>
+      <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+      <dl class="ce-dl ce-dl--wide">
+        <div><dt>Quoting</dt><dd>"SD2 says 9,000 shoppers pass each day, and 30% of those surveyed would visit weekly (SD4)."</dd></div>
+        <div><dt>Using</dt><dd>"Break-even is 20,000 sales a year, about 67 a day over 300 trading days: under 1% of the 9,000 daily shoppers (SD2)."</dd></div>
+        <div><dt>Integrating</dt><dd>"That margin looks safe, but it rests on two assumptions: Eastgate costs matching the current shop's (SD1), and Saturday interest (SD4) holding on weekdays. With two cafés closed nearby (SD5), the change is only worth making once weekday demand is tested."</dd></div>
+      </dl>
+      <p class="small muted">The top level of D asks for sustained integration of ideas, with the assumptions underpinning the arguments and their implications. Always show where a figure comes from (SD1, SD2).</p>
+
+      <div class="ce-practice">
+        <p class="ce-labels"><GuideLabel kind="strategy" /> <GuideLabel kind="example" /></p>
+        <h3 class="ce-h3">Practise: quoting, using or integrating?</h3>
+        <p class="small muted">A new illustrative case: Harbour Cycles, a fictional repair shop deciding whether to open a second workshop.</p>
+        <Sorter
+          uid="ia-qui"
+          legend="How the sentence uses the evidence"
+          lead="Decide what each sentence does with the evidence, then check it."
+          options={[
+            { value: 'quote', label: 'Quoting' },
+            { value: 'use', label: 'Using' },
+            { value: 'integrate', label: 'Integrating' },
+          ]}
+          items={[
+            { id: 's1', text: 'SD3 shows that 42% of surveyed cyclists repair their own bikes.', right: ['quote'], explanation: 'A figure is reported, but nothing is done with it: no tool, no comparison, no consequence.' },
+            { id: 's2', text: 'Fixed costs of $48,000 a year divided by a $40 contribution per repair give a break-even of 1,200 repairs a year, about 23 a week.', right: ['use'], explanation: 'A tool (break-even) is applied to document data to produce a new figure: $48,000 ÷ $40 = 1,200, and 1,200 ÷ 52 is about 23.' },
+            { id: 's3', text: 'Break-even needs about 23 repairs a week, but the footfall count (SD2) was taken in summer and SD4 says winter trade halves, so the second workshop is safe only if winter demand reaches 23 repairs.', right: ['integrate'], explanation: 'The result is tested against an assumption the documents expose (seasonal demand), and the implication for the decision is stated.' },
+            { id: 's4', text: "According to SD1, the shop's revenue was $310,000 last year.", right: ['quote'], explanation: 'Accurate, but only restated from the document.' },
+            { id: 's5', text: 'Revenue grew from $280,000 to $310,000 (SD1), a rise of 10.7%, faster than the 4% market growth reported in SD2.', right: ['use'], explanation: 'The data is processed (a growth rate: 30,000 ÷ 280,000 × 100 = 10.7%) and compared with a second document.' },
+            { id: 's6', text: 'The 10.7% growth looks strong, yet SD5 reports a rival opening nearby next spring; if it takes even a tenth of local repairs, the growth that justifies a second workshop may not continue.', right: ['integrate'], explanation: 'Two documents are weighed against each other, the assumption behind the growth is questioned, and the consequence for the decision follows.' },
+          ]}
+        />
+      </div>
+
+      <h3 class="ce-h3">Criterion E: an explicit answer</h3>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="examiner" /> <GuideLabel kind="example" /></p>
+      <dl class="ce-dl ce-dl--wide">
+        <div><dt>Weaker</dt><dd>"To some extent, a second shop could be a good idea for Crumb & Co."</dd></div>
+        <div><dt>Stronger</dt><dd>"Crumb & Co. should open the Eastgate shop, but only after a weekday trial: it needs under 1% of passing shoppers to break even; the main risk is weekday demand, and Eastgate costs also need confirming."</dd></div>
+      </dl>
+      <p class="small muted">The stronger version answers the question as asked and adds no new facts. If the question names two things, answer both.</p>
+      <div class="ce-practice">
+        <Sorter
+          uid="ia-conc"
+          legend="Is it an explicit answer?"
+          lead="Harbour Cycles again: which conclusions answer the question explicitly?"
+          options={[
+            { value: 'explicit', label: 'Explicit answer' },
+            { value: 'not', label: 'Not yet explicit' },
+          ]}
+          items={[
+            { id: 'c1', text: 'In conclusion, there are many advantages and disadvantages of opening a second workshop.', right: ['not'], explanation: 'It summarizes without answering: should the shop open it or not?' },
+            { id: 'c2', text: 'Harbour Cycles should open the second workshop only if a winter trial shows at least 23 repairs a week, because break-even depends on winter demand the documents do not yet show.', right: ['explicit'], explanation: 'A decision, its condition and the reason, all from evidence already in the project.' },
+            { id: 'c3', text: 'To some extent the second workshop could be a good idea for Harbour Cycles.', right: ['not'], explanation: 'A vague "to some extent" is the form subject reports warn cannot reach the top of criterion E.' },
+            { id: 'c4', text: "Harbour Cycles should not open the second workshop this year: the rival's opening (SD5) puts the 10.7% growth at risk, and break-even needs every summer customer to stay through winter.", right: ['explicit'], explanation: 'A clear answer, consistent with the evidence, with no new facts introduced.' },
+            { id: 'c5', text: 'It is difficult to decide without more information about the market.', right: ['not'], explanation: 'Naming a limitation is useful, but on its own it is not an answer to the question.' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="ia-sub-h">
+      <SectionHead no="06" title="Structure, word count and submission" id="ia-sub-h" dek="How to organize, count and present a project that meets every rule." />
+      <div class="ce-split">
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="examiner" /></p>
+          <h3>F · A structure that serves the argument</h3>
+          <ul>
+            <li><b>Introduction:</b> the organization, the issue and the question, and briefly how you investigated.</li>
+            <li><b>Main body:</b> findings analysed with tools, organized by argument, not one document after another.</li>
+            <li><b>Conclusion:</b> an explicit answer, with what remains open.</li>
+          </ul>
+          <p class="small muted">The guide's elements, not compulsory headings. Reports advise against a long research proposal or methodology section.</p>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="ib" /></p>
+          <h3>G · The four required elements</h3>
+          <ul>
+            <li>A title page</li>
+            <li>An accurate table of contents</li>
+            <li>Appropriate headings and subheadings</li>
+            <li>Numbered pages</li>
+          </ul>
+          <p class="small muted">G is limited to these elements: fonts and layout preferences are not assessed.</p>
+        </div>
+      </div>
+
+      <h3 class="ce-h3">The 1,800-word limit</h3>
+      <p class="ce-labels"><GuideLabel kind="ib" /></p>
+      <p class="ce-p">
+        Moderators stop reading at 1,800 words, and the word count goes on the cover page (guide, p. 56). Some things do not count; everything else in the text does, including headings, definitions of business terms and quotations. Footnotes and endnotes may hold references only.
+      </p>
+      <div class="ce-practice">
+        <Sorter
+          uid="ia-words"
+          legend="Counted or not?"
+          lead="Which of these count towards the 1,800 words?"
+          options={[
+            { value: 'counted', label: 'Counted' },
+            { value: 'not', label: 'Not counted' },
+          ]}
+          items={[
+            { id: 'w1', text: 'Headings and subheadings', right: ['counted'], explanation: 'They are part of the text, and the guide does not exclude them.' },
+            { id: 'w2', text: 'A table of statistical data', right: ['not'], explanation: 'Tables of statistical data are excluded (guide, p. 56).' },
+            { id: 'w3', text: 'A definition of a business management term in your text', right: ['counted'], explanation: 'Definitions must be in the body of the work, and they count.' },
+            { id: 'w4', text: 'Your break-even calculation', right: ['not'], explanation: 'Equations, formulae and calculations are excluded.' },
+            { id: 'w5', text: 'A quotation from a supporting document', right: ['counted'], explanation: 'Quotations must be in the body, and they count.' },
+            { id: 'w6', text: 'The bibliography', right: ['not'], explanation: 'Excluded, like the contents page and acknowledgments.' },
+            { id: 'w7', text: 'A diagram of your force field analysis', right: ['not'], explanation: 'Diagrams and figures are excluded.' },
+            { id: 'w8', text: 'Citations in the body of the project', right: ['not'], explanation: 'Citations are excluded, and if used they must be in the body; full references go in footnotes or endnotes.' },
+          ]}
+        />
+      </div>
+
+      <h3 class="ce-h3">Submission compliance</h3>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="examiner" /></p>
+      <div class="ce-cols">
+        <div class="ce-col ce-col--must">
+          <p class="label">Mandatory</p>
+          <p class="small muted">The guide requires it, though not all is marked</p>
+          <ul>
+            <li>A research question about one organization</li>
+            <li>The key concept on the title page</li>
+            <li>The word count on the cover page</li>
+            <li>Three to five supporting documents attached, highlighted and labelled</li>
+            <li>Citations and a bibliography</li>
+            <li>The four presentation elements of G</li>
+          </ul>
+        </div>
+        <div class="ce-col ce-col--rec">
+          <p class="label">Recommended</p>
+          <p class="small muted">The guide advises it</p>
+          <ul>
+            <li>No document longer than five A4 pages</li>
+            <li>A range of views across the documents, needed for B4</li>
+            <li>A brief account of how you investigated, in the introduction</li>
+            <li>Noting what the project could not fully answer</li>
+          </ul>
+        </div>
+        <div class="ce-col ce-col--not">
+          <p class="label">Not required</p>
+          <p class="small muted">Reports: not penalized if absent</p>
+          <ul>
+            <li>Recommendations or limitations sections</li>
+            <li>A separate methodology section</li>
+            <li>Appendices: your own work, never extra documents</li>
+            <li>A set font, or set heading names</li>
+          </ul>
+        </div>
+      </div>
+      <div class="ce-practice">
+        <Checklist
+          id="ia-submit"
+          title="Before you submit"
+          note="Submission to the IB is in April or October of the final year, depending on your session; your school sets earlier internal deadlines. Ticks stay on this device."
+          items={[
+            { id: 'concept', text: 'One concept, explicit in every section', label: 'strategy' },
+            { id: 'sds', text: 'Three to five documents, all within three years', label: 'ib' },
+            { id: 'traced', text: 'Every figure traced to its document', label: 'strategy' },
+            { id: 'tools', text: 'Every tool helps answer the question', label: 'strategy' },
+            { id: 'answered', text: 'Every part of the question answered', label: 'strategy' },
+            { id: 'words', text: 'Within 1,800 words, with the count on the cover', label: 'ib' },
+          ]}
+        />
+      </div>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="ia-self-h">
+      <SectionHead no="07" title="Criterion-by-criterion self-review" id="ia-self-h" dek="Read your draft once for each criterion. These prompts help you look; they do not predict a mark, which only your teacher's marking and the IB's moderation decide." />
+      <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+      <div class="ce-self">
+        <Checklist id="ia-self-a" title="A · Integration of a key concept (5)" items={[{ id: '1', text: 'The concept is named on the title page and in the introduction' }, { id: '2', text: "It is linked to this organization's issue, not explained in general" }, { id: '3', text: 'It shapes the analysis and the conclusion, not only the opening' }]} />
+        <Checklist id="ia-self-b" title="B · Supporting documents (4)" items={[{ id: '1', text: 'Three to five documents, each relevant to the question' }, { id: '2', text: 'Each has depth: more than a headline or a summary' }, { id: '3', text: 'Together they give a range of ideas and views' }]} />
+        <Checklist id="ia-self-c" title="C · Tools and theories (4)" items={[{ id: '1', text: 'Each tool was chosen because it helps answer the question' }, { id: '2', text: "Each is applied to the organization's own figures" }, { id: '3', text: 'No tool is named without being used' }]} />
+        <Checklist id="ia-self-d" title="D · Analysis and evaluation (5)" items={[{ id: '1', text: 'Document data is used, not only quoted' }, { id: '2', text: 'The assumptions behind your figures are named and weighed' }, { id: '3', text: 'Every figure is traced to its document' }, { id: '4', text: 'Ideas are integrated across documents, not taken one at a time' }]} />
+        <Checklist id="ia-self-e" title="E · Conclusions (3)" items={[{ id: '1', text: 'The conclusion answers the question as asked' }, { id: '2', text: 'It is consistent with the evidence and adds no new facts' }, { id: '3', text: 'If the question names two things, both are answered' }]} />
+        <Checklist id="ia-self-f" title="F · Structure (2)" items={[{ id: '1', text: 'An introduction, a main body organized by argument, and a conclusion' }, { id: '2', text: 'No long methodology section crowding out the analysis' }]} />
+        <Checklist id="ia-self-g" title="G · Presentation (2)" items={[{ id: '1', text: 'A title page' }, { id: '2', text: 'An accurate table of contents' }, { id: '3', text: 'Appropriate headings and subheadings' }, { id: '4', text: 'Numbered pages' }]} />
+      </div>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="ia-tools-h">
+      <SectionHead no="08" title="Choosing your tools" id="ia-tools-h" dek="Start from the decision your question asks about, then pick the tools that inform it. Criterion C rewards tools that are relevant and applied, not many tools." />
+      <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+      <table class="ce-table">
+        <thead><tr><th scope="col">Your question asks</th><th scope="col">Tools that can answer it</th><th scope="col">What they decide</th></tr></thead>
+        <tbody>{TOOLS.map((t) => <tr><th scope="row">{t.q}</th><td>{t.tools}</td><td>{t.decides}</td></tr>)}</tbody>
+      </table>
+      <p class="small muted">Force field analysis and Porter's generic strategies are HL tools in the guide's toolkit; any relevant tool may be used in the project. <a href="/toolkit/">The toolkit</a> explains each one.</p>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="ia-plan-h">
+      <SectionHead no="09" title="Plan it, and keep the guide" id="ia-plan-h" />
+      <div class="ce-cta">
+        <a class="btn btn--primary" href="/ia-studio/">Open the ten-step planner <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+        <a class="btn" href={GUIDES['internal-assessment'].file} download>Download the IA guide (PDF, {GUIDES['internal-assessment'].pages} pages)</a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>

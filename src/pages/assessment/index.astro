@@ -1,0 +1,488 @@
+---
+/**
+ * The Assessment Centre: the four components of the IB assessment, how they
+ * weigh at SL and HL, and the way in to each. Durations, marks and weights
+ * come from the assessment data, checked against the guide (pp. 39 to 40).
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import LabelKey from '../../components/centre/LabelKey.astro';
+import Monogram from '../../components/brand/Monogram.astro';
+import { corpus } from '../../lib/content';
+import { CENTRE_HREF, GUIDES, type GuideId } from '../../lib/guides';
+
+const c = await corpus();
+const comps = Object.entries(c.assessment).sort((a, b) => a[1].order - b[1].order);
+const order: GuideId[] = ['internal-assessment', 'paper-1', 'paper-2', 'paper-3'];
+const byId = Object.fromEntries(comps);
+const EXTRA: Record<GuideId, { line: string; points: string[] }> = {
+  'internal-assessment': {
+    line: 'A real issue facing one organization, analysed through one key concept.',
+    points: ['1,800 words at most', 'Three to five supporting documents', 'Criteria A to G, 25 marks', 'The same task at SL and HL'],
+  },
+  'paper-1': {
+    line: 'A case study about a fictitious organization, part of it released in advance.',
+    points: ['Pre-released statement', 'Section A structured questions', 'Section B: one extended response', 'Units 1 to 5, no HL extension'],
+  },
+  'paper-2': {
+    line: 'The quantitative paper, on unseen stimulus material presented in parts.',
+    points: ['Formulae provided', 'Section A: all questions', 'Section B: one of two, with a 10-mark response', 'Different papers at SL and HL'],
+  },
+  'paper-3': {
+    line: 'A social enterprise: describe a need, explain the challenges, recommend a plan.',
+    points: ['Questions of 2, 6 and 17 marks', 'Question 3 marked on criteria A to D', 'Unseen stimulus', 'HL only'],
+  },
+};
+const weights = (level: 'sl' | 'hl') =>
+  order
+    .map((id) => ({ id, name: byId[id]?.short ?? id, w: byId[id]?.outline?.[level]?.weight ?? 0 }))
+    .filter((x) => x.w > 0);
+const practice = Object.values(c.questions);
+const byStyle = (s: string) => practice.filter((q) => q.paperStyle === s).length;
+const terms = Object.values(c.commandTerms);
+---
+
+<BaseLayout title="Assessment Centre" description="The IB Business Management assessment, component by component: the internal assessment, Paper 1, Paper 2 and the HL Paper 3, explained from the guide, with practice and tools built for each." section="assessment">
+  <header class="ac-hero">
+    <div class="wrap">
+      <Breadcrumbs trail={[{ label: 'Assessment Centre' }]} />
+      <div class="ac-hero__grid">
+        <div>
+          <p class="ac-hero__kicker"><Monogram height={22} reversed /> Assessment Centre</p>
+          <h1 class="ac-hero__title">Know exactly what is asked. Then practise it.</h1>
+          <p class="ac-hero__lead">
+            Every component of the IB Business Management assessment, explained from the guide and the creator's assessment guides, with labelled
+            requirements, examiner emphasis and strategies, and tools to practise each skill.
+          </p>
+        </div>
+        <div class="ac-weights" aria-label="How the final grade is weighted">
+          {
+            (['sl', 'hl'] as const).map((lv) => (
+              <figure class="ac-w">
+                <figcaption>{lv === 'sl' ? 'Standard Level' : 'Higher Level'}</figcaption>
+                <div class="ac-w__bar" role="img" aria-label={`${lv === 'sl' ? 'Standard' : 'Higher'} Level: ${weights(lv).map((x) => `${x.name} ${x.w}%`).join(', ')}`}>
+                  {weights(lv).map((x) => (
+                    <span class={`ac-w__part ac-w__part--${x.id}`} style={`flex:${x.w}`}>
+                      <b>{x.name}</b> {x.w}%
+                    </span>
+                  ))}
+                </div>
+              </figure>
+            ))
+          }
+          <p class="ac-w__note">Weightings from the guide's assessment outlines (pp. 39 to 40).</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap page-body">
+    <section aria-labelledby="ac-comp-h">
+      <SectionHead no="01" title="The four components" id="ac-comp-h" dek="Each has its own room: what the guide requires, what examiners emphasise, how to prepare, and tools to practise." />
+      <ul class="ac-cards" role="list">
+        {
+          order.map((id) => {
+            const a = byId[id];
+            if (!a) return null;
+            const e = EXTRA[id];
+            return (
+              <li class:list={['ac-card', { 'ac-card--hl': a.levels === 'HL only' }]}>
+                <p class="ac-card__short" aria-hidden="true">{a.short}</p>
+                <h3 class="ac-card__name">
+                  <a href={CENTRE_HREF[id]}>{id === 'paper-3' ? 'Paper 3 Boardroom' : id === 'internal-assessment' ? 'Internal assessment' : a.name}</a>
+                </h3>
+                <p class="ac-card__levels">{a.levels}</p>
+                <p class="ac-card__line">{e.line}</p>
+                <dl class="ac-card__facts">
+                  {a.outline?.sl && (
+                    <div>
+                      <dt>SL</dt>
+                      <dd>
+                        {id === 'internal-assessment' ? '25 marks' : `${a.outline.sl.duration}, ${a.outline.sl.marks} marks`}, {a.outline.sl.weight}%
+                      </dd>
+                    </div>
+                  )}
+                  {a.outline?.hl && (
+                    <div>
+                      <dt>HL</dt>
+                      <dd>
+                        {id === 'internal-assessment' ? '25 marks' : `${a.outline.hl.duration}, ${a.outline.hl.marks} marks`}, {a.outline.hl.weight}%
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+                <ul class="ac-card__points">
+                  {e.points.map((p) => (
+                    <li>{p}</li>
+                  ))}
+                </ul>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </section>
+
+    <section class="ac-sec" aria-labelledby="ac-labels-h">
+      <SectionHead no="02" title="What you are reading" id="ac-labels-h" dek="Every statement in the Assessment Centre carries one of four labels, so you always know whether it is a rule, a pattern examiners have reported, or a technique." />
+      <div class="ac-key"><LabelKey /></div>
+    </section>
+
+    <section class="ac-sec" aria-labelledby="ac-more-h">
+      <SectionHead no="03" title="Across every component" id="ac-more-h" />
+      <div class="ac-more">
+        <a class="ac-more__item" href="/examiner-lens/">
+          <p class="label">Command terms</p>
+          <h3>The {terms.length} command terms</h3>
+          <p>What each asks you to do, at its assessment objective, in the platform's words, with the page of the official definition.</p>
+        </a>
+        <a class="ac-more__item" href="/exam-desk/practice/">
+          <p class="label">Practice questions</p>
+          <h3>{practice.length} original questions</h3>
+          <p>
+            {byStyle('paper-1')} in the style of Paper 1, {byStyle('paper-2')} of Paper 2 and {byStyle('paper-3')} of Paper 3, each with a mark scheme to
+            check yourself against. None is an IB question.
+          </p>
+        </a>
+        <a class="ac-more__item" href="/ia-studio/">
+          <p class="label">Planner</p>
+          <h3>The research project planner</h3>
+          <p>Ten steps from a topic to a submitted project, with checks on your supporting documents. Saved on your device.</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="ac-sec" aria-labelledby="ac-dl-h">
+      <SectionHead no="04" title="The assessment guides" id="ac-dl-h" dek="The four guides this Centre is built from, each five pages, to print or keep. From the Arjun Agrawal Knowledge Series." />
+      <ul class="ac-dl" role="list">
+        {
+          order.map((id) => (
+            <li>
+              <a href={GUIDES[id].file} download>
+                <span class="ac-dl__kind">PDF · {GUIDES[id].pages} pages · {GUIDES[id].size}</span>
+                <span class="ac-dl__title">{GUIDES[id].title}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="small muted">An independent student resource. It is not published, approved or endorsed by the International Baccalaureate.</p>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .ac-hero {
+    padding-block: var(--sp-6) var(--sp-8);
+    background:
+      radial-gradient(ellipse at 90% 0%, rgba(44, 70, 117, 0.6), transparent 55%),
+      var(--surface-ink);
+    color: var(--text-on-ink);
+  }
+
+  .ac-hero :global(.breadcrumbs),
+  .ac-hero :global(.breadcrumbs a) {
+    color: var(--text-on-ink-muted);
+  }
+
+  .ac-hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: var(--sp-7);
+    align-items: end;
+    margin-top: var(--sp-6);
+  }
+
+  .ac-hero__kicker {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--gold-400);
+  }
+
+  .ac-hero__title {
+    margin-top: var(--sp-4);
+    color: var(--text-on-ink);
+    font-size: clamp(2.5rem, 1.6rem + 3.4vw, 4.5rem);
+  }
+
+  .ac-hero__lead {
+    margin-top: var(--sp-4);
+    max-width: 40rem;
+    font-family: var(--font-serif);
+    font-size: var(--fs-lead);
+    color: var(--text-on-ink-muted);
+  }
+
+  .ac-weights {
+    display: grid;
+    gap: var(--sp-4);
+  }
+
+  .ac-w {
+    margin: 0;
+  }
+
+  .ac-w figcaption {
+    margin-bottom: 0.4rem;
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--gold-400);
+  }
+
+  .ac-w__bar {
+    display: flex;
+    gap: 3px;
+  }
+
+  .ac-w__part {
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.55rem 0.6rem;
+    font-size: 0.8125rem;
+    color: var(--text-on-ink);
+    background: var(--navy-700);
+  }
+
+  .ac-w__part b {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    color: inherit;
+  }
+
+  .ac-w__part--internal-assessment {
+    background: var(--gold-500);
+    color: var(--navy-950);
+  }
+
+  .ac-w__part--paper-2 {
+    background: var(--navy-600);
+  }
+
+  .ac-w__part--paper-3 {
+    background: #3d5a8c;
+  }
+
+  .ac-w__note {
+    font-size: 0.75rem;
+    color: var(--text-on-ink-muted);
+  }
+
+  .ac-cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--sp-4);
+    margin: var(--sp-6) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ac-card {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: var(--sp-5);
+    background: var(--surface-sheet);
+    border-top: 3px solid var(--navy-900);
+    box-shadow: var(--shadow-sheet);
+    transition:
+      box-shadow var(--dur-base) var(--ease),
+      transform var(--dur-base) var(--ease-out);
+  }
+
+  .ac-card--hl {
+    border-top-color: var(--gold-500);
+  }
+
+  .ac-card:hover {
+    box-shadow: var(--shadow-lift);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ac-card:hover {
+      transform: translateY(-3px);
+    }
+  }
+
+  .ac-card:focus-within {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .ac-card__short {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-style: italic;
+    line-height: 1;
+    color: var(--brass-text);
+  }
+
+  .ac-card__name {
+    font-size: 1.5rem;
+  }
+
+  .ac-card__name a {
+    color: var(--navy-900);
+    text-decoration: none;
+  }
+
+  .ac-card__name a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .ac-card__name a:focus-visible {
+    outline: none;
+  }
+
+  .ac-card__levels {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .ac-card__line {
+    font-family: var(--font-serif);
+    color: var(--text-body);
+  }
+
+  .ac-card__facts {
+    display: grid;
+    gap: 0.2rem;
+    margin: var(--sp-2) 0 0;
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .ac-card__facts div {
+    display: flex;
+    gap: var(--sp-3);
+    font-size: 0.875rem;
+  }
+
+  .ac-card__facts dt {
+    min-width: 1.75rem;
+    font-weight: 700;
+    color: var(--navy-900);
+  }
+
+  .ac-card__facts dd {
+    margin: 0;
+  }
+
+  .ac-card__points {
+    margin: var(--sp-2) 0 0;
+    padding-left: 1.1rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .ac-sec {
+    margin-top: var(--sp-8);
+  }
+
+  .ac-key {
+    margin-top: var(--sp-5);
+  }
+
+  .ac-more {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-4);
+    margin-top: var(--sp-5);
+  }
+
+  .ac-more__item {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+    padding: var(--sp-5);
+    border: 1px solid var(--rule-hair);
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--text-body);
+    text-decoration: none;
+    transition: border-color var(--dur-fast) var(--ease);
+  }
+
+  .ac-more__item:hover {
+    border-color: var(--gold-500);
+  }
+
+  .ac-more__item h3 {
+    font-size: 1.3125rem;
+  }
+
+  .ac-dl {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: var(--sp-3);
+    margin: var(--sp-5) 0 var(--sp-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  .ac-dl li {
+    margin: 0;
+  }
+
+  .ac-dl a {
+    display: grid;
+    gap: 0.3rem;
+    height: 100%;
+    padding: var(--sp-4);
+    background: var(--surface-ink);
+    color: var(--text-on-ink);
+    text-decoration: none;
+    border-left: 3px solid var(--gold-400);
+  }
+
+  .ac-dl a:hover {
+    background: var(--navy-800);
+  }
+
+  .ac-dl__kind {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gold-400);
+  }
+
+  .ac-dl__title {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+
+  @media (max-width: 64rem) {
+    .ac-hero__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ac-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ac-more {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .ac-cards {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

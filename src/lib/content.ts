@@ -66,7 +66,7 @@ export const href = {
   concept: (id: string) => `/ib/concepts/#${id}`,
   revision: (id: string) => `/revision/${id}/`,
   calculation: (id: string, page: string) => `${page}#calc-${id}`,
-  assessment: (id: string) => (id === 'internal-assessment' ? '/ia-studio/' : `/exam-desk/${id}/`),
+  assessment: (id: string) => `/assessment/${id}/`,
   source: (id: string) => `/sources/#src-${id}`,
 };
 

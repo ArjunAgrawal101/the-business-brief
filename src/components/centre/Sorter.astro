@@ -1,0 +1,69 @@
+---
+/**
+ * A sorting exercise: put each item in the right category, check it, and read
+ * why. Built on the platform's quiz engine (src/scripts/quiz.ts); without
+ * JavaScript every answer sits in an "Answer and explanation" disclosure.
+ */
+import QuizShell from '../interactive/parts/QuizShell.astro';
+import Choice from '../interactive/parts/Choice.astro';
+import CheckRow from '../interactive/parts/CheckRow.astro';
+import Key from '../interactive/parts/Key.astro';
+
+interface Option {
+  value: string;
+  label: string;
+}
+interface Item {
+  id: string;
+  text: string;
+  right: string[];
+  partial?: string[];
+  explanation: string;
+}
+interface Props {
+  uid: string;
+  legend: string;
+  lead: string;
+  options: Option[];
+  items: Item[];
+}
+const { uid, legend, lead, options, items } = Astro.props;
+const label = (v: string) => options.find((o) => o.value === v)?.label ?? v;
+const config = {
+  uid,
+  kind: 'check',
+  labels: Object.fromEntries(options.map((o) => [o.value, o.label])),
+  items: items.map((it) => ({ id: it.id, groups: [{ name: 'pick', legend, right: it.right, partial: it.partial ?? [] }] })),
+};
+---
+
+<QuizShell uid={uid} kind="check" config={config} count={items.length}>
+  <p slot="before" class="quiz__lead">{lead}</p>
+  {
+    items.map((it, k) => (
+      <li class="quiz__item so__item" data-item={it.id}>
+        <div class="so__text">
+          <span class="quiz__no" aria-hidden="true">{k + 1}</span>
+          <p>{it.text}</p>
+        </div>
+        <Choice uid={uid} itemId={it.id} name="pick" legend={legend} options={options} layout={options.length > 3 ? 'grid' : 'seg'} showLegend={false} />
+        <CheckRow />
+        <Key answerLabel="Answer:" answer={`${it.right.map(label).join(' or ')}.`} explanation={it.explanation} />
+      </li>
+    ))
+  }
+</QuizShell>
+
+<style>
+  .so__text {
+    display: flex;
+    gap: var(--sp-3);
+    align-items: baseline;
+  }
+
+  .so__text p {
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    color: var(--navy-900);
+  }
+</style>

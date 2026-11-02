@@ -1,0 +1,234 @@
+---
+/**
+ * The supporting-document checker: the reader lists their three to five
+ * documents and the checker tests the list against the guide's rules and the
+ * recommended checks, each labelled. It cannot judge relevance or depth, and
+ * it approves nothing.
+ */
+import GuideLabel from './GuideLabel.astro';
+
+const VOICES = [
+  ['org', 'The organization itself'],
+  ['independent', 'Independent: government, council, industry body, press data'],
+  ['commercial', 'Commercial: supplier, agent, consultancy, competitor'],
+  ['primary', 'Your own primary research'],
+  ['sceptical', 'A sceptical or critical view'],
+  ['other', 'Other'],
+] as const;
+---
+
+<div class="sd" data-ix="sd-analyser">
+  <div class="sd__head">
+    <h3 class="sd__title">Check your supporting documents</h3>
+    <GuideLabel kind="ib" />
+    <GuideLabel kind="strategy" />
+  </div>
+  <p class="nojs-only state">The checker needs JavaScript. The three gates above work as a paper checklist.</p>
+  <div class="js-only">
+    <div class="sd__when">
+      <label>
+        <span>You will submit in</span>
+        <select data-sub-month>
+          <option value="3">April</option>
+          <option value="9">October</option>
+        </select>
+      </label>
+      <label>
+        <span>of</span>
+        <input type="number" data-sub-year min="2024" max="2035" step="1" inputmode="numeric" />
+      </label>
+    </div>
+    <div class="sd__table" role="group" aria-label="Your documents">
+      <template data-row-template>
+        <fieldset class="sd__row" data-row>
+          <legend class="sd__n"></legend>
+          <label class="sd__f sd__f--title"><span>What it is</span><input type="text" data-k="title" placeholder="For example: council footfall survey" /></label>
+          <label class="sd__f"><span>Published (year)</span><input type="number" data-k="year" min="1990" max="2035" inputmode="numeric" /></label>
+          <label class="sd__f sd__f--voice"><span>Whose voice</span><select data-k="voice">{VOICES.map(([v, l]) => <option value={v}>{l}</option>)}</select></label>
+          <div class="sd__flags">
+            <label><input type="checkbox" data-k="data" /> Has data I can analyse with a tool</label>
+            <label><input type="checkbox" data-k="long" /> Longer than five A4 pages</label>
+            <label><input type="checkbox" data-k="teacher" /> Supplied by my teacher</label>
+            <label><input type="checkbox" data-k="textbook" /> A textbook or class notes</label>
+            <label><input type="checkbox" data-k="transcript" /> A transcript of audio or video</label>
+          </div>
+          <button type="button" class="sd__remove" data-remove aria-label="Remove this document">Remove</button>
+        </fieldset>
+      </template>
+      <div data-rows></div>
+      <button type="button" class="btn btn--small" data-add>Add a document</button>
+    </div>
+    <div class="sd__results" aria-live="polite">
+      <p class="label">Your set against the guide</p>
+      <ul class="sd__checks" data-checks></ul>
+      <p class="small muted">
+        A checker can count, date and compare. It cannot tell whether a document is relevant to your question, deep enough, or credible: you and your teacher
+        judge that. Your list stays on this device.
+      </p>
+    </div>
+  </div>
+</div>
+
+<style>
+  .sd {
+    padding: var(--sp-5);
+    background: var(--surface-sheet);
+    border-top: 3px solid var(--navy-900);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .sd__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+  }
+
+  .sd__title {
+    font-size: 1.375rem;
+    margin-right: var(--sp-2);
+  }
+
+  .sd__when {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    align-items: flex-end;
+    margin-top: var(--sp-4);
+  }
+
+  .sd__when label,
+  .sd__f {
+    display: grid;
+    gap: 0.25rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .sd input[type='text'],
+  .sd input[type='number'],
+  .sd select {
+    min-height: 2.4rem;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--rule-control);
+    border-radius: var(--radius-2);
+    background: #fff;
+    color: var(--text-strong);
+    font: 400 0.9375rem/1.3 var(--font-ui);
+  }
+
+  .sd__when input {
+    width: 6.5rem;
+  }
+
+  .sd__table {
+    display: grid;
+    gap: var(--sp-3);
+    margin-top: var(--sp-4);
+  }
+
+  .sd__row {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) 7rem minmax(0, 1.6fr);
+    gap: var(--sp-3);
+    margin: 0;
+    padding: var(--sp-4);
+    border: 1px solid var(--rule-hair);
+    background: var(--ivory-50);
+  }
+
+  .sd__n {
+    padding: 0 0.3rem;
+    font-weight: 700;
+    color: var(--brass-text);
+    letter-spacing: 0.06em;
+  }
+
+  .sd__flags {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-5);
+    font-size: 0.875rem;
+  }
+
+  .sd__flags label {
+    display: inline-flex;
+    gap: 0.4rem;
+    align-items: center;
+  }
+
+  .sd__remove {
+    position: absolute;
+    top: -0.75rem;
+    right: var(--sp-3);
+    padding: 0.1rem 0.6rem;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: #fff;
+    font: 600 0.75rem/1.4 var(--font-ui);
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+
+  .sd__results {
+    margin-top: var(--sp-5);
+    padding: var(--sp-4);
+    border-left: 3px solid var(--navy-900);
+    background: var(--ivory-50);
+  }
+
+  .sd__checks {
+    display: grid;
+    gap: var(--sp-2);
+    margin: var(--sp-3) 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sd__checks li {
+    display: grid;
+    grid-template-columns: 1.5rem minmax(0, 1fr);
+    gap: var(--sp-2);
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  .sd__checks .is-ok::before,
+  .sd__checks .is-no::before,
+  .sd__checks .is-tip::before {
+    font-weight: 700;
+  }
+
+  .sd__checks .is-ok::before {
+    content: '\2713';
+    color: var(--green-text);
+  }
+
+  .sd__checks .is-no::before {
+    content: '\2715';
+    color: var(--signal-text);
+  }
+
+  .sd__checks .is-tip::before {
+    content: '\2192';
+    color: var(--brass-text);
+  }
+
+  .sd__checks small {
+    display: block;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 48rem) {
+    .sd__row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/centre/sd-analyser';
+</script>
