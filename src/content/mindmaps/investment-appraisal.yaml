@@ -1,0 +1,130 @@
+# Mindmap: 3.8 Investment appraisal. The platform's own summary of the
+# subtopic's content statement (guide p. 30): payback period and ARR for all
+# students, net present value for HL only. ARR and NPV are written as on the
+# guide's formula sheet (p. 65); the guide gives no payback formula, so the
+# standard method used by the platform's calculator is shown. Discount factors
+# come from the guide's table (p. 66). Checked against the guide; no coursebook
+# chapter was supplied for this unit.
+title: Investment appraisal
+code: '3.8'
+scope: subtopic
+unit: 3
+level: SL/HL with HL-only content
+summary: How a business judges whether an investment is worth its cost, with the payback period and the average rate of return and, for HL, net present value, and what the numbers leave out.
+centre: Investment appraisal
+order: 38
+branches:
+  - label: Appraising an investment
+    kind: concept
+    children:
+      - label: Is a project worth its cost?
+        kind: definition
+        term: investment-appraisal
+        core: true
+      - label: Capital cost now, net returns later
+        term: investment
+        core: true
+        note: Returns are the net cash flows the project brings in each year.
+      - label: Accept, reject or rank projects
+      - label: Rests on forecasts of future returns
+        kind: limitation
+        core: true
+        note: The further ahead the forecast, the less reliable it is.
+  - label: Payback period
+    kind: calculation
+    children:
+      - label: Payback period
+        kind: formula
+        term: payback-period
+        core: true
+        formula: Payback = years before the cost is recovered + (amount still to recover ÷ net cash flow in the payback year) × 12 months
+        note: Not on the guide's formula sheet; assumes cash arrives evenly through the year.
+      - label: Track cumulative cash flow to find the year
+      - label: Quick and simple; favours a fast return of cash
+        kind: advantage
+        core: true
+      - label: Ignores returns after payback
+        kind: limitation
+        core: true
+      - label: Ignores the time value of money
+        kind: limitation
+        term: time-value-of-money
+  - label: Average rate of return
+    kind: calculation
+    children:
+      - label: Average rate of return (ARR)
+        kind: formula
+        term: average-rate-of-return
+        core: true
+        formula: ARR = ((total returns − capital cost) ÷ years of use) ÷ capital cost × 100
+      - label: Compare with interest rates or a target
+        core: true
+      - label: Uses all the returns and shows profitability
+        kind: advantage
+        core: true
+      - label: Ignores when the returns arrive
+        kind: limitation
+        core: true
+      - label: Depends on long-range forecasts
+        kind: limitation
+  - label: Net present value
+    kind: calculation
+    level: HL
+    children:
+      - label: Later returns are discounted to today's value
+        level: HL
+        core: true
+        note: Money now is worth more than the same sum later.
+      - label: Present value
+        kind: formula
+        term: present-value
+        level: HL
+        core: true
+        formula: Present value = future return × discount factor
+      - label: Discount factors come from the table
+        term: discount-factor
+        level: HL
+        note: The guide's table covers 4% to 20% over years 1 to 10.
+      - label: Net present value (NPV)
+        kind: formula
+        term: net-present-value
+        level: HL
+        core: true
+        formula: NPV = ∑ present values of return − original cost
+      - label: 'Positive NPV: the project adds value'
+        level: HL
+        core: true
+      - label: Allows for the time value of money
+        kind: advantage
+        level: HL
+      - label: Depends on the discount rate chosen
+        kind: limitation
+        level: HL
+  - label: Making the decision
+    kind: evaluation
+    children:
+      - label: The methods can rank projects differently
+        core: true
+      - label: Money received later is worth less
+        term: time-value-of-money
+        core: true
+        note: Payback and ARR ignore this; NPV (HL) allows for it.
+      - label: Qualitative factors
+        core: true
+        children:
+          - label: Fit with objectives and strategy
+          - label: Effects on staff, ethics and the environment
+          - label: Brand image and risk
+      - label: Cost and availability of finance
+connections:
+  - code: '3.1'
+    label: Capital expenditure is what gets appraised
+  - code: '3.2'
+    label: How the chosen project will be financed
+  - code: '3.7'
+    label: When the returns arrive as cash
+  - code: '1.5'
+    label: Investment decisions behind growth
+basis:
+  - source: ib-bm-guide-2024
+    pages: '30, 65-66'
