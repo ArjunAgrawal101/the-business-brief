@@ -6,6 +6,7 @@
  */
 import type { Corpus, Problem } from './integrity';
 import type { MindNode } from './schemas';
+import { DIAGRAMS } from './diagrams';
 
 type Sub = { code: string; title: string; level: string; unit: number };
 
@@ -103,6 +104,7 @@ export function checkLearning(c: Corpus): Problem[] {
     n.questions.forEach((q) => has(c.questions, q) || add(`question "${q}" does not exist`));
     n.connections.forEach((x) => subs.has(x.code) || add(`connection to "${x.code}", which is not a subtopic`));
     n.basis.forEach((b) => has(c.sources, b.source) || add(`basis source "${b.source}" is not in the sources register`));
+    n.sections.forEach((x) => x.diagram && !DIAGRAMS[x.diagram] && add(`section "${x.id}" uses diagram "${x.diagram}", which is not in the library`));
     const ids = n.sections.map((x) => x.id);
     ids.filter((x, i) => ids.indexOf(x) !== i).forEach((d) => add(`section id "${d}" appears twice`));
   }

@@ -1,0 +1,59 @@
+---
+/**
+ * A diagram from the platform's library, by id. The library (src/lib/diagrams)
+ * draws each one from data, so its proportions and labels are exact.
+ */
+import { DIAGRAMS } from '../../lib/diagrams';
+
+interface Props {
+  id: string;
+  caption?: string;
+}
+const { id, caption } = Astro.props;
+const d = DIAGRAMS[id];
+if (!d) throw new Error(`Diagram "${id}" is not in the library (src/lib/diagrams).`);
+const svg = d.render();
+---
+
+<figure class="dg">
+  <div class="dg__art" set:html={svg} />
+  <figcaption class="dg__cap">
+    <span class="dg__title">{d.title}</span>
+    {(caption ?? d.caption) && <span class="dg__text">{caption ?? d.caption}</span>}
+  </figcaption>
+</figure>
+
+<style>
+  .dg {
+    margin: 0;
+    padding: var(--sp-4);
+    background: var(--surface-sheet);
+    border: 1px solid var(--rule-hair);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .dg__art :global(svg) {
+    width: 100%;
+    height: auto;
+    max-height: 32rem;
+  }
+
+  .dg__cap {
+    display: grid;
+    gap: 0.2rem;
+    margin-top: var(--sp-3);
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .dg__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .dg__text {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+</style>

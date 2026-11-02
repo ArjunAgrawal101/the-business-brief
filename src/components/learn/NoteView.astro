@@ -1,0 +1,245 @@
+---
+/**
+ * Full topic notes: introduction, objectives, sections (with their points,
+ * formulas, example, advantages and limitations, and any diagram), the
+ * evaluation, and retrieval questions for revision.
+ */
+import SectionHead from '../layout/SectionHead.astro';
+import Diagram from '../diagrams/Diagram.astro';
+import { rich, inline } from '../../lib/markup';
+import type { Note } from '../../lib/schemas';
+
+interface Props {
+  note: Note;
+  start: number;
+}
+const { note: n, start } = Astro.props;
+const no = (i: number) => String(start + i).padStart(2, '0');
+---
+
+<section class="nv-intro" aria-labelledby="nv-intro-h">
+  <SectionHead no={no(0)} title="Why it matters" id="nv-intro-h" />
+  <div class="nv-cols">
+    <div class="prose nv-lede" set:html={rich(n.introduction)} />
+    <div class="nv-objectives">
+      <p class="label">By the end you can</p>
+      <ol>
+        {n.objectives.map((o) => <li set:html={inline(o)} />)}
+      </ol>
+    </div>
+  </div>
+</section>
+
+{
+  n.sections.map((s, i) => (
+    <section class:list={['nv-section', `nv-section--${s.kind}`]} aria-labelledby={`nv-${s.id}`} data-level={s.level === 'HL' ? 'HL' : undefined} id={s.id}>
+      <SectionHead no={no(i + 1)} title={s.title} id={`nv-${s.id}`}>
+        {s.level === 'HL' && <span class="tag tag--hl">HL only</span>}
+      </SectionHead>
+      <div class="nv-body">
+        <div class="prose" set:html={rich(s.body)} />
+        {s.points.length > 0 && (
+          <dl class="nv-points">
+            {s.points.map((p) => (
+              <div class:list={{ 'nv-point--hl': p.level === 'HL' }} data-level={p.level === 'HL' ? 'HL' : undefined}>
+                <dt>
+                  {p.term} {p.level === 'HL' && <span class="tag tag--hl">HL</span>}
+                </dt>
+                <dd set:html={rich(p.text)} />
+              </div>
+            ))}
+          </dl>
+        )}
+        {s.diagram && <Diagram id={s.diagram} />}
+        {s.formulas.length > 0 && (
+          <div class="nv-formulas">
+            {s.formulas.map((f) => (
+              <div class="nv-formula">
+                <p class="label">{f.name}</p>
+                <p class="nv-formula__x">{f.expression}</p>
+                {f.note && <div class="small muted" set:html={rich(f.note)} />}
+              </div>
+            ))}
+          </div>
+        )}
+        {(s.advantages.length > 0 || s.limitations.length > 0) && (
+          <div class="nv-pc">
+            {s.advantages.length > 0 && (
+              <div class="nv-pc__col nv-pc__col--plus">
+                <p class="label">Advantages</p>
+                <ul>
+                  {s.advantages.map((a) => <li set:html={inline(a)} />)}
+                </ul>
+              </div>
+            )}
+            {s.limitations.length > 0 && (
+              <div class="nv-pc__col nv-pc__col--minus">
+                <p class="label">Limitations</p>
+                <ul>
+                  {s.limitations.map((a) => <li set:html={inline(a)} />)}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+        {s.example && (
+          <aside class="nv-example">
+            <p class="label">
+              {s.example.fictional ? 'Example · fictional' : 'Example'}
+            </p>
+            <h3>{s.example.title}</h3>
+            <div class="prose" set:html={rich(s.example.text)} />
+          </aside>
+        )}
+      </div>
+    </section>
+  ))
+}
+
+<section class="nv-section nv-section--evaluation" aria-labelledby="nv-eval-h">
+  <SectionHead no={no(n.sections.length + 1)} title="Evaluation and limits" id="nv-eval-h" dek="What to weigh before reaching a judgement." />
+  <ul class="nv-eval">
+    {n.evaluation.map((e) => <li set:html={inline(e)} />)}
+  </ul>
+</section>
+
+<style>
+  .nv-intro,
+  .nv-section {
+    margin-top: var(--sp-8);
+    scroll-margin-top: calc(var(--header-h) + var(--sp-4));
+  }
+
+  .nv-cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: var(--sp-6);
+    margin-top: var(--sp-5);
+  }
+
+  .nv-lede {
+    font-family: var(--font-serif);
+    font-size: 1.1875rem;
+    line-height: 1.6;
+    color: var(--navy-900);
+  }
+
+  .nv-objectives {
+    padding: var(--sp-4) var(--sp-5);
+    background: var(--surface-sheet);
+    border-top: 3px solid var(--gold-500);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .nv-objectives ol {
+    margin: var(--sp-2) 0 0;
+    padding-left: 1.2rem;
+  }
+
+  .nv-body {
+    display: grid;
+    gap: var(--sp-5);
+    margin-top: var(--sp-5);
+    max-width: 48rem;
+  }
+
+  .nv-points {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    border-top: 1px solid var(--navy-900);
+  }
+
+  .nv-points > div {
+    display: grid;
+    grid-template-columns: minmax(9rem, 13rem) minmax(0, 1fr);
+    gap: var(--sp-4);
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .nv-points dt {
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .nv-points dd {
+    margin: 0;
+  }
+
+  .nv-formulas {
+    display: grid;
+    gap: var(--sp-3);
+  }
+
+  .nv-formula {
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--surface-sheet);
+    border-left: 3px solid var(--gold-500);
+  }
+
+  .nv-formula__x {
+    margin-top: 0.3rem;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--navy-900);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .nv-pc {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-4);
+  }
+
+  .nv-pc__col {
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--surface-sheet);
+    border-top: 3px solid var(--green-text);
+  }
+
+  .nv-pc__col--minus {
+    border-top-color: var(--signal-text);
+  }
+
+  .nv-pc__col ul {
+    margin: var(--sp-2) 0 0;
+    padding-left: 1.1rem;
+  }
+
+  .nv-example {
+    padding: var(--sp-4) var(--sp-5);
+    background: var(--ivory-50);
+    border: 1px solid var(--rule-hair);
+    border-left: 3px solid var(--navy-900);
+  }
+
+  .nv-example h3 {
+    margin: var(--sp-2) 0;
+    font-size: 1.1875rem;
+  }
+
+  .nv-eval {
+    max-width: 48rem;
+    margin: var(--sp-4) 0 0;
+    padding-left: 1.2rem;
+  }
+
+  .nv-eval li + li {
+    margin-top: var(--sp-2);
+  }
+
+  @media (max-width: 52rem) {
+    .nv-cols,
+    .nv-pc {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .nv-points > div {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sp-1);
+    }
+  }
+</style>

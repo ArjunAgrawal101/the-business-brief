@@ -1,0 +1,418 @@
+---
+/**
+ * A subtopic's page in the topic library: what the IB course asks (the
+ * guide's content statements, in the platform's words, with depth and HL
+ * status), the full notes where they exist, the mindmap, the key terms, the
+ * tools and practice, and how far the platform's coverage goes. The three
+ * subtopics with a complete brief use the brief as their page.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import MindmapView from '../../components/mindmap/MindmapView.astro';
+import NoteView from '../../components/learn/NoteView.astro';
+import RetrievalCards from '../../components/assess/RetrievalCards.astro';
+import LevelSwitch from '../../components/ui/LevelSwitch.astro';
+import { corpus, href } from '../../lib/content';
+import { inline } from '../../lib/markup';
+import { allSubtopics, hubSubtopics, mindmapFor, noteFor, subtopicHref, subtopicSlug } from '../../lib/learning';
+
+export async function getStaticPaths() {
+  const c = await corpus();
+  return hubSubtopics(c).map(({ s }) => ({ params: { slug: subtopicSlug(s.title) }, props: { code: s.code } }));
+}
+
+interface Props {
+  code: string;
+}
+const { code } = Astro.props;
+const c = await corpus();
+const list = allSubtopics(c);
+const idx = list.findIndex((x) => x.s.code === code);
+const { unit, s } = list[idx]!;
+const prev = idx > 0 ? list[idx - 1] : undefined;
+const next = idx < list.length - 1 ? list[idx + 1] : undefined;
+const note = noteFor(c, code);
+const map = mindmapFor(c, code);
+const brief = s.topic ? { id: s.topic, t: c.topics[s.topic] } : undefined;
+const terms = Object.entries(c.glossary)
+  .filter(([, g]) => g.subtopics.includes(code))
+  .sort((a, b) => a[1].term.localeCompare(b[1].term));
+const ixs = Object.entries(c.interactives).filter(([, it]) => it.page && it.syllabus.includes(code));
+const calcs = Object.entries(c.calculations).filter(([, k]) => k.syllabus.some((x) => x.code === code));
+const questions = Object.entries(c.questions).filter(([, q]) => q.syllabus.includes(code));
+const hasHL = s.level !== 'SL/HL';
+const levelText = s.level === 'HL' ? 'HL only' : s.level === 'SL/HL' ? 'SL and HL' : 'SL and HL, with HL-only content';
+const status = note ? 'Full notes' : brief ? 'Taught in a brief' : 'Notes planned';
+const connections = note?.[1].connections ?? map?.[1].connections.map((x) => ({ code: x.code, text: x.label })) ?? [];
+const titleOf = (cd: string) => list.find((x) => x.s.code === cd)?.s.title ?? cd;
+let n = 0;
+const num = () => String(++n).padStart(2, '0');
+const notesStart = 2;
+---
+
+<BaseLayout title={`${s.code} ${s.title}`} description={`${s.title} (IB DP Business Management ${s.code}): what the course asks, notes, mindmap, key terms, tools and practice.`} section="topics">
+  <div class="wrap">
+    <header class="sh">
+      <Breadcrumbs trail={[{ label: 'Topics', href: '/topics/' }, { label: `Unit ${unit.number}`, href: `/topics/#unit-${unit.number}` }, { label: `${s.code} ${s.title}` }]} />
+      <p class="label label--ink sh__kicker">Unit {unit.number}: {unit.title}</p>
+      <h1 class="sh__title">
+        <span class="sh__code">{s.code}</span>
+        {s.title}
+      </h1>
+      <div class="sh__meta">
+        <span class="tag tag--plain">{levelText}</span>
+        <span class:list={['tag', note ? 'tag--live' : brief ? 'tag--live' : 'tag--planned']}>{status}</span>
+        {map && <a class="tag tag--plain" href="#map">Mindmap</a>}
+        {terms.length > 0 && <a class="tag tag--plain" href="#terms">{terms.length} key terms</a>}
+        {hasHL && <LevelSwitch />}
+      </div>
+    </header>
+  </div>
+
+  <div class="wrap page-body sh-body">
+    {
+      brief?.t && (
+        <aside class="sh-brief">
+          <p class="label">Taught in a complete brief</p>
+          <h2>
+            <a href={href.topic(brief.id)}>{brief.t.title}</a>
+          </h2>
+          <p>{brief.t.summary}</p>
+          <p class="small muted">
+            The brief {brief.t.code === s.code ? 'is this subtopic.' : `belongs to ${brief.t.code} and also teaches ${s.code}: its sections on this subtopic, its calculations and its practice are linked below.`}
+          </p>
+        </aside>
+      )
+    }
+
+    <section aria-labelledby="sh-ib-h">
+      <SectionHead no={num()} title="What the IB course asks" id="sh-ib-h" dek={`The content statements for ${s.code}, in the platform's words, with the depth of teaching the guide sets${s.page ? ` (guide, p. ${s.page})` : ''}.`} />
+      <ul class="sh-cs">
+        {
+          s.content.map((cs) => (
+            <li class:list={{ 'sh-cs--hl': cs.level === 'HL' }} data-level={cs.level === 'HL' ? 'HL' : undefined}>
+              <span class="sh-cs__text">{cs.text}</span>
+              <span class="sh-cs__ao">{cs.ao.join(', ')}</span>
+              {cs.level === 'HL' && <span class="tag tag--hl">HL</span>}
+            </li>
+          ))
+        }
+      </ul>
+      <p class="small muted">
+        AO1 knowledge and understanding · AO2 application and analysis · AO3 synthesis and evaluation · AO4 a range of skills. A question can use a command term at its statement's level or below. <a href="/ib/">The whole course</a>.
+      </p>
+    </section>
+
+    {note && <NoteView note={note[1]} start={notesStart} />}
+
+    {
+      !note && (
+        <section class="sh-planned" aria-labelledby="sh-planned-h">
+          <h2 id="sh-planned-h" class="sh-planned__h">Full notes for {s.code} are planned</h2>
+          <p>
+            Until they are written, this page gathers what the platform already has for the subtopic: {map ? 'its mindmap, ' : ''}
+            {terms.length ? `${terms.length} glossary terms, ` : ''}and any tools and practice. Notes are added one subtopic at a time, each complete, rather than many at once and thin. The <a href="/ib/coverage/">coverage tracker</a> shows the order.
+          </p>
+        </section>
+      )
+    }
+
+    {
+      map && (
+        <section id="map" aria-labelledby="sh-map-h" class="sh-sec">
+          <SectionHead no={num()} title="The mindmap" id="sh-map-h" dek={map[1].summary} />
+          <MindmapView id={map[0]} map={map[1]} />
+          <p class="small">
+            <a href={href.mindmap(map[0])}>Open the mindmap on its own page</a>, with its terms and connections.
+          </p>
+        </section>
+      )
+    }
+
+    {
+      terms.length > 0 && (
+        <section id="terms" aria-labelledby="sh-terms-h" class="sh-sec">
+          <SectionHead no={num()} title="Key terms" id="sh-terms-h" dek="Defined in the platform's own words. Each opens its full entry." />
+          <dl class="sh-terms">
+            {terms.map(([id, g]) => (
+              <div data-level={g.level === 'HL' ? 'HL' : undefined}>
+                <dt>
+                  <a href={href.glossary(id)}>{g.term}</a> {g.level === 'HL' && <span class="tag tag--hl">HL</span>}
+                </dt>
+                <dd set:html={inline(g.definition)} />
+              </div>
+            ))}
+          </dl>
+        </section>
+      )
+    }
+
+    {
+      (ixs.length > 0 || calcs.length > 0 || questions.length > 0) && (
+        <section aria-labelledby="sh-tools-h" class="sh-sec">
+          <SectionHead no={num()} title="Tools and practice" id="sh-tools-h" />
+          <div class="sh-tools">
+            {ixs.length > 0 && (
+              <div>
+                <p class="label">Interactive</p>
+                <ul>
+                  {ixs.map(([id, it]) => (
+                    <li>
+                      <a href={`${it.page}#ix-${id}`}>{it.title}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {calcs.length > 0 && (
+              <div>
+                <p class="label">Worked calculations</p>
+                <ul>
+                  {calcs.map(([id, k]) => (
+                    <li>
+                      <a href={href.calculation(id, k.page)}>{k.name}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {questions.length > 0 && (
+              <div>
+                <p class="label">Practice questions</p>
+                <ul>
+                  {questions.map(([id, q]) => (
+                    <li>
+                      <a href={href.question(id)}>{q.title}</a> <span class="small muted">{q.marks} marks</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      note && (
+        <section aria-labelledby="sh-rev-h" class="sh-sec">
+          <SectionHead no={num()} title="Check your recall" id="sh-rev-h" dek="Answer from memory, then reveal and rate yourself. Your ratings stay on this device." />
+          <RetrievalCards id={`notes-${code.replace('.', '-')}`} items={note[1].retrieval} />
+        </section>
+      )
+    }
+
+    {
+      connections.length > 0 && (
+        <section aria-labelledby="sh-conn-h" class="sh-sec">
+          <SectionHead no={num()} title="Connections" id="sh-conn-h" dek="Where this subtopic meets the rest of the course." />
+          <ul class="sh-conn">
+            {connections.map((x) => (
+              <li>
+                <a href={subtopicHref(c, x.code)}>
+                  <span class="sh-conn__code">{x.code}</span> {titleOf(x.code)}
+                </a>
+                <span class="small muted" set:html={inline(x.text)} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      note && (
+        <p class="small muted sh-basis">
+          Notes checked against: {note[1].basis.map((b, i) => <span>{i > 0 && '; '}{c.sources[b.source]?.title ?? b.source}{b.pages && `, pp. ${b.pages}`}{b.note && ` (${b.note})`}</span>)}. Updated {note[1].updated}. The IB guide is the authority on the course.
+        </p>
+      )
+    }
+
+    <nav class="sh-pager" aria-label="Neighbouring subtopics">
+      {prev ? <a href={subtopicHref(c, prev.s.code)}>&larr; {prev.s.code} {prev.s.title}</a> : <span />}
+      <a href="/topics/">Topic library</a>
+      {next ? <a href={subtopicHref(c, next.s.code)}>{next.s.code} {next.s.title} &rarr;</a> : <span />}
+    </nav>
+  </div>
+</BaseLayout>
+
+<style>
+  .sh {
+    padding-top: var(--sp-6);
+    padding-bottom: var(--sp-5);
+    border-bottom: 1px solid var(--navy-900);
+  }
+
+  .sh__kicker {
+    margin-top: var(--sp-5);
+  }
+
+  .sh__title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--sp-4);
+    margin-top: var(--sp-3);
+  }
+
+  .sh__code {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--brass-text);
+  }
+
+  .sh__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-top: var(--sp-4);
+  }
+
+  .sh-body > * + * {
+    margin-top: var(--sp-8);
+  }
+
+  .sh-brief {
+    padding: var(--sp-5);
+    background: var(--surface-ink);
+    color: var(--text-on-ink-muted);
+  }
+
+  .sh-brief h2 {
+    margin: var(--sp-2) 0;
+    font-size: 1.75rem;
+  }
+
+  .sh-brief h2 a {
+    color: var(--text-on-ink);
+  }
+
+  .sh-brief .label {
+    color: var(--gold-400);
+  }
+
+  .sh-cs {
+    margin: var(--sp-5) 0 var(--sp-3);
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--navy-900);
+    max-width: 52rem;
+  }
+
+  .sh-cs li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--sp-2) var(--sp-4);
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .sh-cs__text {
+    flex: 1 1 22rem;
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    color: var(--navy-900);
+  }
+
+  .sh-cs__ao {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--brass-text);
+  }
+
+  .sh-planned {
+    padding: var(--sp-5);
+    border: 1px dashed var(--rule);
+    max-width: 52rem;
+  }
+
+  .sh-planned__h {
+    font-size: 1.375rem;
+    margin-bottom: var(--sp-2);
+  }
+
+  .sh-sec > :global(.mm),
+  .sh-sec > p {
+    margin-top: var(--sp-5);
+  }
+
+  .sh-terms {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+    gap: 0 var(--sp-6);
+    margin: var(--sp-5) 0 0;
+  }
+
+  .sh-terms > div {
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .sh-terms dt a {
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .sh-terms dd {
+    margin: 0.25rem 0 0;
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+  }
+
+  .sh-tools {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: var(--sp-5);
+    margin-top: var(--sp-5);
+  }
+
+  .sh-tools ul {
+    margin: var(--sp-2) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--navy-900);
+  }
+
+  .sh-tools li {
+    margin: 0;
+    padding: var(--sp-2) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .sh-conn {
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-hair);
+    max-width: 52rem;
+  }
+
+  .sh-conn li {
+    display: grid;
+    gap: 0.15rem;
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .sh-conn__code {
+    color: var(--brass-text);
+    font-weight: 600;
+  }
+
+  .sh-pager {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--rule-hair);
+  }
+</style>

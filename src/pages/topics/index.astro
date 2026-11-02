@@ -1,63 +1,289 @@
 ---
+/**
+ * The topic library: all 37 subtopics of IB DP Business Management in their
+ * units, each with what the platform has for it. Every status is computed from
+ * the content, so the library cannot claim a page that does not exist.
+ */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
-import LevelTag from '../../components/ui/LevelTag.astro';
-import VerifyTag from '../../components/ui/VerifyTag.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
 import { corpus, href, topicsInOrder } from '../../lib/content';
+import { allSubtopics, mindmapFor, noteFor, subtopicHref } from '../../lib/learning';
 
 const c = await corpus();
 const topics = await topicsInOrder();
-const curriculum = c.curricula['ib-dp-bm'];
-const subtopicCount = curriculum?.units.reduce((n, u) => n + u.subtopics.length, 0) ?? 0;
+const cur = c.curricula['ib-dp-bm'];
+const rows = allSubtopics(c).map(({ unit, s }) => {
+  const note = noteFor(c, s.code);
+  const map = mindmapFor(c, s.code);
+  const terms = Object.values(c.glossary).filter((g) => g.subtopics.includes(s.code)).length;
+  const tools = Object.values(c.interactives).filter((it) => it.page && it.syllabus.includes(s.code)).length + Object.values(c.calculations).filter((k) => k.syllabus.some((x) => x.code === s.code)).length;
+  const questions = Object.values(c.questions).filter((q) => q.syllabus.includes(s.code)).length;
+  const brief = s.topic && c.topics[s.topic] && c.topics[s.topic]!.code === s.code;
+  const state = brief ? 'brief' : note ? 'notes' : s.topic ? 'brief-part' : 'hub';
+  return { unit, s, note, map, terms, tools, questions, state };
+});
+const count = (st: string) => rows.filter((r) => r.state === st).length;
+const withMaps = rows.filter((r) => r.map).length;
+const STATE_LABEL: Record<string, string> = { brief: 'Complete brief', notes: 'Full notes', 'brief-part': 'In a brief', hub: 'Notes planned' };
 ---
 
-<BaseLayout title="Topics" description="Topic briefs for IB DP Business Management: each starts from a business situation and works through the ideas to a decision." section="topics">
+<BaseLayout title="Topic library" description="The IB DP Business Management course, subtopic by subtopic: notes, briefs, mindmaps, key terms, tools and practice for every part of the syllabus." section="topics">
   <PageIntro
     trail={[{ label: 'Topics' }]}
-    kicker="The Business Brief"
-    title="Topic briefs"
-    lead={`Each brief starts with a business in a situation, works through the ideas in order, and ends with a decision you make and defend. ${topics.length} of the ${subtopicCount} subtopics in the IB course have a complete brief in this release.`}
+    kicker="Topic library"
+    title="The course, subtopic by subtopic"
+    lead={`All ${rows.length} subtopics of IB DP Business Management, in their five units. Every subtopic has a page with what the course asks, its key terms and its tools; ${count('brief') + count('notes')} have complete notes or a full brief, and ${withMaps} have a mindmap. The rest are being written one at a time.`}
   />
+
   <div class="wrap page-body">
-    <ol class="index-list">
-      {
-        topics.map(([id, t]) => {
-          const unit = curriculum?.units.find((u) => u.id === t.unit);
-          const sub = unit?.subtopics.find((s) => s.code === t.code);
-          return (
-            <li class="index-item">
-              <span class="index-item__code">{t.code}</span>
-              <div class="index-item__body">
-                <p class="label">{unit?.title}</p>
-                <h2 class="index-item__title">
-                  <a href={href.topic(id)}>{t.title}</a>
-                </h2>
-                <p>{t.summary}</p>
-                <p class="narrative small">The decision: {t.decisionQuestion}</p>
-              </div>
-              <div class="index-item__side">
-                <div class="tags">
-                  <LevelTag level={t.level} always />
-                  {sub && <VerifyTag status={sub.verification} />}
-                </div>
-                <span class="muted">
-                  {t.sections.length} sections, {t.related.questions.length} practice questions
-                </span>
-                {t.related.decisions[0] && <a href={href.decision(t.related.decisions[0])}>Its Decision Room</a>}
-              </div>
+    <dl class="tl-stats">
+      <div><dt>Complete briefs</dt><dd>{count('brief')}</dd></div>
+      <div><dt>Full notes</dt><dd>{count('notes')}</dd></div>
+      <div><dt>Mindmaps</dt><dd>{withMaps}</dd></div>
+      <div><dt>Glossary terms</dt><dd>{Object.keys(c.glossary).length}</dd></div>
+      <div><dt>Notes planned</dt><dd>{count('hub') + count('brief-part')}</dd></div>
+    </dl>
+
+    <section class="tl-briefs" aria-labelledby="tl-briefs-h">
+      <SectionHead no="01" title="Start with a complete brief" id="tl-briefs-h" dek="Each brief starts from a business in a situation and ends with a decision you make and defend, with a case, interactions, a Decision Room and practice." />
+      <ul class="tl-feature" role="list">
+        {
+          topics.map(([id, t]) => (
+            <li class="tl-feature__item">
+              <span class="tl-feature__code">{t.code}</span>
+              <h3>
+                <a href={href.topic(id)}>{t.title}</a>
+              </h3>
+              <p class="tl-feature__q">{t.decisionQuestion}</p>
             </li>
-          );
-        })
-      }
-    </ol>
-    <aside class="callout callout--note">
-      <span class="callout__kicker">What comes next</span>
-      <div class="prose">
-        <p>
-          The other subtopics are listed on the <a href="/ib/">syllabus map</a>, with what already exists for each one on the
-          <a href="/ib/coverage/">coverage page</a>. Briefs are added one at a time, each complete, rather than many at once and thin.
-        </p>
-      </div>
-    </aside>
+          ))
+        }
+      </ul>
+    </section>
+
+    {
+      cur?.units.map((u) => (
+        <section class="tl-unit" id={`unit-${u.number}`} aria-labelledby={`tl-u${u.number}`}>
+          <SectionHead no={String(u.number + 1).padStart(2, '0')} title={`Unit ${u.number}: ${u.title}`} id={`tl-u${u.number}`} dek={u.hours ? (u.hours.sl === u.hours.hl ? `${u.hours.sl} recommended teaching hours.` : `${u.hours.sl} recommended teaching hours at SL, ${u.hours.hl} at HL.`) : undefined} />
+          <ol class="tl-rows" role="list">
+            {rows
+              .filter((r) => r.unit.id === u.id)
+              .map((r) => (
+                <li class:list={['tl-row', `tl-row--${r.state}`]}>
+                  <span class="tl-row__code">{r.s.code}</span>
+                  <div class="tl-row__main">
+                    <h3 class="tl-row__title">
+                      <a href={subtopicHref(c, r.s.code)}>{r.s.title}</a>
+                      {r.s.level === 'HL' && <span class="tag tag--hl">HL</span>}
+                    </h3>
+                    <p class="tl-row__cs">{r.s.content.map((x) => x.text).join(' · ')}</p>
+                  </div>
+                  <ul class="tl-row__has" aria-label="What exists for this subtopic">
+                    <li class:list={['tl-chip', `tl-chip--${r.state}`]}>{STATE_LABEL[r.state]}</li>
+                    {r.map && <li class="tl-chip">Mindmap</li>}
+                    {r.terms > 0 && <li class="tl-chip">{r.terms} terms</li>}
+                    {r.tools > 0 && <li class="tl-chip">{r.tools} tools</li>}
+                    {r.questions > 0 && <li class="tl-chip">{r.questions} questions</li>}
+                  </ul>
+                </li>
+              ))}
+          </ol>
+        </section>
+      ))
+    }
+
+    <p class="small muted tl-foot">
+      Statuses are computed from the content. The <a href="/ib/coverage/">coverage tracker</a> gives the detail and the <a href="/ib/map/">course map</a> shows it at a glance.
+    </p>
   </div>
 </BaseLayout>
+
+<style>
+  .tl-stats {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    margin: 0 0 var(--sp-7);
+    border-top: 1px solid var(--navy-900);
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .tl-stats > div {
+    padding: var(--sp-3) var(--sp-4) var(--sp-3) 0;
+  }
+
+  .tl-stats > div + div {
+    padding-left: var(--sp-4);
+    border-left: 1px solid var(--rule-hair);
+  }
+
+  .tl-stats dt {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .tl-stats dd {
+    margin: 0.2rem 0 0;
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    font-weight: 500;
+    color: var(--navy-900);
+  }
+
+  .tl-feature {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    gap: var(--sp-4);
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tl-feature__item {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: var(--sp-5);
+    background: var(--surface-sheet);
+    border-top: 3px solid var(--navy-900);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .tl-feature__code {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-style: italic;
+    color: var(--brass-text);
+  }
+
+  .tl-feature__item h3 {
+    font-size: 1.375rem;
+  }
+
+  .tl-feature__q {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--text-body);
+  }
+
+  .tl-unit {
+    margin-top: var(--sp-8);
+    scroll-margin-top: calc(var(--header-h) + var(--sp-4));
+  }
+
+  .tl-rows {
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tl-row {
+    display: grid;
+    grid-template-columns: 3.25rem minmax(0, 1fr) minmax(0, auto);
+    gap: var(--sp-2) var(--sp-5);
+    align-items: start;
+    margin: 0;
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .tl-row__code {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-style: italic;
+    color: var(--brass-text);
+    line-height: 1.2;
+  }
+
+  .tl-row__title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--sp-2);
+    font-size: 1.25rem;
+  }
+
+  .tl-row__title a {
+    color: var(--navy-900);
+    text-decoration: none;
+  }
+
+  .tl-row__title a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--gold-500);
+  }
+
+  .tl-row__cs {
+    margin-top: 0.3rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    max-width: 46rem;
+  }
+
+  .tl-row__has {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.3rem;
+    max-width: 18rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tl-chip {
+    margin: 0;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 560;
+    color: var(--text-muted);
+    background: var(--surface-sheet);
+  }
+
+  .tl-chip--brief,
+  .tl-chip--notes {
+    border-color: var(--navy-900);
+    background: var(--navy-900);
+    color: var(--text-on-ink);
+  }
+
+  .tl-chip--brief-part {
+    border-color: var(--gold-500);
+    color: var(--brass-text);
+  }
+
+  .tl-chip--hub {
+    border-style: dashed;
+  }
+
+  .tl-foot {
+    margin-top: var(--sp-6);
+  }
+
+  @media (max-width: 52rem) {
+    .tl-stats {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .tl-stats > div:nth-child(4) {
+      border-left: 0;
+      padding-left: 0;
+    }
+
+    .tl-row {
+      grid-template-columns: 2.75rem minmax(0, 1fr);
+    }
+
+    .tl-row__has {
+      grid-column: 2;
+      justify-content: flex-start;
+      max-width: none;
+    }
+  }
+</style>

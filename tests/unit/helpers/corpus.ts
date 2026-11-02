@@ -3,7 +3,7 @@
  * entry with the same Zod schemas the Astro build uses. Tests use this so that
  * they check exactly what the site would publish, without running Astro.
  */
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { parse } from 'yaml';
 import type { z } from 'astro/zod';
@@ -31,10 +31,13 @@ import {
 
 const ROOT = new URL('../../../src/content/', import.meta.url).pathname;
 
+/** A collection folder with no entries yet may not exist in a fresh checkout (git does not keep empty folders). */
 const yamlFiles = (dir: string) =>
-  readdirSync(join(ROOT, dir))
-    .filter((f) => f.endsWith('.yaml'))
-    .sort();
+  existsSync(join(ROOT, dir))
+    ? readdirSync(join(ROOT, dir))
+        .filter((f) => f.endsWith('.yaml'))
+        .sort()
+    : [];
 
 function strict<S extends z.ZodType>(schema: S, data: unknown, where: string): z.infer<S> {
   const r = schema.safeParse(data);

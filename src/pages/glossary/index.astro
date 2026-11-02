@@ -1,0 +1,318 @@
+---
+/**
+ * The glossary: every term the course uses, in the platform's own words.
+ * Search it, filter it by unit, level and kind, or browse it from A to Z.
+ * Each term has its own page with context, an example, any formula, and the
+ * related terms, notes and mindmaps.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import { corpus, href } from '../../lib/content';
+import { inline } from '../../lib/markup';
+import { GLOSSARY_CATEGORIES, GLOSSARY_CATEGORY_LABELS } from '../../lib/schemas';
+
+const c = await corpus();
+const entries = Object.entries(c.glossary).sort((a, b) => a[1].term.localeCompare(b[1].term, 'en', { sensitivity: 'base' }));
+const letterOf = (t: string) => {
+  const ch = t.trim()[0]?.toUpperCase() ?? '#';
+  return /[A-Z]/.test(ch) ? ch : '#';
+};
+const ALPHABET = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
+const present = new Set(entries.map(([, g]) => letterOf(g.term)));
+const units = c.curricula['ib-dp-bm']?.units ?? [];
+const unitOf = (code: string) => (code === 'toolkit' ? 'toolkit' : code.split('.')[0]);
+const usedCats = GLOSSARY_CATEGORIES.filter((k) => entries.some(([, g]) => g.category === k));
+const hlCount = entries.filter(([, g]) => g.level === 'HL').length;
+---
+
+<BaseLayout title="Glossary" description={`${entries.length} Business Management terms defined in plain language, with context, examples, formulas and links to the notes and mindmaps that use them.`} section="glossary">
+  <PageIntro
+    trail={[{ label: 'Glossary' }]}
+    kicker="Reference"
+    title="Business Management, defined"
+    lead={`${entries.length} terms in the platform's own words, each with its place in the course. Search, filter by unit or level, or browse from A to Z. ${hlCount} are HL only and marked as such.`}
+  />
+
+  <div class="wrap page-body" data-ix="glossary">
+    <form class="gl-search" role="search" action="/glossary/" method="get" data-form>
+      <label class="label label--ink" for="gq">Search the glossary</label>
+      <div class="gl-search__row">
+        <input id="gq" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="Try: gearing, motivation, break-even" />
+        <button class="btn btn--primary" type="submit">Search</button>
+      </div>
+    </form>
+
+    <div class="gl-filters js-only">
+      <div class="gl-filter">
+        <label class="label" for="gl-unit">Unit</label>
+        <select id="gl-unit" data-filter="unit">
+          <option value="">All units</option>
+          {units.map((u) => <option value={String(u.number)}>Unit {u.number}: {u.title}</option>)}
+          <option value="toolkit">Toolkit</option>
+        </select>
+      </div>
+      <div class="gl-filter">
+        <label class="label" for="gl-level">Level</label>
+        <select id="gl-level" data-filter="level">
+          <option value="">SL and HL</option>
+          <option value="sl">SL only (hide HL-only terms)</option>
+          <option value="hl">HL-only terms</option>
+        </select>
+      </div>
+      <div class="gl-filter">
+        <label class="label" for="gl-cat">Kind</label>
+        <select id="gl-cat" data-filter="category">
+          <option value="">Every kind</option>
+          {usedCats.map((k) => <option value={k}>{GLOSSARY_CATEGORY_LABELS[k]}</option>)}
+        </select>
+      </div>
+      <p class="gl-count" aria-live="polite" data-count>{entries.length} terms</p>
+    </div>
+
+    <nav class="gl-az" aria-label="Browse from A to Z">
+      <ul>
+        {
+          ALPHABET.map((l) => (
+            <li>{present.has(l) ? <a href={`#letter-${l}`} data-letter={l}>{l}</a> : <span aria-hidden="true">{l}</span>}</li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <p class="state" data-none hidden>
+      No term matches. Try a shorter word or clear the filters; the <a href="/search/">site search</a> also looks in notes, cases and tools.
+    </p>
+
+    {
+      ALPHABET.filter((l) => present.has(l)).map((l) => (
+        <section class="gl-letter" aria-labelledby={`letter-${l}`} data-letter-section={l}>
+          <h2 class="gl-letter__h" id={`letter-${l}`}>
+            {l}
+          </h2>
+          <ul class="gl-list" role="list">
+            {entries
+              .filter(([, g]) => letterOf(g.term) === l)
+              .map(([id, g]) => (
+                <li
+                  class="gl-entry"
+                  id={`term-${id}`}
+                  data-entry
+                  data-text={`${g.term} ${g.aliases.join(' ')} ${g.definition}`.toLowerCase()}
+                  data-units={[...new Set(g.subtopics.map(unitOf))].join(' ')}
+                  data-level={g.level === 'HL' ? 'hl' : 'sl'}
+                  data-category={g.category ?? ''}
+                >
+                  <div class="gl-entry__head">
+                    <h3 class="gl-entry__term">
+                      <a href={href.glossary(id)}>{g.term}</a>
+                    </h3>
+                    {g.level === 'HL' && <span class="tag tag--hl">HL</span>}
+                    {g.subtopics.length > 0 && <span class="gl-entry__codes">{g.subtopics.map((s) => (s === 'toolkit' ? 'Toolkit' : s)).join(' · ')}</span>}
+                  </div>
+                  <p class="gl-entry__def" set:html={inline(g.definition)} />
+                  {g.formula && <p class="gl-entry__formula">{g.formula}</p>}
+                </li>
+              ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .gl-search {
+    display: grid;
+    gap: var(--sp-2);
+    max-width: 44rem;
+  }
+
+  .gl-search__row {
+    display: flex;
+    gap: var(--sp-2);
+  }
+
+  .gl-search input {
+    flex: 1;
+    min-width: 0;
+    min-height: 3rem;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--rule-control);
+    border-radius: 999px;
+    background: var(--surface-sheet);
+    color: var(--text-strong);
+    font: 400 1.0625rem/1.3 var(--font-ui);
+  }
+
+  .gl-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--sp-3) var(--sp-5);
+    margin-top: var(--sp-5);
+  }
+
+  .gl-filter {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .gl-filter select {
+    min-height: 2.5rem;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--rule-control);
+    border-radius: var(--radius-2);
+    background: var(--surface-sheet);
+    color: var(--text-strong);
+    font: 500 0.9375rem/1.2 var(--font-ui);
+    max-width: 20rem;
+  }
+
+  .gl-count {
+    margin-left: auto;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .gl-az {
+    position: sticky;
+    top: var(--header-h);
+    z-index: 5;
+    margin-top: var(--sp-5);
+    padding-block: var(--sp-2);
+    background: rgba(246, 241, 231, 0.95);
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .gl-az ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .gl-az li {
+    margin: 0;
+  }
+
+  .gl-az a,
+  .gl-az span {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.85rem;
+    height: 1.85rem;
+    border-radius: 4px;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .gl-az a {
+    color: var(--navy-900);
+  }
+
+  .gl-az a:hover {
+    background: var(--navy-900);
+    color: var(--text-on-ink);
+  }
+
+  .gl-az a.is-empty {
+    color: var(--rule);
+    pointer-events: none;
+  }
+
+  .gl-az span {
+    color: var(--rule);
+  }
+
+  .gl-letter {
+    scroll-margin-top: calc(var(--header-h) + 3.5rem);
+  }
+
+  .gl-letter[hidden] {
+    display: none;
+  }
+
+  .gl-letter__h {
+    margin-top: var(--sp-6);
+    padding-bottom: var(--sp-2);
+    border-bottom: 1px solid var(--navy-900);
+    font-size: 2.25rem;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--brass-text);
+  }
+
+  .gl-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+    gap: 0 var(--sp-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .gl-entry {
+    margin: 0;
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .gl-entry[hidden] {
+    display: none;
+  }
+
+  .gl-entry__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.3rem 0.6rem;
+  }
+
+  .gl-entry__term {
+    font-size: 1.1875rem;
+  }
+
+  .gl-entry__term a {
+    color: var(--navy-900);
+    text-decoration: none;
+  }
+
+  .gl-entry__term a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--gold-500);
+  }
+
+  .gl-entry__codes {
+    margin-left: auto;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--brass-text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .gl-entry__def {
+    margin-top: 0.35rem;
+    font-size: 0.9375rem;
+    color: var(--text-body);
+  }
+
+  .gl-entry__formula {
+    margin-top: 0.4rem;
+    padding: 0.35rem 0.6rem;
+    border-left: 2px solid var(--gold-500);
+    background: var(--surface-gold-wash);
+    font-size: 0.875rem;
+    font-weight: 560;
+    color: var(--navy-900);
+    font-variant-numeric: tabular-nums;
+  }
+</style>
+
+<script>
+  import '../../scripts/glossary';
+</script>

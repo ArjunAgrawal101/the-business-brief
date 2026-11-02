@@ -1,0 +1,351 @@
+---
+/**
+ * One glossary term: the definition, the term in context, an example, its
+ * formula, how everyday usage differs from the course (where it does), the
+ * related terms, and where the course uses it.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import { corpus, href } from '../../lib/content';
+import { inline, rich } from '../../lib/markup';
+import { subtopicHref } from '../../lib/learning';
+import { termsIn } from '../../lib/mindmap';
+import { GLOSSARY_CATEGORY_LABELS, type GlossaryEntry } from '../../lib/schemas';
+
+export async function getStaticPaths() {
+  const c = await corpus();
+  return Object.entries(c.glossary).map(([id, entry]) => ({ params: { id }, props: { id, entry } }));
+}
+
+interface Props {
+  id: string;
+  entry: GlossaryEntry;
+}
+const { id, entry: g } = Astro.props;
+const c = await corpus();
+const all = Object.entries(c.glossary).sort((a, b) => a[1].term.localeCompare(b[1].term, 'en', { sensitivity: 'base' }));
+const i = all.findIndex(([x]) => x === id);
+const prev = i > 0 ? all[i - 1] : undefined;
+const next = i < all.length - 1 ? all[i + 1] : undefined;
+const subs = c.curricula['ib-dp-bm']?.units.flatMap((u) => u.subtopics) ?? [];
+const places = g.subtopics.map((code) => (code === 'toolkit' ? { code, title: 'The toolkit', url: '/toolkit/' } : { code, title: subs.find((s) => s.code === code)?.title ?? code, url: subtopicHref(c, code) }));
+const maps = Object.entries(c.mindmaps).filter(([, m]) => termsIn(m).includes(id) || (m.scope === 'subtopic' && g.subtopics.includes(m.code)));
+const briefs = g.topics.map((t) => ({ id: t, title: c.topics[t]?.title ?? t }));
+const related = g.related.map((r) => ({ id: r, e: c.glossary[r] })).filter((x) => x.e);
+const usedBy = all.filter(([x, e]) => x !== id && e.related.includes(id) && !g.related.includes(x)).slice(0, 8);
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'DefinedTerm',
+  name: g.term,
+  description: g.definition,
+  inDefinedTermSet: { '@type': 'DefinedTermSet', name: 'The Business Brief glossary' },
+};
+---
+
+<BaseLayout title={`${g.term}: definition`} description={`${g.term}: ${g.definition}`} section="glossary" jsonLd={jsonLd}>
+  <article class="wrap gt">
+    <Breadcrumbs trail={[{ label: 'Glossary', href: '/glossary/' }, { label: g.term }]} />
+    <header class="gt__head">
+      <p class="label label--ink">
+        {g.category ? GLOSSARY_CATEGORY_LABELS[g.category] : 'Glossary'}
+        {g.level === 'HL' && <span class="tag tag--hl">HL only</span>}
+      </p>
+      <h1 class="gt__term">{g.term}</h1>
+      {g.aliases.length > 0 && <p class="gt__aliases">Also called {g.aliases.join(', ')}</p>}
+    </header>
+
+    <div class="gt__grid">
+      <div class="gt__main">
+        <p class="gt__def" set:html={inline(g.definition)} />
+        {
+          g.formula && (
+            <div class="gt__formula">
+              <p class="label">Formula</p>
+              <p class="gt__formula-text">{g.formula}</p>
+            </div>
+          )
+        }
+        {
+          g.context && (
+            <section class="gt__block" aria-labelledby="gt-context">
+              <h2 id="gt-context">In context</h2>
+              <div class="prose" set:html={rich(g.context)} />
+            </section>
+          )
+        }
+        {
+          g.example && (
+            <section class="gt__block gt__example" aria-labelledby="gt-example">
+              <h2 id="gt-example">Example</h2>
+              <div class="prose" set:html={rich(g.example)} />
+            </section>
+          )
+        }
+        {
+          g.usage && (
+            <section class="gt__block" aria-labelledby="gt-usage">
+              <h2 id="gt-usage">In management, and in the IB course</h2>
+              <div class="gt__usage">
+                <div>
+                  <p class="label">General usage</p>
+                  <div set:html={rich(g.usage.general)} />
+                </div>
+                <div>
+                  <p class="label">In the IB course</p>
+                  <div set:html={rich(g.usage.syllabus)} />
+                </div>
+              </div>
+            </section>
+          )
+        }
+        {
+          related.length > 0 && (
+            <section class="gt__block" aria-labelledby="gt-related">
+              <h2 id="gt-related">Related terms</h2>
+              <ul class="gt__related">
+                {related.map((r) => (
+                  <li>
+                    <a href={href.glossary(r.id)}>{r.e!.term}</a>
+                    <span set:html={inline(r.e!.definition)} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+      </div>
+
+      <aside class="gt__side" aria-label="Where the course uses this term">
+        {
+          places.length > 0 && (
+            <div>
+              <p class="label">In the course</p>
+              <ul>
+                {places.map((p) => (
+                  <li>
+                    <a href={p.url}>
+                      {p.code !== 'toolkit' && <span class="gt__code">{p.code}</span>} {p.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+        {
+          maps.length > 0 && (
+            <div>
+              <p class="label">On the mindmaps</p>
+              <ul>
+                {maps.map(([mid, m]) => (
+                  <li>
+                    <a href={href.mindmap(mid)}>{m.scope === 'unit' ? `Unit ${m.unit} map` : `${m.code} ${m.title}`}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+        {
+          briefs.length > 0 && (
+            <div>
+              <p class="label">Taught in the brief</p>
+              <ul>
+                {briefs.map((b) => (
+                  <li>
+                    <a href={href.topic(b.id)}>{b.title}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+        {
+          usedBy.length > 0 && (
+            <div>
+              <p class="label">Mentioned with</p>
+              <ul>
+                {usedBy.map(([x, e]) => (
+                  <li>
+                    <a href={href.glossary(x)}>{e.term}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+        <p class="small muted">The platform's own definition. Where the IB course is the authority, the subtopic page gives the guide's reference.</p>
+      </aside>
+    </div>
+
+    <nav class="gt__pager" aria-label="Neighbouring terms">
+      {prev ? <a href={href.glossary(prev[0])}>&larr; {prev[1].term}</a> : <span />}
+      <a href="/glossary/">All terms</a>
+      {next ? <a href={href.glossary(next[0])}>{next[1].term} &rarr;</a> : <span />}
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  .gt {
+    padding-top: var(--sp-6);
+  }
+
+  .gt__head {
+    margin-top: var(--sp-5);
+    padding-bottom: var(--sp-5);
+    border-bottom: 1px solid var(--navy-900);
+  }
+
+  .gt__head .label {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  .gt__term {
+    margin-top: var(--sp-3);
+    font-size: clamp(2.25rem, 1.6rem + 2.6vw, 3.75rem);
+  }
+
+  .gt__aliases {
+    margin-top: var(--sp-2);
+    color: var(--text-muted);
+  }
+
+  .gt__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(14rem, 18rem);
+    gap: var(--sp-8);
+    margin-top: var(--sp-6);
+  }
+
+  .gt__def {
+    font-family: var(--font-serif);
+    font-size: clamp(1.3125rem, 1.15rem + 0.6vw, 1.625rem);
+    line-height: 1.45;
+    color: var(--navy-900);
+    max-width: 40rem;
+  }
+
+  .gt__formula {
+    margin-top: var(--sp-5);
+    padding: var(--sp-4) var(--sp-5);
+    background: var(--surface-sheet);
+    border-left: 3px solid var(--gold-500);
+    box-shadow: var(--shadow-sheet);
+    max-width: 40rem;
+  }
+
+  .gt__formula-text {
+    margin-top: var(--sp-2);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--navy-900);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .gt__block {
+    margin-top: var(--sp-6);
+    max-width: 40rem;
+  }
+
+  .gt__block h2 {
+    margin-bottom: var(--sp-3);
+    font-size: 1.375rem;
+  }
+
+  .gt__example {
+    padding: var(--sp-4) var(--sp-5);
+    background: var(--ivory-50);
+    border: 1px solid var(--rule-hair);
+  }
+
+  .gt__usage {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-5);
+  }
+
+  .gt__usage > div {
+    padding-top: var(--sp-3);
+    border-top: 2px solid var(--rule);
+  }
+
+  .gt__usage > div:last-child {
+    border-top-color: var(--gold-500);
+  }
+
+  .gt__related {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .gt__related li {
+    display: grid;
+    gap: 0.2rem;
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .gt__related a {
+    font-weight: 600;
+  }
+
+  .gt__related span {
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+  }
+
+  .gt__side {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-5);
+    padding: var(--sp-5);
+    background: var(--surface-sheet);
+    border-top: 3px solid var(--navy-900);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .gt__side ul {
+    margin: var(--sp-2) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .gt__side li {
+    margin: 0;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .gt__code {
+    color: var(--brass-text);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .gt__pager {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    margin-top: var(--sp-8);
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  @media (max-width: 56rem) {
+    .gt__grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sp-6);
+    }
+
+    .gt__usage {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

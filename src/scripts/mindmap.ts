@@ -6,8 +6,8 @@
  * on the page.
  */
 import { announce, each, readConfig } from './ix';
-import { MONOGRAM } from '../lib/brand';
-import { esc, layout, renderSvg, type Layout } from '../lib/mindmap';
+import { brandedSvg } from '../lib/mindmap-export';
+import { layout, renderSvg, type Layout } from '../lib/mindmap';
 import type { Mindmap } from '../lib/schemas';
 
 interface Config {
@@ -257,33 +257,9 @@ each('[data-ix="mindmap"]', (root) => {
 
   /* ---------- Downloads ---------- */
   const exportSvg = async (): Promise<{ text: string; w: number; h: number }> => {
-    const full = layout(cfg.map, { collapsed, revision });
-    const inner = renderSvg(full, { code: cfg.code, title, description: cfg.map.summary, idPrefix: `mx-${cfg.id}` });
-    const b = full.bounds;
-    const pad = 40;
-    const head = 96;
-    const foot = 56;
-    const W = Math.round(b.w + pad * 2);
-    const H = Math.round(b.h + head + foot);
-    const monoH = 44;
-    const monoW = (monoH * MONOGRAM.viewBox.w) / MONOGRAM.viewBox.h;
-    const mk = monoH / MONOGRAM.viewBox.h;
-    const page = location.origin + location.pathname;
-    const fonts = await embeddedFonts();
-    const body = inner.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
-    const text = [
-      `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`,
-      `<style>${fonts}.x-h{font-family:"Source Serif 4",Georgia,serif;font-weight:600;font-size:26px;fill:#0b1a33}.x-k{font-family:Inter,sans-serif;font-weight:700;font-size:11px;letter-spacing:.16em;fill:#76591f}.x-f{font-family:Inter,sans-serif;font-size:11px;fill:#566173}</style>`,
-      `<rect width="${W}" height="${H}" fill="#fbf8f1"/>`,
-      `<g transform="translate(${pad} 26) scale(${mk}) translate(${-MONOGRAM.viewBox.x} ${-MONOGRAM.viewBox.y})"><path fill-rule="evenodd" fill="#0b1a33" d="${MONOGRAM.a}"/><path fill-rule="evenodd" fill="#b39350" d="${MONOGRAM.b}"/></g>`,
-      `<text class="x-k" x="${pad + monoW + 16}" y="42">ARJUN AGRAWAL · THE BUSINESS BRIEF · MINDMAP ${esc(cfg.code.toUpperCase())}</text>`,
-      `<text class="x-h" x="${pad + monoW + 16}" y="72">${esc(cfg.map.title)}${revision ? ' (revision view)' : ''}</text>`,
-      `<rect x="${pad}" y="${head - 8}" width="${W - pad * 2}" height="1" fill="#b39350"/>`,
-      `<svg x="${pad}" y="${head}" width="${Math.round(b.w)}" height="${Math.round(b.h)}" viewBox="${b.x} ${b.y} ${b.w} ${b.h}">${body}</svg>`,
-      `<text class="x-f" x="${pad}" y="${H - 22}">${esc(page)} · Original teaching material, not an IB publication.</text>`,
-      '</svg>',
-    ].join('');
-    return { text, w: W, h: H };
+    const text = brandedSvg(cfg.id, cfg.map, { collapsed, revision, page: location.origin + location.pathname, fontCss: await embeddedFonts() });
+    const m = /width="(\d+)" height="(\d+)"/.exec(text);
+    return { text, w: Number(m?.[1] ?? 1200), h: Number(m?.[2] ?? 800) };
   };
 
   const save = (blob: Blob, name: string) => {
