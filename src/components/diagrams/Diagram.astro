@@ -1,25 +1,38 @@
 ---
 /**
  * A diagram from the platform's library, by id. The library (src/lib/diagrams)
- * draws each one from data, so its proportions and labels are exact.
+ * draws each one from data, so its proportions and labels are exact. On a
+ * narrow screen the drawing keeps a readable size and scrolls sideways; the
+ * text description is always one tap away.
  */
-import { DIAGRAMS } from '../../lib/diagrams';
+import { DIAGRAMS, describe } from '../../lib/diagrams';
 
 interface Props {
   id: string;
   caption?: string;
+  /** Show the download link (the library page does). */
+  download?: boolean;
+  /** Set when the same diagram appears twice on one page, to keep its internal ids unique. */
+  instance?: string;
 }
-const { id, caption } = Astro.props;
+const { id, caption, download = false, instance } = Astro.props;
 const d = DIAGRAMS[id];
 if (!d) throw new Error(`Diagram "${id}" is not in the library (src/lib/diagrams).`);
-const svg = d.render();
+const uid = instance ? `dg-${id}-${instance}` : `dg-${id}`;
+const svg = d.render(uid);
+const desc = describe(svg);
 ---
 
-<figure class="dg">
-  <div class="dg__art" set:html={svg} />
+<figure class="dg" id={`diagram-${id}`}>
+  <div class="dg__art" tabindex="0" role="group" aria-label={`${d.title}. Scroll sideways on a narrow screen.`} set:html={svg} />
   <figcaption class="dg__cap">
-    <span class="dg__title">{d.title}</span>
+    <span class="dg__title">{d.title}{d.level === 'HL' && <span class="dg__hl">HL</span>}</span>
     {(caption ?? d.caption) && <span class="dg__text">{caption ?? d.caption}</span>}
+    <details class="dg__desc">
+      <summary>Text description</summary>
+      <p>{desc}</p>
+    </details>
+    {download && <a class="dg__dl" href={`/downloads/diagrams/${id}.svg`} download>Download SVG</a>}
   </figcaption>
 </figure>
 
@@ -30,17 +43,29 @@ const svg = d.render();
     background: var(--surface-sheet);
     border: 1px solid var(--rule-hair);
     box-shadow: var(--shadow-sheet);
+    min-width: 0;
+  }
+
+  .dg__art {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  .dg__art:focus-visible {
+    outline: 2px solid var(--cobalt-text);
+    outline-offset: 3px;
   }
 
   .dg__art :global(svg) {
+    display: block;
     width: 100%;
+    min-width: 34rem;
     height: auto;
-    max-height: 32rem;
   }
 
   .dg__cap {
     display: grid;
-    gap: 0.2rem;
+    gap: 0.3rem;
     margin-top: var(--sp-3);
     padding-top: var(--sp-3);
     border-top: 1px solid var(--rule-hair);
@@ -50,10 +75,63 @@ const svg = d.render();
     font-family: var(--font-display);
     font-weight: 600;
     color: var(--navy-900);
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+  }
+
+  .dg__hl {
+    font-family: var(--font-ui);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--text-on-ink);
+    background: var(--navy-900);
+    padding: 0.05rem 0.35rem;
+    border-radius: 2px;
   }
 
   .dg__text {
     font-size: 0.875rem;
     color: var(--text-muted);
+  }
+
+  .dg__desc {
+    font-size: 0.875rem;
+    color: var(--text-body);
+  }
+
+  .dg__desc summary {
+    cursor: pointer;
+    color: var(--cobalt-text);
+    font-weight: 600;
+    width: max-content;
+  }
+
+  .dg__desc p {
+    margin: 0.4rem 0 0;
+    max-width: var(--text-max);
+  }
+
+  .dg__dl {
+    font-size: 0.875rem;
+    font-weight: 600;
+    width: max-content;
+  }
+
+  @media print {
+    .dg {
+      box-shadow: none;
+      break-inside: avoid;
+    }
+
+    .dg__art :global(svg) {
+      min-width: 0;
+    }
+
+    .dg__desc,
+    .dg__dl {
+      display: none;
+    }
   }
 </style>
