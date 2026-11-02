@@ -1,8 +1,42 @@
 # Changelog
 
-## Unreleased
+## 2.0.0: 2 November 2026
 
-- Node.js pinned to the 22 line in `package.json`, so that Vercel builds on the version CI tests (an open range would let Vercel choose its newest Node).
+The Business Brief 2.0: a premium redesign under the Arjun Agrawal identity, a page for every subtopic of the course, and new libraries for learning and assessment.
+
+### Brand and home
+
+- The AA monogram, from the creator's vector master and unchanged in shape and colour, is now the platform's mark: in the header lockup with "Arjun Agrawal | The Business Brief" in Cinzel, the footer, the favicon, app icons, social card, resource covers, mindmap and diagram downloads, and the print templates. The earlier mark is retired.
+- Navy, ivory and gold, Source Serif 4 headlines with a gold italic accent, and Inter for reading and the interface.
+- A five-second opening on the first visit to the home page: the monogram draws itself and the curtain lifts. Once per browser, skippable at any moment, never under reduced motion, and replayable from the footer.
+- A new home page: "Understand business. Think strategically. Make better decisions." with the creator's portrait framed by exact business diagrams, the course unit by unit with its coverage, mindmaps, diagrams and the glossary, the tools, the cases, the Assessment Centre, the Resources Library and the rooms.
+- A full About page with the creator's own photographs and verified facts. The photograph labelled as AI-generated is not used.
+
+### Learning
+
+- A page for every one of the 37 subtopics: what the course asks (the guide's statements with their AO levels and HL marking), notes where they exist, the mindmap, diagrams, key terms, tools, practice, recall and connections.
+- Full notes, written one subtopic at a time and only when complete, for 11 subtopics: 1.4, 2.2, 2.4, 3.4, 3.5, 3.7, 3.8, 4.2, 4.5, 5.5 and 5.6. Each has objectives, sections with points, fictional worked examples with checked figures, formulas in the guide's form where it gives one, diagrams, evaluation, connections and retrieval questions.
+- 42 interactive mindmaps, one for every subtopic and each unit: fold, zoom, pan, a revision view of the essentials, print, and SVG or PNG downloads, with an outline of every map for screen readers.
+- The glossary grows from 44 to 558 terms, each with its own page: the syllabus meaning, the everyday meaning where it differs, formulas, examples, related terms and subtopics; search and filters by letter, unit, subtopic, level and category; a CSV download.
+- 79 original diagrams for the five units and the toolkit, drawn from data with computed, tested figures, each with a text description and an SVG download.
+- A coverage tracker that reports every subtopic as complete, partly built or planned, and verified against the guide, computed from the content.
+
+### Assessment and resources
+
+- The Assessment Centre replaces the Exam Desk: the internal assessment (research question builder, supporting document analyser, criterion self-review, submission checklist), Paper 1 (an annotated answer builder), Paper 2 (calculations and constructions) and the HL Paper 3 Boardroom (a plan across marketing, operations, human resources and finance, reviewed against criteria A to D). Each page separates what the IB requires, what examiners emphasise, recommended strategy and illustrative examples. Nothing approves an IA or predicts a grade. The old addresses redirect.
+- The creator's four assessment guides as PDF downloads.
+- The Resources Library: more than 100 resources with covers, filters, search and sort, details pages, and a download only where the file exists.
+- Search now covers mindmaps, diagrams, resources and the Assessment Centre, and sends every subtopic to its own page.
+
+### Quality
+
+- Accessibility fixes found by the browser tests: interactive mindmaps are labelled groups, a gold button on navy keeps navy text, large gold numerals and state outlines meet 3:1, controls that need scripts are hidden without them, wide tables and selects no longer widen the page on phones.
+- New tests: every diagram calculation against hand-worked values and every diagram's rendering; the opening; the 2.0 navigation. The page checks sample the glossary's term pages, which share one template.
+- Documentation for 2.0: the audit with the Economics comparison, the resource inventory, the design system, architecture, content model, testing and this release.
+
+### Deployment
+
+- Node.js pinned to the 22 line in `package.json`, so that Vercel builds on the version CI tests.
 - The deployment guide gives the Vercel steps in full, with the checks to run after deploying.
 
 ## 0.2.0: 29 October 2026
