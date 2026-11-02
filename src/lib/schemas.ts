@@ -630,14 +630,178 @@ export const conceptSchema = z.object({
   order: z.number(),
 });
 
+/** What kind of idea a glossary term names: drives the glossary's category filter. */
+export const GLOSSARY_CATEGORIES = [
+  'concept',
+  'organization',
+  'stakeholder',
+  'strategy',
+  'theory',
+  'tool',
+  'measure',
+  'finance',
+  'marketing',
+  'operations',
+  'people',
+] as const;
+export const GLOSSARY_CATEGORY_LABELS: Record<(typeof GLOSSARY_CATEGORIES)[number], string> = {
+  concept: 'Core concept',
+  organization: 'Organizations and ownership',
+  stakeholder: 'Stakeholders and society',
+  strategy: 'Strategy and growth',
+  theory: 'Theory or model',
+  tool: 'Toolkit and decision tool',
+  measure: 'Measure or calculation',
+  finance: 'Finance and accounts',
+  marketing: 'Marketing',
+  operations: 'Operations',
+  people: 'People and organizations',
+};
+
+/**
+ * A glossary entry. Definitions are the platform's own words (never the IB's
+ * or a textbook's). `subtopics` are IB codes ("3.3"), or "toolkit" for a
+ * toolkit tool; `topics` are the briefs that teach the term.
+ */
 export const glossarySchema = z.object({
   term: z.string(),
+  /** Other names the term goes by; searched, not displayed as headings. */
+  aliases: z.array(z.string()).default([]),
   definition: md,
-  topics: z.array(z.string()).min(1),
+  /** The term explained in context: how it is used, and what it is often confused with. */
+  context: md.optional(),
+  /** A short business example. Fictional unless it names its source. */
+  example: md.optional(),
+  /** The formula, in words and symbols, as the platform writes it. */
+  formula: z.string().optional(),
+  /** Where everyday management usage differs from the term's treatment in the IB course. */
+  usage: z.object({ general: md, syllabus: md }).optional(),
+  topics: z.array(z.string()).default([]),
+  subtopics: z.array(z.string()).default([]),
   level: level.default('SL/HL'),
+  category: z.enum(GLOSSARY_CATEGORIES).optional(),
   provenance,
   related: ids,
 });
+
+/* ------------------------------------------------------------------ */
+/* Mindmaps                                                            */
+/* ------------------------------------------------------------------ */
+
+/** The kind of a mindmap branch: it sets the branch's colour and icon. */
+export const MINDMAP_BRANCHES = ['concept', 'types', 'theory', 'tool', 'calculation', 'application', 'evaluation', 'connection'] as const;
+/** The kind of a node inside a branch: it sets the node's marker. */
+export const MINDMAP_NODES = ['point', 'definition', 'type', 'advantage', 'limitation', 'example', 'formula', 'question'] as const;
+
+export interface MindNode {
+  label: string;
+  kind: (typeof MINDMAP_NODES)[number];
+  note?: string;
+  formula?: string;
+  term?: string;
+  level: 'SL/HL' | 'HL';
+  core: boolean;
+  children: MindNode[];
+}
+
+const mindNode: z.ZodType<MindNode, unknown> = z.lazy(() =>
+  z.object({
+    label: z.string().min(1).max(90),
+    kind: z.enum(MINDMAP_NODES).default('point'),
+    /** One line of elaboration, shown in the outline and on focus. */
+    note: z.string().optional(),
+    formula: z.string().optional(),
+    /** A glossary entry this node names. */
+    term: z.string().optional(),
+    level: level.default('SL/HL'),
+    /** Kept in the revision view, which shows only the essentials. */
+    core: z.boolean().default(false),
+    children: z.array(mindNode).default([]),
+  }),
+) as unknown as z.ZodType<MindNode, unknown>;
+
+/**
+ * A mindmap of one subtopic (or one unit): a centre, three to eight branches,
+ * and the links to other parts of the course. The branches and nodes are the
+ * platform's own summary of the subtopic's content statements.
+ */
+export const mindmapSchema = z.object({
+  title: z.string(),
+  /** The IB code ("1.1") for a subtopic map, or "unit-1" for a unit map. */
+  code: z.string(),
+  scope: z.enum(['subtopic', 'unit']),
+  unit: z.number().int().min(1).max(5),
+  level: z.enum(['SL/HL', 'HL', 'SL/HL with HL-only content']),
+  summary: md,
+  centre: z.string().max(60),
+  branches: z
+    .array(
+      z.object({
+        label: z.string().min(1).max(60),
+        kind: z.enum(MINDMAP_BRANCHES),
+        note: z.string().optional(),
+        level: level.default('SL/HL'),
+        children: z.array(mindNode).min(1),
+      }),
+    )
+    .min(3)
+    .max(8),
+  /** Links to other subtopics, by code, with the reason. */
+  connections: z.array(z.object({ code: z.string(), label: z.string() })).default([]),
+  /** What the map was checked against: the guide's page, and supplied textbook pages where used. */
+  basis: z.array(z.object({ source: z.string(), pages: z.string().optional() })).min(1),
+  order: z.number(),
+});
+export type Mindmap = z.infer<typeof mindmapSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Topic notes: the full notes for a subtopic without a brief          */
+/* ------------------------------------------------------------------ */
+
+export const NOTE_SECTION_KINDS = ['concept', 'types', 'theory', 'framework', 'method', 'application', 'evaluation'] as const;
+
+export const noteSchema = z.object({
+  /** The subtopic's IB code. */
+  code: z.string(),
+  title: z.string(),
+  level: topicLevel,
+  /** Why the subtopic matters, in two or three sentences. */
+  introduction: md,
+  /** By the end you can: each begins with a command term. */
+  objectives: z.array(md).min(3),
+  sections: z
+    .array(
+      z.object({
+        id: z.string(),
+        title: z.string(),
+        kind: z.enum(NOTE_SECTION_KINDS).default('concept'),
+        level: level.default('SL/HL'),
+        body: md,
+        /** Definitions, types or features, each with a short explanation. */
+        points: z.array(z.object({ term: z.string(), text: md, level: level.default('SL/HL') })).default([]),
+        /** A diagram from the platform's library (src/lib/diagrams). */
+        diagram: z.string().optional(),
+        example: z.object({ title: z.string(), text: md, fictional: z.boolean() }).optional(),
+        formulas: z.array(z.object({ name: z.string(), expression: z.string(), note: md.optional() })).default([]),
+        advantages: z.array(md).default([]),
+        limitations: z.array(md).default([]),
+      }),
+    )
+    .min(3),
+  /** Evaluation and limits of the ideas, as a student should weigh them. */
+  evaluation: z.array(md).min(2),
+  connections: z.array(z.object({ code: z.string(), text: md })).default([]),
+  /** Glossary entries the notes use. */
+  terms: ids,
+  /** Retrieval questions with short answers, for revision. */
+  retrieval: z.array(z.object({ q: md, a: md })).min(4),
+  questions: ids,
+  /** What the notes were written from: the guide's pages, supplied textbook pages, the platform's own knowledge. */
+  basis: z.array(z.object({ source: z.string(), pages: z.string().optional(), note: z.string().optional() })).min(1),
+  verification,
+  updated: z.string(),
+});
+export type Note = z.infer<typeof noteSchema>;
 
 export const pathwaySchema = z.object({
   name: z.string(),

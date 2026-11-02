@@ -1,0 +1,366 @@
+---
+/**
+ * A mindmap on the page: drawn at build time (complete without JavaScript),
+ * then made interactive by src/scripts/mindmap.ts: collapse and expand a
+ * branch, a revision view of the essentials, zoom and pan, and downloads.
+ * The outline beneath carries the same content for keyboards, screen readers
+ * and print.
+ */
+import MindOutline from './MindOutline.astro';
+import { BRANCH_COLOURS, BRANCH_LABELS, layout, renderSvg } from '../../lib/mindmap';
+import { href } from '../../lib/content';
+import { jsonForScript } from '../../lib/markup';
+import type { Mindmap } from '../../lib/schemas';
+
+interface Props {
+  id: string;
+  map: Mindmap;
+}
+const { id, map } = Astro.props;
+const codeLabel = map.scope === 'unit' ? `Unit ${map.unit}` : map.code;
+const svg = renderSvg(layout(map), {
+  code: codeLabel,
+  glossaryHref: href.glossary,
+  interactive: true,
+  title: `Mindmap: ${map.title}`,
+  description: `${map.summary} The same content follows as an outline.`,
+  idPrefix: `mm-${id}`,
+});
+const kinds = [...new Set(map.branches.map((b) => b.kind))];
+const config = { id, map, code: codeLabel, glossary: '/glossary/' };
+---
+
+<div class="mm" data-ix="mindmap" id={`map-${id}`}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <div class="mm-bar js-only" role="toolbar" aria-label="Mindmap controls">
+    <div class="mm-bar__group" role="group" aria-label="View">
+      <button type="button" class="mm-btn" data-view="full" aria-pressed="true">Full map</button>
+      <button type="button" class="mm-btn" data-view="revision" aria-pressed="false">Revision view</button>
+    </div>
+    <div class="mm-bar__group" role="group" aria-label="Branches">
+      <button type="button" class="mm-btn" data-expand>Expand all</button>
+      <button type="button" class="mm-btn" data-collapse>Branches only</button>
+    </div>
+    <div class="mm-bar__group" role="group" aria-label="Zoom">
+      <button type="button" class="mm-btn mm-btn--icon" data-zoom="out" aria-label="Zoom out">&minus;</button>
+      <button type="button" class="mm-btn" data-zoom="fit">Fit</button>
+      <button type="button" class="mm-btn mm-btn--icon" data-zoom="in" aria-label="Zoom in">+</button>
+    </div>
+    <div class="mm-bar__group mm-bar__group--end" role="group" aria-label="Save">
+      <button type="button" class="mm-btn" data-download="svg">SVG</button>
+      <button type="button" class="mm-btn" data-download="png">PNG</button>
+      <button type="button" class="mm-btn" data-print>Print</button>
+    </div>
+  </div>
+  <div class="mm-viewport" data-viewport tabindex="0" aria-label={`Mindmap of ${map.title}. Drag to move, use the buttons to zoom; the outline below has the same content.`}>
+    <Fragment set:html={svg} />
+  </div>
+  <p class="mm-hint small muted js-only">Drag to move the map. Click a branch to fold it away. Zoom with the buttons, or with Ctrl and the scroll wheel.</p>
+  <p class="sr-only" aria-live="polite" data-status></p>
+  <ul class="mm-legend" aria-label="Branch colours">
+    {
+      kinds.map((k) => (
+        <li>
+          <span class="mm-legend__swatch" style={`--c:${BRANCH_COLOURS[k]}`} aria-hidden="true" />
+          {BRANCH_LABELS[k]}
+        </li>
+      ))
+    }
+    <li><span class="mm-legend__mark" aria-hidden="true">+</span> Advantage</li>
+    <li><span class="mm-legend__mark mm-legend__mark--minus" aria-hidden="true">&minus;</span> Limitation</li>
+    <li><span class="tag tag--hl">HL</span> HL only</li>
+  </ul>
+  <details class="mm-outline" open>
+    <summary>The map as an outline</summary>
+    <div class="mm-outline__body">
+      {
+        map.branches.map((b) => (
+          <section class="mo-branch" style={`--c:${BRANCH_COLOURS[b.kind]}`}>
+            <h3 class="mo-branch__h">
+              {b.label} {b.level === 'HL' && <span class="tag tag--hl">HL</span>}
+            </h3>
+            {b.note && <p class="mo-note">{b.note}</p>}
+            <MindOutline nodes={b.children} glossaryHref={href.glossary} />
+          </section>
+        ))
+      }
+    </div>
+  </details>
+</div>
+
+<style>
+  .mm {
+    --mm-h: clamp(26rem, 72vh, 48rem);
+  }
+
+  .mm-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-4);
+    padding: var(--sp-3) 0;
+    border-top: 1px solid var(--navy-900);
+  }
+
+  .mm-bar__group {
+    display: inline-flex;
+    gap: 0.25rem;
+  }
+
+  .mm-bar__group--end {
+    margin-left: auto;
+  }
+
+  .mm-btn {
+    min-height: 2.25rem;
+    padding: 0.3rem 0.8rem;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: var(--surface-sheet);
+    color: var(--navy-900);
+    font: 560 0.8125rem/1 var(--font-ui);
+    cursor: pointer;
+    transition:
+      border-color var(--dur-fast) var(--ease),
+      background-color var(--dur-fast) var(--ease);
+  }
+
+  .mm-btn:hover {
+    border-color: var(--navy-900);
+  }
+
+  .mm-btn[aria-pressed='true'] {
+    background: var(--navy-900);
+    border-color: var(--navy-900);
+    color: var(--text-on-ink);
+  }
+
+  .mm-btn--icon {
+    min-width: 2.25rem;
+    font-size: 1.05rem;
+  }
+
+  .mm-viewport {
+    position: relative;
+    height: var(--mm-h);
+    overflow: hidden;
+    border: 1px solid var(--rule-hair);
+    background:
+      radial-gradient(circle at 1px 1px, rgba(11, 26, 51, 0.09) 1px, transparent 0) 0 0 / 22px 22px,
+      var(--ivory-50);
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .mm-viewport:active {
+    cursor: grabbing;
+  }
+
+  .mm-viewport:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .mm-viewport :global(.mm-svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    user-select: none;
+  }
+
+  /* Without JavaScript, the map is shown at full size in a scrolling frame. */
+  :global(html:not(.js)) .mm-viewport {
+    height: auto;
+    max-height: var(--mm-h);
+    overflow: auto;
+    cursor: auto;
+    touch-action: auto;
+  }
+
+  :global(html:not(.js)) .mm-viewport :global(.mm-svg) {
+    width: auto;
+    height: auto;
+  }
+
+  :global(html:not(.js)) .mm-viewport :global(.mm-toggle) {
+    display: none;
+  }
+
+  .mm-viewport :global([data-toggle]) {
+    cursor: pointer;
+  }
+
+  .mm-viewport :global([data-toggle]:hover .mm-toggle circle) {
+    fill: var(--gold-300);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .mm-viewport :global(.mm-nodes > g),
+    .mm-viewport :global(.mm-links path) {
+      animation: mm-in var(--dur-slow) var(--ease-out) both;
+    }
+  }
+
+  @keyframes mm-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .mm-hint {
+    margin-top: var(--sp-2);
+  }
+
+  .mm-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-5);
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  .mm-legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+  }
+
+  .mm-legend__swatch {
+    width: 1.5rem;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--c);
+  }
+
+  .mm-legend__mark {
+    font-weight: 700;
+    color: var(--green-text);
+  }
+
+  .mm-legend__mark--minus {
+    color: var(--signal-text);
+  }
+
+  .mm-outline {
+    margin-top: var(--sp-6);
+    border-top: 1px solid var(--navy-900);
+  }
+
+  .mm-outline > summary {
+    padding: var(--sp-3) 0;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--navy-900);
+    cursor: pointer;
+  }
+
+  .mm-outline__body {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+    gap: var(--sp-5) var(--sp-6);
+    padding-bottom: var(--sp-4);
+  }
+
+  .mo-branch {
+    padding-top: var(--sp-3);
+    border-top: 3px solid var(--c);
+  }
+
+  .mo-branch__h {
+    font-size: 1.125rem;
+  }
+
+  .mm-outline :global(.mo-list) {
+    margin: var(--sp-2) 0 0;
+    padding-left: 1rem;
+  }
+
+  .mm-outline :global(.mo-list .mo-list) {
+    margin-top: 0.3rem;
+  }
+
+  .mm-outline :global(.mo-item) {
+    margin: 0.35rem 0 0;
+    font-size: 0.9375rem;
+  }
+
+  .mm-outline :global(.mo-line) {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem;
+  }
+
+  .mm-outline :global(.mo-item--core > .mo-line) {
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .mm-outline :global(.mo-kind) {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .mm-outline :global(.mo-item--advantage > .mo-line .mo-kind) {
+    color: var(--green-text);
+  }
+
+  .mm-outline :global(.mo-item--limitation > .mo-line .mo-kind) {
+    color: var(--signal-text);
+  }
+
+  .mm-outline :global(.mo-formula) {
+    display: block;
+    font-weight: 600;
+    color: var(--brass-text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mm-outline :global(.mo-note),
+  .mo-note {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  @media print {
+    .mm-bar,
+    .mm-hint,
+    .mm-legend {
+      display: none !important;
+    }
+
+    .mm-viewport {
+      height: auto;
+      border: 0;
+      background: none;
+      overflow: visible;
+    }
+
+    .mm-viewport :global(.mm-svg) {
+      width: 100%;
+      height: auto;
+    }
+
+    .mm-viewport :global(.mm-toggle) {
+      display: none;
+    }
+
+    .mm-outline {
+      break-before: page;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/mindmap';
+</script>

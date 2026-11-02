@@ -46,22 +46,24 @@ h5 {
   margin: 0;
   color: var(--text-strong);
   font-family: var(--font-display);
-  font-weight: 680;
+  font-optical-sizing: auto;
+  font-weight: 600;
   line-height: var(--lh-snug);
-  letter-spacing: -0.015em;
+  letter-spacing: -0.008em;
   text-wrap: balance;
 }
 
 h1 {
   font-size: var(--fs-h1);
   line-height: var(--lh-tight);
-  letter-spacing: -0.028em;
-  font-weight: 720;
+  letter-spacing: -0.018em;
+  font-weight: 560;
 }
 
 h2 {
   font-size: var(--fs-h2);
-  letter-spacing: -0.022em;
+  letter-spacing: -0.014em;
+  font-weight: 570;
 }
 
 h3 {
@@ -70,7 +72,15 @@ h3 {
 
 h4 {
   font-size: var(--fs-h4);
-  letter-spacing: -0.01em;
+}
+
+/* Figures line up wherever numbers are compared. */
+table,
+.num,
+.tabular,
+output,
+dd {
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 p,
@@ -126,8 +136,8 @@ a:hover {
 }
 
 ::selection {
-  background: #c9d4ff;
-  color: var(--text-strong);
+  background: var(--gold-300);
+  color: var(--navy-900);
 }
 
 code,
@@ -251,9 +261,19 @@ button {
 }
 
 .band--ink {
-  background: var(--surface-ink);
+  background:
+    radial-gradient(ellipse at 85% 0%, rgba(44, 70, 117, 0.55), transparent 55%),
+    var(--surface-ink);
   color: var(--text-on-ink);
   border-top-color: transparent;
+}
+
+.band--grain {
+  background-image: var(--grain);
+}
+
+.band--white {
+  background: var(--surface-sheet);
 }
 
 .band--ink h2,
@@ -298,12 +318,12 @@ button {
   font-size: var(--fs-small);
 }
 
-/* Mono label: the system's metadata voice */
+/* Label: the system's metadata voice, in small tracked capitals */
 .label {
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: var(--fs-label);
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: var(--track-label);
   text-transform: uppercase;
   color: var(--text-muted);
   line-height: 1.4;
@@ -314,8 +334,8 @@ button {
 }
 
 .num {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
+  font-family: var(--font-ui);
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 /* Serif narrative: reserved for case narrative and quoted evidence */
@@ -331,30 +351,38 @@ button {
   margin-top: 0.9em;
 }
 
-/* Section heading: a tab number on a heavy rule */
+/* Section heading: an editorial numeral, a fine rule with a gold lead-in */
 .sec-head {
+  position: relative;
   display: grid;
   grid-template-columns: auto 1fr;
-  column-gap: var(--sp-4);
+  column-gap: var(--sp-5);
   row-gap: var(--sp-2);
   align-items: start;
-  padding-top: var(--sp-4);
-  border-top: 2px solid var(--rule-ink);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--rule-ink);
+}
+
+.sec-head::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 3.5rem;
+  height: 3px;
+  background: var(--gold-500);
 }
 
 .sec-head__no {
-  display: inline-grid;
-  place-items: center;
-  min-width: 2.25rem;
-  height: 1.75rem;
-  padding-inline: 0.35rem;
-  background: var(--surface-ink);
-  color: var(--text-on-ink);
-  font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  margin-top: 0.3rem;
+  min-width: 2.5rem;
+  color: var(--brass-text);
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.5rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: lining-nums;
 }
 
 .sec-head__text > * + * {
@@ -364,15 +392,19 @@ button {
 .sec-head__dek {
   max-width: var(--text-max);
   color: var(--text-muted);
+  font-size: 1.0625rem;
 }
 
 .band--ink .sec-head {
-  border-top-color: var(--text-on-ink);
+  border-top-color: var(--rule-on-ink);
+}
+
+.band--ink .sec-head::before {
+  background: var(--gold-400);
 }
 
 .band--ink .sec-head__no {
-  background: var(--bb-brass);
-  color: var(--bb-ink);
+  color: var(--gold-400);
 }
 
 .band--ink .sec-head__dek {

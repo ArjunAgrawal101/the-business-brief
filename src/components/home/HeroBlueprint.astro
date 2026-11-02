@@ -1,0 +1,144 @@
+---
+/**
+ * The hero's line drawing: the working tools of the subject, drawn in fine
+ * navy and gold around the portrait. A break-even chart (its lines cross where
+ * revenue meets cost), a decision tree, a two-by-two growth matrix and an arc
+ * that echoes the swash of the monogram. Decorative: the same tools are taught,
+ * with real figures, inside the platform.
+ *
+ * Geometry (viewBox 560 x 680). The portrait frame sits at x 120 to 480,
+ * y 40 to 490, so lines that pass behind it disappear behind the photograph.
+ * Break-even chart: origin (300, 650); total revenue from (300, 650) to
+ * (548, 520); total cost from (300, 600) to (548, 560). They cross where
+ * 650 - 0.524(x - 300) = 600 - 0.161(x - 300), at x = 437.7, y = 577.8.
+ */
+const bep = { x: 437.7, y: 577.8 };
+---
+
+<svg class="blueprint" viewBox="0 0 560 680" aria-hidden="true" focusable="false" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <radialGradient id="bp-fade" cx="0.5" cy="0.45" r="0.62">
+      <stop offset="0.55" stop-color="#fff" stop-opacity="1"></stop>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"></stop>
+    </radialGradient>
+    <mask id="bp-mask"><rect width="560" height="680" fill="url(#bp-fade)"></rect></mask>
+    <pattern id="bp-grid" width="28" height="28" patternUnits="userSpaceOnUse">
+      <path d="M28 0H0V28" fill="none" stroke="#0b1a33" stroke-opacity="0.07" stroke-width="1"></path>
+    </pattern>
+  </defs>
+
+  <rect class="bp-grid" width="560" height="680" fill="url(#bp-grid)" mask="url(#bp-mask)"></rect>
+
+  <!-- The arc: the swash of the monogram, passing behind the portrait -->
+  <path class="bp bp--gold bp--arc" pathLength="1" style="--d:0.2s" d="M6 612C140 520 300 420 554 318"></path>
+
+  <!-- Decision tree, top left: a decision square, two chance circles -->
+  <g class="bp-tree">
+    <path class="bp" pathLength="1" style="--d:0.5s" d="M40 168H62L98 116H150M62 168L98 220H150"></path>
+    <rect class="bp bp--node" pathLength="1" style="--d:0.45s" x="24" y="160" width="16" height="16"></rect>
+    <circle class="bp bp--node" pathLength="1" style="--d:0.75s" cx="98" cy="116" r="6"></circle>
+    <circle class="bp bp--node" pathLength="1" style="--d:0.8s" cx="98" cy="220" r="6"></circle>
+    <path class="bp" pathLength="1" style="--d:0.95s" d="M104 116L136 96M104 116L136 136M104 220L136 204M104 220L136 240"></path>
+  </g>
+
+  <!-- A two-by-two growth matrix, right edge, one quadrant chosen -->
+  <g class="bp-matrix">
+    <rect class="bp-fill" x="496" y="250" width="27" height="27"></rect>
+    <path class="bp" pathLength="1" style="--d:0.6s" d="M496 223H550V277H496ZM523 223V277M496 250H550"></path>
+  </g>
+
+  <!-- Break-even chart, bottom right -->
+  <g class="bp-chart">
+    <path class="bp" pathLength="1" style="--d:0.9s" d="M300 520V650H552"></path>
+    <path class="bp bp--ink" pathLength="1" style="--d:1.15s" d="M300 650L548 520"></path>
+    <path class="bp bp--muted" pathLength="1" style="--d:1.3s" d="M300 600L548 560"></path>
+    <path class="bp bp--dash" style="--d:1.7s" d={`M${bep.x} ${bep.y}V650M${bep.x} ${bep.y}H300`}></path>
+    <circle class="bp-dot" style="--d:1.75s" cx={bep.x} cy={bep.y} r="4.5"></circle>
+  </g>
+</svg>
+
+<style>
+  .blueprint {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .bp {
+    fill: none;
+    stroke: var(--navy-900);
+    stroke-opacity: 0.55;
+    stroke-width: 1.15;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .bp--ink {
+    stroke-opacity: 0.85;
+    stroke-width: 1.5;
+  }
+
+  .bp--muted {
+    stroke-opacity: 0.45;
+  }
+
+  .bp--gold {
+    stroke: var(--gold-500);
+    stroke-opacity: 0.9;
+    stroke-width: 1.4;
+  }
+
+  .bp--node {
+    fill: var(--ivory-100);
+  }
+
+  .bp--dash {
+    stroke-dasharray: 3 4;
+    stroke-opacity: 0.5;
+  }
+
+  .bp-fill {
+    fill: var(--gold-500);
+    fill-opacity: 0.22;
+  }
+
+  .bp-dot {
+    fill: var(--gold-500);
+    stroke: var(--ivory-100);
+    stroke-width: 2;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .bp:not(.bp--dash) {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: bp-draw 1.4s var(--ease-in-out) var(--d, 0s) forwards;
+    }
+
+    .bp--dash,
+    .bp-dot,
+    .bp-fill {
+      opacity: 0;
+      animation: bp-show 0.6s var(--ease-out) var(--d, 1.6s) forwards;
+    }
+
+    .bp-fill {
+      --d: 1.1s;
+    }
+  }
+
+  @keyframes bp-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes bp-show {
+    to {
+      opacity: 1;
+    }
+  }
+</style>

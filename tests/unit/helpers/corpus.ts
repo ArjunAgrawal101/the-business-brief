@@ -19,7 +19,9 @@ import {
   decisionSchema,
   glossarySchema,
   interactiveSchema,
+  mindmapSchema,
   moduleSchema,
+  noteSchema,
   pathwaySchema,
   questionSchema,
   sourceSchema,
@@ -92,6 +94,8 @@ export function loadCorpus() {
     modules: fileList('data/modules.yaml', moduleSchema),
     sources: fileList('data/sources.yaml', sourceSchema),
     claims: fileList('data/claims.yaml', claimSchema),
+    mindmaps: perFile('mindmaps', mindmapSchema),
+    notes: perFile('notes', noteSchema),
   };
 }
 

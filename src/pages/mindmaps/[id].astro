@@ -1,0 +1,176 @@
+---
+/**
+ * One mindmap: the map, its outline, the glossary terms it uses and the
+ * subtopics it connects to.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import MindmapView from '../../components/mindmap/MindmapView.astro';
+import { corpus, href } from '../../lib/content';
+import { nodeCount, termsIn } from '../../lib/mindmap';
+import { mindmapsInOrder, subtopicHref } from '../../lib/learning';
+import type { Mindmap } from '../../lib/schemas';
+
+export async function getStaticPaths() {
+  const maps = await mindmapsInOrder();
+  return maps.map(([id, map]) => ({ params: { id }, props: { id, map } }));
+}
+
+interface Props {
+  id: string;
+  map: Mindmap;
+}
+const { id, map } = Astro.props;
+const c = await corpus();
+const maps = await mindmapsInOrder();
+const unitTitle = c.curricula['ib-dp-bm']?.units.find((u) => u.number === map.unit)?.title ?? '';
+const termIds = [...new Set([...termsIn(map), ...Object.entries(c.glossary).filter(([, g]) => g.subtopics.includes(map.code)).map(([gid]) => gid)])];
+const terms = termIds.map((t) => ({ id: t, entry: c.glossary[t] })).filter((t) => t.entry).sort((a, b) => a.entry!.term.localeCompare(b.entry!.term));
+const index = maps.findIndex(([x]) => x === id);
+const prev = index > 0 ? maps[index - 1] : undefined;
+const next = index < maps.length - 1 ? maps[index + 1] : undefined;
+const codeLabel = map.scope === 'unit' ? `Unit ${map.unit}` : map.code;
+const topicLink = map.scope === 'subtopic' ? subtopicHref(c, map.code) : '/topics/';
+const basis = map.basis.map((b) => ({ ...b, title: c.sources[b.source]?.title ?? b.source }));
+---
+
+<BaseLayout title={`${map.title}: mindmap`} description={`Mindmap of ${map.title} (${codeLabel}): ${map.summary}`} section="mindmaps">
+  <PageIntro
+    trail={[{ label: 'Mindmaps', href: '/mindmaps/' }, { label: `${codeLabel} ${map.title}` }]}
+    kicker={`Mindmap · ${codeLabel} · Unit ${map.unit}: ${unitTitle}`}
+    title={map.title}
+    lead={map.summary}
+  >
+    <span class="tag tag--plain">{map.level === 'HL' ? 'HL only' : map.level === 'SL/HL' ? 'SL and HL' : 'SL and HL, with HL-only parts'}</span>
+    <span class="tag tag--plain">{nodeCount(map)} ideas in {map.branches.length} branches</span>
+    <a class="tag tag--plain" href={topicLink}>{map.scope === 'unit' ? 'Topic library' : 'Read the topic'}</a>
+  </PageIntro>
+
+  <div class="wrap page-body">
+    <MindmapView id={id} map={map} />
+
+    <div class="mmp-grid">
+      {
+        terms.length > 0 && (
+          <section aria-labelledby="mmp-terms-h">
+            <SectionHead no="01" title="Key terms" id="mmp-terms-h" dek="Each opens its glossary entry: definition, context, example and related terms." level={2} />
+            <ul class="mmp-terms">
+              {terms.map((t) => (
+                <li>
+                  <a href={href.glossary(t.id)}>{t.entry!.term}</a>
+                  {t.entry!.level === 'HL' && <span class="tag tag--hl">HL</span>}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+      {
+        map.connections.length > 0 && (
+          <section aria-labelledby="mmp-links-h">
+            <SectionHead no={terms.length > 0 ? '02' : '01'} title="Connections" id="mmp-links-h" dek="Where this part of the course meets the rest." level={2} />
+            <ul class="mmp-links">
+              {map.connections.map((x) => (
+                <li>
+                  <a href={subtopicHref(c, x.code)}>
+                    <span class="mmp-links__code">{x.code}</span> {c.curricula['ib-dp-bm']?.units.flatMap((u) => u.subtopics).find((s) => s.code === x.code)?.title}
+                  </a>
+                  <span class="small muted">{x.label}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+    </div>
+
+    <p class="small muted mmp-basis">
+      Checked against: {basis.map((b, i) => <span>{i > 0 && '; '}{b.title}{b.pages && `, p. ${b.pages}`}</span>)}. The map is the platform's own summary; the IB guide is the authority on the course.
+    </p>
+
+    <nav class="mmp-pager" aria-label="More mindmaps">
+      {prev ? <a href={href.mindmap(prev[0])}>&larr; {prev[1].scope === 'unit' ? `Unit ${prev[1].unit}` : prev[1].code} {prev[1].title}</a> : <span />}
+      <a href="/mindmaps/">All mindmaps</a>
+      {next ? <a href={href.mindmap(next[0])}>{next[1].scope === 'unit' ? `Unit ${next[1].unit}` : next[1].code} {next[1].title} &rarr;</a> : <span />}
+    </nav>
+  </div>
+</BaseLayout>
+
+<style>
+  .mmp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+    gap: var(--sp-7);
+    margin-top: var(--sp-8);
+  }
+
+  .mmp-terms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .mmp-terms li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0;
+  }
+
+  .mmp-terms a {
+    display: inline-block;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: var(--surface-sheet);
+    color: var(--navy-900);
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+
+  .mmp-terms a:hover {
+    border-color: var(--gold-500);
+  }
+
+  .mmp-links {
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .mmp-links li {
+    display: grid;
+    gap: 0.15rem;
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .mmp-links a {
+    font-weight: 560;
+  }
+
+  .mmp-links__code {
+    font-variant-numeric: tabular-nums;
+    color: var(--brass-text);
+  }
+
+  .mmp-basis {
+    margin-top: var(--sp-6);
+  }
+
+  .mmp-pager {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    margin-top: var(--sp-6);
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--rule-hair);
+  }
+</style>

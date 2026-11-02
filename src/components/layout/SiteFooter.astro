@@ -1,55 +1,53 @@
 ---
-import BriefMark from '../brand/BriefMark.astro';
-import CreatorMark from '../brand/CreatorMark.astro';
-
+/**
+ * The footer carries both identities: the full Arjun Agrawal logo (the
+ * creator, from the brand's own reversed master) and The Business Brief (the
+ * product), as two parts of the Arjun Agrawal Knowledge Series.
+ */
 const COLUMNS = [
   {
     title: 'Learn',
     links: [
-      ['Topics', '/topics/'],
-      ['IB Business Management', '/ib/'],
-      ['Course map', '/ib/map/'],
-      ['Syllabus coverage', '/ib/coverage/'],
-      ['Concepts', '/ib/concepts/'],
-      ['Toolkit', '/toolkit/'],
+      ['Topic library', '/topics/'],
+      ['Mindmaps', '/mindmaps/'],
       ['Glossary', '/glossary/'],
-      ['Revision Briefs', '/revision/'],
+      ['Course map', '/ib/map/'],
+      ['Coverage tracker', '/ib/coverage/'],
+      ['Key concepts', '/ib/concepts/'],
+      ['Toolkit', '/toolkit/'],
+      ['Revision briefs', '/revision/'],
+    ],
+  },
+  {
+    title: 'Assess',
+    links: [
+      ['Assessment Centre', '/assessment/'],
+      ['Internal assessment', '/assessment/internal-assessment/'],
+      ['Paper 1', '/assessment/paper-1/'],
+      ['Paper 2', '/assessment/paper-2/'],
+      ['Paper 3 Boardroom (HL)', '/assessment/paper-3/'],
+      ['Practice questions', '/exam-desk/practice/'],
     ],
   },
   {
     title: 'Practise',
     links: [
-      ['All rooms', '/rooms/'],
-      ['Case Room', '/case-room/'],
-      ['Case Vault', '/cases/'],
+      ['Case studies', '/cases/'],
       ['Decision Room', '/decision-room/'],
       ['Finance Desk', '/finance-desk/'],
-      ['Exam Desk', '/exam-desk/'],
-      ['Practice questions', '/exam-desk/practice/'],
-      ['Examiner Lens', '/examiner-lens/'],
-      ['IA Studio', '/ia-studio/'],
-    ],
-  },
-  {
-    title: 'Pathways',
-    links: [
-      ['IB Diploma', '/pathways/ib-dp/'],
-      ['IGCSE and secondary', '/pathways/secondary/'],
-      ['Undergraduate', '/pathways/undergraduate/'],
-      ['MBA and advanced', '/pathways/mba/'],
-      ['Teachers', '/pathways/teachers/'],
-      ['Entrepreneurs', '/pathways/entrepreneurs/'],
-      ['Independent learners', '/pathways/independent/'],
+      ['Case Room lab', '/case-room/'],
+      ['All rooms', '/rooms/'],
+      ['Pathways', '/pathways/'],
     ],
   },
   {
     title: 'Platform',
     links: [
+      ['Resources Library', '/resources/'],
+      ['About Arjun Agrawal', '/about/'],
       ['Search', '/search/'],
       ['Your progress', '/progress/'],
-      ['About the creator', '/about/'],
       ['Sources and evidence', '/sources/'],
-      ['The platform', '/platform/'],
       ['Accessibility', '/accessibility/'],
       ['Privacy', '/privacy/'],
     ],
@@ -62,18 +60,16 @@ const year = new Date().getFullYear();
   <div class="wrap">
     <div class="site-footer__top">
       <div class="site-footer__brand">
-        <a class="site-footer__lockup" href="/">
-          <BriefMark size={44} reversed />
-          <span>
-            <span class="site-footer__kicker">Arjun Agrawal</span>
-            <span class="site-footer__name">The Business Brief</span>
-          </span>
+        <a class="site-footer__logo" href="/about/">
+          <img src="/brand/creator/arjun-agrawal-logo-reversed.svg" width="220" height="134" alt="Arjun Agrawal. Knowledge. Insight. Impact." loading="lazy" decoding="async" />
         </a>
-        <p class="site-footer__tagline">Strategy. Leadership. Decisions.</p>
-        <p class="site-footer__about">
-          A Business Management learning platform built around one sequence: read the situation, weigh the evidence, make
-          the decision, follow the consequence.
-        </p>
+        <div class="site-footer__product">
+          <p class="site-footer__name">The Business Brief</p>
+          <p class="site-footer__tagline">Strategy. Leadership. Decisions.</p>
+          <p class="site-footer__about">
+            A Business Management learning platform: read the situation, weigh the evidence, make the decision, follow the consequence.
+          </p>
+        </div>
       </div>
 
       <nav class="site-footer__nav" id="footer-nav" aria-label="Site">
@@ -94,27 +90,24 @@ const year = new Date().getFullYear();
       </nav>
     </div>
 
-    <div class="site-footer__creator">
-      <CreatorMark height={38} reversed />
+    <div class="site-footer__series">
+      <p class="site-footer__series-name">Arjun Agrawal Knowledge Series</p>
       <p>
-        Created by <a href="/about/">Arjun Agrawal</a>, IB Diploma Programme educator in Economics, Business Management and
-        Global Politics.
-        <span class="site-footer__sibling">
-          Also by Arjun Agrawal: <a href="https://ib-economics-pi.vercel.app/" rel="noopener">Arjun Agrawal Economics<span class="sr-only"> (external site)</span></a>.
-        </span>
+        The Business Brief and <a href="https://ib-economics-pi.vercel.app/" rel="noopener">Arjun Agrawal Economics<span class="sr-only"> (external site)</span></a>, two
+        platforms by <a href="/about/">Arjun Agrawal</a>, IB Diploma Programme educator in Economics, Business Management and Global Politics.
       </p>
     </div>
 
     <div class="site-footer__legal">
       <p>
-        An independent educational resource. It is not affiliated with, endorsed by or produced by the International
-        Baccalaureate Organization. "International Baccalaureate", "IB" and "Diploma Programme" are trademarks of the
-        International Baccalaureate Organization. Organizations in the teaching cases are fictional unless a case says
-        otherwise, and their figures are simulated.
+        An independent educational resource. It is not affiliated with, endorsed by or produced by the International Baccalaureate Organization.
+        "International Baccalaureate", "IB" and "Diploma Programme" are trademarks of the International Baccalaureate Organization. Organizations in the
+        teaching cases are fictional unless a case says otherwise, and their figures are simulated.
       </p>
-      <p>
-        &copy; {year} Arjun Agrawal. Educational content and brand: all rights reserved. Code: MIT licence.
+      <p class="site-footer__fine">
+        <span>&copy; {year} Arjun Agrawal. Educational content and brand: all rights reserved. Code: MIT licence.</span>
         <a href="/privacy/">No account, no tracking: your saved work stays on this device.</a>
+        <a href="/?intro" data-replay-intro>Replay the opening</a>
       </p>
     </div>
   </div>
@@ -122,6 +115,7 @@ const year = new Date().getFullYear();
 
 <style>
   .site-footer {
+    position: relative;
     background: var(--surface-ink);
     color: var(--text-on-ink-muted);
     padding-block: var(--sp-8) var(--sp-6);
@@ -129,65 +123,74 @@ const year = new Date().getFullYear();
     font-size: 0.9375rem;
   }
 
+  .site-footer::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-400) 20%, var(--gold-400) 80%, transparent);
+    opacity: 0.6;
+  }
+
   .site-footer a {
     color: var(--text-on-ink);
-    text-decoration-color: rgba(244, 241, 234, 0.35);
+    text-decoration-color: rgba(244, 239, 228, 0.35);
   }
 
   .site-footer a:hover {
     color: #fff;
-    text-decoration-color: var(--bb-brass);
+    text-decoration-color: var(--gold-400);
   }
 
   .site-footer__top {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 2.2fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
     gap: var(--sp-7);
     padding-bottom: var(--sp-7);
-    border-bottom: 1px solid rgba(244, 241, 234, 0.16);
+    border-bottom: 1px solid var(--rule-on-ink);
   }
 
-  .site-footer__lockup {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.8rem;
-    text-decoration: none;
-  }
-
-  .site-footer__lockup > span {
+  .site-footer__brand {
     display: grid;
-    line-height: 1.05;
+    gap: var(--sp-5);
+    align-content: start;
   }
 
-  .site-footer__kicker {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--text-on-ink-muted);
+  .site-footer__logo {
+    display: inline-block;
+    width: fit-content;
+  }
+
+  .site-footer__logo img {
+    width: 13.75rem;
+    height: auto;
+  }
+
+  .site-footer__product {
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--rule-on-ink);
+    max-width: 24rem;
   }
 
   .site-footer__name {
-    margin-top: 0.25rem;
-    font-family: var(--font-display);
-    font-size: 1.375rem;
-    font-weight: 720;
-    letter-spacing: -0.022em;
+    font-family: var(--font-brand);
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
     color: var(--text-on-ink);
   }
 
   .site-footer__tagline {
-    margin-top: var(--sp-4);
-    font-family: var(--font-mono);
+    margin-top: 0.35rem;
     font-size: 0.75rem;
-    letter-spacing: 0.12em;
+    font-weight: 600;
+    letter-spacing: var(--track-label);
     text-transform: uppercase;
-    color: var(--bb-brass);
+    color: var(--gold-400);
   }
 
   .site-footer__about {
     margin-top: var(--sp-3);
-    max-width: 30rem;
   }
 
   .site-footer__nav {
@@ -197,14 +200,14 @@ const year = new Date().getFullYear();
   }
 
   .site-footer__h {
-    font-family: var(--font-mono);
+    font-family: var(--font-ui);
     font-size: 0.6875rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
+    font-weight: 600;
+    letter-spacing: var(--track-label);
     text-transform: uppercase;
-    color: var(--text-on-ink-muted);
+    color: var(--gold-400);
     padding-bottom: var(--sp-2);
-    border-bottom: 1px solid rgba(244, 241, 234, 0.22);
+    border-bottom: 1px solid var(--rule-on-ink);
   }
 
   .site-footer__nav ul {
@@ -225,21 +228,20 @@ const year = new Date().getFullYear();
     text-decoration: underline;
   }
 
-  .site-footer__creator {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-4);
+  .site-footer__series {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: var(--sp-7);
     padding-block: var(--sp-5);
-    border-bottom: 1px solid rgba(244, 241, 234, 0.16);
+    border-bottom: 1px solid var(--rule-on-ink);
   }
 
-  .site-footer__creator p {
-    max-width: 52rem;
-  }
-
-  .site-footer__sibling {
-    display: block;
-    margin-top: 0.2rem;
+  .site-footer__series-name {
+    font-family: var(--font-brand);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    color: var(--gold-400);
   }
 
   .site-footer__legal {
@@ -251,23 +253,26 @@ const year = new Date().getFullYear();
   }
 
   .site-footer__legal p {
-    max-width: 62rem;
+    max-width: 64rem;
+  }
+
+  .site-footer__fine {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-5);
   }
 
   @media (max-width: 62rem) {
-    .site-footer__top {
+    .site-footer__top,
+    .site-footer__series {
       grid-template-columns: minmax(0, 1fr);
-      gap: var(--sp-6);
+      gap: var(--sp-5);
     }
   }
 
   @media (max-width: 40rem) {
     .site-footer__nav {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .site-footer__creator {
-      align-items: flex-start;
     }
   }
 
@@ -279,8 +284,9 @@ const year = new Date().getFullYear();
       padding-block: var(--sp-4) 0;
     }
 
+    .site-footer::before,
     .site-footer__top,
-    .site-footer__creator img {
+    .site-footer__series {
       display: none;
     }
 

@@ -1,0 +1,64 @@
+---
+/**
+ * The Arjun Agrawal AA monogram, inline. The two paths are the vector master in
+ * public/brand/creator/arjun-agrawal-monogram.svg, unchanged; only the fills are
+ * read from CSS so the same mark serves light and dark surfaces. The reversed
+ * colours are the brand's own (the -reversed file): ivory #F4EFE4 and gold
+ * #C9A866 in place of navy #0B1A33 and gold #B39350.
+ */
+import { MONOGRAM } from '../../lib/brand';
+
+interface Props {
+  height?: number;
+  reversed?: boolean;
+  /** Give it a name when it stands alone; leave decorative beside the creator's name. */
+  label?: string;
+  class?: string;
+}
+const { height = 36, reversed = false, label, class: className } = Astro.props;
+// The monogram's own proportions: viewBox 350.8 x 268.4
+const width = Math.round((height * 350.8) / 268.4);
+---
+
+<svg
+  class:list={['monogram', { 'monogram--reversed': reversed }, className]}
+  width={width}
+  height={height}
+  viewBox="201.2 -1.9 350.8 268.4"
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  focusable="false"
+>
+  {label && <title>{label}</title>}
+  <path
+    class="monogram__a"
+    fill-rule="evenodd"
+    d={MONOGRAM.a}
+  ></path>
+  <path
+    class="monogram__b"
+    fill-rule="evenodd"
+    d={MONOGRAM.b}
+  ></path>
+</svg>
+
+<style>
+  .monogram {
+    display: block;
+    flex: none;
+  }
+
+  .monogram__a {
+    fill: var(--mono-a, #0b1a33);
+  }
+
+  .monogram__b {
+    fill: var(--mono-b, #b39350);
+  }
+
+  .monogram--reversed {
+    --mono-a: #f4efe4;
+    --mono-b: #c9a866;
+  }
+</style>

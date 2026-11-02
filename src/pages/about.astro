@@ -1,84 +1,844 @@
 ---
-/** About the creator and the platform. Creator facts come only from the creator's own published profile (claims register: creator-facts). */
+/**
+ * About Arjun Agrawal: the profile of an educator and the platforms he builds.
+ *
+ * Every fact comes from the creator's published profile (claims register:
+ * creator-facts; the same profile as Arjun Agrawal Economics). No degree,
+ * date, title, award or result is added, and no institution is described as
+ * a current workplace. The reflective passages are written in the first
+ * person, in the voice of that profile, and say nothing that is not a view.
+ * Photographs: the creator's own (assets/creator/README.md), cropped only.
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PageIntro from '../components/layout/PageIntro.astro';
+import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
 import SectionHead from '../components/layout/SectionHead.astro';
+import Monogram from '../components/brand/Monogram.astro';
+import CreatorPhoto from '../components/brand/CreatorPhoto.astro';
 import { corpus } from '../lib/content';
 
 const c = await corpus();
 const claim = c.claims['creator-facts'];
+const EMAIL = 'arjun1agr@gmail.com';
+
+const FACTS = [
+  { k: 'Education', a: 'Economics', b: "St. Stephen's College, University of Delhi" },
+  { k: 'Higher education', a: 'Assistant Professor', b: 'Fergusson College, Pune: undergraduate Economics' },
+  { k: 'IB Diploma Programme', a: 'Teaching and academic work', b: 'BLISS International School, Pune; Symbiosis International School, Pune' },
+  { k: 'Subjects', a: 'Economics, Business Management, Global Politics', b: 'Standard and Higher Level' },
+  { k: 'Mentorship', a: 'UPSC Civil Services', b: 'Economics, for aspirants preparing for the examination' },
+  { k: 'Resource design', a: 'Handbooks, presentations, Economics in 60 Seconds', b: 'and two learning platforms' },
+];
+
+const JOURNEY = [
+  { stage: 'Academia', title: "St. Stephen's College", where: 'University of Delhi', line: 'Economics, studied as a way of arguing before it is a body of content.' },
+  { stage: 'Higher education', title: 'Fergusson College', where: 'Pune', line: 'Undergraduate Economics, taught as an Assistant Professor.' },
+  { stage: 'IB Diploma Programme', title: 'BLISS and Symbiosis', where: 'International Schools, Pune', line: 'Diploma Programme teaching and academic work across three subjects.' },
+  { stage: 'Mentorship', title: 'UPSC Civil Services', where: 'Economics', line: 'Adult learners, a different examination, the same subject.' },
+  { stage: 'Digital education', title: 'Two platforms', where: 'Arjun Agrawal Knowledge Series', line: 'Economics, and now Business Management, built to be used by anyone.' },
+];
+
+const PRINCIPLES = [
+  ['Start with a situation, not a definition.', 'A business facing a real choice makes every term earn its place. The definition arrives when it is needed, and it stays.'],
+  ['Evidence before opinion.', 'An argument begins with what the data shows and admits what it cannot show. The gap is often the most important finding.'],
+  ['A tool must change a decision.', 'A SWOT that changes nothing has cost the time and earned nothing. Use the tool, then say what it changed.'],
+  ['Stakeholders are people.', 'Every decision lands on someone: a worker, a customer, a supplier, a town. Ask who gains, who loses and by how much.'],
+  ['Numbers are arguments.', 'A ratio or a break-even point is a claim about a business. Calculate it carefully, then say what it means and what it hides.'],
+  ['Judge, and state the condition.', 'A good judgement says what the business should do and what would make that answer wrong.'],
+];
 ---
 
-<BaseLayout title="About" description="About Arjun Agrawal and The Business Brief, an independent business management learning platform." section="platform">
-  <PageIntro trail={[{ label: 'About' }]} kicker="About" title="Arjun Agrawal and The Business Brief" />
-  <div class="wrap page-body">
-    <div class="about">
-      <figure class="about__photo">
-        <img src="/brand/creator/arjun-agrawal-portrait-4x5.webp" width="432" height="540" alt="Arjun Agrawal" loading="lazy" decoding="async" />
+<BaseLayout
+  title="About Arjun Agrawal"
+  description="Arjun Agrawal: IB Diploma Programme educator in Economics, Business Management and Global Politics, UPSC Economics mentor, and creator of The Business Brief and Arjun Agrawal Economics."
+  section="about"
+>
+  <section class="ab-hero band--grain" aria-labelledby="ab-h">
+    <div class="wrap">
+      <Breadcrumbs trail={[{ label: 'About' }]} />
+      <div class="ab-hero__grid">
+        <div class="ab-hero__copy enter">
+          <p class="label label--ink">About the creator</p>
+          <h1 id="ab-h" class="ab-hero__name">Arjun Agrawal</h1>
+          <ul class="ab-hero__roles">
+            <li>IB Diploma Programme educator</li>
+            <li>Economics educator</li>
+            <li>UPSC Economics mentor</li>
+            <li>Resource creator</li>
+          </ul>
+          <p class="ab-hero__lede">
+            I teach IB Diploma Programme Economics, Business Management and Global Politics, and I build the resources my own classroom needs. The
+            Business Brief is one of them: a place where business is learned the way it is practised, one decision at a time.
+          </p>
+          <p class="ab-hero__actions">
+            <a class="btn btn--primary" href={`mailto:${EMAIL}`}>Write to Arjun <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+            <a class="btn" href="https://ib-economics-pi.vercel.app/" rel="noopener">Arjun Agrawal Economics<span class="sr-only"> (external site)</span></a>
+          </p>
+        </div>
+        <figure class="ab-hero__figure enter">
+          <div class="ab-hero__frame">
+            <CreatorPhoto name="portrait-formal" alt="Arjun Agrawal" priority sizes="(min-width: 64rem) 34vw, 80vw" />
+          </div>
+          <span class="ab-hero__seal" aria-hidden="true"><Monogram height={34} reversed /></span>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band--white" aria-labelledby="ab-glance-h">
+    <div class="wrap">
+      <SectionHead no="01" title="At a glance" id="ab-glance-h" />
+      <dl class="ab-facts" data-reveal="group">
+        {
+          FACTS.map((f) => (
+            <div class="ab-fact">
+              <dt>{f.k}</dt>
+              <dd>
+                <strong>{f.a}</strong>
+                <span>{f.b}</span>
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+      <p class="small muted ab-note">
+        From the creator's published profile, checked {claim?.checked}. No role is described as a current post, and the order of the journey below is a
+        story, not a chronology.
+      </p>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="ab-journey-h">
+    <div class="wrap">
+      <SectionHead no="02" title="The journey" id="ab-journey-h" dek="From a lecture hall in Delhi to the Diploma Programme classroom, and from there to platforms anyone can open." />
+      <ol class="ab-track" data-reveal="group">
+        {
+          JOURNEY.map((j, i) => (
+            <li class="ab-stop">
+              <span class="ab-stop__dot" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <p class="ab-stop__stage">{j.stage}</p>
+              <h3 class="ab-stop__title">{j.title}</h3>
+              <p class="ab-stop__where">{j.where}</p>
+              <p class="ab-stop__line">{j.line}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="band band--white" aria-labelledby="ab-three-h">
+    <div class="wrap ab-split">
+      <div class="ab-split__text">
+        <SectionHead no="03" title="Three subjects, one way of thinking" id="ab-three-h" />
+        <div class="prose ab-prose">
+          <p>
+            Economics, Business Management and Global Politics ask the same question in different grammars: who decides, with what information, under what
+            constraints, and who lives with the result. Teaching all three keeps each of them honest.
+          </p>
+          <p>
+            Economics supplies the mechanism: incentives, costs, markets and the second-round effects that a first answer misses. Global Politics supplies
+            power and legitimacy: who has a voice, and why a decision that works on paper can fail in public. Business Management is where the two meet a
+            single organization with a budget, a deadline and people who have to carry the plan out.
+          </p>
+          <p>
+            That is why The Business Brief is built around decisions. A student who can read a situation, weigh the evidence and choose, and then say what
+            the choice costs and whom it affects, is doing what the subject asks, in the examination and long after it.
+          </p>
+        </div>
+      </div>
+      <figure class="ab-split__figure">
+        <CreatorPhoto name="audience-wide" alt="Arjun Agrawal teaching a class, standing in front of a screen showing a budget table" sizes="(min-width: 64rem) 46vw, 92vw" />
+        <figcaption>In the classroom: a budget table on the screen, and the question of what it means for the people behind the numbers.</figcaption>
       </figure>
-      <div class="about__text stack">
-        <img class="about__mono" src="/brand/creator/arjun-agrawal-monogram.svg" width="88" height="67" alt="" />
-        <dl class="casefile-facts about__facts">
-          <div><dt>Education</dt><dd>Economics, St. Stephen's College, University of Delhi</dd></div>
-          <div><dt>Higher education</dt><dd>Assistant Professor, Fergusson College, Pune: undergraduate Economics</dd></div>
-          <div><dt>IB Diploma Programme</dt><dd>Teaching and academic work, including at BLISS International School, Pune and Symbiosis International School, Pune</dd></div>
-          <div><dt>Subjects</dt><dd>Economics, Business Management and Global Politics, at SL and HL</dd></div>
-          <div><dt>Mentorship</dt><dd>UPSC Civil Services aspirants, in Economics</dd></div>
-        </dl>
-        <p class="small muted">From the creator's published profile, checked {claim?.checked}. No role is described as a current post.</p>
-        <SectionHead no={1} title="The Business Brief" id="tbb-h" level={2} />
-        <div class="prose">
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="ab-work-h">
+    <div class="wrap">
+      <SectionHead no="04" title="Teaching and academic work" id="ab-work-h" />
+      <div class="ab-work" data-reveal="group">
+        <article class="ab-work__item">
+          <p class="label">IB Diploma Programme</p>
+          <h3>The Diploma Programme classroom</h3>
           <p>
-            The Business Brief is an independent platform for learning business management through decisions: a business in a
-            situation, the ideas needed to read it, a choice to make and defend, and its consequences. It is written first for IB
-            Diploma Programme students and teachers, with pathways for other learners built on the same foundation.
+            Teaching and academic work in the IB Diploma Programme, including at BLISS International School, Pune and Symbiosis International School, Pune,
+            across Economics, Business Management and Global Politics at Standard and Higher Level.
           </p>
           <p>
-            It is a sibling of <a href="https://ib-economics-pi.vercel.app/" rel="noopener">Arjun Agrawal Economics</a>, sharing its
-            standards of accuracy and accessibility but not its design.
+            The work that shows here is curriculum work of a practical kind: every subtopic of this platform is mapped against the IB Business management
+            guide, with the guide's page for each claim, and every assessment component is explained from the guide before any strategy is offered.
+          </p>
+        </article>
+        <article class="ab-work__item">
+          <p class="label">Higher education</p>
+          <h3>Undergraduate Economics</h3>
+          <p>
+            Teaching undergraduate Economics as an Assistant Professor at Fergusson College, Pune. The distance between knowing a model and using one is
+            where most of the teaching happens, at every level.
+          </p>
+        </article>
+        <article class="ab-work__item">
+          <p class="label">Mentorship</p>
+          <h3>UPSC Civil Services, Economics</h3>
+          <p>
+            Mentoring UPSC Civil Services aspirants in Economics: adult learners under time pressure, preparing for a different examination in the same
+            subject. What they need most is the structure of an argument and a way to revise what they already know. No claim is made here about ranks,
+            selections or results.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band--ink" aria-labelledby="ab-phil-h">
+    <div class="wrap">
+      <SectionHead no="05" title="How I teach business" id="ab-phil-h" dek="Six principles, and the reason each part of this platform exists." />
+      <ol class="ab-principles" data-reveal="group">
+        {
+          PRINCIPLES.map(([h, d], i) => (
+            <li>
+              <span class="ab-principles__n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <p class="ab-principles__h">{h}</p>
+              <p class="ab-principles__d">{d}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="band band--white" aria-labelledby="ab-res-h">
+    <div class="wrap ab-split ab-split--reverse">
+      <div class="ab-split__text">
+        <SectionHead no="06" title="Resources and knowledge sharing" id="ab-res-h" />
+        <div class="prose ab-prose">
+          <p>
+            Every resource here began as a problem in a real lesson: a handbook to hold a unit together, a presentation that made a mechanism visible, a
+            sixty-second explanation of an economic idea, a question that separated the students who held a concept from those who held only the sentence.
           </p>
           <p>
-            The Business Brief is not affiliated with, endorsed by or connected to the International Baccalaureate Organization.
-            Statements about the IB course carry their sources and verification status on the <a href="/sources/">sources page</a>.
+            The rule is the same for all of them. A resource has to fit inside a real lesson with a real clock, it has to be accurate before it is
+            attractive, and it has to say what it is: official requirement, examiner emphasis, recommended strategy or illustrative example.
+          </p>
+        </div>
+        <ul class="ab-res">
+          <li><a href="/resources/">The Resources Library</a>: assessment guides, formula sheets, mindmaps and more</li>
+          <li><a href="/assessment/">The Assessment Centre</a>: every component, explained from the guide</li>
+          <li><a href="/mindmaps/">Mindmaps</a> and the <a href="/glossary/">glossary</a>, topic by topic</li>
+        </ul>
+      </div>
+      <div class="ab-series">
+        <img src="/brand/creator/arjun-agrawal-logo.svg" width="300" height="182" alt="Arjun Agrawal. Knowledge. Insight. Impact." loading="lazy" decoding="async" />
+        <p class="ab-series__name">The Arjun Agrawal Knowledge Series</p>
+        <p>
+          Open resources for learning a subject properly: the reasoning made visible, the sources stated, the practice honest about what it is. No account,
+          no advertising, no tracking.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="ab-plat-h">
+    <div class="wrap">
+      <SectionHead no="07" title="Two platforms, one standard" id="ab-plat-h" dek="Siblings under one creator, each designed for its own subject." />
+      <div class="ab-plats" data-reveal="group">
+        <article class="ab-plat">
+          <p class="label">Economics</p>
+          <h3>Arjun Agrawal Economics</h3>
+          <p class="ab-plat__tag">Think like an economist.</p>
+          <p>
+            IB Diploma Programme Economics as a system for practising the reasoning the course assesses: models that move, causal chains, real-world cases
+            and examination practice.
+          </p>
+          <a class="btn" href="https://ib-economics-pi.vercel.app/" rel="noopener">Visit the Economics platform<span class="sr-only"> (external site)</span></a>
+        </article>
+        <article class="ab-plat ab-plat--here">
+          <p class="label">Business Management</p>
+          <h3>The Business Brief</h3>
+          <p class="ab-plat__tag">Strategy. Leadership. Decisions.</p>
+          <p>
+            IB Diploma Programme Business Management learned through decisions: topic notes, mindmaps, case studies, live financial tools and an Assessment
+            Centre, with routes for other learners built on the same foundation.
+          </p>
+          <a class="btn btn--primary" href="/topics/">Explore the topic library <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band--white" aria-labelledby="ab-note-h">
+    <div class="wrap ab-close">
+      <figure class="ab-close__figure">
+        <CreatorPhoto name="traditional" alt="Arjun Agrawal in traditional attire, standing in front of a painted wall" sizes="(min-width: 64rem) 26vw, 70vw" />
+      </figure>
+      <div class="ab-close__text">
+        <SectionHead no="08" title="A personal note" id="ab-note-h" />
+        <blockquote class="ab-quote">
+          <p>
+            I want students to leave a lesson able to do something they could not do when they arrived: read a situation more precisely, weigh an argument
+            more fairly, or make a decision they can defend. Everything on this platform is that lesson, written down, so that anyone can take it.
+          </p>
+        </blockquote>
+        <p class="ab-sign">
+          <Monogram height={28} />
+          <span>Arjun Agrawal</span>
+        </p>
+        <div class="ab-contact">
+          <p class="label">Contact</p>
+          <p>
+            For questions about the platform, permissions or accessibility: <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+          </p>
+          <p class="small muted">
+            The Business Brief is independent and is not affiliated with, endorsed by or connected to the International Baccalaureate Organization.
+            Statements about the IB course carry their sources on the <a href="/sources/">sources page</a>.
           </p>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 </BaseLayout>
 
 <style>
-  .about {
-    display: grid;
-    gap: var(--sp-6);
+  /* ---------- Hero ---------- */
+  .ab-hero {
+    padding-block: var(--sp-6) clamp(3rem, 6vw, 5.5rem);
+    overflow: hidden;
   }
 
-  @media (min-width: 52rem) {
-    .about {
-      grid-template-columns: minmax(14rem, 20rem) minmax(0, 1fr);
-      align-items: start;
+  .ab-hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+    margin-top: var(--sp-6);
+  }
+
+  .ab-hero__name {
+    margin-top: var(--sp-4);
+    font-family: var(--font-brand);
+    font-size: clamp(2.75rem, 1.6rem + 4.6vw, 5.5rem);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+
+  .ab-hero__roles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 0;
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ab-hero__roles li {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .ab-hero__roles li:not(:last-child)::after {
+    content: '';
+    display: inline-block;
+    width: 1.25rem;
+    height: 1px;
+    margin: 0 0.75rem;
+    vertical-align: middle;
+    background: var(--gold-500);
+  }
+
+  .ab-hero__lede {
+    margin-top: var(--sp-5);
+    max-width: 36rem;
+    font-family: var(--font-serif);
+    font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem);
+    line-height: 1.45;
+    color: var(--navy-900);
+  }
+
+  .ab-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    margin-top: var(--sp-6);
+  }
+
+  .ab-hero__figure {
+    position: relative;
+    margin: 0;
+    max-width: 26rem;
+    justify-self: end;
+    width: 100%;
+  }
+
+  .ab-hero__frame {
+    position: relative;
+  }
+
+  .ab-hero__frame::before {
+    content: '';
+    position: absolute;
+    inset: 1.25rem -1.25rem -1.25rem 1.25rem;
+    background: var(--navy-900);
+  }
+
+  .ab-hero__frame::after {
+    content: '';
+    position: absolute;
+    inset: 0.65rem;
+    border: 1px solid rgba(201, 168, 102, 0.85);
+    pointer-events: none;
+  }
+
+  .ab-hero__frame :global(img) {
+    position: relative;
+    width: 100%;
+    height: auto;
+    box-shadow: var(--shadow-lift);
+  }
+
+  .ab-hero__seal {
+    position: absolute;
+    left: -1.75rem;
+    bottom: 2.5rem;
+    display: grid;
+    place-items: center;
+    width: 4.25rem;
+    height: 4.25rem;
+    border-radius: 50%;
+    background: var(--navy-900);
+    box-shadow:
+      0 0 0 3px var(--ivory-100),
+      0 0 0 4px var(--gold-500);
+  }
+
+  /* ---------- Facts ---------- */
+  .ab-facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    margin-top: var(--sp-6);
+    border-top: 1px solid var(--navy-900);
+  }
+
+  .ab-fact {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+    padding: var(--sp-5) var(--sp-5) var(--sp-5) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .ab-fact:not(:nth-child(3n + 1)) {
+    padding-left: var(--sp-5);
+    border-left: 1px solid var(--rule-hair);
+  }
+
+  .ab-fact dt {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .ab-fact dd {
+    display: grid;
+    gap: 0.2rem;
+    margin: 0;
+  }
+
+  .ab-fact strong {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 560;
+    line-height: 1.25;
+  }
+
+  .ab-fact span {
+    color: var(--text-muted);
+  }
+
+  .ab-note {
+    margin-top: var(--sp-4);
+  }
+
+  /* ---------- Journey ---------- */
+  .ab-track {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--sp-5);
+    margin: var(--sp-7) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ab-track::before {
+    content: '';
+    position: absolute;
+    top: 1.25rem;
+    left: 1.25rem;
+    right: 1.25rem;
+    height: 1px;
+    background: linear-gradient(90deg, var(--gold-500), var(--navy-900));
+  }
+
+  .ab-stop {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: 0.35rem;
+    margin: 0;
+  }
+
+  .ab-stop__dot {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-bottom: var(--sp-3);
+    border-radius: 50%;
+    background: var(--ivory-100);
+    border: 1px solid var(--gold-500);
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--brass-text);
+  }
+
+  .ab-stop:last-child .ab-stop__dot {
+    background: var(--navy-900);
+    border-color: var(--navy-900);
+    color: var(--gold-400);
+  }
+
+  .ab-stop__stage {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .ab-stop__title {
+    font-size: 1.3125rem;
+  }
+
+  .ab-stop__where {
+    font-size: 0.875rem;
+    color: var(--brass-text);
+    font-weight: 560;
+  }
+
+  .ab-stop__line {
+    margin-top: var(--sp-2);
+    font-size: 0.9375rem;
+    color: var(--text-body);
+  }
+
+  /* ---------- Split sections ---------- */
+  .ab-split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+  }
+
+  .ab-prose {
+    margin-top: var(--sp-5);
+    font-size: 1.0625rem;
+  }
+
+  .ab-split__figure {
+    position: relative;
+    margin: 0;
+  }
+
+  .ab-split__figure :global(img) {
+    width: 100%;
+    height: auto;
+    box-shadow: var(--shadow-lift);
+  }
+
+  .ab-split__figure figcaption {
+    margin-top: var(--sp-3);
+    padding-left: var(--sp-3);
+    border-left: 2px solid var(--gold-500);
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .ab-res {
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .ab-res li {
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .ab-series {
+    display: grid;
+    justify-items: center;
+    gap: var(--sp-3);
+    padding: clamp(2rem, 4vw, 3.5rem);
+    background: var(--ivory-100);
+    border: 1px solid var(--rule-hair);
+    text-align: center;
+  }
+
+  .ab-series img {
+    width: min(100%, 18rem);
+    height: auto;
+  }
+
+  .ab-series__name {
+    margin-top: var(--sp-3);
+    font-family: var(--font-brand);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--navy-900);
+  }
+
+  .ab-series p:last-child {
+    max-width: 26rem;
+    color: var(--text-muted);
+  }
+
+  /* ---------- Work ---------- */
+  .ab-work {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr;
+    gap: var(--sp-6);
+    margin-top: var(--sp-6);
+  }
+
+  .ab-work__item {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-3);
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--navy-900);
+  }
+
+  .ab-work__item h3 {
+    font-size: 1.5rem;
+  }
+
+  /* ---------- Principles ---------- */
+  .ab-principles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-6) var(--sp-6);
+    margin: var(--sp-7) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ab-principles li {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+    margin: 0;
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--rule-on-ink);
+  }
+
+  .ab-principles__n {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.5rem;
+    color: var(--gold-400);
+  }
+
+  .ab-principles__h {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 560;
+    line-height: 1.25;
+    color: var(--text-on-ink);
+  }
+
+  .ab-principles__d {
+    color: var(--text-on-ink-muted);
+  }
+
+  /* ---------- Platforms ---------- */
+  .ab-plats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-5);
+    margin-top: var(--sp-6);
+  }
+
+  .ab-plat {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: var(--sp-3);
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    background: var(--surface-sheet);
+    border-top: 3px solid var(--slate-500);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .ab-plat--here {
+    border-top-color: var(--gold-500);
+  }
+
+  .ab-plat h3 {
+    font-size: 1.75rem;
+  }
+
+  .ab-plat__tag {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.125rem;
+    color: var(--brass-text);
+  }
+
+  /* ---------- Closing ---------- */
+  .ab-close {
+    display: grid;
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+  }
+
+  .ab-close__figure {
+    margin: 0;
+    max-width: 22rem;
+  }
+
+  .ab-close__figure :global(img) {
+    width: 100%;
+    height: auto;
+    box-shadow: var(--shadow-lift);
+  }
+
+  .ab-quote {
+    margin: var(--sp-5) 0 0;
+    padding-left: var(--sp-5);
+    border-left: 2px solid var(--gold-500);
+  }
+
+  .ab-quote p {
+    font-family: var(--font-serif);
+    font-size: clamp(1.25rem, 1.1rem + 0.7vw, 1.75rem);
+    font-style: italic;
+    line-height: 1.45;
+    color: var(--navy-900);
+  }
+
+  .ab-sign {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    margin-top: var(--sp-5);
+    font-family: var(--font-brand);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    color: var(--navy-900);
+  }
+
+  .ab-contact {
+    display: grid;
+    gap: var(--sp-2);
+    margin-top: var(--sp-6);
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 64rem) {
+    .ab-hero__grid,
+    .ab-split,
+    .ab-close {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ab-hero__figure {
+      justify-self: center;
+      max-width: 22rem;
+    }
+
+    .ab-facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ab-fact:nth-child(n) {
+      padding-left: 0;
+      border-left: 0;
+    }
+
+    .ab-fact:nth-child(2n) {
+      padding-left: var(--sp-5);
+      border-left: 1px solid var(--rule-hair);
+    }
+
+    .ab-track {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sp-5);
+    }
+
+    .ab-track::before {
+      top: 1.25rem;
+      bottom: 1.25rem;
+      left: 1.25rem;
+      right: auto;
+      width: 1px;
+      height: auto;
+      background: linear-gradient(180deg, var(--gold-500), var(--navy-900));
+    }
+
+    .ab-stop {
+      grid-template-columns: 2.5rem minmax(0, 1fr);
+      column-gap: var(--sp-4);
+    }
+
+    .ab-stop > :not(.ab-stop__dot) {
+      grid-column: 2;
+    }
+
+    .ab-stop__dot {
+      grid-row: 1 / span 4;
+      margin-bottom: 0;
+    }
+
+    .ab-work,
+    .ab-principles {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ab-plats {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ab-close__figure {
+      max-width: 18rem;
     }
   }
 
-  .about__photo {
-    margin: 0;
-    border: 1px solid var(--bb-ink);
-    box-shadow: 8px 8px 0 var(--bb-ink);
-    background: #fff;
-  }
+  @media (max-width: 40rem) {
+    .ab-facts {
+      grid-template-columns: minmax(0, 1fr);
+    }
 
-  .about__photo img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
+    .ab-fact:nth-child(2n) {
+      padding-left: 0;
+      border-left: 0;
+    }
 
-  .about__mono {
-    width: 88px;
-    height: auto;
-  }
-
-  .about__facts > div {
-    grid-template-columns: 10rem 1fr;
+    .ab-hero__seal {
+      left: -0.75rem;
+    }
   }
 </style>

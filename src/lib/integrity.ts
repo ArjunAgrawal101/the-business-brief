@@ -7,10 +7,11 @@
  * in both directions and reports every one that does not resolve. The build
  * fails on any problem (see src/lib/content.ts), and so do the unit tests.
  */
-import type { AssessmentComponent, Block, Calculation, CaseEntry, Claim, CommandTerm, Concept, Curriculum, Decision, GlossaryEntry, Interactive, Question, Source, Topic, Tool } from './schemas';
+import type { AssessmentComponent, Block, Calculation, CaseEntry, Claim, CommandTerm, Concept, Curriculum, Decision, GlossaryEntry, Interactive, Mindmap, Note, Question, Source, Topic, Tool } from './schemas';
 import { topoOrder } from './plan';
 import { buildWorking, workings } from './finance';
 import { checkStudioInteractives } from './integrity-studio';
+import { checkLearning } from './integrity-learning';
 import { applyAdjustments, balances, derive, type Statement } from './ratios';
 
 type Dict<T> = Record<string, T>;
@@ -30,6 +31,8 @@ export interface Corpus {
   commandTerms: Dict<CommandTerm>;
   concepts: Dict<Concept>;
   interactives: Dict<Interactive>;
+  mindmaps: Dict<Mindmap>;
+  notes: Dict<Note>;
 }
 
 export interface Problem {
@@ -289,6 +292,7 @@ export function checkIntegrity(c: Corpus): Problem[] {
     }
   }
   problems.push(...checkStudioInteractives(c.interactives));
+  problems.push(...checkLearning(c));
 
   /* Interactions name real subtopics */
   const codes = new Set(Object.values(c.curricula).flatMap((cu) => cu.units.flatMap((u) => u.subtopics.map((st) => st.code))));

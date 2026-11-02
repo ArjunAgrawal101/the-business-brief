@@ -1,0 +1,36 @@
+---
+/**
+ * One of the creator's own photographs, as prepared by
+ * scripts/brand/creator-photos.mjs (cropped and resized, nothing else).
+ */
+import manifest from '../../../public/images/creator/manifest.json';
+
+type Name = keyof typeof manifest;
+interface Props {
+  name: Name;
+  alt: string;
+  /** The sizes attribute: how wide the image is shown. */
+  sizes?: string;
+  /** Above the fold: load at once and with priority. */
+  priority?: boolean;
+  class?: string;
+}
+const { name, alt, sizes = '(min-width: 64rem) 40vw, 90vw', priority = false, class: className } = Astro.props;
+const entry = manifest[name];
+const files = entry.files;
+const largest = files[files.length - 1]!;
+const srcset = files.map((f) => `${f.src} ${f.w}w`).join(', ');
+---
+
+<img
+  class={className}
+  src={largest.src}
+  srcset={srcset}
+  sizes={sizes}
+  width={largest.w}
+  height={largest.h}
+  alt={alt}
+  loading={priority ? 'eager' : 'lazy'}
+  fetchpriority={priority ? 'high' : undefined}
+  decoding="async"
+/>

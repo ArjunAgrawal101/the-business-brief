@@ -24,6 +24,8 @@ const NAMES = [
   'commandTerms',
   'concepts',
   'interactives',
+  'mindmaps',
+  'notes',
 ] as const;
 
 let loaded: Promise<Corpus> | null = null;
@@ -57,7 +59,8 @@ export const href = {
   /** A tool's guide when it has one, otherwise its entry in the toolkit index. */
   toolEntry: (id: string, tool?: Tool) => (tool && tool.status !== 'complete' ? `/toolkit/#tool-${id}` : `/toolkit/${id}/`),
   question: (id: string) => `/exam-desk/practice/#q-${id}`,
-  glossary: (id: string) => `/glossary/#term-${id}`,
+  glossary: (id: string) => `/glossary/${id}/`,
+  mindmap: (id: string) => `/mindmaps/${id}/`,
   commandTerm: (term: string) => `/examiner-lens/#ct-${slug(term)}`,
   pathway: (id: string) => `/pathways/${id}/`,
   concept: (id: string) => `/ib/concepts/#${id}`,

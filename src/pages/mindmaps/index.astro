@@ -1,0 +1,283 @@
+---
+/**
+ * The Mindmaps section: a map for every subtopic, by unit, and a map of each
+ * unit. A subtopic without a map yet is listed as planned, not linked.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import { corpus, href } from '../../lib/content';
+import { mindmapFor } from '../../lib/learning';
+import { BRANCH_COLOURS, BRANCH_LABELS, nodeCount, renderThumb } from '../../lib/mindmap';
+
+const c = await corpus();
+const cur = c.curricula['ib-dp-bm'];
+const units = (cur?.units ?? []).map((u) => ({
+  u,
+  unitMap: Object.entries(c.mindmaps).find(([, m]) => m.scope === 'unit' && m.unit === u.number),
+  subs: u.subtopics.map((s) => ({ s, map: mindmapFor(c, s.code) })),
+}));
+const total = units.reduce((n, x) => n + x.subs.length, 0);
+const done = units.reduce((n, x) => n + x.subs.filter((y) => y.map).length, 0);
+const kinds = Object.keys(BRANCH_COLOURS) as Array<keyof typeof BRANCH_COLOURS>;
+---
+
+<BaseLayout title="Mindmaps" description="Interactive mindmaps of IB DP Business Management, subtopic by subtopic: the structure of each topic, its theories, tools, calculations and evaluation, in one picture." section="mindmaps">
+  <PageIntro
+    trail={[{ label: 'Mindmaps' }]}
+    kicker="Mindmaps"
+    title="The course, one map at a time"
+    lead={`Each map shows the shape of a subtopic: its core ideas, types, theories, tools, calculations and the points to weigh, with the links to the rest of the course. ${done} of ${total} subtopics have a map so far.`}
+  >
+    <span class="tag tag--plain">Fold a branch, zoom, or switch to the revision view</span>
+    <span class="tag tag--plain">Download as SVG or PNG, or print</span>
+  </PageIntro>
+
+  <div class="wrap page-body">
+    <section class="mmi-how" aria-labelledby="mmi-how-h">
+      <h2 class="sr-only" id="mmi-how-h">How the maps work</h2>
+      <div>
+        <p class="label">Two views of every map</p>
+        <p>
+          <strong>The full map</strong> holds every idea in the subtopic. <strong>The revision view</strong> keeps only the essentials of each branch, for a
+          five-minute check before a lesson or an examination.
+        </p>
+      </div>
+      <div>
+        <p class="label">The colours mean the same thing everywhere</p>
+        <ul class="mmi-key">
+          {
+            kinds.map((k) => (
+              <li>
+                <span style={`--c:${BRANCH_COLOURS[k]}`} aria-hidden="true" />
+                {BRANCH_LABELS[k]}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <div class="js-only mmi-filter" role="group" aria-label="Show maps for">
+      <span class="label">Show</span>
+      <button type="button" class="mm-chip" data-level="all" aria-pressed="true">All subtopics</button>
+      <button type="button" class="mm-chip" data-level="sl" aria-pressed="false">For SL (no HL-only subtopics)</button>
+      <button type="button" class="mm-chip" data-level="hl" aria-pressed="false">HL only</button>
+    </div>
+
+    {
+      units.map(({ u, unitMap, subs }) => (
+        <section class="mmi-unit" aria-labelledby={`mmi-u${u.number}`}>
+          <SectionHead no={String(u.number).padStart(2, '0')} title={u.title} id={`mmi-u${u.number}`} level={2}>
+            {unitMap && (
+              <p>
+                <a href={href.mindmap(unitMap[0])}>The whole unit on one map</a>
+              </p>
+            )}
+          </SectionHead>
+          <ul class="mmi-tiles" role="list">
+            {subs.map(({ s, map }) => (
+              <li class:list={['mmi-tile', { 'mmi-tile--planned': !map }]} data-hl={s.level === 'HL' ? 'yes' : 'no'}>
+                {map ? (
+                  <a class="mmi-tile__link" href={href.mindmap(map[0])}>
+                    <span class="mmi-tile__thumb" set:html={renderThumb(map[1])} />
+                    <span class="mmi-tile__code">{s.code}</span>
+                    <span class="mmi-tile__title">{s.title}</span>
+                    <span class="mmi-tile__meta">
+                      {nodeCount(map[1])} ideas{s.level === 'HL' ? ' · HL only' : s.level !== 'SL/HL' ? ' · HL parts marked' : ''}
+                    </span>
+                  </a>
+                ) : (
+                  <span class="mmi-tile__link">
+                    <span class="mmi-tile__thumb mmi-tile__thumb--empty" aria-hidden="true" />
+                    <span class="mmi-tile__code">{s.code}</span>
+                    <span class="mmi-tile__title">{s.title}</span>
+                    <span class="mmi-tile__meta">Planned{s.level === 'HL' ? ' · HL only' : ''}</span>
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .mmi-how {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: var(--sp-6);
+    padding: var(--sp-5) 0 var(--sp-6);
+  }
+
+  .mmi-how p + p {
+    margin-top: var(--sp-2);
+  }
+
+  .mmi-key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-5);
+    margin: var(--sp-3) 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.875rem;
+  }
+
+  .mmi-key li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+  }
+
+  .mmi-key span {
+    width: 1.5rem;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--c);
+  }
+
+  .mmi-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-6);
+  }
+
+  .mm-chip {
+    min-height: 2.25rem;
+    padding: 0.3rem 0.85rem;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: var(--surface-sheet);
+    color: var(--navy-900);
+    font: 560 0.8125rem/1 var(--font-ui);
+    cursor: pointer;
+  }
+
+  .mm-chip[aria-pressed='true'] {
+    background: var(--navy-900);
+    border-color: var(--navy-900);
+    color: var(--text-on-ink);
+  }
+
+  .mmi-unit + .mmi-unit {
+    margin-top: var(--sp-8);
+  }
+
+  .mmi-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15.5rem), 1fr));
+    gap: var(--sp-4);
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .mmi-tile {
+    margin: 0;
+  }
+
+  .mmi-tile[hidden] {
+    display: none;
+  }
+
+  .mmi-tile__link {
+    display: grid;
+    gap: 0.3rem;
+    height: 100%;
+    padding: var(--sp-3);
+    border: 1px solid var(--rule-hair);
+    background: var(--surface-sheet);
+    color: var(--text-body);
+    text-decoration: none;
+    transition:
+      border-color var(--dur-fast) var(--ease),
+      box-shadow var(--dur-base) var(--ease),
+      transform var(--dur-base) var(--ease-out);
+  }
+
+  a.mmi-tile__link:hover {
+    border-color: var(--gold-500);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    a.mmi-tile__link:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  .mmi-tile__thumb {
+    display: block;
+    aspect-ratio: 16 / 9;
+    margin-bottom: var(--sp-2);
+    background: var(--ivory-50);
+    border: 1px solid var(--rule-hair);
+    padding: 0.4rem;
+  }
+
+  .mmi-tile__thumb :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .mmi-tile__thumb--empty {
+    background:
+      repeating-linear-gradient(135deg, transparent 0 8px, rgba(11, 26, 51, 0.05) 8px 9px),
+      var(--ivory-100);
+  }
+
+  .mmi-tile__code {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--brass-text);
+  }
+
+  .mmi-tile__title {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--navy-900);
+  }
+
+  .mmi-tile__meta {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  .mmi-tile--planned .mmi-tile__link {
+    background: transparent;
+    border-style: dashed;
+  }
+
+  .mmi-tile--planned .mmi-tile__title {
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 48rem) {
+    .mmi-how {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-level]');
+  const tiles = document.querySelectorAll<HTMLElement>('.mmi-tile');
+  buttons.forEach((b) =>
+    b.addEventListener('click', () => {
+      buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      const v = b.dataset.level;
+      tiles.forEach((t) => {
+        t.hidden = v === 'sl' ? t.dataset.hl === 'yes' : v === 'hl' ? t.dataset.hl !== 'yes' : false;
+      });
+    }),
+  );
+</script>

@@ -1,0 +1,102 @@
+---
+/**
+ * The brand lockup: the creator's AA monogram, a fine gold rule, and the two
+ * names set in Cinzel, the face of the Arjun Agrawal logo. The creator brand
+ * (Arjun Agrawal) sits above the product (The Business Brief).
+ */
+import Monogram from './Monogram.astro';
+
+interface Props {
+  reversed?: boolean;
+  size?: 'small' | 'medium' | 'large';
+  class?: string;
+}
+const { reversed = false, size = 'medium', class: className } = Astro.props;
+const h = size === 'small' ? 28 : size === 'large' ? 56 : 36;
+---
+
+<span class:list={['lockup', `lockup--${size}`, { 'lockup--reversed': reversed }, className]}>
+  <Monogram height={h} reversed={reversed} />
+  <span class="lockup__rule" aria-hidden="true"></span>
+  <span class="lockup__text">
+    <span class="lockup__creator">Arjun Agrawal</span>
+    <span class="lockup__product">The Business Brief</span>
+  </span>
+</span>
+
+<style>
+  .lockup {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--navy-900);
+  }
+
+  .lockup__rule {
+    width: 1px;
+    align-self: stretch;
+    margin-block: 0.2rem;
+    background: var(--gold-500);
+  }
+
+  .lockup__text {
+    display: grid;
+    gap: 0.18rem;
+    line-height: 1;
+  }
+
+  .lockup__creator,
+  .lockup__product {
+    font-family: var(--font-brand);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .lockup__creator {
+    font-size: 0.6875rem;
+    letter-spacing: 0.24em;
+    color: var(--slate-600);
+  }
+
+  .lockup__product {
+    font-size: 1.0625rem;
+    letter-spacing: 0.07em;
+    color: var(--navy-900);
+  }
+
+  .lockup--small .lockup__creator {
+    font-size: 0.625rem;
+  }
+
+  .lockup--small .lockup__product {
+    font-size: 0.9375rem;
+  }
+
+  .lockup--large {
+    gap: 1.1rem;
+  }
+
+  .lockup--large .lockup__creator {
+    font-size: 0.875rem;
+  }
+
+  .lockup--large .lockup__product {
+    font-size: 1.625rem;
+  }
+
+  .lockup--reversed {
+    color: var(--text-on-ink);
+  }
+
+  .lockup--reversed .lockup__rule {
+    background: var(--gold-400);
+  }
+
+  .lockup--reversed .lockup__creator {
+    color: var(--gold-400);
+  }
+
+  .lockup--reversed .lockup__product {
+    color: var(--text-on-ink);
+  }
+</style>

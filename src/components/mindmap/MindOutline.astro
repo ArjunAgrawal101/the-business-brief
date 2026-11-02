@@ -1,0 +1,32 @@
+---
+/**
+ * A mindmap as an outline: the same content as the drawn map, as nested lists.
+ * It is the accessible form of the map (screen readers and keyboards), and the
+ * form that prints in full on paper.
+ */
+import type { MindNode } from '../../lib/schemas';
+
+interface Props {
+  nodes: MindNode[];
+  glossaryHref: (id: string) => string;
+}
+const { nodes, glossaryHref } = Astro.props;
+const MARK: Record<string, string> = { advantage: 'Advantage', limitation: 'Limitation', example: 'Example', formula: 'Formula', definition: 'Definition', question: 'Question' };
+---
+
+<ul class="mo-list">
+  {
+    nodes.map((n) => (
+      <li class:list={['mo-item', `mo-item--${n.kind}`, { 'mo-item--core': n.core }]}>
+        <span class="mo-line">
+          {MARK[n.kind] && <span class="mo-kind">{MARK[n.kind]}</span>}
+          {n.term ? <a href={glossaryHref(n.term)}>{n.label}</a> : <span>{n.label}</span>}
+          {n.level === 'HL' && <span class="tag tag--hl">HL</span>}
+        </span>
+        {n.formula && <span class="mo-formula">{n.formula}</span>}
+        {n.note && <span class="mo-note">{n.note}</span>}
+        {n.children.length > 0 && <Astro.self nodes={n.children} glossaryHref={glossaryHref} />}
+      </li>
+    ))
+  }
+</ul>

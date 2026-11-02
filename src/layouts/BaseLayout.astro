@@ -12,6 +12,7 @@ import '../styles/motion.css';
 import '../styles/print.css';
 import SiteHeader from '../components/layout/SiteHeader.astro';
 import SiteFooter from '../components/layout/SiteFooter.astro';
+import BrandIntro from '../components/brand/BrandIntro.astro';
 import { corpus } from '../lib/content';
 
 interface Props {
@@ -23,9 +24,13 @@ interface Props {
   /** Structured data for search engines. */
   jsonLd?: Record<string, unknown>;
   noindex?: boolean;
+  /** The home page offers the opening brand reveal on a first visit. */
+  intro?: boolean;
+  /** An image to share instead of the default social card (a path under public/). */
+  image?: string;
 }
 
-const { title, description, section, jsonLd, noindex = false } = Astro.props;
+const { title, description, section, jsonLd, noindex = false, intro = false, image } = Astro.props;
 
 // The integrity gate: building any page loads and checks every relationship.
 await corpus();
@@ -33,7 +38,13 @@ await corpus();
 const SITE_NAME = 'The Business Brief';
 const fullTitle = title === 'home' ? 'Arjun Agrawal | The Business Brief: Strategy. Leadership. Decisions.' : `${title} | ${SITE_NAME}`;
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
-const ogImage = Astro.site ? new URL('/brand/social-card.png', Astro.site).href : undefined;
+const ogImage = Astro.site ? new URL(image ?? '/brand/social-card.png', Astro.site).href : undefined;
+/** Decides, before the first paint, whether the opening plays: a first visit (or ?intro), never under reduced motion. */
+const INTRO_GATE = `try {
+  var forced = /[?&]intro\\b/.test(location.search);
+  var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!calm && (forced || !localStorage.getItem('bb:intro-seen'))) document.documentElement.classList.add('intro-on', 'intro-hold');
+} catch (e) {}`;
 ---
 
 <!doctype html>
@@ -46,13 +57,14 @@ const ogImage = Astro.site ? new URL('/brand/social-card.png', Astro.site).href 
     {canonical && <link rel="canonical" href={canonical} />}
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="author" content="Arjun Agrawal" />
-    <meta name="theme-color" content="#f4f1ea" />
+    <meta name="theme-color" content="#f6f1e7" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/inter-tight-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/source-serif-4-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/cinzel-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Arjun Agrawal | The Business Brief" />
@@ -75,8 +87,10 @@ const ogImage = Astro.site ? new URL('/brand/social-card.png', Astro.site).href 
         if (l === 'SL' || l === 'HL') document.documentElement.setAttribute('data-level', l);
       } catch (e) {}
     </script>
+    {intro && <script is:inline set:html={INTRO_GATE} />}
   </head>
   <body>
+    {intro && <BrandIntro />}
     <a class="skip-link" href="#main">Skip to content</a>
     <SiteHeader current={section} />
     <main id="main" tabindex="-1">
