@@ -80,3 +80,25 @@ Audit of the four documents supplied with the enhancement brief, 29 October 2026
 | Guide financial statement formats (pp. 59 to 63) | The ratio desk's statement of profit or loss and statement of financial position, and the cash flow lab's forecast, in the guide's layout and terms, with negatives in brackets |
 | Guide paper 3 description (pp. 7, 42, 47 to 50), TSM paper 3 (pp. 62 to 67) | Paper 3 practice shaped as three questions of 2, 6 and 17 marks |
 | Guide key concepts (pp. 12 to 13) | Concept pages and the IA concept lens |
+
+## Added for 2.0 (2 November 2026)
+
+The creator supplied seven more files with the 2.0 brief. As before, no PDF is committed to the repository.
+
+| File | What it is | Inspection | Use |
+| --- | --- | --- | --- |
+| `Part_6_520_to_594.pdf` | Third extract of the Hodder coursebook (72 PDF pages) | **Fully inspected.** Every page text-extracted and viewed as an image; figures with numbers zoomed. The file holds printed book pages **511 to 582**, not 520 to 594 as its name says: the end of 5.5 (pp. 511 to 518; the start of 5.5 is not included), 5.6 (pp. 519 to 533), 5.7 (pp. 534 to 539), 5.8 (pp. 540 to 548), 5.9 (pp. 549 to 559), the internal assessment chapter (pp. 560 to 566), the glossary (pp. 567 to 576) and the index | Checked coverage and conventions for the unit 5 glossary, mindmaps and notes. Errors in the book are not repeated on the site: a y-axis labelled "8,0000" in Figure 5.5.5; an exam practice asking for a break-even point the chart does not reach; an operating leverage formula printed with the fixed costs inside the bracket, while its exercises use a different definition (the guide gives no formula, so the site states the one it uses) |
+| `ilovepdf_merged_2.pdf` | The creator's own four assessment guides, merged: the business research project (IA), Paper 1, Paper 2 and Paper 3 (HL) | **Fully inspected.** Every page read | Split, unchanged, into four downloads in `public/downloads/guides/`; the Assessment Centre draws its examiner emphasis and recommended strategies from them, labelled as such. To be confirmed by the creator that they may be published |
+| `5.webp` | The Arjun Agrawal logo | Viewed at full size beside the vector master | The vector master in `public/brand/creator/` matches it in shape, proportion and colour; the monogram paths are used unchanged |
+| `6.jpg`, `8.jpg`, `9.webp` | Photographs of the creator | Viewed at full size; metadata read | Used on the About and home pages, cropped and resized only (`scripts/brand/creator-photos.mjs`). `9.webp` carries the Gemini sparkle mark and is flagged for confirmation (see `assets/creator/README.md`) |
+| `7.webp` | A classroom photograph labelled "AI-generated content" | Viewed | Not used and not stored, as the creator asked |
+
+### Coverage of the coursebook now supplied
+
+| Extract | Book pages | Chapters |
+| --- | --- | --- |
+| Part 1 | 2 to 56 | The toolkit |
+| Part 2 | 57 to 120 | 1.1 to 1.5 |
+| Part 6 | 511 to 582 | End of 5.5; 5.6 to 5.9; internal assessment; glossary; index |
+
+Not supplied: 1.6, units 2 to 4, 5.1 to 5.4 and the start of 5.5. Those subtopics are written from the guide, which controls the course in any case.
