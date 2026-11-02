@@ -19,6 +19,7 @@ import {
   moduleSchema,
   noteSchema,
   pathwaySchema,
+  resourceSchema,
   questionSchema,
   sourceSchema,
   toolSchema,
@@ -88,4 +89,5 @@ export const collections = {
   modules: defineCollection({ loader: file('./src/content/data/modules.yaml'), schema: moduleSchema }),
   sources: defineCollection({ loader: file('./src/content/data/sources.yaml'), schema: sourceSchema }),
   claims: defineCollection({ loader: file('./src/content/data/claims.yaml'), schema: claimSchema }),
+  resources: defineCollection({ loader: file('./src/content/data/resources.yaml'), schema: resourceSchema }),
 };

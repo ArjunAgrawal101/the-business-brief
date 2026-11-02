@@ -1,0 +1,324 @@
+---
+/**
+ * The Resources Library: every resource on the platform, filterable by
+ * qualification, audience, unit, subtopic, assessment component, kind and
+ * level, searchable and sortable. Downloads appear only where a file exists.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import ResourceCover from '../../components/resources/ResourceCover.astro';
+import { library } from '../../lib/resources';
+import { corpus } from '../../lib/content';
+import { RESOURCE_TYPE_LABELS, RESOURCE_TYPES } from '../../lib/schemas';
+
+const c = await corpus();
+const items = (await library()).sort((a, b) => a.order - b.order);
+const units = c.curricula['ib-dp-bm']?.units ?? [];
+const usedTypes = RESOURCE_TYPES.filter((t) => items.some((i) => i.type === t));
+const downloads = items.filter((i) => i.primary.kind === 'download' || i.secondary?.label.startsWith('Download')).length;
+const COMPONENTS = [
+  ['internal-assessment', 'Internal assessment'],
+  ['paper-1', 'Paper 1'],
+  ['paper-2', 'Paper 2'],
+  ['paper-3', 'Paper 3 (HL)'],
+];
+---
+
+<BaseLayout title="Resources Library" description="The Business Brief's resources in one library: assessment guides, notes, mindmaps, case studies, practice, formula sheet, glossary and interactive tools, filterable by unit, topic, level, audience and assessment component." section="resources">
+  <PageIntro
+    trail={[{ label: 'Resources' }]}
+    kicker="Resources Library"
+    title="Everything to learn, teach and revise with"
+    lead={`${items.length} resources: assessment guides, topic notes, mindmaps, case studies, practice, a formula sheet, the glossary and the interactive tools. ${downloads} can be downloaded as files; the rest open as pages you can print.`}
+  />
+
+  <div class="wrap page-body" data-ix="library">
+    <form class="rl-bar" role="search" onsubmit="return false">
+      <div class="rl-search">
+        <label class="label label--ink" for="rq">Search the library</label>
+        <input id="rq" type="search" autocomplete="off" placeholder="Try: break-even, Paper 3, motivation" />
+      </div>
+      <div class="rl-filters js-only">
+        <label><span class="label">Kind</span><select data-f="type"><option value="">All kinds</option>{usedTypes.map((t) => <option value={t}>{RESOURCE_TYPE_LABELS[t]}</option>)}</select></label>
+        <label><span class="label">Unit</span><select data-f="unit"><option value="">All units</option>{units.map((u) => <option value={String(u.number)}>Unit {u.number}: {u.title}</option>)}</select></label>
+        <label><span class="label">Topic</span><select data-f="subtopic"><option value="">All subtopics</option>{units.map((u) => <optgroup label={`Unit ${u.number}`}>{u.subtopics.map((s) => <option value={s.code}>{s.code} {s.title}</option>)}</optgroup>)}</select></label>
+        <label><span class="label">Assessment</span><select data-f="component"><option value="">Every component</option>{COMPONENTS.map(([v, l]) => <option value={v}>{l}</option>)}</select></label>
+        <label><span class="label">Level</span><select data-f="level"><option value="">SL and HL</option><option value="sl">Hide HL-only</option><option value="hl">HL-only</option></select></label>
+        <label><span class="label">For</span><select data-f="audience"><option value="">Everyone</option><option value="students">Students</option><option value="teachers">Teachers</option><option value="independent">Independent learners</option></select></label>
+        <label><span class="label">Sort</span><select data-sort><option value="order">Featured first</option><option value="title">Title, A to Z</option><option value="unit">By unit</option><option value="updated">Recently updated</option></select></label>
+      </div>
+      <p class="rl-count js-only" aria-live="polite" data-count>{items.length} resources</p>
+    </form>
+
+    <p class="state" data-none hidden>Nothing matches. Clear a filter, or try a shorter word.</p>
+
+    <ul class="rl-grid" role="list" data-grid>
+      {
+        items.map((it) => (
+          <li
+            class="rl-card"
+            data-item
+            data-order={it.order}
+            data-title={it.title.toLowerCase()}
+            data-updated={it.updated}
+            data-unit={it.units[0] ?? 9}
+            data-text={`${it.title} ${it.summary} ${it.typeLabel} ${it.subtopics.join(' ')} ${it.contents.join(' ')}`.toLowerCase()}
+            data-type={it.type}
+            data-units={it.units.join(' ')}
+            data-subtopics={it.subtopics.join(' ')}
+            data-component={it.component ?? ''}
+            data-level={it.level === 'HL' ? 'hl' : 'sl'}
+            data-audiences={it.audiences.join(' ')}
+          >
+            <a class="rl-card__cover" href={it.details ?? it.primary.href} tabindex="-1" aria-hidden="true">
+              <ResourceCover item={it} />
+            </a>
+            <div class="rl-card__body">
+              <p class="rl-card__type">
+                {it.typeLabel}
+                {it.level === 'HL' && <span class="tag tag--hl">HL</span>}
+              </p>
+              <h2 class="rl-card__title">
+                <a href={it.details ?? it.primary.href}>{it.title}</a>
+              </h2>
+              <p class="rl-card__sum">{it.summary}</p>
+              <p class="rl-card__meta">
+                {it.subtopics.length ? it.subtopics.slice(0, 4).join(' · ') : it.units.length ? it.units.map((u) => `Unit ${u}`).join(' · ') : 'Across the course'}
+                {it.audiences.includes('teachers') && !it.audiences.includes('students') ? ' · For teachers' : ''}
+              </p>
+              <p class="rl-card__act">
+                {it.primary.kind === 'download' ? (
+                  <a class="btn btn--small btn--primary" href={it.primary.href} download>
+                    {it.primary.label}
+                    {it.primary.size && <span class="rl-size">{it.primary.size}</span>}
+                  </a>
+                ) : (
+                  <a class="btn btn--small" href={it.primary.href}>
+                    {it.primary.label}
+                  </a>
+                )}
+                {it.secondary && (
+                  <a class="rl-sec" href={it.secondary.href} download={it.secondary.label.startsWith('Download') ? '' : undefined}>
+                    {it.secondary.label}
+                  </a>
+                )}
+              </p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="small muted rl-note">
+      Downloads are offered only where a file exists. The assessment guides are the creator's own, from the Arjun Agrawal Knowledge Series; every business in the cases and examples is fictional unless it says otherwise. Nothing here is published, approved or endorsed by the International Baccalaureate.
+    </p>
+  </div>
+</BaseLayout>
+
+<style>
+  .rl-bar {
+    display: grid;
+    gap: var(--sp-4);
+    padding-bottom: var(--sp-5);
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .rl-search {
+    display: grid;
+    gap: var(--sp-2);
+    max-width: 44rem;
+  }
+
+  .rl-search input {
+    min-height: 3rem;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--rule-control);
+    border-radius: 999px;
+    background: var(--surface-sheet);
+    color: var(--text-strong);
+    font: 400 1.0625rem/1.3 var(--font-ui);
+  }
+
+  .rl-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3) var(--sp-4);
+  }
+
+  .rl-filters label {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .rl-filters select {
+    min-height: 2.5rem;
+    max-width: 16rem;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--rule-control);
+    border-radius: var(--radius-2);
+    background: var(--surface-sheet);
+    color: var(--text-strong);
+    font: 500 0.9375rem/1.2 var(--font-ui);
+  }
+
+  .rl-count {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .rl-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17.5rem), 1fr));
+    gap: var(--sp-6) var(--sp-5);
+    margin: var(--sp-6) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .rl-card {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: var(--sp-3);
+    margin: 0;
+  }
+
+  .rl-card[hidden] {
+    display: none;
+  }
+
+  .rl-card__cover {
+    display: block;
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .rl-card:hover .rl-card__cover {
+      transform: translateY(-4px);
+    }
+  }
+
+  .rl-card__body {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+  }
+
+  .rl-card__type {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .rl-card__title {
+    font-size: 1.1875rem;
+    line-height: 1.25;
+  }
+
+  .rl-card__title a {
+    color: var(--navy-900);
+    text-decoration: none;
+  }
+
+  .rl-card__title a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--gold-500);
+  }
+
+  .rl-card__sum {
+    font-size: 0.9375rem;
+    color: var(--text-body);
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .rl-card__meta {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  .rl-card__act {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-4);
+    margin-top: var(--sp-2);
+  }
+
+  .rl-size {
+    margin-left: 0.4rem;
+    font-weight: 400;
+    opacity: 0.75;
+  }
+
+  .rl-sec {
+    font-size: 0.875rem;
+    font-weight: 560;
+  }
+
+  .rl-note {
+    margin-top: var(--sp-7);
+  }
+</style>
+
+<script>
+  import { each } from '../../scripts/ix';
+  each('[data-ix="library"]', (root) => {
+    const q = root.querySelector<HTMLInputElement>('#rq');
+    const filters = [...root.querySelectorAll<HTMLSelectElement>('[data-f]')];
+    const sortSel = root.querySelector<HTMLSelectElement>('[data-sort]');
+    const grid = root.querySelector<HTMLElement>('[data-grid]');
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-item]')];
+    const count = root.querySelector<HTMLElement>('[data-count]');
+    const none = root.querySelector<HTMLElement>('[data-none]');
+    if (!q || !grid) return;
+    const params = new URLSearchParams(location.search);
+    q.value = params.get('q') ?? '';
+    filters.forEach((f) => {
+      const v = params.get(f.dataset.f ?? '');
+      if (v) f.value = v;
+    });
+    const val = (k: string) => filters.find((f) => f.dataset.f === k)?.value ?? '';
+    const run = () => {
+      const words = q.value.toLowerCase().split(/\s+/).filter(Boolean);
+      let shown = 0;
+      for (const c of cards) {
+        const lvl = val('level');
+        const ok =
+          words.every((w) => (c.dataset.text ?? '').includes(w)) &&
+          (!val('type') || c.dataset.type === val('type')) &&
+          (!val('unit') || (c.dataset.units ?? '').split(' ').includes(val('unit'))) &&
+          (!val('subtopic') || (c.dataset.subtopics ?? '').split(' ').includes(val('subtopic'))) &&
+          (!val('component') || c.dataset.component === val('component')) &&
+          (!val('audience') || (c.dataset.audiences ?? '').split(' ').includes(val('audience'))) &&
+          (!lvl || (lvl === 'hl' ? c.dataset.level === 'hl' : c.dataset.level !== 'hl'));
+        c.hidden = !ok;
+        if (ok) shown += 1;
+      }
+      const key = sortSel?.value ?? 'order';
+      const sorted = [...cards].sort((a, b) => {
+        if (key === 'title') return (a.dataset.title ?? '').localeCompare(b.dataset.title ?? '');
+        if (key === 'unit') return Number(a.dataset.unit) - Number(b.dataset.unit) || Number(a.dataset.order) - Number(b.dataset.order);
+        if (key === 'updated') return (b.dataset.updated ?? '').localeCompare(a.dataset.updated ?? '') || Number(a.dataset.order) - Number(b.dataset.order);
+        return Number(a.dataset.order) - Number(b.dataset.order);
+      });
+      sorted.forEach((c) => grid.append(c));
+      if (count) count.textContent = `${shown} ${shown === 1 ? 'resource' : 'resources'}`;
+      if (none) none.hidden = shown > 0;
+      const url = new URL(location.href);
+      url.search = '';
+      if (q.value.trim()) url.searchParams.set('q', q.value.trim());
+      filters.forEach((f) => f.value && url.searchParams.set(f.dataset.f ?? '', f.value));
+      history.replaceState(null, '', url);
+    };
+    q.addEventListener('input', run);
+    filters.forEach((f) => f.addEventListener('change', run));
+    sortSel?.addEventListener('change', run);
+    run();
+  });
+</script>

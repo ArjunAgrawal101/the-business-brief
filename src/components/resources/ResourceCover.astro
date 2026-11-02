@@ -1,0 +1,85 @@
+---
+/**
+ * A resource's cover, generated: the creator's monogram, the platform's name,
+ * the kind of resource, its title, a motif for its kind, and what it is (PDF,
+ * SVG, a page). One design system for every cover, so the library reads as a
+ * collection.
+ */
+import { MONOGRAM } from '../../lib/brand';
+import { wrap } from '../../lib/mindmap';
+import type { LibraryItem } from '../../lib/resources';
+
+interface Props {
+  item: LibraryItem;
+  size?: 'card' | 'large';
+}
+const { item, size = 'card' } = Astro.props;
+const DARK = new Set(['assessment-guide', 'interactive', 'ia-support']);
+const dark = DARK.has(item.type);
+const bg = dark ? (item.type === 'interactive' ? '#13264a' : '#0b1a33') : item.type === 'case-study' ? '#ece5d4' : item.type === 'topic-notes' || item.type === 'terminology' ? '#ffffff' : '#f6f1e7';
+const ink = dark ? '#f4efe4' : '#0b1a33';
+const gold = dark ? '#c9a866' : '#8a6b2a';
+const sub = dark ? 'rgba(244,239,228,0.62)' : '#566173';
+const lines = wrap(item.title, 20).slice(0, 5);
+const fmt = item.primary.kind === 'download' ? (item.primary.format ?? 'File') : item.secondary?.label.includes('SVG') ? 'Page · SVG' : item.primary.kind === 'print' ? 'Print' : 'Page';
+const tagLine = [item.subtopics.length ? item.subtopics.slice(0, 3).join(' · ') : item.units.length ? item.units.map((u) => `Unit ${u}`).join(' · ') : '', item.level === 'HL' ? 'HL' : ''].filter(Boolean).join('  ·  ');
+const mk = 22 / MONOGRAM.viewBox.h;
+const motif = (() => {
+  switch (item.type) {
+    case 'assessment-guide':
+      return `<g stroke="${gold}" fill="none" stroke-width="1.4"><rect x="40" y="250" width="70" height="88"/><rect x="52" y="240" width="70" height="88" fill="${bg}"/><path d="M64 262h46M64 274h46M64 286h30"/></g><path d="M150 300h110" stroke="${gold}" stroke-width="1"/><circle cx="205" cy="300" r="4" fill="${gold}"/>`;
+    case 'mindmap':
+      return `<g fill="none" stroke-width="3" stroke-linecap="round"><path d="M150 290C120 290 120 255 80 255" stroke="#1e355f"/><path d="M150 290C120 290 120 325 80 325" stroke="#a8463f"/><path d="M150 290C180 290 180 250 222 250" stroke="#2e6b8f"/><path d="M150 290C180 290 180 290 226 290" stroke="#8a6b2a"/><path d="M150 290C180 290 180 330 222 330" stroke="#2f6f5e"/></g><rect x="128" y="278" width="44" height="24" rx="6" fill="#0b1a33"/>`;
+    case 'formula-sheet':
+      return `<g fill="none" stroke="${gold}" stroke-width="1"><path d="M40 250h220M40 275h220M40 300h220M40 325h220"/></g><text x="40" y="268" font-family="Georgia,serif" font-size="14" fill="${ink}">BE = FC ÷ (P − VC)</text><text x="40" y="318" font-family="Georgia,serif" font-size="14" fill="${ink}">ROCE = PBIT ÷ CE × 100</text>`;
+    case 'terminology':
+      return `<text x="40" y="320" font-family="Georgia,serif" font-size="78" font-style="italic" fill="${gold}" opacity="0.85">Aa</text><path d="M150 268h110M150 288h90M150 308h100" stroke="${sub}" stroke-width="2"/>`;
+    case 'case-study':
+      return `<rect x="40" y="250" width="220" height="82" fill="#fff" stroke="#cdc2ab"/><text x="54" y="272" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="700" letter-spacing="2" fill="#a8463f">CASE FILE · FICTIONAL</text><path d="M54 288h160M54 302h180M54 316h120" stroke="#aeb8c8" stroke-width="2"/>`;
+    case 'interactive':
+      return `<path d="M40 330L100 300L150 312L210 262L260 250" fill="none" stroke="${gold}" stroke-width="2.5"/><path d="M40 338H262M40 240V338" stroke="${sub}" stroke-width="1"/><circle cx="210" cy="262" r="5" fill="${gold}"/>`;
+    case 'ia-support':
+      return `<g fill="none" stroke="${gold}" stroke-width="1.4"><rect x="60" y="246" width="60" height="80"/><rect x="130" y="246" width="60" height="80"/><rect x="200" y="246" width="60" height="80"/></g><text x="68" y="300" font-family="Georgia,serif" font-size="22" fill="${ink}">SD1</text><text x="138" y="300" font-family="Georgia,serif" font-size="22" fill="${ink}">SD2</text><text x="208" y="300" font-family="Georgia,serif" font-size="22" fill="${ink}">SD3</text>`;
+    case 'practice':
+    case 'worked-solutions':
+      return `<g stroke="${sub}" stroke-width="1"><path d="M40 256h220M40 280h220M40 304h220M40 328h220"/></g><path d="M40 256h120" stroke="${ink}" stroke-width="2"/><text x="238" y="252" font-family="Georgia,serif" font-size="16" font-style="italic" fill="${gold}">[10]</text>`;
+    case 'revision-brief':
+      return `<g fill="${gold}"><circle cx="48" cy="262" r="4"/><circle cx="48" cy="290" r="4"/><circle cx="48" cy="318" r="4"/></g><path d="M62 262h170M62 290h140M62 318h160" stroke="${sub}" stroke-width="2"/>`;
+    default:
+      return `<g fill="none" stroke="${gold}" stroke-width="1.4"><rect x="70" y="240" width="160" height="96"/><path d="M150 240v96M70 288h160"/></g><rect x="150" y="240" width="80" height="48" fill="${gold}" opacity="0.25"/>`;
+  }
+})();
+---
+
+<svg class:list={['rc', `rc--${size}`]} viewBox="0 0 300 400" role="img" aria-label={`Cover: ${item.typeLabel}, ${item.title}`} preserveAspectRatio="xMidYMid meet">
+  <rect width="300" height="400" fill={bg} />
+  {!dark && <rect width="300" height="6" fill="#0b1a33" />}
+  {dark && <rect x="14" y="14" width="272" height="372" fill="none" stroke={gold} stroke-opacity="0.45" />}
+  <g transform={`translate(28 26) scale(${mk}) translate(${-MONOGRAM.viewBox.x} ${-MONOGRAM.viewBox.y})`}>
+    <path fill-rule="evenodd" d={MONOGRAM.a} fill={dark ? '#f4efe4' : '#0b1a33'} />
+    <path fill-rule="evenodd" d={MONOGRAM.b} fill={dark ? '#c9a866' : '#b39350'} />
+  </g>
+  <text x="62" y="35" font-family="Cinzel, Georgia, serif" font-size="8.5" font-weight="600" letter-spacing="1.6" fill={sub}>ARJUN AGRAWAL</text>
+  <text x="62" y="47" font-family="Cinzel, Georgia, serif" font-size="10" font-weight="600" letter-spacing="1" fill={ink}>THE BUSINESS BRIEF</text>
+  <text x="28" y="96" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill={gold}>{item.typeLabel.toUpperCase()}</text>
+  <text x="28" y="128" font-family="'Source Serif 4', Georgia, serif" font-size="23" font-weight="600" fill={ink}>
+    {lines.map((l, i) => <tspan x="28" dy={i === 0 ? 0 : 27}>{l}</tspan>)}
+  </text>
+  <Fragment set:html={motif} />
+  <text x="28" y="372" font-family="Inter, Arial, sans-serif" font-size="9.5" font-weight="600" letter-spacing="0.6" fill={sub}>{tagLine}</text>
+  <rect x={300 - 28 - Math.max(46, fmt.length * 7 + 16)} y="358" width={Math.max(46, fmt.length * 7 + 16)} height="20" rx="10" fill="none" stroke={gold} />
+  <text x={300 - 28 - Math.max(46, fmt.length * 7 + 16) / 2} y="372" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="9.5" font-weight="700" letter-spacing="0.8" fill={gold}>{fmt.toUpperCase()}</text>
+</svg>
+
+<style>
+  .rc {
+    display: block;
+    width: 100%;
+    height: auto;
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .rc--large {
+    box-shadow: var(--shadow-lift);
+  }
+</style>

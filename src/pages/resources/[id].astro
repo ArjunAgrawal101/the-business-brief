@@ -1,0 +1,188 @@
+---
+/** A curated resource's details page: its cover, what it contains, who it is for, and how to get it. */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import ResourceCover from '../../components/resources/ResourceCover.astro';
+import { library, type LibraryItem } from '../../lib/resources';
+import { corpus } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const items = await library();
+  return items.filter((i) => i.curated && i.details === `/resources/${i.id}/`).map((item) => ({ params: { id: item.id }, props: { item } }));
+}
+
+interface Props {
+  item: LibraryItem;
+}
+const { item } = Astro.props;
+const c = await corpus();
+const all = await library();
+const related = all.filter((x) => x.id !== item.id && ((item.component && x.component === item.component) || x.type === item.type)).slice(0, 4);
+const subs = c.curricula['ib-dp-bm']?.units.flatMap((u) => u.subtopics) ?? [];
+const AUD: Record<string, string> = { students: 'Students', teachers: 'Teachers', independent: 'Independent learners' };
+const COMP: Record<string, string> = { 'internal-assessment': 'Internal assessment', 'paper-1': 'Paper 1', 'paper-2': 'Paper 2', 'paper-3': 'Paper 3 (HL)' };
+---
+
+<BaseLayout title={item.title} description={item.summary} section="resources">
+  <div class="wrap rd">
+    <Breadcrumbs trail={[{ label: 'Resources', href: '/resources/' }, { label: item.title }]} />
+    <div class="rd__grid">
+      <div class="rd__cover"><ResourceCover item={item} size="large" /></div>
+      <div class="rd__body">
+        <p class="label label--ink">{item.typeLabel}{item.level === 'HL' ? ' · HL only' : ''}</p>
+        <h1 class="rd__title">{item.title}</h1>
+        <p class="rd__sum">{item.summary}</p>
+        <p class="rd__act">
+          {
+            item.primary.kind === 'download' ? (
+              <a class="btn btn--primary" href={item.primary.href} download>
+                {[item.primary.label, item.primary.pages ? `${item.primary.pages} pages` : '', item.primary.size ?? ''].filter(Boolean).join(', ')}
+              </a>
+            ) : (
+              <a class="btn btn--primary" href={item.primary.href}>
+                {item.primary.label} <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+              </a>
+            )
+          }
+        </p>
+        <dl class="rd__meta">
+          <div><dt>Qualification</dt><dd>{item.qualification === 'ib-dp-bm' ? 'IB Diploma Programme Business Management' : 'General'}</dd></div>
+          <div><dt>For</dt><dd>{item.audiences.map((a) => AUD[a]).join(', ')}</dd></div>
+          <div><dt>Level</dt><dd>{item.level === 'HL' ? 'HL only' : 'SL and HL'}</dd></div>
+          {item.component && <div><dt>Assessment</dt><dd>{COMP[item.component]}</dd></div>}
+          {item.units.length > 0 && <div><dt>Units</dt><dd>{item.units.map((u) => `Unit ${u}`).join(', ')}</dd></div>}
+          {item.subtopics.length > 0 && <div><dt>Subtopics</dt><dd>{item.subtopics.map((s) => `${s} ${subs.find((x) => x.code === s)?.title ?? ''}`).join('; ')}</dd></div>}
+          <div><dt>Format</dt><dd>{item.primary.format ?? (item.primary.kind === 'page' ? 'A page on this site' : 'A printable page')}</dd></div>
+          <div><dt>Updated</dt><dd>{item.updated}</dd></div>
+        </dl>
+        {
+          item.contents.length > 0 && (
+            <div class="rd__contents">
+              <p class="label">What it contains</p>
+              <ol>{item.contents.map((x) => <li>{x}</li>)}</ol>
+            </div>
+          )
+        }
+      </div>
+    </div>
+    {
+      related.length > 0 && (
+        <section class="rd__related" aria-labelledby="rd-rel-h">
+          <h2 id="rd-rel-h">Related resources</h2>
+          <ul>
+            {related.map((r) => (
+              <li>
+                <a href={r.details ?? r.primary.href}>{r.title}</a>
+                <span class="small muted">{r.typeLabel}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .rd {
+    padding-top: var(--sp-6);
+  }
+
+  .rd__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    margin-top: var(--sp-6);
+    align-items: start;
+  }
+
+  .rd__cover {
+    max-width: 22rem;
+  }
+
+  .rd__body {
+    display: grid;
+    gap: var(--sp-4);
+  }
+
+  .rd__title {
+    font-size: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+  }
+
+  .rd__sum {
+    font-family: var(--font-serif);
+    font-size: var(--fs-lead);
+    color: var(--navy-900);
+    max-width: 40rem;
+  }
+
+  .rd__meta {
+    display: grid;
+    gap: 0;
+    margin: var(--sp-2) 0 0;
+    border-top: 1px solid var(--navy-900);
+    max-width: 40rem;
+  }
+
+  .rd__meta > div {
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr);
+    gap: var(--sp-3);
+    padding: var(--sp-2) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .rd__meta dt {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding-top: 0.15rem;
+  }
+
+  .rd__meta dd {
+    margin: 0;
+  }
+
+  .rd__contents ol {
+    margin: var(--sp-2) 0 0;
+    padding-left: 1.2rem;
+  }
+
+  .rd__related {
+    margin-top: var(--sp-8);
+    padding-top: var(--sp-5);
+    border-top: 1px solid var(--navy-900);
+  }
+
+  .rd__related h2 {
+    font-size: 1.5rem;
+  }
+
+  .rd__related ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: var(--sp-3) var(--sp-5);
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .rd__related li {
+    display: grid;
+    gap: 0.15rem;
+    margin: 0;
+  }
+
+  @media (max-width: 52rem) {
+    .rd__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .rd__meta > div {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.15rem;
+    }
+  }
+</style>

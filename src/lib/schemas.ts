@@ -1411,3 +1411,64 @@ export type GlossaryEntry = z.infer<typeof glossarySchema>;
 export type Source = z.infer<typeof sourceSchema>;
 export type Claim = z.infer<typeof claimSchema>;
 export type Concept = z.infer<typeof conceptSchema>;
+
+/* ------------------------------------------------------------------ */
+/* Resources Library: curated entries (the rest is generated)          */
+/* ------------------------------------------------------------------ */
+
+export const RESOURCE_TYPES = [
+  'assessment-guide',
+  'topic-notes',
+  'revision-brief',
+  'mindmap',
+  'framework',
+  'case-study',
+  'practice',
+  'worked-solutions',
+  'ia-support',
+  'formula-sheet',
+  'terminology',
+  'teaching',
+  'interactive',
+] as const;
+export const RESOURCE_TYPE_LABELS: Record<(typeof RESOURCE_TYPES)[number], string> = {
+  'assessment-guide': 'Assessment guide',
+  'topic-notes': 'Topic notes',
+  'revision-brief': 'Revision brief',
+  mindmap: 'Mindmap',
+  framework: 'Business framework',
+  'case-study': 'Case study',
+  practice: 'Practice questions',
+  'worked-solutions': 'Worked solutions',
+  'ia-support': 'IA support',
+  'formula-sheet': 'Formula sheet',
+  terminology: 'Business terminology',
+  teaching: 'Teaching resource',
+  interactive: 'Interactive tool',
+};
+export const AUDIENCES = ['students', 'teachers', 'independent'] as const;
+
+export const resourceSchema = z.object({
+  title: z.string(),
+  summary: md,
+  type: z.enum(RESOURCE_TYPES),
+  qualification: z.enum(['ib-dp-bm', 'general']).default('ib-dp-bm'),
+  audiences: z.array(z.enum(AUDIENCES)).min(1),
+  level: z.enum(['SL/HL', 'HL']).default('SL/HL'),
+  units: z.array(z.number().int().min(1).max(5)).default([]),
+  subtopics: z.array(z.string()).default([]),
+  component: z.enum(['internal-assessment', 'paper-1', 'paper-2', 'paper-3']).optional(),
+  /** How to get it: a file to download (it must exist in public/), a page, or a page to print. */
+  access: z.object({
+    kind: z.enum(['download', 'page', 'print']),
+    href: z.string().startsWith('/'),
+    format: z.string().optional(),
+    pages: z.number().int().positive().optional(),
+    size: z.string().optional(),
+  }),
+  /** What it contains, for its details page. */
+  contents: z.array(z.string()).default([]),
+  updated: z.string(),
+  order: z.number(),
+});
+export type ResourceEntry = z.infer<typeof resourceSchema>;

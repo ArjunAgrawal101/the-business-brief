@@ -1,0 +1,318 @@
+---
+/**
+ * The formula sheet: a printable page. The first part is the formulae the
+ * examination provides (guide, pp. 64 to 65); the second, the ones students
+ * must learn, in their standard form. HL-only formulae are marked.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import Monogram from '../../components/brand/Monogram.astro';
+
+type F = { name: string; f: string; where?: string; hl?: boolean };
+const PROVIDED: Array<{ group: string; hl?: boolean; items: F[] }> = [
+  {
+    group: 'Profitability ratios',
+    items: [
+      { name: 'Gross profit margin', f: 'gross profit ÷ sales revenue × 100' },
+      { name: 'Profit margin', f: 'profit before interest and tax ÷ sales revenue × 100' },
+      { name: 'Return on capital employed (ROCE)', f: 'profit before interest and tax ÷ capital employed × 100', where: 'capital employed = non-current liabilities + equity' },
+    ],
+  },
+  {
+    group: 'Liquidity ratios',
+    items: [
+      { name: 'Current ratio', f: 'current assets ÷ current liabilities' },
+      { name: 'Acid test (quick) ratio', f: '(current assets − stock) ÷ current liabilities' },
+    ],
+  },
+  {
+    group: 'Efficiency ratios',
+    hl: true,
+    items: [
+      { name: 'Stock turnover (number of times)', f: 'cost of sales ÷ average stock', hl: true },
+      { name: 'Stock turnover (number of days)', f: 'average stock ÷ cost of sales × 365', where: 'average stock = (opening stock + closing stock) ÷ 2', hl: true },
+      { name: 'Debtor days ratio (number of days)', f: 'debtors ÷ total sales revenue × 365', hl: true },
+      { name: 'Creditor days ratio (number of days)', f: 'creditors ÷ cost of sales × 365', hl: true },
+      { name: 'Gearing ratio', f: 'non-current liabilities ÷ capital employed × 100', where: 'capital employed = non-current liabilities + equity', hl: true },
+    ],
+  },
+  {
+    group: 'Investment appraisal',
+    items: [
+      { name: 'Average rate of return (ARR)', f: '((total returns − capital cost) ÷ years of use) ÷ capital cost × 100' },
+      { name: 'Net present value (NPV)', f: 'sum of the present values of the returns − original cost', hl: true },
+    ],
+  },
+  {
+    group: 'Capacity utilization and productivity',
+    hl: true,
+    items: [
+      { name: 'Capacity utilization rate', f: 'actual output ÷ productive capacity × 100', hl: true },
+      { name: 'Productivity rate', f: 'total output ÷ total input × 100', hl: true },
+    ],
+  },
+];
+const LEARN: Array<{ group: string; items: F[] }> = [
+  {
+    group: 'Costs, revenue and break-even',
+    items: [
+      { name: 'Total cost', f: 'total fixed costs + total variable costs' },
+      { name: 'Average cost', f: 'total cost ÷ output' },
+      { name: 'Profit', f: 'total revenue − total cost' },
+      { name: 'Contribution per unit', f: 'price − variable cost per unit' },
+      { name: 'Total contribution', f: 'contribution per unit × quantity sold' },
+      { name: 'Break-even quantity', f: 'fixed costs ÷ contribution per unit', where: 'rounded up to a whole unit' },
+      { name: 'Margin of safety', f: 'actual (or forecast) output − break-even quantity' },
+      { name: 'Target profit output', f: '(fixed costs + target profit) ÷ contribution per unit' },
+      { name: 'Target price', f: '(fixed costs + target profit) ÷ expected output + variable cost per unit' },
+    ],
+  },
+  {
+    group: 'Finance',
+    items: [
+      { name: 'Working capital', f: 'current assets − current liabilities' },
+      { name: 'Payback period', f: 'whole years before recovery + (amount still to recover ÷ net cash flow in the payback year) × 12 months' },
+      { name: 'Straight-line depreciation (a year)', f: '(purchase cost − residual value) ÷ years of usage', hl: true },
+      { name: 'Units of production depreciation', f: '(purchase cost − residual value) ÷ total expected units × units produced in the period', hl: true },
+    ],
+  },
+  {
+    group: 'Marketing',
+    items: [
+      { name: 'Market share', f: "the firm's sales ÷ total market sales × 100" },
+      { name: 'Market (or sales) growth', f: '(this period − last period) ÷ last period × 100' },
+      { name: 'Price elasticity of demand', f: '% change in quantity demanded ÷ % change in price', hl: true },
+    ],
+  },
+  {
+    group: 'Operations',
+    items: [
+      { name: 'Labour productivity', f: 'total output ÷ number of workers (or labour hours)', hl: true },
+      { name: 'Capital productivity', f: 'total output ÷ capital input (such as machine hours)', hl: true },
+      { name: 'Defect rate', f: 'defective units ÷ total units produced × 100', hl: true },
+      { name: 'Cost to make (CTM)', f: 'total fixed costs + (variable cost per unit × quantity)', hl: true },
+      { name: 'Cost to buy (CTB)', f: 'price per unit × quantity', hl: true },
+    ],
+  },
+  {
+    group: 'Toolkit',
+    items: [{ name: 'Expected value (decision trees)', f: 'sum of (probability × outcome) for each chance node' }],
+  },
+];
+---
+
+<BaseLayout title="Formula sheet" description="Every formula in IB DP Business Management on one printable page: the formulae the examination provides, and the ones you must learn, with HL-only formulae marked." section="resources">
+  <article class="wrap fs">
+    <div class="fs__screen">
+      <Breadcrumbs trail={[{ label: 'Resources', href: '/resources/' }, { label: 'Formula sheet' }]} />
+      <p class="fs__actions js-only"><button type="button" class="btn btn--primary" data-print>Print or save as PDF</button></p>
+    </div>
+    <header class="fs__head">
+      <Monogram height={40} />
+      <div>
+        <p class="fs__brand">Arjun Agrawal · The Business Brief</p>
+        <h1 class="fs__title">Formula sheet</h1>
+        <p class="fs__sub">IB Diploma Programme Business Management · first assessment 2024 · <span class="fs__hl">HL</span> marks a formula for HL only</p>
+      </div>
+    </header>
+
+    <section class="fs__part" aria-labelledby="fs-given">
+      <h2 id="fs-given">Provided in the examination</h2>
+      <p class="fs__note">The formulae the guide lists for external assessment (Business management guide, pp. 64 to 65), written out in words. A copy is given to students in the examination.</p>
+      <div class="fs__groups">
+        {
+          PROVIDED.map((g) => (
+            <div class="fs__group">
+              <h3>
+                {g.group} {g.hl && <span class="fs__hl">HL</span>}
+              </h3>
+              <dl>
+                {g.items.map((it) => (
+                  <div>
+                    <dt>
+                      {it.name} {it.hl && !g.hl && <span class="fs__hl">HL</span>}
+                    </dt>
+                    <dd>= {it.f}</dd>
+                    {it.where && <dd class="fs__where">where {it.where}</dd>}
+                  </div>
+                ))}
+              </dl>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="fs__part" aria-labelledby="fs-learn">
+      <h2 id="fs-learn">To learn</h2>
+      <p class="fs__note">Not on the examination's copy, so learn them. Standard forms, consistent with the platform's calculators; the guide's discount table for NPV is supplied with HL questions that need it.</p>
+      <div class="fs__groups">
+        {
+          LEARN.map((g) => (
+            <div class="fs__group">
+              <h3>{g.group}</h3>
+              <dl>
+                {g.items.map((it) => (
+                  <div>
+                    <dt>
+                      {it.name} {it.hl && <span class="fs__hl">HL</span>}
+                    </dt>
+                    <dd>= {it.f}</dd>
+                    {it.where && <dd class="fs__where">{it.where}</dd>}
+                  </div>
+                ))}
+              </dl>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+    <p class="fs__foot">The Business Brief, by Arjun Agrawal. Original teaching material, not an IB publication. Practise every formula with the <a href="/assessment/paper-2/">Paper 2 answer builder</a>.</p>
+  </article>
+</BaseLayout>
+
+<style>
+  .fs {
+    padding-top: var(--sp-6);
+  }
+
+  .fs__screen {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+  }
+
+  .fs__head {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-4);
+    margin-top: var(--sp-5);
+    padding-bottom: var(--sp-4);
+    border-bottom: 2px solid var(--navy-900);
+  }
+
+  .fs__brand {
+    font-family: var(--font-brand);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: var(--brass-text);
+  }
+
+  .fs__title {
+    font-size: clamp(2rem, 1.6rem + 1.8vw, 3rem);
+  }
+
+  .fs__sub {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .fs__hl {
+    display: inline-block;
+    padding: 0 0.35rem;
+    background: var(--navy-900);
+    color: var(--gold-400);
+    font: 700 0.6875rem/1.6 var(--font-ui);
+    letter-spacing: 0.06em;
+    vertical-align: 0.15em;
+  }
+
+  .fs__part {
+    margin-top: var(--sp-6);
+  }
+
+  .fs__part h2 {
+    font-size: 1.5rem;
+  }
+
+  .fs__note {
+    margin-top: var(--sp-2);
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    max-width: 52rem;
+  }
+
+  .fs__groups {
+    columns: 2 22rem;
+    column-gap: var(--sp-7);
+    margin-top: var(--sp-4);
+  }
+
+  .fs__group {
+    break-inside: avoid;
+    margin-bottom: var(--sp-5);
+  }
+
+  .fs__group h3 {
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--gold-500);
+    font-size: 1.0625rem;
+  }
+
+  .fs__group dl {
+    margin: var(--sp-2) 0 0;
+  }
+
+  .fs__group dl > div {
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .fs__group dt {
+    font-weight: 600;
+    color: var(--navy-900);
+    font-size: 0.9375rem;
+  }
+
+  .fs__group dd {
+    margin: 0.1rem 0 0;
+    font-family: var(--font-serif);
+    font-size: 1rem;
+    color: var(--text-body);
+  }
+
+  .fs__where {
+    font-family: var(--font-ui) !important;
+    font-size: 0.8125rem !important;
+    color: var(--text-muted) !important;
+  }
+
+  .fs__foot {
+    margin-top: var(--sp-5);
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--rule-hair);
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  @media print {
+    @page {
+      size: A4;
+      margin: 14mm;
+    }
+
+    .fs__screen {
+      display: none !important;
+    }
+
+    .fs {
+      padding: 0;
+    }
+
+    .fs__groups {
+      columns: 2;
+      column-gap: 10mm;
+    }
+
+    .fs__group dl > div {
+      padding: 1.5mm 0;
+    }
+  }
+</style>
+
+<script>
+  document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+</script>

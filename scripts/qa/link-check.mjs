@@ -41,7 +41,9 @@ for (const page of pages) {
       continue;
     }
     checked++;
-    const [pathPart, frag] = url.split('#');
+    const [withQuery, frag] = url.split('#');
+    // A query string selects a state of a page (for example /?intro), not a different file.
+    const pathPart = (withQuery ?? '').split('?')[0] ?? '';
     const targetPath = pathPart === '' ? from : pathPart.startsWith('/') ? pathPart : new URL(pathPart, `http://x${from}`).pathname;
     const file = resolveFile(targetPath);
     if (!existsSync(file)) {
