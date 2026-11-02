@@ -59,6 +59,11 @@ const hl = (level: string) => mixed && level === 'HL';
             ))}
           </dl>
         )}
+        {mixed && s.level !== 'HL' && s.points.some((p) => p.level === 'HL') && (
+          <p class="hl-notice">
+            <span class="tag tag--hl">HL</span> This section has HL-only points, hidden while you are viewing SL content.
+          </p>
+        )}
         {s.diagram && <Diagram id={s.diagram} />}
         {s.formulas.length > 0 && (
           <div class="nv-formulas">

@@ -169,7 +169,7 @@ const num = () => {
           <SectionHead no={num()} title="Key terms" id="sh-terms-h" dek="Defined in the platform's own words. Each opens its full entry." />
           <dl class="sh-terms">
             {terms.map(([id, g]) => (
-              <div data-level={g.level === 'HL' ? 'HL' : undefined}>
+              <div data-level={g.level === 'HL' && s.level !== 'HL' ? 'HL' : undefined}>
                 <dt>
                   <a href={href.glossary(id)}>{g.term}</a> {g.level === 'HL' && <span class="tag tag--hl">HL</span>}
                 </dt>
