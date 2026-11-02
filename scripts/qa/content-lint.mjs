@@ -60,6 +60,8 @@ const PLACEHOLDERS = [/lorem ipsum/i, /\bTODO\b/, /\bTBD\b/, /\bFIXME\b/, /comin
 const FALSE_CLAIMS = [/\b(official|past|real) (IB )?(exam(ination)?|paper) question/i, /\bIB markscheme for this question\b/i];
 for (const f of pages) {
   const html = readFileSync(f, 'utf8');
+  // The build writes a small redirect page for each moved address (astro.config.mjs); it is not a page to check.
+  if (/<meta http-equiv="refresh"/i.test(html) && !/<h1[\s>]/.test(html)) continue;
   if (DASH.test(html)) report(f, 0, 'en or em dash in the built page');
   const t = text(html);
   for (const re of LEAKS) if (re.test(t)) report(f, 0, `leaked value ${re} near "${t.slice(Math.max(0, t.search(re) - 40), t.search(re) + 30)}"`);

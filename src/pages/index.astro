@@ -16,6 +16,7 @@ import { casesInOrder, corpus, href, modulesInOrder, pathwaysInOrder } from '../
 import { curriculumOf, subtopicCoverage } from '../lib/coverage';
 import { isIcon } from '../lib/icons';
 import { library } from '../lib/resources';
+import { DIAGRAMS } from '../lib/diagrams';
 import { renderThumb } from '../lib/mindmap';
 import ResourceCover from '../components/resources/ResourceCover.astro';
 
@@ -37,6 +38,7 @@ const terms = Object.keys(c.glossary).length;
 const maps = Object.entries(c.mindmaps).sort((a, b) => a[1].order - b[1].order);
 const resources = (await library()).sort((a, b) => a.order - b.order);
 const featured = resources.filter((r) => r.curated).slice(0, 4);
+const HOME_DIAGRAMS = ['break-even-chart', 'bcg-matrix', 'maslow-hierarchy'];
 const LETTERS = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].filter((l) => Object.values(c.glossary).some((g) => g.term.toUpperCase().startsWith(l)));
 
 const INDEX = [
@@ -240,7 +242,7 @@ const jsonLd = {
 
   <section class="band band--white" aria-labelledby="see-h">
     <div class="wrap">
-      <SectionHead no="03" title="See the structure, know the words" id="see-h" dek="Every subtopic as a mindmap you can fold, zoom, print and download, and a glossary of the whole course in plain language." />
+      <SectionHead no="03" title="See the structure, know the words" id="see-h" dek="Every subtopic as a mindmap you can fold, zoom, print and download, original diagrams for every unit, and a glossary of the whole course in plain language." />
       <div class="hv">
         <a class="hv__maps" href="/mindmaps/">
           <span class="hv__thumbs" aria-hidden="true">
@@ -262,6 +264,16 @@ const jsonLd = {
             {LETTERS.map((l) => <li><a href={`/glossary/#letter-${l}`}>{l}</a></li>)}
           </ul>
         </div>
+        <a class="hv__dg" href="/diagrams/">
+          <span class="hv__dgthumbs" aria-hidden="true">
+            {HOME_DIAGRAMS.map((did) => <span class="hv__dgthumb" set:html={DIAGRAMS[did]!.render(`home-${did}`)} />)}
+          </span>
+          <span class="hv__dgtext">
+            <span class="hv__label">Diagrams and infographics</span>
+            <span class="hv__title">{Object.keys(DIAGRAMS).length} original diagrams, drawn from data</span>
+            <span class="hv__text">Models, processes, structures and charts for all five units and the toolkit, each with a text description and an SVG download.</span>
+          </span>
+        </a>
       </div>
     </div>
   </section>
@@ -895,6 +907,49 @@ const jsonLd = {
     border-top: 3px solid var(--gold-500);
   }
 
+  .hv__dg {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: var(--sp-5);
+    align-items: center;
+    padding: var(--sp-5);
+    background: var(--ivory-50);
+    border: 1px solid var(--rule-hair);
+    border-top: 3px solid var(--cobalt-text);
+    color: var(--text-body);
+    text-decoration: none;
+    transition: border-color var(--dur-fast) var(--ease);
+  }
+
+  .hv__dg:hover {
+    border-top-color: var(--gold-500);
+  }
+
+  .hv__dgthumbs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-2);
+  }
+
+  .hv__dgthumb {
+    display: block;
+    padding: 0.4rem;
+    background: #fff;
+    border: 1px solid var(--rule-hair);
+  }
+
+  .hv__dgthumb :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .hv__dgtext {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
   .hv__thumbs {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1406,6 +1461,10 @@ const jsonLd = {
     }
 
     .hv {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hv__dg {
       grid-template-columns: minmax(0, 1fr);
     }
 

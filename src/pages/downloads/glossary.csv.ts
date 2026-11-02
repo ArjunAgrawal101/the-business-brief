@@ -14,6 +14,6 @@ export const GET: APIRoute = async () => {
     );
   const head = ['Term', 'Definition', 'Subtopics', 'Level', 'Kind', 'Formula', 'Related terms', 'Id'].map(cell).join(',');
   const note = cell('The Business Brief glossary, by Arjun Agrawal. Definitions in the platform\'s own words; not an IB publication.');
-  const body = `﻿${head}\r\n${rows.join('\r\n')}\r\n${note}\r\n`;
+  const body = `\uFEFF${head}\r\n${rows.join('\r\n')}\r\n${note}\r\n`;
   return new Response(body, { headers: { 'Content-Type': 'text/csv; charset=utf-8' } });
 };

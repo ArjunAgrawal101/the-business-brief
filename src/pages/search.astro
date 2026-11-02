@@ -8,6 +8,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/layout/PageIntro.astro';
 import { corpus, href, modulesInOrder, pathwaysInOrder, slug, topicsInOrder } from '../lib/content';
 import { plain } from '../lib/markup';
+import { mindmapsInOrder, noteFor, subtopicHref } from '../lib/learning';
+import { DIAGRAMS } from '../lib/diagrams';
+import { library } from '../lib/resources';
 
 const c = await corpus();
 type Entry = { kind: string; title: string; url: string; text: string };
@@ -34,14 +37,25 @@ for (const [id, it] of Object.entries(c.interactives))
 const cur = c.curricula['ib-dp-bm'];
 cur?.units.forEach((u) =>
   u.subtopics.forEach((s) =>
-    entries.push({ kind: 'IB subtopic', title: `${s.code} ${s.title}`, url: s.topic ? href.topic(s.topic) : `/ib/#st-${s.code.replace('.', '-')}`, text: s.topic ? 'Complete brief' : 'On the syllabus map' }),
+    entries.push({ kind: 'IB subtopic', title: `${s.code} ${s.title}`, url: s.topic ? href.topic(s.topic) : subtopicHref(c, s.code), text: s.topic ? 'Complete brief' : noteFor(c, s.code) ? 'Full notes, mindmap, terms and tools' : 'Subtopic page: mindmap, terms and tools' }),
   ),
 );
+for (const [id, m] of await mindmapsInOrder()) entries.push({ kind: 'Mindmap', title: m.scope === 'unit' ? `Unit ${m.unit}: ${m.title}` : `${m.code} ${m.title}`, url: href.mindmap(id), text: `${m.summary} ${m.branches.map((b) => b.label).join(' ')}` });
+for (const [id, d] of Object.entries(DIAGRAMS)) entries.push({ kind: 'Diagram', title: d.title, url: `/diagrams/#diagram-${id}`, text: `${d.caption ?? ''} ${d.syllabus.join(' ')}` });
+for (const r of (await library()).filter((x) => x.curated)) entries.push({ kind: 'Resource', title: r.title, url: r.details ?? r.primary.href, text: `${r.typeLabel}. ${r.summary}` });
+const ASSESSMENT_PAGES: Array<[string, string, string]> = [
+  ['/assessment/', 'The Assessment Centre', 'Every assessed component, explained from the guide'],
+  ['/assessment/internal-assessment/', 'Internal assessment: the business research project', 'Research question builder, supporting documents, criteria'],
+  ['/assessment/paper-1/', 'Paper 1: the pre-released case study', 'Annotated answer builder'],
+  ['/assessment/paper-2/', 'Paper 2: the quantitative paper', 'Calculations and constructions'],
+  ['/assessment/paper-3/', 'Paper 3 (HL): the social enterprise Boardroom', 'Plan builder across the functions, criteria A to D'],
+];
+for (const [path, title, text] of ASSESSMENT_PAGES) entries.push({ kind: 'Assessment', title, url: path, text });
 const kinds = [...new Set(entries.map((e) => e.kind))];
 ---
 
-<BaseLayout title="Search" description="Search the topics, cases, tools, calculations, practice questions and glossary." section="search">
-  <PageIntro trail={[{ label: 'Search' }]} kicker="Search" title="Find anything" lead={`${entries.length} entries: topics, cases, tools, calculations, practice questions, glossary terms and command terms.`} />
+<BaseLayout title="Search" description="Search the topics, mindmaps, diagrams, glossary, cases, tools, calculations, practice questions and resources." section="search">
+  <PageIntro trail={[{ label: 'Search' }]} kicker="Search" title="Find anything" lead={`${entries.length} entries: topics, subtopics, mindmaps, diagrams, glossary terms, cases, tools, calculations, practice questions, resources and the Assessment Centre.`} />
   <div class="wrap page-body">
     <form class="search-box" role="search" data-search-form hidden onsubmit="return false">
       <label for="q" class="label label--ink">Search the platform</label>

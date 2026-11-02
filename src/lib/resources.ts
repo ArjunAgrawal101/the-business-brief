@@ -12,6 +12,7 @@ import { getCollection } from 'astro:content';
 import { corpus, href } from './content';
 import { subtopicHref } from './learning';
 import { RESOURCE_TYPE_LABELS, type RESOURCE_TYPES } from './schemas';
+import { DIAGRAMS, DIAGRAM_GROUPS } from './diagrams';
 
 export type ResourceType = (typeof RESOURCE_TYPES)[number];
 
@@ -38,7 +39,7 @@ export interface LibraryItem {
 }
 
 /** Files the build writes itself, so they exist in every deployment without being in public/. */
-const GENERATED = [/^\/downloads\/glossary\.csv$/, /^\/downloads\/mindmaps\/[a-z0-9-]+\.svg$/];
+const GENERATED = [/^\/downloads\/glossary\.csv$/, /^\/downloads\/mindmaps\/[a-z0-9-]+\.svg$/, /^\/downloads\/diagrams\/[a-z0-9-]+\.svg$/];
 
 function fileExists(path: string): boolean {
   if (GENERATED.some((r) => r.test(path))) return true;
@@ -97,6 +98,30 @@ export function library(): Promise<LibraryItem[]> {
         primary: { kind: 'page', href: href.mindmap(id), label: 'Open the map' },
         secondary: { href: svg, label: 'Download SVG' },
         contents: m.branches.map((b) => b.label),
+        updated: '2026-11-02',
+        order: order++,
+        curated: false,
+      });
+    }
+
+    for (const g of DIAGRAM_GROUPS) {
+      const list = Object.values(DIAGRAMS).filter((d) => d.group === g.id);
+      if (!list.length) continue;
+      const unit = g.id.startsWith('unit-') ? Number(g.id.slice(5)) : undefined;
+      items.push({
+        id: `diagrams-${g.id}`,
+        title: `${g.title.split(':')[0]} diagrams`,
+        summary: `${list.length} original diagrams for ${g.id === 'toolkit' ? 'the business management toolkit' : g.title.split(': ')[1]?.toLowerCase()}, each drawn from data, with a text description and an SVG download.`,
+        type: 'diagram',
+        typeLabel: RESOURCE_TYPE_LABELS.diagram,
+        qualification: 'ib-dp-bm',
+        audiences: ['students', 'teachers', 'independent'],
+        level: list.every((d) => d.level === 'HL') ? 'HL' : 'SL/HL',
+        units: unit ? [unit] : [],
+        subtopics: [...new Set(list.flatMap((d) => d.syllabus))],
+        primary: { kind: 'page', href: `/diagrams/#${g.id}`, label: 'Open the diagrams' },
+        secondary: { href: `/diagrams/#${g.id}`, label: 'SVG downloads' },
+        contents: list.map((d) => d.title),
         updated: '2026-11-02',
         order: order++,
         curated: false,

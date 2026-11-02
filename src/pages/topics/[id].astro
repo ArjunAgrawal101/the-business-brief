@@ -14,6 +14,8 @@ import LevelSwitch from '../../components/ui/LevelSwitch.astro';
 import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
 import VerifyTag from '../../components/ui/VerifyTag.astro';
 import LevelTag from '../../components/ui/LevelTag.astro';
+import Diagram from '../../components/diagrams/Diagram.astro';
+import { DIAGRAMS } from '../../lib/diagrams';
 import { corpus, href, longDate, pathwaysInOrder, topicsInOrder } from '../../lib/content';
 import { CONCEPT_NAMES } from '../../lib/labels';
 import { inline, rich } from '../../lib/markup';
@@ -44,6 +46,9 @@ const glossary = t.related.glossary.map((x) => ({ id: x, data: c.glossary[x] }))
 const questions = t.related.questions.map((x) => ({ id: x, data: c.questions[x] })).filter((x) => x.data).sort((a, b) => (a.data?.order ?? 0) - (b.data?.order ?? 0));
 const sources = t.sources.map((x) => ({ id: x, data: c.sources[x] })).filter((x) => x.data);
 const n = t.sections.length;
+const diagrams = Object.entries(DIAGRAMS).filter(([, d]) => d.syllabus.includes(t.code));
+// The diagrams section, when there is one, comes straight after the brief's own sections.
+const dOff = diagrams.length ? 1 : 0;
 // Calculations whose home is this brief get an anchor on their first worked example.
 const anchors = new Map<string, string>();
 for (const s of t.sections)
@@ -54,10 +59,11 @@ for (const s of t.sections)
   });
 const nav = [
   ...t.sections.map((s, i) => ({ id: s.id, label: s.title, no: String(i + 1).padStart(2, '0') })),
-  { id: 'practice', label: 'Practice questions', no: String(n + 1).padStart(2, '0') },
-  { id: 'concepts', label: 'The concept lens', no: String(n + 2).padStart(2, '0') },
-  { id: 'revision', label: 'Revision', no: String(n + 3).padStart(2, '0') },
-  { id: 'connections', label: 'Connections and sources', no: String(n + 4).padStart(2, '0') },
+  ...(dOff ? [{ id: 'diagrams', label: 'Diagrams', no: String(n + 1).padStart(2, '0') }] : []),
+  { id: 'practice', label: 'Practice questions', no: String(n + 1 + dOff).padStart(2, '0') },
+  { id: 'concepts', label: 'The concept lens', no: String(n + 2 + dOff).padStart(2, '0') },
+  { id: 'revision', label: 'Revision', no: String(n + 3 + dOff).padStart(2, '0') },
+  { id: 'connections', label: 'Connections and sources', no: String(n + 4 + dOff).padStart(2, '0') },
 ];
 ---
 
@@ -166,8 +172,22 @@ const nav = [
         ))
       }
 
+      {
+        dOff > 0 && (
+          <section class="brief-section" id="diagrams" aria-labelledby="diagrams-h">
+            <SectionHead no={n + 1} title="Diagrams" dek="Original diagrams from the platform's library for this subtopic, each with a text description." id="diagrams-h" />
+            <div class="brief-diagrams">
+              {diagrams.map(([did]) => (
+                <Diagram id={did} />
+              ))}
+            </div>
+            <p class="small"><a href="/diagrams/">Every diagram in the library</a></p>
+          </section>
+        )
+      }
+
       <section class="brief-section" id="practice" aria-labelledby="practice-h">
-        <SectionHead no={n + 1} title="Practice questions" dek="Original practice questions in the style of each paper. They are not IB questions, and their marks and level descriptors are the platform's." id="practice-h" />
+        <SectionHead no={n + 1 + dOff} title="Practice questions" dek="Original practice questions in the style of each paper. They are not IB questions, and their marks and level descriptors are the platform's." id="practice-h" />
         <div class="stack">
           {questions.map((q) => q.data && <QuestionCard id={q.id} question={q.data} showCase={true} />)}
         </div>
@@ -177,7 +197,7 @@ const nav = [
       </section>
 
       <section class="brief-section" id="concepts" aria-labelledby="concepts-h">
-        <SectionHead no={n + 2} title="The concept lens" dek="The four IB concepts, applied to this topic's case." id="concepts-h" />
+        <SectionHead no={n + 2 + dOff} title="The concept lens" dek="The four IB concepts, applied to this topic's case." id="concepts-h" />
         <div class="concept-grid">
           {
             t.conceptLens.map((cl) => (
@@ -213,7 +233,7 @@ const nav = [
       </section>
 
       <section class="brief-section" id="revision" aria-labelledby="revision-h">
-        <SectionHead no={n + 3} title="Revision" id="revision-h">
+        <SectionHead no={n + 3 + dOff} title="Revision" id="revision-h">
           <p class="small">
             <a href={href.revision(id)}>Open the one-page revision brief</a>, ready to print.
           </p>
@@ -233,7 +253,7 @@ const nav = [
       </section>
 
       <section class="brief-section" id="connections" aria-labelledby="connections-h">
-        <SectionHead no={n + 4} title="Connections and sources" id="connections-h" />
+        <SectionHead no={n + 4 + dOff} title="Connections and sources" id="connections-h" />
         <div class="connections">
           {
             relatedCases.length > 0 && (
