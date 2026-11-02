@@ -1,0 +1,195 @@
+# Mindmap: 5.6 Production planning (HL only). The platform's own summary of the
+# subtopic's seven content statements (guide pp. 34 to 35). The capacity
+# utilization and productivity rate formulas are the guide's (p. 65); the others
+# follow the platform's code (src/lib/operations.ts) or standard forms, and the
+# guide gives no formula for operating leverage. The supplied coursebook chapter
+# (pp. 519 to 533) was used only to check coverage, and nothing from it is
+# reproduced.
+title: Production planning
+code: '5.6'
+scope: subtopic
+unit: 5
+level: HL
+summary: Supply chains, just-in-time against just-in-case, stock control charts, capacity, quality and productivity measures, operating leverage, and the choice between making and buying.
+centre: Production planning
+order: 56
+branches:
+  - label: Supply chain
+    kind: concept
+    level: HL
+    children:
+      - label: From raw materials to the final customer
+        kind: definition
+        term: supply-chain
+        core: true
+      - label: 'Local: easier to control'
+        kind: type
+        core: true
+        note: Shorter lead times and easier ethical checks, often at a higher cost.
+      - label: 'Global: cheaper but riskier'
+        kind: type
+        core: true
+        note: Exposed to transport, political and currency risks.
+      - label: Managing suppliers, terms and ethics
+        note: One weak link can stop production or harm the brand.
+  - label: JIT versus JIC
+    kind: evaluation
+    level: HL
+    children:
+      - label: 'JIT: stock arrives as needed'
+        kind: definition
+        term: just-in-time
+        core: true
+        children:
+          - label: Less cash and space tied up
+            kind: advantage
+          - label: No cover if supply fails
+            kind: limitation
+      - label: 'JIC: stock held as insurance'
+        kind: definition
+        term: just-in-case
+        core: true
+        children:
+          - label: Keeps production going
+            kind: advantage
+          - label: Storage, cash and spoilage
+            kind: limitation
+      - label: Choice depends on suppliers
+        core: true
+        note: Reliable suppliers and steady demand favour JIT.
+  - label: Stock control chart
+    kind: tool
+    level: HL
+    children:
+      - label: 'Stock over time: a saw-tooth'
+        kind: definition
+        term: stock-control-chart
+        core: true
+      - label: 'Lead time: order to delivery'
+        term: lead-time
+        core: true
+      - label: 'Buffer stock: safety level'
+        term: buffer-stock
+        core: true
+      - label: 'Reorder level: when to order'
+        kind: formula
+        term: reorder-level
+        core: true
+        formula: 'Reorder level = buffer stock + (usage per period × lead time in periods)'
+      - label: 'Reorder quantity: how much'
+        term: reorder-quantity
+        core: true
+      - label: Maximum stock level
+        kind: formula
+        term: maximum-stock-level
+        formula: 'Maximum stock level = buffer stock + reorder quantity'
+      - label: Risk of a stock-out
+        term: stock-out
+        note: If a delivery is late or stock is used faster than planned.
+  - label: Capacity
+    kind: calculation
+    level: HL
+    children:
+      - label: Capacity utilization rate
+        kind: formula
+        term: capacity-utilization-rate
+        core: true
+        formula: 'Capacity utilization rate = (actual output ÷ productive capacity) × 100'
+        note: In the guide's formula list.
+      - label: 'Capacity: maximum output now'
+        term: productive-capacity
+      - label: 'High rate: lower unit costs'
+        kind: advantage
+        core: true
+        note: Fixed costs are spread over more units.
+      - label: Near 100%, no room for breakdowns
+        kind: limitation
+      - label: 'Low rate: spare capacity'
+        term: spare-capacity
+        core: true
+        children:
+          - label: Boost demand or sell capacity
+          - label: 'Rationalize: cut capacity'
+            term: rationalization
+  - label: Quality and productivity
+    kind: calculation
+    level: HL
+    children:
+      - label: Defect rate
+        kind: formula
+        term: defect-rate
+        core: true
+        formula: 'Defect rate = (units that fail to meet the quality standard ÷ units made) × 100'
+        note: Not in the guide's formula list; the standard form.
+      - label: Productivity rate
+        kind: formula
+        term: productivity-rate
+        core: true
+        formula: 'Productivity rate = (total output ÷ total input) × 100'
+        note: In the guide's formula list.
+      - label: Labour productivity
+        kind: formula
+        term: labour-productivity
+        core: true
+        formula: 'Labour productivity = total output ÷ number of workers (or labour hours)'
+      - label: Capital productivity
+        kind: formula
+        term: capital-productivity
+        core: true
+        formula: 'Capital productivity = total output ÷ capital input (such as machine hours)'
+  - label: Operating leverage
+    kind: concept
+    level: HL
+    children:
+      - label: How far costs are fixed
+        kind: definition
+        term: operating-leverage
+        core: true
+      - label: 'High: capital-intensive'
+        term: capital-intensive-production
+        core: true
+        note: Profit swings sharply with sales, so risk is higher when sales fall.
+      - label: 'Low: labour-intensive'
+        term: labour-intensive-production
+        note: More costs are variable, so profit is steadier.
+      - label: A common measure
+        kind: formula
+        formula: 'Degree of operating leverage = total contribution ÷ operating profit'
+        note: The guide gives no formula for operating leverage.
+  - label: Make or buy
+    kind: calculation
+    level: HL
+    children:
+      - label: Cost to buy (CTB)
+        kind: formula
+        term: cost-to-buy
+        core: true
+        formula: 'Cost to buy = supplier price per unit × quantity'
+      - label: Cost to make (CTM)
+        kind: formula
+        term: cost-to-make
+        core: true
+        formula: 'Cost to make = total fixed costs + (variable cost per unit × quantity)'
+      - label: 'On cost: pick the cheaper'
+        core: true
+      - label: Weigh quality and ethics too
+        core: true
+        note: Spare capacity, supplier reliability and keeping skills in-house all matter.
+      - label: Compare with a decision tree
+        note: A toolkit method for setting out both choices and their outcomes.
+connections:
+  - code: '5.3'
+    label: JIT as a lean method; quality and defects
+  - code: '5.4'
+    label: Outsourcing and offshoring reshape the supply chain
+  - code: '5.5'
+    label: Capacity limits break-even and target output
+  - code: '3.3'
+    label: Fixed and variable costs behind CTM and leverage
+  - code: '3.6'
+    label: Stock turnover measures how fast stock moves
+basis:
+  - source: ib-bm-guide-2024
+    pages: '34-35'
+  - source: hodder-bm-2022
+    pages: '519-533'

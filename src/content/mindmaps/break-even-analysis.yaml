@@ -1,0 +1,145 @@
+# Mindmap: 5.5 Break-even analysis. The platform's own summary of the subtopic's
+# four content statements (guide p. 34). Formulas follow the platform's
+# calculation register and src/lib/finance.ts; the guide's formula list gives
+# none for break-even. The supplied part of the coursebook chapter (pp. 511 to
+# 518) was used only to check coverage, and nothing from it is reproduced.
+title: Break-even analysis
+code: '5.5'
+scope: subtopic
+unit: 5
+level: SL/HL
+summary: Contribution, the break-even chart and its calculations, what happens when price or costs change, and why break-even is only a guide.
+centre: Break-even analysis
+order: 55
+branches:
+  - label: Contribution
+    kind: concept
+    children:
+      - label: Contribution per unit
+        kind: formula
+        term: contribution-per-unit
+        core: true
+        formula: 'Contribution per unit = selling price per unit − variable cost per unit'
+      - label: Total contribution
+        kind: formula
+        term: total-contribution
+        core: true
+        formula: 'Total contribution = contribution per unit × quantity sold'
+        note: Or total revenue minus total variable costs.
+      - label: Profit = total contribution − fixed costs
+        core: true
+        note: Break-even is where total contribution equals fixed costs.
+      - label: 'Per unit: one more sale; total: all sales'
+        note: Use per unit to find break-even, total to find profit.
+  - label: Calculations
+    kind: calculation
+    children:
+      - label: Break-even quantity
+        kind: formula
+        term: break-even-quantity
+        core: true
+        formula: 'Break-even quantity = total fixed costs ÷ contribution per unit'
+        note: Round up to the next whole unit.
+      - label: Margin of safety
+        kind: formula
+        term: margin-of-safety
+        core: true
+        formula: 'Margin of safety = actual or forecast output − break-even quantity'
+        note: Can also be shown as a percentage of output.
+      - label: Target profit output
+        kind: formula
+        term: target-profit-output
+        core: true
+        formula: 'Target profit output = (total fixed costs + target profit) ÷ contribution per unit'
+      - label: Target price
+        kind: formula
+        term: target-price
+        core: true
+        formula: 'Target price = ((total fixed costs + target profit) ÷ expected sales) + variable cost per unit'
+      - label: Break-even revenue
+        kind: formula
+        term: break-even-revenue
+        formula: 'Break-even revenue = break-even quantity × selling price per unit'
+        note: Not named in the guide; it follows from the break-even quantity.
+  - label: The break-even chart
+    kind: tool
+    children:
+      - label: Revenue and costs by output
+        kind: definition
+        term: break-even-chart
+        core: true
+        note: Output on the horizontal axis, money on the vertical; all lines straight.
+        children:
+          - label: 'Fixed costs: a horizontal line'
+            term: fixed-cost
+            core: true
+          - label: 'Total costs: from fixed costs'
+            term: total-cost
+            core: true
+          - label: 'Total revenue: starts at zero'
+            term: total-revenue
+            core: true
+      - label: Lines cross at break-even
+        term: break-even-quantity
+        core: true
+      - label: Profit right, loss left
+        core: true
+        note: Read profit or loss as the vertical gap between the two lines.
+      - label: Shows margin of safety and target profit
+        term: target-profit
+        note: Target profit output is where the gap equals the target.
+  - label: Price or cost changes
+    kind: application
+    children:
+      - label: 'Higher price: revenue pivots'
+        core: true
+        note: Higher contribution per unit and lower break-even; the margin of safety grows if sales hold.
+      - label: 'Higher variable cost: total cost pivots'
+        core: true
+        note: Lower contribution per unit, higher break-even, smaller margin of safety.
+      - label: 'Higher fixed costs: total cost shifts'
+        core: true
+        note: A parallel shift; break-even rises and the margin of safety falls.
+      - label: Profit depends on sales
+        note: A higher price may lose customers; a lower one may win enough to raise profit.
+      - label: Show it on a chart and by calculation
+        note: Recalculate contribution per unit first, then the rest.
+  - label: Value and limitations
+    kind: evaluation
+    children:
+      - label: Quick, simple and visual
+        kind: advantage
+        core: true
+      - label: Tests what-if changes, supports a plan
+        kind: advantage
+        note: Useful in a business plan or a loan application.
+      - label: Assumes constant price and unit costs
+        kind: limitation
+        core: true
+        note: Bulk discounts and price cuts change both.
+      - label: Assumes all output is sold
+        kind: limitation
+        core: true
+      - label: Hard with several products
+        kind: limitation
+        core: true
+      - label: Fixed costs step up
+        kind: limitation
+        note: Beyond capacity, more premises or machines are needed.
+      - label: Only as good as the data
+        kind: limitation
+        note: The sales forecast is usually the weakest input.
+connections:
+  - code: '3.3'
+    label: Fixed and variable costs are the inputs
+  - code: '4.5'
+    label: Pricing decisions change contribution
+  - code: '1.1'
+    label: Testing whether a start-up can cover its costs
+  - code: '5.6'
+    label: 'HL: capacity limits and operating leverage'
+basis:
+  - source: ib-bm-guide-2024
+    pages: '34'
+  - source: hodder-bm-2022
+    pages: '511-518'
