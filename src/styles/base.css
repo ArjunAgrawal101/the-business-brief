@@ -276,6 +276,11 @@ button {
   background: var(--surface-sheet);
 }
 
+/* A page that ends on a full-width band meets the footer directly, without a strip of page colour between them. */
+main:has(> .band + .print-attribution:last-child) + .site-footer {
+  margin-top: 0;
+}
+
 .band--ink h2,
 .band--ink h3,
 .band--ink h4,
