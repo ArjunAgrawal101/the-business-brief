@@ -2,7 +2,7 @@
 /** A one-page revision brief, designed to print on two sides of A4. */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import RetrievalCards from '../../components/assess/RetrievalCards.astro';
-import BriefMark from '../../components/brand/BriefMark.astro';
+import Monogram from '../../components/brand/Monogram.astro';
 import { corpus, href, longDate, topicsInOrder } from '../../lib/content';
 import { inline } from '../../lib/markup';
 import type { Topic } from '../../lib/schemas';
@@ -25,7 +25,7 @@ const misconceptions = t.sections.flatMap((s) => s.blocks).filter((b) => b.type 
   <div class="wrap page-body rev">
     <header class="rev__head">
       <div class="rev__brand">
-        <BriefMark size={36} decorative />
+        <Monogram height={30} />
         <span class="label">Revision Brief {t.code}</span>
       </div>
       <h1>{t.title}</h1>
