@@ -12,12 +12,12 @@ It is written first for IB Diploma Programme Business Management (SL and HL), wi
 | --- | --- |
 | Brand | The Arjun Agrawal AA monogram, from the creator's vector master, as the platform's mark; navy, ivory and gold; Source Serif 4, Inter and Cinzel; a five-second opening on the first visit, skippable and off under reduced motion |
 | Topic library | All 37 subtopics, each with a page of its own: the guide's statements with their AO levels and HL marking, notes, the mindmap, diagrams, key terms, tools, practice, recall and connections |
-| Notes and briefs | Full notes for 11 subtopics (1.4, 2.2, 2.4, 3.4, 3.5, 3.7, 3.8, 4.2, 4.5, 5.5 and 5.6), written one at a time and only when complete, and complete briefs for 1.5, 2.3 and 3.3. The other 23 subtopics have their pages, mindmaps, terms and diagrams, with notes to come |
+| Notes and briefs | Full notes for 14 subtopics (1.1, 1.2, 1.3, 1.4, 2.2, 2.4, 3.4, 3.5, 3.7, 3.8, 4.2, 4.5, 5.5 and 5.6), written one at a time and only when complete, and complete briefs for 1.5, 2.3 and 3.3: 17 subtopics complete. The other 20 have their pages, mindmaps, terms and diagrams, with notes to come |
 | Mindmaps | 42: every subtopic and each unit. Fold, zoom, pan, revision view, print, SVG and PNG downloads, an outline for screen readers |
 | Glossary | 558 terms, each with its own page: syllabus meaning, everyday meaning, formula, example, related terms; search and filters; a CSV download |
 | Diagrams | 79 original diagrams for the five units and the toolkit, drawn from data, each with a text description and an SVG download |
 | Assessment Centre | The internal assessment, Paper 1, Paper 2 and the HL Paper 3 Boardroom, with workspaces and the creator's four assessment guides. Each page labels what the IB requires, what examiners emphasise, recommended strategy and illustrative examples; nothing approves an IA or predicts a grade |
-| Resources Library | More than 100 resources with covers, filters, search and details pages; a download only where the file exists |
+| Resources Library | 112 resources with covers, filters, search and details pages; a download only where the file exists |
 | Tools and cases | 20 interactions, 3 fictional case files, 3 Decision Rooms, the Case Room lab, the Finance Desk, Market Studio and Operations Floor, 24 original practice questions |
 | Coverage | A tracker of every subtopic as complete, partly built or planned, and verified against the guide, computed from the content |
 | Pages | 723, built statically; the browser tests check every page kind with axe-core at desktop and phone sizes |

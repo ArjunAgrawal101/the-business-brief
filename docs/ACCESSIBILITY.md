@@ -22,30 +22,34 @@
 | Diagrams | A title and a full description inside every SVG, the same description visible under "Text description", and a focusable, labelled region that scrolls sideways on narrow screens |
 | Tables in the Assessment Centre | Scroll inside labelled, focusable regions; long selects never widen the page |
 
-## Test results for this release (29 October 2026)
+## Test results for this release (2.0.0, 2 November 2026)
 
 | Check | Tool | Result |
 | --- | --- | --- |
-| Automated scan of all 54 pages at desktop (1280 px) and phone (Pixel 7) sizes, WCAG 2.0, 2.1 and 2.2 A and AA rules | axe-core 4.11 with Playwright | 0 violations on 108 page scans |
-| Horizontal scrolling at phone width, every page | Playwright | None |
-| Horizontal scrolling at 1440, 1024, 768 and 390 px, eight key pages | `npm run qa:screens` | None |
-| Colour contrast of 23 token pairs | `npm run qa:contrast` | All pass |
+| Automated scan of 183 pages (every page of every kind; a fixed sample of the 558 glossary term pages, which share one template) at desktop (1280 px) and phone (Pixel 7) sizes, WCAG 2.0, 2.1 and 2.2 A and AA rules | axe-core 4.11 with Playwright | No violations: 183 pages at both sizes, 366 scans |
+| Horizontal scrolling at phone width, the same pages | Playwright | None |
+| Colour contrast of 34 token pairs, including the navy, ivory and gold identity | `npm run qa:contrast` | All pass |
+| The brand opening: focus, skip, inert page, no replay, reduced motion | Playwright | Pass |
 | Skip link, menu keyboard behaviour, focus after decisions, SL and HL switch | Playwright | Pass |
-| Interactions without JavaScript | Playwright with JavaScript disabled, including a check of every page for buttons that cannot work | Pass |
+| Interactions without JavaScript, and no page showing a button that needs a script | Playwright with JavaScript disabled | Pass |
 | Motion rules | Playwright, with and without reduced motion | Pass |
 
-Problems found and fixed during QA:
+Problems found and fixed during 2.0 QA:
 
-- Muted text on the sunk band was 4.43 to 1. The token was darkened to #5A6670 (4.77 to 1).
-- Six pages scrolled sideways on phones, because grid items and fieldsets kept the width of a wide table or chart. Blocks inside `main` may now shrink, and wide content scrolls inside its own region.
-- Links in the coverage table were closer than the WCAG 2.2 target size allows. Their targets are now at least 24 px tall.
+- Interactive mindmaps had `role="img"` while holding links and toggles; they are now labelled groups.
+- A gold button on a navy band measured 1.97 to 1, because the band's ivory link colour overrode its navy text; the button keeps navy text (8.26 to 1).
+- Large gold numerals and the "partly built" outlines used plain gold, 2.59 to 1 on ivory; a darker gold (4.42 to 1) replaces it there.
+- Muted text on the navy brief panel measured 2.77 to 1; it now uses the ivory-muted token.
+- Two controls that need scripts (the mindmap level filter and the formula sheet's print button) showed without JavaScript; they are hidden until scripts run.
+- Three Assessment Centre pages scrolled sideways on phones (by 52 to 157 px); their tables now scroll inside labelled regions and long selects shrink.
+- HL points and statements stayed visible in the SL view; the SL rule now wins, and hidden material leaves a notice.
 
 ## Known gaps
 
 - **No testing with assistive technology users.** Automated tools find only part of the problems. Testing with people who use screen readers (NVDA, JAWS, VoiceOver, TalkBack), screen magnification and switch access is needed before a public launch.
 - **Only Chromium was tested.** Firefox and Safari (WebKit) were not available in the build environment.
 - **No real devices.** Phone sizes were emulated.
-- **Charts on phones scroll sideways inside their region** rather than reflowing. The data table under each chart is the accessible alternative.
+- **Charts and diagrams on phones scroll sideways inside their region** rather than reflowing. The data table under each chart, and the text description under each diagram, are the accessible alternatives.
 - The break-even chart's labels can sit close together at unusual inputs; the table and text description always carry the figures.
 
 ## Reporting a problem

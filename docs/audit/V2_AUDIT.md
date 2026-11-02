@@ -16,10 +16,10 @@ This is the Phase 1 record for 2.0: what was inspected, what the platform held b
 
 ## 2. The platform before 2.0
 
-Release 0.2.0 had a verified course spine (all 37 subtopics checked against the guide), four complete topic briefs, three fictional case files, three Decision Rooms, twenty working tools, 24 original practice questions, an IA Studio, an Exam Desk, the Examiner Lens and a claims register. Against the 2.0 brief it lacked:
+Release 0.2.0 had a verified course spine (all 37 subtopics checked against the guide), three complete topic briefs (one of which also teaches 5.5), three fictional case files, three Decision Rooms, twenty working tools, 24 original practice questions, an IA Studio, an Exam Desk, the Examiner Lens and a claims register. Against the 2.0 brief it lacked:
 
 - **Brand.** No consistent creator identity: the AA monogram was not used, the typography did not match the brand, and there was no opening.
-- **Course coverage.** 33 of 37 subtopics had no page of their own; they existed only as rows on the syllabus map.
+- **Course coverage.** 34 of 37 subtopics had no page of their own; they existed only as rows on the syllabus map.
 - **Glossary.** 44 terms, on one page, without per-term pages, filters or the difference between everyday and syllabus meaning.
 - **Mindmaps and diagrams.** None.
 - **Assessment.** The Exam Desk explained the papers but offered no workspace for Paper 1 answers or the Paper 3 plan, and the IA Studio had no research question builder or supporting document checks.
@@ -35,7 +35,7 @@ The Economics platform is a sister site by the same creator. 2.0 adapts what ser
 | Course reference layer: curriculum explorer, SL and HL differences | High | A page for every subtopic built from the guide's content statements, with their AO levels and HL marking, plus the course map and a coverage tracker computed from the content | `/topics/`, `/ib/map/`, `/ib/coverage/` | Built |
 | Glossary 2.0 (250 terms) | High | 558 terms, each with its own page: syllabus meaning, everyday meaning where it differs, related terms, the subtopics that use it; search and filters by letter, unit, subtopic, level and category; a CSV download | `/glossary/` | Built |
 | Command term lab | High | The Examiner Lens: every command term at its AO level, in the platform's words | `/examiner-lens/` | Built in 0.2.0 |
-| Nine-stage lessons | Medium | Not copied. Business Management uses topic briefs (situation, decision, consequence) and full subtopic notes (why it matters, sections with points, examples and diagrams, evaluation, retrieval) | `/topics/<subtopic>/` | Partly built: 4 briefs and the subtopic notes written so far (see the coverage tracker) |
+| Nine-stage lessons | Medium | Not copied. Business Management uses topic briefs (situation, decision, consequence) and full subtopic notes (why it matters, sections with points, examples and diagrams, evaluation, retrieval) | `/topics/<subtopic>/` | Partly built: 3 briefs and full notes for 14 subtopics (the site's coverage tracker lists them) |
 | Mindmaps (42 maps, 13 modes) | High | 42 maps: every subtopic and each unit. Branches coloured by kind (concept, types, theory, tool, calculation, evaluation); full and revision views; fold, zoom, pan, print, SVG and PNG download; an outline for screen readers | `/mindmaps/` | Built, with two views rather than thirteen modes |
 | Diagram atlas (35 plates with reading guides) | High | 79 original diagrams drawn from data, each with a text description and an SVG download, for all five units and the toolkit | `/diagrams/` | Built; per-diagram reading guides planned |
 | Computed models you can move | High | Business tools that answer back: break-even, cash flow, ratios, investment appraisal, stock control, capacity, location, decision trees, force field | Finance Desk, Operations Floor, toolkit | Built in 0.2.0 |

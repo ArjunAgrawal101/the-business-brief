@@ -37,29 +37,33 @@ runs, in order: `astro check`, ESLint and the content lint, the unit tests, the 
 | Without JavaScript | `tests/e2e/nojs.spec.ts` | Topic briefs, Decision Rooms, search, the cash flow lab and the case lab work with JavaScript off, and no page shows a button that needs a script |
 | Screenshots | `scripts/qa/screens.mjs` | Sixteen key pages at 1440, 1024, 768 and 390 px, for visual review, with a check for horizontal scrolling; taken with reduced motion so every section shows |
 
-## Results for this release (0.2.0, 29 October 2026)
+## Results for this release (2.0.0, 2 November 2026)
+
+On the final 2.0 source and build:
 
 | Suite | Result |
 | --- | --- |
-| `astro check` | 0 errors, 0 warnings, 0 hints (189 files) |
+| `astro check` | 0 errors, 0 warnings, 0 hints (252 files) |
 | ESLint | No problems |
-| Content lint | No problems (255 source files, 66 built pages) |
-| Unit tests | 146 passed in 12 files |
-| Build | 66 pages |
-| Link check | 7,717 internal links and assets, none broken; 16 external links listed, not fetched |
-| Contrast | 23 pairs, all pass |
-| Browser tests | 205 passed, 1 skipped by design (the current-section test on mobile, where the navigation is in the menu) |
-| Screenshots | 64 (16 pages at 4 widths), no horizontal scrolling; reviewed by eye at phone, tablet and desktop widths for the home page, the case lab, the cash flow lab, the ratio and appraisal desks, the studios, the course map, the IA planner and the menu |
+| Content lint | No problems (378 source files, 723 built pages) |
+| Unit tests | 245 passed in 15 files (89 of them for the diagram library) |
+| Build | 723 pages; the integrity checks pass |
+| Link check | 85,057 internal links and assets, none broken; 16 external links listed, not fetched |
+| Contrast | 34 pairs, all pass |
+| Diagram labels | 79 diagrams, no label outside its frame or overlapping another |
+| Browser tests | 444 passed and 1 skipped by design (the current-section test on mobile, where the navigation is in the menu), in 8.4 minutes; no failures and no retries |
+
+Problems the checks found during 2.0 and that were fixed before release: interactive mindmaps marked as images while holding links (axe `nested-interactive`); a gold button on navy taking the band's ivory link colour (1.97:1); plain gold numerals on ivory (2.59:1); muted text on the navy brief panel (2.77:1); two script-only controls shown without JavaScript; Assessment Centre tables and long selects widening phone pages by up to 157 px; HL points and statements still showing in the SL view because component styles outranked the SL rule; section numbers restarting after the notes; a mindmap fitted before layout dividing by zero; the opening's stored flag counted by the privacy test.
 
 ## What is not tested
 
-- **Firefox and Safari.** Only Chromium is installed in the build environment. The code uses widely supported features (`:has()`, `inert` is not relied on, `structuredClone`, CSS grid), but this should be checked.
+- **Firefox and Safari.** Only Chromium is installed in the build environment. The code uses widely supported features (`:has()`, `structuredClone`, CSS grid, and `inert`, used only while the opening plays), but this should be checked.
 - **Real devices and assistive technology.** See [ACCESSIBILITY.md](ACCESSIBILITY.md#known-gaps).
-- **The deployed site.** No deployment was made from this environment; see [DEPLOYMENT.md](DEPLOYMENT.md).
+- **The deployed site.** Vercel deploys from `main`, but `the-business-brief-dun.vercel.app` cannot be reached from this environment, so the live site was not checked; see [DEPLOYMENT.md](DEPLOYMENT.md).
 - **External links.** They are listed by the link check but not fetched, because the environment's network policy blocks most outside sites.
 - **Performance on slow networks.** Page weight is modest (about 260 KB of scripts in total across 30 files, each page loading only its own, and about 130 KB of CSS) but was not measured under throttling.
 - **Page transitions in other browsers.** Cross-document view transitions run in Chromium; other browsers navigate without them, which is the intended fallback, but this was not checked.
-- **Visual regression.** Screenshots are produced for review; no baseline is stored for automatic comparison.
+- **Visual regression.** Screenshots are produced for review; no baseline is stored for automatic comparison. In 2.0 the home page, About, the topic library and subtopic pages with notes, the mindmaps, every diagram, the glossary, the Assessment Centre pages and the Resources Library were reviewed by eye at desktop and phone widths.
 - **The Astro 7.4 upgrade.** See SECURITY.md.
 
 ## Adding tests

@@ -15,7 +15,7 @@ The Business Brief 2.0: a premium redesign under the Arjun Agrawal identity, a p
 ### Learning
 
 - A page for every one of the 37 subtopics: what the course asks (the guide's statements with their AO levels and HL marking), notes where they exist, the mindmap, diagrams, key terms, tools, practice, recall and connections.
-- Full notes, written one subtopic at a time and only when complete, for 11 subtopics: 1.4, 2.2, 2.4, 3.4, 3.5, 3.7, 3.8, 4.2, 4.5, 5.5 and 5.6. Each has objectives, sections with points, fictional worked examples with checked figures, formulas in the guide's form where it gives one, diagrams, evaluation, connections and retrieval questions.
+- Full notes, written one subtopic at a time and only when complete, for 14 subtopics: 1.1, 1.2, 1.3, 1.4, 2.2, 2.4, 3.4, 3.5, 3.7, 3.8, 4.2, 4.5, 5.5 and 5.6. Each has objectives, sections with points, fictional worked examples with checked figures, formulas in the guide's form where it gives one, diagrams, evaluation, connections and retrieval questions.
 - 42 interactive mindmaps, one for every subtopic and each unit: fold, zoom, pan, a revision view of the essentials, print, and SVG or PNG downloads, with an outline of every map for screen readers.
 - The glossary grows from 44 to 558 terms, each with its own page: the syllabus meaning, the everyday meaning where it differs, formulas, examples, related terms and subtopics; search and filters by letter, unit, subtopic, level and category; a CSV download.
 - 79 original diagrams for the five units and the toolkit, drawn from data with computed, tested figures, each with a text description and an SVG download.
@@ -25,7 +25,7 @@ The Business Brief 2.0: a premium redesign under the Arjun Agrawal identity, a p
 
 - The Assessment Centre replaces the Exam Desk: the internal assessment (research question builder, supporting document analyser, criterion self-review, submission checklist), Paper 1 (an annotated answer builder), Paper 2 (calculations and constructions) and the HL Paper 3 Boardroom (a plan across marketing, operations, human resources and finance, reviewed against criteria A to D). Each page separates what the IB requires, what examiners emphasise, recommended strategy and illustrative examples. Nothing approves an IA or predicts a grade. The old addresses redirect.
 - The creator's four assessment guides as PDF downloads.
-- The Resources Library: more than 100 resources with covers, filters, search and sort, details pages, and a download only where the file exists.
+- The Resources Library: 112 resources with covers, filters, search and sort, details pages, and a download only where the file exists.
 - Search now covers mindmaps, diagrams, resources and the Assessment Centre, and sends every subtopic to its own page.
 
 ### Quality

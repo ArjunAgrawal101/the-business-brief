@@ -17,7 +17,7 @@ In order of priority. Each step is done completely before the next begins.
 2. **The HL-only subtopics:** 2.5 Organizational culture, 2.7 Industrial relations, 3.6 Efficiency ratios, 3.9 Budgets, 4.3 Sales forecasting, 4.6 International marketing, 5.3 Lean production and quality, 5.7 Crisis management, 5.8 Research and development, 5.9 Management information systems.
 3. Notes for the three subtopics taught in briefs (1.5, 2.3, 3.3), so every subtopic reads the same way.
 
-The coursebook extracts supplied so far cover the toolkit, 1.1 to 1.5 and 5.5 to 5.9; the rest are written from the guide.
+Full notes exist for 1.1 to 1.4, 2.2, 2.4, 3.4, 3.5, 3.7, 3.8, 4.2, 4.5, 5.5 and 5.6. The coursebook extracts supplied so far cover the toolkit, 1.1 to 1.5 and 5.5 to 5.9; the rest are written from the guide.
 
 ## Learning tools
 
