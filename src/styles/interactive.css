@@ -12,6 +12,11 @@
   display: none !important;
 }
 
+/* Outside a widget, a control that needs a script is hidden until the page knows scripts run. */
+html:not(.js) .js-only {
+  display: none !important;
+}
+
 [data-ix].is-enhanced .nojs-only {
   display: none !important;
 }

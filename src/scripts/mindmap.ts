@@ -82,6 +82,8 @@ each('[data-ix="mindmap"]', (root) => {
 
   /** Fit the whole map, keeping the viewport's proportions. */
   const fit = () => {
+    // Not laid out yet (hidden, or before the first paint): fitting now would divide by zero.
+    if (!viewport.clientWidth || !viewport.clientHeight) return;
     const b = lay.bounds;
     const aspect = viewport.clientWidth / Math.max(1, viewport.clientHeight);
     let w = b.w;

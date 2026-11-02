@@ -103,10 +103,12 @@ const BANDS = [
       <h3 class="ce-h3">Five terms, one topic</h3>
       <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="example" /></p>
       <p class="ce-p">Juniper Juice (invented) sells juice from three kiosks, plans to supply two chains with 140 stores, has taste-tested new flavours, and claims a new pressing machine would pay for itself within a year.</p>
-      <table class="ce-table">
-        <thead><tr><th scope="col">Term</th><th scope="col">Asks you to give</th><th scope="col">Applied to primary market research at Juniper</th></tr></thead>
-        <tbody>{FIVE.map(([t, a, x]) => <tr><th scope="row">{t}</th><td>{a}</td><td>{x}</td></tr>)}</tbody>
-      </table>
+      <div class="table-scroll ce-scroll" role="region" aria-label="Table: Term, Asks you to give, Applied to primary market research at Juniper" tabindex="0">
+        <table class="ce-table">
+          <thead><tr><th scope="col">Term</th><th scope="col">Asks you to give</th><th scope="col">Applied to primary market research at Juniper</th></tr></thead>
+          <tbody>{FIVE.map(([t, a, x]) => <tr><th scope="row">{t}</th><td>{a}</td><td>{x}</td></tr>)}</tbody>
+        </table>
+      </div>
 
       <h3 class="ce-h3">How the marks signal depth</h3>
       <p class="ce-labels"><GuideLabel kind="examiner" /></p>
@@ -145,30 +147,34 @@ const BANDS = [
     <section class="ce-sec" aria-labelledby="p1-a-h">
       <SectionHead no="03" title="Mastering Section A" id="p1-a-h" dek="Copying the case shows reading; stating theory shows memory. Application joins the two and follows the consequence for this business." />
       <p class="ce-labels"><GuideLabel kind="examiner" /> <GuideLabel kind="example" /></p>
-      <table class="ce-table">
-        <thead><tr><th scope="col"></th><th scope="col">Case fact</th><th scope="col">Business knowledge</th><th scope="col">Consequence for Juniper</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">Restates the case<br /><span class="small muted">shows reading only</span></th><td>Juniper's juices last five days.</td><td class="muted">Missing</td><td class="muted">Missing</td></tr>
-          <tr><th scope="row">Generic<br /><span class="small muted">fits any business</span></th><td class="muted">Missing</td><td>Retailers can return unsold stock to suppliers.</td><td class="muted">Missing</td></tr>
-          <tr><th scope="row">Applied<br /><span class="small muted">knowledge used on the case</span></th><td>Five-day shelf life.</td><td>Sale-or-return shifts unsold stock to the supplier.</td><td>Unsold bottles return at Juniper's cost.</td></tr>
-        </tbody>
-      </table>
+      <div class="table-scroll ce-scroll" role="region" aria-label="Table: Case fact, Business knowledge, Consequence for Juniper" tabindex="0">
+        <table class="ce-table">
+          <thead><tr><th scope="col"></th><th scope="col">Case fact</th><th scope="col">Business knowledge</th><th scope="col">Consequence for Juniper</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Restates the case<br /><span class="small muted">shows reading only</span></th><td>Juniper's juices last five days.</td><td class="muted">Missing</td><td class="muted">Missing</td></tr>
+            <tr><th scope="row">Generic<br /><span class="small muted">fits any business</span></th><td class="muted">Missing</td><td>Retailers can return unsold stock to suppliers.</td><td class="muted">Missing</td></tr>
+            <tr><th scope="row">Applied<br /><span class="small muted">knowledge used on the case</span></th><td>Five-day shelf life.</td><td>Sale-or-return shifts unsold stock to the supplier.</td><td>Unsold bottles return at Juniper's cost.</td></tr>
+          </tbody>
+        </table>
+      </div>
       <p class="small muted">The teacher support material notes that AO2 answers without appropriate application are typically limited to about half of the marks.</p>
 
       <h3 class="ce-h3">An annotated 6-mark answer</h3>
       <p class="ce-labels"><GuideLabel kind="examiner" /> <GuideLabel kind="example" /></p>
       <p class="ce-p"><strong>Explain two disadvantages for Juniper of selling through the supermarket chains. [6]</strong> Illustrative markscheme: for each disadvantage, identify (1), explain with business knowledge (1), apply to Juniper (1).</p>
-      <table class="ce-table">
-        <thead><tr><th scope="col">Mark</th><th scope="col">Extract from the response</th><th scope="col">Why it scores</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">Identify</th><td>One disadvantage is that the chains may insist on sale-or-return terms.</td><td>Names the point</td></tr>
-          <tr><th scope="row">Explain</th><td>Retailers with buying power can push the cost of unsold stock back onto suppliers.</td><td>Knowledge the case lacks</td></tr>
-          <tr><th scope="row">Apply</th><td>Juniper's juices last five days, so bottles not sold in time return at its cost.</td><td>This case, and its effect</td></tr>
-          <tr><th scope="row">Identify</th><td>A second is lower revenue per bottle, and so a lower margin.</td><td>A distinct point</td></tr>
-          <tr><th scope="row">Explain</th><td>The retailer's price must cover its own costs and profit, so the supplier receives only part.</td><td>Its own reasoning</td></tr>
-          <tr><th scope="row">Apply</th><td>At its kiosks Juniper receives the full $4 a bottle; through the chains it receives less.</td><td>Its own evidence</td></tr>
-        </tbody>
-      </table>
+      <div class="table-scroll ce-scroll" role="region" aria-label="Table: Mark, Extract from the response, Why it scores" tabindex="0">
+        <table class="ce-table">
+          <thead><tr><th scope="col">Mark</th><th scope="col">Extract from the response</th><th scope="col">Why it scores</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Identify</th><td>One disadvantage is that the chains may insist on sale-or-return terms.</td><td>Names the point</td></tr>
+            <tr><th scope="row">Explain</th><td>Retailers with buying power can push the cost of unsold stock back onto suppliers.</td><td>Knowledge the case lacks</td></tr>
+            <tr><th scope="row">Apply</th><td>Juniper's juices last five days, so bottles not sold in time return at its cost.</td><td>This case, and its effect</td></tr>
+            <tr><th scope="row">Identify</th><td>A second is lower revenue per bottle, and so a lower margin.</td><td>A distinct point</td></tr>
+            <tr><th scope="row">Explain</th><td>The retailer's price must cover its own costs and profit, so the supplier receives only part.</td><td>Its own reasoning</td></tr>
+            <tr><th scope="row">Apply</th><td>At its kiosks Juniper receives the full $4 a bottle; through the chains it receives less.</td><td>Its own evidence</td></tr>
+          </tbody>
+        </table>
+      </div>
       <p class="small muted">One question's markscheme, not a universal formula: each paper's markscheme decides. From May 2027 the case has no line numbers, and questions quote the text they need (May 2026 subject report, as cited in the Paper 1 guide).</p>
 
       <div class="ce-split">
@@ -218,29 +224,33 @@ const BANDS = [
     <section class="ce-sec" aria-labelledby="p1-b-h">
       <SectionHead no="04" title="Mastering Section B" id="p1-b-h" dek="The 10-mark response is read as a whole. Knowledge and application run through every argument, analysis carries each argument to its consequence, and evaluation grows from weighing the arguments into a judgement." />
       <p class="ce-labels"><GuideLabel kind="strategy" /></p>
-      <table class="ce-table p1-weave">
-        <thead><tr><th scope="col"></th><th scope="col">Frame the decision</th><th scope="col">Argument developed</th><th scope="col">Counter-argument developed</th><th scope="col">Weighing, case-specific</th><th scope="col">Judgement with a condition</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">Knowledge AO1</th><td>&#9679;</td><td>&#9679;</td><td>&#9679;</td><td>&#9675;</td><td>&#9675;</td></tr>
-          <tr><th scope="row">Application AO2</th><td>&#9679;</td><td>&#9679;</td><td>&#9679;</td><td>&#9679;</td><td>&#9679;</td></tr>
-          <tr><th scope="row">Analysis AO2</th><td>&#9675;</td><td>&#9679;</td><td>&#9679;</td><td>&#9675;</td><td>&#9675;</td></tr>
-          <tr><th scope="row">Evaluation AO3</th><td></td><td>&#9675;</td><td>&#9675;</td><td>&#9679;</td><td>&#9679;</td></tr>
-        </tbody>
-      </table>
+      <div class="table-scroll ce-scroll" role="region" aria-label="Table: Frame the decision, Argument developed, Counter-argument developed, Weighing, case-specific" tabindex="0">
+        <table class="ce-table p1-weave">
+          <thead><tr><th scope="col"></th><th scope="col">Frame the decision</th><th scope="col">Argument developed</th><th scope="col">Counter-argument developed</th><th scope="col">Weighing, case-specific</th><th scope="col">Judgement with a condition</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Knowledge AO1</th><td>&#9679;</td><td>&#9679;</td><td>&#9679;</td><td>&#9675;</td><td>&#9675;</td></tr>
+            <tr><th scope="row">Application AO2</th><td>&#9679;</td><td>&#9679;</td><td>&#9679;</td><td>&#9679;</td><td>&#9679;</td></tr>
+            <tr><th scope="row">Analysis AO2</th><td>&#9675;</td><td>&#9679;</td><td>&#9679;</td><td>&#9675;</td><td>&#9675;</td></tr>
+            <tr><th scope="row">Evaluation AO3</th><td></td><td>&#9675;</td><td>&#9675;</td><td>&#9679;</td><td>&#9679;</td></tr>
+          </tbody>
+        </table>
+      </div>
       <p class="small muted">&#9679; central to this stage · &#9675; present in support · blank: not expected here. A recommended construction, not an IB template. When evaluating one option, the teacher support material suggests at least two arguments for and two against.</p>
 
       <h3 class="ce-h3">An annotated response</h3>
       <p class="ce-labels"><GuideLabel kind="example" /></p>
       <p class="ce-p"><strong>Discuss whether Juniper should sell its juices through the two supermarket chains. [10]</strong> Extracts:</p>
-      <table class="ce-table">
-        <thead><tr><th scope="col">Stage</th><th scope="col">Extract</th><th scope="col">Skills shown</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">Argument</th><td>The chains' 140 stores reach far more shoppers than three kiosks. Higher volume would spread the fixed cost of the new pressing machine over more bottles, lowering average cost, so profit could rise despite a lower price per bottle.</td><td>Knowledge, application, analysis</td></tr>
-          <tr><th scope="row">Counter-argument</th><td>However, the machine raises fixed costs before supermarket income arrives, and sale-or-return terms move the risk of a five-day shelf life onto Juniper: if bottles do not sell in time, returns could erase the volume gain.</td><td>Knowledge, application, analysis</td></tr>
-          <tr><th scope="row">Weighing</th><td>The volume gain is likely; its profit depends on bottles selling within five days, which the taste tests cannot show: 120 shoppers in two city stores are not 140 stores.</td><td>Evaluation, with a limitation</td></tr>
-          <tr><th scope="row">Judgement</th><td>Juniper should supply the chains, but trial a limited number of stores first and buy the machine only if bottles sell within their shelf life at the forecast rate.</td><td>A decision and its condition</td></tr>
-        </tbody>
-      </table>
+      <div class="table-scroll ce-scroll" role="region" aria-label="Table: Stage, Extract, Skills shown" tabindex="0">
+        <table class="ce-table">
+          <thead><tr><th scope="col">Stage</th><th scope="col">Extract</th><th scope="col">Skills shown</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Argument</th><td>The chains' 140 stores reach far more shoppers than three kiosks. Higher volume would spread the fixed cost of the new pressing machine over more bottles, lowering average cost, so profit could rise despite a lower price per bottle.</td><td>Knowledge, application, analysis</td></tr>
+            <tr><th scope="row">Counter-argument</th><td>However, the machine raises fixed costs before supermarket income arrives, and sale-or-return terms move the risk of a five-day shelf life onto Juniper: if bottles do not sell in time, returns could erase the volume gain.</td><td>Knowledge, application, analysis</td></tr>
+            <tr><th scope="row">Weighing</th><td>The volume gain is likely; its profit depends on bottles selling within five days, which the taste tests cannot show: 120 shoppers in two city stores are not 140 stores.</td><td>Evaluation, with a limitation</td></tr>
+            <tr><th scope="row">Judgement</th><td>Juniper should supply the chains, but trial a limited number of stores first and buy the machine only if bottles sell within their shelf life at the forecast rate.</td><td>A decision and its condition</td></tr>
+          </tbody>
+        </table>
+      </div>
       <h3 class="ce-h3">When a final judgement is expected</h3>
       <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="strategy" /></p>
       <div class="ce-cols p1-four">
@@ -256,10 +266,12 @@ const BANDS = [
       <SectionHead no="05" title="Reaching the highest markband" id="p1-band-h" dek="What separates 7 or 8 marks from 9 or 10." />
       <p class="ce-labels"><GuideLabel kind="ib" /></p>
       <div class="p1-bands">
-        <table class="ce-table">
-          <thead><tr><th scope="col">Strand</th><th scope="col">1 to 2</th><th scope="col">3 to 4</th><th scope="col">5 to 6</th><th scope="col">7 to 8</th><th scope="col">9 to 10</th></tr></thead>
-          <tbody>{BANDS.map((row) => <tr><th scope="row">{row[0]}</th>{row.slice(1).map((x) => <td>{x}</td>)}</tr>)}</tbody>
-        </table>
+        <div class="table-scroll ce-scroll" role="region" aria-label="Table: Strand, 1 to 2, 3 to 4, 5 to 6" tabindex="0">
+          <table class="ce-table">
+            <thead><tr><th scope="col">Strand</th><th scope="col">1 to 2</th><th scope="col">3 to 4</th><th scope="col">5 to 6</th><th scope="col">7 to 8</th><th scope="col">9 to 10</th></tr></thead>
+            <tbody>{BANDS.map((row) => <tr><th scope="row">{row[0]}</th>{row.slice(1).map((x) => <td>{x}</td>)}</tr>)}</tbody>
+          </table>
+        </div>
       </div>
       <p class="small muted">Paraphrased from the IB markbands for the 10-mark response, applied best fit; zero when the first band is not reached. Read the markbands themselves in the guide with your teacher.</p>
       <div class="ce-split">

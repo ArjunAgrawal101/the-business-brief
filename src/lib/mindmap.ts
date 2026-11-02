@@ -385,7 +385,7 @@ export function renderSvg(lay: Layout, o: RenderOptions): string {
   const p = o.idPrefix ?? 'mm';
   const out: string[] = [];
   out.push(
-    `<svg class="mm-svg" xmlns="http://www.w3.org/2000/svg" viewBox="${r(x)} ${r(y)} ${r(w)} ${r(h)}" width="${Math.round(w)}" height="${Math.round(h)}" role="img" aria-labelledby="${p}-title ${p}-desc" data-bounds="${r(x)} ${r(y)} ${r(w)} ${r(h)}">`,
+    `<svg class="mm-svg" xmlns="http://www.w3.org/2000/svg" viewBox="${r(x)} ${r(y)} ${r(w)} ${r(h)}" width="${Math.round(w)}" height="${Math.round(h)}" role="${o.interactive ? 'group' : 'img'}" aria-labelledby="${p}-title ${p}-desc" data-bounds="${r(x)} ${r(y)} ${r(w)} ${r(h)}">`,
   );
   out.push(`<title id="${p}-title">${esc(o.title)}</title><desc id="${p}-desc">${esc(o.description)}</desc>`);
   out.push(`<style>${SVG_STYLE}</style>`);

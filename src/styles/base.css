@@ -182,7 +182,13 @@ button {
  * (.table-scroll, .chart-scroll). Zero specificity, so any component can
  * override it.
  */
-:where(main) :where(div, section, article, header, footer, figure, form, fieldset, aside, details, dl, dd, li, nav) {
+:where(main) :where(div, section, article, header, footer, figure, form, fieldset, aside, details, dl, dd, li, nav, label) {
+  min-width: 0;
+}
+
+/* A select with long options never pushes the page wider than the screen. */
+:where(main) select {
+  max-width: 100%;
   min-width: 0;
 }
 

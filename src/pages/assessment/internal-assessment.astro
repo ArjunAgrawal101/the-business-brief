@@ -112,20 +112,22 @@ const TOOLS = [
         total={25}
         parts={criteria.map((cr) => ({ label: `${cr.id}`, marks: cr.marks, tone: ['A', 'D'].includes(cr.id) ? 'navy' : ['B', 'C'].includes(cr.id) ? 'slate' : 'gold' }))}
       />
-      <table class="ce-table">
-        <thead><tr><th scope="col">Criterion</th><th scope="col">Marks</th><th scope="col">The top level, in brief</th></tr></thead>
-        <tbody>
-          {
-            criteria.map((cr) => (
-              <tr>
-                <th scope="row"><span class="ce-crit">{cr.id}</span> {cr.name}</th>
-                <td class="num">{cr.marks}</td>
-                <td>{TOP[cr.id]}</td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
+      <div class="table-scroll ce-scroll" role="region" aria-label="Table: Criterion, Marks, The top level, in brief" tabindex="0">
+        <table class="ce-table">
+          <thead><tr><th scope="col">Criterion</th><th scope="col">Marks</th><th scope="col">The top level, in brief</th></tr></thead>
+          <tbody>
+            {
+              criteria.map((cr) => (
+                <tr>
+                  <th scope="row"><span class="ce-crit">{cr.id}</span> {cr.name}</th>
+                  <td class="num">{cr.marks}</td>
+                  <td>{TOP[cr.id]}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <section class="ce-sec" aria-labelledby="ia-rq-h">
@@ -217,10 +219,12 @@ const TOOLS = [
 
       <h3 class="ce-h3">Crumb & Co.'s set</h3>
       <p class="ce-labels"><GuideLabel kind="example" /></p>
-      <table class="ce-table">
-        <thead><tr><th scope="col"></th><th scope="col">Document</th><th scope="col">Voice</th><th scope="col">What it adds</th></tr></thead>
-        <tbody>{SDS.map(([id, d, v, a]) => <tr><th scope="row">{id}</th><td>{d}</td><td>{v}</td><td>{a}</td></tr>)}</tbody>
-      </table>
+      <div class="table-scroll ce-scroll" role="region" aria-label="Table: Document, Voice, What it adds" tabindex="0">
+        <table class="ce-table">
+          <thead><tr><th scope="col"></th><th scope="col">Document</th><th scope="col">Voice</th><th scope="col">What it adds</th></tr></thead>
+          <tbody>{SDS.map(([id, d, v, a]) => <tr><th scope="row">{id}</th><td>{d}</td><td>{v}</td><td>{a}</td></tr>)}</tbody>
+        </table>
+      </div>
       <p class="small muted">Five documents from Crumb's own website would lack balance, as would five surveys of similar people: the guide gives both as examples.</p>
 
       <div class="ce-warn">
@@ -438,10 +442,12 @@ const TOOLS = [
     <section class="ce-sec" aria-labelledby="ia-tools-h">
       <SectionHead no="08" title="Choosing your tools" id="ia-tools-h" dek="Start from the decision your question asks about, then pick the tools that inform it. Criterion C rewards tools that are relevant and applied, not many tools." />
       <p class="ce-labels"><GuideLabel kind="strategy" /></p>
-      <table class="ce-table">
-        <thead><tr><th scope="col">Your question asks</th><th scope="col">Tools that can answer it</th><th scope="col">What they decide</th></tr></thead>
-        <tbody>{TOOLS.map((t) => <tr><th scope="row">{t.q}</th><td>{t.tools}</td><td>{t.decides}</td></tr>)}</tbody>
-      </table>
+      <div class="table-scroll ce-scroll" role="region" aria-label="Table: Your question asks, Tools that can answer it, What they decide" tabindex="0">
+        <table class="ce-table">
+          <thead><tr><th scope="col">Your question asks</th><th scope="col">Tools that can answer it</th><th scope="col">What they decide</th></tr></thead>
+          <tbody>{TOOLS.map((t) => <tr><th scope="row">{t.q}</th><td>{t.tools}</td><td>{t.decides}</td></tr>)}</tbody>
+        </table>
+      </div>
       <p class="small muted">Force field analysis and Porter's generic strategies are HL tools in the guide's toolkit; any relevant tool may be used in the project. <a href="/toolkit/">The toolkit</a> explains each one.</p>
     </section>
 

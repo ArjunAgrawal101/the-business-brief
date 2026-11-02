@@ -32,6 +32,12 @@ const no = (i: number) => String(start + i).padStart(2, '0');
 
 {
   n.sections.map((s, i) => (
+    <>
+    {s.level === 'HL' && (
+      <p class="hl-notice nv-hl-gap">
+        <span class="tag tag--hl">HL</span> Section {no(i + 1)}, {s.title}, is HL only and is hidden while you are viewing SL content. Switch to HL at the top of the page to see it.
+      </p>
+    )}
     <section class:list={['nv-section', `nv-section--${s.kind}`]} aria-labelledby={`nv-${s.id}`} data-level={s.level === 'HL' ? 'HL' : undefined} id={s.id}>
       <SectionHead no={no(i + 1)} title={s.title} id={`nv-${s.id}`}>
         {s.level === 'HL' && <span class="tag tag--hl">HL only</span>}
@@ -93,6 +99,7 @@ const no = (i: number) => String(start + i).padStart(2, '0');
         )}
       </div>
     </section>
+    </>
   ))
 }
 

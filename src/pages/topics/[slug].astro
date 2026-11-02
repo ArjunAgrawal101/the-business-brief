@@ -51,9 +51,15 @@ const connections = note?.[1].connections ?? map?.[1].connections.map((x) => ({ 
 const inNotes = new Set(note ? note[1].sections.map((x) => x.diagram).filter(Boolean) : []);
 const diagrams = Object.entries(DIAGRAMS).filter(([did, d]) => d.syllabus.includes(code) && !inNotes.has(did));
 const titleOf = (cd: string) => list.find((x) => x.s.code === cd)?.s.title ?? cd;
-let n = 0;
-const num = () => String(++n).padStart(2, '0');
+// One numbering for the whole page: "What the IB course asks" is 01, the notes take the numbers after it
+// (introduction, each section, evaluation), and the page's later sections carry on from there.
 const notesStart = 2;
+const notesTaken = note ? note[1].sections.length + 2 : 0; // introduction, sections, evaluation
+let n = 0;
+const num = () => {
+  n += 1;
+  return String(n === 1 ? 1 : n + notesTaken).padStart(2, '0');
+};
 ---
 
 <BaseLayout title={`${s.code} ${s.title}`} description={`${s.title} (IB DP Business Management ${s.code}): what the course asks, notes, mindmap, key terms, tools and practice.`} section="topics">
@@ -79,12 +85,12 @@ const notesStart = 2;
     {
       brief?.t && (
         <aside class="sh-brief">
-          <p class="label">Taught in a complete brief</p>
+          <p class="label">{brief.t.code === s.code ? 'Taught in a complete brief' : `Also taught in the ${brief.t.code} brief`}</p>
           <h2>
             <a href={href.topic(brief.id)}>{brief.t.title}</a>
           </h2>
           <p>{brief.t.summary}</p>
-          <p class="small muted">
+          <p class="small sh-brief__note">
             The brief {brief.t.code === s.code ? 'is this subtopic.' : `belongs to ${brief.t.code} and also teaches ${s.code}: its sections on this subtopic, its calculations and its practice are linked below.`}
           </p>
         </aside>
@@ -309,6 +315,10 @@ const notesStart = 2;
 
   .sh-brief .label {
     color: var(--gold-400);
+  }
+
+  .sh-brief__note {
+    color: var(--text-on-ink-muted);
   }
 
   .sh-cs {
