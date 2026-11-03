@@ -11,6 +11,7 @@ import LabelKey from '../../components/centre/LabelKey.astro';
 import Monogram from '../../components/brand/Monogram.astro';
 import { corpus } from '../../lib/content';
 import { CENTRE_HREF, GUIDES, type GuideId } from '../../lib/guides';
+import { buildBank } from '../../lib/bank-build';
 
 const c = await corpus();
 const comps = Object.entries(c.assessment).sort((a, b) => a[1].order - b[1].order);
@@ -39,6 +40,24 @@ const weights = (level: 'sl' | 'hl') =>
     .map((id) => ({ id, name: byId[id]?.short ?? id, w: byId[id]?.outline?.[level]?.weight ?? 0 }))
     .filter((x) => x.w > 0);
 const practice = Object.values(c.questions);
+const bankSize = buildBank(c).items.length;
+/** The Centre's practice tools, each for the components it serves. */
+const TOOLS: Array<{ href: string; kind: string; title: string; text: string; for: string[] }> = [
+  {
+    href: '/assessment/question-bank/',
+    kind: 'Question bank',
+    title: `All ${bankSize} questions in one bank`,
+    text: 'Every original question on the platform, filtered by unit, paper, level, command term and marks, with guidance to reveal, self-ratings and timed sets at each paper’s pace.',
+    for: ['P1', 'P2', 'P3'],
+  },
+  {
+    href: '/assessment/paper-2/practice/',
+    kind: 'Calculation practice',
+    title: 'New Paper 2 calculations, checked',
+    text: 'Break-even, ratios, investment appraisal and cash flow with fictional figures each time, the full working and the error behind each typical wrong answer.',
+    for: ['P2'],
+  },
+];
 const byStyle = (s: string) => practice.filter((q) => q.paperStyle === s).length;
 const terms = Object.values(c.commandTerms);
 ---
@@ -129,8 +148,31 @@ const terms = Object.values(c.commandTerms);
       <div class="ac-key"><LabelKey /></div>
     </section>
 
+    <section class="ac-sec" aria-labelledby="ac-tools-h">
+      <SectionHead no="03" title="Practise and plan" id="ac-tools-h" dek="Tools that check your own work as you go. They give feedback; they never award a mark or predict a grade." />
+      <ul class="ac-tools" role="list">
+        {
+          TOOLS.map((t) => (
+            <li>
+              <p class="ac-tools__kind">{t.kind}</p>
+              <div>
+                <h3 class="ac-tools__title">
+                  <a href={t.href}>{t.title}</a>
+                </h3>
+                <p class="ac-tools__text">{t.text}</p>
+              </div>
+              <p class="ac-tools__for">
+                <span class="sr-only">For: </span>
+                {t.for.join(' · ')}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
     <section class="ac-sec" aria-labelledby="ac-more-h">
-      <SectionHead no="03" title="Across every component" id="ac-more-h" />
+      <SectionHead no="04" title="Across every component" id="ac-more-h" />
       <div class="ac-more">
         <a class="ac-more__item" href="/examiner-lens/">
           <p class="label">Command terms</p>
@@ -154,7 +196,7 @@ const terms = Object.values(c.commandTerms);
     </section>
 
     <section class="ac-sec" aria-labelledby="ac-dl-h">
-      <SectionHead no="04" title="The assessment guides" id="ac-dl-h" dek="The four guides this Centre is built from, each five pages, to print or keep. From the Arjun Agrawal Knowledge Series." />
+      <SectionHead no="05" title="The assessment guides" id="ac-dl-h" dek="The four guides this Centre is built from, each five pages, to print or keep. From the Arjun Agrawal Knowledge Series." />
       <ul class="ac-dl" role="list">
         {
           order.map((id) => (
@@ -181,9 +223,13 @@ const terms = Object.values(c.commandTerms);
     color: var(--text-on-ink);
   }
 
-  .ac-hero :global(.breadcrumbs),
-  .ac-hero :global(.breadcrumbs a) {
+  .ac-hero :global(.crumbs),
+  .ac-hero :global(.crumbs a) {
     color: var(--text-on-ink-muted);
+  }
+
+  .ac-hero :global(.crumbs [aria-current='page']) {
+    color: var(--text-on-ink);
   }
 
   .ac-hero__grid {
@@ -424,6 +470,79 @@ const terms = Object.values(c.commandTerms);
     font-size: 1.3125rem;
   }
 
+  .ac-tools {
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 3px solid var(--navy-900);
+  }
+
+  .ac-tools li {
+    position: relative;
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1fr) 7rem;
+    gap: var(--sp-2) var(--sp-5);
+    align-items: baseline;
+    margin: 0;
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .ac-tools li:hover {
+    background: rgba(255, 255, 255, 0.55);
+  }
+
+  .ac-tools__kind {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .ac-tools__title {
+    font-size: 1.3125rem;
+  }
+
+  .ac-tools__title a {
+    color: var(--navy-900);
+    text-decoration: none;
+  }
+
+  .ac-tools__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .ac-tools__title a:hover {
+    text-decoration: underline;
+  }
+
+  .ac-tools li:focus-within {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .ac-tools__title a:focus-visible {
+    outline: none;
+  }
+
+  .ac-tools__text {
+    margin-top: 0.25rem;
+    max-width: 46rem;
+    color: var(--text-body);
+  }
+
+  .ac-tools__for {
+    justify-self: end;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--navy-900);
+    font-variant-numeric: tabular-nums;
+  }
+
   .ac-dl {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
@@ -477,6 +596,24 @@ const terms = Object.values(c.commandTerms);
 
     .ac-more {
       grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ac-tools li {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .ac-tools__kind {
+      grid-column: 1;
+    }
+
+    .ac-tools li > div {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+
+    .ac-tools__for {
+      grid-column: 2;
+      grid-row: 1;
     }
   }
 
