@@ -1,139 +1,183 @@
 ---
 /**
  * Search. The page lists everything that can be found, grouped by kind, so
- * without JavaScript it is a complete index of the site. With JavaScript the
- * box filters the list as you type.
+ * without JavaScript it is a complete index of the site, with a contents list
+ * to jump to each kind. With JavaScript the box searches as you type, ranks
+ * the best matches first, filters by kind, unit and level, keeps the query
+ * and filters in the address, and the arrow keys move through the results.
+ *
+ * The index is built from the content (src/lib/search-index.ts) and every
+ * link in the navigation, so new material is found without being listed.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/layout/PageIntro.astro';
-import { corpus, href, modulesInOrder, pathwaysInOrder, slug, topicsInOrder } from '../lib/content';
-import { plain } from '../lib/markup';
-import { mindmapsInOrder, noteFor, subtopicHref } from '../lib/learning';
+import { corpus, href, modulesInOrder, pathwaysInOrder } from '../lib/content';
+import { subtopicHref } from '../lib/learning';
 import { DIAGRAMS } from '../lib/diagrams';
 import { library } from '../lib/resources';
+import { NAV } from '../lib/navigation';
+import { buildSearchIndex, type SearchLinks } from '../lib/search-index';
+import { SEARCH_KINDS, extraWords } from '../lib/search';
+import { iconSvg } from '../lib/icons';
+import '../styles/search.css';
 
 const c = await corpus();
-type Entry = { kind: string; title: string; url: string; text: string };
-const entries: Entry[] = [];
-for (const [id, t] of await topicsInOrder()) {
-  entries.push({ kind: 'Topic brief', title: `${t.code} ${t.title}`, url: href.topic(id), text: `${t.summary} ${t.decisionQuestion}` });
-  t.sections.forEach((s) => entries.push({ kind: 'Topic section', title: `${s.title} (${t.title})`, url: `${href.topic(id)}#${s.id}`, text: plain(s.dek ?? '') }));
-}
-for (const [id, cs] of Object.entries(c.cases)) entries.push({ kind: 'Case', title: cs.title, url: href.case(id), text: `${cs.dek} ${cs.decision} ${cs.organization.sector}` });
-for (const [id, d] of Object.entries(c.decisions)) entries.push({ kind: 'Decision Room', title: d.title, url: href.decision(id), text: d.dek });
-for (const [id, t] of Object.entries(c.tools)) {
-  const url = href.tool(id, t);
-  entries.push({ kind: 'Tool', title: t.name, url: url ?? '/toolkit/', text: `${t.summary}${url ? '' : ' Guide in preparation.'}` });
-}
-for (const [id, k] of Object.entries(c.calculations)) entries.push({ kind: 'Calculation', title: k.name, url: href.calculation(id, k.page), text: k.formula });
-for (const [id, q] of Object.entries(c.questions)) entries.push({ kind: 'Practice question', title: q.title, url: href.question(id), text: `${q.commandTerm}. ${plain(q.prompt)}` });
-for (const [id, g] of Object.entries(c.glossary)) entries.push({ kind: 'Glossary', title: g.term, url: href.glossary(id), text: plain(g.definition) });
-for (const [, ct] of Object.entries(c.commandTerms)) entries.push({ kind: 'Command term', title: ct.term, url: href.commandTerm(ct.term), text: ct.definition });
-for (const [id, k] of Object.entries(c.concepts)) entries.push({ kind: 'Concept', title: k.name, url: href.concept(id), text: plain(k.summary) });
-for (const p of await pathwaysInOrder()) entries.push({ kind: 'Pathway', title: p.data.name, url: href.pathway(p.id), text: p.data.promise });
-for (const m of await modulesInOrder()) if (m.data.href) entries.push({ kind: 'Room', title: m.data.name, url: m.data.href, text: m.data.purpose });
-for (const [id, it] of Object.entries(c.interactives))
-  if (it.page) entries.push({ kind: it.component === 'case-lab' ? 'Case lab' : 'Interaction', title: it.title, url: `${it.page}#ix-${id}`, text: plain(it.purpose) });
-const cur = c.curricula['ib-dp-bm'];
-cur?.units.forEach((u) =>
-  u.subtopics.forEach((s) =>
-    entries.push({ kind: 'IB subtopic', title: `${s.code} ${s.title}`, url: s.topic && c.topics[s.topic]?.code === s.code ? href.topic(s.topic) : subtopicHref(c, s.code), text: s.topic && c.topics[s.topic]?.code === s.code ? 'Complete brief' : noteFor(c, s.code) ? 'Full notes, mindmap, terms and tools' : 'Subtopic page: mindmap, terms and tools' }),
-  ),
-);
-for (const [id, m] of await mindmapsInOrder()) entries.push({ kind: 'Mindmap', title: m.scope === 'unit' ? `Unit ${m.unit}: ${m.title}` : `${m.code} ${m.title}`, url: href.mindmap(id), text: `${m.summary} ${m.branches.map((b) => b.label).join(' ')}` });
-for (const [id, d] of Object.entries(DIAGRAMS)) entries.push({ kind: 'Diagram', title: d.title, url: `/diagrams/#diagram-${id}`, text: `${d.caption ?? ''} ${d.syllabus.join(' ')}` });
-for (const r of (await library()).filter((x) => x.curated)) entries.push({ kind: 'Resource', title: r.title, url: r.details ?? r.primary.href, text: `${r.typeLabel}. ${r.summary}` });
-const ASSESSMENT_PAGES: Array<[string, string, string]> = [
-  ['/assessment/', 'The Assessment Centre', 'Every assessed component, explained from the guide'],
-  ['/assessment/internal-assessment/', 'Internal assessment: the business research project', 'Research question builder, supporting documents, criteria'],
-  ['/assessment/paper-1/', 'Paper 1: the pre-released case study', 'Annotated answer builder'],
-  ['/assessment/paper-2/', 'Paper 2: the quantitative paper', 'Calculations and constructions'],
-  ['/assessment/paper-3/', 'Paper 3 (HL): the Strategic Planning Centre', 'Plan builder across the functions, criteria A to D'],
-];
-for (const [path, title, text] of ASSESSMENT_PAGES) entries.push({ kind: 'Assessment', title, url: path, text });
-const kinds = [...new Set(entries.map((e) => e.kind))];
+const links: SearchLinks = {
+  subtopic: (code) => subtopicHref(c, code),
+  topic: href.topic,
+  case: href.case,
+  decision: href.decision,
+  toolEntry: (id) => href.toolEntry(id, c.tools[id]),
+  question: href.question,
+  glossary: href.glossary,
+  mindmap: href.mindmap,
+  commandTerm: href.commandTerm,
+  concept: href.concept,
+  revision: href.revision,
+  calculation: href.calculation,
+  pathway: href.pathway,
+};
+const entries = buildSearchIndex({
+  c,
+  nav: NAV,
+  links,
+  modules: (await modulesInOrder()).map((m) => m.data),
+  library: (await library())
+    .filter((r) => r.curated)
+    .map((r) => ({ title: r.title, summary: r.summary, typeLabel: r.typeLabel, level: r.level, units: r.units, subtopics: r.subtopics, href: r.details ?? r.primary.href })),
+  diagrams: DIAGRAMS,
+  pathways: (await pathwaysInOrder()).map((p) => ({ id: p.id, name: p.data.name, promise: p.data.promise })),
+});
+const groups = SEARCH_KINDS.map((k) => ({ ...k, items: entries.filter((e) => e.kind === k.id) })).filter((g) => g.items.length);
+const units = c.curricula['ib-dp-bm']?.units ?? [];
+const total = entries.length.toLocaleString('en-GB');
+/** Where an entry sits in the course, unless its title already says. */
+const codesLabel = (title: string, codes: string[], unitList: string[]) =>
+  codes.length && codes.every((code) => title.includes(code))
+    ? ''
+    : codes.length
+      ? codes.length > 3
+        ? `${codes.slice(0, 3).join(', ')} and more`
+        : codes.join(', ')
+      : unitList.length === 1 && unitList[0] !== 'toolkit'
+        ? `Unit ${unitList[0]}`
+        : unitList.includes('toolkit')
+          ? 'Toolkit'
+          : '';
 ---
 
-<BaseLayout title="Search" description="Search the topics, mindmaps, diagrams, glossary, cases, tools, calculations, practice questions and resources." section="search">
-  <PageIntro trail={[{ label: 'Search' }]} kicker="Search" title="Find anything" lead={`${entries.length} entries: topics, subtopics, mindmaps, diagrams, glossary terms, cases, tools, calculations, practice questions, resources and the Assessment Centre.`} />
-  <div class="wrap page-body">
-    <form class="search-box" role="search" data-search-form hidden onsubmit="return false">
+<BaseLayout title="Search" description="Search the whole platform: subtopics, notes, definitions, formulas, cases, frameworks, practice questions, calculators and tools, resources and pages." section="search">
+  <PageIntro
+    trail={[{ label: 'Search' }]}
+    kicker="Search"
+    title="Find anything"
+    lead={`${total} entries across the course: subtopics, notes, definitions, formulas, cases, frameworks, questions, calculators and tools, resources and pages. Search by name, filter by kind, unit or level, and keep the address to come back to the same results.`}
+  />
+
+  <div class="wrap page-body sx" data-ix="search">
+    <form class="sx-form js-only" role="search" action="/search/" method="get" data-search-form>
       <label for="q" class="label label--ink">Search the platform</label>
-      <input class="input" id="q" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="For example: break-even, franchising, autocratic" aria-describedby="search-count" />
-      <p class="small muted" id="search-count" data-count aria-live="polite"></p>
+      <div class="sx-box">
+        <Fragment set:html={iconSvg('search', 22)} />
+        <input id="q" name="q" type="search" autocomplete="off" spellcheck="false" enterkeyhint="go" placeholder="Try: gearing ratio, franchising, autocratic" aria-describedby="sx-hint search-count" />
+      </div>
+      <p class="sx-hint" id="sx-hint">The best matches come first in each kind. The arrow keys move through the results, and Enter opens one.</p>
+      <p class="sx-count" id="search-count" data-count>{total} entries</p>
+      <p class="sr-only" aria-live="polite" data-announce></p>
     </form>
-    <div data-results>
-      {
-        kinds.map((k) => (
-          <section class="search-group" data-group aria-labelledby={`k-${slug(k)}`}>
-            <h2 class="label label--ink" id={`k-${slug(k)}`}>{k}</h2>
-            <ul class="link-list">
-              {entries
-                .filter((e) => e.kind === k)
-                .map((e) => (
-                  <li data-entry data-text={`${e.title} ${e.text} ${e.kind}`.toLowerCase()}>
-                    <a href={e.url}>{e.title}</a>
-                    {e.text && <span class="small muted">{e.text.length > 160 ? `${e.text.slice(0, 157).trimEnd()}...` : e.text}</span>}
-                  </li>
-                ))}
-            </ul>
-          </section>
-        ))
-      }
+
+    <div class="sx-layout">
+      <details class="sx-facets js-only" data-facets open>
+        <summary class="sx-facets__toggle"><span class="label">Filters</span> <span class="sx-facets__sum" data-facets-sum>Everything, all units, SL and HL</span></summary>
+        <div class="sx-facets__body" role="group" aria-label="Filter the results">
+        <fieldset class="sx-kinds">
+          <legend class="label">Kind</legend>
+          <label class="sx-kind">
+            <input type="radio" name="kind" value="" checked />
+            <span class="sx-kind__label">Everything</span>
+            <span class="sx-kind__n" data-kind-n="">{total}</span>
+          </label>
+          {
+            groups.map((g) => (
+              <label class="sx-kind">
+                <input type="radio" name="kind" value={g.id} />
+                <span class="sx-kind__label">{g.label}</span>
+                <span class="sx-kind__n" data-kind-n={g.id}>
+                  {g.items.length.toLocaleString('en-GB')}
+                </span>
+              </label>
+            ))
+          }
+        </fieldset>
+        <div class="sx-filters">
+          <label class="sx-filter">
+            <span class="label">Unit</span>
+            <select name="unit" data-f="unit">
+              <option value="">All units</option>
+              {units.map((u) => <option value={String(u.number)}>Unit {u.number}: {u.title}</option>)}
+              <option value="toolkit">The toolkit</option>
+            </select>
+          </label>
+          <label class="sx-filter">
+            <span class="label">Level</span>
+            <select name="level" data-f="level">
+              <option value="">SL and HL</option>
+              <option value="sl">Hide HL-only entries</option>
+              <option value="hl">HL-only entries</option>
+            </select>
+          </label>
+          <button type="button" class="btn btn--small sx-clear" data-clear>Clear the search</button>
+        </div>
+        </div>
+      </details>
+
+      <div class="sx-main">
+        <nav class="sx-toc nojs-only" aria-label="Kinds of entry">
+          <p class="label label--ink">Jump to</p>
+          <ul>
+            {
+              groups.map((g) => (
+                <li>
+                  <a href={`#k-${g.id}`}>
+                    {g.label} <span class="sx-toc__n">{g.items.length.toLocaleString('en-GB')}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+
+        <div class="sx-results" data-results>
+          {
+            groups.map((g) => (
+              <section class="sx-group" id={`k-${g.id}`} data-group={g.id} aria-labelledby={`k-${g.id}-h`}>
+                <h2 class="sx-group__h" id={`k-${g.id}-h`} tabindex="-1">
+                  {g.label} <span class="sx-group__n" data-group-n>{g.items.length.toLocaleString('en-GB')}</span>
+                </h2>
+                <ol class="sx-list" role="list">
+                  {g.items.map((e) => {
+                    const where = codesLabel(e.title, e.codes, e.units);
+                    const k = extraWords(e.keys, `${e.title} ${e.type} ${where} ${e.text}`);
+                    return (
+                      <li data-entry data-units={e.units.join(' ') || undefined} data-hl={e.hl ? '1' : undefined} data-k={k || undefined}><a href={e.url}>{e.title}</a><p><span>{e.type}</span>{where && <> <span>{where}</span></>}{e.hl && <> <span class="tag tag--hl">HL</span></>}</p>{e.text && <p>{e.text}</p>}</li>
+                    );
+                  })}
+                </ol>
+                <button type="button" class="sx-more js-only" data-more={g.id} hidden>
+                  Show all {g.items.length.toLocaleString('en-GB')} {g.many}
+                </button>
+              </section>
+            ))
+          }
+          <p class="state sx-none" data-none hidden>
+            Nothing matches. Try a shorter word or another spelling, clear a filter, or browse the <a href="/topics/">topic library</a> and the <a href="/glossary/">glossary</a>.
+          </p>
+        </div>
+      </div>
     </div>
-    <p class="state" data-none hidden>Nothing matches. Try a shorter word, or browse the <a href="/topics/">topics</a> and the <a href="/glossary/">glossary</a>.</p>
   </div>
 </BaseLayout>
 
 <script>
-  const form = document.querySelector<HTMLFormElement>('[data-search-form]');
-  const input = document.querySelector<HTMLInputElement>('#q');
-  const count = document.querySelector<HTMLElement>('[data-count]');
-  const none = document.querySelector<HTMLElement>('[data-none]');
-  const items = [...document.querySelectorAll<HTMLElement>('[data-entry]')];
-  const groups = [...document.querySelectorAll<HTMLElement>('[data-group]')];
-  if (form && input) {
-    form.hidden = false;
-    const run = () => {
-      const terms = input.value.toLowerCase().trim().split(/\s+/).filter(Boolean);
-      let shown = 0;
-      items.forEach((li) => {
-        const ok = terms.every((t) => (li.dataset.text ?? '').includes(t));
-        li.hidden = !ok;
-        if (ok) shown++;
-      });
-      groups.forEach((g) => (g.hidden = !g.querySelector('[data-entry]:not([hidden])')));
-      if (none) none.hidden = shown > 0;
-      if (count) count.textContent = terms.length ? `${shown} ${shown === 1 ? 'result' : 'results'}` : `${items.length} entries`;
-      const url = new URL(window.location.href);
-      if (terms.length) url.searchParams.set('q', input.value.trim());
-      else url.searchParams.delete('q');
-      history.replaceState(null, '', url);
-    };
-    const initial = new URL(window.location.href).searchParams.get('q');
-    if (initial) input.value = initial;
-    input.addEventListener('input', run);
-    run();
-    input.focus();
-  }
+  import '../scripts/search';
 </script>
-
-<style>
-  .search-box {
-    display: grid;
-    gap: var(--sp-2);
-    max-width: 40rem;
-    margin-bottom: var(--sp-6);
-  }
-
-  .search-box .input {
-    min-height: 3.25rem;
-    font-size: 1.125rem;
-    border-width: 2px;
-    border-color: var(--bb-ink);
-  }
-
-  .search-group + .search-group {
-    margin-top: var(--sp-6);
-  }
-</style>
