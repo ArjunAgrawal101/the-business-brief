@@ -1,0 +1,110 @@
+---
+/**
+ * The board memo: the MBA pathway's practice format, as a template to copy.
+ * The template is visible and selectable without JavaScript; the copy button
+ * (js-only) puts the same text on the clipboard.
+ */
+import ProvenanceTag from '../ui/ProvenanceTag.astro';
+
+const HEADINGS: Array<[string, string]> = [
+  ['Decision', 'The decision the board is asked to make, in one sentence.'],
+  ['The evidence', 'The three facts that matter most, each with its figure and its source in the case.'],
+  ['Options considered', 'At least three, including doing nothing, each with its main gain and its main risk.'],
+  ['Recommendation', 'The option, and the reason it beats the next best.'],
+  ['Implementation', 'Who does what in the first ninety days, and what it costs.'],
+  ['Risks', 'What could go wrong, how likely it is, and what you would do.'],
+  ['What would change our mind', 'The signal that would make you reverse the decision, and when you will check for it.'],
+];
+const text = ['To: The board', 'From:', 'Date:', '', ...HEADINGS.flatMap(([h, d]) => [`${h}`, `(${d})`, ''])].join('\n').trim();
+---
+
+<div class="memo-tpl" data-ix="copy">
+  <div class="memo-tpl__head">
+    <p class="label label--ink">The board memo, one page</p>
+    <ProvenanceTag kind="aa-framework" />
+  </div>
+  <dl class="memo-tpl__rows">
+    {
+      HEADINGS.map(([h, d]) => (
+        <div>
+          <dt>{h}</dt>
+          <dd>{d}</dd>
+        </div>
+      ))
+    }
+  </dl>
+  <pre hidden data-copy-text>{text}</pre>
+  <p class="memo-tpl__actions">
+    <button type="button" class="btn btn--small js-only" data-copy>Copy the template</button>
+    <span class="small muted" data-copy-status aria-live="polite"></span>
+  </p>
+</div>
+
+<script>
+  import '../../scripts/copy-text';
+</script>
+
+<style>
+  .memo-tpl {
+    margin-top: var(--sp-5);
+    padding: var(--sp-5);
+    background: var(--surface-sheet);
+    border: 1px solid var(--rule-hair);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .memo-tpl__head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-4);
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: var(--sp-3);
+    border-bottom: 1px solid var(--navy-900);
+  }
+
+  .memo-tpl__rows {
+    margin: 0;
+  }
+
+  .memo-tpl__rows > div {
+    display: grid;
+    grid-template-columns: 13rem minmax(0, 1fr);
+    gap: var(--sp-1) var(--sp-4);
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .memo-tpl__rows dt {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .memo-tpl__rows dd {
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  .memo-tpl__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    align-items: center;
+    margin-top: var(--sp-4);
+  }
+
+  .memo-tpl__actions .btn {
+    min-height: 2.75rem;
+  }
+
+  @media (max-width: 40rem) {
+    .memo-tpl {
+      padding: var(--sp-4);
+    }
+
+    .memo-tpl__rows > div {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

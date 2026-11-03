@@ -70,6 +70,7 @@ The label column is what readers see on the page.
 | `questions` | `questions/*.yaml` (lists) | An original practice question with its mark scheme |
 | `glossary` | `glossary/*.yaml` (lists, one file per unit plus `toolkit.yaml`) | A term: its syllabus `definition`, the everyday meaning where it differs (`general`), `context`, `example`, `formula`, `usage` notes, `aliases`, `level`, `category`, the `subtopics` it belongs to and `related` terms |
 | `mindmaps` | `mindmaps/<id>.yaml` | A mindmap of a subtopic (`scope: subtopic`, with its `code`) or of a unit (`scope: unit`): 3 to 8 `branches`, each of a kind (concept, types, theory, tool, calculation, application, evaluation, connection) with nested nodes; a node may be `core` (kept in the revision view), name a glossary `term`, carry a `formula` or a `note`, and be marked `level: HL`; `connections` to other subtopics; the `basis` it was checked against |
+| `enrichmentMaps` | `enrichment-maps/<id>.yaml` | A map of management ideas beyond the IB course, for the undergraduate and MBA pathways: a mindmap's `centre`, `branches` and nodes with `scope: enrichment` in place of an IB code, unit and level, its `audience`, `field`, the IB subtopics it `builds` on, `related` maps and its `basis`. A collection of its own, so it never counts as IB coverage, an IB map or an IB resource. `src/lib/integrity-pathways.ts` holds it to the IB map bar and rejects any HL mark |
 | `notes` | `notes/<slug>.yaml` | Full notes for one subtopic (below) |
 | `calculations` | `data/calculations.yaml` | A calculation: formula, variables, unit, interpretation, errors, worked example |
 | `assessment` | `data/assessment.yaml` | An assessment component: facts with sources and pages; `outline` (duration, marks and weight at SL and HL), `sections` (marks, task, AOs), `criteria` (name and maximum mark only), `requirements`, `ibGuidance` (paraphrased teacher support material, with page); what is not stated; preparation |
@@ -207,6 +208,21 @@ A question has `paperStyle`, `commandTerm` (which must exist in the command term
 ## Calculations
 
 Each calculation's `id` matches a builder in `workings` (`src/lib/finance.ts`). Its `example` gives inputs from a case (or, for expected value, an option from a decision tree interaction); the integrity check works every example and fails on an error. `page` is where the calculation lives; the Finance Desk, tool and topic pages anchor it as `#calc-<id>`.
+
+## Pathways
+
+`pathwaySchema` in `src/lib/schemas.ts`; rendered by `src/pages/pathways/[id].astro` with the components in `src/components/pathways/`. Each pathway keeps its own audience, `depth`, `terminology`, route and assessment; qualifications are never combined.
+
+| Field | What it holds |
+| --- | --- |
+| `stageName`, `routeIntro`, `stages` | The route: each stage has a `title`, a `goal`, `items` (working pages, each with a `kind` and a `level`), key glossary `terms`, a `check` and, where tools are involved, a `caveat` (what they cannot tell you). Only the IB DP route names `syllabus` units; its stage `id` names the course time it takes (`toolkit`, `paper-1-research`, `internal-assessment`), and the page sums the guide's hours from the curriculum |
+| `assessment` | How learning is checked, with its provenance: the IB's own assessment for the IB DP route, the platform's practice formats elsewhere |
+| `leavesOut` | What the pathway leaves out on purpose, and why |
+| `practice` | Short-answer and data-response tasks. A part with a `calculation` names finance functions and figures, so its answer is worked, never typed |
+| `lessons` | Teachers: discussion prompts by subtopic for the lesson sequences that `src/lib/lessons.ts` builds from the notes |
+| `reading` | Reading pointers, limited to the sources register |
+
+`checkPathways` in `src/lib/integrity-pathways.ts` runs when the pathway pages build and in the unit tests: the secondary route uses SL material only and names no syllabus, a link is marked HL exactly when it leads to HL-only material, enrichment maps stay off the IB DP, secondary and teachers' routes, and every practice answer can be worked.
 
 ## Adding a topic brief
 

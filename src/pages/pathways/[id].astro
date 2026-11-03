@@ -1,110 +1,280 @@
 ---
+/**
+ * One audience pathway: who it is for, how deep it goes and the words it uses,
+ * its route of stages through working pages, how learning on it is checked,
+ * and what it leaves out on purpose. Each pathway adds what only it needs:
+ * the IB DP route its course hours and the IB assessment, the secondary route
+ * its own practice, the undergraduate route its reading pointers, the MBA
+ * route its board memo, the teachers' route its lesson library, and the
+ * undergraduate and MBA routes their enrichment maps. The honesty rules each
+ * page promises are checked at build time (src/lib/integrity-pathways.ts).
+ */
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import PageIntro from '../../components/layout/PageIntro.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import StatusTag from '../../components/ui/StatusTag.astro';
 import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
-import { href, pathwaysInOrder, topicsInOrder } from '../../lib/content';
+import LevelSwitch from '../../components/ui/LevelSwitch.astro';
+import PathwayStages from '../../components/pathways/PathwayStages.astro';
+import HoursChart from '../../components/pathways/HoursChart.astro';
+import AssessmentOutline from '../../components/pathways/AssessmentOutline.astro';
+import PracticeSet from '../../components/pathways/PracticeSet.astro';
+import MemoTemplate from '../../components/pathways/MemoTemplate.astro';
+import ReadingList from '../../components/pathways/ReadingList.astro';
+import EnrichmentList from '../../components/pathways/EnrichmentList.astro';
+import LessonLibrary from '../../components/pathways/LessonLibrary.astro';
+import { corpus, href, pathwaysInOrder, topicsInOrder } from '../../lib/content';
+import { enrichmentMapsInOrder } from '../../lib/learning';
+import { checkPathways } from '../../lib/integrity-pathways';
 import { inline, rich } from '../../lib/markup';
+import { hoursRows, routeHours } from '../../lib/pathways';
 import type { Pathway } from '../../lib/schemas';
 
 export async function getStaticPaths() {
-  return (await pathwaysInOrder()).map((p) => ({ params: { id: p.id }, props: { id: p.id, p: p.data } }));
+  const list = await pathwaysInOrder();
+  const problems = checkPathways(
+    list.map((p) => [p.id, p.data]),
+    await corpus(),
+  );
+  if (problems.length) throw new Error(`Pathway check failed (${problems.length}):\n${problems.map((p) => `  ${p.where}: ${p.message}`).join('\n')}`);
+  return list.map((p, i) => ({
+    params: { id: p.id },
+    props: {
+      id: p.id,
+      p: p.data,
+      index: i,
+      total: list.length,
+      prev: list[i - 1] ? { id: list[i - 1]!.id, name: list[i - 1]!.data.name } : undefined,
+      next: list[i + 1] ? { id: list[i + 1]!.id, name: list[i + 1]!.data.name } : undefined,
+    },
+  }));
 }
+
 interface Props {
   id: string;
   p: Pathway;
+  index: number;
+  total: number;
+  prev?: { id: string; name: string };
+  next?: { id: string; name: string };
 }
-const { id, p } = Astro.props;
+const { id, p, index, total, prev, next } = Astro.props;
+const c = await corpus();
+const cur = c.curricula['ib-dp-bm'];
+const isIb = id === 'ib-dp';
+const hours = isIb && cur ? routeHours(p.stages, cur) : null;
+const rows = isIb && cur ? hoursRows(p.stages, cur) : [];
 const topics = await topicsInOrder();
 const lenses = topics.flatMap(([tid, t]) => t.lenses.filter((l) => l.pathway === id).map((l) => ({ tid, t, l })));
+const audience = id === 'undergraduate' || id === 'mba' ? id : null;
+const enrichment = audience ? (await enrichmentMapsInOrder()).filter(([, m]) => m.audience.includes(audience)) : [];
+const prompts = Object.fromEntries(p.lessons.map((l) => [l.code, l.prompts]));
+const pad = (n: number) => String(n).padStart(2, '0');
+const stageWord = `${p.stageName.toLowerCase()}${p.stages.length === 1 ? '' : 's'}`;
+const CASE_STEPS: Array<[string, string]> = [
+  ['Data', 'What the exhibits show, with the figures that matter and where they come from.'],
+  ['Insight', 'What the data means for the decision: the cause, not only the symptom.'],
+  ['Options', 'At least three real choices, each with what it gains and what it risks.'],
+  ['Recommendation', 'The option you would take, and why it beats the next best.'],
+  ['Caveat', 'What would have to be true for the recommendation to be wrong, and how you would find out.'],
+];
 let n = 0;
 ---
 
 <BaseLayout title={`${p.name}: Pathways`} description={p.promise} section="pathways">
-  <PageIntro trail={[{ label: 'Pathways', href: '/pathways/' }, { label: p.name }]} kicker="Pathway" title={p.name} lead={p.promise}>
-    <div class="tags"><StatusTag status={p.status} /></div>
-  </PageIntro>
-  <div class="wrap page-body">
-    <div class="grid grid--2">
-      <div class="stack">
-        <p class="label">For</p>
-        <p>{p.audience}</p>
-        <div class="prose" set:html={rich(p.intro)} />
-      </div>
-      <div>
-        <h2 class="label label--ink">Principles</h2>
-        <ul class="prose">{p.principles.map((x) => <li set:html={inline(x)} />)}</ul>
+  <header class="pwh">
+    <div class="wrap">
+      <Breadcrumbs trail={[{ label: 'Pathways', href: '/pathways/' }, { label: p.name }]} />
+      <div class="pwh__grid">
+        <div class="pwh__main">
+          <p class="pwh__kicker">
+            <span class="label label--ink">Pathway {pad(index + 1)} of {pad(total)}</span>
+            <StatusTag status={p.status} />
+          </p>
+          <h1>{p.name}</h1>
+          <p class="lead pwh__lead">{p.promise}</p>
+          <div class="prose pwh__intro" set:html={rich(p.intro)} />
+        </div>
+        <aside class="pwh__glance" aria-label="This pathway at a glance">
+          <dl class="pwh__facts">
+            <div>
+              <dt>For</dt>
+              <dd>{p.audience}</dd>
+            </div>
+            <div>
+              <dt>Route</dt>
+              <dd>
+                <a href="#pw-route-h">{`${p.stages.length} ${stageWord}`}</a>{hours && <span>, {hours.sl} hours at SL and {hours.hl} at HL</span>}
+              </dd>
+            </div>
+            {
+              p.assessment && (
+                <div>
+                  <dt>Checked by</dt>
+                  <dd>
+                    <a href="#pw-assess-h">{p.assessment.title}</a>
+                  </dd>
+                </div>
+              )
+            }
+            <div>
+              <dt>Syllabus</dt>
+              <dd>{isIb ? 'Mapped to the IB Business management guide, first assessment 2024' : 'Not mapped to any syllabus or specification'}</dd>
+            </div>
+          </dl>
+          <p class="pwh__start-h">Start here</p>
+          <ul class="pwh__start">
+            {
+              p.available.map((a) => (
+                <li>
+                  <a href={a.href}>{a.label}</a>
+                  <span class="small muted">{a.note}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </aside>
       </div>
     </div>
+  </header>
+
+  <div class="wrap page-body">
     {
       p.caution && (
-        <aside class="callout callout--caution">
+        <aside class="callout callout--caution" aria-label="Caution">
           <span class="callout__kicker">Caution</span>
           <div class="prose" set:html={rich(p.caution)} />
         </aside>
       )
     }
-    <section aria-labelledby="now-h">
-      <SectionHead no={++n} title="Available now" id="now-h" />
-      <ul class="link-list" style="margin-top:var(--sp-4)">
+
+    <section aria-labelledby="pw-how-h">
+      <SectionHead no={++n} title="Depth and words" id="pw-how-h" dek="How far this pathway goes, the terms it uses, and the rules it keeps." />
+      <div class="pw-facts">
         {
-          p.available.map((a) => (
-            <li>
-              <a href={a.href}>{a.label}</a>
-              <span class="small muted">{a.note}</span>
-            </li>
-          ))
+          p.depth && (
+            <div>
+              <h3 class="pw-facts__h">Depth</h3>
+              <div class="prose" set:html={rich(p.depth)} />
+            </div>
+          )
         }
-      </ul>
+        {
+          p.terminology && (
+            <div>
+              <h3 class="pw-facts__h">Terminology</h3>
+              <div class="prose" set:html={rich(p.terminology)} />
+            </div>
+          )
+        }
+        <div>
+          <h3 class="pw-facts__h">Principles</h3>
+          <ul class="prose">{p.principles.map((x) => <li set:html={inline(x)} />)}</ul>
+        </div>
+      </div>
     </section>
+
+    <section class="pw-sec" aria-labelledby="pw-route-h">
+      <SectionHead no={++n} title="The route" id="pw-route-h" dek={p.routeIntro} />
+      {
+        isIb && (
+          <div class="pw-ib-tools">
+            <LevelSwitch id="pw-ib" />
+            <HoursChart rows={rows} />
+          </div>
+        )
+      }
+      <PathwayStages id={id} p={p} c={c} />
+    </section>
+
     {
       id === 'teachers' && (
-        <section id="sequences" aria-labelledby="seq-h">
-          <SectionHead no={++n} title="Lesson sequences" dek="One sequence for each complete brief, with timings and discussion prompts. Adapt them to your class." id="seq-h" />
-          <div class="stack stack-lg" style="margin-top:var(--sp-5)">
-            {topics.map(([tid, t]) => (
-              <article>
-                <h3>
-                  <a href={href.topic(tid)}>
-                    {t.code} {t.title}
-                  </a>
-                </h3>
-                <div class="tags" style="margin:var(--sp-2) 0">
-                  <ProvenanceTag kind="aa-framework" />
-                  <span class="tag tag--plain">{t.teaching.sequence.reduce((m, s) => m + s.minutes, 0)} minutes</span>
-                </div>
-                <div class="table-scroll" role="region" aria-label={`Lesson sequence for ${t.title}`} tabindex="0">
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th scope="col" class="n">Minutes</th>
-                        <th scope="col">Activity</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {t.teaching.sequence.map((s) => (
-                        <tr>
-                          <td class="n">{s.minutes}</td>
-                          <td set:html={inline(s.activity)} />
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <h4 class="label label--ink" style="margin-top:var(--sp-3)">Discussion prompts</h4>
-                <ul class="prose">{t.teaching.prompts.map((q) => <li>{q}</li>)}</ul>
-              </article>
-            ))}
+        <section class="pw-sec" id="lessons" aria-labelledby="pw-lessons-h">
+          <SectionHead
+            no={++n}
+            title="The lesson library"
+            id="pw-lessons-h"
+            dek="A timed sequence for each subtopic with full notes or a complete brief, built from that material. The timings, activities and prompts are the platform's suggestions; adapt them to your class."
+          />
+          <div class="tags pw-tags">
+            <ProvenanceTag kind="aa-framework" />
           </div>
+          <LessonLibrary c={c} prompts={prompts} />
         </section>
       )
     }
+
+    {
+      p.assessment && (
+        <section class="pw-sec" aria-labelledby="pw-assess-h">
+          <SectionHead no={++n} title={p.assessment.title} id="pw-assess-h" />
+          <div class="tags pw-tags">
+            <ProvenanceTag kind={p.assessment.provenance} />
+          </div>
+          <div class="prose pw-assess__summary" set:html={rich(p.assessment.summary)} />
+          {isIb && <AssessmentOutline c={c} />}
+          {p.assessment.formats.length > 0 && (
+            <ul class="pw-formats" role="list">
+              {p.assessment.formats.map((f) => (
+                <li>
+                  <h3 class="pw-formats__name">{f.name}</h3>
+                  <p set:html={inline(f.text)} />
+                </li>
+              ))}
+            </ul>
+          )}
+          {id === 'undergraduate' && (
+            <div class="pw-steps">
+              <h3 class="pw-facts__h">The five steps of a case analysis</h3>
+              <ol class="pw-steps__list">
+                {CASE_STEPS.map(([k, v]) => (
+                  <li>
+                    <span class="pw-steps__k">{k}</span>
+                    <span>{v}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+          {id === 'mba' && <MemoTemplate />}
+          {p.practice.length > 0 && <PracticeSet tasks={p.practice} />}
+        </section>
+      )
+    }
+
+    {
+      p.reading.length > 0 && (
+        <section class="pw-sec" aria-labelledby="pw-read-h">
+          <SectionHead
+            no={++n}
+            title="Reading pointers"
+            id="pw-read-h"
+            dek="Only sources in the platform's register, each labelled by how far the platform checked it. They are places to start, not a reading list."
+          />
+          <ReadingList c={c} reading={p.reading} />
+        </section>
+      )
+    }
+
+    {
+      enrichment.length > 0 && (
+        <section class="pw-sec" aria-labelledby="pw-enrich-h">
+          <SectionHead
+            no={++n}
+            title="Enrichment maps"
+            id="pw-enrich-h"
+            dek="Management ideas beyond the IB course, each as a map to fold, zoom, print and download. They are not IB content and count towards no coverage."
+          />
+          <EnrichmentList maps={enrichment} />
+        </section>
+      )
+    }
+
     {
       lenses.length > 0 && (
-        <section aria-labelledby="lens-h">
-          <SectionHead no={++n} title="From the briefs" dek="What each complete brief adds for this pathway." id="lens-h" />
-          <div class="lens-grid" style="margin-top:var(--sp-4)">
+        <section class="pw-sec" aria-labelledby="pw-lens-h">
+          <SectionHead no={++n} title="From the briefs" dek="What each complete brief adds for this pathway." id="pw-lens-h" />
+          <div class="lens-grid pw-lenses">
             {lenses.map(({ tid, t, l }) => (
               <article class="lens">
                 <p class="lens__for">
@@ -121,13 +291,292 @@ let n = 0;
         </section>
       )
     }
-    {
-      p.planned.length > 0 && (
-        <section aria-labelledby="planned-h">
-          <SectionHead no={++n} title="Planned" id="planned-h" />
-          <ul class="prose" style="margin-top:var(--sp-4)">{p.planned.map((x) => <li>{x}</li>)}</ul>
-        </section>
-      )
-    }
+
+    <section class="pw-sec" aria-labelledby="pw-out-h">
+      <SectionHead no={++n} title="What this pathway leaves out" id="pw-out-h" dek="On purpose. Each omission keeps the pathway honest about what it is." />
+      <ul class="pw-out" role="list">
+        {p.leavesOut.map((x) => <li set:html={inline(x)} />)}
+      </ul>
+      {
+        p.planned.length > 0 && (
+          <div class="pw-planned">
+            <h3 class="pw-facts__h">Planned, and not built yet</h3>
+            <ul class="prose">
+              {p.planned.map((x) => (
+                <li>{x}</li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </section>
+
+    <nav class="pw-pager" aria-label="Other pathways">
+      {prev ? <a href={href.pathway(prev.id)}>&larr; {prev.name}</a> : <span />}
+      <a href="/pathways/">All pathways</a>
+      {next ? <a href={href.pathway(next.id)}>{next.name} &rarr;</a> : <span />}
+    </nav>
   </div>
 </BaseLayout>
+
+<style>
+  .pwh {
+    padding-block: var(--sp-6) var(--sp-7);
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .pwh__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: var(--sp-7);
+    align-items: start;
+    margin-top: var(--sp-5);
+  }
+
+  .pwh__kicker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-3);
+    align-items: center;
+  }
+
+  .pwh__main h1 {
+    margin-top: var(--sp-3);
+    max-width: 18ch;
+  }
+
+  .pwh__lead {
+    margin-top: var(--sp-4);
+    max-width: 38rem;
+  }
+
+  .pwh__intro {
+    margin-top: var(--sp-4);
+    max-width: var(--text-max);
+  }
+
+  .pwh__glance {
+    padding: var(--sp-5);
+    background: var(--surface-sheet);
+    border-top: 3px solid var(--navy-900);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .pwh__facts {
+    margin: 0;
+  }
+
+  .pwh__facts > div {
+    display: grid;
+    grid-template-columns: 6.5rem minmax(0, 1fr);
+    gap: var(--sp-3);
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .pwh__facts > div:first-child {
+    padding-top: 0;
+  }
+
+  .pwh__facts dt,
+  .pwh__start-h {
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .pwh__facts dd {
+    margin: 0;
+    font-size: var(--fs-small);
+  }
+
+  .pwh__start-h {
+    margin-top: var(--sp-4);
+  }
+
+  .pwh__start {
+    margin: var(--sp-2) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pwh__start li {
+    display: grid;
+    gap: 0.1rem;
+    margin: 0;
+    padding: 0.45rem 0;
+  }
+
+  .pwh__start a {
+    font-weight: 600;
+  }
+
+  .pw-facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-6);
+    margin-top: var(--sp-5);
+  }
+
+  .pw-facts > div {
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--navy-900);
+  }
+
+  .pw-facts__h {
+    margin-bottom: var(--sp-2);
+    font-family: var(--font-ui);
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--navy-900);
+  }
+
+  .pw-sec {
+    margin-top: var(--sp-8);
+  }
+
+  .pw-ib-tools {
+    display: grid;
+    gap: var(--sp-4);
+    margin-top: var(--sp-5);
+  }
+
+  .pw-tags {
+    margin-top: var(--sp-3);
+  }
+
+  .pw-assess__summary {
+    max-width: var(--text-max);
+    margin-top: var(--sp-3);
+  }
+
+  .pw-formats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: var(--sp-4);
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pw-formats li {
+    margin: 0;
+    padding: var(--sp-4) 0 0;
+    border-top: 1px solid var(--navy-900);
+  }
+
+  .pw-formats__name {
+    margin-bottom: var(--sp-2);
+    font-size: var(--fs-h4);
+  }
+
+  .pw-steps {
+    margin-top: var(--sp-6);
+  }
+
+  .pw-steps__list {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .pw-steps__list li {
+    display: grid;
+    grid-template-columns: 2.25rem 9rem minmax(0, 1fr);
+    gap: var(--sp-3);
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+    counter-increment: step;
+  }
+
+  .pw-steps__list li::before {
+    content: counter(step, decimal-leading-zero);
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--brass-text);
+  }
+
+  .pw-steps__k {
+    font-weight: 700;
+    color: var(--navy-900);
+  }
+
+  .pw-lenses {
+    margin-top: var(--sp-4);
+  }
+
+  .pw-out {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: var(--sp-3) var(--sp-6);
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pw-out li {
+    margin: 0;
+    padding: var(--sp-3) 0 0 var(--sp-5);
+    border-top: 1px solid var(--rule-hair);
+    position: relative;
+  }
+
+  .pw-out li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: calc(var(--sp-3) + 0.6em);
+    width: 0.7rem;
+    height: 2px;
+    background: var(--navy-900);
+  }
+
+  .pw-planned {
+    margin-top: var(--sp-6);
+  }
+
+  .pw-pager {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    margin-top: var(--sp-8);
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  @media (max-width: 60rem) {
+    .pwh__grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sp-5);
+    }
+
+    .pw-facts {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sp-4);
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .pwh__glance {
+      padding: var(--sp-4);
+    }
+
+    .pw-steps__list li {
+      grid-template-columns: 2rem minmax(0, 1fr);
+    }
+
+    .pw-steps__list li > span:last-child {
+      grid-column: 2;
+    }
+  }
+</style>

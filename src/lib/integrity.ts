@@ -7,7 +7,7 @@
  * in both directions and reports every one that does not resolve. The build
  * fails on any problem (see src/lib/content.ts), and so do the unit tests.
  */
-import type { AssessmentComponent, Block, Calculation, CaseEntry, Claim, CommandTerm, Concept, Curriculum, Decision, GlossaryEntry, Interactive, Mindmap, Note, Question, Source, Topic, Tool } from './schemas';
+import type { AssessmentComponent, Block, Calculation, CaseEntry, Claim, CommandTerm, Concept, Curriculum, Decision, EnrichmentMap, GlossaryEntry, Interactive, Mindmap, Note, Question, Source, Topic, Tool } from './schemas';
 import { topoOrder } from './plan';
 import { buildWorking, workings } from './finance';
 import { checkStudioInteractives } from './integrity-studio';
@@ -15,6 +15,7 @@ import { checkMarketTools } from './integrity-market';
 import { checkLearning } from './integrity-learning';
 import { checkCases } from './integrity-cases';
 import { applyAdjustments, balances, derive, type Statement } from './ratios';
+import { checkEnrichmentMaps } from './integrity-pathways';
 
 type Dict<T> = Record<string, T>;
 
@@ -35,6 +36,8 @@ export interface Corpus {
   interactives: Dict<Interactive>;
   mindmaps: Dict<Mindmap>;
   notes: Dict<Note>;
+  /** Maps beyond the IB course (undergraduate and MBA): never counted as IB maps or coverage. */
+  enrichmentMaps: Dict<EnrichmentMap>;
 }
 
 export interface Problem {
@@ -355,6 +358,9 @@ export function checkIntegrity(c: Corpus): Problem[] {
     g.topics.forEach((x) => need(c.topics, x, `glossary/${id}`, 'topic'));
     g.related.forEach((x) => need(c.glossary, x, `glossary/${id}`, 'glossary term'));
   }
+
+  /* Enrichment maps beyond the IB course: the same bar as an IB map, and no IB level */
+  problems.push(...checkEnrichmentMaps(c));
 
   return problems;
 }

@@ -16,6 +16,29 @@ import type { MindNode, Mindmap } from './schemas';
 
 export type BranchKind = Mindmap['branches'][number]['kind'];
 
+/**
+ * Any map the engine can draw: an IB map (scope subtopic or unit) or an
+ * enrichment map beyond the course (scope enrichment), which has no IB code,
+ * unit or level.
+ */
+export interface AnyMap {
+  title: string;
+  summary: string;
+  centre: string;
+  scope: string;
+  code?: string;
+  unit?: number;
+  level?: Mindmap['level'];
+  branches: Mindmap['branches'];
+}
+
+/** The label above a map's centre and in its file's header: the IB code, the unit, or Enrichment. */
+export function mapCode(map: Pick<AnyMap, 'scope' | 'code' | 'unit'>): string {
+  if (map.scope === 'enrichment') return 'Enrichment';
+  if (map.scope === 'unit') return `Unit ${map.unit}`;
+  return map.code ?? '';
+}
+
 /** One colour per kind of branch, chosen to read as a family on ivory (each at least 3:1 against it). */
 export const BRANCH_COLOURS: Record<BranchKind, string> = {
   concept: '#1e355f',
@@ -158,7 +181,7 @@ interface Tree {
   span: number;
 }
 
-function build(map: Mindmap, opts: LayoutOptions): Tree[] {
+function build(map: AnyMap, opts: LayoutOptions): Tree[] {
   const collapsed = opts.collapsed ?? new Set<string>();
   const keep = (n: MindNode) => !opts.revision || n.core;
   // On a map of an HL-only subtopic every node is HL: the map's own label says so, and the nodes carry no pill.
@@ -227,7 +250,7 @@ function columns(branches: Tree[]): number[] {
   return widths;
 }
 
-export function layout(map: Mindmap, opts: LayoutOptions = {}): Layout {
+export function layout(map: AnyMap, opts: LayoutOptions = {}): Layout {
   const branches = build(map, opts);
   const root = measure(map.centre, 0, {});
   branches.forEach(span);
@@ -476,7 +499,7 @@ function drawNode(n: LaidNode, o: RenderOptions): string {
 }
 
 /** Count of nodes in a map (branches included), for summaries. */
-export function nodeCount(map: Mindmap): number {
+export function nodeCount(map: Pick<AnyMap, 'branches'>): number {
   let n = 0;
   const visit = (list: MindNode[]) => {
     for (const x of list) {
@@ -492,7 +515,7 @@ export function nodeCount(map: Mindmap): number {
 }
 
 /** Glossary ids named anywhere in a map. */
-export function termsIn(map: Mindmap): string[] {
+export function termsIn(map: Pick<AnyMap, 'branches'>): string[] {
   const out = new Set<string>();
   const visit = (list: MindNode[]) => {
     for (const x of list) {
@@ -505,7 +528,7 @@ export function termsIn(map: Mindmap): string[] {
 }
 
 /** A small, textless picture of a map's shape: the centre, its branches and their spread. For index tiles. */
-export function renderThumb(map: Mindmap): string {
+export function renderThumb(map: AnyMap): string {
   const collapsed = new Set<string>();
   map.branches.forEach((b, i) => b.children.forEach((_, j) => collapsed.add(`b${i}.${j}`)));
   const lay = layout(map, { collapsed });

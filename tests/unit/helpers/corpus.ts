@@ -17,6 +17,7 @@ import {
   conceptSchema,
   curriculumSchema,
   decisionSchema,
+  enrichmentMapSchema,
   glossarySchema,
   interactiveSchema,
   mindmapSchema,
@@ -99,6 +100,7 @@ export function loadCorpus() {
     claims: fileList('data/claims.yaml', claimSchema),
     mindmaps: perFile('mindmaps', mindmapSchema),
     notes: perFile('notes', noteSchema),
+    enrichmentMaps: perFile('enrichment-maps', enrichmentMapSchema),
   };
 }
 

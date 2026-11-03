@@ -1,0 +1,261 @@
+---
+/**
+ * A pathway's own practice: short-answer and data-response tasks. Every answer
+ * to a calculation is worked at build time by the platform's calculation
+ * functions from the figures in the task's table, so the table, the working
+ * and the answer can never disagree. The guidance says what a good answer
+ * includes; it is not a markscheme. Answers sit in disclosures, so the page
+ * works without JavaScript.
+ */
+import ProvenanceTag from '../ui/ProvenanceTag.astro';
+import { fmtMoney, fmtNumber } from '../../lib/format';
+import { inline, rich } from '../../lib/markup';
+import { cashRun, partWorking, taskMarks } from '../../lib/pathways';
+import type { PathwayTask } from '../../lib/schemas';
+
+interface Props {
+  tasks: PathwayTask[];
+}
+const { tasks } = Astro.props;
+const STYLE = { 'short-answer': 'Short answer', 'data-response': 'Data response' } as const;
+const money = (v: number, cur: string) => fmtMoney(v, cur, Number.isInteger(v) ? 0 : 2);
+const bracket = (v: number, cur: string) => (v < 0 ? `(${money(-v, cur)})` : money(v, cur));
+---
+
+<ol class="ps" role="list">
+  {
+    tasks.map((t, ti) => {
+      const run = t.cash ? cashRun(t.cash.opening, t.cash.months) : [];
+      return (
+        <li class="ps-task" id={`practice-${t.id}`}>
+          <header class="ps-task__head">
+            <p class="ps-task__kicker">
+              <span>Task {ti + 1}</span>
+              <span>{STYLE[t.style]}</span>
+              <span>{taskMarks(t)} marks</span>
+            </p>
+            <h3 class="ps-task__title">{t.title}</h3>
+            <div class="tags">
+              <ProvenanceTag kind="original-practice" />
+              {t.style === 'data-response' && <ProvenanceTag kind="simulated-data" />}
+            </div>
+          </header>
+          {t.context && <div class="prose ps-task__context" set:html={rich(t.context)} />}
+          {t.figures.length > 0 && (
+            <div class="table-scroll" role="region" aria-label={`${t.title}: the figures`} tabindex="0">
+              <table class="table ps-data">
+                <caption>{t.title}: the figures (fictional)</caption>
+                <tbody>
+                  {t.figures.map((f) => (
+                    <tr>
+                      <th scope="row">{f.label}</th>
+                      <td class="n">{f.money ? money(f.value, t.currency) : fmtNumber(f.value)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {run.length > 0 && (
+            <div class="table-scroll" role="region" aria-label={`${t.title}: the cash flow forecast`} tabindex="0">
+              <table class="table ps-data">
+                <caption>{t.title}: cash flow forecast (fictional). Negative figures are in brackets.</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Month</th>
+                    {run.map((r) => (
+                      <th scope="col" class="n">
+                        {r.month}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">Opening balance</th>
+                    {run.map((r, i) => <td class="n">{i === 0 ? bracket(r.opening, t.currency) : ''}</td>)}
+                  </tr>
+                  <tr>
+                    <th scope="row">Cash inflows</th>
+                    {run.map((r) => <td class="n">{money(r.inflows, t.currency)}</td>)}
+                  </tr>
+                  <tr>
+                    <th scope="row">Cash outflows</th>
+                    {run.map((r) => <td class="n">{money(r.outflows, t.currency)}</td>)}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+          <ol class="ps-parts">
+            {t.parts.map((part, pi) => {
+              const w = partWorking(t, part);
+              return (
+                <li>
+                  <p class="ps-q">
+                    <span class="ps-q__letter" aria-hidden="true">
+                      ({String.fromCharCode(97 + pi)})
+                    </span>
+                    <span set:html={inline(part.q)} />
+                    <span class="ps-q__marks">
+                      [{part.marks} {part.marks === 1 ? 'mark' : 'marks'}]
+                    </span>
+                  </p>
+                  <details class="disclosure ps-guide">
+                    <summary>What a good answer includes</summary>
+                    <div class="disclosure__body">
+                      <div class="prose small" set:html={rich(part.guidance)} />
+                      {w && (
+                        <dl class="working ps-working">
+                          <dt>Given</dt>
+                          <dd>
+                            <ul>
+                              {w.given.map((g) => (
+                                <li>
+                                  {g.label}: <span class="num">{g.value}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </dd>
+                          <dt>Formula</dt>
+                          <dd class="w-math">{w.formula}</dd>
+                          <dt>Substitution</dt>
+                          <dd class="w-math">{w.substitution}</dd>
+                          <dt>Working</dt>
+                          <dd class="w-math">
+                            {w.steps.map((s) => (
+                              <div>{s}</div>
+                            ))}
+                          </dd>
+                          <dt>Answer</dt>
+                          <dd>
+                            <span class="w-answer">{w.answer}</span>
+                            {w.note && <p class="small muted ps-note">{w.note}</p>}
+                          </dd>
+                          <dt>Unit</dt>
+                          <dd>{w.unit}</dd>
+                        </dl>
+                      )}
+                    </div>
+                  </details>
+                </li>
+              );
+            })}
+          </ol>
+        </li>
+      );
+    })
+  }
+</ol>
+
+<style>
+  .ps {
+    display: grid;
+    gap: var(--sp-6);
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ps-task {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding: var(--sp-5);
+    background: var(--surface-sheet);
+    border-top: 3px solid var(--navy-900);
+    box-shadow: var(--shadow-sheet);
+    scroll-margin-top: calc(var(--header-h) + var(--sp-4));
+  }
+
+  .ps-task__head {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .ps-task__kicker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-4);
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .ps-task__title {
+    font-size: var(--fs-h3);
+  }
+
+  .ps-task__context {
+    max-width: var(--text-max);
+  }
+
+  .ps-data {
+    width: auto;
+    min-width: min(100%, 26rem);
+  }
+
+  .ps-data caption {
+    text-align: left;
+  }
+
+  .ps-parts {
+    display: grid;
+    gap: var(--sp-4);
+    margin: var(--sp-2) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ps-parts > li {
+    margin: 0;
+  }
+
+  .ps-q {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr) auto;
+    gap: 0.2rem var(--sp-3);
+    align-items: baseline;
+    max-width: 48rem;
+  }
+
+  .ps-q__letter {
+    font-weight: 700;
+    color: var(--navy-900);
+  }
+
+  .ps-q__marks {
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 40rem) {
+    .ps-q {
+      grid-template-columns: 1.75rem minmax(0, 1fr);
+    }
+
+    .ps-q__marks {
+      grid-column: 2;
+    }
+
+    .ps-task {
+      padding: var(--sp-4);
+    }
+  }
+
+  .ps-guide {
+    margin-top: var(--sp-2);
+  }
+
+  .ps-working {
+    margin-top: var(--sp-3);
+  }
+
+  .ps-note {
+    margin-top: 0.35rem;
+  }
+</style>

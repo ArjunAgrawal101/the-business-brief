@@ -1,0 +1,67 @@
+---
+/**
+ * Reading pointers, limited to entries in the sources register. Each says how
+ * far the platform checked it: a supplied source the platform read, or a
+ * bibliographic reference it cites without having opened the work.
+ */
+import type { Corpus } from '../../lib/integrity';
+import { href } from '../../lib/content';
+import { inline } from '../../lib/markup';
+
+interface Props {
+  c: Corpus;
+  reading: Array<{ source: string; for: string }>;
+}
+const { c, reading } = Astro.props;
+const CHECKED: Record<string, string> = {
+  supplied: 'Supplied to the platform and read',
+  referenced: 'A bibliographic reference: cited, but the platform has not opened the work',
+  repository: 'In the platform repository',
+  'web-search': 'Found by web search',
+  'not-available': 'Not available to the platform',
+};
+const items = reading.map((r) => ({ ...r, s: c.sources[r.source] })).filter((r) => r.s);
+---
+
+<ol class="rl" role="list">
+  {
+    items.map((r) => (
+      <li>
+        <p class="rl__cite">
+          <a href={href.source(r.source)}>{r.s!.title}</a>{r.s!.author && <span>. {r.s!.author}</span>}{r.s!.year && <span> ({r.s!.year})</span>}
+        </p>
+        <p class="rl__for" set:html={inline(r.for)} />
+        <p class="rl__checked small">{CHECKED[r.s!.availability] ?? r.s!.availability}</p>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .rl {
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .rl li {
+    display: grid;
+    gap: 0.2rem;
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .rl__cite {
+    font-family: var(--font-serif);
+  }
+
+  .rl__cite a {
+    font-style: italic;
+  }
+
+  .rl__checked {
+    color: var(--text-muted);
+  }
+</style>

@@ -1,0 +1,436 @@
+---
+/**
+ * The teachers' lesson library: a timed sequence for every subtopic with full
+ * notes or a complete brief, built from that material by src/lib/lessons.ts.
+ * The build renders each at 60 minutes for an HL class (HL steps marked HL),
+ * so the page is complete without JavaScript; the script re-renders every
+ * plan with the same functions when the teacher picks another lesson length
+ * or an SL class. Each subtopic adds its discussion prompts, its assessment
+ * resources and a presentation outline as plain text, for the teacher's own
+ * slides: the platform makes no slides.
+ */
+import { jsonForScript } from '../../lib/markup';
+import { lessonLibrary } from '../../lib/lesson-sources';
+import { DEFAULT_LENGTH, LESSON_LENGTHS, lessonsHtml, outlineFrames, outlineText, planSummary } from '../../lib/lessons';
+import type { Corpus } from '../../lib/integrity';
+
+interface Props {
+  c: Corpus;
+  prompts: Record<string, string[]>;
+}
+const { c, prompts } = Astro.props;
+const lib = lessonLibrary(c, prompts);
+const units = [...new Set(lib.map((e) => e.unit))].map((u) => ({
+  number: u,
+  title: lib.find((e) => e.unit === u)?.unitTitle ?? '',
+  entries: lib.filter((e) => e.unit === u),
+}));
+const config = { entries: lib.map((e) => ({ code: e.code, source: e.source })) };
+const notesCount = lib.filter((e) => e.source.kind === 'notes').length;
+const briefsCount = lib.length - notesCount;
+---
+
+<div class="ll" data-ix="lessons">
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="ll-lead">
+    {lib.length} subtopics: {notesCount} built from their full notes and {briefsCount} from their complete briefs. Each opens to its lessons, its discussion prompts,
+    its assessment resources and a presentation outline.
+  </p>
+
+  <div class="ll-controls js-only">
+    <div class="field ll-field">
+      <label for="ll-length">Lesson length</label>
+      <select id="ll-length" class="select" data-length>
+        {
+          LESSON_LENGTHS.map((n) => (
+            <option value={n} selected={n === DEFAULT_LENGTH}>
+              {n} minutes
+            </option>
+          ))
+        }
+      </select>
+    </div>
+    <fieldset class="ll-level">
+      <legend>Your class</legend>
+      <label><input type="radio" name="ll-level" value="SL" /> SL</label>
+      <label><input type="radio" name="ll-level" value="HL" checked /> HL</label>
+    </fieldset>
+    <p class="small muted ll-controls__note">An SL plan leaves out HL sections and HL-only subtopics. Your choice is kept on this device.</p>
+    <p class="sr-only" aria-live="polite" data-status></p>
+  </div>
+  <p class="nojs-only small muted ll-nojs">Shown for {DEFAULT_LENGTH}-minute lessons with an HL class, so HL steps are marked HL. With JavaScript on, you can choose another length or an SL class.</p>
+  <p class="ll-error" data-error hidden>The planner could not start, so the plans are shown for {DEFAULT_LENGTH}-minute HL lessons.</p>
+
+  {
+    units.map((u) => (
+      <section class="ll-unit" aria-labelledby={`ll-u${u.number}`}>
+        <h3 class="ll-unit__h" id={`ll-u${u.number}`}>
+          Unit {u.number}: {u.title}
+        </h3>
+        {u.entries.map((e) => {
+          const frames = outlineFrames(e.outline);
+          return (
+            <details class="ll-entry" id={`lesson-${e.code.replace('.', '-')}`} data-code={e.code}>
+              <summary>
+                <span class="ll-entry__code">{e.code}</span>
+                <span class="ll-entry__title">{e.title}</span>
+                <span class="ll-entry__meta">
+                  <span data-summary>{planSummary(e.source, DEFAULT_LENGTH, 'HL')}</span>
+                  <span class="ll-entry__from">{e.source.kind === 'notes' ? 'from the notes' : 'from the brief'}</span>
+                  {e.level === 'HL' && <span class="tag tag--hl">HL only</span>}
+                </span>
+              </summary>
+              <div class="ll-entry__body">
+                <div data-plan set:html={lessonsHtml(e.source, DEFAULT_LENGTH, 'HL')} />
+                <div class="ll-cols">
+                  {e.source.prompts.length > 0 && (
+                    <div>
+                      <h4 class="ll-h">Discussion prompts</h4>
+                      <ul class="ll-list">
+                        {e.source.prompts.map((q) => (
+                          <li>{q}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <div>
+                    <h4 class="ll-h">Assessment resources</h4>
+                    <ul class="ll-list">
+                      {e.source.kind === 'notes' && (
+                        <li>
+                          <a href={`${e.source.href}#sh-rev-h`}>Recall cards</a> on the notes page, {e.source.retrieval.length} questions
+                        </li>
+                      )}
+                      {e.source.kind === 'notes' && e.source.exam.length > 0 && (
+                        <li>
+                          <a href={`${e.source.href}#nv-exam-h`}>Exam-style practice in the notes</a>, {e.source.exam.length} questions with guidance
+                        </li>
+                      )}
+                      {e.source.kind === 'brief' && e.source.revision && (
+                        <li>
+                          <a href={e.source.revision}>The Revision Brief</a>, printable on one page
+                        </li>
+                      )}
+                      {e.source.questions.map((q) => (
+                        <li>
+                          <a href={q.href}>{q.title}</a>
+                          {q.level === 'HL' && <span class="tag tag--hl">HL</span>} <span class="small muted">original practice question</span>
+                        </li>
+                      ))}
+                      {e.source.mindmap && (
+                        <li>
+                          <a href={e.source.mindmap}>The mindmap</a>, with its revision view
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+                <details class="disclosure ll-outline" data-ix="copy">
+                  <summary>Presentation outline, as text for your own slides</summary>
+                  <div class="disclosure__body">
+                    <ol class="ll-frames">
+                      {frames.map((f) => (
+                        <li>
+                          <span class="ll-frames__title">{f.title}</span>
+                          {f.points.length > 0 && (
+                            <ul>
+                              {f.points.map((pt) => (
+                                <li>{pt}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </li>
+                      ))}
+                    </ol>
+                    <pre hidden data-copy-text>{outlineText(frames, `Arjun Agrawal | The Business Brief, ${e.source.href}`)}</pre>
+                    <p class="ll-copy">
+                      <button type="button" class="btn btn--small js-only" data-copy>
+                        Copy the outline
+                      </button>
+                      <span class="small muted" data-copy-status aria-live="polite" />
+                    </p>
+                  </div>
+                </details>
+              </div>
+            </details>
+          );
+        })}
+      </section>
+    ))
+  }
+</div>
+
+<script>
+  import '../../scripts/lessons';
+  import '../../scripts/copy-text';
+</script>
+
+<style>
+  .ll-lead {
+    max-width: var(--text-max);
+    margin-top: var(--sp-4);
+  }
+
+  .ll-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--sp-3) var(--sp-6);
+    margin-top: var(--sp-5);
+    padding: var(--sp-4);
+    background: var(--surface-sheet);
+    border: 1px solid var(--rule-hair);
+  }
+
+  .ll-field {
+    margin: 0;
+  }
+
+  .ll-field .select {
+    min-height: 2.75rem;
+    min-width: 11rem;
+  }
+
+  .ll-level {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-4);
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .ll-level legend {
+    float: left;
+    margin-right: var(--sp-2);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .ll-level label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2.75rem;
+    padding: 0 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .ll-level input {
+    width: 1.15rem;
+    height: 1.15rem;
+    accent-color: var(--bb-cobalt);
+  }
+
+  .ll-controls__note {
+    flex-basis: 100%;
+  }
+
+  .ll-nojs,
+  .ll-error {
+    margin-top: var(--sp-4);
+  }
+
+  .ll-unit {
+    margin-top: var(--sp-6);
+  }
+
+  .ll-unit__h {
+    padding-bottom: var(--sp-2);
+    border-bottom: 1px solid var(--navy-900);
+    font-size: var(--fs-h4);
+  }
+
+  .ll-entry {
+    border-bottom: 1px solid var(--rule-hair);
+    scroll-margin-top: calc(var(--header-h) + var(--sp-4));
+  }
+
+  .ll-entry > summary {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr) auto;
+    gap: var(--sp-1) var(--sp-3);
+    align-items: baseline;
+    min-height: 2.75rem;
+    padding: var(--sp-3) 0;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .ll-entry > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .ll-entry > summary::after {
+    content: '+';
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .ll-entry[open] > summary::after {
+    content: '\2212';
+  }
+
+  .ll-entry__code {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    color: var(--brass-text);
+  }
+
+  .ll-entry__title {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .ll-entry__meta {
+    grid-column: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-3);
+    align-items: center;
+    font-size: var(--fs-small);
+    color: var(--text-muted);
+  }
+
+  .ll-entry__from::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    margin-right: var(--sp-3);
+    border-radius: 50%;
+    background: var(--rule);
+    vertical-align: middle;
+  }
+
+  .ll-entry__body {
+    display: grid;
+    gap: var(--sp-5);
+    padding: var(--sp-2) 0 var(--sp-6) 3.75rem;
+  }
+
+  .ll-entry__body :global(.lp-lesson__h) {
+    margin-bottom: var(--sp-2);
+    font-size: var(--fs-small);
+    font-weight: 700;
+    color: var(--navy-900);
+  }
+
+  .ll-entry__body :global(.lp-lesson + .lp-lesson) {
+    margin-top: var(--sp-5);
+  }
+
+  .ll-entry__body :global(.lp-table caption) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .ll-entry__body :global(.lp-table td) {
+    vertical-align: top;
+  }
+
+  .ll-entry__body :global(.lp-phase) {
+    white-space: nowrap;
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .ll-entry__body :global(.lp-detail) {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: var(--fs-small);
+    color: var(--text-muted);
+  }
+
+  .ll-entry__body :global(.lp-table .tag) {
+    margin-left: var(--sp-2);
+  }
+
+  .ll-entry__body :global(.lp-none) {
+    padding: var(--sp-3) var(--sp-4);
+    border: 1px dashed var(--rule-control);
+    color: var(--text-muted);
+  }
+
+  .ll-cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: var(--sp-5);
+  }
+
+  .ll-h {
+    margin-bottom: var(--sp-2);
+    font-family: var(--font-ui);
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .ll-list {
+    margin: 0;
+    padding-left: 1.1rem;
+  }
+
+  .ll-list li + li {
+    margin-top: 0.35rem;
+  }
+
+  .ll-frames {
+    margin: 0;
+    padding-left: 1.4rem;
+  }
+
+  .ll-frames > li + li {
+    margin-top: var(--sp-3);
+  }
+
+  .ll-frames__title {
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .ll-frames ul {
+    margin: 0.25rem 0 0;
+    padding-left: 1.1rem;
+    font-size: var(--fs-small);
+  }
+
+  .ll-copy {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    align-items: center;
+    margin-top: var(--sp-4);
+  }
+
+  .ll-copy .btn {
+    min-height: 2.75rem;
+  }
+
+  @media (max-width: 40rem) {
+    .ll-entry > summary {
+      grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+    }
+
+    .ll-entry__body {
+      padding-left: 0;
+    }
+  }
+</style>

@@ -1,39 +1,183 @@
 ---
+/**
+ * The pathways index: seven routes through one foundation, each with its own
+ * audience, depth, route and way of checking learning, and a table that sets
+ * them side by side so the differences are plain. Only the IB DP route is
+ * mapped to a syllabus, because the IB guide is the only specification the
+ * platform holds.
+ */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
 import StatusTag from '../../components/ui/StatusTag.astro';
-import { href, pathwaysInOrder } from '../../lib/content';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import { corpus, href, pathwaysInOrder } from '../../lib/content';
+import { firstSentence, routeHours } from '../../lib/pathways';
 
 const pathways = await pathwaysInOrder();
+const c = await corpus();
+const cur = c.curricula['ib-dp-bm'];
+const facts = pathways.map((p) => {
+  const d = p.data;
+  const hours = p.id === 'ib-dp' && cur ? routeHours(d.stages, cur) : null;
+  return {
+    p,
+    route: `${d.stages.length} ${d.stageName.toLowerCase()}${d.stages.length === 1 ? '' : 's'}${hours ? `, ${hours.sl} hours at SL and ${hours.hl} at HL` : ''}`,
+    syllabus: p.id === 'ib-dp' ? 'The IB guide, first assessment 2024' : 'None mapped',
+    depth: d.depth ? firstSentence(d.depth) : '',
+    checked: d.assessment?.title ?? '',
+    kind: d.assessment?.provenance,
+  };
+});
 ---
 
-<BaseLayout title="Pathways" description="One shared foundation of topics, cases and tools, with an entry point for each kind of learner." section="pathways">
+<BaseLayout title="Pathways" description="Seven routes through one foundation of topics, cases and tools, each with its own audience, depth, terminology, route and way of checking learning." section="pathways">
   <PageIntro
     trail={[{ label: 'Pathways' }]}
     kicker="Pathways"
-    title="One foundation, several ways in"
-    lead="The topics, cases, tools and calculations are shared. Each pathway is a route through them with its own emphasis and its own cautions. A pathway never relabels shared material as meeting a qualification's requirements unless that qualification has been mapped."
+    title="One foundation, seven routes kept apart"
+    lead="The topics, cases, tools and calculations are shared. Each pathway is a route through them with its own audience, depth, terminology, way of checking learning and deliberate omissions. Qualifications are never combined: only the IB DP route is mapped to a syllabus, because the IB guide is the only specification the platform holds."
   />
   <div class="wrap page-body">
-    <ol class="index-list">
+    <ol class="index-list pwi">
       {
-        pathways.map((p) => (
+        facts.map(({ p, route, syllabus, checked, kind }) => (
           <li class="index-item">
-            <span class="index-item__code" style="font-size:1rem">{String(p.data.order).padStart(2, '0')}</span>
+            <span class="index-item__code pwi__no">{String(p.data.order).padStart(2, '0')}</span>
             <div class="index-item__body">
               <h2 class="index-item__title">
                 <a href={href.pathway(p.id)}>{p.data.name}</a>
               </h2>
               <p>{p.data.audience}</p>
               <p class="narrative small">{p.data.promise}</p>
+              <dl class="pwi__facts">
+                <div>
+                  <dt>Route</dt>
+                  <dd>{route}</dd>
+                </div>
+                <div>
+                  <dt>Checked by</dt>
+                  <dd>
+                    {checked} {kind && <ProvenanceTag kind={kind} />}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Syllabus</dt>
+                  <dd>{syllabus}</dd>
+                </div>
+              </dl>
             </div>
             <div class="index-item__side">
               <StatusTag status={p.data.status} />
-              <span class="muted">{p.data.available.length} ways in now</span>
             </div>
           </li>
         ))
       }
     </ol>
+
+    <section class="pwi-cmp" aria-labelledby="pwi-cmp-h">
+      <SectionHead no="01" title="How the pathways differ" id="pwi-cmp-h" dek="The same material, read at different depths and checked in different ways." />
+      <div class="table-scroll" role="region" aria-label="The pathways side by side" tabindex="0">
+        <table class="table pwi-table">
+          <thead>
+            <tr>
+              <th scope="col">Pathway</th>
+              <th scope="col">Mapped to</th>
+              <th scope="col">Depth</th>
+              <th scope="col">Route</th>
+              <th scope="col">Checked by</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              facts.map(({ p, route, syllabus, depth, checked, kind }) => (
+                <tr>
+                  <th scope="row">
+                    <a href={href.pathway(p.id)}>{p.data.name}</a>
+                  </th>
+                  <td>{syllabus}</td>
+                  <td>{depth}</td>
+                  <td>{route}</td>
+                  <td>
+                    <span class="pwi-checked">{checked}</span>
+                    {kind && <ProvenanceTag kind={kind} />}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted pwi-note">
+        No specification for IGCSE, GCSE, A level or any university course was supplied, so no page claims to cover one. Teachers on those courses should check
+        each route against their own specification.
+      </p>
+    </section>
   </div>
 </BaseLayout>
+
+<style>
+  .pwi__no {
+    font-size: 1rem;
+  }
+
+  .pwi__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-6);
+    margin: var(--sp-3) 0 0;
+    font-size: var(--fs-small);
+  }
+
+  .pwi__facts div {
+    display: flex;
+    gap: var(--sp-2);
+  }
+
+  .pwi__facts dt {
+    font-weight: 700;
+    color: var(--navy-900);
+  }
+
+  .pwi__facts dd {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    align-items: center;
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  .pwi-checked {
+    display: block;
+    margin-bottom: var(--sp-1);
+  }
+
+  .pwi-cmp {
+    margin-top: var(--sp-8);
+  }
+
+  /* The tags' screen-reader text is positioned absolutely: keep it inside the scrolling region. */
+  .pwi-cmp .table-scroll {
+    position: relative;
+  }
+
+  .pwi-table {
+    min-width: 52rem;
+    margin-top: var(--sp-4);
+  }
+
+  .pwi-table td,
+  .pwi-table th {
+    vertical-align: top;
+  }
+
+  .pwi-table th[scope='row'] {
+    min-width: 11rem;
+  }
+
+  .pwi-note {
+    margin-top: var(--sp-3);
+    max-width: var(--text-max);
+  }
+</style>

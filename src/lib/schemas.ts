@@ -895,6 +895,37 @@ export const mindmapSchema = z.object({
 });
 export type Mindmap = z.infer<typeof mindmapSchema>;
 
+/** Who an enrichment map is written for: the pathways that go beyond the IB course. */
+export const ENRICHMENT_AUDIENCES = ['undergraduate', 'mba'] as const;
+/** The area of management an enrichment map belongs to, for grouping on the index. */
+export const ENRICHMENT_FIELDS = ['Strategy', 'Finance', 'People', 'Leadership', 'Marketing', 'Operations', 'Enterprise', 'Governance', 'Sustainability'] as const;
+
+/**
+ * A mindmap of management ideas beyond the IB course, for the undergraduate
+ * and MBA pathways. It keeps the mindmap schema's centre, branches and nodes
+ * as they are, and replaces the IB code, unit and level with scope
+ * 'enrichment' and the audiences it is written for. Enrichment maps are a
+ * collection of their own (src/content/enrichment-maps/), so nothing that
+ * counts IB maps, IB coverage or IB resources can count one by mistake.
+ */
+export const enrichmentMapSchema = mindmapSchema
+  .omit({ code: true, scope: true, unit: true, level: true, connections: true, basis: true })
+  .extend({
+    scope: z.literal('enrichment'),
+    audience: z.array(z.enum(ENRICHMENT_AUDIENCES)).min(1),
+    field: z.enum(ENRICHMENT_FIELDS),
+    /** Where a reader who knows the IB course starts from: subtopics by code, with what the map builds on. */
+    builds: z.array(z.object({ code: z.string(), label: z.string() })).default([]),
+    /** Other enrichment maps, by id, with the link between them. */
+    related: z.array(z.object({ map: z.string(), label: z.string() })).default([]),
+    /** How the map was written. Any source it names must be in the register, with what it is cited for. */
+    basis: z.object({
+      note: md,
+      sources: z.array(z.object({ source: z.string(), pages: z.string().optional(), for: z.string() })).default([]),
+    }),
+  });
+export type EnrichmentMap = z.infer<typeof enrichmentMapSchema>;
+
 /* ------------------------------------------------------------------ */
 /* Topic notes: the full notes for a subtopic without a brief          */
 /* ------------------------------------------------------------------ */
@@ -985,6 +1016,99 @@ export const noteSchema = z.object({
 });
 export type Note = z.infer<typeof noteSchema>;
 
+/** What a stop on a pathway's route is, shown as its label. */
+export const PATHWAY_ITEM_KINDS = [
+  'Notes',
+  'Brief',
+  'Mindmap',
+  'Enrichment map',
+  'Case',
+  'Case lab',
+  'Decision Room',
+  'Workspace',
+  'Interaction',
+  'Toolkit guide',
+  'Practice',
+  'Assessment',
+  'Planner',
+  'Glossary',
+  'Revision',
+  'Course map',
+  'Diagrams',
+  'Reference',
+  'Room',
+] as const;
+
+/** One stop on a route: a working page (the link check fails the build on a broken one). */
+export const pathwayItemSchema = z.object({
+  label: z.string(),
+  href: z.string().startsWith('/'),
+  kind: z.enum(PATHWAY_ITEM_KINDS),
+  note: z.string().optional(),
+  level: level.default('SL/HL'),
+});
+
+/** A stage of a pathway's route: a week, a module, a level or a question, with its goal and its stops. */
+export const pathwayStageSchema = z.object({
+  /** An anchor for the stage. On the IB DP route it also names the course time the stage takes: toolkit, paper-1-research or internal-assessment. */
+  id: z.string().optional(),
+  title: z.string(),
+  /** What the learner can do at the end of the stage. */
+  goal: md,
+  /** Roughly how long it takes, in the pathway's own terms. */
+  time: z.string().optional(),
+  /** IB units ("unit-1") or subtopic codes the stage covers. Only the IB DP route uses this; the page lists the subtopics from the curriculum. */
+  syllabus: z.array(z.string()).default([]),
+  items: z.array(pathwayItemSchema).default([]),
+  /** Glossary ids for the stage's key words. */
+  terms: ids,
+  /** How to tell the stage is done. */
+  check: md.optional(),
+  /** What the stage's tools cannot tell you. */
+  caveat: md.optional(),
+});
+
+/** A figure given in a data-response task: shown in the task's table and named by its calculations. */
+const pathwayTaskFigure = z.object({ key: z.string(), label: z.string(), value: z.number(), money: z.boolean().default(false) });
+
+/**
+ * A practice task written for a pathway with its own assessment style (the
+ * secondary pathway's short-answer and data-response practice). The answer
+ * to a calculation is never typed: it is worked by the platform's own
+ * calculation functions from the task's figures.
+ */
+export const pathwayTaskSchema = z.object({
+  id: z.string(),
+  style: z.enum(['short-answer', 'data-response']),
+  title: z.string(),
+  /** The fictional business and its situation. */
+  context: md.optional(),
+  currency: z.string().default(''),
+  labels: z.object({ unit: z.string(), units: z.string(), period: z.string() }).optional(),
+  figures: z.array(pathwayTaskFigure).default([]),
+  /** Months of cash flow from an opening balance: the table and the balances are computed. */
+  cash: z
+    .object({ opening: z.number(), months: z.array(z.object({ month: z.string(), inflows: z.number(), outflows: z.number() })).min(2) })
+    .optional(),
+  parts: z
+    .array(
+      z.object({
+        q: md,
+        marks: z.number().int().min(1).max(10),
+        /** A calculation from src/lib/finance.ts that answers the part. */
+        calculation: z.string().optional(),
+        /** The calculation's inputs, each naming a figure by its key. */
+        inputs: z.record(z.string(), z.string()).default({}),
+        /** For a cash task: the month whose balance the calculation uses. */
+        month: z.string().optional(),
+        /** What a good answer includes: the platform's guidance, not a markscheme. */
+        guidance: md,
+      }),
+    )
+    .min(1),
+});
+export type PathwayTask = z.infer<typeof pathwayTaskSchema>;
+
 export const pathwaySchema = z.object({
   name: z.string(),
   audience: z.string(),
@@ -996,6 +1120,32 @@ export const pathwaySchema = z.object({
   planned: z.array(z.string()).default([]),
   principles: z.array(md).min(2),
   caution: md.optional(),
+  /** How deep the pathway goes, and the register it is written in. */
+  depth: md.optional(),
+  /** How the pathway uses terms, and where they differ from other courses. */
+  terminology: md.optional(),
+  /** What one stage of the route is called on this pathway. */
+  stageName: z.enum(['Stage', 'Week', 'Module', 'Level', 'Question', 'Phase']).default('Stage'),
+  /** A sentence or two above the route. */
+  routeIntro: md.optional(),
+  stages: z.array(pathwayStageSchema).default([]),
+  /** How learning on the pathway is checked, and what kind of statement that is. */
+  assessment: z
+    .object({
+      title: z.string(),
+      summary: md,
+      provenance,
+      formats: z.array(z.object({ name: z.string(), text: md })).default([]),
+    })
+    .optional(),
+  /** What the pathway leaves out on purpose, and why. */
+  leavesOut: z.array(md).default([]),
+  /** Teachers: discussion prompts for the lesson sequences built from the notes, by subtopic code. */
+  lessons: z.array(z.object({ code: z.string(), prompts: z.array(z.string()).min(2).max(5) })).default([]),
+  /** Practice in the pathway's own assessment style. */
+  practice: z.array(pathwayTaskSchema).default([]),
+  /** Reading pointers: entries in the sources register, with what each is the place to start for. */
+  reading: z.array(z.object({ source: z.string(), for: md })).default([]),
 });
 
 export const moduleSchema = z.object({

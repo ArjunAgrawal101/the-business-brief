@@ -1,0 +1,484 @@
+---
+/**
+ * A pathway's route: its stages in order, each with its goal, the working
+ * pages to go through, and how to tell it is done. On the IB DP route a stage
+ * names units, and the subtopics are listed from the curriculum with what the
+ * platform has for each; on the secondary route each stage gives its key
+ * words with a plain meaning from the glossary. HL-only material carries the
+ * HL tag everywhere, and on the IB DP route the SL view hides it.
+ */
+import type { Corpus } from '../../lib/integrity';
+import type { Pathway } from '../../lib/schemas';
+import { href } from '../../lib/content';
+import { inline } from '../../lib/markup';
+import { plainMeaning, resolveTarget, stageHours, subtopicRefs } from '../../lib/pathways';
+
+interface Props {
+  id: string;
+  p: Pathway;
+  c: Corpus;
+}
+const { id, p, c } = Astro.props;
+const cur = c.curricula['ib-dp-bm'];
+const subs = subtopicRefs(c);
+const isIb = id === 'ib-dp';
+const pad = (n: number) => String(n).padStart(2, '0');
+const anchor = (s: Pathway['stages'][number], i: number) => `stage-${s.id ?? i + 1}`;
+
+/** What the platform has for a subtopic: its notes or its brief, and its map. */
+function has(code: string) {
+  const notes = Object.values(c.notes).some((n) => n.code === code);
+  const brief = Object.values(c.topics).some((t) => t.code === code);
+  const map = Object.values(c.mindmaps).some((m) => m.scope === 'subtopic' && m.code === code);
+  return [notes ? 'Notes' : brief ? 'Brief' : 'Guide statements', map ? 'Map' : ''].filter(Boolean);
+}
+const stages = p.stages.map((s, i) => {
+  const hours = cur ? stageHours(s, cur) : null;
+  const units = s.syllabus.map((u) => cur?.units.find((x) => x.id === u)).filter((u) => u !== undefined);
+  const subtopics = units.flatMap((u) => subs.filter((x) => x.unit === u.number));
+  const terms = s.terms.map((t) => ({ id: t, g: c.glossary[t] })).filter((t) => t.g);
+  // The subtopic code of an item that leads to notes or a brief, so the reader can see where in the course it sits.
+  const items = s.items.map((it) => {
+    const t = resolveTarget(it.href, c);
+    return { it, code: t.kind === 'subtopic' ? t.code : undefined };
+  });
+  return { s, i, hours, subtopics, terms, items };
+});
+---
+
+<nav class="pw-strip" aria-label={`The ${p.stageName.toLowerCase()}s of this route`}>
+  <ol>
+    {
+      stages.map(({ s, i }) => (
+        <li>
+          <a href={`#${anchor(s, i)}`}>
+            <span class="pw-strip__no">{pad(i + 1)}</span>
+            <span>{s.title}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<ol class="pw-stages" role="list">
+  {
+    stages.map(({ s, i, hours, subtopics, terms, items }) => (
+      <li class="pw-stage" id={anchor(s, i)}>
+        <div class="pw-stage__rail" aria-hidden="true">
+          <span class="pw-stage__no">{pad(i + 1)}</span>
+        </div>
+        <div class="pw-stage__body">
+          <p class="pw-stage__kicker">
+            {p.stageName} {i + 1}
+            {hours && <span class="pw-stage__time">{hours.sl === hours.hl ? `${hours.sl} hours at SL and HL` : `${hours.sl} hours at SL, ${hours.hl} at HL`}</span>}
+            {s.time && <span class="pw-stage__time">{s.time}</span>}
+          </p>
+          <h3 class="pw-stage__title">{s.title}</h3>
+          <p class="pw-stage__goal">
+            <span class="pw-stage__label">By the end</span> <span set:html={inline(s.goal)} />
+          </p>
+
+          {subtopics.length > 0 && (
+            <div class="pw-block">
+              <h4 class="pw-block__h">The subtopics</h4>
+              <ul class="pw-subs" role="list">
+                {subtopics.map((x) => (
+                  <li data-level={x.level === 'HL' ? 'HL' : undefined}>
+                    <a class="pw-subs__link" href={`/topics/${x.slug}/`}>
+                      <span class="pw-subs__code">{x.code}</span>
+                      <span class="pw-subs__title">{x.title}</span>
+                    </a>
+                    <span class="pw-subs__meta">
+                      {x.level === 'HL' && <span class="tag tag--hl">HL only</span>}
+                      {x.level === 'SL/HL with HL-only content' && <span class="tag tag--plain">HL parts marked</span>}
+                      <span class="small muted">{has(x.code).join(' · ')}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              {subtopics.some((x) => x.level === 'HL') && <p class="hl-notice small">HL-only subtopics are hidden in the SL view.</p>}
+            </div>
+          )}
+
+          {s.items.length > 0 && (
+            <div class="pw-block">
+              <h4 class="pw-block__h">{subtopics.length ? 'Also in this stage' : 'Work through'}</h4>
+              <ul class="pw-items" role="list">
+                {items.map(({ it, code }) => (
+                  <li data-level={isIb && it.level === 'HL' ? 'HL' : undefined}>
+                    <span class="pw-items__kind">{it.kind}</span>
+                    <span class="pw-items__what">
+                      {code && <span class="pw-items__code">{code}</span>}
+                      <a href={it.href}>{it.label}</a>
+                      {it.level === 'HL' && (
+                        <span class="tag tag--hl">
+                          <span class="sr-only">IB </span>HL
+                        </span>
+                      )}
+                      {it.kind === 'Enrichment map' && <span class="tag tag--enrichment">Enrichment</span>}
+                      {it.note && <span class="pw-items__note">{it.note}</span>}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {terms.length > 0 && (
+            <div class="pw-block">
+              <h4 class="pw-block__h">Words to know</h4>
+              <dl class="pw-terms">
+                {terms.map(({ id: tid, g }) => (
+                  <div>
+                    <dt>
+                      <a href={href.glossary(tid)}>{g!.term}</a>
+                    </dt>
+                    <dd set:html={inline(plainMeaning(g!))} />
+                  </div>
+                ))}
+              </dl>
+            </div>
+          )}
+
+          {(s.check || s.caveat) && (
+            <div class="pw-close">
+              {s.check && (
+                <p class="pw-check">
+                  <span class="pw-stage__label">Check</span> <span set:html={inline(s.check)} />
+                </p>
+              )}
+              {s.caveat && (
+                <p class="pw-caveat">
+                  <span class="pw-stage__label">What the tools cannot tell you</span> <span set:html={inline(s.caveat)} />
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .pw-strip {
+    margin: var(--sp-5) 0 var(--sp-6);
+    border-top: 1px solid var(--rule-hair);
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .pw-strip ol {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11.5rem), 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pw-strip li {
+    margin: 0;
+  }
+
+  .pw-strip a {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: baseline;
+    min-height: 2.75rem;
+    padding: var(--sp-3) var(--sp-3) var(--sp-3) 0;
+    color: var(--navy-900);
+    font-size: 0.875rem;
+    font-weight: 560;
+    line-height: 1.3;
+    text-decoration: none;
+  }
+
+  .pw-strip a:hover span:last-child {
+    text-decoration: underline;
+    text-decoration-color: var(--gold-500);
+    text-underline-offset: 0.2em;
+  }
+
+  .pw-strip__no {
+    flex: none;
+    font-family: var(--font-display);
+    font-style: italic;
+    color: var(--brass-text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pw-stages {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pw-stage {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    gap: var(--sp-5);
+    margin: 0;
+    scroll-margin-top: calc(var(--header-h) + var(--sp-4));
+  }
+
+  .pw-stage + .pw-stage .pw-stage__body {
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .pw-stage__rail {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  .pw-stage__rail::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 1px;
+    background: var(--rule);
+  }
+
+  .pw-stage:first-child .pw-stage__rail::before {
+    top: var(--sp-6);
+  }
+
+  .pw-stage:last-child .pw-stage__rail::before {
+    bottom: auto;
+    height: var(--sp-6);
+  }
+
+  .pw-stage__no {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    margin-top: var(--sp-5);
+    border: 1px solid var(--navy-900);
+    background: var(--surface-page);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-style: italic;
+    color: var(--navy-900);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pw-stage__body {
+    display: grid;
+    gap: var(--sp-3);
+    padding: var(--sp-5) 0 var(--sp-6);
+  }
+
+  .pw-stage__kicker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-3);
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .pw-stage__time {
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .pw-stage__title {
+    font-size: var(--fs-h3);
+  }
+
+  .pw-stage__goal {
+    max-width: var(--text-max);
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+  }
+
+  .pw-stage__label {
+    display: inline-block;
+    margin-right: 0.35rem;
+    font-family: var(--font-ui);
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--navy-900);
+  }
+
+  .pw-block {
+    margin-top: var(--sp-2);
+  }
+
+  .pw-block__h {
+    margin-bottom: var(--sp-2);
+    font-family: var(--font-ui);
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .pw-subs,
+  .pw-items {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .pw-subs li,
+  .pw-items li {
+    display: grid;
+    margin: 0;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .pw-subs li {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--sp-1) var(--sp-4);
+    align-items: baseline;
+  }
+
+  .pw-subs__link {
+    display: inline-flex;
+    gap: var(--sp-2);
+    align-items: baseline;
+    font-weight: 560;
+    text-decoration: none;
+  }
+
+  .pw-subs__title {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+
+  .pw-subs__link:hover .pw-subs__title {
+    text-decoration-thickness: 2px;
+  }
+
+  .pw-subs__code {
+    min-width: 2.25rem;
+    color: var(--brass-text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pw-subs__meta {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .pw-items li {
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    gap: var(--sp-1) var(--sp-4);
+    align-items: baseline;
+  }
+
+  .pw-items__kind {
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .pw-items__what {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem var(--sp-2);
+    align-items: baseline;
+  }
+
+  .pw-items__what a {
+    font-weight: 560;
+  }
+
+  .pw-items__code {
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--brass-text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pw-items__note {
+    flex-basis: 100%;
+    font-size: var(--fs-small);
+    color: var(--text-muted);
+  }
+
+  .pw-terms {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+    gap: 0 var(--sp-5);
+    margin: 0;
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .pw-terms > div {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .pw-terms dt a {
+    font-weight: 600;
+  }
+
+  .pw-terms dd {
+    margin: 0.15rem 0 0;
+    font-size: var(--fs-small);
+    color: var(--text-body);
+  }
+
+  .pw-close {
+    display: grid;
+    gap: var(--sp-2);
+    margin-top: var(--sp-2);
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--surface-sheet);
+    border-left: 3px solid var(--navy-900);
+  }
+
+  .pw-caveat {
+    color: var(--text-body);
+  }
+
+  .pw-close p {
+    max-width: var(--text-max);
+  }
+
+  @media (max-width: 40rem) {
+    .pw-stage {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+
+    .pw-stage__rail {
+      display: none;
+    }
+
+    .pw-stage__body {
+      padding-top: var(--sp-4);
+    }
+
+    .pw-items li {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pw-subs li {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pw-subs__meta {
+      justify-content: flex-start;
+    }
+  }
+</style>

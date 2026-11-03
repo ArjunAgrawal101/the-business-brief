@@ -6,8 +6,9 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
 import { corpus, href } from '../../lib/content';
-import { mindmapFor } from '../../lib/learning';
+import { enrichmentMapsInOrder, mindmapFor } from '../../lib/learning';
 import { BRANCH_COLOURS, BRANCH_LABELS, nodeCount, renderThumb } from '../../lib/mindmap';
 
 const c = await corpus();
@@ -20,6 +21,14 @@ const units = (cur?.units ?? []).map((u) => ({
 const total = units.reduce((n, x) => n + x.subs.length, 0);
 const done = units.reduce((n, x) => n + x.subs.filter((y) => y.map).length, 0);
 const kinds = Object.keys(BRANCH_COLOURS) as Array<keyof typeof BRANCH_COLOURS>;
+// Maps beyond the IB course, for the undergraduate and MBA pathways: listed apart, never counted in the figures above.
+const enrichment = await enrichmentMapsInOrder();
+const AUDIENCE_LABEL = { undergraduate: 'undergraduate', mba: 'MBA' } as const;
+const audienceText = (list: Array<keyof typeof AUDIENCE_LABEL>) =>
+  (['undergraduate', 'mba'] as const)
+    .filter((a) => list.includes(a))
+    .map((a) => AUDIENCE_LABEL[a])
+    .join(' and ');
 ---
 
 <BaseLayout title="Mindmaps" description="Interactive mindmaps of IB DP Business Management, subtopic by subtopic: the structure of each topic, its theories, tools, calculations and evaluation, in one picture." section="mindmaps">
@@ -27,7 +36,7 @@ const kinds = Object.keys(BRANCH_COLOURS) as Array<keyof typeof BRANCH_COLOURS>;
     trail={[{ label: 'Mindmaps' }]}
     kicker="Mindmaps"
     title="The course, one map at a time"
-    lead={`Each map shows the shape of a subtopic: its core ideas, types, theories, tools, calculations and the points to weigh, with the links to the rest of the course. ${done} of ${total} subtopics have a map so far.`}
+    lead={`Each map shows the shape of a subtopic: its core ideas, types, theories, tools, calculations and the points to weigh, with the links to the rest of the course. ${done} of ${total} subtopics have a map so far.${enrichment.length ? ` After the five units, ${enrichment.length} enrichment maps go beyond the course for undergraduate and MBA learners.` : ''}`}
   >
     <span class="tag tag--plain">Fold a branch, zoom, or switch to the revision view</span>
     <span class="tag tag--plain">Download as SVG or PNG, or print</span>
@@ -100,6 +109,39 @@ const kinds = Object.keys(BRANCH_COLOURS) as Array<keyof typeof BRANCH_COLOURS>;
           </ul>
         </section>
       ))
+    }
+
+    {
+      enrichment.length > 0 && (
+        <section class="mme" id="enrichment" aria-labelledby="mme-h">
+          <div class="mme-head">
+            <p class="label label--ink">Beyond the IB course</p>
+            <h2 id="mme-h">Enrichment maps for undergraduate and MBA learners</h2>
+            <p class="mme-head__tags">
+              <ProvenanceTag kind="enrichment" />
+            </p>
+            <p class="mme-head__note">
+              Management ideas that go further than the IB syllabus: strategy, finance, people, marketing, operations, ventures, governance and
+              sustainability. They are not part of the IB course, are not assessed by the IB and are not counted in the figures above. No university
+              syllabus was supplied, so they are aligned to no university course: each is the platform's own summary of established ideas.
+            </p>
+          </div>
+          <ul class="mmi-tiles" role="list">
+            {enrichment.map(([eid, m]) => (
+              <li class="mme-tile">
+                <a class="mmi-tile__link mme-tile__link" href={href.enrichmentMap(eid)}>
+                  <span class="mmi-tile__thumb" set:html={renderThumb(m)} />
+                  <span class="mmi-tile__code mme-tile__code">Enrichment · {m.field}</span>
+                  <span class="mmi-tile__title">{m.title}</span>
+                  <span class="mmi-tile__meta">
+                    {nodeCount(m)} ideas · for {audienceText(m.audience)} learners
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
     }
   </div>
 </BaseLayout>
@@ -259,6 +301,39 @@ const kinds = Object.keys(BRANCH_COLOURS) as Array<keyof typeof BRANCH_COLOURS>;
 
   .mmi-tile--planned .mmi-tile__title {
     color: var(--text-muted);
+  }
+
+  .mme {
+    margin-top: var(--sp-9);
+    padding-top: var(--sp-6);
+    border-top: 3px double var(--rule-ink);
+  }
+
+  .mme-head {
+    display: grid;
+    gap: var(--sp-2);
+    max-width: var(--text-max);
+  }
+
+  .mme-head h2 {
+    font-size: var(--fs-h2);
+  }
+
+  .mme-head__note {
+    color: var(--text-muted);
+  }
+
+  .mme-tile {
+    margin: 0;
+  }
+
+  .mme-tile__link {
+    align-content: start;
+    border-top: 3px solid var(--bb-green);
+  }
+
+  .mme-tile__code {
+    color: var(--green-text);
   }
 
   @media (max-width: 48rem) {

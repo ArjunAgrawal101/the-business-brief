@@ -7,12 +7,11 @@
  */
 import { announce, each, readConfig } from './ix';
 import { brandedSvg } from '../lib/mindmap-export';
-import { layout, renderSvg, type Layout } from '../lib/mindmap';
-import type { Mindmap } from '../lib/schemas';
+import { layout, renderSvg, type AnyMap, type Layout } from '../lib/mindmap';
 
 interface Config {
   id: string;
-  map: Mindmap;
+  map: AnyMap;
   code: string;
 }
 
