@@ -673,6 +673,106 @@ def silvertree(k: Check) -> None:
     k.allow(210, 96, 30, 2012, 2019, 6, 16.7, 10, 22, 24)
 
 
+
+@case('larkspur-software')
+def larkspur(k: Check) -> None:
+    """C$000. A scheduling platform priced per worker per month; four responses to a request for worker monitoring."""
+    pl = {2024: (3960, 1030, 3020), 2025: (4752, 1188, 3380)}
+    rows = {}
+    for y, (rev, cos, exp) in pl.items():
+        gp = rev - cos
+        rows[y] = [rev, cos, gp, exp, gp - exp]
+        k.allow(rhu(gp / rev * 100, 1), rhu((gp - exp) / rev * 100, 1))
+    labels = ['Revenue', 'Cost of sales', 'Gross profit', 'Expenses', 'Profit before interest and tax']
+    k.table('ex-1', [[lab, rows[2024][i], rows[2025][i]] for i, lab in enumerate(labels)])
+    k.allow(rhu((4752 / 3960 - 1) * 100, 1), 2900, 2100, 900, 380)
+
+    segments = [['Care and health', 380, 31000, 4.50], ['Retail and hospitality', 520, 27000, 4.50], ['Logistics and warehousing', 90, 37500, 3.60]]
+    table = [[n, c, w, p, rhu(w * p * 12 / 1000)] for n, c, w, p in segments]
+    revenue = sum(r[4] for r in table)
+    assert revenue == pl[2025][0]
+    k.table('ex-2', table, ['All clients', sum(r[1] for r in table), sum(r[2] for r in table), '', revenue])
+    big = {'Northgate Logistics': 12500, 'Halvorsen Freight': 7500, 'Bayline Distribution': 5000}
+    big_workers = sum(big.values())
+    big_revenue = big_workers * 3.60 * 12 / 1000
+    k.allow(*big.values(), big_workers, big_revenue, rhu(big_revenue / revenue * 100, 1), 37500 - big_workers, 54, 43.2,
+            *[w * 43.2 / 1000 for w in big.values()], rhu(1188 / 4752 * 100))
+
+    # Four responses, from 2027. Gross margin 75% on any change in revenue (cost of sales is a quarter of revenue).
+    margin = 0.75
+    pulse, lite, api = 24, 18, 6  # C$ a worker a year: C$2.00, C$1.50 and C$0.50 a month
+    options = {
+        'A. Build Pulse as asked': dict(dev=1800, revenue=big_workers * pulse / 1000 + 6250 * pulse / 1000 - 3000 * 54 / 1000, other=200),
+        'B. Build Pulse Lite': dict(dev=1500, revenue=20000 * lite / 1000 + 10000 * lite / 1000 - 5000 * 43.2 / 1000, other=150),
+        'C. Open an API for clients': dict(dev=600, revenue=big_workers * api / 1000 - 1000 * 54 / 1000, other=50),
+        'D. Decline and refocus': dict(dev=0, revenue=-big_revenue + 4000 * 54 / 1000, other=300),
+    }
+    rows = []
+    base = rows_2025_pbit = pl[2025][0] - pl[2025][1] - pl[2025][2]
+    for name, o in options.items():
+        dgp = o['revenue'] * margin
+        dp = dgp - o['other']
+        rows.append([name, o['dev'], rhu(o['revenue']), rhu(dgp), o['other'], rhu(dp), rhu(base + dp)])
+        k.allow(rhu(dp - options['D. Decline and refocus']['revenue'] * margin + options['D. Decline and refocus']['other']))
+    k.table('ex-6', rows)
+    a, b = rows[0][5], rows[1][5]
+    k.allow(a - b, rows_2025_pbit, 2.00, 1.50, 0.50, pulse, lite, api, 6250, 3000, 20000, 10000, 1000, 4000, 25, 75,
+            big_workers * pulse / 1000, 6250 * pulse / 1000, 3000 * 54 / 1000, 20000 * lite / 1000, 10000 * lite / 1000, 4000 * 54 / 1000, big_workers * api / 1000)
+    # Givens quoted in the text.
+    k.allow(140, 58, 34, 2400, 4.6, 78, 81, 46, 990, 95500, 35, 20, 2018, 12, 3.9)
+
+
+
+@case('patchwork-digital')
+def patchwork(k: Check) -> None:
+    """£000. A laptop-refurbishing social enterprise: its income streams, its impact, and four plans to meet more of the need."""
+    school_price, online_price, wipe_fee, parts_income, parts_cost = 60, 180, 12, 10, 30
+    collected, schools, online = 6000, 2400, 900
+    refurbished = schools + online
+    recycled = collected - refurbished
+    income = [
+        ['Laptops sold to schools', schools * school_price / 1000], ['Laptops sold online', online * online_price / 1000],
+        ['Data-wiping fees', collected * wipe_fee / 1000], ['Parts and recycling', recycled * parts_income / 1000], ['Grants', 120],
+    ]
+    costs = [
+        ['Permanent staff', 186], ["Trainees' wages", 8 * 20], ['Parts and software licences', refurbished * parts_cost / 1000],
+        ['Premises', 48], ['Transport and collection', 30], ['Other costs', 14],
+    ]
+    total_in = sum(v for _, v in income)
+    total_out = sum(v for _, v in costs)
+    rows = [*income, ['Total income', total_in], *costs, ['Total costs', total_out], ['Surplus or deficit for the year', total_in - total_out]]
+    k.table('ex-1', [[a, int(b) if float(b).is_integer() else b] for a, b in rows])
+    k.allow(rhu((total_out - total_in) / total_in * 100, 1), rhu(120 / total_in * 100, 1), rhu(total_out / 12, 2), 45, 20, 8, 31,
+            rhu((144 + 162 + 72 + 27) / total_in * 100, 1), total_in - 120)
+    k.table('ex-2', [
+        ['Collected from donors', collected, wipe_fee], ['Refurbished and sold to schools', schools, school_price],
+        ['Refurbished and sold online', online, online_price], ['Stripped for parts and recycled', recycled, parts_income],
+    ])
+    k.allow(refurbished, parts_cost)
+    history = [['2023', 4200, 1600, 5, 4, 150, 6], ['2024', 5100, 2000, 6, 4, 140, -4], ['2025', collected, schools, 7, 5, 120, total_in - total_out]]
+    k.table('ex-3', history)
+    k.allow(3600, 41, 4000, 9000)
+
+    # Four plans, a year from 2026 (£000).
+    plans = {
+        'A. The bank contract': dict(
+            income=9000 * 15 / 1000 + 3600 * school_price / 1000 + 400 * online_price / 1000 + 5000 * parts_income / 1000,
+            costs=4 * 32 + 4000 * parts_cost / 1000 + 20 + 15, once=40, pupils=3600, trainees=0),
+        'B. A second workshop': dict(
+            income=1200 * school_price / 1000 + 200 * online_price / 1000 + 2500 * wipe_fee / 1000 + 1100 * parts_income / 1000 + 90,
+            costs=8 * 20 + 32 + 36 + 1400 * parts_cost / 1000 + 15, once=60, pupils=1200, trainees=8),
+        'C. Sell more online': dict(income=600 * (online_price - school_price) / 1000, costs=0, once=0, pupils=-600, trainees=0),
+        'D. License the model': dict(income=2 * 12, costs=10, once=0, pupils=0, trainees=0),
+    }
+    rows = []
+    for name, p_ in plans.items():
+        change = p_['income'] - p_['costs']
+        rows.append([name, rhu(p_['income']), rhu(p_['costs']), rhu(change), p_['once'], p_['pupils'], p_['trainees']])
+    k.table('ex-4', rows)
+    k.allow(15, 135, 216, 72, 50, 128, 120, 32, 36, 42, 30, 11, 90, 2500, 1400, 1200, 200, 1100, 400, 5000, 600, 12, 24, 10, 3000,
+            plans['B. A second workshop']['income'] - 90 - plans['B. A second workshop']['costs'], 6 * 20, 190 - 6 * 20, 6, 1500, 2019)
+
+
 def main(argv: list[str]) -> int:
     emit = '--emit' in argv
     ids = [a for a in argv if not a.startswith('--')]

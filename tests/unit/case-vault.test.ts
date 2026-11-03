@@ -201,7 +201,7 @@ describe('the archive', () => {
   const all = Object.entries(c.cases).map(([id, cs]) => toVaultCase(id, cs, `/cases/${id}/`));
 
   it('holds every case, with the decision and the search text', () => {
-    expect(all.length).toBeGreaterThanOrEqual(3);
+    expect(all.length).toBeGreaterThanOrEqual(9);
     for (const vc of all) {
       expect(vc.title.length, vc.id).toBeGreaterThan(0);
       expect(vc.decision.length, vc.id).toBeGreaterThan(0);

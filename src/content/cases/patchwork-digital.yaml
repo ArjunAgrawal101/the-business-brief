@@ -1,0 +1,577 @@
+# Patchwork Digital CIC. A fictional organization; every figure is simulated.
+# Income is devices times the price or fee for each; costs follow the stated
+# rates; each plan in Exhibit 4 adds the income and costs its note states.
+# scripts/qa/case-figures.py rebuilds every exhibit and checks every figure in
+# the text; tests/unit/vault-cases.test.ts recomputes the plans.
+
+title: Patchwork Digital
+dek: A Glasgow social enterprise that refurbishes laptops for pupils and trains people leaving prison is offered a contract its trainees could not work on.
+kind: fictional
+dataStatus: simulated
+organization:
+  name: Patchwork Digital CIC
+  sector: Social enterprise (laptop refurbishment and training)
+  location: Glasgow, United Kingdom
+  size: One workshop; six permanent staff and eight trainees
+  legalForm: Community interest company (a for-profit social enterprise)
+currency:
+  code: GBP
+  symbol: '£'
+  unit: thousands of pounds sterling (£000), and pounds for prices
+decision: How should Patchwork meet more of the need for laptops without losing the second half of its mission?
+brief: >
+  Patchwork Digital refurbishes donated laptops, sells them to schools at a fraction of their value for pupils who have
+  none at home, and does the work with trainees who have criminal convictions. It is running a small deficit, its grant
+  is tapering, and schools have a waiting list of 3,600 pupils. A bank has offered a three-year contract that would
+  clear the waiting list and earn a large surplus, but everyone who handles the bank's laptops must pass a background
+  check that most trainees would fail. The directors must recommend a plan of action.
+
+narrative:
+  - >
+    Morag Kerr taught in a prison for eleven years. Daniel Okoye spent the same years wiping and scrapping companies'
+    old computers. When they met in 2019 they saw two problems with one answer. Pupils in Glasgow's poorest
+    neighbourhoods were falling behind because they had no laptop at home, while companies were paying to destroy
+    machines that still worked. And people leaving prison could rarely get a first job, however much they wanted one.
+  - >
+    Patchwork Digital, the community interest company they founded, collects laptops that companies, councils and
+    universities no longer need, wipes their data to a certified standard, and refurbishes the ones that can be saved.
+    Schools buy them for £60 each for pupils without a laptop at home; some are sold online at £180 to pay for the rest;
+    the machines that cannot be saved are stripped for parts. The work is done by six permanent staff and eight trainees
+    a year, people with convictions on twelve-month paid traineeships (Exhibits 1 and 2).
+  - >
+    It works. Patchwork supplied 2,400 laptops to schools in 2025, and five of the seven trainees who finished in 2024
+    were in work six months later (Exhibit 3). But it does not quite pay. Patchwork ran a deficit of £12k in 2025, its
+    reserves are about a month's costs, and the foundation whose grants have kept it going has said its support was
+    always meant to taper (Exhibit 8). Meanwhile 41 schools have nominated 3,600 pupils who are still waiting for a
+    laptop.
+  - >
+    In September, Clydeport Bank offered Patchwork a three-year contract to destroy the data on the 9,000 laptops it
+    retires each year, and to keep the machines (Exhibit 5). It would clear the waiting list and earn a large surplus.
+    But everyone who handles the bank's devices must pass the bank's enhanced background check, which most trainees
+    would fail. The contract would have to be done by new staff, in a secure room the trainees could not enter.
+  - >
+    Morag and Daniel have costed four plans (Exhibit 4). Morag fears that the contract would turn Patchwork into an
+    ordinary IT disposal firm with a charity's name; Daniel fears that without it Patchwork will not survive long enough
+    to help anyone. The board, which includes a head teacher and a former trainee, meets in November.
+
+industryContext:
+  - >
+    Social enterprises trade like businesses but exist for a social or environmental purpose, and reinvest most of what
+    they earn in that purpose. In the United Kingdom many take the form of a community interest company, a limited
+    company whose profits and assets must be used for the community purpose it states.
+  - >
+    Organizations replace their laptops every few years, often long before the machines stop working. Refurbishing
+    them extends their life, which is one of the ideas behind circular business models, but it depends on secure data
+    destruction, because donors' devices hold confidential data. Certified wiping is a service that organizations pay
+    for, which gives refurbishers a source of income as well as a source of machines.
+  - >
+    Pupils without a suitable device at home find it harder to do schoolwork as more of it moves online. Social
+    enterprises that also employ people facing barriers to work, such as people with convictions, serve two purposes at
+    once, and must balance both against earning enough to survive.
+
+challenge: >
+  Patchwork exists to meet two needs: laptops for pupils who have none, and work for people leaving prison. It can meet
+  more of the first only by growing, and it must grow without a reliable grant and with almost no reserves. The plan
+  that grows it fastest would be done by people without convictions, and the plan that grows the traineeships would
+  lose money. The directors must find a plan of action that meets more of the need while keeping the enterprise both
+  solvent and true to its purpose.
+
+financials:
+  summary: >
+    Patchwork's income was £525k in 2025, of which grants were £120k, or 22.9%; its costs were £537k, leaving a deficit
+    of £12k, 2.3% of income. Grants have fallen each year since 2023 (Exhibit 3). Each refurbished laptop costs about
+    £30 in parts and licences; the larger costs are people, and the trainees' wages of £160k are the price of the
+    second half of the mission. Exhibit 4 sets out what each plan would add each year.
+  exhibits: [ex-1, ex-2, ex-4]
+
+exhibits:
+  - id: ex-1
+    title: Income and costs, 2025 (£000)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Item }
+      - { label: '£000', numeric: true, format: money }
+    rows:
+      - [Laptops sold to schools, 144]
+      - [Laptops sold online, 162]
+      - [Data-wiping fees, 72]
+      - [Parts and recycling, 27]
+      - [Grants, 120]
+      - [Total income, 525]
+      - [Permanent staff, 186]
+      - ["Trainees' wages", 160]
+      - [Parts and software licences, 99]
+      - [Premises, 48]
+      - [Transport and collection, 30]
+      - [Other costs, 14]
+      - [Total costs, 537]
+      - [Surplus or deficit for the year, -12]
+    totals: [Total income, Total costs, Surplus or deficit for the year]
+    note: Eight trainees are paid £20k each for a year. Reserves at the end of 2025 were £45k.
+    source: Simulated teaching data, from Patchwork's accounts.
+
+  - id: ex-2
+    title: Devices in 2025, and the price or fee for each
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Devices }
+      - { label: Number, numeric: true }
+      - { label: 'Price or fee for each (£)', numeric: true }
+    rows:
+      - [Collected from donors, 6000, 12]
+      - [Refurbished and sold to schools, 2400, 60]
+      - [Refurbished and sold online, 900, 180]
+      - [Stripped for parts and recycled, 2700, 10]
+    note: Donors pay £12 for each device to have its data destroyed to a certified standard. Each refurbished laptop needs about £30 of parts and software licences.
+    source: Simulated teaching data, from the workshop's records.
+
+  - id: ex-3
+    title: Three years of Patchwork
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Year }
+      - { label: Devices collected, numeric: true }
+      - { label: Laptops to schools, numeric: true }
+      - { label: Trainees completing, numeric: true }
+      - { label: In work six months later, numeric: true }
+      - { label: 'Grants (£000)', numeric: true, format: money }
+      - { label: 'Surplus or deficit (£000)', numeric: true, format: money }
+    rows:
+      - ['2023', 4200, 1600, 5, 4, 150, 6]
+      - ['2024', 5100, 2000, 6, 4, 140, -4]
+      - ['2025', 6000, 2400, 7, 5, 120, -12]
+    note: Eight traineeships start each year. In work six months later counts trainees from that year who were in a job six months after finishing.
+    source: Simulated teaching data, from Patchwork's impact reports.
+
+  - id: ex-4
+    title: Four plans, a year from 2026
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Plan }
+      - { label: 'Extra income (£000)', numeric: true, format: money }
+      - { label: 'Extra costs (£000)', numeric: true, format: money }
+      - { label: 'Change in yearly surplus (£000)', numeric: true, format: money }
+      - { label: 'One-off cost (£000)', numeric: true, format: money }
+      - { label: Extra pupils with a laptop each year, numeric: true }
+      - { label: Extra traineeships each year, numeric: true }
+    rows:
+      - [A. The bank contract, 473, 283, 190, 40, 3600, 0]
+      - [B. A second workshop, 239, 285, -46, 60, 1200, 8]
+      - [C. Sell more online, 72, 0, 72, 0, -600, 0]
+      - [D. License the model, 24, 10, 14, 0, 0, 0]
+    note: |
+      The directors' estimates.
+
+      - A. The bank's 9,000 laptops a year at £15 each for data destruction (£135k); 4,000 can be refurbished, 3,600 for schools at £60 and 400 online at £180; 5,000 recycled at £10. Costs: four technicians who pass the bank's check at £32k each, £30 of parts for each refurbished laptop, £20k of transport and £15k to run a secure room, which costs £40k to build.
+      - B. A second workshop in another part of the city, with eight more traineeships at £20k each, a supervisor at £32k and premises at £36k a year. 2,500 more devices from councils: 1,200 laptops for schools, 200 sold online, 1,100 recycled, £12 data-wiping fees on all 2,500 and £30 of parts for each refurbished laptop, with £15k of transport. Income includes a new grant of £90k a year, which the foundation has not yet agreed. The £60k fit-out would be crowdfunded.
+      - C. Sell 600 of the laptops that now go to schools online instead, at £180 rather than £60.
+      - D. License Patchwork's methods, name and training to social enterprises in two other Scottish cities for £12k a year each, with £10k a year of support. Each plans 1,500 laptops for its own schools and six trainees a year.
+    source: Simulated teaching data, prepared by the directors.
+
+  - id: ex-5
+    title: Email from Clydeport Bank
+    kind: quote
+    provenance: simulated-data
+    quote:
+      text: >
+        We retire around nine thousand laptops a year, and every one must have its data destroyed to a certified
+        standard. We would like Patchwork to do this for three years from January, and you may keep the machines. Every
+        person who handles our devices must pass our enhanced background check. We understand what that means for your
+        trainees, and we cannot make an exception.
+      attribution: Alasdair Ross, head of technology operations, Clydeport Bank
+    source: Fictional email, written for this case.
+
+  - id: ex-6
+    title: A head teacher's post on social media
+    kind: quote
+    provenance: simulated-data
+    quote:
+      text: >
+        Our pupils without a laptop at home used to fall behind every time homework went online. This term Patchwork's
+        laptops went to the families at the top of our list, and the difference in the classroom is real. We still have
+        more names on the list than laptops. Thank you, Patchwork.
+      attribution: Fiona MacLeod, head teacher of a primary school in Glasgow's East End
+    source: Fictional post, written for this case.
+
+  - id: ex-7
+    title: A trainee's view
+    kind: quote
+    provenance: simulated-data
+    quote:
+      text: >
+        When I came out, every application asked about convictions, and that was the end of it. Here they asked what I
+        could learn. Six months on, I'm the one showing the new trainees how to replace a screen.
+      attribution: Jamie Boyle, trainee technician, Patchwork Digital
+    source: Fictional interview, written for this case.
+
+  - id: ex-8
+    title: The foundation's position
+    kind: quote
+    provenance: simulated-data
+    quote:
+      text: >
+        Our support was always meant to taper. We will consider one final three-year grant for growth, but we want to
+        see Patchwork earning more of its own income, and we will decide in the spring.
+      attribution: Ruth Okafor, director of grants, the Clydeside Foundation
+    source: Fictional letter, written for this case.
+
+constraints:
+  - Reserves are £45k, about one month of costs.
+  - The bank requires an enhanced background check for anyone who handles its devices, and will not make an exception; most trainees could not pass it.
+  - The foundation will decide on any new grant in the spring, six months away.
+  - As a community interest company, Patchwork must use its surplus and its assets for its community purpose.
+  - The current workshop has room for a secure area or for more trainees, but not both.
+
+stakeholders:
+  - name: Morag Kerr and Daniel Okoye, founders and directors
+    interest: An enterprise that meets both needs and survives.
+    influence: high
+    stake: high
+    concern: Morag fears mission drift; Daniel fears closure.
+  - name: Trainees
+    interest: Paid work, skills and a route into a job.
+    influence: low
+    stake: high
+    concern: Growth that happens without them.
+  - name: Pupils and their families
+    interest: A laptop at home for schoolwork.
+    influence: low
+    stake: high
+    concern: Waiting another year.
+  - name: Schools
+    interest: Affordable laptops for the pupils who need them.
+    influence: medium
+    stake: high
+    concern: Higher prices, or fewer laptops.
+  - name: Clydeport Bank
+    interest: Secure, certified data destruction, and a story of social value.
+    influence: high
+    stake: low
+    concern: Any risk to its customers' data.
+  - name: The Clydeside Foundation
+    interest: Lasting social impact for its grants.
+    influence: high
+    stake: medium
+    concern: An enterprise that depends on it for ever.
+  - name: Permanent staff
+    interest: Secure jobs in work they believe in.
+    influence: medium
+    stake: high
+    concern: Supervising more people with no more resources.
+  - name: Donor organizations
+    interest: Safe disposal of their old devices, and doing some good.
+    influence: medium
+    stake: low
+    concern: Data security.
+
+options:
+  - id: bank-contract
+    label: 'A. Take the bank contract'
+    summary: Destroy the data on Clydeport Bank's laptops for three years, refurbish the machines, and clear the schools' waiting list.
+    requires: Four new technicians who pass the bank's check, and a secure room costing £40k.
+    upside: Clears the waiting list of 3,600 pupils and adds £190k a year to the surplus, enough to fund more traineeships elsewhere.
+    risks: The growth is done by people without convictions, so the traineeships do not grow unless the surplus is committed to them; one large customer for three years; mission drift.
+    evidence: [ex-4, ex-5]
+  - id: second-workshop
+    label: 'B. Open a second workshop'
+    summary: Open a second workshop with eight more traineeships, funded by crowdfunding and a new grant.
+    requires: £60k from crowdfunding, a new three-year grant of £90k a year, and 2,500 more donated devices.
+    upside: Doubles the traineeships, the heart of the mission, and supplies 1,200 more laptops a year.
+    risks: Loses £46k a year even with the grant, and more without it; the grant will not be decided for six months.
+    evidence: [ex-4, ex-8]
+  - id: sell-online
+    label: 'C. Sell more laptops online'
+    summary: Sell 600 of the laptops that now go to schools online, at £180 rather than £60.
+    requires: Nothing new.
+    upside: Adds £72k a year at once, and turns the deficit into a surplus.
+    risks: 600 fewer pupils get a laptop; the mission pays for the enterprise rather than the other way round.
+    evidence: [ex-2, ex-4, ex-6]
+  - id: license
+    label: 'D. License the model to other cities'
+    summary: License Patchwork's methods, name and training to social enterprises in two other Scottish cities.
+    requires: Partners who meet Patchwork's standards, and staff time to support them.
+    upside: Spreads the model to other cities at little cost or risk, adding £14k a year.
+    risks: Does nothing for Glasgow's waiting list; Patchwork's reputation rests on partners it does not control.
+    evidence: [ex-4]
+
+analysis:
+  data:
+    - Income was £525k in 2025 and costs £537k, a deficit of £12k; grants were 22.9% of income and have fallen from £150k to £120k since 2023 (Exhibits 1 and 3).
+    - Reserves are £45k, and 3,600 nominated pupils are waiting for a laptop.
+    - The bank contract would add £190k a year to the surplus and 3,600 laptops for schools, but no traineeships; the second workshop would add eight traineeships and lose £46k a year even with a grant (Exhibit 4).
+    - Selling 600 more laptops online would add £72k a year and serve 600 fewer pupils (Exhibit 4).
+  insight:
+    - Patchwork's two purposes pull apart at scale. Laptops for pupils can grow with any workforce; traineeships grow only with more supervision, space and subsidy.
+    - The bank contract is not mission drift in itself. It becomes mission drift only if its surplus does not flow back to the purposes; committed to traineeships, it could fund six more a year.
+    - The second workshop has the right purpose and the wrong economics. It depends on a grant that is uncertain and still loses money with it.
+  options:
+    - The bank contract meets the first need in full and can pay for the second, if the board commits its surplus.
+    - The second workshop grows the second need and endangers the enterprise.
+    - Selling more online trades pupils for money.
+    - Licensing spreads the model but does not help Glasgow now.
+  recommendation: >
+    One defensible plan: accept the bank contract for three years, and commit £120k a year of its surplus to six more
+    traineeships doing the school and recycling work, which the bank's checks do not cover. Build the secure room in the
+    current workshop, and keep the trainees' space elsewhere. Rebuild reserves with the rest of the surplus. Tell the
+    foundation and the schools exactly how the contract's money is used, and report both the laptops and the
+    traineeships each year. License the model to other cities once the contract is running.
+  caveat: >
+    This depends on there being enough school and recycling work for fourteen trainees, and on the board holding to the
+    commitment when the surplus could be used for other things. If the bank's contract ended after three years with no
+    replacement, Patchwork would have expanded its costs on a single customer's income, so the plan must also look for
+    other paying donors of devices.
+
+method: >
+  Patchwork Digital, Clydeport Bank, the Clydeside Foundation and everyone in this case are fictional, and every
+  figure is simulated. Income is the number of devices times the price or fee for each; costs follow the rates stated
+  in the exhibits; and each plan in Exhibit 4 adds the income and costs its note sets out. The plans' figures are the
+  directors' estimates, not predictions. A script in the repository (`scripts/qa/case-figures.py`) rebuilds every
+  exhibit and checks every figure in the text, and the unit tests recompute the plans.
+
+topics: []
+tools: [circular-business-models, swot-analysis]
+concepts: [change, creativity, ethics, sustainability]
+calculations: []
+questions: []
+sources: [method-simulated, ib-bm-guide-2024, hodder-bm-2022]
+updated: 2026-11-03
+
+# Case Vault classification (src/lib/case-vault.ts).
+industry: social-enterprise
+functions: [strategy, finance, operations]
+difficulty: advanced
+qualifications: [ib-dp-sl, ib-dp-hl, undergraduate, mba]
+keyConcepts: [ethics, sustainability]
+caseType: fictional
+syllabus: ['1.1', '1.2', '1.3', '1.4', '3.2', '3.3']
+
+analysisQuestions:
+  - id: pd-need
+    commandTerm: Describe
+    ao: AO1
+    marks: 2
+    level: HL
+    paper: paper-3
+    syllabus: ['1.2']
+    prompt: Describe the human need that Patchwork Digital addresses.
+    guidance: >
+      One mark for identifying a need, and one for describing it with the case. Either need earns the marks: pupils
+      without a laptop at home, who fall behind as schoolwork moves online (3,600 are on the waiting list); or people
+      with convictions who cannot get a first job after prison.
+  - id: pd-challenges
+    commandTerm: Explain
+    ao: AO2
+    marks: 6
+    level: HL
+    paper: paper-3
+    syllabus: ['1.2', '3.2']
+    exhibits: [ex-1, ex-3, ex-5, ex-8]
+    prompt: Explain the key challenges Patchwork Digital faces in meeting this need.
+    guidance: >
+      Up to three marks for each of two challenges, explained with the resource material. Strong challenges: financial
+      sustainability, with a deficit of £12k, reserves of £45k and grants falling to 22.9% of income; growth that
+      cannot include the trainees, because the bank's checks exclude them; and dependence on donated devices and on one
+      foundation. An answer that lists challenges without explaining them, or without the case, stays at the bottom of
+      the range.
+  - id: pd-plan
+    commandTerm: Recommend
+    ao: AO3
+    marks: 17
+    level: HL
+    paper: paper-3
+    syllabus: ['1.2', '1.3', '1.4', '3.2']
+    exhibits: [ex-1, ex-3, ex-4, ex-5, ex-6, ex-7, ex-8]
+    prompt: Using all the resource material, recommend a plan of action for Patchwork Digital to meet more of the need.
+    guidance: |
+      In the style of the paper, a plan like this is judged on four things: how well it uses the resource material, how well it uses business management tools and theories, how well it evaluates, and how clearly its ideas and actions are sequenced. A strong answer:
+
+      - uses every exhibit, including the figures in Exhibit 4 and the voices in Exhibits 5 to 8;
+      - applies tools that fit, such as a stakeholder map, sources of finance, or a SWOT analysis of the enterprise;
+      - weighs each plan against both needs and against the enterprise's survival, not against money alone;
+      - sets out a plan in order, with who does what and when, and how Patchwork will know whether it is working.
+
+      The marks are the question's own allocation in the style of the paper; this guidance is the platform's, not the IB's criteria or markbands.
+  - id: pd-entity
+    commandTerm: Distinguish
+    ao: AO2
+    marks: 4
+    syllabus: ['1.2']
+    prompt: Distinguish between a for-profit social enterprise, such as Patchwork, and a non-governmental organization (NGO).
+    guidance: >
+      Two marks for each side of the distinction, with the case. A for-profit social enterprise such as Patchwork
+      trades, earning most of its income from selling goods and services, and uses its surplus for its social purpose;
+      as a community interest company, its profits and assets are tied to that purpose. A non-profit NGO usually relies
+      more on donations and grants, and is not run to make a surplus. The best answers note that Patchwork's falling
+      grants push it towards trading.
+  - id: pd-income
+    commandTerm: Calculate
+    ao: AO4
+    marks: 4
+    syllabus: ['3.3']
+    exhibits: [ex-1]
+    prompt: Using Exhibit 1, calculate (i) Patchwork's deficit as a percentage of its income and (ii) the percentage of its income that came from grants in 2025.
+    answer: >
+      (i) Deficit = 537 − 525 = £12k; 12 ÷ 525 × 100 = 2.3%. (ii) Grants = 120 ÷ 525 × 100 = 22.9%.
+    guidance: Two marks for each, one for the method and one for the answer.
+  - id: pd-finance
+    commandTerm: Explain
+    ao: AO2
+    marks: 4
+    syllabus: ['3.2']
+    exhibits: [ex-4, ex-8]
+    prompt: Explain two sources of finance Patchwork could use for the one-off costs of its plans.
+    guidance: >
+      Two sources, each explained with its fit to Patchwork, for two marks each. Strong choices: crowdfunding, which
+      suits a cause people care about and is planned for the second workshop's fit-out; loan capital, which the bank
+      contract's surplus could repay; or retained surplus from the contract itself. Business angels and share capital
+      need care: a community interest company's profits and assets are tied to its purpose, which limits what an
+      investor can be offered.
+
+exercise:
+  role: You are Morag Kerr, co-founder and director of Patchwork Digital.
+  brief: >
+    The board meets in November: Daniel, a head teacher, a former trainee and you. The bank wants an answer by
+    December, the foundation will decide on any grant in the spring, and 3,600 pupils are waiting. You have said many
+    times that Patchwork exists for two reasons.
+  task: Recommend a plan of action that meets more of the need and keeps Patchwork solvent and true to its purpose.
+  deliverable: A plan of action of about 300 words, setting out the steps in order, who they depend on, their cost and effect, and how the board will know whether they work.
+  minutes: 45
+  criteria:
+    - Uses all the resource material, including the figures in Exhibit 4 and the voices in Exhibits 5 to 8.
+    - Applies business management tools and theories that fit, such as stakeholder mapping or sources of finance.
+    - Weighs the plans against both needs and against the enterprise's survival.
+    - Sets out the plan in a clear order, with what will be measured.
+
+debrief:
+  summary: >
+    Patchwork's two purposes grow in different ways: laptops for pupils with any capable workforce, traineeships only
+    with supervision, space and subsidy. The strongest plans use the part of the business that can grow profitably to
+    pay for the part that cannot, and make the link binding, so that growth serves the mission rather than replacing
+    it.
+  byOption:
+    - option: bank-contract
+      fit: conditional
+      body: >
+        The only plan that clears the waiting list, with 3,600 laptops a year, and adds a large surplus, £190k a year.
+        But it grows Patchwork through people without convictions, because the bank's checks exclude the trainees, so
+        the second half of the mission stands still unless the surplus is committed to traineeships. Strong with that
+        commitment; mission drift without it.
+    - option: second-workshop
+      fit: conditional
+      body: >
+        It doubles the traineeships, the heart of the mission, and supplies 1,200 more laptops a year. But it loses £46k a
+        year even with a grant that has not been agreed, and £136k without it, with reserves of £45k. The right purpose
+        on the wrong economics; worth doing later, funded by something that pays.
+    - option: sell-online
+      fit: weak
+      body: >
+        A quick £72k a year that turns the deficit into a surplus, paid for by 600 pupils who would not get a laptop. It
+        uses the mission to fund the enterprise rather than the enterprise to fund the mission.
+    - option: license
+      fit: conditional
+      body: >
+        A low-cost way to spread the model, adding £14k a year and helping pupils and trainees in other cities. But it
+        does nothing for Glasgow's waiting list, and Patchwork's reputation would rest on partners it does not control.
+        A good second step, not a first.
+  tradeoffs:
+    - Scale against purpose. The plan that helps most pupils does not employ more trainees.
+    - Earned income against grants. The foundation wants Patchwork to earn more; the most mission-focused plan needs a grant.
+    - One large customer against many small ones. The bank contract brings money and dependence together.
+    - Pupils against money. Selling more online improves the accounts by serving fewer pupils.
+  evidenceThatMatters:
+    - The deficit, the falling grants and the reserves of a month (Exhibits 1 and 3).
+    - The plans' effects on the surplus, on pupils and on traineeships, side by side (Exhibit 4).
+    - The bank's refusal to make an exception (Exhibit 5).
+    - The voices of the head teacher and the trainee, which show what each need means (Exhibits 6 and 7).
+  changeYourMind:
+    - The foundation agrees a three-year grant early. The second workshop becomes affordable alongside, or instead of, the contract.
+    - There is not enough school and recycling work for more trainees. The contract's surplus cannot buy traineeships, and the contract becomes harder to justify.
+    - Another large donor offers devices without the background check. That would grow both purposes at once.
+  commonErrors:
+    - Judging the plans on the surplus alone, as if Patchwork were an ordinary company.
+    - Rejecting the bank contract as mission drift without asking what its surplus could pay for.
+    - Recommending the second workshop without noticing that it loses money even with the grant.
+    - Describing a plan without an order of steps, owners and measures.
+
+frameworks:
+  - name: Social enterprises
+    use: >
+      Patchwork is a for-profit social enterprise: it trades, and its surplus and assets serve its community purpose.
+      Its falling grants push it further from the model of a non-profit NGO.
+    terms: [social-enterprise, for-profit-social-enterprise, non-profit-social-enterprise, non-governmental-organization, social-entrepreneur]
+    subtopics: ['1.2', '1.1']
+  - name: The triple bottom line and ethical objectives
+    use: >
+      Patchwork measures success in pupils served and trainees in work as well as in money, so each plan must be judged
+      on all three.
+    terms: [triple-bottom-line, ethical-objectives, corporate-social-responsibility]
+    subtopics: ['1.3']
+  - name: Stakeholder mapping and conflict
+    use: >
+      The bank and the foundation have high influence; trainees, pupils and families have a high stake and little
+      influence. The plan must protect the interests of those who cannot press for them.
+    terms: [stakeholder-mapping, stakeholder-conflict]
+    subtopics: ['1.4']
+  - name: Sources of finance
+    use: >
+      Crowdfunding, grants, loans and retained surplus each fit some plans and not others; a community interest
+      company's asset lock limits what it can offer an equity investor.
+    terms: [crowdfunding, loan-capital, retained-profit, business-angel, internal-sources-of-finance, external-sources-of-finance]
+    subtopics: ['3.2']
+  - name: Revenue streams
+    use: >
+      Patchwork earns from four streams besides grants, and the plans change their mix: the bank contract adds fees, the
+      online plan shifts laptops from one stream to another.
+    terms: [revenue-stream, total-revenue]
+    subtopics: ['3.3']
+  - name: Circular business models
+    use: >
+      Refurbishing laptops is a product life extension model, and stripping the rest for parts is resource recovery;
+      both turn other organizations' waste into Patchwork's raw material.
+    terms: [circular-business-models, product-life-extension-model, resource-recovery-model]
+    tool: circular-business-models
+  - name: SWOT analysis
+    use: >
+      A SWOT analysis of Patchwork sets its strengths (a trusted model, results) and weaknesses (a deficit, thin
+      reserves) against the bank's offer as an opportunity and the tapering grant as a threat.
+    terms: [swot-analysis]
+    tool: swot-analysis
+
+discussion:
+  - >
+    When does growth funded by a commercial contract become mission drift? Propose a rule a board could adopt in advance
+    to decide.
+  - >
+    Patchwork's two purposes have different economics. Should a social enterprise with two purposes ever split them
+    into two organizations?
+  - >
+    The bank gains a story of social value from the contract. How should Patchwork price that, and should it?
+
+furtherReading:
+  - title: 1.2 Types of business entities
+    href: /topics/types-of-business-entities/
+    note: Private and public sectors, companies, and for-profit and non-profit social enterprises.
+  - title: 1.3 Business objectives
+    href: /topics/business-objectives/
+    note: Mission, ethical objectives and corporate social responsibility.
+  - title: 1.4 Stakeholders
+    href: /topics/stakeholders/
+    note: Internal and external stakeholders, and conflict between them.
+  - title: 'Paper 3: the Boardroom'
+    href: /assessment/paper-3/
+    note: How the HL paper on a social enterprise works, with a workspace for planning an answer.
+  - title: The Paper 3 assessment guide
+    href: /downloads/guides/business-brief-paper-3-assessment-guide-hl.pdf
+    note: The creator's guide to the HL paper.
+  - title: Business management guide
+    source: ib-bm-guide-2024
+    location: p. 47
+    note: The structure of Paper 3, its questions and their marks.
+  - title: Business Management for the IB Diploma
+    source: hodder-bm-2022
+    location: chapter 1.2, pp. 71 to 83
+    note: The coursebook's chapter on types of business entities, including social enterprises.

@@ -8,9 +8,9 @@
  */
 import { describe, expect, it } from 'vitest';
 import { acidTestRatio, balances, creditorDays, currentRatio, derive, gearingRatio, grossProfitMargin, profitMargin, roce, stockTurnoverDays, type Statement } from '../../src/lib/ratios';
+import { labourTurnover, percentChange, totalRevenue } from '../../src/lib/finance';
 import { arr, npv, payback, type Project } from '../../src/lib/investment';
 import { growthRate, marketShare } from '../../src/lib/market';
-import { labourTurnover, percentChange } from '../../src/lib/finance';
 import type { Exhibit } from '../../src/lib/schemas';
 import { loadCorpus } from './helpers/corpus';
 
@@ -236,5 +236,70 @@ describe('Silvertree Clinics', () => {
     expect(row(options, 'Clinical career ladder')[4]).toBe(net(2400000, 20, perLeaver, 1200000));
     expect(row(options, 'Team leaders in every clinic')[4]).toBe(net(1500000, 25, perLeaver));
     expect(row(options, 'One contracted agency')[4]).toBe(net(0, (30 / 96) * 100, 45000 + 80 * (3800 - 2600)));
+  });
+});
+
+describe('Larkspur Software', () => {
+  const id = 'larkspur-software';
+
+  it('earns its revenue from workers times price, and its margins from the statement', () => {
+    const clients = exhibit(id, 'ex-2');
+    for (const r of clients.rows ?? []) {
+      const [, workers, price, revenue] = r.slice(1) as number[];
+      expect(totalRevenue(price ?? 0, (workers ?? 0) * 12) / 1000, String(r[0])).toBeCloseTo(revenue ?? NaN, 9);
+    }
+    const pl = exhibit(id, 'ex-1');
+    const [rev, , gp, , pbit] = [0, 1, 2, 3, 4].map((i) => (pl.rows?.[i]?.[2] as number) ?? NaN) as number[];
+    expect(r1(grossProfitMargin(gp ?? 0, rev ?? 0))).toBe(75);
+    expect(r1(profitMargin(pbit ?? 0, rev ?? 0))).toBe(3.9);
+    expect(r1((25000 * 3.6 * 12) / 1000 / (rev ?? 1) * 100)).toBe(22.7);
+    expect(question(id, 'lk-margins')).toContain('= 75.0%');
+    expect(question(id, 'lk-concentration')).toContain('= 22.7%');
+  });
+
+  it('compares every response with losing the clients', () => {
+    const responses = exhibit(id, 'ex-6');
+    const profit = (label: string) => row(responses, label)[4] ?? NaN;
+    for (const r of responses.rows ?? []) {
+      const [, revenue, gp, other, change, pbit] = r.slice(1) as number[];
+      expect(gp, String(r[0])).toBe(Math.round((revenue ?? 0) * 0.75));
+      expect(change, String(r[0])).toBe((gp ?? 0) - (other ?? 0));
+      expect(pbit, String(r[0])).toBe(184 + (change ?? 0));
+    }
+    const decline = profit('D. Decline and refocus');
+    expect(profit('A. Build Pulse as asked') - decline).toBe(1189);
+    expect(profit('B. Build Pulse Lite') - decline).toBe(1041);
+    expect(profit('A. Build Pulse as asked') - profit('B. Build Pulse Lite')).toBe(148);
+  });
+});
+
+describe('Patchwork Digital', () => {
+  const id = 'patchwork-digital';
+
+  it('builds income from devices and prices, and the deficit from the totals', () => {
+    const devices = exhibit(id, 'ex-2');
+    const n = (label: string) => row(devices, label);
+    const statement = exhibit(id, 'ex-1');
+    const line = (label: string) => row(statement, label)[0] ?? NaN;
+    expect(line('Laptops sold to schools')).toBe(((n('Refurbished and sold to schools')[0] ?? 0) * (n('Refurbished and sold to schools')[1] ?? 0)) / 1000);
+    expect(line('Laptops sold online')).toBe(((n('Refurbished and sold online')[0] ?? 0) * (n('Refurbished and sold online')[1] ?? 0)) / 1000);
+    expect(line('Data-wiping fees')).toBe(((n('Collected from donors')[0] ?? 0) * 12) / 1000);
+    expect(line('Total income') - line('Total costs')).toBe(line('Surplus or deficit for the year'));
+    expect(r1((12 / 525) * 100)).toBe(2.3);
+    expect(r1((120 / 525) * 100)).toBe(22.9);
+    expect(question(id, 'pd-income')).toContain('= 2.3%');
+    expect(question(id, 'pd-income')).toContain('= 22.9%');
+  });
+
+  it('adds up each plan, and the bank contract can pay for six traineeships', () => {
+    const plans = exhibit(id, 'ex-4');
+    for (const r of plans.rows ?? []) {
+      const [income, costs, change] = r.slice(1) as number[];
+      expect(change, String(r[0])).toBe((income ?? 0) - (costs ?? 0));
+    }
+    expect(9000 * 15 / 1000 + 3600 * 60 / 1000 + 400 * 180 / 1000 + 5000 * 10 / 1000).toBe(473);
+    expect(4 * 32 + 4000 * 30 / 1000 + 20 + 15).toBe(283);
+    expect(row(plans, 'A. The bank contract')[2]! - 6 * 20).toBeGreaterThanOrEqual(0);
+    expect(row(plans, 'B. A second workshop')[2]! - 90).toBe(-136);
   });
 });
