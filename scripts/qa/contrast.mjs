@@ -69,6 +69,16 @@ for (const [fg, bg, min, use] of PAIRS) {
   if (!ok) failed++;
   console.log(`${ok ? 'pass' : 'FAIL'}  ${r.toFixed(2).padStart(5)} : 1  (needs ${min})  --${fg} on --${bg}: ${use}`);
 }
+// Each room's text colour (src/styles/rooms.css) on paper and on sheets: kickers and section numbers.
+const rooms = readFileSync(new URL('../../src/styles/rooms.css', import.meta.url), 'utf8');
+for (const m of rooms.matchAll(/body\[data-room="([a-z]+)"\] \{[^}]*?--room-accent-text: (#[0-9a-fA-F]{6});/g)) {
+  for (const bg of ['surface-page', 'surface-sheet']) {
+    const r = ratio(m[2], token(bg));
+    const ok = r >= 4.5;
+    if (!ok) failed++;
+    console.log(`${ok ? 'pass' : 'FAIL'}  ${r.toFixed(2).padStart(5)} : 1  (needs 4.5)  ${m[1]} room text ${m[2]} on --${bg}: room kickers and section numbers`);
+  }
+}
 // White text on the cobalt button.
 const btn = ratio('#ffffff', token('bb-cobalt'));
 console.log(`${btn >= 4.5 ? 'pass' : 'FAIL'}  ${btn.toFixed(2).padStart(5)} : 1  (needs 4.5)  white on --bb-cobalt: primary button text`);

@@ -24,7 +24,7 @@ const answerErrors = Object.values(c.questions)
   .flatMap((q) => q.errors.map((e) => ({ e, from: `${q.commandTerm}: ${q.title}` })));
 ---
 
-<BaseLayout title="Examiner Lens" description="Command terms for IB Business Management: what each asks an answer to do, where its definition comes from, and how to answer to it." section="exam-desk">
+<BaseLayout room="assessment" title="Examiner Lens" description="Command terms for IB Business Management: what each asks an answer to do, where its definition comes from, and how to answer to it." section="exam-desk">
   <PageIntro
     trail={[{ label: 'Assessment Centre', href: '/assessment/' }, { label: 'Command terms' }]}
     kicker="Examiner Lens"

@@ -16,6 +16,8 @@ import { rich } from '../../lib/markup';
 
 interface Props {
   id: string;
+  /** The room's visual identity (see BaseLayout and src/styles/rooms.css). */
+  room?: string;
   /** Page description for search engines; defaults to the room's purpose. */
   description?: string;
   /** Which primary navigation item to mark as current. */
@@ -23,7 +25,7 @@ interface Props {
   /** Number of the first section after the slot's own sections. */
   firstSection?: number;
 }
-const { id, description, section, firstSection = 1 } = Astro.props;
+const { id, room: identity, description, section, firstSection = 1 } = Astro.props;
 const all = await modulesInOrder();
 const room = all.find((m) => m.id === id);
 if (!room) throw new Error(`RoomPage: no module "${id}" in src/content/data/modules.yaml`);
@@ -43,7 +45,7 @@ const syllabusNo = served.length ? n++ : 0;
 const plannedNo = r.planned.length ? n++ : 0;
 ---
 
-<BaseLayout title={r.name} description={description ?? r.purpose} section={section ?? id}>
+<BaseLayout title={r.name} description={description ?? r.purpose} section={section ?? id} room={identity}>
   <div class="wrap">
     <header class="room-intro">
       <Breadcrumbs trail={[{ label: 'All rooms', href: '/rooms/' }, { label: r.name }]} />
