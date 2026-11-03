@@ -63,8 +63,10 @@ describe('critical path analysis', () => {
 });
 
 describe('the Halden diagnosis lab plan', () => {
+  // Loaded while the tests are collected, as the other suites do, so a busy machine cannot push the test past its time limit.
+  const corpus = loadCorpus();
   it('matches the plan worked above', () => {
-    const lab = loadCorpus().interactives['halden-diagnosis'];
+    const lab = corpus.interactives['halden-diagnosis'];
     if (!lab || lab.component !== 'case-lab') throw new Error('The Halden lab is missing');
     const task = lab.stages.flatMap((st) => st.tasks).find((t) => t.kind === 'plan');
     if (!task || task.kind !== 'plan') throw new Error('No plan task');
