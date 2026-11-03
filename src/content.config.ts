@@ -25,6 +25,7 @@ import {
   toolSchema,
   topicSchema,
 } from './lib/schemas';
+import { scenarioSchema } from './lib/boardroom/schema';
 
 /**
  * Loads every `.yaml` file in a folder, each holding a list of entries with an
@@ -90,4 +91,5 @@ export const collections = {
   sources: defineCollection({ loader: file('./src/content/data/sources.yaml'), schema: sourceSchema }),
   claims: defineCollection({ loader: file('./src/content/data/claims.yaml'), schema: claimSchema }),
   resources: defineCollection({ loader: file('./src/content/data/resources.yaml'), schema: resourceSchema }),
+  boardroom: defineCollection({ loader: yamlFiles('./src/content/boardroom'), schema: scenarioSchema }),
 };
