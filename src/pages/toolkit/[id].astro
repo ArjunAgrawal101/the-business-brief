@@ -11,6 +11,7 @@ import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
 import { corpus, href, longDate, toolsInOrder } from '../../lib/content';
 import { inline, rich } from '../../lib/markup';
 import type { Tool } from '../../lib/schemas';
+import { studio, studioHref } from '../../lib/strategy/content';
 
 type CompleteTool = Extract<Tool, { status: 'complete' }>;
 export async function getStaticPaths() {
@@ -25,6 +26,8 @@ const c = await corpus();
 const ix = t.interactive ? c.interactives[t.interactive] : undefined;
 const calcs = Object.entries(c.calculations).filter(([, k]) => k.page === `/toolkit/${id}/`);
 const theCase = c.cases[t.application.case];
+// The Strategy Studio tool that applies this one to the reader's own case, if there is one.
+const build = (await studio()).tools.find((x) => x.status.toolkit === id);
 const lists = [
   { key: 'when', title: 'When to use it', items: t.whenToUse },
   { key: 'construct', title: 'How to build it', items: t.construct, ordered: true },
@@ -89,6 +92,19 @@ const lists = [
         </div>
         {theCase && <p class="small"><a href={href.case(t.application.case)}>Read the case file: {theCase.title}</a></p>}
       </div>
+      {
+        build && (
+          <aside class="callout callout--framework" style="margin-top:var(--sp-5)">
+            <span class="callout__kicker">Build your own</span>
+            <div class="prose">
+              <p>
+                The <a href={studioHref(build.slug)}>{build.title}</a> in the Strategy Studio applies this tool to a case of your choosing, checks your entries as you work, and keeps your
+                analysis on this device to export or print.
+              </p>
+            </div>
+          </aside>
+        )
+      }
       {
         ix && t.interactive && (
           <div style="margin-top:var(--sp-6)">

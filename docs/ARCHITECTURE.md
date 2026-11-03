@@ -32,6 +32,7 @@ The platform has no accounts and stores nothing on a server. A static site is th
 | topics, cases, decisions, tools, interactives, curricula, mindmaps, notes | one YAML file per entry | Astro `glob` |
 | questions, glossary | several YAML files, each a list of entries with ids | custom `yamlList` loader (checks for duplicate ids) |
 | calculations, assessment, commandTerms, concepts, pathways, modules, sources, claims, resources | one YAML file of entries in `src/content/data/` | Astro `file` |
+| studio | one YAML file per Strategy Studio tool, and one for its engagement, in `src/content/studio/` (schema in `src/lib/schemas-strategy.ts`) | Astro `glob` |
 
 Two kinds of material are code rather than content, because they are drawn or computed: the diagram library (`src/lib/diagrams.ts`, with the drawings in `src/lib/figures/`) and the Resources Library catalogue (`src/lib/resources.ts`), which joins the curated `resources.yaml` with entries generated from the content (mindmaps, notes, briefs, revision briefs, cases, Decision Rooms, tools, practice and the diagram groups).
 
@@ -52,6 +53,7 @@ Schemas live in `src/lib/schemas.ts`. Every content block, exhibit and interacti
 - no HL question is in the style of paper 1 (which excludes HL-only content), a paper 3 question is HL, and a paper 3 question marked on criteria uses the guide's criteria A to D;
 - every interaction names subtopics that exist; a case lab's evidence comes from its case, its answers are among its options, and its plan has no loops;
 - the ratio desk's statements balance and link across the two years, and every strategy keeps them balanced; the Market Studio and Operations Floor data pass their own checks (`src/lib/integrity-studio.ts`);
+- in the Strategy Studio (`src/lib/integrity-strategy.ts`, run by the studio's pages and its unit test), a tool called an IB toolkit tool names its entry in `src/content/tools` and has the same level, a tool outside the toolkit is labelled enrichment and says so, every subtopic, Decision Room and toolkit guide named exists, and every worked example reads back unchanged through the tool's own reader of saved work and passes the tool's checks;
 - for the 2.0 learning collections (`src/lib/integrity-learning.ts`): every mindmap names a real subtopic in the right unit (one map each), is marked HL exactly when its subtopic is HL only, has enough nodes to revise from (16 or more), gives every branch at least two children and a core node for the revision view, gives every formula node its formula, links only to glossary terms that exist and gives the sources it was checked against; every set of notes carries the guide's exact subtopic title, is marked HL when its subtopic is, and names only glossary terms, questions, subtopics, sources and diagrams that exist; every glossary entry names a real subtopic, has a name no other entry uses, is not related to itself, and is marked HL when all its subtopics are HL only;
 - a resource is offered as a download only when its file exists in `public/` or is one the build writes (`/downloads/glossary.csv`, `/downloads/mindmaps/*.svg`, `/downloads/diagrams/*.svg`).
 
@@ -71,6 +73,7 @@ The same checks run in the unit tests (`tests/unit/integrity.test.ts`), which lo
 | `src/lib/cashflow.ts` | The cash flow forecast in the guide's layout, ways of paying for an investment, working capital measures, the profit for the period and its reconciliation to cash, worked in cents |
 | `src/lib/ratios.ts`, `src/lib/investment.ts` | The guide's ratios from two years of statements, with strategies applied to the accounts; payback, ARR and NPV with the guide's printed discount factors |
 | `src/lib/plan.ts` | Critical path analysis: earliest and latest times, total and free float, the critical path |
+| `src/lib/strategy/*.ts` | The Strategy Studio's ten tools: each tool's model, checks, reader of saved work, editor and analysis HTML, chart and exports; the decision tree reuses `decision-tree.ts`, the force field `force-field.ts` and the option appraisal the weighted scoring in `operations.ts` |
 | `src/lib/market.ts`, `src/lib/operations.ts` | Market share and growth, position maps; capacity utilization, productivity, stock control, weighted location scores |
 | `src/lib/ia.ts` | The IA planner's checks on supporting documents, dates, word count and self-marks, each citing its page |
 | `src/lib/format.ts` | en-GB number and money formatting with the typographic minus |
@@ -117,6 +120,7 @@ The quiz engine (`src/scripts/quiz.ts`) dispatches a bubbling `quiz:progress` ev
 | `/decision-room/`, `/decision-room/[id]/` | Decision Rooms |
 | `/finance-desk/`, `/finance-desk/costs-and-revenue/`, `/finance-desk/break-even/`, `/finance-desk/contribution/`, `/finance-desk/ratios/`, `/finance-desk/cash-flow/`, `/finance-desk/investment-appraisal/` | Finance Desk |
 | `/rooms/`, `/case-room/`, `/case-room/halden-diagnosis/`, `/strategy-studio/`, `/market-studio/`, `/people-and-culture/`, `/operations-floor/` | All rooms; the rooms with pages of their own; the case lab |
+| `/strategy-studio/[tool]/` | The Strategy Studio's tools: `swot`, `steeple`, `five-forces`, `ansoff`, `bcg-matrix`, `generic-strategies`, `stakeholder-map`, `decision-tree`, `force-field`, `option-appraisal` |
 | `/progress/` | What this browser has kept |
 | `/toolkit/`, `/toolkit/[id]/` | Toolkit (guides for complete tools only) |
 | `/exam-desk/practice/` | All practice questions, filterable (the other Exam Desk addresses redirect to the Assessment Centre) |

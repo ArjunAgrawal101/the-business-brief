@@ -156,7 +156,9 @@ export function equalWeightLeaders(s: AppraisalState): SiteResult[] {
 }
 
 const nameOf = (s: AppraisalState, id: string) => sites(s).find((x) => x.id === id)?.name ?? id;
-const critName = (s: AppraisalState, id: string) => factors(s).find((x) => x.id === id)?.label.toLowerCase() ?? id;
+/** A label in the middle of a sentence: only its first letter is lowered, so a name such as Northvale keeps its capital. */
+const mid = (t: string) => t.charAt(0).toLowerCase() + t.slice(1);
+const critName = (s: AppraisalState, id: string) => mid(factors(s).find((x) => x.id === id)?.label ?? id);
 
 export function sensitivityReading(s: AppraisalState): string {
   const r = ranking(s);
@@ -211,7 +213,7 @@ const paras = (t: string) =>
 export function evaluationSummary(s: AppraisalState): string {
   const r = ranking(s);
   if (!r.length || maxTotal(s) === 0) return '';
-  const crit = andList(s.criteria.filter((c) => c.weight > 0).map((c) => `${c.label.trim().toLowerCase() || 'unnamed'} (weight ${c.weight})`));
+  const crit = andList(s.criteria.filter((c) => c.weight > 0).map((c) => `${mid(c.label.trim()) || 'unnamed'} (weight ${c.weight})`));
   return `Each option was scored from 1 to 5 against ${s.criteria.filter((c) => c.weight > 0).length} weighted criteria: ${crit}. ${r.map((x) => `${x.name} scored ${fmtNumber(x.total)} of ${fmtNumber(maxTotal(s))} (${fmtNumber(x.share, 0)}%)`).join('; ')}. ${sensitivityReading(s)}`;
 }
 

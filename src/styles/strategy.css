@@ -1868,7 +1868,7 @@ tr.is-best td {
 }
 
 .sx-chart--wide .chart {
-  min-width: 52rem;
+  min-width: 0;
 }
 
 /* Option appraisal: the score matrix and the memo */
@@ -1929,6 +1929,12 @@ tr.is-best td {
   border: 1px solid var(--bb-ink);
   background: #fff;
   box-shadow: 8px 8px 0 var(--bb-ink);
+}
+
+@media (max-width: 40rem) {
+  .sx-memo {
+    box-shadow: 4px 4px 0 var(--bb-ink);
+  }
 }
 
 .sx-memo__kind {

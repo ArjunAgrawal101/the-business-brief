@@ -427,7 +427,8 @@ export function treeSvg(s: TreeState, id: string, evals = evaluate(s)): string {
   }
   const best = s.nodes.find((n) => n.id === evals.get(root.id)?.best);
   const desc = `Decision tree for ${s.question.trim() || 'the decision'}, with ${s.nodes.length} nodes. ${headline(s)}${best ? ` The chosen branch, ${lbl(best)}, is drawn heavier; rejected branches are dashed and crossed with two short strokes.` : ''}`;
-  return svgDoc(W, H, id, `Decision tree: ${s.question.trim() || 'the decision'}`, desc, p.join(''));
+  // Drawn at its own size everywhere; on a narrow screen its region scrolls, so the labels stay legible.
+  return svgDoc(W, H, id, `Decision tree: ${s.question.trim() || 'the decision'}`, desc, p.join('')).replace(`style="max-width:${W}px"`, `style="width:${W}px;max-width:none"`);
 }
 
 /* ---------- HTML ---------- */
@@ -473,7 +474,7 @@ function sumProblem(s: TreeState, n: TreeNode, evals: Map<string, NodeEval>): st
   const e = evals.get(n.id);
   const kids = childrenOf(s, n.id);
   if (!e || n.kind !== 'chance' || kids.some((k) => k.prob === null || k.prob === undefined)) return '';
-  if (e.probSum !== null && Math.abs(e.probSum - 1) > 1e-6) return `The probabilities here add up to ${fmtNumber(round(e.probSum, 4), 2)}, not 1.`;
+  if (e.probSum !== null && Math.abs(e.probSum - 1) > 1e-6) return `The probabilities here add up to ${pr(round(e.probSum, 4))}, not 1.`;
   if (kids.some((k) => (k.prob as number) < 0 || (k.prob as number) > 1)) return 'Each probability must be between 0 and 1.';
   return '';
 }

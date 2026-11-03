@@ -76,6 +76,7 @@ The label column is what readers see on the page.
 | `concepts`, `pathways`, `modules` | `data/*.yaml` | The four concepts, the audience pathways, the platform's rooms. A room may carry a `lead`, `items` (each a working page or anchor, checked by the link check), the `syllabus` codes it serves and what is `planned`, which its page renders |
 | `sources`, `claims` | `data/sources.yaml`, `data/claims.yaml` | The source register and the claims register |
 | `resources` | `data/resources.yaml` | A curated resource for the library: type, audiences, level, units and subtopics, the assessment component, `access` (a `download` with its file, format, size and pages; a `page`; or a `print` page), `contents` and `updated`. A download must exist, or the build fails |
+| `studio` | `studio/<slug>.yaml` | A Strategy Studio tool (`type: tool`): its `kind`, `slug`, `stage` of the engagement, `purpose`, `howTo`, `limitations`, its IB `status` (an `ib-toolkit` tool names its `toolkit` entry and `level`; anything else is `enrichment`, with any `extensions` such as the TOWS matrix), the notes and guides to `read`, the worked `example` (the tool's state exactly as the tool saves it) and its recommended use (`inUse`). One entry is the `engagement` that frames the room: the fictional client, its question, facts, the four stages, principles, reading and Decision Rooms |
 
 ## Subtopic notes
 

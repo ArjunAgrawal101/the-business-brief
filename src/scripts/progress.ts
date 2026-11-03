@@ -10,6 +10,7 @@ interface Config {
   topics: Array<{ id: string; title: string; href: string; cards: number }>;
   interactions: Array<{ id: string; uid: string; title: string; href: string; keys: string[]; stages: number }>;
   ia: { href: string; steps: number };
+  strategy?: Array<{ slug: string; title: string; href: string }>;
 }
 
 const has = (key: string): boolean => {
@@ -84,6 +85,15 @@ each('[data-ix="progress"]', (root) => {
   const steps = plan?.fields ? Object.keys(plan.fields).filter((k) => /^done-\d+$/.test(k) && plan.fields?.[k] === 'on').length : 0;
   if (plan?.fields && Object.keys(plan.fields).length) add('IA Studio', 'Your research project plan', cfg.ia.href, `${steps} of ${cfg.ia.steps} steps done`, steps === cfg.ia.steps);
 
+  // Strategy Studio analyses
+  let analyses = 0;
+  for (const t of cfg.strategy ?? []) {
+    const v = store.get<{ headline?: string } | null>(`strategy:${t.slug}`, null);
+    if (!v) continue;
+    analyses += 1;
+    add('Strategy Studio', t.title, t.href, 'Analysis saved', false);
+  }
+
   const figures: Array<[string, string, string]> = [
     ['Practice questions answered', String(answered), `${marked} self-marked, of ${cfg.questions.length}`],
     ['Decision Rooms finished', `${roomsDone} of ${cfg.decisions.length}`, ''],
@@ -91,6 +101,7 @@ each('[data-ix="progress"]', (root) => {
     ['Interactions started', String(tried), `of ${cfg.interactions.filter((i) => !i.stages).length} that keep your work`],
     ['Retrieval cards rated', String(cards), ''],
     ['IA plan steps done', `${steps} of ${cfg.ia.steps}`, ''],
+    ['Strategy Studio analyses', `${analyses} of ${(cfg.strategy ?? []).length}`, ''],
   ];
   const sum = root.querySelector<HTMLElement>('[data-summary]');
   if (sum)
