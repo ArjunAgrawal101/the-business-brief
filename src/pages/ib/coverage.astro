@@ -30,7 +30,7 @@ const sum = coverageSummary(c);
     trail={[{ label: 'IB course', href: '/ib/' }, { label: 'Coverage' }]}
     kicker="IB Diploma Programme"
     title="Coverage tracker"
-    lead={`${sum.complete} of ${sum.total} subtopics are complete, with full notes (${sum.withNotes}) or a complete brief (${sum.withBriefs}); ${sum.partial} are partly built; ${sum.planned} are planned. ${sum.verified} of ${sum.total} have their content statements verified against the guide. The table is generated from the content itself, so a subtopic shows material only when it exists.`}
+    lead={`${sum.complete} of ${sum.total} subtopics are complete, with full notes (${sum.withNotes}) or a complete brief (${sum.withBriefs})${sum.partial ? `; ${sum.partial} ${sum.partial === 1 ? 'is' : 'are'} partly built` : ''}${sum.planned ? `; ${sum.planned} ${sum.planned === 1 ? 'is' : 'are'} planned` : ''}. ${sum.verified} of ${sum.total} have their content statements verified against the guide. The table is generated from the content itself, so a subtopic shows material only when it exists.`}
   />
   <div class="wrap page-body">
     <ul class="cov-key" aria-label="What the states mean">

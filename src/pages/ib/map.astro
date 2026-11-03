@@ -53,7 +53,7 @@ const count = (st: string) => all.filter((t) => t.state === st).length;
     trail={[{ label: 'IB course', href: '/ib/' }, { label: 'Course map' }]}
     kicker="IB Diploma Programme"
     title="The course at a glance"
-    lead={`All ${all.length} subtopics in their five units. ${count('complete')} are complete, with full notes or a brief; ${count('partial')} are partly built, with a page holding their mindmap, key terms, diagrams and any tools; ${count('planned')} are planned. Each tile shows the rooms that serve it.`}
+    lead={`All ${all.length} subtopics in their five units. ${count('complete') === all.length ? 'Every one is complete, with full notes or a brief.' : `${count('complete')} are complete, with full notes or a brief${count('partial') ? `; ${count('partial')} partly built, with a page holding their mindmap, key terms, diagrams and any tools` : ''}${count('planned') ? `; ${count('planned')} planned` : ''}.`} Each tile shows the rooms that serve it.`}
   />
   <div class="wrap page-body">
     <ul class="map-key" aria-label="Key">

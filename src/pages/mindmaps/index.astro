@@ -36,7 +36,7 @@ const audienceText = (list: Array<keyof typeof AUDIENCE_LABEL>) =>
     trail={[{ label: 'Mindmaps' }]}
     kicker="Mindmaps"
     title="The course, one map at a time"
-    lead={`Each map shows the shape of a subtopic: its core ideas, types, theories, tools, calculations and the points to weigh, with the links to the rest of the course. ${done} of ${total} subtopics have a map so far.${enrichment.length ? ` After the five units, ${enrichment.length} enrichment maps go beyond the course for undergraduate and MBA learners.` : ''}`}
+    lead={`Each map shows the shape of a subtopic: its core ideas, types, theories, tools, calculations and the points to weigh, with the links to the rest of the course. ${done === total ? `All ${total} subtopics have a map.` : `${done} of ${total} subtopics have a map so far.`}${enrichment.length ? ` After the five units, ${enrichment.length} enrichment maps go beyond the course for undergraduate and MBA learners.` : ''}`}
   >
     <span class="tag tag--plain">Fold a branch, zoom, or switch to the revision view</span>
     <span class="tag tag--plain">Download as SVG or PNG, or print</span>

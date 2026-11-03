@@ -22,7 +22,7 @@ const counts = {
     trail={[{ label: 'All rooms' }]}
     kicker="The platform"
     title="All rooms"
-    lead={`One platform, ${howMany} rooms, each with one job. ${counts.live} are live, ${counts.partial} are partly built and ${counts.planned} are planned. A room is linked only when something in it works.`}
+    lead={`One platform, ${howMany} rooms, each with one job. ${[`${counts.live} ${counts.live === 1 ? 'is' : 'are'} live`, counts.partial && `${counts.partial} ${counts.partial === 1 ? 'is' : 'are'} partly built`, counts.planned && `${counts.planned} ${counts.planned === 1 ? 'is' : 'are'} planned`].filter(Boolean).join(', ').replace(/, ([^,]*)$/, ' and $1')}. A room is linked only when something in it works.`}
   />
   <div class="wrap page-body">
     <ol class="room-list" role="list">

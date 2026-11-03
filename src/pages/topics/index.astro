@@ -35,7 +35,7 @@ const sum = coverageSummary(c);
     trail={[{ label: 'Topics' }]}
     kicker="Topic library"
     title="The course, subtopic by subtopic"
-    lead={`All ${sum.total} subtopics of IB DP Business Management, in their five units. Every subtopic has a page with what the course asks, its key terms and its tools. ${sum.complete} of ${sum.total} are complete, with full notes (${sum.withNotes}) or a complete brief (${sum.withBriefs}); the other ${sum.partial} are partly built, with notes being written one at a time.`}
+    lead={`All ${sum.total} subtopics of IB DP Business Management, in their five units. Every subtopic has a page with what the course asks, its key terms and its tools. ${sum.complete} of ${sum.total} are complete, with full notes (${sum.withNotes}) or a complete brief (${sum.withBriefs})${sum.partial + sum.planned ? `; the other ${sum.partial + sum.planned} are partly built or planned, with notes being written one at a time` : ''}.`}
   />
 
   <div class="wrap page-body">
