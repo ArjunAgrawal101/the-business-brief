@@ -254,6 +254,7 @@ export interface Addition {
  * new notes are added to this list automatically from their `updated` dates.
  */
 export const ADDITIONS: Addition[] = [
+  { date: '2026-11-03', kind: 'Laboratory', title: 'The Financial Laboratory', text: 'Twenty calculators for your own figures, from break-even to NPV, each with the formula, the working and what it means.', href: '/finance-desk/lab/' },
   { date: '2026-11-03', kind: 'Room', title: 'The Market Studio', text: 'Nine marketing tools on one fictional café, from market metrics and research to the mix, the life cycle and the budget.', href: '/market-studio/' },
   { date: '2026-11-03', kind: 'Briefing', title: 'The Business Intelligence Briefing', text: 'Real developments read through the course, every fact tied to a dated source, the analysis labelled as the platform’s own.', href: '/intelligence/' },
   { date: '2026-11-03', kind: 'Cases', title: 'The Case Vault and six new cases', text: 'Retail, automobile, FMCG, healthcare, technology and a social enterprise, filtered by industry, function and topic, with a Case of the Week.', href: '/case-vault/' },
