@@ -1,0 +1,54 @@
+name: Critical path analysis
+aliases: [CPA, Network analysis]
+summary: "A method of planning a project as a network of linked activities, to find the shortest time it can take, the activities that cannot slip, and the float on the rest."
+question: "How long will the project take, and which activities can we not afford to delay?"
+group: change
+status: toolkit
+guidePages: '14 to 15'
+subtopics: ['5.1', '5.6']
+level: HL
+qualifications: [ib, undergraduate, mba, professional]
+tool: critical-path-analysis
+diagram: critical-path
+explanation: |
+  A project is drawn as a network: activities, each with a duration, run between numbered nodes, and an activity cannot start until those before it are finished. Each node records two times. The earliest start time is found by a forward pass, adding durations from the start and taking the largest total where paths meet. The latest finish time is found by a backward pass from the end, subtracting durations and taking the smallest result.
+
+  The critical path is the longest chain of dependent activities, and its length is the shortest possible duration of the project. Activities on it have no float, so any delay to them delays the whole project. Total float is how long an activity can be delayed without delaying the project; free float is how long it can be delayed without delaying the next activity. The guide expects students to complete and analyse a network and to calculate the floats, not to draw one from scratch.
+purpose: |
+  To schedule a project, find the activities that need the closest management, and see where resources can be moved without delaying completion. The toolkit lists it as an HL tool for units 4 and 5; its full guide is in preparation.
+steps:
+  - "List the activities, their durations and which must finish before each can start."
+  - "Complete the network: the forward pass gives the earliest start times at each node."
+  - "Complete the backward pass from the final node to find the latest finish times."
+  - "Find the critical path: the activities with no total float, which give the project's duration."
+  - "Calculate total and free float for the other activities, and use them to plan resources and deal with delays."
+example:
+  fictional: true
+  business: Fernwood Bistro
+  title: Fernwood Bistro plans its refit
+  body: |
+    Fernwood Bistro, a fictional restaurant, plans a refit with the six activities in the diagram above, in weeks: agree the design (A, 3), rebuild the kitchen (B, 4), order the furniture (C, 2), fit out the dining room (D, 5), install and test the furniture (E, 3) and final inspection and training (F, 2). B and C start after A; D follows B, E follows C, and F follows both D and E.
+
+    The longest path is A, B, D, F: 3 + 4 + 5 + 2 = 14 weeks. The other path, A, C, E, F, takes 10 weeks, so C and E each have a total float of 4 weeks. C's free float is 0, because E cannot start until it ends; E's free float is 4 weeks.
+  result: |
+    The refit takes at least 14 weeks, and the kitchen and the dining room fit-out are the activities the manager must watch: a week's delay to either is a week's delay to reopening. The furniture work can slip by up to 4 weeks in total without delaying reopening, so a joiner can be shared with the kitchen work if needed.
+advantages:
+  - "It finds the minimum duration of a project and the activities that cannot slip."
+  - "Float shows where there is flexibility to move people and equipment."
+  - "It gives a basis for monitoring progress and judging the effect of delays."
+limitations:
+  - "Durations are estimates, and the critical path can change when they are wrong."
+  - "Large networks are complex and need software to manage."
+  - "It does not show the cost of activities or the people needed, unless these are added."
+exercise:
+  prompt: |
+    A school is staging a concert. Activities, in days: book the hall (A, 2); then rehearse (B, 10) and design and print posters (C, 4) can run at the same time; selling tickets (D, 6) can start once the posters are ready; the dress rehearsal (E, 1) needs the rehearsals finished, and the concert follows once both D and E are complete. Find the critical path, the minimum time to the concert, and the total float on C and D.
+  guidance:
+    - "Work out each path from start to finish and add its durations."
+    - "The critical path is the longest path; its total is the minimum time."
+    - "Total float is the difference between the critical path's length and the length of the longest path through the activity."
+    - "Say which activity the organizers should watch most closely, and why."
+terms: [critical-path-analysis, critical-path, total-float, free-float, gantt-chart]
+related: [gantt-chart, raci-matrix, decision-trees]
+sources: [ib-bm-guide-2024]
+order: 6

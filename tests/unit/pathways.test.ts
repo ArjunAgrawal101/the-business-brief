@@ -86,7 +86,9 @@ describe('the pathways', () => {
     expect(resolveTarget('/topics/business-objectives/#porters-generic-strategies', c)).toMatchObject({ kind: 'subtopic', section: { level: 'HL' } });
     expect(resolveTarget('/mindmaps/enrichment/leading-change/', c)).toEqual({ kind: 'enrichment-map', id: 'leading-change', exists: true });
     expect(resolveTarget('/toolkit/force-field-analysis/', c)).toMatchObject({ kind: 'toolkit', exists: true, level: 'HL' });
-    expect(resolveTarget('/toolkit/bcg-matrix/', c)).toMatchObject({ kind: 'toolkit', exists: false });
+    // A guide still planned (or, once every guide is written, a tool that does not exist) is not a live link.
+    const planned = Object.entries(c.tools).find(([, t]) => t.status !== 'complete')?.[0] ?? 'no-such-tool';
+    expect(resolveTarget(`/toolkit/${planned}/`, c)).toMatchObject({ kind: 'toolkit', exists: false });
     expect(resolveTarget('/assessment/paper-3/', c)).toEqual({ kind: 'page', path: '/assessment/paper-3/' });
   });
 });

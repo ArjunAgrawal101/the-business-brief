@@ -40,7 +40,12 @@ export interface IndexInput {
   library?: ReadonlyArray<{ title: string; summary: string; typeLabel: string; level: string; units: number[]; subtopics: string[]; href: string }>;
   diagrams?: Readonly<Record<string, { title: string; caption?: string; syllabus: string[]; level: string; group: string }>>;
   pathways?: ReadonlyArray<{ id: string; name: string; promise: string }>;
+  /** The frameworks library (src/content/frameworks), by id: each framework's page, labelled by its standing in the course. */
+  frameworks?: Readonly<Record<string, { name: string; aliases: readonly string[]; summary: string; question: string; status: 'syllabus' | 'toolkit' | 'enrichment'; level: string; subtopics: readonly string[] }>>;
 }
+
+/** A framework page's type in the results: its standing in the course. */
+const FRAMEWORK_TYPES = { syllabus: 'Framework · IB syllabus', toolkit: 'Framework · IB toolkit', enrichment: 'Framework · enrichment, beyond the IB course' } as const;
 
 /** Pages that are not content and not in the menu, written out once. */
 const STATIC_PAGES: Array<{ kind: SearchKind; type: string; url: string; title: string; text: string; hl?: boolean }> = [
@@ -234,6 +239,21 @@ export function buildSearchIndex(input: IndexInput): SearchEntry[] {
       codes: [],
       hl: t.level === 'HL',
     });
+  // The frameworks library, framework by framework. Enrichment carries no unit or subtopic, so a unit filter never finds it, and its type says it is beyond the course.
+  for (const [id, f] of Object.entries(input.frameworks ?? {}).sort((a, b) => a[1].name.localeCompare(b[1].name, 'en', { sensitivity: 'base' }))) {
+    const ib = f.status !== 'enrichment';
+    add({
+      kind: 'frameworks',
+      type: FRAMEWORK_TYPES[f.status],
+      title: f.name,
+      url: `/frameworks/${id}/`,
+      text: f.summary,
+      keys: `${f.aliases.join(' ')} ${f.question}`,
+      units: ib ? [...new Set([...unitsOf(f.subtopics), ...(f.status === 'toolkit' ? ['toolkit'] : [])])] : [],
+      codes: ib ? f.subtopics.filter((x) => x !== 'toolkit') : [],
+      hl: ib && f.level === 'HL',
+    });
+  }
 
   // Questions: the practice questions, then the exam-style questions in the notes.
   for (const [id, q] of Object.entries(c.questions).sort((a, b) => a[1].order - b[1].order))

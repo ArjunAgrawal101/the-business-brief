@@ -37,6 +37,7 @@ export const NAV: NavGroup[] = [
       { label: 'Mindmaps', href: '/mindmaps/', text: 'Every subtopic and unit as a map to fold, zoom and print' },
       { label: 'Enrichment maps', href: '/mindmaps/#enrichment', text: 'Nine maps of management beyond the IB course, labelled enrichment' },
       { label: 'Diagrams', href: '/diagrams/', text: 'Original diagrams for every unit, each with a text description' },
+      { label: 'Frameworks', href: '/frameworks/', text: '35 business frameworks by purpose, each with a diagram, method, example and exercise' },
       { label: 'Toolkit', href: '/toolkit/', text: 'The business management toolkit, tool by tool' },
       { label: 'Revision briefs', href: '/revision/', text: 'Each complete topic on a page, for the last week' },
     ],

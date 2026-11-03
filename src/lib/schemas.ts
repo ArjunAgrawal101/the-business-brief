@@ -801,9 +801,26 @@ export const GLOSSARY_CATEGORY_LABELS: Record<(typeof GLOSSARY_CATEGORIES)[numbe
 };
 
 /**
+ * Where a learner meets a term or a framework: "ib" for the IB Diploma
+ * course, and the other levels of study and work the platform serves. A term
+ * beyond the IB course never carries "ib" (src/lib/integrity-frameworks.ts).
+ */
+export const QUALIFICATION_TAGS = ['ib', 'secondary', 'undergraduate', 'mba', 'professional'] as const;
+export type QualificationTag = (typeof QUALIFICATION_TAGS)[number];
+export const QUALIFICATION_TAG_LABELS: Record<QualificationTag, string> = {
+  ib: 'IB Diploma',
+  secondary: 'Secondary school',
+  undergraduate: 'Undergraduate',
+  mba: 'MBA',
+  professional: 'Professional',
+};
+
+/**
  * A glossary entry. Definitions are the platform's own words (never the IB's
  * or a textbook's). `subtopics` are IB codes ("3.3"), or "toolkit" for a
- * toolkit tool; `topics` are the briefs that teach the term.
+ * toolkit tool; `topics` are the briefs that teach the term. A term beyond
+ * the IB course has `provenance: enrichment`, no subtopics, and qualifications
+ * that do not include "ib".
  */
 export const glossarySchema = z.object({
   term: z.string(),
@@ -824,6 +841,16 @@ export const glossarySchema = z.object({
   category: z.enum(GLOSSARY_CATEGORIES).optional(),
   provenance,
   related: ids,
+  /** The term in plain language, for a first reading. */
+  simple: md.optional(),
+  /** A more precise or advanced explanation: the term as a specialist uses it. */
+  technical: md.optional(),
+  /** Common misunderstandings, each with its correction. */
+  misconceptions: z.array(z.object({ claim: z.string().trim().min(1), correction: md })).default([]),
+  /** Where a learner meets the term. Empty means the IB course only, for a term with subtopics. */
+  qualifications: z.array(z.enum(QUALIFICATION_TAGS)).default([]),
+  /** Frameworks, toolkit tools or library diagrams that use the term, by id. */
+  frameworks: ids,
 });
 
 /* ------------------------------------------------------------------ */

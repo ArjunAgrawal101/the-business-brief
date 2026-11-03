@@ -4,6 +4,7 @@ import type { Loader } from 'astro/loaders';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { parse } from 'yaml';
+import { frameworkSchema } from './lib/framework-schema';
 import {
   assessmentSchema,
   calculationSchema,
@@ -84,6 +85,8 @@ export const collections = {
   curricula: defineCollection({ loader: yamlFiles('./src/content/curricula'), schema: curriculumSchema }),
   questions: defineCollection({ loader: yamlList('./src/content/questions'), schema: questionSchema }),
   glossary: defineCollection({ loader: yamlList('./src/content/glossary'), schema: glossarySchema }),
+  // The frameworks library: one framework per file (src/lib/framework-schema.ts).
+  frameworks: defineCollection({ loader: yamlFiles('./src/content/frameworks'), schema: frameworkSchema }),
   mindmaps: defineCollection({ loader: yamlFiles('./src/content/mindmaps'), schema: mindmapSchema }),
   enrichmentMaps: defineCollection({ loader: yamlFiles('./src/content/enrichment-maps'), schema: enrichmentMapSchema }),
   notes: defineCollection({ loader: yamlFiles('./src/content/notes'), schema: noteSchema }),

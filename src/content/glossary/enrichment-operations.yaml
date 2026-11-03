@@ -1,0 +1,229 @@
+# Glossary: operations terms beyond the IB course.
+# Every entry is enrichment (provenance: enrichment): it names no IB subtopic, never carries
+# the ib qualification, and links to the IB terms it builds on through related. Definitions,
+# explanations and examples are the platform's own words; every business named is fictional.
+# Entries are in alphabetical order of term.
+
+- id: agile-project-management
+  term: "Agile project management"
+  aliases: ["Agile", "Scrum"]
+  definition: "An approach to managing projects, first developed for software, that delivers work in short cycles, adapts plans to feedback and relies on small, self-organizing teams."
+  simple: "Running a project in short bursts, showing users what has been made after each one and changing the plan according to their feedback, instead of planning everything at the start."
+  technical: "Agile methods such as Scrum use short iterations called sprints, a prioritized list of work, brief daily meetings and reviews with users. They suit projects whose requirements are uncertain; plan-driven methods using Gantt charts and critical path analysis suit projects with fixed scope and dependencies, such as construction. Many organizations combine the two."
+  example: "A fictional council team building a website for parking permits releases a basic version after two weeks, watches residents use it, and adds online payment in the next sprint because that is what most of them asked for."
+  misconceptions:
+    - claim: "Agile means working without a plan."
+      correction: "Agile teams plan in short cycles and revise often; the plan changes with evidence rather than being fixed at the start."
+  category: operations
+  qualifications: [undergraduate, mba, professional]
+  provenance: enrichment
+  related: [gantt-chart, critical-path-analysis, project-based-organization, lean-start-up]
+
+- id: bottleneck
+  term: "Bottleneck"
+  aliases: ["Constraint"]
+  definition: "The stage of a process with the lowest capacity, which limits the output of the whole process."
+  simple: "The slowest step in a process. However fast the other steps are, the whole process can only go as fast as this one."
+  technical: "Output is set by the bottleneck, so an hour lost there is an hour lost for the whole system, while an hour saved elsewhere saves nothing. Bottlenecks show up as queues in front of them and idle time after them. Improvement starts by finding and fully using the bottleneck, then adding to its capacity, after which the constraint moves somewhere else, which is the logic of the theory of constraints."
+  example: "A fictional sandwich shop can make 120 sandwiches an hour, but its one till serves 60 customers an hour, so at lunchtime the till, not the kitchen, limits its sales."
+  misconceptions:
+    - claim: "Speeding up any step speeds up the whole process."
+      correction: "Only improving the bottleneck raises output; faster steps elsewhere just build bigger queues."
+  category: operations
+  qualifications: [secondary, undergraduate, professional]
+  provenance: enrichment
+  related: [theory-of-constraints, productive-capacity, capacity-utilization-rate, takt-time]
+
+- id: bullwhip-effect
+  term: "Bullwhip effect"
+  definition: "The tendency for small changes in consumer demand to grow into larger and larger swings in orders as they pass back up a supply chain, from retailers to wholesalers, manufacturers and their suppliers."
+  simple: "When a small change in what shoppers buy turns into big jumps in what factories are asked to make, because each business in the chain over-reacts a little."
+  technical: "Causes include forecasting from orders rather than from final demand, ordering in large batches, price promotions that bring orders forward, and hoarding when supply is short. It inflates stock, the cost of capacity and stock-outs. Sharing sales data along the chain, smaller and more frequent orders, steady pricing and joint planning reduce it."
+  example: "A fictional toy shop's sales rise 10% before a holiday; it orders 20% more to be safe, the wholesaler orders 40% more from the factory, and the factory runs overtime to meet demand that soon falls back."
+  misconceptions:
+    - claim: "The bullwhip effect is caused by customers changing their minds."
+      correction: "Final demand may change only a little; the swings grow because of how the businesses in the chain forecast and order."
+  category: operations
+  qualifications: [undergraduate, mba, professional]
+  provenance: enrichment
+  related: [supply-chain, just-in-case, buffer-stock, sales-forecast]
+
+- id: economic-order-quantity
+  term: "Economic order quantity (EOQ)"
+  aliases: ["EOQ"]
+  definition: "The order size that minimizes the combined costs of ordering stock and of holding it, under a simple model of steady demand."
+  simple: "The best amount of stock to order each time: order too little and you pay for lots of deliveries; order too much and you pay to store it."
+  technical: "EOQ = √(2DS ÷ H), where D is annual demand in units, S is the cost of placing one order and H is the cost of holding one unit for a year. At the EOQ, the annual cost of ordering equals the annual cost of holding. The model assumes constant, known demand, a fixed lead time, no bulk discounts and no stock-outs, so it is a starting point that just-in-time and practical limits modify."
+  example: "A fictional hardware store sells 4,000 tins of paint a year, each order costs $40 to place, and holding a tin for a year costs $2, so its EOQ = √(2 × 4,000 × 40 ÷ 2) = 400 tins an order."
+  formula: "EOQ = √(2 × annual demand × cost per order ÷ holding cost per unit per year)"
+  misconceptions:
+    - claim: "The economic order quantity is the cheapest price at which to buy stock."
+      correction: "It is the order size that balances the costs of ordering and holding; in its basic form it ignores price and bulk discounts."
+  category: operations
+  qualifications: [undergraduate, professional]
+  provenance: enrichment
+  related: [reorder-quantity, buffer-stock, stock-control-chart, just-in-case, just-in-time]
+
+- id: kanban
+  term: "Kanban"
+  definition: "A visual signalling system, often cards or a board, that triggers production or replenishment only when items have been used, so that work is pulled by demand rather than pushed."
+  simple: "A system of cards or a board that tells workers when to make or order more, only when something has been used up, so nothing is made too early."
+  technical: "Kanban, from the Toyota Production System, is a tool of just-in-time: each card authorizes a fixed quantity, and the number of cards in circulation caps the stock and the work in progress. In office and knowledge work, kanban boards show tasks in columns, such as to do, in progress and done, and limit the work in progress to keep it flowing."
+  example: "In a fictional furniture factory, when a bin of screws at the assembly line is emptied, its card goes to the stores, which refill the bin, and nothing is reordered until a card arrives."
+  misconceptions:
+    - claim: "Kanban is just a to-do list on a board."
+      correction: "Its key feature is limiting stock or work in progress, so that work is pulled by demand and problems become visible."
+  category: operations
+  qualifications: [undergraduate, professional]
+  provenance: enrichment
+  related: [just-in-time, lean-production, waste, stock-out]
+
+- id: overall-equipment-effectiveness
+  term: "Overall equipment effectiveness (OEE)"
+  aliases: ["OEE"]
+  definition: "A measure of how productively equipment is used, combining availability, performance (speed) and quality into one percentage of the output it could ideally produce."
+  simple: "A score that shows how much of the time a machine is really making good products at full speed, compared with the best it could do."
+  technical: "OEE = availability × performance × quality, where availability is run time ÷ planned production time, performance is actual output ÷ the output possible at ideal speed in the run time, and quality is good output ÷ total output. It shows which loss to attack first, breakdowns, slow running or defects, and it goes further than capacity utilization by counting losses of speed and quality too."
+  example: "A fictional bottling line runs for 90% of its planned time, at 85% of its ideal speed, and 98% of its bottles are good: its OEE is 0.90 × 0.85 × 0.98, about 75%."
+  formula: "OEE = availability × performance × quality"
+  misconceptions:
+    - claim: "A machine running all day has a high OEE."
+      correction: "OEE also counts slow running and defective output; a machine can run all day and still waste much of its capacity."
+  category: measure
+  qualifications: [undergraduate, professional]
+  provenance: enrichment
+  related: [capacity-utilization-rate, productivity-rate, defect-rate, lean-production]
+
+- id: poka-yoke
+  term: "Poka-yoke"
+  aliases: ["Mistake-proofing", "Error-proofing"]
+  definition: "A design feature or device that prevents a mistake from being made, or makes it obvious at once, at the point in a process where it could happen."
+  simple: "Designing things so that mistakes are impossible or are spotted straight away, like a plug that only fits one way round."
+  technical: "The term comes from lean production and means avoiding inadvertent errors. A device may control, by stopping the process when something is wrong, or warn, with a signal. Building quality into the process in this way is cheaper than inspecting defects out, which links poka-yoke to quality assurance and total quality management."
+  example: "A fictional kitchen appliance maker designs its blender so that the motor will not start unless the lid is locked, preventing spills and injuries."
+  misconceptions:
+    - claim: "Poka-yoke means checking products more carefully."
+      correction: "It means designing the process so that errors cannot happen or are caught at once, rather than relying on inspection."
+  category: operations
+  qualifications: [undergraduate, professional]
+  provenance: enrichment
+  related: [quality-assurance, lean-production, defect-rate, total-quality-management]
+
+- id: reverse-logistics
+  term: "Reverse logistics"
+  definition: "The management of goods flowing backwards through the supply chain, from customers to the business, for returns, repair, refurbishment, remanufacturing, recycling or disposal."
+  simple: "Getting products back from customers, for returns, repairs or recycling, and dealing with them sensibly."
+  technical: "Reverse logistics covers collection, inspection, sorting and the choice of what to do with each item: resell, repair, refurbish, harvest parts, recycle or dispose of it safely. It is costly and hard to forecast, but it recovers value, supports circular business models and is increasingly required by rules that make producers responsible for their products at the end of their life."
+  example: "A fictional phone retailer collects old handsets in store, refurbishes the best for resale with a warranty, harvests parts from the rest and sends what remains to a certified recycler."
+  misconceptions:
+    - claim: "Reverse logistics is only about customer returns."
+      correction: "It also covers repair, refurbishment, remanufacturing and recycling, which are central to circular business models."
+  category: operations
+  qualifications: [undergraduate, mba, professional]
+  provenance: enrichment
+  related: [circular-business-models, supply-chain, resource-recovery-model, product-life-extension-model]
+
+- id: service-level-agreement
+  term: "Service level agreement (SLA)"
+  aliases: ["SLA"]
+  definition: "A formal agreement between a provider and a customer that defines the level of service expected, how it is measured and what happens if it is not met."
+  simple: "A written promise from a supplier about how good its service will be, such as answering calls within a minute, with penalties if it falls short."
+  technical: "SLAs set measurable standards, such as availability, response and resolution times and accuracy, together with reporting and remedies such as credits against the bill. They are central to outsourcing, where the buyer depends on the supplier's performance. Badly chosen measures encourage providers to meet the letter of the agreement rather than serve customers well."
+  example: "A fictional cloud hosting firm guarantees that its service will be available 99.9% of the time each month; if it is down for longer, the customer receives a credit on its bill."
+  misconceptions:
+    - claim: "An SLA guarantees good service."
+      correction: "It guarantees the measured standards; the service can still be poor in ways the agreement does not measure."
+  category: operations
+  qualifications: [undergraduate, professional]
+  provenance: enrichment
+  related: [outsourcing, quality-standard, key-performance-indicator, supply-chain]
+
+- id: six-sigma
+  term: "Six Sigma"
+  definition: "A data-driven approach to improving quality by reducing variation in processes, aiming at a level of performance with very few defects per million opportunities."
+  simple: "A strict method for making processes so consistent that mistakes almost never happen, by measuring everything and finding the causes of errors."
+  technical: "Sigma is the standard deviation; a six sigma process is conventionally quoted as producing about 3.4 defects per million opportunities. Projects follow the DMAIC cycle (define, measure, analyse, improve, control) and are led by specially trained staff. It is often combined with lean production as Lean Six Sigma. Critics point to its cost and bureaucracy, and to the risk of concentrating on measurable defects at the expense of innovation."
+  example: "A fictional bank runs a Six Sigma project to cut errors in mortgage applications: it measures where the errors arise, finds that most come from one form, and redesigns it."
+  misconceptions:
+    - claim: "Six Sigma means six defects per million."
+      correction: "The six refers to standard deviations; the target usually quoted is about 3.4 defects per million opportunities."
+  category: operations
+  qualifications: [undergraduate, mba, professional]
+  provenance: enrichment
+  related: [total-quality-management, quality-assurance, standard-deviation, kaizen, lean-production]
+
+- id: statistical-process-control
+  term: "Statistical process control (SPC)"
+  aliases: ["SPC", "Control chart"]
+  definition: "The use of statistical methods, especially control charts, to monitor a process over time and detect when its variation goes beyond what is normal, so that problems are corrected before defects are made."
+  simple: "Keeping a chart of measurements from a process, such as the weight of each bag of flour, so that you can spot quickly when something starts to go wrong."
+  technical: "A control chart plots a measure over time against a centre line and control limits, often three standard deviations either side. Points outside the limits, or patterns that are not random, signal special causes to investigate; variation within the limits is ordinary noise, and reacting to it makes a process worse. SPC moves quality control from inspecting outputs towards managing the process."
+  example: "A fictional coffee packer weighs five bags every hour; when the average creeps towards the lower control limit over three hours, it recalibrates the filling machine before any underweight bags are packed."
+  misconceptions:
+    - claim: "Every change in a measurement needs action."
+      correction: "Some variation is normal; adjusting a process for ordinary variation can make it less stable."
+  category: tool
+  qualifications: [undergraduate, professional]
+  provenance: enrichment
+  related: [quality-control, standard-deviation, six-sigma, quality-assurance]
+
+- id: takt-time
+  term: "Takt time"
+  definition: "The pace at which a product must be completed to meet customer demand, found by dividing the production time available by the number of units customers want."
+  simple: "How often a finished product needs to come off the line to keep up with what customers are ordering. If customers want 60 a day and you work 8 hours, you need one every 8 minutes."
+  technical: "Takt time = production time available ÷ customer demand. In lean production it sets the rhythm of work: each station's cycle time must be at or below takt time to avoid a bottleneck, and work is balanced across stations to match it. It differs from cycle time, which is how long a step actually takes."
+  example: "A fictional bicycle workshop works 450 minutes a day and customers order 30 bikes a day, so its takt time is 15 minutes a bike."
+  formula: "Takt time = production time available ÷ units demanded"
+  misconceptions:
+    - claim: "Takt time is how long it takes to make one product."
+      correction: "That is the cycle time; takt time is how often one must be finished to meet demand."
+  category: operations
+  qualifications: [undergraduate, professional]
+  provenance: enrichment
+  related: [lean-production, bottleneck, productive-capacity, just-in-time]
+
+- id: theory-of-constraints
+  term: "Theory of constraints (TOC)"
+  aliases: ["TOC"]
+  definition: "A management approach which holds that every system's output is limited by a small number of constraints, and that improvement comes from identifying and managing them."
+  simple: "The idea that in every business one thing holds everything else back, so you get the biggest improvement by finding that one thing and fixing it."
+  technical: "Associated with Eliyahu Goldratt, it sets out five focusing steps: identify the constraint, exploit it (get the most from it), subordinate everything else to it, elevate it (add capacity), and repeat as the constraint moves. A constraint can be physical, such as a machine, or a policy, such as a rule that limits orders. It complements lean production by directing improvement to where it raises output."
+  example: "A fictional printing firm finds that its constraint is its one finishing machine, so it moves the machine's maintenance outside working hours and stops the presses producing work faster than finishing can handle."
+  misconceptions:
+    - claim: "The constraint is always a machine."
+      correction: "It can be a policy, a skill, a supplier or the market itself."
+  category: theory
+  qualifications: [undergraduate, mba, professional]
+  provenance: enrichment
+  related: [bottleneck, lean-production, productive-capacity, kaizen]
+
+- id: total-cost-of-ownership
+  term: "Total cost of ownership (TCO)"
+  aliases: ["TCO", "Whole-life cost"]
+  definition: "The full cost of acquiring, operating, maintaining and disposing of an asset or a purchased item over its life, not just its purchase price."
+  simple: "Everything something really costs over the years you own it: the price, plus running it, repairing it and getting rid of it."
+  technical: "TCO adds the purchase price, delivery and installation, training, energy and consumables, maintenance and downtime, and disposal, less any resale value. It often reverses a decision made on price: a cheaper machine with higher energy use or more breakdowns can cost more over its life. It is used in buying, make or buy and leasing decisions."
+  example: "A fictional delivery firm compares two vans: one costs $30,000 and $9,000 a year to run, the other $36,000 and $7,000 a year. Over five years the dearer van costs $71,000 in total, against $75,000 for the cheaper one."
+  formula: "Total cost of ownership = purchase cost + running and maintenance costs over the life + disposal costs − resale value"
+  misconceptions:
+    - claim: "The cheapest item to buy is the cheapest to own."
+      correction: "Running, maintenance and disposal costs can outweigh a lower purchase price."
+  category: operations
+  qualifications: [undergraduate, mba, professional]
+  provenance: enrichment
+  related: [capital-expenditure, make-or-buy-analysis, leasing, investment-appraisal]
+
+- id: value-stream-mapping
+  term: "Value stream mapping"
+  aliases: ["VSM"]
+  definition: "A lean method of drawing every step, flow of material and flow of information needed to deliver a product to the customer, with the time taken at each step, to find waste and plan a better future state."
+  simple: "Drawing a map of everything that happens from an order to the delivery, with how long each step takes, to see where time and effort are wasted."
+  technical: "The current-state map records the process steps, the stock between them, cycle and waiting times and the flows of information, and it often reveals that the time spent adding value is a small fraction of the total lead time. A future-state map then designs flow, pull and a pace matched to takt time. It differs from the value chain, which is a strategic view of a firm's activities."
+  example: "A fictional kitchen manufacturer's map shows that an order takes 21 days from receipt to delivery, but only 6 hours of that is work on the kitchen; most of the rest is waiting between departments."
+  misconceptions:
+    - claim: "Value stream mapping is the same as value chain analysis."
+      correction: "The value chain is a strategic view of a firm's activities; value stream mapping is a detailed operational map of one product's flow, used to remove waste."
+  category: tool
+  qualifications: [undergraduate, professional]
+  provenance: enrichment
+  related: [lean-production, waste, kaizen, takt-time, lead-time]

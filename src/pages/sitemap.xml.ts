@@ -4,6 +4,7 @@ import type { APIRoute } from 'astro';
 export const GET: APIRoute = async ({ site }) => {
   const pages = import.meta.glob('./**/*.astro');
   const { corpus, pathwaysInOrder } = await import('../lib/content');
+  const { library } = await import('../lib/frameworks-content');
   const c = await corpus();
   const paths = new Set<string>();
   for (const key of Object.keys(pages)) {
@@ -21,6 +22,7 @@ export const GET: APIRoute = async ({ site }) => {
   Object.keys(c.cases).forEach((id) => paths.add(`/cases/${id}/`));
   Object.keys(c.decisions).forEach((id) => paths.add(`/decision-room/${id}/`));
   Object.entries(c.tools).forEach(([id, t]) => t.status === 'complete' && paths.add(`/toolkit/${id}/`));
+  Object.keys((await library()).frameworks).forEach((id) => paths.add(`/frameworks/${id}/`));
   Object.keys(c.assessment).forEach((id) => id !== 'internal-assessment' && paths.add(`/exam-desk/${id}/`));
   (await pathwaysInOrder()).forEach((p) => paths.add(`/pathways/${p.id}/`));
   // The Entrepreneurship and Innovation Lab's briefings and tools.

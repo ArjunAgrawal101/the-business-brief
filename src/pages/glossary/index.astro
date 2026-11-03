@@ -1,15 +1,16 @@
 ---
 /**
- * The glossary: every term the course uses, in the platform's own words.
- * Search it, filter it by unit, level and kind, or browse it from A to Z.
- * Each term has its own page with context, an example, any formula, and the
- * related terms, notes and mindmaps.
+ * The glossary: every term the course uses, and the terms beyond it, in the
+ * platform's own words. Search it as you type, filter it by unit, level,
+ * category and qualification, or browse it from A to Z. Without JavaScript
+ * every term is listed. Each term has its own page.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
 import { corpus, href } from '../../lib/content';
 import { inline } from '../../lib/markup';
-import { GLOSSARY_CATEGORIES, GLOSSARY_CATEGORY_LABELS } from '../../lib/schemas';
+import { GLOSSARY_CATEGORIES, GLOSSARY_CATEGORY_LABELS, QUALIFICATION_TAGS, QUALIFICATION_TAG_LABELS } from '../../lib/schemas';
+import { isDeep, isEnrichment, qualificationsOf, searchKeys } from '../../lib/glossary';
 
 const c = await corpus();
 const entries = Object.entries(c.glossary).sort((a, b) => a[1].term.localeCompare(b[1].term, 'en', { sensitivity: 'base' }));
@@ -17,30 +18,46 @@ const letterOf = (t: string) => {
   const ch = t.trim()[0]?.toUpperCase() ?? '#';
   return /[A-Z]/.test(ch) ? ch : '#';
 };
-const ALPHABET = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
 const present = new Set(entries.map(([, g]) => letterOf(g.term)));
+// Terms that start with a figure (360-degree feedback) come first, under "0 to 9".
+const ALPHABET = [...(present.has('#') ? ['#'] : []), ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
+const key = (l: string) => (l === '#' ? 'num' : l);
 const units = c.curricula['ib-dp-bm']?.units ?? [];
 const unitOf = (code: string) => (code === 'toolkit' ? 'toolkit' : code.split('.')[0]);
 const usedCats = GLOSSARY_CATEGORIES.filter((k) => entries.some(([, g]) => g.category === k));
-const hlCount = entries.filter(([, g]) => g.level === 'HL').length;
+const hlCount = entries.filter(([, g]) => g.level === 'HL' && !isEnrichment(g)).length;
+const beyondCount = entries.filter(([, g]) => isEnrichment(g)).length;
+const ibCount = entries.length - beyondCount;
+const deepCount = entries.filter(([, g]) => isDeep(g)).length;
+const usedQuals = QUALIFICATION_TAGS.filter((q) => entries.some(([, g]) => qualificationsOf(g).includes(q)));
+const unitsOf = (g: (typeof entries)[number][1]) => (isEnrichment(g) ? 'beyond' : [...new Set(g.subtopics.map(unitOf))].join(' '));
 ---
 
-<BaseLayout title="Glossary" description={`${entries.length} Business Management terms defined in plain language, with context, examples, formulas and links to the notes and mindmaps that use them.`} section="glossary">
+<BaseLayout title="Glossary" description={`${entries.length} business management terms defined in plain language, with context, examples, formulas and links to the notes, mindmaps and frameworks that use them.`} section="glossary">
   <PageIntro
     trail={[{ label: 'Glossary' }]}
     kicker="Reference"
     title="Business Management, defined"
-    lead={`${entries.length} terms in the platform's own words, each with its place in the course. Search, filter by unit or level, or browse from A to Z. ${hlCount} are HL only and marked as such.`}
+    lead={`${ibCount} terms from the IB course and ${beyondCount} beyond it, in the platform's own words. Search as you type, filter by unit, level, category or qualification, or browse from A to Z. ${hlCount} are HL only and marked as such.`}
   />
 
   <div class="wrap page-body" data-ix="glossary">
-    <form class="gl-search" role="search" action="/glossary/" method="get" data-form>
+    <dl class="gl-key" aria-label="What the glossary holds">
+      <div><dt>{ibCount}</dt><dd>terms from the IB course, each with its place in the syllabus</dd></div>
+      <div><dt>{deepCount}</dt><dd>full dictionary entries: plain and technical explanations and common misconceptions</dd></div>
+      <div><dt>{beyondCount}</dt><dd>enrichment terms beyond the IB course, for university, MBA and professional study</dd></div>
+    </dl>
+    <p class="gl-csv"><a href="/downloads/glossary.csv" download>Download every term as a spreadsheet (CSV)</a>, with the plain and technical explanations and the misconceptions.</p>
+
+    <form class="gl-search js-only" role="search" action="/glossary/" method="get" data-form>
       <label class="label label--ink" for="gq">Search the glossary</label>
       <div class="gl-search__row">
-        <input id="gq" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="Try: gearing, motivation, break-even" />
+        <input id="gq" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="Try: gearing, motivation, break-even" aria-describedby="gq-hint" />
         <button class="btn btn--primary" type="submit">Search</button>
       </div>
+      <p class="gl-search__hint" id="gq-hint">Results narrow as you type. Searches names, other names, definitions and the plain-language explanations.</p>
     </form>
+    <p class="gl-nojs nojs-only">All {entries.length} terms are listed below from A to Z. To search them, use your browser's find on this page.</p>
 
     <div class="gl-filters js-only">
       <div class="gl-filter">
@@ -49,6 +66,7 @@ const hlCount = entries.filter(([, g]) => g.level === 'HL').length;
           <option value="">All units</option>
           {units.map((u) => <option value={String(u.number)}>Unit {u.number}: {u.title}</option>)}
           <option value="toolkit">Toolkit</option>
+          {beyondCount > 0 && <option value="beyond">Beyond the IB course</option>}
         </select>
       </div>
       <div class="gl-filter">
@@ -60,10 +78,17 @@ const hlCount = entries.filter(([, g]) => g.level === 'HL').length;
         </select>
       </div>
       <div class="gl-filter">
-        <label class="label" for="gl-cat">Kind</label>
+        <label class="label" for="gl-cat">Category</label>
         <select id="gl-cat" data-filter="category">
-          <option value="">Every kind</option>
+          <option value="">Every category</option>
           {usedCats.map((k) => <option value={k}>{GLOSSARY_CATEGORY_LABELS[k]}</option>)}
+        </select>
+      </div>
+      <div class="gl-filter">
+        <label class="label" for="gl-qual">QualificationTag</label>
+        <select id="gl-qual" data-filter="qualification">
+          <option value="">Every qualification</option>
+          {usedQuals.map((q) => <option value={q}>{QUALIFICATION_TAG_LABELS[q]}</option>)}
         </select>
       </div>
       <p class="gl-count" aria-live="polite" data-count>{entries.length} terms</p>
@@ -73,7 +98,7 @@ const hlCount = entries.filter(([, g]) => g.level === 'HL').length;
       <ul>
         {
           ALPHABET.map((l) => (
-            <li>{present.has(l) ? <a href={`#letter-${l}`} data-letter={l}>{l}</a> : <span aria-hidden="true">{l}</span>}</li>
+            <li>{present.has(l) ? <a href={`#letter-${key(l)}`} data-letter={key(l)}>{l === '#' ? '0-9' : l}</a> : <span aria-hidden="true">{l}</span>}</li>
           ))
         }
       </ul>
@@ -85,30 +110,30 @@ const hlCount = entries.filter(([, g]) => g.level === 'HL').length;
 
     {
       ALPHABET.filter((l) => present.has(l)).map((l) => (
-        <section class="gl-letter" aria-labelledby={`letter-${l}`} data-letter-section={l}>
-          <h2 class="gl-letter__h" id={`letter-${l}`}>
-            {l}
+        <section class="gl-letter" aria-labelledby={`letter-${key(l)}`} data-letter-section={key(l)}>
+          <h2 class="gl-letter__h" id={`letter-${key(l)}`}>
+            {l === '#' ? '0 to 9' : l}
           </h2>
           <ul class="gl-list" role="list">
             {entries
               .filter(([, g]) => letterOf(g.term) === l)
               .map(([id, g]) => (
                 <li
-                  class="gl-entry"
+                  class={`gl-entry${isEnrichment(g) ? ' gl-entry--beyond' : ''}`}
                   id={`term-${id}`}
                   data-entry
-                  data-text={`${g.term} ${g.aliases.join(' ')} ${g.definition}`.toLowerCase()}
-                  data-units={[...new Set(g.subtopics.map(unitOf))].join(' ')}
-                  data-level={g.level === 'HL' ? 'hl' : 'sl'}
+                  data-text={searchKeys(g)}
+                  data-units={unitsOf(g)}
+                  data-level={g.level === 'HL' && !isEnrichment(g) ? 'hl' : 'sl'}
                   data-category={g.category ?? ''}
+                  data-qualification={qualificationsOf(g).join(' ')}
                 >
-                  <div class="gl-entry__head">
-                    <h3 class="gl-entry__term">
-                      <a href={href.glossary(id)}>{g.term}</a>
-                    </h3>
-                    {g.level === 'HL' && <span class="tag tag--hl">HL</span>}
-                    {g.subtopics.length > 0 && <span class="gl-entry__codes">{g.subtopics.map((s) => (s === 'toolkit' ? 'Toolkit' : s)).join(' · ')}</span>}
-                  </div>
+                  <h3 class="gl-entry__term">
+                    <a href={href.glossary(id)}>{g.term}</a>
+                  </h3>
+                  {g.level === 'HL' && !isEnrichment(g) && <span class="tag tag--hl">HL</span>}
+                  {isEnrichment(g) && <span class="tag tag--enrichment">Beyond IB</span>}
+                  {g.subtopics.length > 0 && <span class="gl-entry__codes">{g.subtopics.map((s) => (s === 'toolkit' ? 'Toolkit' : s)).join(' · ')}</span>}
                   <p class="gl-entry__def" set:html={inline(g.definition)} />
                   {g.formula && <p class="gl-entry__formula">{g.formula}</p>}
                 </li>
@@ -121,10 +146,62 @@ const hlCount = entries.filter(([, g]) => g.level === 'HL').length;
 </BaseLayout>
 
 <style>
+  .gl-key {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0 var(--sp-6);
+    margin: 0 0 var(--sp-6);
+    padding: var(--sp-4) 0;
+    border-top: 2px solid var(--rule-ink);
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .gl-key > div {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--sp-3);
+    align-items: baseline;
+  }
+
+  .gl-key dt {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1;
+    color: var(--gold-600);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .gl-key dd {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--text-body);
+  }
+
+  @media (max-width: 52rem) {
+    .gl-key {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sp-3);
+    }
+  }
+
+  .gl-csv {
+    margin: calc(var(--sp-6) * -1 + var(--sp-3)) 0 var(--sp-6);
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
   .gl-search {
     display: grid;
     gap: var(--sp-2);
     max-width: 44rem;
+  }
+
+  .gl-search__hint,
+  .gl-nojs {
+    font-size: 0.875rem;
+    color: var(--text-muted);
   }
 
   .gl-search__row {
@@ -256,6 +333,10 @@ const hlCount = entries.filter(([, g]) => g.level === 'HL').length;
   }
 
   .gl-entry {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.3rem 0.6rem;
     margin: 0;
     padding: var(--sp-4) 0;
     border-bottom: 1px solid var(--rule-hair);
@@ -265,11 +346,9 @@ const hlCount = entries.filter(([, g]) => g.level === 'HL').length;
     display: none;
   }
 
-  .gl-entry__head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.3rem 0.6rem;
+  .gl-entry__def,
+  .gl-entry__formula {
+    flex-basis: 100%;
   }
 
   .gl-entry__term {
@@ -296,13 +375,13 @@ const hlCount = entries.filter(([, g]) => g.level === 'HL').length;
   }
 
   .gl-entry__def {
-    margin-top: 0.35rem;
+    margin-top: 0.05rem;
     font-size: 0.9375rem;
     color: var(--text-body);
   }
 
   .gl-entry__formula {
-    margin-top: 0.4rem;
+    margin-top: 0.1rem;
     padding: 0.35rem 0.6rem;
     border-left: 2px solid var(--gold-500);
     background: var(--surface-gold-wash);

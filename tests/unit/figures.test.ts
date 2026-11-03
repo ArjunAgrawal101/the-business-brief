@@ -109,7 +109,9 @@ describe('the diagram library', () => {
     expect(svg.startsWith('<svg')).toBe(true);
     expect(svg).toContain(`aria-labelledby="t-${id}-t t-${id}-d"`);
     expect(descOf(svg).length).toBeGreaterThan(80);
-    expect(d.syllabus.length).toBeGreaterThan(0);
+    // An enrichment diagram is beyond the course: it names no subtopic, so it never counts as IB coverage.
+    if (d.group === 'enrichment') expect(d.syllabus, `${id} is enrichment`).toEqual([]);
+    else expect(d.syllabus.length).toBeGreaterThan(0);
     for (const code of d.syllabus) expect(codes.has(code), `${id}: ${code}`).toBe(true);
     // No en or em dashes in what readers see.
     expect(/[–—]/.test(svg)).toBe(false);

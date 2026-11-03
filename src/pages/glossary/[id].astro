@@ -1,8 +1,10 @@
 ---
 /**
- * One glossary term: the definition, the term in context, an example, its
- * formula, how everyday usage differs from the course (where it does), the
- * related terms, and where the course uses it.
+ * One glossary term as a dictionary entry: the definition, a plain-language
+ * and a technical explanation, its formula, the term in context, an example,
+ * common misconceptions, how everyday usage differs from the course (where it
+ * does), the frameworks that use it, related and suggested terms, and where
+ * the course uses it. A term beyond the IB course says so at the top.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
@@ -11,7 +13,10 @@ import { corpus, href } from '../../lib/content';
 import { inline, rich } from '../../lib/markup';
 import { subtopicHref } from '../../lib/learning';
 import { termsIn } from '../../lib/mindmap';
-import { GLOSSARY_CATEGORY_LABELS, type GlossaryEntry } from '../../lib/schemas';
+import { GLOSSARY_CATEGORY_LABELS, QUALIFICATION_TAG_LABELS, type GlossaryEntry } from '../../lib/schemas';
+import { isEnrichment, qualificationsOf, suggestTerms } from '../../lib/glossary';
+import { frameworksForTerm } from '../../lib/frameworks';
+import { library } from '../../lib/frameworks-content';
 
 export async function getStaticPaths() {
   const c = await corpus();
@@ -31,9 +36,21 @@ const next = i < all.length - 1 ? all[i + 1] : undefined;
 const subs = c.curricula['ib-dp-bm']?.units.flatMap((u) => u.subtopics) ?? [];
 const places = g.subtopics.map((code) => (code === 'toolkit' ? { code, title: 'The toolkit', url: '/toolkit/' } : { code, title: subs.find((s) => s.code === code)?.title ?? code, url: subtopicHref(c, code) }));
 const maps = Object.entries(c.mindmaps).filter(([, m]) => termsIn(m).includes(id) || (m.scope === 'subtopic' && g.subtopics.includes(m.code)));
+// The maps beyond the IB course that use the term, listed apart from the IB maps.
+const enrichmentMaps = Object.entries(c.enrichmentMaps).filter(([, m]) => termsIn(m).includes(id)).sort((a, b) => a[1].order - b[1].order);
 const briefs = g.topics.map((t) => ({ id: t, title: c.topics[t]?.title ?? t }));
 const related = g.related.map((r) => ({ id: r, e: c.glossary[r] })).filter((x) => x.e);
 const usedBy = all.filter(([x, e]) => x !== id && e.related.includes(id) && !g.related.includes(x)).slice(0, 8);
+const beyond = isEnrichment(g);
+const quals = qualificationsOf(g);
+const lib = await library();
+const fws = frameworksForTerm(id, g, lib.refs);
+const suggested = suggestTerms(id, c.glossary, 6).map((x) => ({ ...x, e: c.glossary[x.id]! }));
+const ibRelated = beyond ? related.filter((r) => !isEnrichment(r.e!)) : [];
+// "undergraduate, MBA and professional": the qualifications as a phrase in running text.
+const STUDY: Record<string, string> = { secondary: 'secondary school', undergraduate: 'undergraduate', mba: 'MBA', professional: 'professional' };
+const study = quals.filter((q) => q !== 'ib').map((q) => STUDY[q] ?? q);
+const studyList = study.length > 1 ? `${study.slice(0, -1).join(', ')} and ${study[study.length - 1]}` : (study[0] ?? 'further');
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'DefinedTerm',
@@ -49,16 +66,39 @@ const jsonLd = {
     <header class="gt__head">
       <p class="label label--ink">
         {g.category ? GLOSSARY_CATEGORY_LABELS[g.category] : 'Glossary'}
-        {g.level === 'HL' && <span class="tag tag--hl">HL only</span>}
+        {g.level === 'HL' && !beyond && <span class="tag tag--hl">HL only</span>}
+        {beyond && <span class="tag tag--enrichment">Enrichment: beyond the IB course</span>}
       </p>
       <h1 class="gt__term">{g.term}</h1>
       {g.aliases.length > 0 && <p class="gt__aliases">Also called {g.aliases.join(', ')}</p>}
+      <p class="gt__quals">
+        <span class="sr-only">Where you meet this term: </span>
+        {quals.map((q) => <span class={`gt__qual${q === 'ib' ? ' gt__qual--ib' : ''}`}>{QUALIFICATION_TAG_LABELS[q]}</span>)}
+      </p>
       <div class="gt__save"><SaveButton title={g.term} kind="term" /></div>
     </header>
 
     <div class="gt__grid">
       <div class="gt__main">
         <p class="gt__def" set:html={inline(g.definition)} />
+        {
+          (g.simple || g.technical) && (
+            <div class="gt__depth">
+              {g.simple && (
+                <section class="gt__plain" aria-labelledby="gt-plain">
+                  <h2 id="gt-plain" class="gt__depth-h">In plain words</h2>
+                  <div class="prose" set:html={rich(g.simple)} />
+                </section>
+              )}
+              {g.technical && (
+                <section class="gt__tech" aria-labelledby="gt-tech">
+                  <h2 id="gt-tech" class="gt__depth-h">In more depth</h2>
+                  <div class="prose" set:html={rich(g.technical)} />
+                </section>
+              )}
+            </div>
+          )
+        }
         {
           g.formula && (
             <div class="gt__formula">
@@ -101,6 +141,42 @@ const jsonLd = {
           )
         }
         {
+          g.misconceptions.length > 0 && (
+            <section class="gt__block" aria-labelledby="gt-mis">
+              <h2 id="gt-mis">Common misconceptions</h2>
+              <ul class="gt__mis">
+                {g.misconceptions.map((m) => (
+                  <li class="misconception">
+                    <div class="misconception__claim">
+                      <span class="misconception__label">Misconception</span>
+                      <p>{m.claim}</p>
+                    </div>
+                    <div class="misconception__fix">
+                      <span class="misconception__label">In fact</span>
+                      <div set:html={rich(m.correction)} />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+        {
+          fws.length > 0 && (
+            <section class="gt__block" aria-labelledby="gt-fw">
+              <h2 id="gt-fw">Frameworks, tools and diagrams</h2>
+              <ul class="gt__fw">
+                {fws.map((f) => (
+                  <li>
+                    <a href={f.href}>{f.title}</a>
+                    <span class="gt__fw-kind">{f.label}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+        {
           related.length > 0 && (
             <section class="gt__block" aria-labelledby="gt-related">
               <h2 id="gt-related">Related terms</h2>
@@ -115,9 +191,45 @@ const jsonLd = {
             </section>
           )
         }
+        {
+          suggested.length > 0 && (
+            <section class="gt__block" aria-labelledby="gt-next">
+              <h2 id="gt-next">Suggested next</h2>
+              <ul class="gt__next">
+                {suggested.map((x) => (
+                  <li>
+                    <a href={href.glossary(x.id)}>{x.e.term}</a>
+                    {isEnrichment(x.e) && <span class="tag tag--enrichment">Beyond IB</span>}
+                    <span class="gt__why">{x.reason.charAt(0).toUpperCase() + x.reason.slice(1)}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
       </div>
 
-      <aside class="gt__side" aria-label="Where the course uses this term">
+      <aside class="gt__side" aria-label={beyond ? 'How this term relates to the IB course' : 'Where the course uses this term'}>
+        {
+          beyond && (
+            <div class="gt__beyond">
+              <p class="label">Beyond the IB course</p>
+              <p class="small">This term is not in the IB Business Management syllabus. It is here for learners going further, in {studyList} study.</p>
+              {ibRelated.length > 0 && (
+                <>
+                  <p class="small">It builds on these IB terms:</p>
+                  <ul>
+                    {ibRelated.map((r) => (
+                      <li>
+                        <a href={href.glossary(r.id)}>{r.e!.term}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </div>
+          )
+        }
         {
           places.length > 0 && (
             <div>
@@ -142,6 +254,20 @@ const jsonLd = {
                 {maps.map(([mid, m]) => (
                   <li>
                     <a href={href.mindmap(mid)}>{m.scope === 'unit' ? `Unit ${m.unit} map` : `${m.code} ${m.title}`}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+        {
+          enrichmentMaps.length > 0 && (
+            <div>
+              <p class="label">On the enrichment maps, beyond the IB course</p>
+              <ul>
+                {enrichmentMaps.map(([mid, m]) => (
+                  <li>
+                    <a href={href.enrichmentMap(mid)}>{m.title}</a>
                   </li>
                 ))}
               </ul>
@@ -176,7 +302,7 @@ const jsonLd = {
             </div>
           )
         }
-        <p class="small muted">The platform's own definition. Where the IB course is the authority, the subtopic page gives the guide's reference.</p>
+        <p class="small muted">{beyond ? 'The platform\'s own definition and explanations, as enrichment beyond the course.' : 'The platform\'s own definition. Where the IB course is the authority, the subtopic page gives the guide\'s reference.'}</p>
       </aside>
     </div>
 
@@ -217,6 +343,136 @@ const jsonLd = {
 
   .gt__save {
     margin-top: var(--sp-4);
+  }
+
+  .gt__quals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: var(--sp-3);
+  }
+
+  .gt__qual {
+    padding: 0.15rem 0.55rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-1);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text-body);
+    background: var(--surface-sheet);
+  }
+
+  .gt__qual--ib {
+    border-color: var(--navy-900);
+    color: var(--navy-900);
+  }
+
+  .gt__depth {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    margin-top: var(--sp-6);
+    max-width: 48rem;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .gt__depth > section {
+    padding: var(--sp-4) var(--sp-5) var(--sp-5) 0;
+  }
+
+  .gt__depth > section + section {
+    padding-left: var(--sp-5);
+    border-left: 1px solid var(--rule-hair);
+  }
+
+  .gt__depth > section:only-child {
+    grid-column: 1 / -1;
+  }
+
+  .gt__depth-h {
+    margin-bottom: var(--sp-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .gt__plain .prose {
+    font-size: 1.0625rem;
+  }
+
+  .gt__tech .prose {
+    font-size: 0.9688rem;
+  }
+
+  .gt__mis {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .gt__mis > li {
+    margin: 0;
+  }
+
+  .gt__fw,
+  .gt__next {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .gt__fw li,
+  .gt__next li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.3rem 0.75rem;
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .gt__fw a,
+  .gt__next a {
+    font-weight: 600;
+  }
+
+  .gt__fw-kind,
+  .gt__why {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  .gt__fw-kind {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .gt__why {
+    flex-basis: 100%;
+  }
+
+  .gt__beyond {
+    padding-bottom: var(--sp-4);
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .gt__beyond .label {
+    color: var(--green-text);
+  }
+
+  .gt__beyond p + p {
+    margin-top: var(--sp-2);
   }
 
   .gt__grid {
@@ -352,6 +608,22 @@ const jsonLd = {
 
     .gt__usage {
       grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .gt__depth {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .gt__depth > section,
+    .gt__depth > section + section {
+      padding: var(--sp-4) 0;
+      border-left: 0;
+    }
+
+    .gt__depth > section + section {
+      border-top: 1px solid var(--rule-hair);
     }
   }
 </style>

@@ -7,6 +7,7 @@
 import type { Corpus, Problem } from './integrity';
 import type { MindNode } from './schemas';
 import { DIAGRAMS } from './diagrams';
+import { checkGlossaryDepth } from './integrity-frameworks';
 
 type Sub = { code: string; title: string; level: string; unit: number };
 
@@ -39,7 +40,8 @@ export function checkLearning(c: Corpus): Problem[] {
   for (const [id, g] of Object.entries(c.glossary)) {
     const w = `glossary/${id}`;
     const add = (message: string) => out.push({ where: w, message });
-    if (!g.topics.length && !g.subtopics.length) add('names no topic and no subtopic');
+    // A term beyond the IB course (provenance: enrichment) belongs to no subtopic; integrity-frameworks.ts checks it instead.
+    if (!g.topics.length && !g.subtopics.length && g.provenance !== 'enrichment') add('names no topic and no subtopic');
     g.subtopics.forEach((code) => validCode(code) || add(`subtopic "${code}" is not in the IB course`));
     g.related.forEach((r) => {
       if (r === id) add('lists itself as related');
@@ -53,6 +55,8 @@ export function checkLearning(c: Corpus): Problem[] {
     const levels = g.subtopics.filter((code) => code !== 'toolkit').map((code) => subs.get(code)?.level);
     if (levels.length && levels.every((l) => l === 'HL') && g.level !== 'HL') add('every subtopic it belongs to is HL only, so the term must be marked HL');
   }
+
+  out.push(...checkGlossaryDepth(c));
 
   /* ---------- Mindmaps ---------- */
   const seen = new Map<string, string>();

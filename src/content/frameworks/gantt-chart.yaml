@@ -1,0 +1,52 @@
+name: Gantt charts
+aliases: [Gantt chart]
+summary: "A chart of a project's tasks as bars against a timeline, showing when each starts and ends, which overlap, and the milestones along the way."
+question: "When does each task happen, and is the project on schedule?"
+group: change
+status: toolkit
+guidePages: '14'
+subtopics: ['5.1', '4.2']
+level: HL
+qualifications: [ib, undergraduate, mba, professional]
+tool: gantt-chart
+diagram: gantt-chart
+explanation: |
+  A Gantt chart lists the tasks of a project down the side and time along the top. Each task is a bar from its start to its finish, so the chart shows at a glance the order of work, which tasks run at the same time, and the milestones, such as a launch date. Dependencies, where one task cannot start until another ends, can be shown with arrows, and progress can be shaded in as the project runs.
+
+  It is easy to read and good for communicating a schedule to a team. It shows dependencies less rigorously than a critical path network, and does not by itself reveal which tasks have float, so the two tools are often used together.
+purpose: |
+  To plan and track a project's timing, allocate people to tasks and communicate the schedule. The toolkit lists it as an HL tool for units 4 and 5; its full guide is in preparation.
+steps:
+  - "List the tasks and estimate the duration of each."
+  - "Identify which tasks depend on others finishing first."
+  - "Draw each task as a bar on the timeline, starting when its dependencies allow."
+  - "Mark milestones and the project's end date."
+  - "Track progress against the plan and adjust the bars when tasks slip."
+example:
+  fictional: true
+  business: Juniper Café
+  title: Juniper Café plans its opening
+  body: |
+    The owner of Juniper Café, a fictional business, plans the twelve weeks to opening day, as in the diagram above: find and sign a site (weeks 1 to 3), arrange finance (weeks 2 to 4), fit out the café (weeks 5 to 9), recruit staff (weeks 6 to 8), train staff (weeks 9 and 10) and run the launch marketing (weeks 8 to 11), with the opening in week 12.
+  result: |
+    The chart shows that training cannot start until recruitment ends in week 8, and that the café cannot open until the trained staff are in place, so a delay of two weeks in hiring would leave almost no margin before opening day. The owner starts advertising the jobs a week earlier to build one in.
+advantages:
+  - "Easy to read, so everyone can see what happens when."
+  - "Good for allocating people and spotting overlaps and clashes."
+  - "Progress can be tracked against the plan visually."
+limitations:
+  - "Dependencies are harder to read than on a network diagram, especially in large projects."
+  - "It does not by itself identify the critical path or the float on each task."
+  - "Estimates of duration are uncertain, so the chart needs updating."
+exercise:
+  prompt: |
+    Plan a school charity fair with six tasks, such as booking the hall, recruiting volunteers and advertising. Draw a Gantt chart over six weeks, show one dependency and one milestone, and explain which task would most delay the fair if it ran late.
+  guidance:
+    - "Give each task a realistic duration and a reason for its start date."
+    - "Show at least one task that cannot start until another ends."
+    - "Mark the fair itself as the milestone."
+    - "Explain the delay using the dependencies, which is where critical path analysis adds detail."
+terms: [gantt-chart, critical-path-analysis, lead-time]
+related: [critical-path-analysis, raci-matrix, lewin-change-model, business-plan]
+sources: [ib-bm-guide-2024]
+order: 5

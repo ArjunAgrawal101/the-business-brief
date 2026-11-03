@@ -15,6 +15,7 @@ import { corpus, href, modulesInOrder, pathwaysInOrder } from '../lib/content';
 import { subtopicHref } from '../lib/learning';
 import { DIAGRAMS } from '../lib/diagrams';
 import { library } from '../lib/resources';
+import { library as frameworkLibrary } from '../lib/frameworks-content';
 import { NAV } from '../lib/navigation';
 import { buildSearchIndex, type SearchLinks } from '../lib/search-index';
 import { SEARCH_KINDS, extraWords } from '../lib/search';
@@ -47,6 +48,7 @@ const entries = buildSearchIndex({
     .map((r) => ({ title: r.title, summary: r.summary, typeLabel: r.typeLabel, level: r.level, units: r.units, subtopics: r.subtopics, href: r.details ?? r.primary.href })),
   diagrams: DIAGRAMS,
   pathways: (await pathwaysInOrder()).map((p) => ({ id: p.id, name: p.data.name, promise: p.data.promise })),
+  frameworks: (await frameworkLibrary()).frameworks,
 });
 const groups = SEARCH_KINDS.map((k) => ({ ...k, items: entries.filter((e) => e.kind === k.id) })).filter((g) => g.items.length);
 const units = c.curricula['ib-dp-bm']?.units ?? [];
