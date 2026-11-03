@@ -1,0 +1,365 @@
+---
+/**
+ * The stock control simulator (5.6, HL): a reorder plan run against weeks of
+ * demand, with stock-outs flagged. The worked example is simulated on the
+ * server by src/lib/stock-sim.ts (which runs simulateStock from
+ * src/lib/operations.ts); src/scripts/stock-simulator.ts reruns it as the
+ * reader changes the plan, the demand or the disruption.
+ */
+import { MAX_WEEKS, MIN_WEEKS, planWarnings, readPlan, simulatePlan } from '../../../lib/stock-sim';
+import { demandGridHtml, stockCostRowsHtml, stockSimFiguresHtml, stockSimRowsHtml, stockSimSvg } from '../../../lib/stock-sim-view';
+import { jsonForScript, rich } from '../../../lib/markup';
+import { fmtNumber } from '../../../lib/format';
+import type { RoomTool } from '../../../lib/room-tools';
+
+interface Props {
+  id: string;
+  data: Extract<RoomTool, { component: 'stock-simulator' }>;
+}
+const { id, data } = Astro.props;
+const uid = `ss-${id}`;
+const u = data.units;
+const cur = data.currency;
+const late = data.late ?? null;
+const inputs = { ...data.plan, demand: data.demand, late, costs: data.costs };
+const r = simulatePlan(inputs);
+const reading = readPlan(r, u, cur);
+const warnings = planWarnings(inputs);
+const config = { uid, key: data.guide.storageKey, units: u, currency: cur, plan: data.plan, demand: data.demand, late, costs: data.costs };
+const PLAN = [
+  { key: 'opening', label: 'Stock at the start', suffix: u.many, step: '1' },
+  { key: 'leadTime', label: 'Lead time', suffix: 'weeks', step: '0.5' },
+  { key: 'buffer', label: 'Buffer stock', suffix: u.many, step: '1' },
+  { key: 'reorderLevel', label: 'Reorder level', suffix: u.many, step: '1' },
+  { key: 'reorderQty', label: 'Reorder quantity', suffix: u.many, step: '1' },
+] as const;
+const COSTS = [
+  { key: 'holding', label: `Holding one ${u.one} for a week`, step: '0.01' },
+  { key: 'ordering', label: 'Placing one order', step: '0.01' },
+  { key: 'shortage', label: `Each ${u.one} of demand not met`, step: '0.01' },
+] as const;
+const plan = data.plan as Record<string, number>;
+const costs = data.costs as Record<string, number>;
+---
+
+<script type="application/json" data-config set:html={jsonForScript(config)} />
+
+<form class="stk-sim" data-form novalidate aria-label="The stock plan">
+  <div class="stk-sim__top">
+    <fieldset class="stk-sim__set">
+      <legend class="label label--ink">The plan</legend>
+      <div class="stk-sim__fields">
+        {
+          PLAN.map((f) => (
+            <div class="field">
+              <label for={`${uid}-${f.key}`}>{f.label}</label>
+              <div class="affix">
+                <input class="input input--num" id={`${uid}-${f.key}`} name={f.key} type="number" inputmode="decimal" min="0" step={f.step} value={String(plan[f.key] ?? 0)} aria-describedby={`${uid}-${f.key}-err${f.key === 'reorderLevel' ? ` ${uid}-rol-hint` : ''}`} />
+                <span class="affix__post" aria-hidden="true" data-unit-label={f.key === 'leadTime' ? 'weeks' : 'many'}>{f.suffix}</span>
+              </div>
+              {f.key === 'reorderLevel' && (
+                <span class="field__hint" id={`${uid}-rol-hint`} data-rol-hint>
+                  Suggested: {fmtNumber(r.suggestedReorderLevel, Number.isInteger(r.suggestedReorderLevel) ? 0 : 1)}, the buffer plus average demand during the lead time.
+                </span>
+              )}
+              {f.key === 'reorderLevel' && (
+                <button type="button" class="btn btn--small js-only stk-sim__use" data-use-rol>
+                  Use the suggested level
+                </button>
+              )}
+              <span class="field__error" id={`${uid}-${f.key}-err`} data-err={f.key} />
+            </div>
+          ))
+        }
+      </div>
+    </fieldset>
+
+    <fieldset class="stk-sim__set">
+      <legend class="label label--ink">A late delivery</legend>
+      <label class="stk-sim__check js-only"><input type="checkbox" name="lateOn" checked={Boolean(late && late.extraWeeks > 0)} /> One order arrives late</label>
+      <div class="stk-sim__fields" data-late-fields>
+        <div class="field">
+          <label for={`${uid}-lateOrder`}>Which order</label>
+          <input class="input input--num" id={`${uid}-lateOrder`} name="lateOrder" type="number" inputmode="numeric" min="1" max="20" step="1" value={String(late?.order ?? 2)} aria-describedby={`${uid}-lateOrder-err`} />
+          <span class="field__error" id={`${uid}-lateOrder-err`} data-err="lateOrder" />
+        </div>
+        <div class="field">
+          <label for={`${uid}-lateWeeks`}>How late</label>
+          <div class="affix">
+            <input class="input input--num" id={`${uid}-lateWeeks`} name="lateWeeks" type="number" inputmode="decimal" min="0" max="8" step="0.5" value={String(late?.extraWeeks ?? 1)} aria-describedby={`${uid}-lateWeeks-err`} />
+            <span class="affix__post" aria-hidden="true">weeks</span>
+          </div>
+          <span class="field__error" id={`${uid}-lateWeeks-err`} data-err="lateWeeks" />
+        </div>
+      </div>
+      <p class="tool-note">Orders are numbered in the order they are placed, as on the chart.</p>
+    </fieldset>
+  </div>
+
+  <fieldset class="stk-sim__set">
+    <legend class="label label--ink">Demand, week by week</legend>
+    <div class="stk-sim__demand-tools js-only">
+      <div class="field">
+        <label for={`${uid}-weeks`}>Number of weeks</label>
+        <input class="input input--num" id={`${uid}-weeks`} name="weeks" type="number" inputmode="numeric" min={MIN_WEEKS} max={MAX_WEEKS} step="1" value={String(data.demand.length)} aria-describedby={`${uid}-weeks-hint`} />
+        <span class="field__hint" id={`${uid}-weeks-hint`}>{MIN_WEEKS} to {MAX_WEEKS}. New weeks copy the last one.</span>
+      </div>
+      <div class="field">
+        <label for={`${uid}-fill`}>Set every week to</label>
+        <div class="stk-sim__fill">
+          <input class="input input--num" id={`${uid}-fill`} name="fill" type="number" inputmode="decimal" min="0" step="1" value={String(data.demand[0] ?? 0)} />
+          <button type="button" class="btn btn--small" data-fill>Apply</button>
+        </div>
+      </div>
+    </div>
+    <ol class="stk-sim__weeks" role="list" data-weeks set:html={demandGridHtml(data.demand, uid)} />
+    <span class="field__error" id={`${uid}-demand-err`} data-err="demand" />
+  </fieldset>
+
+  <details class="disclosure stk-sim__costs" open>
+    <summary>What stock costs</summary>
+    <div class="disclosure__body">
+      <div class="stk-sim__fields">
+        {
+          COSTS.map((f) => (
+            <div class="field">
+              <label for={`${uid}-${f.key}`}>{f.label}</label>
+              <div class="affix">
+                <span class="affix__pre" aria-hidden="true" data-cur>{cur}</span>
+                <input class="input input--num" id={`${uid}-${f.key}`} name={f.key} type="number" inputmode="decimal" min="0" step={f.step} value={String(costs[f.key] ?? 0)} aria-describedby={`${uid}-${f.key}-err`} />
+              </div>
+              <span class="field__error" id={`${uid}-${f.key}-err`} data-err={f.key} />
+            </div>
+          ))
+        }
+      </div>
+      <div class="tool-note" set:html={rich(data.costNote)} />
+    </div>
+  </details>
+  <p class="nojs-only tool-note">This is the worked example. With JavaScript on, you can change the plan, the demand and the late delivery, and the chart and figures follow.</p>
+</form>
+
+<div class="tool-problems" data-problems hidden></div>
+
+<section class="tool-panel" aria-labelledby={`${uid}-res-h`} data-results>
+  <h3 id={`${uid}-res-h`}>How the plan runs</h3>
+  <dl class="figs" data-figures set:html={stockSimFiguresHtml(r, u)} />
+  <div class="stk-sim__warn" data-warnings hidden={!warnings.length}>
+    <p class="label label--ink">Check the plan</p>
+    <ul data-warning-list>{warnings.map((w) => <li>{w}</li>)}</ul>
+  </div>
+  <figure class="stk-sim__figure">
+    <div class="chart-scroll" role="region" aria-label="Stock control chart for the plan" tabindex="0" data-chart set:html={stockSimSvg(r, { id: `${uid}-chart`, units: u })} />
+    <figcaption class="exhibit__source">
+      <b>Chart</b> Stock week by week (dark line), with the maximum, the reorder level (dashed blue) and the buffer (green). Each numbered blue mark is an order being placed; stock-outs are shaded and labelled. Below, demand each week. Simulated teaching data.
+    </figcaption>
+  </figure>
+  <div class="tool-reading">
+    <p><strong>Reading.</strong> <span data-interp>{reading.reading}</span></p>
+    <p class="muted"><strong>Implication.</strong> <span data-impl>{reading.implication}</span></p>
+  </div>
+  <div class="stk-sim__pair">
+    <div>
+      <h4 class="label label--ink stk-sim__h">The plan week by week</h4>
+      <div class="table-scroll" role="region" aria-label="Stock week by week" tabindex="0">
+        <table class="table tool-table stk-sim__table">
+          <thead>
+            <tr>
+              <th scope="col">Week</th>
+              <th scope="col" class="n">Start</th>
+              <th scope="col" class="n">Demand</th>
+              <th scope="col" class="n">Met</th>
+              <th scope="col" class="n">Not met</th>
+              <th scope="col" class="n">Delivered</th>
+              <th scope="col" class="n">End</th>
+              <th scope="col">Note</th>
+            </tr>
+          </thead>
+          <tbody data-rows set:html={stockSimRowsHtml(r)} />
+        </table>
+      </div>
+    </div>
+    <div>
+      <h4 class="label label--ink stk-sim__h">What the plan costs over the weeks shown</h4>
+      <div class="table-scroll" role="region" aria-label="The cost of the plan" tabindex="0">
+        <table class="table tool-table">
+          <thead>
+            <tr>
+              <th scope="col">Cost</th>
+              <th scope="col">How it is worked out</th>
+              <th scope="col" class="n">Amount</th>
+            </tr>
+          </thead>
+          <tbody data-costs set:html={stockCostRowsHtml(r, cur)} />
+        </table>
+      </div>
+      <p class="tool-note">A bigger buffer raises the cost of holding stock and cuts the cost of running out. Just in time pushes one way, just in case the other.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  import '../../../scripts/stock-simulator';
+</script>
+
+<style>
+  .stk-sim {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .stk-sim__top {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  @media (min-width: 60rem) {
+    .stk-sim__top {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      align-items: start;
+    }
+  }
+
+  .stk-sim__set {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .stk-sim__set > legend {
+    padding: 0;
+    margin-bottom: var(--sp-3);
+  }
+
+  .stk-sim__fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr));
+    gap: var(--sp-3) var(--sp-4);
+    align-items: start;
+  }
+
+  .stk-sim__use {
+    justify-self: start;
+  }
+
+  .stk-sim__check {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    min-height: 44px;
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .stk-sim__check input {
+    width: 1.15rem;
+    height: 1.15rem;
+    accent-color: var(--bb-cobalt);
+  }
+
+  .stk-sim__demand-tools {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+    gap: var(--sp-3) var(--sp-4);
+    max-width: 36rem;
+  }
+
+  .stk-sim__fill {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .stk-sim__demand-tools .input {
+    max-width: 8rem;
+  }
+
+  .stk-sim__fill .input {
+    max-width: 8rem;
+  }
+
+  .stk-sim__weeks {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(5.25rem, 1fr));
+    gap: var(--sp-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .stk-sim__weeks :global(.stk-sim__week) {
+    display: grid;
+    gap: 0.15rem;
+    margin: 0;
+  }
+
+  .stk-sim__weeks :global(label) {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .stk-sim__weeks :global(.input) {
+    min-height: 2.5rem;
+    padding: 0.35rem 0.5rem;
+  }
+
+  .stk-sim__costs {
+    max-width: 46rem;
+  }
+
+  .stk-sim__warn {
+    padding: var(--sp-3) var(--sp-4);
+    border: 1px solid var(--rule-hair);
+    border-left: 4px solid var(--bb-brass);
+    background: var(--surface-partial);
+  }
+
+  .stk-sim__warn ul {
+    margin: var(--sp-1) 0 0;
+    padding-left: 1.1em;
+    font-size: 0.9375rem;
+  }
+
+  .stk-sim__figure {
+    margin: 0;
+  }
+
+  .stk-sim__figure :global(.chart) {
+    margin-inline: auto;
+  }
+
+  .stk-sim__pair {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  @media (min-width: 64rem) {
+    .stk-sim__pair {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      align-items: start;
+    }
+  }
+
+  .stk-sim__h {
+    margin: 0 0 var(--sp-2);
+  }
+
+  .stk-sim__table :global(tr.is-out th),
+  .stk-sim__table :global(tr.is-out td) {
+    background: var(--surface-wrong);
+  }
+
+  .stk-sim__table :global(tr.is-low th),
+  .stk-sim__table :global(tr.is-low td) {
+    background: var(--surface-partial);
+  }
+
+  :global(.chart text.stk-sim__no) {
+    font-weight: 700;
+    stroke: none;
+  }
+</style>

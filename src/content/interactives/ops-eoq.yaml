@@ -1,0 +1,68 @@
+# The economic order quantity calculator: enrichment beyond the IB syllabus.
+# Wrenhurst Cycles is fictional. 10,000 gear sets a year is the notes' 200 a
+# week over 50 working weeks; the costs are simulated and match the stock
+# control simulator ($96 an order, $3 a gear set a year). EOQ =
+# √(2 × 10,000 × 96 ÷ 3) = √640,000 = 800, the reorder quantity in the notes.
+# tests/unit/eoq.test.ts checks every figure.
+component: eoq-calculator
+title: Economic order quantity calculator (enrichment)
+purpose: >
+  The learner finds the order size that minimizes the yearly cost of ordering and holding stock, sees how flat the
+  total cost is around it, and checks whether a quantity discount is worth taking. Enrichment beyond the IB syllabus:
+  it diagnoses the belief that the formula's answer is exact, and shows what the formula leaves out.
+provenance: enrichment
+syllabus: ['5.6']
+page: /operations-floor/economic-order-quantity/
+guide:
+  room: operations
+  slug: economic-order-quantity
+  order: 6
+  kind: Calculator
+  question: How much should we order at a time?
+  summary: Find the order quantity that balances the cost of ordering against the cost of holding stock, with a cost chart, the range of nearly-as-good quantities and a quantity discount check. Enrichment, beyond the syllabus.
+  lead: >
+    Order often in small batches and the cost of ordering mounts; order rarely in large ones and the cost of holding
+    stock mounts instead. The economic order quantity is the batch size that balances the two. Enter your figures and
+    the calculator finds it, shows what a different order size would cost, and checks whether a supplier's quantity
+    discount is worth taking.
+  status: enrichment
+  statusNote: >
+    Not part of the IB course. Subtopic 5.6 (HL only) names the reorder quantity on a stock control chart but gives no
+    method for choosing it (guide, p. 35), and the guide's list of formulas has no economic order quantity. The model
+    comes from operations management and is here for interest and for university and professional study. The IB does
+    not assess it.
+  howTo:
+    - Enter the yearly demand, the cost of placing one order and the cost of holding one unit for a year. The calculator finds the economic order quantity at once.
+    - Enter the order size you use now, or one you are considering, to see what it costs a year beside the EOQ.
+    - Add any buffer stock, and switch on a supplier's quantity discount to see whether buying in bigger batches pays once the price is included.
+    - Read the chart, the table of order sizes and the working. Your figures are kept on this device; download them as JSON or CSV, or print the page.
+  limitations:
+    - The formula assumes demand is steady and known, each order costs the same whatever its size, holding costs rise in proportion to stock, each order arrives complete and stock never runs out. Few businesses meet all five.
+    - It ignores quantity discounts, which is why the discount check adds the price paid; even then, it treats the holding cost of a unit as fixed when the price changes.
+    - Lead time and buffer stock do not change the EOQ. The lead time sets when to reorder, and the buffer adds the same holding cost at every order size.
+    - The answer is less exact than it looks. Order sizes well away from the EOQ cost little more, so practical limits such as pack sizes, storage space and cash often decide the final figure.
+  inAnswer: >
+    The IB does not assess the EOQ, so never use it in place of the guide's stock control chart. In an answer about the
+    reorder quantity, the trade-off it captures is still worth putting into words: larger orders mean fewer ordering
+    costs and perhaps bulk discounts, but more cash, space and risk tied up in stock.
+  storageKey: ops:eoq
+  example:
+    name: Wrenhurst Cycles' gear sets, a fictional example
+    note: >
+      Wrenhurst uses 10,000 gear sets a year, 200 in each of 50 working weeks, as in the notes on
+      [production planning](/topics/production-planning/). Each order costs $96 and each gear set $3 a year to hold. Its
+      buyer is weighing orders of 1,200, and the supplier offers 2% off orders of 2,000 or more. Every figure is
+      simulated.
+  related:
+    subtopics: ['3.7']
+    interactives: [ops-stock-control-atelier]
+units: { one: gear set, many: gear sets }
+currency: $
+inputs: { demand: 10000, orderCost: 96, holdingCost: 3, current: 1200, weeks: 50, buffer: 200, price: 30 }
+discount: { minQty: 2000, price: 29.4 }
+assumptions:
+  - Demand is steady and known for the whole year.
+  - Each order costs the same to place, whatever its size.
+  - Holding cost rises in proportion to the stock held.
+  - Each order arrives complete and all at once, and stock never runs out.
+  - Apart from the discount check, the price of a unit is the same at every order size.

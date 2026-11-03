@@ -5,6 +5,8 @@
  */
 import ToolPage from '../../components/tools/ToolPage.astro';
 import CapacityCalculator from '../../components/tools/ops/CapacityCalculator.astro';
+import StockSimulator from '../../components/tools/ops/StockSimulator.astro';
+import EoqCalculator from '../../components/tools/ops/EoqCalculator.astro';
 import { corpus } from '../../lib/content';
 import { TOOL_FRAME, roomTools, type RoomTool } from '../../lib/room-tools';
 
@@ -24,4 +26,6 @@ const f = TOOL_FRAME[t.component];
 
 <ToolPage id={id} ix={f.ix} csv={f.csv} open={f.open} what={f.what} levelSwitch={f.levelSwitch}>
   {t.component === 'capacity-calculator' && <CapacityCalculator id={id} data={t} />}
+  {t.component === 'stock-simulator' && <StockSimulator id={id} data={t} />}
+  {t.component === 'eoq-calculator' && <EoqCalculator id={id} data={t} />}
 </ToolPage>

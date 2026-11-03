@@ -8,6 +8,8 @@
 import type { Corpus, Problem } from './integrity';
 import { delayerLevels, orgModel, validateOrg } from './org-chart';
 import { validatePeriod } from './productivity';
+import { validatePlan } from './stock-sim';
+import { validateEoq } from './eoq';
 import { ROOM_INFO, isRoomTool, toolHref } from './room-tools';
 
 export function checkRoomTools(c: Corpus): Problem[] {
@@ -56,6 +58,15 @@ export function checkRoomTools(c: Corpus): Problem[] {
     if (it.component === 'capacity-calculator') {
       it.periods.forEach((p) => validatePeriod(p.values).forEach((x) => add(`${p.name}: ${x.field}: ${x.message}`)));
       if (it.periods[0]?.name === it.periods[1]?.name) add('the two periods need different names');
+    }
+
+    if (it.component === 'stock-simulator') {
+      validatePlan({ ...it.plan, ...it.costs, demand: it.demand, late: it.late ?? null }).forEach((x) => add(`the plan: ${x.field}: ${x.message}`));
+    }
+
+    if (it.component === 'eoq-calculator') {
+      if (it.guide.status !== 'enrichment' || it.provenance !== 'enrichment') add('the economic order quantity is beyond the syllabus, so it must be labelled enrichment');
+      validateEoq({ ...it.inputs, minQty: it.discount?.minQty ?? null, discountPrice: it.discount?.price ?? null }, Boolean(it.discount)).forEach((x) => add(`${x.field}: ${x.message}`));
     }
   }
   return out;

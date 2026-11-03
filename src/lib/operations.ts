@@ -219,10 +219,23 @@ export interface StockOrder {
 export interface StockRow {
   week: number;
   start: number;
+  /** Usage that could be met from stock. */
   used: number;
   delivered: number;
   end: number;
   ordered: boolean;
+  /** Usage planned for the week. */
+  demand: number;
+  /** Usage that could not be met because stock ran out. */
+  unmet: number;
+}
+
+/** Choices that a simulation can override (the stock control simulator uses them; the chart above does not). */
+export interface StockOptions {
+  /** Place each order at this stock level instead of buffer + usage × lead time. */
+  reorderLevel?: number;
+  /** Stock at the start, instead of the maximum. */
+  opening?: number;
 }
 
 export interface StockRun {
@@ -253,12 +266,12 @@ const clean = (v: number) => Math.round(v * 1e6) / 1e6;
  * from the plan) and arrives after the lead time; only one order is open at a
  * time. Stock cannot fall below zero: unmet usage is counted as a shortfall.
  */
-export function simulateStock(plan: StockPlan, scenario: StockScenario = {}): StockRun {
-  const rol = reorderLevel(plan);
+export function simulateStock(plan: StockPlan, scenario: StockScenario = {}, opts: StockOptions = {}): StockRun {
+  const rol = opts.reorderLevel ?? reorderLevel(plan);
   const max = maxStock(plan);
   const usageIn = (week: number) => scenario.usage?.find((u) => week >= u.from && week <= u.to)?.usage ?? plan.usage;
   let t = 0;
-  let s = max;
+  let s = opts.opening ?? max;
   let open: StockOrder | null = null;
   const orders: StockOrder[] = [];
   const points: Array<[number, number]> = [[0, s]];
@@ -284,7 +297,7 @@ export function simulateStock(plan: StockPlan, scenario: StockScenario = {}): St
   for (let w = 1; w <= plan.weeks; w += 1) {
     const end = w;
     const r = usageIn(w);
-    const row: StockRow = { week: w, start: clean(s), used: 0, delivered: 0, end: 0, ordered: false };
+    const row: StockRow = { week: w, start: clean(s), used: 0, delivered: 0, end: 0, ordered: false, demand: r, unmet: 0 };
     // An order is due at the start of the week, or stock already at the reorder level with none open.
     for (let guard = 0; guard < 100; guard += 1) {
       const o = open as StockOrder | null;
@@ -321,6 +334,7 @@ export function simulateStock(plan: StockPlan, scenario: StockScenario = {}): St
       note();
     }
     row.used = clean(row.used);
+    row.unmet = clean(Math.max(0, r - row.used));
     row.end = clean(s);
     rows.push(row);
   }

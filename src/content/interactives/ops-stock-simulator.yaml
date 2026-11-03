@@ -1,0 +1,71 @@
+# The stock control simulator. Wrenhurst Cycles is fictional; its gear-set plan
+# is the one in the notes on production planning (5.6): about 200 used a week,
+# a lead time of 2 weeks, a buffer of 200, a reorder level of 600 and a reorder
+# quantity of 800. The busy spell, the late delivery and the costs are added
+# here. tests/unit/stock-sim.test.ts works the run by hand: the second order,
+# placed in week 6, arrives in week 9 instead of week 8, stock runs out at
+# week 8.4, and 0.6 × 250 = 150 gear sets of demand are not met.
+component: stock-simulator
+title: Stock control simulator
+purpose: >
+  The learner sets a reorder plan (lead time, buffer stock, reorder level and reorder quantity) and runs it against
+  weeks of demand and a late delivery, seeing the stock control chart, every stock-out and what the plan costs. It
+  diagnoses the belief that a buffer guarantees supply: a busy spell and one late delivery together can empty it.
+provenance: simulated-data
+syllabus: ['5.6']
+page: /operations-floor/stock-control/
+guide:
+  room: operations
+  slug: stock-control
+  order: 5
+  kind: Simulator
+  question: When should we reorder, and what happens when demand or a delivery does not go to plan?
+  summary: Run a reorder plan against weeks of demand and a late delivery, with a stock control chart, every stock-out flagged, the share of demand met and what holding, ordering and running out cost.
+  lead: >
+    A stock control chart is a plan: when to reorder, how much, and how much to keep in reserve. Set the plan, enter
+    demand week by week, make a delivery late, and the simulator runs the weeks, draws the chart, flags every stock-out
+    and puts a price on holding stock, ordering it and running out of it.
+  status: HL
+  statusNote: >
+    Subtopic 5.6, Production planning (guide, pp. 34 to 35), is HL only. It names stock control charts based on lead
+    time, buffer stock, reorder level and reorder quantity (AO2 and AO4), and the difference between just in time and
+    just in case (AO3). The guide gives no formula for the reorder level or the maximum stock, so the standard forms of
+    the notes on production planning are used. The costs go beyond the syllabus, to make the trade-off visible.
+  ao: [AO2, AO4]
+  howTo:
+    - Set the plan. The suggested reorder level is the buffer plus average demand during the lead time; use it or set your own.
+    - Enter demand for each week, or set every week at once, and choose how many weeks to run.
+    - Make one order arrive late, or switch the delay off, and watch where the buffer is used and where stock runs out.
+    - Read the figures, the chart, the week-by-week table and the costs. Your plan is kept on this device; download it as JSON or CSV, open a saved plan, or print it.
+  limitations:
+    - Each week's demand is used at a steady rate through the week and is known in advance. Real demand varies by the day and is uncertain.
+    - Only one order is open at a time, every delivery is complete and arrives at once, and there is one item. A real business manages thousands of items, often with software.
+    - Demand that cannot be met is counted as lost, at the cost entered. In practice some customers wait and some leave for good.
+    - "The costs are simple illustrations: a holding cost per unit per week, a fixed cost per order and a cost per unit short. Real holding costs include the cash tied up, storage, insurance and the risk of stock perishing or going out of date."
+    - The reorder level and maximum stock formulas are standard forms that the guide does not give, so show your method in an answer.
+  inAnswer: >
+    On a stock control chart, label the four things the guide names: lead time, buffer stock, reorder level and reorder
+    quantity. Then use the chart to judge the plan: say what the buffer protects against, what it costs, and whether just
+    in time or just in case suits this business's suppliers and demand.
+  storageKey: ops:stock-control
+  example:
+    name: Wrenhurst Cycles' gear sets, a fictional example
+    note: >
+      The plan is the one in the notes on [production planning](/topics/production-planning/): Wrenhurst uses about
+      200 gear sets a week, reorders 800 when stock falls to 600, keeps a buffer of 200 and waits two weeks for each
+      delivery. Here a busy spell lifts demand to 250 a week in weeks 7 to 10, and the second order arrives a week late.
+      Every figure is simulated.
+  related:
+    subtopics: ['5.3', '3.7']
+    interactives: [ops-stock-control-atelier]
+    cases: [atelier-barro]
+units: { one: gear set, many: gear sets }
+currency: $
+plan: { opening: 1000, leadTime: 2, buffer: 200, reorderLevel: 600, reorderQty: 800 }
+demand: [200, 200, 200, 200, 200, 200, 250, 250, 250, 250, 200, 200, 200, 200, 200, 200]
+late: { order: 2, extraWeeks: 1 }
+costs: { holding: 0.06, ordering: 96, shortage: 200 }
+costNote: >
+  Simulated: a gear set costs about $30, and holding one for a year costs about a tenth of that, $3, or $0.06 a week.
+  Each order costs $96 to place and deliver. A gear set short means a bike not built, and $200 is the contribution of
+  one bike in the notes on production planning.

@@ -122,5 +122,46 @@ export function roomToolSchemas<B extends z.ZodRawShape>(base: B) {
       settings: z.object({ defects: z.enum(['reworked', 'scrapped']), labour: z.enum(['workers', 'hours']) }),
       periods: z.array(z.object({ name: text, values: periodValues })).length(2),
     }),
+    z.object({
+      component: z.literal('stock-simulator'),
+      ...base,
+      guide,
+      units: z.object({ one: text, many: text }),
+      currency: text,
+      plan: z.object({
+        opening: nonNeg,
+        leadTime: z.number().min(0).max(8),
+        buffer: nonNeg,
+        reorderLevel: nonNeg,
+        reorderQty: z.number().positive(),
+      }),
+      /** Demand in each week, from 4 to 26 weeks. */
+      demand: z.array(nonNeg).min(4).max(26),
+      /** One order that arrives late in the worked example. */
+      late: z.object({ order: z.number().int().min(1).max(20), extraWeeks: z.number().min(0).max(8) }).optional(),
+      costs: z.object({ holding: nonNeg, ordering: nonNeg, shortage: nonNeg }),
+      /** Where the costs come from. */
+      costNote: text,
+    }),
+    z.object({
+      component: z.literal('eoq-calculator'),
+      ...base,
+      guide,
+      units: z.object({ one: text, many: text }),
+      currency: text,
+      inputs: z.object({
+        demand: z.number().positive(),
+        orderCost: z.number().positive(),
+        holdingCost: z.number().positive(),
+        current: z.number().positive(),
+        weeks: z.number().positive().max(53),
+        buffer: nonNeg,
+        price: nonNeg,
+      }),
+      /** A supplier's quantity discount in the worked example. */
+      discount: z.object({ minQty: z.number().positive(), price: nonNeg }).optional(),
+      /** The assumptions of the model, listed beside the result. */
+      assumptions: z.array(text).min(3),
+    }),
   ] as const;
 }
