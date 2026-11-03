@@ -102,6 +102,9 @@ each('[data-ix="case-vault"]', (root) => {
       list.append(li);
     }
     updateCounts(filters);
+    const active = FACETS.filter((k) => filters[k]).length;
+    const badge = form.querySelector<HTMLElement>('[data-active]');
+    if (badge) badge.textContent = active ? `${active} in use` : '';
     const text = countText(shown.size, cases.length);
     if (count) {
       if (speak) announce(count, text);
@@ -117,6 +120,9 @@ each('[data-ix="case-vault"]', (root) => {
   const start = filtersFromQuery(location.search);
   write(start.filters, start.sort);
   apply(false);
+  // On a narrow screen the filters start folded, unless the address already uses one.
+  const more = form.querySelector<HTMLDetailsElement>('details[data-more]');
+  if (more && window.matchMedia('(max-width: 47.99rem)').matches && !FACETS.some((k) => start.filters[k])) more.open = false;
 
   form.addEventListener('change', () => apply(true));
   form.addEventListener('submit', (e) => {

@@ -10,6 +10,8 @@ interface Config {
   topics: Array<{ id: string; title: string; href: string; cards: number }>;
   interactions: Array<{ id: string; uid: string; title: string; href: string; keys: string[]; stages: number }>;
   ia: { href: string; steps: number };
+  /** Case files with a decision exercise. */
+  cases?: Array<{ id: string; title: string; href: string }>;
 }
 
 const has = (key: string): boolean => {
@@ -79,6 +81,16 @@ each('[data-ix="progress"]', (root) => {
     add('Retrieval cards', t.title, t.href, `${n} of ${t.cards} rated`, n >= t.cards);
   }
 
+  // Decision exercises in the case files
+  let casesDone = 0;
+  for (const cf of cfg.cases ?? []) {
+    const v = store.get<{ choice?: string; reasons?: string; committed?: string } | null>(`case:${cf.id}`, null);
+    if (!v || !(v.choice || (v.reasons && v.reasons.trim()))) continue;
+    const done = Boolean(v.committed && v.choice);
+    casesDone += done ? 1 : 0;
+    add('Case decisions', cf.title, cf.href, done ? `Decided on ${v.committed}` : 'Started', done);
+  }
+
   // IA planner
   const plan = store.get<{ fields?: Record<string, string> } | null>('ia-plan', null);
   const steps = plan?.fields ? Object.keys(plan.fields).filter((k) => /^done-\d+$/.test(k) && plan.fields?.[k] === 'on').length : 0;
@@ -88,6 +100,7 @@ each('[data-ix="progress"]', (root) => {
     ['Practice questions answered', String(answered), `${marked} self-marked, of ${cfg.questions.length}`],
     ['Decision Rooms finished', `${roomsDone} of ${cfg.decisions.length}`, ''],
     ['Case lab stages done', `${stagesDone} of ${stagesAll}`, ''],
+    ['Case decisions made', `${casesDone} of ${(cfg.cases ?? []).length}`, ''],
     ['Interactions started', String(tried), `of ${cfg.interactions.filter((i) => !i.stages).length} that keep your work`],
     ['Retrieval cards rated', String(cards), ''],
     ['IA plan steps done', `${steps} of ${cfg.ia.steps}`, ''],
