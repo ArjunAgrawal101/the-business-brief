@@ -1,0 +1,220 @@
+---
+/**
+ * The Paper 1 case analysis workspace. The reader pastes or types a case, or
+ * uses the illustrative one; tags evidence by stakeholder, problem, data and
+ * tool; builds it into an answer plan for Section A or Section B; and exports
+ * the plan. Everything is kept on this device (bb:p1-workspace). Without
+ * JavaScript the illustrative case and the plan structures can be read and
+ * printed to work on paper.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import CentreHead from '../../../components/centre/CentreHead.astro';
+import GuideLabel from '../../../components/centre/GuideLabel.astro';
+import { ILLUSTRATIVE_CASE } from '../../../lib/p1-cases';
+import { PLANS, TAGS, TAG_IDS, paragraphHtml, splitCase, wordCount } from '../../../lib/p1-workspace';
+import { jsonForScript } from '../../../lib/markup';
+import '../../../styles/centre.css';
+import '../../../styles/p1-workspace.css';
+
+const paras = splitCase(ILLUSTRATIVE_CASE.text);
+const words = wordCount(ILLUSTRATIVE_CASE.text);
+const PLAN_KINDS = Object.keys(PLANS) as Array<keyof typeof PLANS>;
+---
+
+<BaseLayout
+  room="assessment"
+  title="Paper 1 case workspace"
+  description="An IB Business Management Paper 1 workspace: paste a case or use an illustrative one, tag the evidence by stakeholder, problem, data and tool, and build it into an answer plan for Section A or Section B. Everything stays on your device."
+  section="assessment"
+>
+  <CentreHead
+    crumb="Case workspace"
+    parent={{ label: 'Paper 1', href: '/assessment/paper-1/' }}
+    kicker="Paper 1 · Workspace"
+    title="Case analysis workspace"
+    lead="Paste or type a case, or use the illustrative one. Tag the evidence by stakeholder, problem, data and tool, build it into an answer plan for Section A or Section B, and export the plan. Everything stays on this device."
+    stats={[
+      { value: '4', label: 'Tags', note: 'stakeholder · problem · data · tool' },
+      { value: '2', label: 'Plans', note: 'Section A and Section B' },
+      { value: 'Local', label: 'Storage', note: 'nothing leaves this device' },
+    ]}
+  />
+
+  <div class="wrap page-body ws-page" data-ix="p1-workspace">
+    <script type="application/json" data-config set:html={jsonForScript({ example: ILLUSTRATIVE_CASE })} />
+    <p class="state state--error" data-error hidden>The workspace could not start. The case and the plan structures can still be read and printed.</p>
+    <p class="sr-only" aria-live="polite" data-live></p>
+
+    <section class="ws-sec" aria-labelledby="ws-case-h">
+      <SectionHead no="01" title="The case" id="ws-case-h" dek="A Paper 1 case is about 800 to 1,000 words, of which about the first 200 are released three months before the examination (guide, p. 41)." />
+      <div class="ws-source js-only" data-source>
+        <fieldset class="ws-fs">
+          <legend>Work on</legend>
+          <div class="ws-seg">
+            <label class="ws-opt"><input type="radio" name="source" value="example" checked /> <span>The illustrative case</span></label>
+            <label class="ws-opt"><input type="radio" name="source" value="own" /> <span>My own case</span></label>
+          </div>
+        </fieldset>
+        <div class="ws-own" data-own hidden>
+          <div class="field">
+            <label for="ws-own-text">Paste or type the case</label>
+            <textarea class="textarea" id="ws-own-text" rows="10" aria-describedby="ws-own-hint" data-own-text></textarea>
+            <span class="field__hint" id="ws-own-hint" data-own-hint>Up to 20,000 characters. A blank line starts a new paragraph. It stays on this device.</span>
+          </div>
+          <button type="button" class="btn btn--primary" data-own-use>Use this text</button>
+        </div>
+      </div>
+
+      <div class="ws-layout">
+        <article class="ws-casebox" aria-labelledby="ws-title">
+          <header class="ws-casebox__head">
+            <h3 id="ws-title" data-title>{ILLUSTRATIVE_CASE.title}</h3>
+            <p class="small muted" data-case-note>{ILLUSTRATIVE_CASE.note} {words} words.</p>
+            <p class="ws-labels"><GuideLabel kind="example" /></p>
+          </header>
+          <p class="ws-how js-only">Click or press Enter on a sentence to tag it, or select a few words with the mouse and choose a tag.</p>
+          <div class="ws-case" data-case>
+            {paras.map((p, i) => <p class="ws-p" data-para={i} set:html={paragraphHtml(p, i, [])} />)}
+          </div>
+          <div class="ws-palette" data-palette hidden role="group" aria-labelledby="ws-pal-h">
+            <p class="ws-palette__k" id="ws-pal-h">Tag these words</p>
+            <p class="ws-palette__q" data-quote></p>
+            <div class="ws-palette__tags">
+              {
+                TAG_IDS.map((t) => (
+                  <button type="button" class={`btn btn--small ws-tagbtn ws-tagbtn--${t}`} data-tag={t}>
+                    {TAGS[t].label}
+                  </button>
+                ))
+              }
+              <button type="button" class="btn btn--small" data-cancel>Cancel</button>
+            </div>
+          </div>
+        </article>
+
+        <aside class="ws-key" aria-labelledby="ws-key-h">
+          <p class="label" id="ws-key-h">The four tags</p>
+          <dl>
+            {
+              TAG_IDS.map((t) => (
+                <div class={`ws-key__row ws-key__row--${t}`}>
+                  <dt>{TAGS[t].label}</dt>
+                  <dd>{TAGS[t].hint}</dd>
+                </div>
+              ))
+            }
+          </dl>
+          <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+          <p class="small">In the reading time, read the questions first, then the case: match each question to its evidence, and notice what the case leaves out.</p>
+          <p class="small muted">Every paper starts with five minutes' reading time (guide, p. 41).</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="ws-sec js-only" aria-labelledby="ws-ev-h">
+      <SectionHead no="02" title="Your evidence" id="ws-ev-h" dek="What you tagged, by kind. Add a note in your own words, and put each piece into your plan." />
+      <p class="ws-count" data-count aria-live="polite" tabindex="-1">Nothing tagged yet.</p>
+      <div class="ws-board" data-board>
+        {
+          TAG_IDS.map((t) => (
+            <section class={`ws-col ws-col--${t}`} aria-labelledby={`ws-col-${t}`}>
+              <h3 id={`ws-col-${t}`}>
+                {TAGS[t].label} <span class="ws-col__n" data-n={t}>0</span>
+              </h3>
+              <ol class="ws-col__list" data-col={t} />
+            </section>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="ws-sec" aria-labelledby="ws-plan-h">
+      <SectionHead no="03" title="Your answer plan" id="ws-plan-h" dek="A plan, not an answer: the points you will make, the evidence for each, and in your own words what it shows." />
+      <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+      <div class="ws-planhead js-only">
+        <fieldset class="ws-fs">
+          <legend>The question is for</legend>
+          <div class="ws-seg">
+            {
+              PLAN_KINDS.map((k) => (
+                <label class="ws-opt">
+                  <input type="radio" name="plan" value={k} checked={k === 'section-b'} /> <span>{PLANS[k].label}</span>
+                </label>
+              ))
+            }
+          </div>
+        </fieldset>
+        <div class="field ws-question">
+          <label for="ws-question">The question you are planning for</label>
+          <input class="input" id="ws-question" data-question autocomplete="off" aria-describedby="ws-question-hint" />
+          <span class="field__hint" id="ws-question-hint">For example, Discuss whether Juniper should accept the supermarket chains' offer.</span>
+        </div>
+      </div>
+      <ol class="ws-slots js-only" data-slots></ol>
+      <div class="ws-checks js-only">
+        <p class="label">What the plan still needs</p>
+        <ul class="ws-checklist" data-checks></ul>
+        <p class="small muted">Checks of completeness from the Paper 1 page's recommended construction and the assessment guides. They never mark a plan.</p>
+      </div>
+      <div class="ws-export js-only">
+        <button type="button" class="btn btn--small btn--primary" data-txt>Download the plan (text)</button>
+        <button type="button" class="btn btn--small" data-copy>Copy the plan</button>
+        <button type="button" class="btn btn--small" data-json>Download a backup (JSON)</button>
+        <button type="button" class="btn btn--small" data-print>Print</button>
+        <button type="button" class="btn btn--small" data-reset>Clear the workspace</button>
+        <span class="ws-export__confirm" data-reset-confirm hidden>
+          <span>This clears your evidence, your plan and any case you pasted.</span>
+          <button type="button" class="btn btn--small btn--primary" data-reset-yes>Clear it</button>
+          <button type="button" class="btn btn--small" data-reset-no>Keep it</button>
+        </span>
+      </div>
+
+      <div class="ws-paper nojs-only">
+        <p class="small">With JavaScript off, plan on paper with these structures.</p>
+        {
+          PLAN_KINDS.map((k) => (
+            <div class="ws-paper__plan">
+              <h3>
+                {PLANS[k].label} <span class="small muted">{PLANS[k].marks}</span>
+              </h3>
+              <ol>
+                {PLANS[k].slots.map((s) => (
+                  <li>
+                    <b>{s.title}.</b> {s.prompt}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="ws-sec" aria-labelledby="ws-why-h">
+      <SectionHead no="04" title="Why tag before you write" id="ws-why-h" />
+      <div class="ws-why">
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="ib" /></p>
+          <h3>Use the case, not just its names</h3>
+          <p>Evidence from the case earns credit when you show what it means for the question asked; repeating it shows only that you read it (guide, p. 42).</p>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+          <h3>Distinct evidence for each point</h3>
+          <p>Two points that overlap or share evidence earn less, and sentences lifted from the case read as comprehension, not analysis. Tagging shows you, before you write, which evidence each point stands on.</p>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="examiner" /></p>
+          <h3>Say what the case does not tell you</h3>
+          <p>The top markband of the 10-mark response asks for the limitations of the case to be explained; the assessment guides report that without them marks stop at 8. Plan the limitation, and how it weakens your judgement.</p>
+        </div>
+      </div>
+      <p class="small muted"><a href="/assessment/paper-1/">The Paper 1 page</a> explains each part of the paper, with annotated answers on Juniper Juice.</p>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../../scripts/centre/p1-workspace';
+</script>
