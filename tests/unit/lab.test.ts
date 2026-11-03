@@ -26,8 +26,10 @@ import { formulaHtml, regionsHtml } from '../../src/lib/lab/render';
 import { buildStatement, fmtStatement, STATEMENT_DEFAULTS, statementLines, validateStatement } from '../../src/lib/lab/statement';
 import type { FieldSpec, LabReport } from '../../src/lib/lab/types';
 import { csvCell, toCsv } from '../../src/lib/lab/util';
+import { loadCorpus } from './helpers/corpus';
 
 const S = SETTINGS;
+const c = loadCorpus();
 const be = (over: Partial<BreakEvenState> = {}): BreakEvenState => ({ ...BREAK_EVEN_DEFAULTS, ...over });
 const fig = (r: LabReport, label: string) => r.figures.find((f) => f.label === label)?.value;
 
@@ -451,6 +453,17 @@ describe('the catalogue, formulas, charts and export', () => {
     expect(LAB.filter((e) => e.level === 'HL').map((e) => e.id)).toEqual(['gearing-ratio', 'stock-turnover', 'debtor-days', 'creditor-days', 'budget-variances', 'net-present-value']);
     expect(labForRegister('stock-turnover-days')?.id).toBe('stock-turnover');
     expect(() => labEntry('nope')).toThrow();
+  });
+
+  it('names only calculations and subtopics that exist, and HL subtopics only at HL', () => {
+    const subs = (c.curricula['ib-dp-bm']?.units ?? []).flatMap((u) => u.subtopics);
+    for (const e of LAB) {
+      if (e.register) expect(c.calculations[e.register], `${e.id} register`).toBeDefined();
+      const sub = subs.find((x) => x.code === e.subtopic);
+      expect(sub, `${e.id} subtopic`).toBeDefined();
+      if (sub?.level === 'HL') expect(e.level, e.id).toBe('HL');
+    }
+    for (const g of GROUPS) for (const code of g.subtopics) expect(subs.some((x) => x.code === code), code).toBe(true);
   });
 
   it('every default report is complete and every chart is accessible', () => {

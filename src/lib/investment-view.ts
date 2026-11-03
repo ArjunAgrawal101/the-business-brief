@@ -107,8 +107,11 @@ export function cumulativeSvg(a: Appraisal, b: Appraisal | null, o: { currency: 
     const pb = s.ap.payback;
     if (pb) {
       parts.push(`<circle cx="${r1(x(pb.total))}" cy="${r1(y(0))}" r="5" fill="${s.color}" stroke="#fff" stroke-width="2"/>`);
+      // One project: the title names it, so the payback point is labelled instead of the line's end.
+      if (!b) parts.push(`<text x="${r1(x(pb.total)) - 8}" y="${r1(y(0)) - 12}" text-anchor="end" class="ch-label" fill="${INK}">${esc(`Pays back: ${fmtPayback(pb)}`)}</text>`);
     }
   }
+  if (!b) ends.length = 0;
   ends.sort((m, n) => m.y - n.y);
   let lastY = -Infinity;
   for (const e of ends) {

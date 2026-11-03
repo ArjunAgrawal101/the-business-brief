@@ -384,7 +384,16 @@ export function buildRatio(id: RatioLabId, st: RatioState, s: Settings): LabRepo
     figures,
     workings,
     chart: {
-      svg: ratioBarsSvg({ name: def.name, values: [{ label: 'Previous year', value: a, text: fmtRatio(a, def.kind) }, { label: 'Latest year', value: b, text: fmtRatio(b, def.kind) }], id: `lab-${id}-chart`, better: def.better }),
+      svg: ratioBarsSvg({
+        name: def.name,
+        values: [
+          { label: 'Previous year', value: a, text: fmtRatio(a, def.kind) },
+          { label: 'Latest year', value: b, text: fmtRatio(b, def.kind) },
+        ],
+        id: `lab-${id}-chart`,
+        better: def.better,
+        unit: def.kind === 'percent' ? '%' : def.kind === 'days' ? ' days' : def.kind === 'times' ? '×' : '',
+      }),
       caption: `${def.name} in each year, measured from zero. The latest year is the darker bar.`,
       table: {
         caption: `${def.name} by year`,

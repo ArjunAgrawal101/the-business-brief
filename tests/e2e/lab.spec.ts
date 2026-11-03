@@ -90,6 +90,15 @@ test('the CSV export holds the figures and the results', async ({ page }) => {
   expect(text).toContain('43.5232');
 });
 
+test('the SL view hides the HL parts of an SL calculator, with a notice', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('bb:level', 'SL'));
+  await page.goto('/finance-desk/lab/margin-of-safety/');
+  await expect(page.locator('.fig', { hasText: 'Degree of operating leverage' })).toBeHidden();
+  await expect(page.locator('.lab-working', { hasText: 'Degree of operating leverage (HL)' })).toBeHidden();
+  await expect(page.locator('.hl-notice')).toBeVisible();
+  await expect(page.locator('.fig', { hasText: 'Margin of safety in value' })).toBeVisible();
+});
+
 test.describe('without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
 

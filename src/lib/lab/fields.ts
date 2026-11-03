@@ -47,7 +47,7 @@ const F = {
   sold: { key: 'quantity', label: 'Sales per {period}', kind: 'count', min: 0, integer: true, name: 'sales' },
   capacity: { key: 'capacity', label: 'Capacity per {period}', kind: 'count', min: 1, integer: true, name: 'capacity', hint: 'The most that can be made in the period.' },
   targetProfit: { key: 'targetProfit', label: 'Target profit per {period}', kind: 'money', name: 'the target profit' },
-  expectedSales: { key: 'expectedSales', label: 'Expected sales per {period}, for the target price', kind: 'count', min: 1, integer: true, name: 'expected sales' },
+  expectedSales: { key: 'expectedSales', label: 'Expected sales per {period}', kind: 'count', min: 1, integer: true, name: 'expected sales', hint: 'The sales the target price is worked for.' },
 } satisfies Record<string, FieldSpec>;
 
 export const BREAK_EVEN_FIELDS: Record<string, FieldSpec[]> = {

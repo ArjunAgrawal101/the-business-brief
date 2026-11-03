@@ -137,6 +137,11 @@
     padding-left: var(--sp-6);
     border-left: 1px solid var(--rule-hair);
   }
+
+  /* The statement is taller than a screen, so its column scrolls with the page. */
+  .lab[data-family="statement"] .lab-desk__results {
+    position: static;
+  }
 }
 
 .lab-desk__inputs,
@@ -526,6 +531,44 @@
 .lab-grid__cell {
   min-width: 6.25rem;
   text-align: right;
+}
+
+/* Line names stay in view while the months scroll sideways. */
+.lab-grid tbody th[scope="row"],
+.cff tbody th[scope="row"]:not([colspan]),
+.bt tbody th[scope="row"] {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--surface-sheet);
+  box-shadow: 1px 0 0 var(--rule-hair);
+}
+
+@media (max-width: 40rem) {
+  .lab-grid__label {
+    min-width: 9.5rem;
+  }
+
+  .lab-grid__cell {
+    min-width: 5.5rem;
+  }
+
+  .cff tbody th[scope="row"],
+  .bt tbody th[scope="row"] {
+    max-width: 9rem;
+  }
+
+  .lab-grid--budget .lab-grid__label {
+    min-width: 7.25rem;
+  }
+
+  .lab-grid--budget .lab-grid__cell {
+    min-width: 5rem;
+  }
+
+  .lab-grid__x {
+    width: 2.5rem;
+  }
 }
 
 .lab-grid--budget .lab-grid__cell {

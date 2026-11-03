@@ -70,6 +70,8 @@ The same checks run in the unit tests (`tests/unit/integrity.test.ts`), which lo
 | `src/lib/decision-room.ts` | Which choices a round offers, how outcomes combine into the board pack, how measures are written and compared |
 | `src/lib/cashflow.ts` | The cash flow forecast in the guide's layout, ways of paying for an investment, working capital measures, the profit for the period and its reconciliation to cash, worked in cents |
 | `src/lib/ratios.ts`, `src/lib/investment.ts` | The guide's ratios from two years of statements, with strategies applied to the accounts; payback, ARR and NPV with the guide's printed discount factors |
+| `src/lib/budget.ts` | Budget variances for 3.9, marked [F] or [A] by their effect on profit, with totals in the layout of the guide's budget |
+| `src/lib/lab/` | The Financial Laboratory: the catalogue of calculators, the example business's figures, and for each family of calculators the report (headline, figures, workings, chart, sensitivity, interpretation, CSV rows) built from the modules above; `render.ts` turns a report into the page's HTML on the server and in the browser |
 | `src/lib/plan.ts` | Critical path analysis: earliest and latest times, total and free float, the critical path |
 | `src/lib/market.ts`, `src/lib/operations.ts` | Market share and growth, position maps; capacity utilization, productivity, stock control, weighted location scores |
 | `src/lib/ia.ts` | The IA planner's checks on supporting documents, dates, word count and self-marks, each citing its page |
@@ -116,6 +118,7 @@ The quiz engine (`src/scripts/quiz.ts`) dispatches a bubbling `quiz:progress` ev
 | `/cases/`, `/cases/[id]/` | Case files |
 | `/decision-room/`, `/decision-room/[id]/` | Decision Rooms |
 | `/finance-desk/`, `/finance-desk/costs-and-revenue/`, `/finance-desk/break-even/`, `/finance-desk/contribution/`, `/finance-desk/ratios/`, `/finance-desk/cash-flow/`, `/finance-desk/investment-appraisal/` | Finance Desk |
+| `/finance-desk/lab/`, `/finance-desk/lab/[id]/` | The Financial Laboratory and its twenty calculators (`src/lib/lab/catalogue.ts`) |
 | `/rooms/`, `/case-room/`, `/case-room/halden-diagnosis/`, `/strategy-studio/`, `/market-studio/`, `/people-and-culture/`, `/operations-floor/` | All rooms; the rooms with pages of their own; the case lab |
 | `/progress/` | What this browser has kept |
 | `/toolkit/`, `/toolkit/[id]/` | Toolkit (guides for complete tools only) |

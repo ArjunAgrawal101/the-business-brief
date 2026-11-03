@@ -304,7 +304,7 @@ export function buildBreakEvenRevenue(st: BreakEvenState, s: Settings): LabRepor
       { label: 'Revenue at the whole-unit break-even', value: wholeRevenue === null ? 'None' : money2(wholeRevenue, s.currency), note: m.beq === null ? undefined : `${count(m.beq, s)} × ${money2(st.price, s.currency)}` },
       { label: 'Forecast sales revenue', value: money2(forecastRevenue, s.currency), note: `${count(st.quantity, s)} × ${money2(st.price, s.currency)}` },
       { label: 'Break-even as a share of forecast revenue', value: shareOfForecast === null ? 'n/a' : pct(shareOfForecast) },
-      { label: 'Contribution in each unit of sales', value: m.beRevenue === null ? 'n/a' : pct(ratio * 100), scope: 'enrichment', note: 'contribution per unit ÷ price' },
+      { label: 'Contribution as a share of the price', value: m.beRevenue === null ? 'n/a' : pct(ratio * 100), scope: 'enrichment', note: 'contribution per unit ÷ price' },
     ],
     workings,
     chart: chartBlock('break-even-revenue', m, s, 'Forecast'),

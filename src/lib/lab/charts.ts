@@ -145,7 +145,7 @@ export function contributionBarsSvg(o: { price: number; variableCost: number; qu
 /* Ratio bars: the ratio in each year                                  */
 /* ------------------------------------------------------------------ */
 
-export function ratioBarsSvg(o: { name: string; values: Array<{ label: string; value: number | null; text: string }>; id: string; better: 'higher' | 'lower' | 'depends' }): string {
+export function ratioBarsSvg(o: { name: string; values: Array<{ label: string; value: number | null; text: string }>; id: string; better: 'higher' | 'lower' | 'depends'; unit?: string }): string {
   const W = 560;
   const rowH = 46;
   const T = 30;
@@ -159,7 +159,7 @@ export function ratioBarsSvg(o: { name: string; values: Array<{ label: string; v
   const parts: string[] = [];
   for (let v = sc.min; v <= sc.max + 1e-9; v += sc.step) {
     parts.push(`<line x1="${r1(x(v))}" y1="${T - 8}" x2="${r1(x(v))}" y2="${H - B}" stroke="${RULE}" stroke-width="1"/>`);
-    parts.push(`<text x="${r1(x(v))}" y="${H - B + 17}" text-anchor="middle" class="ch-tick">${esc(fmtNumber(v, sc.step < 1 ? (sc.step < 0.1 ? 2 : 1) : 0))}</text>`);
+    parts.push(`<text x="${r1(x(v))}" y="${H - B + 17}" text-anchor="middle" class="ch-tick">${esc(`${fmtNumber(v, sc.step < 1 ? (sc.step < 0.1 ? 2 : 1) : 0)}${o.unit ?? ''}`)}</text>`);
   }
   o.values.forEach((v, k) => {
     const y = T + k * rowH + 8;
@@ -335,7 +335,7 @@ export function waterfallSvg(steps: WaterfallStep[], o: { currency: string; id: 
     parts.push(`<text x="${r1(end + (right ? 7 : -7))}" y="${y + 16}" text-anchor="${right ? 'start' : 'end'}" class="ch-note" fill="${INK}">${esc(shown)}</text>`);
   });
   parts.push(`<line x1="${r1(x(0))}" y1="${T - 6}" x2="${r1(x(0))}" y2="${H - B}" stroke="${INK}" stroke-width="1.25"/>`);
-  parts.push(`<text x="${L}" y="14" class="ch-note" fill="${MUTED}">${esc('Dark bars: each stage of profit. Light bars: what is deducted between stages.')}</text>`);
+  parts.push(`<text x="16" y="14" class="ch-note" fill="${MUTED}">${esc('Dark bars: each stage of profit. Light bars: what is deducted between stages.')}</text>`);
   const desc = steps.map((s2) => `${s2.label} ${s2.kind === 'total' ? fmtMoney(s2.value, o.currency, 0) : `less ${fmtMoney(s2.value, o.currency, 0)}`}`).join(', ');
   return svg(W, H, o.id, 'From sales revenue to retained profit', `${desc}.`, parts.join(''));
 }
