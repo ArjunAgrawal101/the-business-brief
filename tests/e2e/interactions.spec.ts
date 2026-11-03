@@ -365,7 +365,7 @@ test.describe('Privacy', () => {
 
 test.describe('Market Studio', () => {
   test('the market share workspace catches rising sales with a falling share', async ({ page }) => {
-    await page.goto('/market-studio/');
+    await page.goto('/market-studio/market-metrics/');
     await ready(page, '[data-ix="market-share"]');
     const ws = page.locator('[data-ix="market-share"]');
     await expect(ws.locator('[data-figures]')).toContainText('10.0%');
@@ -384,7 +384,7 @@ test.describe('Market Studio', () => {
   });
 
   test('the position map redraws for new axes and checks the gap', async ({ page }) => {
-    await page.goto('/market-studio/');
+    await page.goto('/market-studio/positioning-map/');
     await ready(page, '[data-ix="position-map"]');
     const pm = page.locator('[data-ix="position-map"]');
     await pm.locator('label[data-value="high-low"]').click();
@@ -405,6 +405,152 @@ test.describe('Market Studio', () => {
     await page.reload();
     await ready(page, '[data-ix="position-map"]');
     await expect(pm.locator('[data-axis="x"]')).toHaveValue('convenience');
+  });
+});
+
+test.describe('Market Studio instruments', () => {
+  test('the STP planner re-ranks on new weights, keeps the work and resets', async ({ page }) => {
+    await page.goto('/market-studio/stp-planner/');
+    await ready(page, '[data-ix="stp"]');
+    const ix = page.locator('[data-ix="stp"]');
+    await expect(ix.locator('[data-interp]')).toContainText('The highest-scoring segment is College students, with 46 of 60 points');
+    // A size weight of 1 puts the home brewers first, as the reading predicts.
+    await ix.locator('[data-weight="size"]').fill('1');
+    await expect(ix.locator('[data-interp]')).toContainText('The highest-scoring segment is Home brewers');
+    await expect(ix.locator('[data-kit-status]')).toContainText('Saved on this device');
+    await page.reload();
+    await ready(page, '[data-ix="stp"]');
+    await expect(ix.locator('[data-weight="size"]')).toHaveValue('1');
+    await expect(ix.locator('[data-kit-status]')).toContainText('Your saved work');
+    // An unreachable target is a problem.
+    await ix.locator('[data-row="students"] [data-f="reachable"]').uncheck();
+    await expect(ix.locator('[data-checks]')).toContainText('It cannot be reached through promotion and distribution');
+    page.once('dialog', (d) => d.accept());
+    await ix.locator('[data-kit-reset]').click();
+    await expect(ix.locator('[data-weight="size"]')).toHaveValue('3');
+    expect(await page.evaluate(() => localStorage.getItem('bb:market:stp-planner'))).toBeNull();
+  });
+
+  test('the questionnaire builder flags leading and double-barrelled questions until they are rewritten', async ({ page }) => {
+    await page.goto('/market-studio/research-questionnaire/');
+    await ready(page, '[data-ix="questionnaire"]');
+    const ix = page.locator('[data-ix="questionnaire"]');
+    await expect(ix.locator('[data-row="q3"]')).toHaveAttribute('data-level', 'conflict');
+    await expect(ix.locator('[data-row="q3"] [data-flags]')).toContainText('Possibly leading');
+    await ix.locator('[data-row="q3"] [data-f="text"]').fill('How would you rate the coffee at Corner Brew?');
+    await expect(ix.locator('[data-row="q3"]')).toHaveAttribute('data-level', 'clear');
+    await expect(ix.locator('[data-row="q4"] [data-flags]')).toContainText('Possibly double-barrelled');
+    await expect(ix.locator('[data-preview]')).toContainText('How would you rate the coffee at Corner Brew?');
+    // A random sample brings the margin of error.
+    await ix.locator('[data-f="method"]').selectOption('random');
+    await expect(ix.locator('[data-sampling]')).toContainText('±8.7');
+    await expect(ix.locator('[data-quotas-wrap]')).toBeHidden();
+    await ix.locator('[data-add]').click();
+    await expect(ix.locator('[data-rows] > [data-row]')).toHaveCount(9);
+    await expect(ix.locator('[data-row="q9"] [data-flags]')).toContainText('Write the question.');
+  });
+
+  test('the persona creator redraws the card and warns about a persona built on assumptions', async ({ page }) => {
+    await page.goto('/market-studio/customer-persona/');
+    await ready(page, '[data-ix="persona"]');
+    const ix = page.locator('[data-ix="persona"]');
+    await ix.locator('[data-f="name"]').first().fill('Lena Ortiz');
+    await expect(ix.locator('[data-card]')).toContainText('Lena Ortiz');
+    await ix.locator('[data-f="basis"]').selectOption('assumption');
+    await expect(ix.locator('[data-checks]')).toContainText('Built on assumptions');
+  });
+
+  test('the competitor map redraws for a new rival and validates its ratings', async ({ page }) => {
+    await page.goto('/market-studio/positioning-map/');
+    await ready(page, '[data-ix="competitor-map"]');
+    const ix = page.locator('[data-ix="competitor-map"]');
+    await expect(ix.locator('[data-spaces]')).toContainText('low price, high perceived quality');
+    await ix.locator('[data-add]').click();
+    const row = ix.locator('[data-rows] > tr').last();
+    await row.locator('[data-f="name"]').fill('Fresh Cup');
+    await row.locator('[data-f="x"]').fill('2.5');
+    await row.locator('[data-f="y"]').fill('7.5');
+    await expect(ix.locator('[data-chart] svg desc')).toContainText('Fresh Cup: 2.5 across, 7.5 up');
+    await row.locator('[data-f="y"]').fill('12');
+    await expect(row.locator('[data-f="y"]')).toHaveAttribute('aria-invalid', 'true');
+    await ix.locator('input[data-test="demand"][value="no"]').check();
+    await expect(ix.locator('[data-verdict]')).toContainText('Probably empty for a good reason');
+  });
+
+  test('the marketing mix builder finds a conflict when the price contradicts the position', async ({ page }) => {
+    await page.goto('/market-studio/marketing-mix/');
+    await ready(page, '[data-ix="mix"]');
+    const ix = page.locator('[data-ix="mix"]');
+    await expect(ix.locator('[data-tally]')).toContainText('0 problems, 1 check');
+    await ix.locator('[data-f="position"]').selectOption('premium');
+    await expect(ix.locator('[data-checks]')).toContainText('A premium position needs a price at or above rivals');
+    await ix.locator('[data-f="kind"]').selectOption('good');
+    await expect(ix.locator('[data-service-only]').first()).toBeHidden();
+    await expect(ix.locator('[data-table] tr')).toHaveCount(4);
+  });
+
+  test('the product life cycle simulator shows a price cut raising revenue but cutting profit', async ({ page }) => {
+    await page.goto('/market-studio/product-life-cycle/');
+    await ready(page, '[data-ix="plc"]');
+    const ix = page.locator('[data-ix="plc"]');
+    await expect(ix.locator('[data-figures]')).toContainText('Year 5');
+    await expect(ix.locator('[data-figures]')).toContainText('$54,725');
+    await ix.locator('[data-row="new-version"] [data-f="on"]').uncheck();
+    await ix.locator('[data-row="price-cut"] [data-f="on"]').check();
+    await expect(ix.locator('[data-impl]')).toContainText('a price cut lowers the contribution on every unit');
+  });
+
+  test('the campaign planner catches spending over budget and redraws the timeline', async ({ page }) => {
+    await page.goto('/market-studio/campaign-planner/');
+    await ready(page, '[data-ix="campaign"]');
+    const ix = page.locator('[data-ix="campaign"]');
+    await expect(ix.locator('[data-checks]')).toContainText('The plan spends $3,000 of the $3,000 budget');
+    await ix.locator('[data-row="posters"] [data-f="cost"]').fill('900');
+    await expect(ix.locator('[data-checks]')).toContainText('over the budget of $3,000 by $600');
+    await ix.locator('[data-row="posters"] [data-f="end"]').fill('30');
+    await expect(ix.locator('[data-checks]')).toContainText('falls outside the 26 weeks');
+    await expect(ix.locator('[data-gantt] svg desc')).toContainText('Posters on campus noticeboards, a channel: weeks 3 to 30');
+  });
+
+  test('the budget tool applies the suggested split and wins more customers', async ({ page }) => {
+    await page.goto('/market-studio/budget-allocation/');
+    await ready(page, '[data-ix="budget"]');
+    const ix = page.locator('[data-ix="budget"]');
+    await expect(ix.locator('[data-figures]')).toContainText('247');
+    await expect(ix.locator('[data-dim]')).toContainText('the next $100 wins about 0.9');
+    await ix.locator('[data-apply-suggested]').click();
+    await expect(ix.locator('[data-row="posts"] [data-f="spend"]')).toHaveValue('662');
+    await expect(ix.locator('[data-figures]')).toContainText('264');
+  });
+
+  test('the metrics calculators recalculate share and lifetime value, and export a file', async ({ page }) => {
+    await page.goto('/market-studio/market-metrics/');
+    await ready(page, '[data-ix="market-metrics"]');
+    const ix = page.locator('[data-ix="market-metrics"]');
+    await expect(ix.locator('[data-figures]')).toContainText('13.3%');
+    // 280,000 of a 1,840,000 market is 15.2%
+    await ix.locator('[data-row="cornerbrew"] [data-f="now"]').fill('280000');
+    await expect(ix.locator('[data-figures]')).toContainText('15.2%');
+    // At 65% retention: 91 ÷ (1.08 − 0.65) = 211.63
+    await ix.locator('[data-f="retention"]').fill('65');
+    await expect(ix.locator('[data-clv-figures]')).toContainText('$211.63');
+    const download = page.waitForEvent('download');
+    await ix.locator('[data-kit-csv]').click();
+    expect((await download).suggestedFilename()).toBe('market-metrics.csv');
+  });
+
+  test('the studio lists the work this browser has kept, and removes it on request', async ({ page }) => {
+    await page.goto('/market-studio/budget-allocation/');
+    await ready(page, '[data-ix="budget"]');
+    await page.locator('[data-row="radio"] [data-f="spend"]').fill('100');
+    await expect(page.locator('[data-kit-status]')).toContainText('Saved on this device');
+    await page.goto('/market-studio/');
+    await expect(page.locator('[data-notebook-list]')).toContainText('Marketing budget allocation');
+    await expect(page.locator('[data-tool="budget-allocation"] [data-saved]')).toBeVisible();
+    page.once('dialog', (d) => d.accept());
+    await page.locator('[data-notebook-clear]').click();
+    await expect(page.locator('[data-notebook-empty]')).toBeVisible();
+    expect(await page.evaluate(() => localStorage.getItem('bb:market:budget-allocation'))).toBeNull();
   });
 });
 

@@ -53,3 +53,14 @@ test('the cash flow lab and the case lab read in full without JavaScript', async
   for (const id of ['problem', 'cause', 'strategy', 'implementation', 'evaluation']) await expect(page.locator(`[data-stage="${id}"] [data-body]`)).toBeVisible();
   await expect(page.locator('[data-plan-chart] svg')).toBeVisible();
 });
+
+test('a Market Studio instrument reads as a complete worked example without JavaScript', async ({ page }) => {
+  await page.goto('/market-studio/stp-planner/');
+  await expect(page.locator('[data-ix="stp"] [data-table] tr')).toHaveCount(4);
+  await expect(page.locator('[data-ix="stp"] [data-statement]')).toContainText('For college students');
+  await expect(page.locator('[data-ix="stp"] [data-kit-json]')).toBeHidden();
+  await expect(page.locator('[data-ix="stp"] .mk-kit__note')).toBeVisible();
+  await page.goto('/market-studio/product-life-cycle/');
+  await expect(page.locator('[data-ix="plc"] [data-chart-cash] svg')).toBeVisible();
+  await expect(page.locator('[data-ix="plc"] [data-figures]')).toContainText('Year 5');
+});

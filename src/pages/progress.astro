@@ -9,6 +9,7 @@ import PageIntro from '../components/layout/PageIntro.astro';
 import SectionHead from '../components/layout/SectionHead.astro';
 import { corpus, decisionsInOrder, href, questionsInOrder, topicsInOrder } from '../lib/content';
 import { jsonForScript } from '../lib/markup';
+import { toolKey } from '../lib/market-tools';
 
 const c = await corpus();
 const topics = await topicsInOrder();
@@ -21,7 +22,9 @@ const tracked = Object.entries(c.interactives)
     const uid = `ix-${id}`;
     const quizLike = ['cost-classifier', 'error-diagnosis', 'ansoff-placer', 'style-matcher', 'functions-sorter'].includes(it.component);
     const keys =
-      it.component === 'case-lab'
+      'guide' in it && it.page?.startsWith('/market-studio/')
+        ? [toolKey(it.page.split('/')[2] ?? '')]
+        : it.component === 'case-lab'
         ? [`case-lab:${uid}`]
         : it.component === 'cash-flow-lab'
           ? [`cash-flow:${uid}`, `quiz:${uid}-q`]

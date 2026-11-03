@@ -52,6 +52,7 @@ Schemas live in `src/lib/schemas.ts`. Every content block, exhibit and interacti
 - no HL question is in the style of paper 1 (which excludes HL-only content), a paper 3 question is HL, and a paper 3 question marked on criteria uses the guide's criteria A to D;
 - every interaction names subtopics that exist; a case lab's evidence comes from its case, its answers are among its options, and its plan has no loops;
 - the ratio desk's statements balance and link across the two years, and every strategy keeps them balanced; the Market Studio and Operations Floor data pass their own checks (`src/lib/integrity-studio.ts`);
+- every Market Studio instrument is listed in `src/lib/market-tools.ts` and lives at its address, quotes the guide's statements exactly as the curriculum file has them, names glossary terms that exist, and has a worked example that passes its own validation; the questionnaire's deliberately flawed questions are exactly the ones its rules flag; and the worked examples agree where they share a figure (`src/lib/integrity-market.ts`);
 - for the 2.0 learning collections (`src/lib/integrity-learning.ts`): every mindmap names a real subtopic in the right unit (one map each), is marked HL exactly when its subtopic is HL only, has enough nodes to revise from (16 or more), gives every branch at least two children and a core node for the revision view, gives every formula node its formula, links only to glossary terms that exist and gives the sources it was checked against; every set of notes carries the guide's exact subtopic title, is marked HL when its subtopic is, and names only glossary terms, questions, subtopics, sources and diagrams that exist; every glossary entry names a real subtopic, has a name no other entry uses, is not related to itself, and is marked HL when all its subtopics are HL only;
 - a resource is offered as a download only when its file exists in `public/` or is one the build writes (`/downloads/glossary.csv`, `/downloads/mindmaps/*.svg`, `/downloads/diagrams/*.svg`).
 
@@ -72,6 +73,7 @@ The same checks run in the unit tests (`tests/unit/integrity.test.ts`), which lo
 | `src/lib/ratios.ts`, `src/lib/investment.ts` | The guide's ratios from two years of statements, with strategies applied to the accounts; payback, ARR and NPV with the guide's printed discount factors |
 | `src/lib/plan.ts` | Critical path analysis: earliest and latest times, total and free float, the critical path |
 | `src/lib/market.ts`, `src/lib/operations.ts` | Market share and growth, position maps; capacity utilization, productivity, stock control, weighted location scores |
+| `src/lib/market-*.ts` | The Market Studio instruments: metrics and customer lifetime value, the questionnaire's wording rules and sampling, personas, STP scoring, the competitor map's open spaces, the mix's consistency rules, the product life cycle model, the campaign's funnel and timeline, and the budget response model; `market-tools.ts` lists the instruments, `market-kit.ts` reads saved state safely and writes CSV, and the `-view.ts` files and `market-charts.ts` draw them |
 | `src/lib/ia.ts` | The IA planner's checks on supporting documents, dates, word count and self-marks, each citing its page |
 | `src/lib/format.ts` | en-GB number and money formatting with the typographic minus |
 | `src/lib/charts.ts`, `cashflow-chart.ts`, `plan-chart.ts`, `charts-studio.ts` | SVG charts (break-even, decision tree, scale, cash flow, plans, the studio tools), each with a title and a text description |
@@ -117,6 +119,7 @@ The quiz engine (`src/scripts/quiz.ts`) dispatches a bubbling `quiz:progress` ev
 | `/decision-room/`, `/decision-room/[id]/` | Decision Rooms |
 | `/finance-desk/`, `/finance-desk/costs-and-revenue/`, `/finance-desk/break-even/`, `/finance-desk/contribution/`, `/finance-desk/ratios/`, `/finance-desk/cash-flow/`, `/finance-desk/investment-appraisal/` | Finance Desk |
 | `/rooms/`, `/case-room/`, `/case-room/halden-diagnosis/`, `/strategy-studio/`, `/market-studio/`, `/people-and-culture/`, `/operations-floor/` | All rooms; the rooms with pages of their own; the case lab |
+| `/market-studio/[instrument]/` | The nine Market Studio instruments, from one template (`src/pages/market-studio/[tool].astro`) |
 | `/progress/` | What this browser has kept |
 | `/toolkit/`, `/toolkit/[id]/` | Toolkit (guides for complete tools only) |
 | `/exam-desk/practice/` | All practice questions, filterable (the other Exam Desk addresses redirect to the Assessment Centre) |

@@ -214,7 +214,7 @@ On the IA Studio page.
 
 ## 17. Market share and growth workspace
 
-`market-share-porto`, in the Market Studio. Subtopic 4.1, AO2 and AO4; the closing question is HL (AO3).
+`market-share-porto`, the case exercise on the Market Studio's market metrics page (`/market-studio/market-metrics/`). Subtopic 4.1, AO2 and AO4; the closing question is HL (AO3).
 
 | | |
 | --- | --- |
@@ -227,7 +227,7 @@ On the IA Studio page.
 
 ## 18. Position map builder
 
-`market-position-map-porto`, in the Market Studio. Subtopic 4.2, AO2 and AO4.
+`market-position-map-porto`, the case exercise on the Market Studio's positioning map page (`/market-studio/positioning-map/`). Subtopic 4.2, AO2 and AO4.
 
 | | |
 | --- | --- |
@@ -301,3 +301,19 @@ On the IA Studio page.
 | **Feedback** | A methods table with the preferred project for each, readings in words (including "the methods disagree" and "neither project is worth its cost" at 20%), a cumulative cash flow chart with a key in words and a data table, the present values year by year, and the eight-part working for every method and project. Invalid inputs are named beside the field |
 | **Misconception diagnosed** | The fastest payback is the best project; a higher ARR means the money arrives sooner; the capital cost is discounted; NPV settles the decision on its own |
 | **Objective** | Appraise investment opportunities by payback and ARR (and NPV at HL), and judge between them when the methods disagree |
+
+## 24 to 32. The Market Studio instruments
+
+Nine instruments, each at `/market-studio/<instrument>/`, listed and ordered in `src/lib/market-tools.ts`, with their guide and worked example in `src/content/interactives/market-*-corner-brew.yaml`. The worked examples follow Corner Brew, the fictional café of the 4.2 notes, and agree with each other (`src/lib/integrity-market.ts` checks the figures they share). Every instrument has the same frame: its purpose, how to use it, its limitations and its IB syllabus status (the guide's statements, quoted exactly and checked against the curriculum file), a worked example as its default state, saving under `bb:market:<instrument>`, and export as JSON, CSV or text, with copy, print, import and reset (`src/scripts/market/kit.ts`). Models are in `src/lib/market-*.ts`, with HTML and SVG in the matching `-view.ts` files, used by the server render and the browser alike.
+
+| Instrument | The learner does | Feedback | Misconception diagnosed | Syllabus |
+| --- | --- | --- | --- | --- |
+| **Market metrics calculators** (`market-metrics`) | Enters sales for the sellers in a market they define, by value or volume; enters spend, visits, margin, retention, a discount rate and an acquisition cost | Market size, growth, shares, change in points, relative share against the largest rival, the leader, a reading, a chart, a table and eight-part workings; lifetime value with a year-by-year table and a sensitivity line | Rising sales mean a rising share; a group of small sellers leads the market; a customer's cost can be judged without their value | 4.1 (AO2, AO4); lifetime value is enrichment |
+| **Questionnaire builder** (`research-questionnaire`) | Writes the objective, population, sampling method and size, quotas and questions of each type | Rule-based flags for leading, loaded, double-barrelled, double negative, absolute, sensitive and hypothetical wording, overlapping or gapped ranges, unbalanced scales; the data mix; quota counts; the margin of error for a random sample (enrichment); a respondent's preview | A leading question gives honest answers; any convenient sample represents the market | 4.4 (AO2, AO3) |
+| **Customer persona creator** (`customer-persona`) | Builds a portrait of one typical customer: profile, needs, pains, buying, channels, objections, what would win them, evidence | A persona card, and checks for a missing segment, too few needs or pains, no channel used a lot, no evidence | A persona built on assumptions is evidence about customers | Enrichment, applying 4.2 and 4.4 |
+| **STP planner** (`stp-planner`) | Chooses bases, describes and rates segments on size, growth, fit and competitive space, weights the criteria, chooses targets and writes a positioning statement | A weighted ranking with a chart, the targeting strategy named, the weight that would change the leader, checks on reach, fit and a statement that names the targets | Segmentation is a list of bases rather than a choice; a position needs no point of difference | 4.2 (AO2, AO3, AO4); the statement format is enrichment |
+| **Competitor positioning map** (`positioning-map`) | Names the axes and their ends, chooses the scale, enters their business and its rivals, answers a four-question gap test | The map with the largest open spaces outlined, the empty quarters, head-to-head rivals, the nearest rival, and a verdict on the gap | Every gap is an opportunity; a map shows facts rather than perceptions | 4.2 (AO2, AO4) |
+| **Marketing mix builder** (`marketing-mix`) | Builds four Ps for a good or seven for a service, each with structured choices and a description, against a target and a position | A consistency table and rule-based checks between each P and the target, the position and the other Ps | The Ps are a list rather than a mix; a service can be planned without its people, processes and physical evidence | 4.5 (AO3); HL pricing methods marked |
+| **Product life cycle simulator** (`product-life-cycle`) | Sets the costs, the shape of the life cycle, capital spending and working capital, and chooses extension strategies and the year they start | Profit, net cash flow, cumulative cash flow, payback and the peak cash need by stage, two charts and a table, and what the extensions add | Profit and cash flow are the same; a new product pays its way from launch; an extension cures decline | 4.5 (AO2, AO3); an illustrative model |
+| **Campaign planner** (`campaign-planner`) | Sets a measurable objective, the audience, message, channels with line, role, cost and weeks, tasks and KPIs, and a funnel estimate | A Gantt chart (an HL toolkit tool), review weeks from the KPIs, the campaign's line, budget and timeline checks, and the funnel against the objective | A campaign is a list of activities with no way of telling whether it worked | 4.2 and 4.5 (AO2, AO3) |
+| **Budget allocation** (`budget-allocation`) | Splits a promotion budget across channels, each with an audience, the spend that reaches two thirds of it and a conversion rate | Reach, customers, average and next-customer cost per channel, response curves, the first and next hundred spent, and a suggested split that evens out the next-customer cost | More money in the channel that worked best always buys more customers | Enrichment; an illustrative model |
