@@ -19,6 +19,12 @@ const KEYS = [
   { key: 'bb:strategy:…', what: 'Your analysis in each Strategy Studio tool, such as your SWOT, decision tree or recommendation memo, with a one-line summary of it.' },
   { key: 'bb:lab:…', what: 'Your work in the Entrepreneurship and Innovation Lab: the canvas, the feasibility scores, the costs, revenue and unit economics you entered, your business plan outline, and a summary of each tool’s results for the plan to quote.' },
   { key: 'bb:case:…', what: 'The alternative you chose in a case file’s decision exercise, your reasons and the date you committed.' },
+  { key: 'bb:ck:…', what: 'The items you ticked in the Assessment Centre checklists.' },
+  { key: 'bb:ia:rq', what: 'Your research question in the Assessment Centre builder.' },
+  { key: 'bb:ia:sd', what: 'The supporting documents you listed in the Assessment Centre, with their dates.' },
+  { key: 'bb:p3:plan', what: 'Your Paper 3 plan of action in the plan builder.' },
+  { key: 'bb:learner', what: 'For your dashboard: the subtopic, mindmap, case, toolkit and tool pages you open, with the time of your first and latest visit, and the exercise items you check, with whether each was right. Capped at the 400 most recent pages.' },
+  { key: 'bb:saved', what: 'The pages and items you saved with the Save button, listed on your dashboard.' },
 ];
 ---
 
@@ -55,6 +61,13 @@ const KEYS = [
           </tbody>
         </table>
       </div>
+      <div class="prose" style="margin-top:var(--sp-5)">
+        <p>
+          Your <a href="/dashboard/">dashboard</a> is built from these items. To show where you have been, the site notes in
+          <code>bb:learner</code> the pages you open, by kind, and when. Like everything else here, it stays in this browser and is never
+          sent anywhere. You can turn it off on the dashboard (nothing new is noted while it is off), download a copy, or clear it.
+        </p>
+      </div>
       <div class="clear-box" data-clear-box>
         <p class="small" data-count>Clearing needs JavaScript. You can also clear this site's data in your browser's settings.</p>
         <button type="button" class="btn btn--primary" data-clear hidden>Clear everything this site has stored</button>
@@ -72,8 +85,8 @@ const KEYS = [
           Links to other sites, such as the sources on the sources page, take you to sites with their own policies.
         </p>
         <p>
-          If accounts, analytics or progress tracking are ever added, this page will say so first, with what is collected, why, and how to
-          say no.
+          If accounts, analytics or any tracking that leaves your device are ever added, this page will say so first, with what is collected,
+          why, and how to say no.
         </p>
       </div>
     </section>

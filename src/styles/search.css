@@ -1,0 +1,522 @@
+/*
+ * Search (/search/). A catalogue, not a feed: one strong box, the kinds as a
+ * ruled facet list with live counts, and results set as an index, grouped by
+ * kind under fine rules. Without JavaScript the box and facets are hidden and
+ * the whole index is listed, with a contents list to jump to each kind.
+ * Global rather than scoped, so the 1,000-odd entries carry no scoping
+ * attributes.
+ */
+
+.sx-form {
+  display: grid;
+  gap: var(--sp-2);
+  max-width: 52rem;
+  margin-bottom: var(--sp-6);
+}
+
+.sx-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sx-box > .icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--navy-700);
+  pointer-events: none;
+}
+
+.sx-box input {
+  width: 100%;
+  min-height: 3.5rem;
+  padding: 0.75rem 1rem 0.75rem 3.1rem;
+  border: 2px solid var(--bb-ink);
+  border-radius: var(--radius-2);
+  background: var(--surface-sheet);
+  color: var(--text-strong);
+  font: 400 1.1875rem/1.3 var(--font-ui);
+  box-shadow: var(--shadow-sheet);
+}
+
+.sx-box input::placeholder {
+  color: var(--text-muted);
+}
+
+.sx-box input:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.sx-hint {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+}
+
+.sx-count {
+  margin: var(--sp-2) 0 0;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--navy-900);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Layout: facets beside the results on wide screens ---------- */
+
+.sx-layout {
+  display: grid;
+  gap: var(--sp-6);
+}
+
+@media (min-width: 64rem) {
+  [data-ix="search"].is-enhanced .sx-layout {
+    grid-template-columns: 15.5rem minmax(0, 52rem);
+    column-gap: var(--sp-7);
+    align-items: start;
+  }
+
+  .sx-facets {
+    position: sticky;
+    top: calc(var(--header-h) + var(--sp-4));
+    max-height: calc(100vh - var(--header-h) - var(--sp-6));
+    overflow-y: auto;
+    padding-right: var(--sp-2);
+  }
+}
+
+/* ---------- Facets ---------- */
+
+.sx-facets {
+  display: block;
+  min-width: 0;
+}
+
+/* On a narrow screen the filters fold into one line that says what is set. */
+.sx-facets__toggle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem var(--sp-3);
+  min-height: 2.75rem;
+  padding: 0.5rem 2.5rem 0.5rem 0.9rem;
+  position: relative;
+  border: 1px solid var(--rule-control);
+  border-radius: var(--radius-2);
+  background: var(--surface-sheet);
+  list-style: none;
+  cursor: pointer;
+}
+
+.sx-facets__toggle::-webkit-details-marker {
+  display: none;
+}
+
+.sx-facets__toggle::after {
+  content: "";
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid var(--navy-900);
+  border-bottom: 2px solid var(--navy-900);
+  transform: translateY(-70%) rotate(45deg);
+  transition: transform var(--dur-base) var(--ease);
+}
+
+.sx-facets[open] > .sx-facets__toggle::after {
+  transform: translateY(-30%) rotate(225deg);
+}
+
+.sx-facets__toggle:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.sx-facets__sum {
+  font-size: 0.9375rem;
+  font-weight: 560;
+  color: var(--text-strong);
+}
+
+.sx-facets__body {
+  display: grid;
+  gap: var(--sp-5);
+  align-content: start;
+  margin-top: var(--sp-4);
+}
+
+@media (min-width: 64rem) {
+  .sx-facets__toggle {
+    display: none;
+  }
+
+  .sx-facets__body {
+    margin-top: 0;
+  }
+}
+
+.sx-kinds {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.sx-kinds legend {
+  float: left;
+  width: 100%;
+  margin-bottom: var(--sp-2);
+  padding: 0 0 var(--sp-2);
+  border-bottom: 2px solid var(--rule-ink);
+}
+
+.sx-kind {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  min-height: 2.5rem;
+  padding: 0.55rem 0.6rem 0.55rem 0.9rem;
+  border-bottom: 1px solid var(--rule-hair);
+  border-left: 3px solid transparent;
+  font-size: 0.9375rem;
+  color: var(--text-body);
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease);
+}
+
+.sx-kind input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.sx-kind:hover {
+  background: var(--surface-sunk);
+}
+
+.sx-kind:has(input:focus-visible) {
+  outline: var(--focus-ring);
+  outline-offset: -3px;
+}
+
+.sx-kind:has(input:checked) {
+  border-left-color: var(--gold-500);
+  background: var(--surface-sheet);
+  color: var(--navy-900);
+  font-weight: 650;
+}
+
+.sx-kind__n {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--brass-text);
+}
+
+.sx-kind.is-zero {
+  color: var(--text-muted);
+}
+
+.sx-kind.is-zero .sx-kind__n {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* On narrower screens the kinds wrap as a row of chips. */
+@media (max-width: 63.99rem) {
+  .sx-kinds {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+  }
+
+  .sx-kinds legend {
+    float: none;
+    border-bottom: 0;
+    padding: 0;
+    margin-bottom: var(--sp-1);
+  }
+
+  .sx-kind {
+    min-height: 2.75rem;
+    align-items: center;
+    padding: 0.4rem 0.85rem;
+    border: 1px solid var(--rule-control);
+    border-radius: 999px;
+    background: var(--surface-sheet);
+  }
+
+  .sx-kind:has(input:checked) {
+    border-color: var(--bb-ink);
+    background: var(--bb-ink);
+    color: var(--text-on-ink);
+  }
+
+  .sx-kind:has(input:checked) .sx-kind__n {
+    color: var(--gold-400);
+  }
+
+  .sx-kind:has(input:focus-visible) {
+    outline-offset: 2px;
+  }
+}
+
+.sx-filters {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.sx-filter {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.sx-filter select {
+  min-height: 2.75rem;
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--rule-control);
+  border-radius: var(--radius-2);
+  background: var(--surface-sheet);
+  color: var(--text-strong);
+  font: 500 0.9375rem/1.2 var(--font-ui);
+}
+
+.sx-clear {
+  justify-self: start;
+  min-height: 2.75rem;
+}
+
+@media (max-width: 63.99rem) {
+  .sx-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: end;
+  }
+}
+
+@media (min-width: 40rem) and (max-width: 63.99rem) {
+  .sx-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+  }
+}
+
+/* ---------- Contents, without JavaScript ---------- */
+
+.sx-toc {
+  margin-bottom: var(--sp-6);
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--surface-sunk);
+  border-left: 3px solid var(--bb-ink);
+}
+
+.sx-toc ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-5);
+  margin: var(--sp-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sx-toc a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  min-height: 24px;
+  font-weight: 560;
+}
+
+.sx-toc__n {
+  font-size: 0.8125rem;
+  color: var(--brass-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Results ---------- */
+
+.sx-group + .sx-group {
+  margin-top: var(--sp-7);
+}
+
+.sx-group[hidden],
+.sx-list > li[hidden] {
+  display: none;
+}
+
+.sx-group__h {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin: 0;
+  padding-bottom: var(--sp-2);
+  border-bottom: 2px solid var(--rule-ink);
+  font-family: var(--font-ui);
+  font-size: var(--fs-label);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--navy-900);
+  scroll-margin-top: calc(var(--header-h) + var(--sp-4));
+}
+
+.sx-group__h:focus {
+  outline: none;
+}
+
+.sx-group__h:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 4px;
+}
+
+.sx-group__n {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--brass-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.sx-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Each entry: its link, a line saying what it is and where, and a line of text. Plain elements under the list, so the thousand entries carry no classes. */
+.sx-list > li {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+  padding: var(--sp-3) var(--sp-3) var(--sp-3) 0;
+  border-bottom: 1px solid var(--rule-hair);
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.sx-list > li:focus-within {
+  background: var(--surface-sheet);
+  box-shadow: inset 3px 0 0 var(--bb-cobalt);
+  padding-left: var(--sp-3);
+}
+
+.sx-list > li > a {
+  justify-self: start;
+  min-height: 24px;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--navy-900);
+  text-decoration: none;
+}
+
+.sx-list > li > a:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--gold-500);
+  text-underline-offset: 0.18em;
+}
+
+.sx-list > li > a mark {
+  background: var(--surface-gold-wash);
+  color: inherit;
+  box-shadow: inset 0 -2px 0 var(--gold-500);
+}
+
+/* What it is, and where it sits in the course */
+.sx-list > li > p:nth-of-type(1) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem 0.6rem;
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.sx-list > li > p:nth-of-type(1) > span:first-child {
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brass-text);
+}
+
+.sx-list > li > p:nth-of-type(1) > span:nth-child(2):not(.tag) {
+  font-variant-numeric: tabular-nums;
+}
+
+.sx-list > li > p:nth-of-type(1) > span:nth-child(2):not(.tag)::before {
+  content: "·";
+  margin-right: 0.6rem;
+  color: var(--rule);
+}
+
+/* The line of text; a formula's is set as a formula */
+.sx-list > li > p:nth-of-type(2) {
+  margin: 0;
+  max-width: 46rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--text-body);
+}
+
+[data-group="formulas"] .sx-list > li > p:nth-of-type(2) {
+  justify-self: start;
+  margin-top: 0.2rem;
+  padding: 0.3rem 0.6rem;
+  border-left: 2px solid var(--gold-500);
+  background: var(--surface-gold-wash);
+  font-size: 0.875rem;
+  font-weight: 560;
+  color: var(--navy-900);
+  font-variant-numeric: tabular-nums;
+}
+
+.sx-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  margin-top: var(--sp-2);
+  padding: 0.4rem 0;
+  border: 0;
+  background: none;
+  color: var(--cobalt-text);
+  font: 600 0.9375rem/1.2 var(--font-ui);
+  cursor: pointer;
+}
+
+.sx-more::after {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+}
+
+.sx-more:hover {
+  text-decoration: underline;
+}
+
+.sx-more:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.sx-none {
+  margin-top: var(--sp-5);
+}

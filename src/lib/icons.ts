@@ -29,6 +29,8 @@ export const ICONS = {
   check: '<path d="M4.5 12.5l4.5 4.5 10.5-10.5"/>',
   progress: '<path d="M3 12h4l3-7 4 14 3-7h4"/>',
   map: '<circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><circle cx="5" cy="18" r="2"/><path d="M7 6h10M6 8l5.2 8.3M18 8l-5.2 8.3M7 18h3"/>',
+  /* A ribbon bookmark for the save button; filled by the button when the page is saved. */
+  bookmark: '<path d="M6.5 3.5h11v17L12 16.25 6.5 20.5z"/>',
 } as const;
 
 export type IconId = keyof typeof ICONS;

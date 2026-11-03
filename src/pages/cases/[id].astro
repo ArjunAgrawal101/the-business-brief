@@ -13,6 +13,7 @@ import Exhibit from '../../components/blocks/Exhibit.astro';
 import DecisionExercise from '../../components/cases/DecisionExercise.astro';
 import LevelSwitch from '../../components/ui/LevelSwitch.astro';
 import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import SaveButton from '../../components/ui/SaveButton.astro';
 import { casesInOrder, corpus, href, longDate } from '../../lib/content';
 import { CONCEPT_NAMES, PROVENANCE_LABELS } from '../../lib/labels';
 import { allSubtopics, codeKey, subtopicHref } from '../../lib/learning';
@@ -87,6 +88,7 @@ const full = Boolean(cs.exercise || cs.analysisQuestions.length || cs.industryCo
       <span class="tag tag--plain">{cs.kind === 'fictional' ? 'Fictional organization' : 'Real organization'}</span>
       {cs.difficulty && <span class="tag tag--plain">{DIFFICULTY_LABELS[cs.difficulty].label}</span>}
       <span class="tag tag--plain">Updated {longDate(cs.updated)}</span>
+      <SaveButton title={cs.title} kind="case" />
     </div>
   </PageIntro>
 

@@ -21,7 +21,7 @@ There is no UI framework. Components are `.astro` files; browser behaviour is pl
 
 ## Why static
 
-The platform has no accounts and stores nothing on a server. A static site is the simplest thing that meets the requirements: it is fast, cheap to host, has no runtime attack surface, and can be read offline once loaded. If accounts, progress tracking or analytics are ever added, they need a privacy and consent review first (see `src/pages/privacy.astro`).
+The platform has no accounts and stores nothing on a server. A static site is the simplest thing that meets the requirements: it is fast, cheap to host, has no runtime attack surface, and can be read offline once loaded. The learner dashboard's record of the pages a reader opens stays in that reader's browser, can be paused, exported and cleared, and is described on the privacy page; anything that would leave the device, such as accounts, analytics or progress across devices, needs a privacy and consent review first (see `src/pages/privacy.astro`).
 
 ## The content layer
 
@@ -101,7 +101,7 @@ Each interaction follows the same pattern:
 4. Changing results are announced through a polite live region; errors are shown beside the field and marked with `aria-invalid`.
 5. If a script fails, the component shows its own error message and the server-rendered content remains.
 
-Work that a learner might want back is kept in `localStorage` under keys starting `bb:` (listed on the privacy page). Storage access never throws: if it is blocked, the interaction still works for the visit. The progress page (`/progress/`) only reads these keys.
+Work that a learner might want back is kept in `localStorage` under keys starting `bb:` (listed on the privacy page). Storage access never throws: if it is blocked, the interaction still works for the visit. The learner dashboard (`/dashboard/`, also rendered at its old address, `/progress/`) reads these keys through `dashboardView()` in `src/lib/dashboard.ts`. Two keys are its own, with their rules (parsing, size caps, merging, the import check) in `src/lib/learner.ts`: `bb:learner`, written by the recorder `src/scripts/learner.ts` with the pages opened by kind and the exercise items checked (it listens for the quiz engine's `quiz:progress`), and `bb:saved`, written by the save button (`src/components/ui/SaveButton.astro`). The recorder runs once a page, only when storage works and the reader has not paused it.
 
 Controls that need a script outside an interaction carry `needs-js`; an inline script in the head adds the class `js` to `<html>` before the first paint, and the controls stay hidden without it. A browser test checks that no page shows a button it cannot run.
 
@@ -133,13 +133,13 @@ The quiz engine (`src/scripts/quiz.ts`) dispatches a bubbling `quiz:progress` ev
 | `/rooms/`, `/case-room/`, `/case-room/halden-diagnosis/`, `/strategy-studio/`, `/market-studio/`, `/people-and-culture/`, `/operations-floor/` | All rooms; the rooms with pages of their own; the case lab |
 | `/strategy-studio/[tool]/` | The Strategy Studio's tools: `swot`, `steeple`, `five-forces`, `ansoff`, `bcg-matrix`, `generic-strategies`, `stakeholder-map`, `decision-tree`, `force-field`, `option-appraisal` |
 | `/market-studio/[instrument]/` | The nine Market Studio instruments, from one template (`src/pages/market-studio/[tool].astro`) |
-| `/progress/` | What this browser has kept |
+| `/dashboard/`, `/progress/` | The learner dashboard: what this browser has kept (the old address renders the same page) |
 | `/toolkit/`, `/toolkit/[id]/` | Toolkit (guides for complete tools only) |
 | `/exam-desk/practice/` | All practice questions, filterable (the other Exam Desk addresses redirect to the Assessment Centre) |
 | `/examiner-lens/`, `/ia-studio/` | Command terms; the IA planner |
 | `/revision/`, `/revision/[id]/` | Printable revision briefs |
 | `/ib/`, `/ib/map/`, `/ib/coverage/`, `/ib/concepts/` | The IB course, the course map, the coverage matrix, concepts |
-| `/search/`, `/sources/` | Search across everything; the sources and claims register |
+| `/search/`, `/sources/` | Search across everything, built from the content and every navigation link by `src/lib/search-index.ts`, with filters by kind, unit and level kept in the address; the sources and claims register |
 | `/pathways/`, `/pathways/[id]/` | Audience pathways |
 | `/entrepreneurship-lab/`, `/entrepreneurship-lab/[slug]/` | The Entrepreneurship and Innovation Lab: its home, six briefings and six tools, from the `briefings` and `labTools` collections |
 | `/about/`, `/platform/`, `/accessibility/`, `/privacy/` | About the creator and the platform |

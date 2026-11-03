@@ -15,6 +15,7 @@ import MindmapView from '../../components/mindmap/MindmapView.astro';
 import NoteView from '../../components/learn/NoteView.astro';
 import RetrievalCards from '../../components/assess/RetrievalCards.astro';
 import LevelSwitch from '../../components/ui/LevelSwitch.astro';
+import SaveButton from '../../components/ui/SaveButton.astro';
 import { corpus, href } from '../../lib/content';
 import { inline } from '../../lib/markup';
 import { allSubtopics, hubSubtopics, mindmapFor, noteFor, noteParts, subtopicHref, subtopicSlug } from '../../lib/learning';
@@ -81,6 +82,7 @@ const num = () => {
         {map && <a class="tag tag--plain" href="#map">Mindmap</a>}
         {terms.length > 0 && <a class="tag tag--plain" href="#terms">{terms.length} key terms</a>}
         {showSwitch && <LevelSwitch />}
+        <SaveButton title={`${s.code} ${s.title}`} kind="topic" />
       </div>
       {
         s.level === 'HL' && (
