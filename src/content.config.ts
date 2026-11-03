@@ -15,6 +15,7 @@ import {
   decisionSchema,
   glossarySchema,
   interactiveSchema,
+  intelligenceSchema,
   mindmapSchema,
   moduleSchema,
   noteSchema,
@@ -90,4 +91,5 @@ export const collections = {
   sources: defineCollection({ loader: file('./src/content/data/sources.yaml'), schema: sourceSchema }),
   claims: defineCollection({ loader: file('./src/content/data/claims.yaml'), schema: claimSchema }),
   resources: defineCollection({ loader: file('./src/content/data/resources.yaml'), schema: resourceSchema }),
+  intelligence: defineCollection({ loader: yamlFiles('./src/content/intelligence'), schema: intelligenceSchema }),
 };
