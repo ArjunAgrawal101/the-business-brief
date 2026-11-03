@@ -64,7 +64,8 @@ const evidence = (vc: (typeof cases)[number]) =>
     .join(', ') + (vc.caseType ? `; ${CASE_TYPE_LABELS[vc.caseType].label.toLowerCase()}` : '');
 const sorted = (codes: string[]) => [...codes].sort((a, b) => codeKey(a) - codeKey(b));
 
-const config = { order, cases, built };
+// The Case of the Week needs what it shows, not the search text the archive uses.
+const config = { order, cases: cases.map((vc) => ({ ...vc, text: '' })), built };
 const description = `An archive of ${total} business cases for IB Diploma, undergraduate and MBA study, with filters by industry, function, difficulty, qualification, topic and concept, and a Case of the Week.`;
 ---
 
