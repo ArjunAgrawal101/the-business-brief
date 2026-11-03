@@ -14,7 +14,8 @@ import { BREAK_EVEN_BUILDERS, BREAK_EVEN_DEFAULTS, breakEvenState, validateBreak
 import { BUDGET_DEFAULTS, buildBudget, validateBudget } from '../../src/lib/finance-lab/budget';
 import { ACCOUNTS, BREAK_EVEN, CASH_FLOW, OPENING_STOCK, PROFIT_AND_LOSS, PROJECT, SETTINGS } from '../../src/lib/finance-lab/business';
 import { buildCash, CASH_DEFAULTS, cashState, forecastOf, monthLabels, validateCash } from '../../src/lib/finance-lab/cash';
-import { GROUPS, LAB, labEntry, labForRegister } from '../../src/lib/finance-lab/catalogue';
+import { GROUPS, LAB, PRACTICE_KIND, labEntry, labForRegister } from '../../src/lib/finance-lab/catalogue';
+import { KINDS, generate, parseCode, type KindId } from '../../src/lib/p2-practice';
 import { arrBarsSvg, cashLineSvg, contributionBarsSvg, discountedSvg, npvProfileSvg, ratioBarsSvg, varianceBarsSvg, waterfallSvg } from '../../src/lib/finance-lab/charts';
 import { checkValue, cleanSettings, fillLabel } from '../../src/lib/finance-lab/fields';
 import { cashGridHtml, budgetGridHtml, yearsHtml } from '../../src/lib/finance-lab/forms';
@@ -529,5 +530,29 @@ describe('the catalogue, formulas, charts and export', () => {
     expect(checkValue(0, f)).toBe('Capacity must be at least 1.');
     expect(checkValue(5, { ...f, max: 4 })).toBe('Capacity must be no more than 4.');
     expect(checkValue(3, f)).toBeNull();
+  });
+});
+
+describe('each calculator points to a practice question on the same calculation', () => {
+  it('names real calculators and real practice kinds, at the same level', () => {
+    for (const [lab, kind] of Object.entries(PRACTICE_KIND)) {
+      const e = labEntry(lab);
+      const k = KINDS[kind as KindId];
+      expect(k, `${lab} -> ${kind}`).toBeDefined();
+      expect(k?.level, `${lab} is ${e.level}, its practice kind ${k?.level}`).toBe(e.level);
+    }
+  });
+
+  it('covers every calculator but budget variances, which has no practice kind yet', () => {
+    expect(LAB.filter((e) => !PRACTICE_KIND[e.id]).map((e) => e.id)).toEqual(['budget-variances']);
+  });
+
+  it('opens on a question the practice page can read from its address', () => {
+    for (const kind of Object.values(PRACTICE_KIND)) {
+      const code = `${KINDS[kind as KindId]?.code}-24680`;
+      const parsed = parseCode(code);
+      expect(parsed, code).toEqual({ kind, seed: 24680 });
+      expect(generate(parsed!.kind, parsed!.seed).code).toBe(code);
+    }
   });
 });

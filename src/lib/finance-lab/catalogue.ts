@@ -353,6 +353,33 @@ export function labEntry(id: string): LabEntry {
 
 export const labHref = (id: string): string => `/finance-desk/lab/${id}/`;
 
+/**
+ * The kind of Paper 2 practice question (src/lib/p2-practice.ts) that drills
+ * each calculator's calculation, so a reader who has used the calculator can
+ * try one with fresh figures. Budget variances have no practice kind yet.
+ */
+export const PRACTICE_KIND: Readonly<Record<string, string>> = {
+  'break-even-quantity': 'break-even-quantity',
+  'break-even-revenue': 'break-even-revenue',
+  'margin-of-safety': 'margin-of-safety',
+  'target-profit': 'target-profit-output',
+  contribution: 'contribution-per-unit',
+  'profit-and-loss': 'profit',
+  'gross-profit-margin': 'gross-profit-margin',
+  'profit-margin': 'profit-margin',
+  roce: 'roce',
+  'current-ratio': 'current-ratio',
+  'acid-test-ratio': 'acid-test-ratio',
+  'stock-turnover': 'stock-turnover-times',
+  'debtor-days': 'debtor-days',
+  'creditor-days': 'creditor-days',
+  'gearing-ratio': 'gearing-ratio',
+  'cash-flow-forecast': 'closing-balance',
+  'payback-period': 'payback-period',
+  'average-rate-of-return': 'average-rate-of-return',
+  'net-present-value': 'net-present-value',
+};
+
 /** The calculators of a group, in order. */
 export const inGroup = (g: GroupId): LabEntry[] => LAB.filter((e) => e.group === g);
 

@@ -1,6 +1,7 @@
 // Checks every internal link and asset in the built site: the target file must
 // exist and, for a link with a #fragment, the target page must contain an
-// element with that id. External links are listed, not fetched.
+// element with that id (or be a page whose fragment is a state, listed below).
+// External links are listed, not fetched.
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
@@ -27,6 +28,11 @@ const resolveFile = (path) => {
   return p;
 };
 
+// Pages whose fragment carries a state their script reads rather than naming an element: Paper 2 practice
+// opens the question whose code follows the # (as in #CFB-24680), and writes the code there itself.
+const STATE_FRAGMENTS = [{ page: '/assessment/paper-2/practice/', fragment: /^[A-Z]{3}-\d{5}$/ }];
+const isState = (path, frag) => STATE_FRAGMENTS.some((s) => s.page === path && s.fragment.test(frag));
+
 const problems = [];
 const external = new Set();
 let checked = 0;
@@ -50,7 +56,7 @@ for (const page of pages) {
       problems.push(`${from}: broken link ${url}`);
       continue;
     }
-    if (frag && file.endsWith('.html') && !idsOf(file).has(frag)) problems.push(`${from}: ${url} has no element with id "${frag}"`);
+    if (frag && file.endsWith('.html') && !idsOf(file).has(frag) && !isState(targetPath, frag)) problems.push(`${from}: ${url} has no element with id "${frag}"`);
   }
   // Internal links must end with a slash (the site uses trailing slashes).
   for (const m of html.matchAll(/\shref="(\/[^"#?]*)(?:[#?][^"]*)?"/g)) {

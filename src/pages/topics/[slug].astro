@@ -11,6 +11,7 @@ import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import Diagram from '../../components/diagrams/Diagram.astro';
 import { DIAGRAMS } from '../../lib/diagrams';
+import { LAB, labHref } from '../../lib/finance-lab/catalogue';
 import MindmapView from '../../components/mindmap/MindmapView.astro';
 import NoteView from '../../components/learn/NoteView.astro';
 import RetrievalCards from '../../components/assess/RetrievalCards.astro';
@@ -44,6 +45,8 @@ const terms = Object.entries(c.glossary)
 const ixs = Object.entries(c.interactives).filter(([, it]) => it.page && it.syllabus.includes(code));
 const calcs = Object.entries(c.calculations).filter(([, k]) => k.syllabus.some((x) => x.code === code));
 const questions = Object.entries(c.questions).filter(([, q]) => q.syllabus.includes(code));
+// The Financial Laboratory's calculators for the subtopic, where the reader enters their own figures.
+const labCalcs = LAB.filter((e) => e.subtopic === code);
 const hasHL = s.level !== 'SL/HL';
 const levelText = s.level === 'HL' ? 'HL only' : s.level === 'SL/HL' ? 'SL and HL' : 'SL and HL, with HL-only content';
 const status = note ? 'Full notes' : brief ? 'Taught in a brief' : 'Notes planned';
@@ -188,7 +191,7 @@ const num = () => {
     }
 
     {
-      (ixs.length > 0 || calcs.length > 0 || questions.length > 0) && (
+      (ixs.length > 0 || labCalcs.length > 0 || calcs.length > 0 || questions.length > 0) && (
         <section aria-labelledby="sh-tools-h" class="sh-sec">
           <SectionHead no={num()} title="Tools and practice" id="sh-tools-h" />
           <div class="sh-tools">
@@ -199,6 +202,18 @@ const num = () => {
                   {ixs.map(([id, it]) => (
                     <li>
                       <a href={`${it.page}#ix-${id}`}>{it.title}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {labCalcs.length > 0 && (
+              <div>
+                <p class="label">Financial Laboratory</p>
+                <ul>
+                  {labCalcs.map((e) => (
+                    <li>
+                      <a href={labHref(e.id)}>{e.name}</a> {e.level === 'HL' && s.level !== 'HL' && <span class="tag tag--hl">HL</span>}
                     </li>
                   ))}
                 </ul>

@@ -20,7 +20,8 @@ import InvestmentScript from './scripts/InvestmentScript.astro';
 import { corpus, href } from '../../lib/content';
 import { noteFor, subtopicHref, allSubtopics } from '../../lib/learning';
 import { BUSINESS } from '../../lib/finance-lab/business';
-import { GROUPS, LAB, labEntry, labHref } from '../../lib/finance-lab/catalogue';
+import { GROUPS, LAB, PRACTICE_KIND, labEntry, labHref } from '../../lib/finance-lab/catalogue';
+import { KINDS, type KindId } from '../../lib/p2-practice';
 import { FORMULAS } from '../../lib/finance-lab/formulas';
 import { OPTIONS_NOTE } from '../../lib/finance-lab/breakeven';
 import { defaultReport } from '../../lib/finance-lab/registry';
@@ -38,6 +39,9 @@ const report = defaultReport(id);
 const html = regionsHtml(report, e.name);
 const formulas = FORMULAS[id] ?? [];
 const uid = `fl-${id}`;
+// A practice question on the same calculation, opened by its code (the practice page reads it from the address).
+const practiceKind = PRACTICE_KIND[id] as KindId | undefined;
+const practice = practiceKind && KINDS[practiceKind] ? { href: `/assessment/paper-2/practice/#${KINDS[practiceKind].code}-24680`, name: KINDS[practiceKind].name } : undefined;
 const sub = allSubtopics(c).find((x) => x.s.code === e.subtopic)?.s;
 const notes = noteFor(c, e.subtopic);
 const subHref = subtopicHref(c, e.subtopic);
@@ -216,6 +220,15 @@ const EXTRA_TITLE: Record<string, string> = { statement: 'The statement', cash: 
           <a href="/resources/formula-sheet/">The formula sheet</a>
           <span class="small muted">The formulae the examination provides, and the ones to learn, on one printable page.</span>
         </li>
+        {
+          practice && (
+            <li>
+              <span class="label">Practice</span>
+              <a href={practice.href}>{practice.name}, a practice question</a>
+              <span class="small muted">Fresh fictional figures, checked as you answer, with the working and the usual slips. Paper 2 style, the platform’s own.</span>
+            </li>
+          )
+        }
         <li>
           <span class="label">On a case</span>
           <a href={e.desk.href}>{e.desk.label}</a>
