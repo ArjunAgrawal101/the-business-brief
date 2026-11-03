@@ -6,12 +6,12 @@ import { expect, test } from '@playwright/test';
 
 test('below the fold, groups wait until they are scrolled into view', async ({ page }) => {
   await page.goto('/');
-  const rooms = page.locator('.hr[data-reveal]');
-  await expect(rooms).toHaveClass(/is-pending/);
-  await expect(rooms).not.toHaveClass(/is-in/);
-  await rooms.scrollIntoViewIfNeeded();
-  await expect(rooms).toHaveClass(/is-in/);
-  await expect(rooms.locator('> li').last()).toHaveCSS('opacity', '1');
+  const units = page.locator('.hc[data-reveal]');
+  await expect(units).toHaveClass(/is-pending/);
+  await expect(units).not.toHaveClass(/is-in/);
+  await units.scrollIntoViewIfNeeded();
+  await expect(units).toHaveClass(/is-in/);
+  await expect(units.locator('> li').last()).toHaveCSS('opacity', '1');
 });
 
 test('nothing is held back under reduced motion', async ({ browser }) => {
@@ -19,7 +19,7 @@ test('nothing is held back under reduced motion', async ({ browser }) => {
   const page = await context.newPage();
   await page.goto('/');
   await expect(page.locator('.is-pending')).toHaveCount(0);
-  await expect(page.locator('.hr > li').last()).toHaveCSS('opacity', '1');
+  await expect(page.locator('.hc > li').last()).toHaveCSS('opacity', '1');
   // The hero arrives at once.
   await expect(page.locator('.hh .btn--primary').first()).toHaveCSS('opacity', '1');
   await context.close();

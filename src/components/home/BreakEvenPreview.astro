@@ -1,0 +1,246 @@
+---
+/**
+ * A working preview of the Finance Desk on the home page: enter a price,
+ * a variable cost, fixed costs and an output, and the break-even figures and
+ * chart answer at once. Without JavaScript it shows the worked default, and
+ * says the boxes need a script.
+ */
+import { PREVIEW_DEFAULTS, previewChart, previewLines } from '../../lib/home-preview';
+
+const d = PREVIEW_DEFAULTS;
+const lines = previewLines(d);
+const FIELDS = [
+  { id: 'price', label: 'Selling price per unit', prefix: '$', value: d.price, step: '0.5' },
+  { id: 'variableCost', label: 'Variable cost per unit', prefix: '$', value: d.variableCost, step: '0.5' },
+  { id: 'fixedCosts', label: 'Fixed costs per year', prefix: '$', value: d.fixedCosts, step: '1000' },
+  { id: 'output', label: 'Output (units a year)', prefix: '', value: d.output, step: '100' },
+];
+---
+
+<div class="hp" data-preview data-ix>
+  <form class="hp__form js-only" aria-describedby="hp-note" onsubmit="return false">
+    <fieldset>
+      <legend class="label">Your figures</legend>
+      {
+        FIELDS.map((f) => (
+          <div class="hp__field">
+            <label for={`hp-${f.id}`}>{f.label}</label>
+            <span class="hp__input">
+              {f.prefix && <span aria-hidden="true">{f.prefix}</span>}
+              <input id={`hp-${f.id}`} name={f.id} type="number" inputmode="decimal" min="0" step={f.step} value={f.value} />
+            </span>
+          </div>
+        ))
+      }
+    </fieldset>
+    <p class="hp__note small muted" id="hp-note">A workshop's figures to start; they are fictional. Change any box and the answer follows.</p>
+  </form>
+
+  <div class="hp__out">
+    <div class="hp__chart" data-preview-chart set:html={previewChart(d, 'hp')} />
+    <dl class="hp__lines" data-preview-lines>
+      {
+        lines.map((l) => (
+          <div>
+            <dt>{l.label}</dt>
+            <dd>{l.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+    <p class="sr-only" aria-live="polite" data-preview-live></p>
+    <p class="nojs-only small muted">This is the worked example for a fictional workshop. With JavaScript on, you can enter your own figures.</p>
+    <p class="hp__more">
+      <a class="btn btn--primary" href="/finance-desk/">Open the Finance Desk <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+      <a href="/topics/break-even-analysis/">Learn break-even (5.5)</a>
+    </p>
+  </div>
+</div>
+
+<style>
+  .hp {
+    display: grid;
+    grid-template-columns: minmax(15rem, 0.8fr) minmax(0, 2fr);
+    gap: var(--sp-6);
+    margin-top: var(--sp-6);
+    padding: clamp(1.25rem, 3vw, 2.25rem);
+    color: var(--text-on-ink);
+    background:
+      linear-gradient(rgba(244, 239, 228, 0.04) 1px, transparent 1px) 0 0 / 100% 28px,
+      linear-gradient(90deg, rgba(244, 239, 228, 0.04) 1px, transparent 1px) 0 0 / 28px 100%,
+      var(--surface-ink);
+    border-top: 3px solid var(--gold-400);
+  }
+
+  .hp fieldset {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .hp legend {
+    color: var(--text-gold-on-ink);
+  }
+
+  .hp__field {
+    margin-top: var(--sp-3);
+  }
+
+  .hp__field label {
+    display: block;
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--text-on-ink);
+  }
+
+  .hp__input {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.35rem;
+    padding: 0 0.75rem;
+    min-height: 2.75rem;
+    background: var(--surface-ink-raised);
+    border: 1px solid rgba(244, 239, 228, 0.3);
+  }
+
+  .hp__input:focus-within {
+    border-color: var(--gold-400);
+    outline: 2px solid var(--gold-400);
+    outline-offset: 1px;
+  }
+
+  .hp__input span {
+    color: var(--text-on-ink-muted);
+  }
+
+  .hp__input input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: var(--text-on-ink);
+    font: 600 1.0625rem var(--font-ui);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hp__input input:focus {
+    outline: none;
+  }
+
+  .hp__note {
+    margin-top: var(--sp-3);
+    color: var(--text-on-ink-muted);
+  }
+
+  .hp__out {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: var(--sp-5);
+    align-items: start;
+  }
+
+  .hp__chart :global(.hp-chart) {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .hp__chart :global(.hp-axes line) {
+    stroke: rgba(244, 239, 228, 0.5);
+  }
+
+  .hp__chart :global(.hp-tick),
+  .hp__chart :global(.hp-axis-label),
+  .hp__chart :global(.hp-key text) {
+    font: 500 11px var(--font-ui);
+    fill: var(--text-on-ink-muted);
+  }
+
+  .hp__chart :global(.hp-tr) {
+    stroke: var(--gold-400);
+    stroke-width: 2.5;
+    fill: none;
+  }
+
+  .hp__chart :global(.hp-tc) {
+    stroke: #9db0ff;
+    stroke-width: 2.5;
+    fill: none;
+  }
+
+  .hp__chart :global(.hp-fc) {
+    stroke: rgba(244, 239, 228, 0.55);
+    stroke-width: 1.5;
+    stroke-dasharray: 5 5;
+    fill: none;
+  }
+
+  .hp__chart :global(.hp-be line),
+  .hp__chart :global(.hp-out line) {
+    stroke: rgba(244, 239, 228, 0.4);
+    stroke-dasharray: 3 4;
+  }
+
+  .hp__chart :global(.hp-be circle) {
+    fill: var(--text-on-ink);
+  }
+
+  .hp__chart :global(.hp-be text),
+  .hp__chart :global(.hp-out text) {
+    font: 600 11px var(--font-ui);
+    fill: var(--text-on-ink);
+  }
+
+  .hp__lines {
+    margin: 0;
+    border-top: 1px solid rgba(244, 239, 228, 0.25);
+  }
+
+  .hp__lines > div {
+    padding: var(--sp-2) 0;
+    border-bottom: 1px solid rgba(244, 239, 228, 0.12);
+  }
+
+  .hp__lines dt {
+    font-size: var(--fs-label);
+    font-weight: 650;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-gold-on-ink);
+  }
+
+  .hp__lines dd {
+    margin: 0.2rem 0 0;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-on-ink);
+  }
+
+  .hp__more {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-4);
+    margin: 0;
+  }
+
+  .hp__more a:not(.btn) {
+    color: var(--cobalt-on-ink);
+  }
+
+  .hp .nojs-only {
+    color: var(--text-on-ink-muted);
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 64rem) {
+    .hp,
+    .hp__out {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

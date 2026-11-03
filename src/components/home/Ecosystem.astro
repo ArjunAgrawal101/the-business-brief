@@ -1,0 +1,413 @@
+---
+/**
+ * The learning ecosystem as the floor plan of an institution: a library wing
+ * (Explore), case rooms (Practise), laboratories (Tools), an examination
+ * hall (Assess) and an entrance hall (Discover), around the atrium of The
+ * Business Brief. The plan is a drawing (aria-hidden); the list beside it is
+ * the real navigation, read from src/lib/navigation.ts. Pointing at a wing
+ * lights its list, and pointing at or focusing a list lights its wing; a
+ * click on a wing takes focus to its first link.
+ */
+import Monogram from '../brand/Monogram.astro';
+import { NAV } from '../../lib/navigation';
+
+interface Props {
+  complete: number;
+  total: number;
+}
+const { complete, total } = Astro.props;
+
+const WINGS: Record<string, { x: number; y: number; w: number; h: number; room: string }> = {
+  explore: { x: 24, y: 24, w: 236, h: 150, room: 'The library' },
+  practise: { x: 380, y: 24, w: 236, h: 150, room: 'The case rooms' },
+  tools: { x: 24, y: 286, w: 236, h: 150, room: 'The laboratories' },
+  assess: { x: 380, y: 286, w: 236, h: 150, room: 'The examination hall' },
+  discover: { x: 262, y: 356, w: 116, h: 80, room: 'Entrance' },
+};
+const count = (id: string) => NAV.find((g) => g.id === id)?.links.length ?? 0;
+---
+
+<div class="eco" data-eco>
+  <figure class="eco__plan">
+    <svg viewBox="0 0 640 460" aria-hidden="true" focusable="false">
+      <defs>
+        <pattern id="eco-tiles" width="16" height="16" patternUnits="userSpaceOnUse">
+          <path d="M16 0H0V16" fill="none" stroke="#0b1a33" stroke-opacity=".05" />
+        </pattern>
+      </defs>
+      <rect x="8" y="8" width="624" height="444" fill="url(#eco-tiles)" stroke="#0b1a33" stroke-opacity=".25" />
+      <!-- Corridors from each wing to the atrium -->
+      <g class="eco__corridors">
+        <path d="M260 120 L262 150 Q276 166 270 176" />
+        <path d="M380 120 L378 150 Q364 166 370 176" />
+        <path d="M260 340 L262 310 Q276 294 270 284" />
+        <path d="M380 340 L378 310 Q364 294 370 284" />
+        <path d="M320 356 L320 314" />
+      </g>
+
+      <!-- The library: shelves -->
+      <g class="eco__wing" data-wing="explore">
+        <rect x={WINGS.explore!.x} y={WINGS.explore!.y} width={WINGS.explore!.w} height={WINGS.explore!.h} />
+        <g class="eco__detail">
+          {[0, 1, 2, 3, 4].map((i) => <line x1="44" y1={88 + i * 16} x2="160" y2={88 + i * 16} />)}
+          {[0, 1, 2, 3, 4].map((i) => <line x1="176" y1={88 + i * 16} x2="240" y2={88 + i * 16} />)}
+        </g>
+      </g>
+
+      <!-- The case rooms: a discussion table -->
+      <g class="eco__wing" data-wing="practise">
+        <rect x={WINGS.practise!.x} y={WINGS.practise!.y} width={WINGS.practise!.w} height={WINGS.practise!.h} />
+        <g class="eco__detail">
+          <rect x="430" y="100" width="136" height="44" rx="22" />
+          {[0, 1, 2, 3].map((i) => <rect x={442 + i * 30} y="86" width="18" height="8" rx="2" />)}
+          {[0, 1, 2, 3].map((i) => <rect x={442 + i * 30} y="150" width="18" height="8" rx="2" />)}
+        </g>
+      </g>
+
+      <!-- The laboratories: benches and a chart -->
+      <g class="eco__wing" data-wing="tools">
+        <rect x={WINGS.tools!.x} y={WINGS.tools!.y} width={WINGS.tools!.w} height={WINGS.tools!.h} />
+        <g class="eco__detail">
+          <rect x="44" y="348" width="88" height="26" />
+          <rect x="44" y="388" width="88" height="26" />
+          <polyline points="152,412 172,396 192,402 212,376 236,360" />
+          <line x1="150" y1="416" x2="240" y2="416" />
+        </g>
+      </g>
+
+      <!-- The examination hall: rows of desks -->
+      <g class="eco__wing" data-wing="assess">
+        <rect x={WINGS.assess!.x} y={WINGS.assess!.y} width={WINGS.assess!.w} height={WINGS.assess!.h} />
+        <g class="eco__detail">
+          {[0, 1, 2].map((r) => [0, 1, 2, 3, 4].map((c) => <rect x={404 + c * 40} y={350 + r * 24} width="24" height="12" />))}
+        </g>
+      </g>
+
+      <!-- The entrance hall: doors -->
+      <g class="eco__wing" data-wing="discover">
+        <rect x={WINGS.discover!.x} y={WINGS.discover!.y} width={WINGS.discover!.w} height={WINGS.discover!.h} />
+        <g class="eco__detail">
+          <path d="M300 436 A20 20 0 0 1 320 416 M340 436 A20 20 0 0 0 320 416" />
+        </g>
+      </g>
+
+      <!-- The atrium -->
+      <g class="eco__atrium">
+        <circle cx="320" cy="230" r="84" />
+        <circle cx="320" cy="230" r="76" class="eco__atrium-inner" />
+      </g>
+
+      {
+        NAV.map((g) => {
+          const w = WINGS[g.id]!;
+          const small = g.id === 'discover';
+          return (
+            <g class="eco__label" data-wing={g.id}>
+              <text x={w.x + (small ? w.w / 2 : 16)} y={w.y + (small ? 30 : 30)} text-anchor={small ? 'middle' : 'start'} class="eco__room">
+                {w.room}
+              </text>
+              <text x={w.x + (small ? w.w / 2 : 16)} y={w.y + (small ? 50 : 54)} text-anchor={small ? 'middle' : 'start'} class="eco__group">
+                {g.label}
+              </text>
+              {!small && (
+                <text x={w.x + w.w - 14} y={w.y + 30} text-anchor="end" class="eco__count">
+                  {count(g.id)}
+                </text>
+              )}
+            </g>
+          );
+        })
+      }
+    </svg>
+    <div class="eco__core" aria-hidden="true">
+      <Monogram height={34} reversed />
+      <span class="eco__core-name">The Business Brief</span>
+      <span class="eco__core-stat">{complete} of {total} subtopics complete</span>
+    </div>
+    <figcaption class="sr-only">The platform drawn as a building: five wings around a central atrium. The same destinations are listed beside the plan.</figcaption>
+  </figure>
+
+  <div class="eco__list">
+    {
+      NAV.map((g) => (
+        <section class="eco__groupbox" data-wing={g.id} aria-labelledby={`eco-${g.id}`}>
+          <h3 id={`eco-${g.id}`} class="eco__h">
+            <span class="eco__mark" aria-hidden="true" />
+            {g.label}
+            <span class="eco__room-name">{WINGS[g.id]!.room}</span>
+          </h3>
+          <p class="eco__intro">{g.intro}</p>
+          <ul class="eco__links" role="list">
+            {g.links.map((l) => (
+              <li>
+                <a href={l.href}>{l.label}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .eco {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: clamp(1.5rem, 4vw, 4rem);
+    align-items: start;
+    margin-top: var(--sp-6);
+  }
+
+  .eco__plan {
+    position: sticky;
+    top: calc(var(--header-h) + var(--sp-4));
+    margin: 0;
+  }
+
+  .eco__plan svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: var(--surface-sheet);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .eco__corridors path {
+    fill: none;
+    stroke: #b39350;
+    stroke-width: 1.5;
+    stroke-dasharray: 4 5;
+  }
+
+  .eco__wing > rect {
+    fill: #fbf8f1;
+    stroke: #0b1a33;
+    stroke-opacity: 0.55;
+    stroke-width: 1.5;
+    transition:
+      fill var(--dur-base) var(--ease),
+      stroke var(--dur-base) var(--ease);
+  }
+
+  .eco__wing {
+    cursor: pointer;
+  }
+
+  .eco__detail {
+    fill: none;
+    stroke: #0b1a33;
+    stroke-opacity: 0.32;
+    transition: stroke var(--dur-base) var(--ease);
+  }
+
+  .eco__wing[data-wing="explore"] { --wing: #0b1a33; }
+  .eco__wing[data-wing="practise"] { --wing: #7a2e2e; }
+  .eco__wing[data-wing="tools"] { --wing: #2f6f5e; }
+  .eco__wing[data-wing="assess"] { --wing: #1d3cb4; }
+  .eco__wing[data-wing="discover"] { --wing: #8a6b2a; }
+
+  .eco__wing.is-lit > rect,
+  .eco__wing:hover > rect {
+    fill: color-mix(in srgb, var(--wing) 9%, #fbf8f1);
+    stroke: var(--wing);
+    stroke-opacity: 1;
+    stroke-width: 2.5;
+  }
+
+  .eco__wing.is-lit .eco__detail,
+  .eco__wing:hover .eco__detail {
+    stroke: var(--wing);
+    stroke-opacity: 0.7;
+  }
+
+  .eco__atrium circle {
+    fill: #0b1a33;
+  }
+
+  .eco__atrium .eco__atrium-inner {
+    fill: none;
+    stroke: #c9a866;
+    stroke-opacity: 0.6;
+  }
+
+  .eco__label {
+    pointer-events: none;
+  }
+
+  .eco__room {
+    font: 600 10px var(--font-ui);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    fill: #566173;
+  }
+
+  .eco__group {
+    font: 500 22px var(--font-display);
+    fill: #0b1a33;
+  }
+
+  .eco__label[data-wing="discover"] .eco__group {
+    font-size: 17px;
+  }
+
+  .eco__count {
+    font: 400 26px var(--font-display);
+    font-style: italic;
+    fill: #8a6b2a;
+  }
+
+  .eco__core {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: grid;
+    justify-items: center;
+    gap: 0.15rem;
+    width: 24%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .eco__core :global(.monogram) {
+    width: 46%;
+    height: auto;
+  }
+
+  .eco__core-name {
+    font: 600 clamp(0.42rem, 0.78vw, 0.6rem) var(--font-brand);
+    letter-spacing: 0.04em;
+    color: #f4efe4;
+    text-transform: uppercase;
+  }
+
+  .eco__core-stat {
+    max-width: 80%;
+    font-size: clamp(0.4rem, 0.72vw, 0.54rem);
+    line-height: 1.25;
+    color: var(--gold-300);
+  }
+
+  .eco__list {
+    display: grid;
+    gap: 0;
+    border-top: 1px solid var(--navy-900);
+  }
+
+  .eco__groupbox {
+    padding: var(--sp-4) var(--sp-3) var(--sp-4) var(--sp-4);
+    border-bottom: 1px solid var(--rule-hair);
+    border-left: 3px solid transparent;
+    transition:
+      border-color var(--dur-base) var(--ease),
+      background-color var(--dur-base) var(--ease);
+  }
+
+  .eco__groupbox[data-wing="explore"] { --wing: #0b1a33; }
+  .eco__groupbox[data-wing="practise"] { --wing: #7a2e2e; }
+  .eco__groupbox[data-wing="tools"] { --wing: #2f6f5e; }
+  .eco__groupbox[data-wing="assess"] { --wing: #1d3cb4; }
+  .eco__groupbox[data-wing="discover"] { --wing: #8a6b2a; }
+
+  .eco__groupbox.is-lit {
+    border-left-color: var(--wing);
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  .eco__h {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.6rem;
+    margin: 0;
+    font-size: var(--fs-h4);
+  }
+
+  .eco__mark {
+    width: 0.6rem;
+    height: 0.6rem;
+    align-self: center;
+    background: var(--wing);
+  }
+
+  .eco__room-name {
+    font: 600 var(--fs-label) var(--font-ui);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .eco__intro {
+    margin: var(--sp-2) 0 0;
+    font-size: var(--fs-small);
+    color: var(--text-muted);
+    max-width: 38rem;
+  }
+
+  .eco__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.1rem 1.15rem;
+    margin: var(--sp-2) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .eco__links li {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .eco__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    text-decoration: none;
+  }
+
+  .eco__links a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  @media (max-width: 60rem) {
+    .eco {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .eco__plan {
+      position: relative;
+      top: 0;
+      max-width: 36rem;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-eco]').forEach((root) => {
+    const wings = [...root.querySelectorAll<SVGGElement>('.eco__wing')];
+    const boxes = [...root.querySelectorAll<HTMLElement>('.eco__groupbox')];
+    const light = (id: string | null) => {
+      wings.forEach((w) => w.classList.toggle('is-lit', w.dataset.wing === id));
+      boxes.forEach((b) => b.classList.toggle('is-lit', b.dataset.wing === id));
+    };
+    boxes.forEach((b) => {
+      b.addEventListener('mouseenter', () => light(b.dataset.wing ?? null));
+      b.addEventListener('focusin', () => light(b.dataset.wing ?? null));
+    });
+    wings.forEach((w) => {
+      w.addEventListener('mouseenter', () => light(w.dataset.wing ?? null));
+      w.addEventListener('click', () => {
+        const box = boxes.find((b) => b.dataset.wing === w.dataset.wing);
+        box?.querySelector<HTMLAnchorElement>('a')?.focus();
+      });
+    });
+    root.addEventListener('mouseleave', () => light(null));
+    root.addEventListener('focusout', (e) => {
+      if (!root.contains(e.relatedTarget as Node | null)) light(null);
+    });
+  });
+</script>

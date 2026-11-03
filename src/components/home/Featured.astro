@@ -1,0 +1,316 @@
+---
+/**
+ * The weekly briefing: a case of the week, a strategic decision, a financial
+ * analysis challenge, a management insight and a featured framework. Every
+ * variant is rendered; the build week's shows by default and the reader's
+ * own ISO week chooses in the browser (src/scripts/home.ts). Nothing here
+ * is news: the cases and decisions are the platform's fictional ones, the
+ * figures are worked by its functions, and the insights are its own teaching.
+ */
+import { corpus, href } from '../../lib/content';
+import { CHALLENGES, FRAMEWORKS, INSIGHTS, isoWeek } from '../../lib/home';
+import { DIAGRAMS } from '../../lib/diagrams';
+
+const c = await corpus();
+const cases = Object.entries(c.cases).sort((a, b) => a[0].localeCompare(b[0]));
+const decisions = Object.entries(c.decisions).sort((a, b) => a[0].localeCompare(b[0]));
+// Only tools whose guide page exists (status complete) are featured.
+const frameworks = FRAMEWORKS.filter((f) => c.tools[f.tool]?.status === 'complete' && DIAGRAMS[f.diagram]);
+const week = isoWeek(new Date());
+const pick = (n: number) => (n ? week % n : 0);
+---
+
+<div class="hbf" data-rotate-root data-build-week={week}>
+  <p class="hbf__dateline">
+    <span class="label">The briefing</span>
+    <span class="hbf__week" data-week-label>Week {week}, as published</span>
+  </p>
+
+  <div class="hbf__grid">
+    <article class="hbf__case" data-rotate={cases.length}>
+      {
+        cases.map(([id, cs], i) => (
+          <div class="hbf__variant" data-variant={i} hidden={i !== pick(cases.length)}>
+            <p class="hbf__kicker">Case of the week <span class="tag tag--simulated">Fictional</span></p>
+            <h3 class="hbf__case-title">
+              <a href={href.case(id)}>{cs.title}</a>
+            </h3>
+            <p class="hbf__case-q">{cs.decision}</p>
+            <p class="hbf__meta">
+              {cs.exhibits.length} exhibits · {cs.stakeholders.length} stakeholders
+            </p>
+            <a class="hbf__cta" href={href.case(id)}>
+              Open the case file <span aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+        ))
+      }
+    </article>
+
+    <article class="hbf__card hbf__card--decision" data-rotate={decisions.length}>
+      {
+        decisions.map(([id, d], i) => (
+          <div class="hbf__variant" data-variant={i} hidden={i !== pick(decisions.length)}>
+            <p class="hbf__kicker">Strategic decision challenge</p>
+            <h3 class="hbf__title">
+              <a href={href.decision(id)}>{d.title}</a>
+            </h3>
+            <p class="hbf__text">{d.dek}</p>
+            <a class="hbf__cta" href={href.decision(id)}>
+              Enter the Decision Room <span aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+        ))
+      }
+    </article>
+
+    <article class="hbf__card hbf__card--money" data-rotate={CHALLENGES.length}>
+      {
+        CHALLENGES.map((ch, i) => (
+          <div class="hbf__variant" data-variant={i} hidden={i !== pick(CHALLENGES.length)}>
+            <p class="hbf__kicker">Financial analysis challenge</p>
+            <h3 class="hbf__title">{ch.title}</h3>
+            <p class="hbf__text">{ch.question}</p>
+            <details class="hbf__answer">
+              <summary>Show the answer and working</summary>
+              <p class="hbf__result">{ch.answer}</p>
+              <ol class="hbf__working">
+                {ch.working.map((w) => (
+                  <li>{w}</li>
+                ))}
+              </ol>
+              <a href={ch.href}>{ch.linkLabel}</a>
+            </details>
+            <p class="hbf__fine">Fictional figures, worked by the platform's tested finance functions.</p>
+          </div>
+        ))
+      }
+    </article>
+
+    <article class="hbf__card hbf__card--insight" data-rotate={INSIGHTS.length}>
+      {
+        INSIGHTS.map((ins, i) => (
+          <div class="hbf__variant" data-variant={i} hidden={i !== pick(INSIGHTS.length)}>
+            <p class="hbf__kicker">Management insight</p>
+            <h3 class="hbf__title hbf__title--quote">{ins.title}</h3>
+            <p class="hbf__text">{ins.text}</p>
+            <a class="hbf__cta" href={ins.href}>
+              From the notes on {ins.code} <span aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
+        ))
+      }
+    </article>
+
+    <article class="hbf__card hbf__card--framework" data-rotate={frameworks.length}>
+      {
+        frameworks.map((f, i) => (
+          <div class="hbf__variant" data-variant={i} hidden={i !== pick(frameworks.length)}>
+            <p class="hbf__kicker">Featured framework</p>
+            <h3 class="hbf__title">
+              <a href={`/toolkit/${f.tool}/`}>{c.tools[f.tool]!.name}</a>
+            </h3>
+            <div class="hbf__diagram" aria-hidden="true" set:html={DIAGRAMS[f.diagram]!.render(`brief-${f.diagram}`)} />
+            <p class="hbf__text">{f.note}</p>
+          </div>
+        ))
+      }
+    </article>
+  </div>
+</div>
+
+<style>
+  .hbf__dateline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-2);
+    margin: var(--sp-5) 0 0;
+    padding-bottom: var(--sp-2);
+    border-bottom: 3px double var(--navy-900);
+  }
+
+  .hbf__week {
+    font: 500 0.875rem var(--font-display);
+    font-style: italic;
+    color: var(--text-muted);
+  }
+
+  .hbf__grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0;
+    border-bottom: 1px solid var(--navy-900);
+  }
+
+  .hbf__case,
+  .hbf__card {
+    padding: var(--sp-5) var(--sp-5) var(--sp-5) 0;
+  }
+
+  .hbf__case {
+    grid-column: span 4;
+    padding-right: var(--sp-6);
+    border-right: 1px solid var(--rule-hair);
+  }
+
+  .hbf__card--decision {
+    grid-column: span 2;
+    padding-left: var(--sp-5);
+  }
+
+  .hbf__card--money,
+  .hbf__card--insight,
+  .hbf__card--framework {
+    grid-column: span 2;
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .hbf__card--insight,
+  .hbf__card--framework {
+    padding-left: var(--sp-5);
+    border-left: 1px solid var(--rule-hair);
+  }
+
+  .hbf__kicker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font: 650 var(--fs-label) var(--font-ui);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .hbf__case-title {
+    margin: var(--sp-3) 0 0;
+    font-size: clamp(2rem, 1.4rem + 2.4vw, 3.25rem);
+    line-height: 1.02;
+    letter-spacing: -0.015em;
+  }
+
+  .hbf__case-title a {
+    color: var(--navy-900);
+    text-decoration: none;
+  }
+
+  .hbf__case-title a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.12em;
+  }
+
+  .hbf__case-q {
+    max-width: 38rem;
+    margin: var(--sp-4) 0 0;
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    line-height: 1.45;
+    color: var(--charcoal);
+  }
+
+  .hbf__meta {
+    margin: var(--sp-3) 0 0;
+    font-size: var(--fs-small);
+    color: var(--text-muted);
+  }
+
+  .hbf__title {
+    margin: var(--sp-2) 0 0;
+    font-size: 1.25rem;
+    line-height: 1.25;
+  }
+
+  .hbf__title a {
+    color: var(--navy-900);
+  }
+
+  .hbf__title--quote {
+    font-style: italic;
+  }
+
+  .hbf__text {
+    margin: var(--sp-2) 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+
+  .hbf__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 2.5rem;
+    margin-top: var(--sp-2);
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+
+  .hbf__answer {
+    margin-top: var(--sp-3);
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .hbf__answer summary {
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-weight: 600;
+    color: var(--cobalt-text);
+    cursor: pointer;
+  }
+
+  .hbf__result {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    color: var(--green-text);
+  }
+
+  .hbf__working {
+    margin: var(--sp-2) 0;
+    padding-left: 1.1rem;
+    font-size: var(--fs-small);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hbf__fine {
+    margin: var(--sp-2) 0 0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .hbf__diagram {
+    margin-top: var(--sp-3);
+    max-width: 22rem;
+  }
+
+  .hbf__diagram :global(svg) {
+    width: 100%;
+    height: auto;
+  }
+
+  @media (max-width: 60rem) {
+    .hbf__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hbf__case,
+    .hbf__card,
+    .hbf__card--decision,
+    .hbf__card--insight,
+    .hbf__card--framework {
+      grid-column: auto;
+      padding: var(--sp-5) 0;
+      border-left: 0;
+      border-right: 0;
+      border-top: 1px solid var(--rule-hair);
+    }
+
+    .hbf__case {
+      border-top: 0;
+    }
+  }
+</style>

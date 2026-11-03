@@ -1,9 +1,12 @@
 ---
 /**
- * The home page. It opens (on a first visit) with the brand reveal, then a
- * hero that says who made the platform and what it is for, and then one
- * section for each part of the platform. Every figure on the page is counted
- * from the content, so it changes when the content does.
+ * The home page. After the opening (on every fresh entry), a hero that says
+ * who made the platform and what it is for, with five ways in; then the
+ * ecosystem drawn as an institution, the weekly briefing, the three chains
+ * of reasoning, the course unit by unit, a working preview of a tool, the
+ * mindmaps, diagrams and glossary, learning objectives, pathways, the
+ * Assessment Centre, the latest additions, the creator and a closing
+ * invitation. Every figure on the page is counted from the content.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHead from '../components/layout/SectionHead.astro';
@@ -12,23 +15,20 @@ import CreatorPhoto from '../components/brand/CreatorPhoto.astro';
 import HeroBlueprint from '../components/home/HeroBlueprint.astro';
 import StatusTag from '../components/ui/StatusTag.astro';
 import Icon from '../components/ui/Icon.astro';
-import { casesInOrder, corpus, href, modulesInOrder, pathwaysInOrder } from '../lib/content';
+import { corpus, href, pathwaysInOrder } from '../lib/content';
 import { curriculumOf, subtopicCoverage } from '../lib/coverage';
-import { isIcon } from '../lib/icons';
-import { library } from '../lib/resources';
 import { DIAGRAMS } from '../lib/diagrams';
 import { renderThumb } from '../lib/mindmap';
-import ResourceCover from '../components/resources/ResourceCover.astro';
+import Ecosystem from '../components/home/Ecosystem.astro';
+import Featured from '../components/home/Featured.astro';
+import BreakEvenPreview from '../components/home/BreakEvenPreview.astro';
+import { ADDITIONS, OBJECTIVES } from '../lib/home';
+import { subtopicHref } from '../lib/learning';
 
 const c = await corpus();
 const cur = curriculumOf(c);
 const coverage = subtopicCoverage(c);
-const modules = await modulesInOrder();
 const pathways = await pathwaysInOrder();
-const cases = await casesInOrder();
-/** The four ways in offered in the hero; the full list is further down the page. */
-const HERO_PATHS = ['ib-dp', 'teachers', 'undergraduate', 'independent'];
-const heroPaths = HERO_PATHS.map((id) => pathways.find((p) => p.id === id)).filter((p): p is NonNullable<typeof p> => Boolean(p));
 
 const complete = coverage.filter((s) => s.state === 'complete').length;
 const partial = coverage.filter((s) => s.state === 'partial').length;
@@ -36,8 +36,6 @@ const interactions = Object.values(c.interactives).filter((it) => it.page).lengt
 const questions = Object.keys(c.questions).length;
 const terms = Object.keys(c.glossary).length;
 const maps = Object.entries(c.mindmaps).sort((a, b) => a[1].order - b[1].order);
-const resources = (await library()).sort((a, b) => a.order - b.order);
-const featured = resources.filter((r) => r.curated).slice(0, 4);
 const HOME_DIAGRAMS = ['break-even-chart', 'bcg-matrix', 'maslow-hierarchy'];
 const LETTERS = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].filter((l) => Object.values(c.glossary).some((g) => g.term.toUpperCase().startsWith(l)));
 
@@ -74,16 +72,23 @@ const METHODS = [
   },
 ];
 
-const WORKBENCH = [
-  { room: 'case-room', title: 'Diagnose before you decide', text: 'A staged case lab: problem, cause, strategy, a plan against the deadline, and a judgement.', href: '/case-room/halden-diagnosis/' },
-  { room: 'finance-desk', title: 'Will the cash last the winter?', text: 'A cash flow forecast in the IB layout, and five ways to pay for a kiln.', href: '/finance-desk/cash-flow/' },
-  { room: 'finance-desk', title: 'Break-even, live', text: 'Move price and costs; the chart, the margin of safety and the profit answer back.', href: '/finance-desk/break-even/' },
-  { room: 'finance-desk', title: 'Ratio analysis', text: "Two years of accounts, the guide's ratios, and the strategies that move them.", href: '/finance-desk/ratios/' },
-  { room: 'finance-desk', title: 'Investment appraisal', text: "Payback, ARR and, at HL, NPV with the guide's discount factors.", href: '/finance-desk/investment-appraisal/' },
-  { room: 'operations-floor', title: 'Capacity, stock and location', text: 'Stock control charts and capacity at HL; weighted location scoring for all.', href: '/operations-floor/' },
-];
 
 const components = Object.entries(c.assessment).sort((a, b) => a[1].order - b[1].order);
+
+/** Curated additions, with each set of notes added from its own date; newest first, eight at most. */
+const noteAdditions = Object.values(c.notes).map((n) => ({
+  date: n.updated,
+  kind: 'Notes',
+  title: `${n.code} ${n.title}`,
+  text: `Full notes, with examples, evaluation and original exam-style practice.`,
+  href: subtopicHref(c, n.code),
+}));
+const additions = [...ADDITIONS, ...noteAdditions].sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title)).slice(0, 8);
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const dayMonth = (iso: string) => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return `${d} ${MONTHS[(m ?? 1) - 1]} ${y}`;
+};
 const ASSESS_HREF: Record<string, string> = {
   'internal-assessment': '/assessment/internal-assessment/',
   'paper-1': '/assessment/paper-1/',
@@ -125,19 +130,14 @@ const jsonLd = {
           consequence.
         </p>
         <p class="hh__actions">
-          <a class="btn btn--primary" href="/topics/">Explore the topic library <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
-          <a class="btn" href="/assessment/">Assessment Centre</a>
+          <a class="btn btn--primary" href="/topics/">Explore Business Management <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+          <a class="btn" href="/assessment/">Open the Assessment Centre</a>
         </p>
-        <nav class="hh__paths" aria-labelledby="hh-paths-h">
-          <p class="label" id="hh-paths-h">Start where you are</p>
-          <ul>
-            {
-              heroPaths.map((p) => (
-                <li>
-                  <a href={href.pathway(p.id)}>{p.data.name}</a>
-                </li>
-              ))
-            }
+        <nav class="hh__doors" aria-label="Ways in">
+          <ul role="list">
+            <li><a href="/case-room/"><span class="hh__door-k">Practise</span> Enter the Case Room</a></li>
+            <li><a href="/decision-room/"><span class="hh__door-k">Decide</span> Explore the Decision Room</a></li>
+            <li><a href="/pathways/"><span class="hh__door-k">Choose</span> Discover learning pathways</a></li>
           </ul>
         </nav>
       </div>
@@ -171,9 +171,23 @@ const jsonLd = {
     </div>
   </section>
 
+  <section class="band" aria-labelledby="eco-h">
+    <div class="wrap">
+      <SectionHead no="01" title="One institution, five wings" id="eco-h" dek="The platform is built like a school of business: a library to learn in, case rooms to practise in, laboratories to work the numbers, an examination hall to prepare in, and an entrance hall that leads to everything else." />
+      <Ecosystem complete={complete} total={coverage.length} />
+    </div>
+  </section>
+
+  <section class="band band--white" aria-labelledby="brief-h">
+    <div class="wrap">
+      <SectionHead no="02" title="This week's briefing" id="brief-h" dek="A case to read, a decision to make, a calculation to try, an idea to think with and a framework to use. It changes every week." />
+      <Featured />
+    </div>
+  </section>
+
   <section class="band band--ink" aria-labelledby="method-h">
     <div class="wrap">
-      <SectionHead no="01" title="Three chains of reasoning, everywhere" id="method-h" dek="The same habits of mind run through every topic, case and Decision Room until they become second nature." />
+      <SectionHead no="03" title="Three chains of reasoning, everywhere" id="method-h" dek="The same habits of mind run through every topic, case and Decision Room until they become second nature." />
       <ol class="hm" role="list" data-reveal="group">
         {
           METHODS.map((m) => (
@@ -200,7 +214,7 @@ const jsonLd = {
 
   <section class="band" aria-labelledby="course-h">
     <div class="wrap">
-      <SectionHead no="02" title="The course, unit by unit" id="course-h" dek={`All ${coverage.length} subtopics of IB DP Business Management in their five units. Each square is a subtopic: filled where its full notes or a complete brief exist, outlined in gold where its page has a mindmap, key terms and diagrams but the notes are still to come, ruled where it is planned.`} />
+      <SectionHead no="04" title="The course, unit by unit" id="course-h" dek={`All ${coverage.length} subtopics of IB DP Business Management in their five units. Each square is a subtopic: filled where its full notes or a complete brief exist, outlined in gold where its page has a mindmap, key terms and diagrams but the notes are still to come, ruled where it is planned.`} />
       <ol class="hc" role="list" data-reveal="group">
         {
           cur.units.map((u) => {
@@ -239,9 +253,16 @@ const jsonLd = {
     </div>
   </section>
 
+  <section class="band" aria-labelledby="try-h">
+    <div class="wrap">
+      <SectionHead no="05" title="Try it now: where does the loss stop?" id="try-h" dek="A working piece of the Finance Desk. Enter the figures for any business and the break-even point, the margin of safety and the chart answer as you type, with the working shown." />
+      <BreakEvenPreview />
+    </div>
+  </section>
+
   <section class="band band--white" aria-labelledby="see-h">
     <div class="wrap">
-      <SectionHead no="03" title="See the structure, know the words" id="see-h" dek="Every subtopic as a mindmap you can fold, zoom, print and download, original diagrams for every unit, and a glossary of the whole course in plain language." />
+      <SectionHead no="06" title="See the structure, know the words" id="see-h" dek="Every subtopic as a mindmap you can fold, zoom, print and download, original diagrams for every unit, and a glossary of the whole course in plain language." />
       <div class="hv">
         <a class="hv__maps" href="/mindmaps/">
           <span class="hv__thumbs" aria-hidden="true">
@@ -277,19 +298,23 @@ const jsonLd = {
     </div>
   </section>
 
-  <section class="band band--white" aria-labelledby="bench-h">
+  <section class="band band--white" aria-labelledby="obj-h">
     <div class="wrap">
-      <SectionHead no="04" title="Interactive tools that answer back" id="bench-h" dek="Change the plan or the numbers and watch the business respond. Every business in them is fictional; every figure is checked." />
-      <ol class="hb" role="list" data-reveal="group">
+      <SectionHead no="07" title="Start from what you want to do" id="obj-h" dek="Seven things learners come here to do, and where on the platform to do each one." />
+      <ol class="hob" role="list" data-reveal="group">
         {
-          WORKBENCH.map((w, i) => (
-            <li class="hb__item lift">
-              <span class="hb__no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-              <span class="hb__icon" aria-hidden="true">{isIcon(w.room) && <Icon id={w.room} size={22} />}</span>
-              <h3 class="hb__title">
-                <a href={w.href}>{w.title}</a>
-              </h3>
-              <p class="hb__text">{w.text}</p>
+          OBJECTIVES.map((o, i) => (
+            <li class="hob__item">
+              <span class="hob__no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="hob__verb">{o.verb}</h3>
+              <p class="hob__text">{o.text}</p>
+              <ul class="hob__links" role="list">
+                {o.links.map((l) => (
+                  <li>
+                    <a href={l.href}>{l.label}</a>
+                  </li>
+                ))}
+              </ul>
             </li>
           ))
         }
@@ -297,31 +322,30 @@ const jsonLd = {
     </div>
   </section>
 
-  <section class="band" aria-labelledby="cases-h">
+  <section class="band" aria-labelledby="paths-h">
     <div class="wrap">
-      <SectionHead no="05" title="Business case studies" id="cases-h" dek="Fictional organizations with complete, consistent data: exhibits, stakeholders and a decision to make. Each is labelled as fiction." />
-      <div class="hk" data-reveal="group">
+      <SectionHead no="08" title="A way in for every learner" id="paths-h" dek="One foundation and seven routes through it, each with its own depth and its own starting points. Qualifications are kept apart: nothing outside the IB course is presented as IB material." />
+      <ul class="hpw" role="list" data-reveal="group">
         {
-          cases.map(([id, cs]) => (
-            <article class="hk__case lift">
-              <p class="label">Case file · fictional</p>
-              <h3 class="hk__title">
-                <a href={href.case(id)}>{cs.title}</a>
-              </h3>
-              <p class="hk__q">{cs.decision}</p>
-              <p class="hk__meta">
-                {cs.exhibits.length} exhibits · {cs.stakeholders.length} stakeholders
-              </p>
-            </article>
+          pathways.map((p, i) => (
+            <li>
+              <a href={href.pathway(p.id)}>
+                <span class="hpw__no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                <strong>{p.data.name}</strong>
+                <span class="hpw__who">{p.data.audience}</span>
+                <span class="hpw__promise">{p.data.promise}</span>
+                <StatusTag status={p.data.status} />
+              </a>
+            </li>
           ))
         }
-      </div>
+      </ul>
     </div>
   </section>
 
   <section class="band band--ink" aria-labelledby="assess-h">
     <div class="wrap">
-      <SectionHead no="06" title="The Assessment Centre" id="assess-h" dek="Every component of the IB assessment, explained from the guide, with practice built for it: the research project, Paper 1, Paper 2 and the HL Paper 3." />
+      <SectionHead no="09" title="The Assessment Centre" id="assess-h" dek="Every component of the IB assessment, explained from the guide, with practice built for it: the research project, Paper 1, Paper 2 and the HL Paper 3." />
       <ul class="ha" role="list" data-reveal="group">
         {
           components.map(([id, a]) => (
@@ -355,48 +379,27 @@ const jsonLd = {
     </div>
   </section>
 
-  <section class="band" aria-labelledby="res-h">
+  <section class="band band--white" aria-labelledby="new-h">
     <div class="wrap">
-      <SectionHead no="07" title="The Resources Library" id="res-h" dek={`${resources.length} resources to learn, teach and revise with: assessment guides, notes, mindmaps, case studies, practice, a formula sheet and the tools. Downloads only where a real file exists.`} />
-      <ul class="hres" role="list">
+      <SectionHead no="10" title="Latest additions" id="new-h" dek="What has been added or updated most recently, newest first; notes are dated by their last revision. Only what is finished and working is listed." />
+      <ol class="hnew" role="list">
         {
-          featured.map((r) => (
-            <li>
-              <a href={r.details ?? r.primary.href} class="hres__item">
-                <ResourceCover item={r} />
-                <span class="hres__title">{r.title}</span>
-              </a>
+          additions.map((a) => (
+            <li class="hnew__item">
+              <time class="hnew__date" datetime={a.date}>{dayMonth(a.date)}</time>
+              <span class="hnew__kind">{a.kind}</span>
+              <span class="hnew__body">
+                <a class="hnew__title" href={a.href}>{a.title}</a>
+                <span class="hnew__text">{a.text}</span>
+              </span>
             </li>
           ))
         }
-      </ul>
+      </ol>
       <p class="hc__more">
-        <a class="btn" href="/resources/">Open the library <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
-        <a href="/resources/formula-sheet/">The formula sheet</a>
+        <a class="btn" href="/resources/">Open the Resources Library <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+        <a href="/ib/coverage/">See what is complete, partly built and planned</a>
       </p>
-    </div>
-  </section>
-
-  <section class="band" aria-labelledby="rooms-h">
-    <div class="wrap">
-      <SectionHead
-        no="08"
-        title="Learning environments"
-        id="rooms-h"
-        dek={`Fourteen rooms, each a way of working. ${modules.filter((m) => m.data.status !== 'planned').length} have working material now; a room is linked only when something in it works.`}
-      />
-      <ul class="hr" role="list" data-reveal="group">
-        {
-          modules.map((m) => (
-            <li class:list={['hr__room', `hr__room--${m.data.status}`, { lift: Boolean(m.data.href) }]}>
-              <span class="hr__icon" aria-hidden="true">{isIcon(m.id) && <Icon id={m.id} size={24} />}</span>
-              <h3 class="hr__name">{m.data.href ? <a href={m.data.href}>{m.data.name}</a> : m.data.name}</h3>
-              <StatusTag status={m.data.status} />
-              <p class="hr__purpose">{m.data.purpose}</p>
-            </li>
-          ))
-        }
-      </ul>
     </div>
   </section>
 
@@ -406,7 +409,7 @@ const jsonLd = {
         <CreatorPhoto name="audience-portrait" alt="Arjun Agrawal speaking to a class, gesturing towards a budget table on the screen behind him" sizes="(min-width: 64rem) 32vw, 90vw" />
       </figure>
       <div class="hcr__text">
-        <p class="label">09 · About the creator</p>
+        <p class="label">11 · About the creator</p>
         <h2 id="creator-h" class="hcr__title">Arjun Agrawal</h2>
         <p class="hcr__lead">
           An IB Diploma Programme educator in Economics, Business Management and Global Politics, with an academic background in Economics at St.
@@ -424,45 +427,31 @@ const jsonLd = {
     </div>
   </section>
 
-  <section class="band" aria-labelledby="paths-h">
-    <div class="wrap">
-      <SectionHead no="10" title="A way in for every learner" id="paths-h" dek="One foundation, with a route through it for IB students, teachers, university students, entrepreneurs and anyone learning on their own." />
-      <ul class="hp" data-reveal="group">
-        {
-          pathways.map((p) => (
-            <li>
-              <a href={href.pathway(p.id)}>
-                <strong>{p.data.name}</strong>
-                <span class="small">{p.data.promise}</span>
-                <StatusTag status={p.data.status} />
-              </a>
-            </li>
-          ))
-        }
+  <section class="hclose" aria-labelledby="close-h">
+    <div class="wrap hclose__inner">
+      <p class="hclose__kicker">
+        <Monogram height={26} reversed />
+        <span>Strategy. Leadership. Decisions.</span>
+      </p>
+      <h2 id="close-h" class="hclose__title">Read the situation. Weigh the evidence. <em>Make the decision.</em></h2>
+      <p class="hclose__lead">Every topic, case and tool here ends the same way: with a choice you make, defend, and see the consequences of. Start anywhere.</p>
+      <p class="hclose__actions">
+        <a class="btn btn--gold" href="/topics/">Explore Business Management <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+        <a class="btn btn--ghost-ink" href="/decision-room/">Make a decision</a>
+        <a class="btn btn--ghost-ink" href="/assessment/">Prepare for the examination</a>
+      </p>
+      <ul class="hclose__trust" role="list">
+        <li><strong>Every claim is sourced.</strong> Statements about the IB course give their page in the guide, in a public <a href="/sources/">claims register</a>.</li>
+        <li><strong>Fiction is labelled.</strong> The cases are fictional, with simulated data that adds up; real organizations appear only as cited, dated facts.</li>
+        <li><strong>Practice is practice.</strong> Every question is original and labelled; nothing is presented as an IB question or markscheme.</li>
       </ul>
     </div>
   </section>
-
-  <section class="band band--sunk" aria-labelledby="honest-h">
-    <div class="wrap">
-      <SectionHead no="11" title="How far to trust it" id="honest-h" />
-      <div class="ht" data-reveal="group">
-        <div>
-          <h3>Every claim is sourced</h3>
-          <p>Statements about the IB course are checked against the Business management guide and give its page, in a public <a href="/sources/">claims register</a>.</p>
-        </div>
-        <div>
-          <h3>Fiction is labelled</h3>
-          <p>The cases are fictional, with simulated data that adds up. Real organizations appear only as cited, dated facts.</p>
-        </div>
-        <div>
-          <h3>Practice is practice</h3>
-          <p>Every question is original and labelled as such. Nothing is presented as an IB question, markscheme or markband.</p>
-        </div>
-      </div>
-    </div>
-  </section>
 </BaseLayout>
+
+<script>
+  import '../scripts/home';
+</script>
 
 <style>
   /* ---------- Hero ---------- */
@@ -535,46 +524,54 @@ const jsonLd = {
     margin-top: var(--sp-6);
   }
 
-  .hh__paths {
+  .hh__doors {
     margin-top: var(--sp-6);
-    padding-top: var(--sp-4);
-    border-top: 1px solid var(--rule);
     max-width: 38rem;
+    border-top: 1px solid var(--rule);
   }
 
-  .hh__paths ul {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-2);
-    margin: var(--sp-3) 0 0;
+  .hh__doors ul {
+    margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .hh__paths li {
-    margin: 0;
+  .hh__doors li {
+    border-bottom: 1px solid var(--rule-hair);
   }
 
-  .hh__paths a {
-    display: inline-flex;
+  .hh__doors a {
+    display: flex;
     align-items: center;
-    min-height: 2.25rem;
-    padding: 0.35rem 0.85rem;
-    border: 1px solid var(--rule);
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.55);
+    gap: var(--sp-4);
+    min-height: 3rem;
     color: var(--navy-900);
-    font-size: 0.875rem;
-    font-weight: 540;
+    font-weight: 600;
     text-decoration: none;
-    transition:
-      border-color var(--dur-fast) var(--ease),
-      background-color var(--dur-fast) var(--ease);
   }
 
-  .hh__paths a:hover {
-    border-color: var(--gold-500);
-    background: #fff;
+  .hh__doors a::after {
+    content: "\2192";
+    margin-left: auto;
+    color: var(--gold-600);
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+
+  .hh__doors a:hover {
+    color: var(--cobalt-text);
+  }
+
+  .hh__doors a:hover::after {
+    transform: translateX(4px);
+  }
+
+  .hh__door-k {
+    min-width: 5rem;
+    font-size: var(--fs-label);
+    font-weight: 650;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
   }
 
   /* The figure: portrait in a frame, the line drawing around it */
@@ -1037,171 +1034,6 @@ const jsonLd = {
     color: var(--text-on-ink);
   }
 
-  /* ---------- Resources ---------- */
-  .hres {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--sp-5);
-    margin: var(--sp-6) 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .hres li {
-    margin: 0;
-  }
-
-  .hres__item {
-    display: grid;
-    gap: var(--sp-3);
-    color: var(--navy-900);
-    text-decoration: none;
-  }
-
-  .hres__title {
-    font-family: var(--font-display);
-    font-size: 1.0625rem;
-    font-weight: 600;
-  }
-
-  .hres__item:hover .hres__title {
-    text-decoration: underline;
-    text-decoration-color: var(--gold-500);
-  }
-
-  /* ---------- Workbench ---------- */
-  .hb {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0;
-    margin: var(--sp-6) 0 0;
-    padding: 0;
-    list-style: none;
-    border-top: 1px solid var(--navy-900);
-  }
-
-  .hb__item {
-    position: relative;
-    display: grid;
-    align-content: start;
-    gap: var(--sp-2);
-    margin: 0;
-    padding: var(--sp-5) var(--sp-5) var(--sp-6) 0;
-    border-bottom: 1px solid var(--rule-hair);
-  }
-
-  .hb__item:not(:nth-child(3n + 1)) {
-    padding-left: var(--sp-5);
-    border-left: 1px solid var(--rule-hair);
-  }
-
-  .hb__no {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 1.125rem;
-    color: var(--brass-text);
-  }
-
-  .hb__icon {
-    position: absolute;
-    top: var(--sp-5);
-    right: var(--sp-5);
-    color: var(--gold-500);
-  }
-
-  .hb__title {
-    font-size: 1.375rem;
-  }
-
-  .hb__title a {
-    color: var(--navy-900);
-    text-decoration: none;
-  }
-
-  .hb__title a::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-  }
-
-  .hb__item:hover .hb__title a {
-    text-decoration: underline;
-    text-decoration-color: var(--gold-500);
-  }
-
-  .hb__item:focus-within {
-    outline: var(--focus-ring);
-    outline-offset: -3px;
-  }
-
-  .hb__title a:focus-visible {
-    outline: none;
-  }
-
-  .hb__text {
-    color: var(--text-muted);
-  }
-
-  /* ---------- Cases ---------- */
-  .hk {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
-    gap: var(--sp-5);
-    margin-top: var(--sp-6);
-  }
-
-  .hk__case {
-    position: relative;
-    display: grid;
-    align-content: start;
-    gap: var(--sp-2);
-    padding: var(--sp-5);
-    background: var(--surface-sheet);
-    border-top: 3px solid var(--navy-900);
-    box-shadow: var(--shadow-sheet);
-  }
-
-  .hk__title {
-    font-size: 1.5rem;
-  }
-
-  .hk__title a {
-    color: var(--navy-900);
-    text-decoration: none;
-  }
-
-  .hk__title a::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-  }
-
-  .hk__case:hover .hk__title a {
-    text-decoration: underline;
-    text-decoration-color: var(--gold-500);
-  }
-
-  .hk__case:focus-within {
-    outline: var(--focus-ring);
-    outline-offset: 2px;
-  }
-
-  .hk__title a:focus-visible {
-    outline: none;
-  }
-
-  .hk__q {
-    font-family: var(--font-serif);
-    font-size: 1.0625rem;
-    font-style: italic;
-    color: var(--text-body);
-  }
-
-  .hk__meta {
-    font-size: 0.8125rem;
-    color: var(--text-muted);
-  }
-
   /* ---------- Assessment ---------- */
   .ha {
     display: grid;
@@ -1280,69 +1112,6 @@ const jsonLd = {
     margin-top: var(--sp-6);
   }
 
-  /* ---------- Rooms ---------- */
-  .hr {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
-    gap: var(--sp-4);
-    margin: var(--sp-6) 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .hr__room {
-    position: relative;
-    display: grid;
-    align-content: start;
-    gap: var(--sp-2);
-    margin: 0;
-    padding: var(--sp-4);
-    border: 1px solid var(--rule-hair);
-    background: rgba(255, 255, 255, 0.6);
-  }
-
-  .hr__room--planned {
-    background: transparent;
-    border-style: dashed;
-  }
-
-  .hr__icon {
-    color: var(--brass-text);
-  }
-
-  .hr__name {
-    font-size: 1.1875rem;
-  }
-
-  .hr__name a {
-    color: var(--navy-900);
-    text-decoration: none;
-  }
-
-  .hr__name a::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-  }
-
-  .hr__room:hover {
-    border-color: var(--gold-500);
-  }
-
-  .hr__room:focus-within {
-    outline: var(--focus-ring);
-    outline-offset: 2px;
-  }
-
-  .hr__name a:focus-visible {
-    outline: none;
-  }
-
-  .hr__purpose {
-    font-size: 0.875rem;
-    color: var(--text-muted);
-  }
-
   /* ---------- Creator ---------- */
   .hcr {
     display: grid;
@@ -1390,57 +1159,272 @@ const jsonLd = {
     color: var(--text-body);
   }
 
-  /* ---------- Pathways ---------- */
-  .hp {
+  /* ---------- Objectives ---------- */
+  .hob {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
-    gap: var(--sp-3);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 var(--sp-7);
     margin: var(--sp-6) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--navy-900);
+  }
+
+  .hob__item {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    column-gap: var(--sp-4);
+    align-content: start;
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .hob__no {
+    grid-row: span 3;
+    font: italic 400 1.75rem/1 var(--font-display);
+    color: var(--gold-600);
+  }
+
+  .hob__verb {
+    margin: 0;
+    font-size: 1.375rem;
+  }
+
+  .hob__text {
+    margin: var(--sp-1) 0 0;
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+  }
+
+  .hob__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--sp-4);
+    margin: var(--sp-2) 0 0;
     padding: 0;
     list-style: none;
   }
 
-  .hp li {
-    margin: 0;
+  .hob__links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    font-weight: 600;
+    font-size: 0.9375rem;
   }
 
-  .hp a {
+  /* ---------- Pathways ---------- */
+  .hpw {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+    gap: 0;
+    margin: var(--sp-6) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--navy-900);
+    border-left: 1px solid var(--rule-hair);
+  }
+
+  .hpw li {
+    margin: 0;
+    border-right: 1px solid var(--rule-hair);
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .hpw a {
     display: grid;
     gap: 0.35rem;
     height: 100%;
-    padding: var(--sp-4);
-    border: 1px solid var(--rule-hair);
-    background: rgba(255, 255, 255, 0.55);
+    padding: var(--sp-5) var(--sp-4);
     color: var(--text-body);
     text-decoration: none;
-    transition: border-color var(--dur-fast) var(--ease);
+    transition: background-color var(--dur-fast) var(--ease);
   }
 
-  .hp a:hover {
-    border-color: var(--gold-500);
+  .hpw a:hover {
+    background: rgba(255, 255, 255, 0.7);
   }
 
-  .hp strong {
+  .hpw__no {
+    font: italic 400 1.25rem/1 var(--font-display);
+    color: var(--brass-text);
+  }
+
+  .hpw strong {
     font-family: var(--font-display);
-    font-size: 1.1875rem;
+    font-size: 1.25rem;
     font-weight: 600;
+    line-height: 1.2;
+    color: var(--navy-900);
   }
 
-  .hp :global(.tag) {
+  .hpw a:hover strong {
+    color: var(--cobalt-text);
+  }
+
+  .hpw__who {
+    font-size: var(--fs-label);
+    font-weight: 650;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .hpw__promise {
+    font-size: 0.9375rem;
+  }
+
+  .hpw :global(.tag) {
     width: fit-content;
+    margin-top: var(--sp-1);
   }
 
-  /* ---------- Trust ---------- */
-  .ht {
+  /* ---------- Latest additions ---------- */
+  .hnew {
+    margin: var(--sp-6) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--navy-900);
+  }
+
+  .hnew__item {
+    display: grid;
+    grid-template-columns: 9.5rem 7rem minmax(0, 1fr);
+    gap: var(--sp-4);
+    align-items: baseline;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .hnew__date {
+    font: italic 400 1rem var(--font-display);
+    color: var(--text-muted);
+  }
+
+  .hnew__kind {
+    font-size: var(--fs-label);
+    font-weight: 650;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .hnew__body {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .hnew__title {
+    font-weight: 650;
+  }
+
+  .hnew__text {
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+  }
+
+  /* ---------- Closing ---------- */
+  .hclose {
+    position: relative;
+    padding-block: clamp(3.5rem, 8vw, 6.5rem);
+    color: var(--text-on-ink);
+    background:
+      radial-gradient(ellipse 60% 70% at 85% 10%, rgba(201, 168, 102, 0.16), transparent 60%),
+      linear-gradient(rgba(244, 239, 228, 0.035) 1px, transparent 1px) 0 0 / 100% 40px,
+      var(--surface-ink-deep);
+    overflow: hidden;
+  }
+
+  .hclose::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-400) 20%, var(--gold-400) 80%, transparent);
+  }
+
+  .hclose__inner > * {
+    max-width: 62rem;
+  }
+
+  /* The closing band runs straight into the footer. */
+  :global(main:has(.hclose) + .site-footer) {
+    margin-top: 0;
+  }
+
+  .hclose__kicker {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    margin: 0;
+    font: 600 var(--fs-label) var(--font-ui);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--text-gold-on-ink);
+  }
+
+  .hclose__title {
+    margin: var(--sp-4) 0 0;
+    font-size: clamp(2.25rem, 1.4rem + 3.6vw, 4.5rem);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    color: var(--text-on-ink);
+  }
+
+  .hclose__title em {
+    color: var(--gold-400);
+  }
+
+  .hclose__lead {
+    max-width: 40rem;
+    margin: var(--sp-4) 0 0;
+    font-size: var(--fs-lead);
+    color: var(--text-on-ink-muted);
+  }
+
+  .hclose__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    margin: var(--sp-6) 0 0;
+  }
+
+  .hclose a.btn--gold,
+  .hclose a.btn--gold:hover {
+    color: var(--navy-950);
+  }
+
+  .hclose .btn--ghost-ink {
+    background: transparent;
+    border-color: rgba(244, 239, 228, 0.45);
+    color: var(--text-on-ink);
+  }
+
+  .hclose .btn--ghost-ink:hover {
+    background: rgba(244, 239, 228, 0.08);
+    border-color: var(--text-on-ink);
+  }
+
+  .hclose__trust {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--sp-6);
-    margin-top: var(--sp-6);
+    gap: var(--sp-5);
+    margin: var(--sp-7) 0 0;
+    padding: var(--sp-5) 0 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-on-ink);
+    font-size: var(--fs-small);
+    color: var(--text-on-ink-muted);
   }
 
-  .ht h3 {
-    font-size: 1.25rem;
-    margin-bottom: var(--sp-2);
+  .hclose__trust strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--text-on-ink);
+  }
+
+  .hclose__trust a {
+    color: var(--cobalt-on-ink);
   }
 
   /* ---------- Responsive ---------- */
@@ -1467,9 +1451,6 @@ const jsonLd = {
       grid-template-columns: minmax(0, 1fr);
     }
 
-    .hres {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
 
     .hh__index > div:nth-child(4) {
       border-left: 0;
@@ -1481,23 +1462,13 @@ const jsonLd = {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .hb {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .hb__item:not(:nth-child(3n + 1)) {
-      padding-left: 0;
-      border-left: 0;
-    }
-
-    .hb__item:nth-child(2n) {
-      padding-left: var(--sp-5);
-      border-left: 1px solid var(--rule-hair);
-    }
-
-    .ht {
+    .hob {
       grid-template-columns: minmax(0, 1fr);
-      gap: var(--sp-5);
+    }
+
+    .hclose__trust {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sp-3);
     }
 
     .hcr__figure {
@@ -1518,14 +1489,13 @@ const jsonLd = {
     }
 
     .hm,
-    .ha,
-    .hb {
+    .ha {
       grid-template-columns: minmax(0, 1fr);
     }
 
-    .hb__item:nth-child(n) {
-      padding-left: 0;
-      border-left: 0;
+    .hnew__item {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.2rem;
     }
 
     .hc__unit {
