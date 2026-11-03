@@ -1,29 +1,142 @@
 # Audience pathways. One shared foundation of topics, cases, tools and
-# calculations; each pathway is an entry point with its own route, emphasis
-# and cautions. A pathway never relabels shared content as meeting a
-# qualification's requirements unless that qualification has been mapped.
+# calculations; each pathway is a route through it with its own audience,
+# depth, terminology, stages, assessment style and deliberate omissions.
+# Qualifications are never combined: only the IB DP route maps to a syllabus,
+# because the IB guide is the only specification supplied. A pathway never
+# relabels shared content as meeting a qualification's requirements.
+# Every href must be a working page; the link check fails the build otherwise,
+# and src/lib/integrity-pathways.ts checks the honesty rules on each route.
 
 - id: ib-dp
   name: IB Diploma Business Management
-  audience: Students taking IB DP Business Management at SL or HL.
-  promise: The syllabus mapped subtopic by subtopic, complete briefs to learn from, and practice organized by paper.
+  audience: Students taking IB Diploma Programme Business Management at SL or HL, and anyone checking what the course requires.
+  promise: The syllabus route through all five units with SL and HL marked, the toolkit, the internal assessment and the papers, every statement checked against the IB guide.
   status: live
   order: 1
   intro: >
-    Start with the syllabus map to see the whole course and what each subtopic connects to. Work through
-    a topic brief from situation to decision, then practise in the Assessment Centre. Statements about the IB
-    course were checked against the Business management guide and give its page; the guide is the authority.
+    This route follows the IB course: five units of thirty-seven subtopics, the business management toolkit,
+    the internal assessment and the examination papers. Every subtopic has its own page with the guide's
+    content statements, and HL-only material is marked so that SL students can hide it. Statements about
+    the course give the guide's page; the guide is the authority.
+  depth: >
+    The guide's own depth, set by the assessment objective of each content statement. The objectives run
+    from AO1 (knowledge and understanding) to AO4 (use and application of appropriate skills), and decide
+    how far each statement is taught and examined (p. 18). HL adds eleven HL-only subtopics and HL-only
+    content in seven others (pp. 23 to 36).
+  terminology: >
+    The guide's terms throughout: the statement of profit or loss and the statement of financial position,
+    not the profit and loss account and the balance sheet (pp. 59 to 63); the guide's thirty-one command
+    terms (pp. 19 to 20); and the guide's subtopic numbers at both levels, so a code always means the same
+    subtopic. Where everyday business usage differs, the glossary says so.
+  stageName: Stage
+  routeIntro: >
+    The order is the platform's recommendation, not the IB's: the guide sets the content and the recommended
+    hours (pp. 21 to 22), and each school orders the units in its own way. The hours shown are the guide's.
+  stages:
+    - id: unit-1
+      title: 'Unit 1: Introduction to business management'
+      goal: Explain what businesses are, how they are owned, what they aim for and who has a stake in them, and weigh the ways they grow.
+      syllabus: [unit-1]
+      items:
+        - { label: 'Unit 1 on one map', href: '/mindmaps/unit-1/', kind: Mindmap }
+        - { label: 'Marigold Kitchens: which way to grow?', href: '/decision-room/marigold-growth/', kind: Decision Room }
+        - { label: SWOT analysis, href: '/toolkit/swot-analysis/', kind: Toolkit guide }
+        - { label: The Ansoff matrix, href: '/toolkit/ansoff-matrix/', kind: Toolkit guide }
+      check: Answer the Paper 1 style practice on growth, then compare your answers with the mark schemes.
+    - id: unit-2
+      title: 'Unit 2: Human resource management'
+      goal: Analyse how organizations structure, lead and motivate their people, and at HL how culture and employee relations shape them.
+      syllabus: [unit-2]
+      items:
+        - { label: 'Unit 2 on one map', href: '/mindmaps/unit-2/', kind: Mindmap }
+        - { label: 'Halden Distribution: how to lead in the first ninety days', href: '/decision-room/halden-leadership/', kind: Decision Room }
+        - { label: 'Halden Distribution: diagnose before you decide', href: '/case-room/halden-diagnosis/', kind: Case lab }
+        - { label: Force field analysis, href: '/toolkit/force-field-analysis/', kind: Toolkit guide, level: HL }
+      check: Use the recall cards on each notes page until you can answer most from memory.
+    - id: unit-3
+      title: 'Unit 3: Finance and accounts'
+      goal: Calculate and interpret costs, final accounts, ratios, cash flow and investment appraisal, and judge the decisions they inform.
+      syllabus: [unit-3]
+      items:
+        - { label: 'Unit 3 on one map', href: '/mindmaps/unit-3/', kind: Mindmap }
+        - { label: The ratio desk, href: '/finance-desk/ratios/', kind: Workspace }
+        - { label: The cash flow lab, href: '/finance-desk/cash-flow/', kind: Workspace }
+        - { label: Investment appraisal, href: '/finance-desk/investment-appraisal/', kind: Workspace }
+        - { label: The formula sheet, href: '/resources/formula-sheet/', kind: Reference }
+      check: Work one calculation of each kind in the eight-part form, then check it in the matching workspace.
+    - id: unit-4
+      title: 'Unit 4: Marketing'
+      goal: Explain how organizations plan, research and price their marketing, and at HL forecast sales and market abroad.
+      syllabus: [unit-4]
+      items:
+        - { label: 'Unit 4 on one map', href: '/mindmaps/unit-4/', kind: Mindmap }
+        - { label: Market Studio, href: '/market-studio/', kind: Room }
+      check: Draw a position map for a market you know and say which gap, if any, is worth filling.
+    - id: unit-5
+      title: 'Unit 5: Operations management'
+      goal: Explain how organizations produce, where they locate and how they break even, and at HL plan production, quality, crises and innovation.
+      syllabus: [unit-5]
+      items:
+        - { label: 'Unit 5 on one map', href: '/mindmaps/unit-5/', kind: Mindmap }
+        - { label: The break-even workspace, href: '/finance-desk/break-even/', kind: Workspace }
+        - { label: Operations Floor, href: '/operations-floor/', kind: Room }
+      check: Change one cost in the break-even workspace and explain, before you look, what will happen to the break-even quantity.
+    - id: toolkit
+      title: The business management toolkit
+      goal: Use the toolkit's tools where they fit, across all five units, and at HL the HL-only tools too.
+      items:
+        - { label: The toolkit, href: '/toolkit/', kind: Toolkit guide, note: 'Fifteen tools: what each reveals and what it hides' }
+        - { label: STEEPLE analysis, href: '/toolkit/steeple-analysis/', kind: Toolkit guide }
+        - { label: Decision trees, href: '/toolkit/decision-trees/', kind: Toolkit guide }
+        - { label: Contribution, href: '/toolkit/contribution/', kind: Toolkit guide, level: HL }
+      check: For each tool you have met, write one sentence on when it helps and one on what it cannot show.
+    - id: paper-1-research
+      title: 'Paper 1 research: the pre-released statement'
+      goal: Research the topics in the statement the IB releases before Paper 1, so that the unseen case study meets prepared knowledge.
+      items:
+        - { label: Paper 1, href: '/assessment/paper-1/', kind: Assessment }
+        - { label: The Paper 1 assessment guide, href: '/resources/guide-paper-1/', kind: Reference }
+    - id: internal-assessment
+      title: The internal assessment
+      goal: Plan, research and write a research project about a real issue facing one organization, through one key concept.
+      items:
+        - { label: The internal assessment, href: '/assessment/internal-assessment/', kind: Assessment }
+        - { label: The research project planner, href: '/ia-studio/', kind: Planner }
+        - { label: The internal assessment guide, href: '/resources/guide-internal-assessment/', kind: Reference }
+    - id: exams
+      title: Examination practice and revision
+      goal: Answer Papers 1 and 2, and at HL Paper 3, to time, using the command terms exactly.
+      items:
+        - { label: Paper 2, href: '/assessment/paper-2/', kind: Assessment }
+        - { label: Paper 3 Strategic Planning Centre, href: '/assessment/paper-3/', kind: Assessment, level: HL }
+        - { label: Practice questions, href: '/exam-desk/practice/', kind: Practice }
+        - { label: The command terms, href: '/examiner-lens/', kind: Reference }
+        - { label: Revision Briefs, href: '/revision/', kind: Revision }
+      check: Write one timed answer for each paper and mark it against the mark scheme, then against the command term.
+  assessment:
+    title: The IB's assessment at SL and HL
+    summary: >
+      The IB assesses the course through external examinations and an internal assessment that the teacher
+      marks and the IB moderates. SL takes Papers 1 and 2 and the internal assessment; HL also takes
+      Paper 3. Each component's time, marks and weighting are from the guide's assessment outlines
+      (pp. 39 to 40).
+    provenance: ib-requirement
+    formats:
+      - { name: Paper 1, text: 'An unseen case study about a fictitious organization, built on a statement released in advance. The same paper at SL and HL, without HL extension material (pp. 39 to 41).' }
+      - { name: Paper 2, text: 'Unseen stimulus material with a quantitative focus. SL and HL sit different papers, and HL includes the HL extension material (pp. 39 to 42).' }
+      - { name: Paper 3 (HL only), text: 'Unseen stimulus material about a social enterprise: describe a human need, explain the challenges facing the social entrepreneur, and recommend a plan (pp. 40 and 42).' }
+      - { name: Internal assessment, text: 'A business research project of at most 1,800 words about a real issue facing one organization, through one key concept; the same task at SL and HL (pp. 39 to 40 and 51 to 56).' }
+  leavesOut:
+    - 'Grades and predictions. Nothing here predicts a grade or approves an internal assessment: your teacher and the IB assess your work.'
+    - "Released papers, markschemes and subject reports, which were not supplied. The practice questions are the platform's own, and their mark schemes are guidance."
+    - Material from other courses. Ideas beyond the IB syllabus are kept on the undergraduate and MBA pathways, not mixed into this route.
+    - "A timetable. The order of the stages is a recommendation; follow your school's."
   available:
-    - { label: "The course and syllabus map", href: "/ib/", note: "Five units, thirty-seven subtopics, SL and HL marked" }
-    - { label: "Syllabus coverage", href: "/ib/coverage/", note: "What exists for each subtopic, including the gaps" }
-    - { label: "Growth and evolution (1.5)", href: "/topics/growth-and-evolution/", note: "A complete brief with a case and a Decision Room" }
-    - { label: "Leadership and management (2.3)", href: "/topics/leadership-and-management/", note: "A complete brief with a case and a Decision Room" }
-    - { label: "Costs and revenues (3.3)", href: "/topics/costs-and-revenues/", note: "A complete brief linked to break-even (5.5)" }
-    - { label: "Assessment Centre", href: "/assessment/", note: "The IA, Paper 1, Paper 2 and the HL Paper 3, with practice and tools" }
-    - { label: "Internal assessment", href: "/assessment/internal-assessment/", note: "The research project step by step, with a question builder and a document checker" }
-    - { label: "Revision Briefs", href: "/revision/", note: "One printable page per complete topic" }
+    - { label: 'The course and syllabus map', href: '/ib/', note: 'Five units, thirty-seven subtopics, SL and HL marked' }
+    - { label: 'Syllabus coverage', href: '/ib/coverage/', note: 'What exists for each subtopic, including the gaps' }
+    - { label: 'Assessment Centre', href: '/assessment/', note: 'The IA, Paper 1, Paper 2 and the HL Paper 3, with practice and tools' }
   planned:
-    - Briefs for the remaining thirty-four subtopics, in the order shown on the coverage page
+    - Notes for the remaining subtopics, in the order shown on the coverage page
     - Analysis of released papers, markschemes and subject reports, once they are supplied
   principles:
     - Every statement about the syllabus or the examinations gives its page in the Business management guide, and is written in the platform's words.
@@ -31,66 +144,475 @@
     - SL and HL are taught together. HL-only content is labelled, and SL students can hide it.
 
 - id: secondary
-  name: IGCSE and other secondary courses
-  audience: Students of Cambridge IGCSE Business Studies, other IGCSE and GCSE specifications, CBSE and national curricula.
-  promise: A shared foundation now; a mapping for each qualification, with its own terminology and rules, later.
-  status: planned
+  name: Secondary business foundations
+  audience: Students in secondary school meeting business for the first time, on any course, and the teachers who teach them.
+  promise: The foundations of business in plain language, at the depth of a first course, with short-answer and data-response practice. Not mapped to any specification.
+  status: live
   order: 2
   intro: >
-    Much of what is taught here (costs and break-even, leadership styles, ways businesses grow) appears in
-    secondary business courses too. But no secondary specification has been mapped yet, so nothing on the
-    platform is labelled as meeting one. Use the topics as learning, and use your own specification for
-    what your examination requires.
+    This pathway teaches general business foundations: what businesses do, who owns them, what they aim
+    for, and how they manage people, money and customers. **It is not mapped to any specific syllabus.** No
+    specification for IGCSE, GCSE or any other secondary course was supplied, so nothing here claims to
+    cover one. Teachers: check each module against your own specification, and use the parts that fit.
+  depth: >
+    A first course: each idea in plain words, with a short fictional example. Calculations (revenue, costs,
+    profit, break-even and cash flow) show every step, and there is no HL material: the route uses only the
+    SL sections of the platform's notes.
+  terminology: >
+    Each module lists its key words with a plain meaning from the platform's glossary. Courses name some
+    things differently: yours may say balance sheet where the notes say statement of financial position,
+    or overheads where they say indirect costs. Learn the words your own specification uses.
+  stageName: Module
+  routeIntro: >
+    Eight modules, each a short read of the notes' SL sections, its key words and a check. Take them in
+    order: each one builds on the one before.
+  stages:
+    - title: What a business is and does
+      goal: Describe how a business turns inputs into goods and services that meet people's needs, and how it adds value on the way.
+      items:
+        - { label: What a business is, href: '/topics/what-is-a-business/#what-a-business-is', kind: Notes }
+        - { label: 'Inputs, the transformation process and outputs', href: '/topics/what-is-a-business/#transformation-process', kind: Notes }
+        - { label: Adding value, href: '/topics/what-is-a-business/#adding-value', kind: Notes }
+        - { label: The four sectors of economic activity, href: '/topics/what-is-a-business/#four-sectors', kind: Notes }
+      terms: [business, goods-and-services, factors-of-production, added-value, primary-sector, secondary-sector, tertiary-sector]
+      check: Name the inputs and outputs of a business you know, and say how it adds value.
+    - title: Starting a business
+      goal: Explain why people start businesses and the problems a new business faces in its first years.
+      items:
+        - { label: Entrepreneurship, href: '/topics/what-is-a-business/#entrepreneurship', kind: Notes }
+        - { label: 'Starting up: opportunities and challenges', href: '/topics/what-is-a-business/#starting-up', kind: Notes }
+      terms: [entrepreneurship, start-up, business-plan, gap-in-the-market]
+      check: Give two reasons people start a business and two problems a start-up meets, with an example of each.
+    - title: Who owns a business
+      goal: Compare sole traders, partnerships and companies, and explain why owners choose one form over another.
+      items:
+        - { label: The private and public sectors, href: '/topics/types-of-business-entities/#private-and-public-sectors', kind: Notes }
+        - { label: Sole traders, href: '/topics/types-of-business-entities/#sole-traders', kind: Notes }
+        - { label: Partnerships, href: '/topics/types-of-business-entities/#partnerships', kind: Notes }
+        - { label: Companies and privately held companies, href: '/topics/types-of-business-entities/#privately-held-companies', kind: Notes }
+        - { label: Choosing and changing the legal form, href: '/topics/types-of-business-entities/#choosing-a-legal-form', kind: Notes }
+      terms: [sole-trader, partnership, company, unlimited-liability, limited-liability, private-sector, public-sector]
+      check: Explain the difference between unlimited and limited liability, and why it matters to an owner.
+    - title: Aims and the people who care about them
+      goal: Explain what businesses aim for and who has a stake in what they do, and why those groups sometimes want different things.
+      items:
+        - { label: Vision and mission statements, href: '/topics/business-objectives/#vision-and-mission', kind: Notes }
+        - { label: Common business objectives, href: '/topics/business-objectives/#common-objectives', kind: Notes }
+        - { label: What a stakeholder is, href: '/topics/stakeholders/#what-a-stakeholder-is', kind: Notes }
+        - { label: Internal and external stakeholders, href: '/topics/stakeholders/#internal-and-external', kind: Notes }
+        - { label: Conflict between stakeholders, href: '/topics/stakeholders/#conflict', kind: Notes }
+      terms: [mission-statement, vision-statement, business-objective, stakeholder, internal-stakeholder, external-stakeholder, stakeholder-conflict]
+      check: Choose a decision a local business might make and say which two stakeholder groups would disagree about it, and why.
+    - title: People at work
+      goal: Describe how businesses organize their people, what motivates people at work, and how managers lead.
+      items:
+        - { label: The hierarchy and the organization chart, href: '/topics/organizational-structure/#the-hierarchy', kind: Notes }
+        - { label: 'Tall and flat structures, and delayering', href: '/topics/organizational-structure/#tall-and-flat', kind: Notes }
+        - { label: Motivation and demotivation, href: '/topics/motivation-and-demotivation/#what-motivation-is', kind: Notes }
+        - { label: 'Maslow: the hierarchy of needs', href: '/topics/motivation-and-demotivation/#maslow', kind: Notes }
+        - { label: 'Herzberg: motivation-hygiene theory', href: '/topics/motivation-and-demotivation/#herzberg', kind: Notes }
+        - { label: Financial rewards, href: '/topics/motivation-and-demotivation/#financial-rewards', kind: Notes }
+        - { label: Non-financial rewards, href: '/topics/motivation-and-demotivation/#non-financial-rewards', kind: Notes }
+        - { label: Match the leadership style to the situation, href: '/topics/leadership-and-management/#ix-lead-style-matcher', kind: Interaction }
+      terms: [organization-chart, levels-of-hierarchy, span-of-control, chain-of-command, motivation, maslows-hierarchy-of-needs, herzbergs-motivation-hygiene-theory, financial-rewards, non-financial-rewards]
+      check: Explain one financial and one non-financial reward that would suit staff in a busy restaurant, and why.
+    - title: Costs, revenue, profit and break-even
+      goal: Calculate revenue, costs, profit and the break-even point, and explain what happens when the price or a cost changes.
+      items:
+        - { label: Classify the costs, href: '/finance-desk/costs-and-revenue/', kind: Workspace }
+        - { label: Contribution per unit and total contribution, href: '/topics/break-even-analysis/#contribution', kind: Notes }
+        - { label: The break-even chart, href: '/topics/break-even-analysis/#break-even-chart', kind: Notes }
+        - { label: The margin of safety, href: '/topics/break-even-analysis/#margin-of-safety', kind: Notes }
+        - { label: When price or costs change, href: '/topics/break-even-analysis/#changes-in-price-or-cost', kind: Notes }
+        - { label: The break-even workspace, href: '/finance-desk/break-even/', kind: Workspace }
+      terms: [fixed-cost, variable-cost, total-cost, total-revenue, profit, contribution-per-unit, break-even-quantity, margin-of-safety]
+      check: Answer the data-response task on Harbour Bikes below, showing every step.
+    - title: Cash and the accounts
+      goal: Explain why profit and cash are different, read a simple cash flow forecast, and say what the two main financial statements show.
+      items:
+        - { label: Profit and cash flow are different, href: '/topics/cash-flow/#profit-and-cash-flow', kind: Notes }
+        - { label: Cash flow forecasts, href: '/topics/cash-flow/#cash-flow-forecasts', kind: Notes }
+        - { label: Why cash runs short, href: '/topics/cash-flow/#causes-of-cash-flow-problems', kind: Notes }
+        - { label: The cash flow lab, href: '/finance-desk/cash-flow/', kind: Workspace }
+        - { label: 'Who reads the accounts, and why', href: '/topics/final-accounts/#purpose-of-accounts', kind: Notes }
+      terms: [cash-flow, cash-inflow, cash-outflow, net-cash-flow, opening-balance, closing-balance, cash-flow-forecast, statement-of-profit-or-loss, statement-of-financial-position]
+      check: Answer the data-response task on Lantern Street Kitchen below.
+    - title: Marketing
+      goal: Explain how businesses decide whom to sell to and how they use the marketing mix to reach them.
+      items:
+        - { label: Segmentation, href: '/topics/marketing-planning/#segmentation', kind: Notes }
+        - { label: Targeting niche and mass markets, href: '/topics/marketing-planning/#targeting-niche-and-mass', kind: Notes }
+        - { label: The unique selling point, href: '/topics/marketing-planning/#unique-selling-point', kind: Notes }
+        - { label: The product life cycle, href: '/topics/the-seven-ps-of-the-marketing-mix/#product-life-cycle', kind: Notes }
+        - { label: Pricing methods, href: '/topics/the-seven-ps-of-the-marketing-mix/#pricing-methods', kind: Notes }
+        - { label: Distribution channels, href: '/topics/the-seven-ps-of-the-marketing-mix/#distribution-channels', kind: Notes }
+      terms: [market, market-research, market-segmentation, target-market, unique-selling-point, marketing-mix, product-life-cycle, penetration-pricing, price-skimming, distribution-channel]
+      check: Describe the target market and the unique selling point of a product you bought recently.
+  assessment:
+    title: Short-answer and data-response practice
+    summary: >
+      Practice written by the platform in a general short-answer and data-response style. It does not come
+      from any examination board's papers and is not modelled on any one specification; its marks are the
+      platform's own guide to how long an answer should be. Check your own specification for the question
+      styles and command words it uses.
+    provenance: original-practice
+    formats:
+      - { name: Short answer, text: 'State, define, outline or explain one idea in a few lines, often with an example. Each question comes with what a good answer includes.' }
+      - { name: Data response, text: 'A short account of a fictional business with figures. Calculate from the data, then explain what the results mean. The working is shown step by step, by the same functions as the Finance Desk.' }
+  practice:
+    - id: what-a-business-does
+      style: short-answer
+      title: What a business does
+      parts:
+        - q: State two factors of production that a café uses.
+          marks: 2
+          guidance: Any two of land (the premises), labour (the staff), capital (the coffee machine and the furniture) and enterprise (the owner who takes the risk), each tied to the café.
+        - q: Explain one way a café adds value to the coffee beans it buys.
+          marks: 3
+          guidance: >
+            Added value is the difference between the price customers pay and the cost of the materials bought
+            in. A good answer names one way the café adds value (brewing the coffee well, a comfortable place
+            to sit, quick service) and explains why customers will pay more for the result than the beans cost.
+    - id: who-owns-it
+      style: short-answer
+      title: Who owns a business
+      parts:
+        - q: Define unlimited liability.
+          marks: 2
+          guidance: The owner is personally responsible for all of the business's debts, so their own savings or belongings can be used to pay them if the business cannot.
+        - q: Explain one advantage and one disadvantage for a sole trader of taking on a partner.
+          marks: 4
+          guidance: >
+            One advantage, explained: more money to invest, new skills, or someone to share the work and the
+            decisions. One disadvantage, explained: the profit is shared, the partners may disagree, and in
+            most partnerships each partner is responsible for the debts the other runs up.
+    - id: stakeholders-disagree
+      style: short-answer
+      title: When stakeholders disagree
+      parts:
+        - q: Distinguish between an internal and an external stakeholder.
+          marks: 2
+          guidance: An internal stakeholder is part of the business (its employees, managers or owners); an external one is outside it but affected by it or able to influence it (customers, suppliers, the local community, the government).
+        - q: Explain why the owners and the employees of a factory might disagree about a plan to open on Sundays.
+          marks: 4
+          guidance: >
+            The owners may want more output and profit from the same machines. The employees may lose time
+            with their families, or want extra pay for the day. A good answer explains each side's objective
+            and why both cannot be fully met at once.
+    - id: rewards
+      style: short-answer
+      title: Rewards and motivation
+      parts:
+        - q: Outline one financial and one non-financial way to motivate the staff of a clothes shop.
+          marks: 4
+          guidance: >
+            Financial: commission or a bonus for sales, which links pay to effort. Non-financial: training,
+            more responsibility (running a section of the shop) or praise and recognition. Each needs a
+            sentence on why it would motivate shop staff.
+    - id: harbour-bikes
+      style: data-response
+      title: Harbour Bikes
+      context: >
+        Harbour Bikes is a fictional bicycle hire business on a seafront. Customers pay for each hire. The
+        owner has set out the figures below for July, the busiest month of the year.
+      currency: '$'
+      labels: { unit: hire, units: hires, period: month }
+      figures:
+        - { key: price, label: Price per hire, value: 15, money: true }
+        - { key: variableCost, label: Variable cost per hire (cleaning and repairs), value: 3, money: true }
+        - { key: fixedCosts, label: Fixed costs per month (rent and insurance), value: 2400, money: true }
+        - { key: quantity, label: Hires expected in July, value: 400 }
+      parts:
+        - q: Calculate the contribution per hire.
+          marks: 2
+          calculation: contribution-per-unit
+          inputs: { price: price, variableCost: variableCost }
+          guidance: Contribution per hire is the price of a hire minus the variable cost of that hire. Show the subtraction.
+        - q: Calculate how many hires Harbour Bikes needs each month to break even.
+          marks: 2
+          calculation: break-even-quantity
+          inputs: { fixedCosts: fixedCosts, price: price, variableCost: variableCost }
+          guidance: Divide the fixed costs by the contribution per hire. If the answer is not a whole number, round up, because a part of a hire cannot be sold.
+        - q: Calculate the profit if Harbour Bikes makes the number of hires it expects in July.
+          marks: 2
+          calculation: profit
+          inputs: { price: price, variableCost: variableCost, fixedCosts: fixedCosts, quantity: quantity }
+          guidance: Work out total revenue and total cost first, then take one from the other.
+        - q: Explain one reason why Harbour Bikes might not make as many hires as it expects in July.
+          marks: 3
+          guidance: >
+            A reason (a rainy month, a rival opening nearby, fewer visitors to the town), explained with its
+            effect: fewer hires bring in less contribution towards the same fixed costs, so profit falls, and
+            below the break-even number of hires the business makes a loss.
+    - id: lantern-street-kitchen
+      style: data-response
+      title: Lantern Street Kitchen
+      context: >
+        Lantern Street Kitchen is a fictional food truck. Its owner has forecast the cash coming in and going
+        out over the summer. In July the truck needs a new generator, and the owner buys extra stock for a
+        festival in August.
+      currency: '$'
+      cash:
+        opening: 1800
+        months:
+          - { month: June, inflows: 5200, outflows: 4700 }
+          - { month: July, inflows: 3900, outflows: 5600 }
+          - { month: August, inflows: 6100, outflows: 4900 }
+      parts:
+        - q: Calculate the net cash flow in July.
+          marks: 2
+          calculation: net-cash-flow
+          month: July
+          guidance: Net cash flow is the month's cash inflows minus its cash outflows. A negative figure is written in brackets in a forecast.
+        - q: Calculate the closing balance at the end of July.
+          marks: 2
+          calculation: closing-balance
+          month: July
+          guidance: The opening balance for July is the closing balance at the end of June. Add July's net cash flow to it.
+        - q: Explain why the food truck could make a profit over the summer and still be short of cash in July.
+          marks: 4
+          guidance: >
+            Profit compares revenue with costs over the whole summer; cash flow depends on when money comes in
+            and goes out. In July more cash goes out than comes in, for the generator and the festival stock,
+            so the balance falls even though the summer as a whole is profitable. A good answer uses the July
+            figures from the forecast.
+        - q: Suggest one way the owner could avoid running low on cash in July.
+          marks: 2
+          guidance: Arrange an overdraft before July, ask the supplier for longer to pay for the festival stock, or spread the cost of the generator, with a reason the choice suits a small food truck.
+  leavesOut:
+    - 'Any claim to match a syllabus. The modules are general foundations; your own specification decides what you need to know.'
+    - "HL material and the IB's assessment: no HL-only sections, no internal assessment and no Paper 1, 2 or 3."
+    - Harder calculations, such as ratio analysis, investment appraisal and depreciation, which belong to later courses.
+    - Real company data. Every example is fictional, and its figures are simulated.
   available:
-    - { label: "Topics", href: "/topics/", note: "The shared foundation; written for IB but readable at this level" }
-    - { label: "Finance Desk", href: "/finance-desk/", note: "Costs, revenue and break-even with full working" }
-    - { label: "Glossary", href: "/glossary/", note: "Terms defined in plain language" }
+    - { label: 'Start with Module 1', href: '/topics/what-is-a-business/#what-a-business-is', note: 'What a business is, in the notes' }
+    - { label: 'Glossary', href: '/glossary/', note: 'Every key word, defined in plain language' }
+    - { label: 'Break-even workspace', href: '/finance-desk/break-even/', note: 'Costs, revenue and break-even with full working' }
   planned:
-    - A mapping for Cambridge IGCSE Business Studies, built from its current syllabus
-    - Mappings for other specifications on request, each from its own authoritative document
+    - A mapping for a specific qualification, built from its own specification, if one is supplied. Until then none is claimed.
+    - More data-response practice for each module
   principles:
-    - Each qualification gets its own mapping, terminology and assessment rules. The IB structure is never assumed to fit another course.
-    - Until a specification is mapped, its pathway says so, and no page claims to cover it.
+    - No specification is mapped, and no page claims to cover one. The IB structure is never assumed to fit another course.
+    - Only the SL sections of the notes are used, and each key word is given a plain meaning.
   caution: >
-    Terms differ between qualifications (some use "overheads" where the IB uses "indirect costs", some
-    expect break-even to be read from a chart rather than calculated). Check your own specification.
+    Courses differ in what they include and in the words they use. Check every module against your own
+    specification before you rely on it.
 
 - id: undergraduate
   name: Undergraduate business and management
-  audience: University students in introductory management, strategy, organizational behaviour and case analysis.
-  promise: Cases written to be argued, tools with their origins and limits, and enrichment that points to the literature.
+  audience: University students in introductory management, strategy, organizational behaviour, marketing, finance and case analysis.
+  promise: Deeper theory through enrichment maps beyond the IB course, structured analysis of the platform's cases, and reading pointers limited to what the platform has checked.
   status: partial
   order: 3
   intro: >
-    University courses ask where a framework came from, what it assumes and what the evidence says. Each
-    toolkit page states the tool's limits and, where one is well established, its origin, and each topic
-    brief has enrichment panels that go beyond the school course. The cases are built for structured
-    case analysis.
+    University courses ask where a framework comes from, what it assumes and what the evidence says. This
+    route starts from the platform's notes, where each idea is first set out, then goes further with
+    enrichment maps beyond the IB course, case analysis and the questions to ask of any theory. No
+    university syllabus was supplied, so the route is aligned to no particular course: use it beside your
+    own reading list.
+  depth: >
+    Beyond the school course: the notes give the foundation and an enrichment map the university-level
+    extension. Each module asks you to evaluate a framework's assumptions and evidence rather than only
+    apply it. HL material is included where it is the foundation for a university topic, and marked HL.
+  terminology: >
+    The IB's terms are kept where they are precise, and the enrichment maps add university usage beside
+    them. Gearing is measured against capital employed in the IB course but often as debt to equity in
+    finance texts, and the statement of profit or loss is often called the income statement. Check which
+    definition a source uses before you compare figures.
+  stageName: Module
+  routeIntro: >
+    Six modules. Each starts from the notes or a brief as the foundation, adds an enrichment map, and ends
+    with a task that asks for judgement.
+  stages:
+    - title: Strategy and the firm
+      goal: Analyse how an organization chooses where to compete and how to win, and evaluate the frameworks used to decide.
+      items:
+        - { label: Strategy formulation, href: '/mindmaps/enrichment/strategy-formulation/', kind: Enrichment map }
+        - { label: Strategic and tactical objectives, href: '/topics/business-objectives/#strategic-and-tactical', kind: Notes }
+        - { label: "Porter's generic strategies", href: '/topics/business-objectives/#porters-generic-strategies', kind: Notes, level: HL }
+        - { label: Growth and evolution, href: '/topics/growth-and-evolution/', kind: Brief }
+        - { label: The Ansoff matrix, href: '/toolkit/ansoff-matrix/', kind: Toolkit guide }
+      check: Write 300 words on one framework from the map, saying what it assumes, where it would mislead, and what you would use beside it.
+    - title: People and organizations
+      goal: Explain behaviour at work through motivation, leadership and structure, and weigh the evidence for each theory.
+      items:
+        - { label: Organizational behaviour, href: '/mindmaps/enrichment/organizational-behaviour/', kind: Enrichment map }
+        - { label: 'Maslow: the hierarchy of needs', href: '/topics/motivation-and-demotivation/#maslow', kind: Notes }
+        - { label: 'Herzberg: motivation-hygiene theory', href: '/topics/motivation-and-demotivation/#herzberg', kind: Notes }
+        - { label: Equity theory and expectancy theory, href: '/topics/motivation-and-demotivation/#equity-and-expectancy', kind: Notes, level: HL }
+        - { label: Matrix structure, href: '/topics/organizational-structure/#matrix', kind: Notes }
+        - { label: Leadership and management, href: '/topics/leadership-and-management/', kind: Brief }
+      check: Compare a content theory with a process theory of motivation, and say which better explains one situation you know.
+    - title: Accounting and corporate finance
+      goal: Interpret final accounts and ratios, appraise an investment, and connect each to the cost of capital and risk.
+      items:
+        - { label: Corporate finance, href: '/mindmaps/enrichment/corporate-finance/', kind: Enrichment map }
+        - { label: The statement of profit or loss, href: '/topics/final-accounts/#statement-of-profit-or-loss', kind: Notes }
+        - { label: 'Calculating and commenting: a worked example', href: '/topics/profitability-and-liquidity-ratio-analysis/#worked-example', kind: Notes }
+        - { label: Net present value, href: '/topics/investment-appraisal/#net-present-value', kind: Notes, level: HL }
+        - { label: The ratio desk, href: '/finance-desk/ratios/', kind: Workspace }
+        - { label: Investment appraisal, href: '/finance-desk/investment-appraisal/', kind: Workspace }
+      check: Change the discount rate in the investment appraisal workspace and explain why the ranking of the two projects does or does not change.
+    - title: Marketing
+      goal: Analyse how organizations choose and position against their markets, and evaluate pricing decisions.
+      items:
+        - { label: Marketing strategy, href: '/mindmaps/enrichment/marketing-strategy/', kind: Enrichment map }
+        - { label: Segmentation, href: '/topics/marketing-planning/#segmentation', kind: Notes }
+        - { label: Positioning and position maps, href: '/topics/marketing-planning/#positioning-and-position-maps', kind: Notes }
+        - { label: The product portfolio, href: '/topics/the-seven-ps-of-the-marketing-mix/#product-portfolio', kind: Notes }
+        - { label: Market Studio, href: '/market-studio/', kind: Room }
+      check: Explain which segment Atelier Barro should target and what its position map says about the gap.
+    - title: Operations and supply chains
+      goal: Explain how operations support a competitive position, and weigh efficiency against resilience in a supply chain.
+      items:
+        - { label: Operations strategy, href: '/mindmaps/enrichment/operations-strategy/', kind: Enrichment map }
+        - { label: The local and global supply chain, href: '/topics/production-planning/#supply-chain', kind: Notes, level: HL }
+        - { label: Just-in-time versus just-in-case, href: '/topics/production-planning/#jit-and-jic', kind: Notes, level: HL }
+        - { label: Operations Floor, href: '/operations-floor/', kind: Room }
+        - { label: Sustainable business strategy, href: '/mindmaps/enrichment/sustainability-strategy/', kind: Enrichment map }
+      check: Argue for or against holding more stock at a business you know, using the trade-off between efficiency and resilience.
+    - title: Case analysis
+      goal: Analyse a case from its data to a recommendation, and state the conditions under which the recommendation would change.
+      items:
+        - { label: Halden Distribution, href: '/cases/halden-distribution/', kind: Case }
+        - { label: Marigold Kitchens, href: '/cases/marigold-kitchens/', kind: Case }
+        - { label: Atelier Barro, href: '/cases/atelier-barro/', kind: Case }
+        - { label: 'Halden Distribution: diagnose before you decide', href: '/case-room/halden-diagnosis/', kind: Case lab }
+      check: Write a case analysis of one case in the five steps below, then compare it with the analysis at the end of the case file.
+  assessment:
+    title: Written analysis and evaluation
+    summary: >
+      Your university sets its own assessment; the platform does not know your course's rules and claims
+      none of them. The formats below are the platform's own practice, built to rehearse the judgement that
+      written analysis rewards.
+    provenance: aa-framework
+    formats:
+      - { name: Case analysis, text: 'Data, insight, options, recommendation, then the caveat: what would have to be true for the recommendation to change. Each case file ends with an analysis in this form to compare yours with.' }
+      - { name: Critical evaluation of a framework, text: 'Where the framework comes from, what it assumes, what supports it and where it would mislead.' }
+      - { name: Reading from the source, text: 'Start from the references below, note what each argues, and compare it with how the platform and your course present the idea.' }
+  reading:
+    - { source: ansoff-1957, for: 'The original article behind the Ansoff matrix, for the strategy module.' }
+    - { source: capron-mitchell-2012, for: 'How firms choose between building, borrowing and buying the resources to grow.' }
+    - { source: kotter-1990, for: 'The distinction between management and leadership, for the people module.' }
+    - { source: hersey-blanchard, for: 'The origin of the situational leadership model.' }
+    - { source: lewin-1951, for: 'The usual source for force field analysis.' }
+    - { source: fayol-1916, for: 'The classic functions of management.' }
+    - { source: hodder-bm-2022, for: 'The IB coursebook, for the school foundations the modules start from.' }
+  leavesOut:
+    - "A university's syllabus or reading list. None was supplied, so the route is aligned to no course and replaces no module."
+    - Summaries of works the platform has not read. The reading pointers are labelled by how far each was checked.
+    - Quantitative methods beyond the course, such as statistics, econometrics and financial modelling.
+    - Real company case data. The cases are fictional and their figures simulated.
   available:
-    - { label: "Case Vault", href: "/cases/", note: "Three case files with exhibits, stakeholders, options and a worked analysis" }
-    - { label: "Decision Room", href: "/decision-room/", note: "Commit to a decision and follow its consequences" }
-    - { label: "Toolkit", href: "/toolkit/", note: "What each tool reveals and what it hides" }
+    - { label: 'Enrichment maps', href: '/mindmaps/#enrichment', note: 'Nine maps of management beyond the IB course' }
+    - { label: 'Case Vault', href: '/cases/', note: 'Three case files with exhibits, stakeholders, options and a worked analysis' }
+    - { label: 'Toolkit', href: '/toolkit/', note: 'What each tool reveals and what it hides' }
   planned:
-    - Reading lists for each topic, drawn from sources that have been checked
-    - Longer cases with financial statements
+    - Longer cases with full financial statements
+    - Reading lists for each module, drawn from sources the platform has checked
   principles:
     - Enrichment is labelled as enrichment. It deepens the school course; it does not replace a university reading list.
     - A framework is taught with its limits, and its origin where one is well established.
+    - No university course is claimed or mapped.
 
 - id: mba
   name: MBA and advanced management
   audience: MBA students, executive learners and managers who want deliberate practice in judgement.
-  promise: Decisions under uncertainty, with the trade-offs, implementation risks and stakeholder costs made explicit.
+  promise: Decisions under uncertainty in competitive strategy, financial analysis, leadership and transformation, and governance, practised in the Decision Rooms and written up as a board memo.
   status: partial
   order: 4
   intro: >
-    The value here for an advanced learner is the discipline of the sequence: data, insight, option,
+    The value here for an advanced learner is the discipline of the sequence: data, insight, options,
     recommendation, then implementation and consequence. The Decision Rooms make you commit before you see
     the consequences, and the debriefs ask what would have to be true for your choice to be the right one.
+    The enrichment maps give the advanced frameworks; the platform's own figures keep the arithmetic honest.
+  depth: >
+    Advanced and applied: each module sets a decision, the frameworks that structure it and the numbers
+    that test it. The cases are kept small on purpose, so that the judgement is visible; the debrief
+    matters more than the outcome.
+  terminology: >
+    Management usage, with the finance terms worked by the platform's functions: return on capital
+    employed, gearing, net present value, contribution and operating leverage. Where practice differs from
+    the IB course, such as gearing measured as debt to equity, the enrichment maps say so.
+  stageName: Module
+  routeIntro: >
+    Six modules, each built around a decision. Read the frameworks, work the numbers, commit in a Decision
+    Room or a case, then write the board memo.
+  stages:
+    - title: Competitive strategy and growth
+      goal: Recommend where a business should compete and how it should grow, and name the condition that would change your recommendation.
+      items:
+        - { label: Strategy formulation, href: '/mindmaps/enrichment/strategy-formulation/', kind: Enrichment map }
+        - { label: 'Marigold Kitchens: which way to grow?', href: '/decision-room/marigold-growth/', kind: Decision Room }
+        - { label: Growth and evolution, href: '/topics/growth-and-evolution/', kind: Brief, note: 'Read the panel on building, borrowing or buying' }
+        - { label: Decision trees, href: '/toolkit/decision-trees/', kind: Toolkit guide }
+        - { label: "Porter's generic strategies", href: '/topics/business-objectives/#porters-generic-strategies', kind: Notes, level: HL }
+      check: Write a one-page board memo on Marigold's route to growth.
+      caveat: Expected value ranks options by their average outcome. It says nothing about the worst case, or whether the business could survive it.
+    - title: Financial analysis for decisions
+      goal: Diagnose a business's performance from its accounts and choose between investments on cash, return and risk.
+      items:
+        - { label: Corporate finance, href: '/mindmaps/enrichment/corporate-finance/', kind: Enrichment map }
+        - { label: The ratio desk, href: '/finance-desk/ratios/', kind: Workspace }
+        - { label: Investment appraisal, href: '/finance-desk/investment-appraisal/', kind: Workspace }
+        - { label: The cash flow lab, href: '/finance-desk/cash-flow/', kind: Workspace }
+      check: Decide which of Halden's two projects you would fund, and what would change your mind.
+      caveat: The ratios describe the past and the appraisal depends on forecasts. Neither tells you why the numbers moved.
+    - title: Pricing and operating leverage
+      goal: Judge a price change and a special order on contribution, and explain how the cost structure changes the risk.
+      items:
+        - { label: 'Atelier Barro: the pricing decision', href: '/decision-room/atelier-pricing/', kind: Decision Room }
+        - { label: The break-even workspace, href: '/finance-desk/break-even/', kind: Workspace }
+        - { label: Costs and revenues, href: '/topics/costs-and-revenues/', kind: Brief, note: 'Read the panel on operating leverage' }
+        - { label: Operating leverage, href: '/topics/production-planning/#operating-leverage', kind: Notes, level: HL }
+      check: Explain, with figures from the workspace, why a business with high fixed costs should watch its margin of safety more closely than its profit.
+      caveat: The models hold price and unit costs constant and assume everything made is sold; real demand responds to price.
+    - title: Leadership and transformation
+      goal: Plan how to lead a team through change, from diagnosis to the first ninety days, and anticipate resistance.
+      items:
+        - { label: Leading change, href: '/mindmaps/enrichment/leading-change/', kind: Enrichment map }
+        - { label: Organizational behaviour, href: '/mindmaps/enrichment/organizational-behaviour/', kind: Enrichment map }
+        - { label: 'Halden Distribution: diagnose before you decide', href: '/case-room/halden-diagnosis/', kind: Case lab }
+        - { label: 'Halden Distribution: how to lead in the first ninety days', href: '/decision-room/halden-leadership/', kind: Decision Room }
+        - { label: Force field analysis, href: '/toolkit/force-field-analysis/', kind: Toolkit guide, level: HL }
+      check: Write the first-ninety-days plan you would give Halden's new manager, with the signal that would make you change course.
+      caveat: A force field gives strengths you assign yourself. It structures the argument; it does not measure the forces.
+    - title: Governance, stakeholders and sustainability
+      goal: Weigh the interests a board must balance, and judge whether a sustainability commitment is material or cosmetic.
+      items:
+        - { label: Corporate governance, href: '/mindmaps/enrichment/corporate-governance/', kind: Enrichment map }
+        - { label: Sustainable business strategy, href: '/mindmaps/enrichment/sustainability-strategy/', kind: Enrichment map }
+        - { label: Stakeholder mapping, href: '/topics/stakeholders/#stakeholder-mapping', kind: Notes }
+        - { label: Weighing CSR, href: '/topics/business-objectives/#weighing-csr', kind: Notes }
+      check: Map the stakeholders in one of the Decision Rooms and say whose interest the board should put first, and why.
+    - title: Marketing and operations as strategy
+      goal: Connect positioning and pricing to the operations that must deliver them.
+      items:
+        - { label: Marketing strategy, href: '/mindmaps/enrichment/marketing-strategy/', kind: Enrichment map }
+        - { label: Operations strategy, href: '/mindmaps/enrichment/operations-strategy/', kind: Enrichment map }
+        - { label: Market Studio, href: '/market-studio/', kind: Room }
+        - { label: Operations Floor, href: '/operations-floor/', kind: Room }
+      check: For one case, name the performance objective its operations must win on, and one decision that would undermine it.
+  assessment:
+    title: The board memo and the decision log
+    summary: >
+      Your programme sets its own assessment; the platform claims none of it. Its practice format is the
+      board memo: one page that commits to a decision and shows the judgement behind it, written after a
+      Decision Room and compared with its debrief.
+    provenance: aa-framework
+    formats:
+      - { name: The board memo, text: 'The decision, the evidence, the options considered, the recommendation, the risks, and how you would know you were wrong, on one page.' }
+      - { name: The decision log, text: 'Before each round in a Decision Room, write what you expect to happen and why; afterwards, compare.' }
+      - { name: The debrief, text: 'Each Decision Room ends with the trade-offs, the evidence that mattered, what would change your mind and the misconceptions to avoid.' }
+  leavesOut:
+    - Real company valuations, deal data and market figures. The cases are fictional and their figures simulated.
+    - "Legal, tax and regulatory advice, and any country's governance code."
+    - Quantitative finance beyond NPV, ratios and contribution, such as option pricing, econometrics and forecasting models.
+    - Any claim of accreditation, or of equivalence to an MBA module.
   available:
-    - { label: "Decision Room", href: "/decision-room/", note: "Two-round decisions with simulated consequences" }
-    - { label: "Case Vault", href: "/cases/", note: "A worked data, insight, option and recommendation analysis for each case" }
-    - { label: "Decision trees", href: "/toolkit/decision-trees/", note: "Expected value, and what it cannot tell you" }
+    - { label: 'Decision Rooms', href: '/decision-room/', note: 'Two-round decisions with simulated consequences' }
+    - { label: 'Enrichment maps', href: '/mindmaps/#enrichment', note: 'Strategy, finance, leadership, governance and more' }
+    - { label: 'Case Vault', href: '/cases/', note: 'A worked data, insight, option and recommendation analysis for each case' }
   planned:
     - A Boardroom with multi-function cases and several rounds
     - Corporate strategy cases on portfolio choices and capital allocation
@@ -103,21 +625,151 @@
 
 - id: teachers
   name: Teachers and educators
-  audience: Teachers of IB DP Business Management and other business courses.
-  promise: Classroom-ready sequences, printable case files, discussion prompts and practice with markschemes.
+  audience: Teachers of IB DP Business Management and of other business courses.
+  promise: Lesson sequences built from the platform's notes and briefs, with timings, discussion prompts, activities, assessment resources and text outlines for your own slides.
   status: live
   order: 5
   intro: >
-    Each complete topic brief ends with a teaching sequence sized for a lesson, discussion prompts and the
-    misconceptions to listen for. Case files, Revision Briefs and practice questions print cleanly with their
-    sources and attribution. Students' work is never collected: anything they save stays on their own device.
+    Every subtopic with full notes or a complete brief has a lesson sequence below, built from that
+    material: a starter, the sections to teach, an activity, a check and an exit ticket, each step linked to
+    the exact place on the platform. Choose your lesson length and the timings follow. Students' work is
+    never collected: anything they save stays on their own device.
+  depth: >
+    The depth of the notes and briefs each sequence is built from: the IB course at SL and HL, with HL
+    sections marked. For other courses, take the SL sections and check them against your own
+    specification.
+  terminology: >
+    The sequences use the IB's subtopic numbers and terms. The prompts, activities and timings are the
+    platform's suggestions for teachers, not IB requirements.
+  stageName: Phase
+  routeIntro: >
+    How the platform fits a teaching cycle, from planning the course to revision. The lesson library below
+    gives a timed sequence for each subtopic.
+  stages:
+    - title: Plan the course
+      goal: See the whole course, what the platform holds for each subtopic and where the gaps are, before you plan your scheme of work.
+      items:
+        - { label: The course map, href: '/ib/map/', kind: Course map }
+        - { label: Syllabus coverage, href: '/ib/coverage/', kind: Course map }
+        - { label: The topic library, href: '/topics/', kind: Course map }
+    - title: Teach a subtopic
+      goal: Teach from the notes and briefs, using the lesson sequences, the diagrams and the mindmaps.
+      items:
+        - { label: The lesson library, href: '/pathways/teachers/#lessons', kind: Planner }
+        - { label: The diagram library, href: '/diagrams/', kind: Diagrams }
+        - { label: Mindmaps, href: '/mindmaps/', kind: Mindmap }
+    - title: Practise in class
+      goal: Let students commit to decisions and work the numbers themselves.
+      items:
+        - { label: Decision Rooms, href: '/decision-room/', kind: Decision Room }
+        - { label: The Case Room, href: '/case-room/', kind: Case lab }
+        - { label: The Finance Desk, href: '/finance-desk/', kind: Workspace }
+    - title: Assess
+      goal: Set original practice in the style of the papers, mark it with the platform's mark schemes, and support the internal assessment.
+      items:
+        - { label: Practice questions, href: '/exam-desk/practice/', kind: Practice }
+        - { label: The Assessment Centre, href: '/assessment/', kind: Assessment }
+        - { label: The research project planner, href: '/ia-studio/', kind: Planner }
+        - { label: The command terms, href: '/examiner-lens/', kind: Reference }
+    - title: Revise
+      goal: Give students printable briefs, the revision view of every map and the formula sheet.
+      items:
+        - { label: Revision Briefs, href: '/revision/', kind: Revision }
+        - { label: The formula sheet, href: '/resources/formula-sheet/', kind: Reference }
+        - { label: The glossary as a spreadsheet, href: '/resources/glossary-csv/', kind: Glossary }
+  assessment:
+    title: Formative checks and original practice
+    summary: >
+      Every sequence ends with a check and an exit ticket drawn from the notes, and points to the platform's
+      original practice questions. Their mark schemes are guidance for your marking, not official
+      markschemes, and no question is an IB question.
+    provenance: original-practice
+    formats:
+      - { name: Recall cards, text: 'On each notes page. Students answer from memory, reveal the answer and rate themselves; the ratings stay on their device.' }
+      - { name: Exit tickets, text: "One task per lesson, taken from the notes' objectives, each starting with a command term." }
+      - { name: Practice questions, text: 'Original questions in the style of the papers, with mark schemes and the common errors to look for.' }
+  lessons:
+    - code: '1.1'
+      prompts:
+        - Is a charity shop that sells second-hand clothes a business?
+        - Which adds more value, the farm that grows the fruit or the firm that turns it into jam?
+        - When a town loses factory jobs and gains office jobs, who loses out?
+    - code: '1.2'
+      prompts:
+        - Why would anyone choose to have unlimited liability?
+        - Should a family company sell shares to an outsider so that it can grow?
+        - Is a social enterprise that makes a profit still a social enterprise?
+    - code: '1.3'
+      prompts:
+        - Can a business be ethical and still aim to maximize its profit?
+        - What is the difference between a mission statement and an advertising slogan?
+        - When should a business change its objectives?
+    - code: '1.4'
+      prompts:
+        - Which stakeholder matters most, the most powerful or the most affected?
+        - Is it ever right to ignore a stakeholder group?
+        - Can a decision be good for every stakeholder?
+    - code: '2.2'
+      prompts:
+        - Why might a business remove a layer of managers, and who gains from it?
+        - Would you rather work in a tall organization or a flat one?
+        - What problems does having two managers create for one employee?
+    - code: '2.4'
+      prompts:
+        - Is money a motivator, or only a hygiene factor?
+        - Where does Taylor's thinking still shape work today?
+        - Can a manager motivate anyone, or only remove what demotivates them?
+    - code: '3.4'
+      prompts:
+        - Why do different readers of the same accounts look for different things?
+        - Is a brand an asset if it cannot be found in the statement of financial position?
+        - What does the statement of profit or loss not tell you?
+    - code: '3.5'
+      prompts:
+        - Can a business be too liquid?
+        - Why might a profitable business choose a lower profit margin?
+        - What would you want to know before comparing two companies' ratios?
+    - code: '3.7'
+      prompts:
+        - How can a profitable business run out of cash?
+        - Which cash flow problem is the hardest to fix quickly?
+        - Is a forecast that turns out to be wrong still useful?
+    - code: '3.8'
+      prompts:
+        - Why might a business choose the project with the longer payback?
+        - What can the numbers in an investment appraisal not tell you?
+        - How much should risk change the decision?
+    - code: '4.2'
+      prompts:
+        - Is it better to be the best in a niche or one of many in a mass market?
+        - Can a business have too many segments?
+        - What makes a unique selling point hard to copy?
+    - code: '4.5'
+      prompts:
+        - When should a product be allowed to die?
+        - Is a low price ever a bad idea?
+        - Which of the seven Ps matters most for a service business?
+    - code: '5.5'
+      prompts:
+        - Why is break-even analysis still used when its assumptions are rarely true?
+        - Should a business ever sell below its break-even price?
+        - Which is safer, a high margin of safety or a high profit?
+    - code: '5.6'
+      prompts:
+        - Is just-in-time too risky when supply chains are often disrupted?
+        - Why would a business choose to work below its full capacity?
+        - When should a business make a component it could buy?
+  leavesOut:
+    - Slides. The presentation outlines are text, for you to build your own; the platform makes no slide files.
+    - Student data. Nothing here collects, stores or reports on students.
+    - Official markschemes and grade boundaries, which were not supplied.
+    - "Your school's scheme of work: the timings are a starting point for your own."
   available:
-    - { label: "Teaching sequences", href: "/pathways/teachers/#sequences", note: "One for each complete topic" }
-    - { label: "Case files", href: "/cases/", note: "Printable, with exhibits and sources" }
-    - { label: "Practice questions", href: "/exam-desk/practice/", note: "Original questions with markschemes and common errors" }
-    - { label: "Revision Briefs", href: "/revision/", note: "One printable page per topic" }
+    - { label: 'The lesson library', href: '/pathways/teachers/#lessons', note: 'A timed sequence for each subtopic with notes or a brief' }
+    - { label: 'Case files', href: '/cases/', note: 'Printable, with exhibits and sources' }
+    - { label: 'Practice questions', href: '/exam-desk/practice/', note: 'Original questions with markschemes and common errors' }
+    - { label: 'Revision Briefs', href: '/revision/', note: 'One printable page per topic' }
   planned:
-    - Editable slide decks for each topic
     - A builder for printable question sets
   principles:
     - Resources keep the creator attribution and the platform address when printed for a class.
@@ -126,21 +778,101 @@
 - id: entrepreneurs
   name: Entrepreneurs and professionals
   audience: People starting or running a business, and professionals who make business decisions.
-  promise: The same tools a student learns, used on the questions a business owner actually faces.
+  promise: The questions a business owner actually faces, each worked with a tool that shows every step, and a plain statement of what the tool cannot tell you.
   status: partial
   order: 6
   intro: >
-    Will this price cover my costs? How many do I need to sell? Should I grow by opening my own sites or by
-    franchising? What kind of leadership does this team need now? The Finance Desk works the numbers with
-    every step shown, and the Decision Rooms let you rehearse a decision before it is real.
+    Will this price cover my costs? How many do I need to sell? Will the cash last? Should I grow by
+    opening my own sites or by franchising? What kind of leadership does this team need now? Each stage
+    below takes one question, works it with a tool that shows every step, and says what the tool leaves to
+    your judgement.
+  depth: >
+    Practical: classroom models with every step of the arithmetic shown, and the judgement kept apart.
+    The models assume a constant price and unit cost and that everything made is sold, and each tool says
+    so, so that you can check its working against your own figures.
+  terminology: >
+    Plain business language. Where a tool uses a course term, such as contribution, margin of safety or net
+    cash flow, it defines the term as it uses it.
+  stageName: Question
+  routeIntro: >
+    Six questions, roughly in the order a new business meets them. Start with the one you face now.
+  stages:
+    - title: Is there a business here?
+      goal: Check that an idea meets a real need for customers who will pay, before you spend money on it.
+      items:
+        - { label: 'Starting up: opportunities and challenges', href: '/topics/what-is-a-business/#starting-up', kind: Notes }
+        - { label: The unique selling point, href: '/topics/marketing-planning/#unique-selling-point', kind: Notes }
+        - { label: Where you sit in customers' minds, href: '/market-studio/', kind: Room }
+        - { label: Entrepreneurship and new ventures, href: '/mindmaps/enrichment/entrepreneurship/', kind: Enrichment map }
+      check: You can name the customer, the need, and why they would choose you over what they use now.
+      caveat: No tool here can tell you whether customers will pay. Only selling, or a test that asks them to commit, can.
+    - title: Will the price cover my costs?
+      goal: Know your contribution per unit, your break-even quantity and your margin of safety.
+      items:
+        - { label: Classify your costs, href: '/finance-desk/costs-and-revenue/', kind: Workspace }
+        - { label: The break-even workspace, href: '/finance-desk/break-even/', kind: Workspace }
+        - { label: The margin of safety, href: '/topics/break-even-analysis/#margin-of-safety', kind: Notes }
+        - { label: Costs and revenues, href: '/topics/costs-and-revenues/', kind: Brief, note: 'Read the panel: know your three numbers' }
+      check: You can state your three numbers and say which cost is most often forgotten in your business.
+      caveat: Break-even assumes a constant price and unit cost and that everything made is sold. Treat it as a guide to the scale you need, not a forecast.
+    - title: Will the cash last?
+      goal: Forecast your cash month by month and see the low point before it arrives.
+      items:
+        - { label: The cash flow lab, href: '/finance-desk/cash-flow/', kind: Workspace }
+        - { label: Profit and cash flow are different, href: '/topics/cash-flow/#profit-and-cash-flow', kind: Notes }
+        - { label: Why cash runs short, href: '/topics/cash-flow/#causes-of-cash-flow-problems', kind: Notes }
+        - { label: Strategies for cash flow problems, href: '/topics/cash-flow/#cash-flow-strategies', kind: Notes }
+      check: You can find the lowest balance in a forecast and the month it falls in, and say what you would do about it.
+      caveat: 'A forecast is only as good as its timing: when customers really pay, and when bills really fall due.'
+    - title: How should I price?
+      goal: Test a price change, and a discounted order, on what they do to contribution and profit.
+      items:
+        - { label: 'Atelier Barro: the pricing decision', href: '/decision-room/atelier-pricing/', kind: Decision Room }
+        - { label: Pricing methods, href: '/topics/the-seven-ps-of-the-marketing-mix/#pricing-methods', kind: Notes }
+        - { label: 'A discounted order, judged on contribution', href: '/finance-desk/contribution/', kind: Workspace }
+      check: You can say how many fewer sales a price rise could lose before it lowers your profit.
+      caveat: The tools show what a price does to contribution and profit. They cannot tell you how customers or rivals will react.
+    - title: Should I grow, and how?
+      goal: Compare ways to grow on their returns, their risks and the control you keep.
+      items:
+        - { label: 'Marigold Kitchens: which way to grow?', href: '/decision-room/marigold-growth/', kind: Decision Room }
+        - { label: Growth and evolution, href: '/topics/growth-and-evolution/', kind: Brief, note: 'Read the panel: before you grow, ask three questions' }
+        - { label: Investment appraisal, href: '/finance-desk/investment-appraisal/', kind: Workspace }
+        - { label: Decision trees, href: '/toolkit/decision-trees/', kind: Toolkit guide }
+      check: You can say what would have to be true for your chosen route to fail.
+      caveat: Expected values average the outcomes. Ask what happens in the worst one, and whether the business survives it.
+    - title: How should I lead the people I hire?
+      goal: Decide what to delegate, how to reward people and which leadership style the team needs now.
+      items:
+        - { label: 'Halden Distribution: how to lead in the first ninety days', href: '/decision-room/halden-leadership/', kind: Decision Room }
+        - { label: Leadership and management, href: '/topics/leadership-and-management/', kind: Brief, note: 'Read the panel: from founder to leader' }
+        - { label: 'Centralization, decentralization and bureaucracy', href: '/topics/organizational-structure/#where-decisions-are-made', kind: Notes }
+        - { label: Non-financial rewards, href: '/topics/motivation-and-demotivation/#non-financial-rewards', kind: Notes }
+      check: You can list the decisions only you should make, and give the rest to someone by name.
+      caveat: No style suits every team. The material here is about matching the style to the people and the situation.
+  assessment:
+    title: Decision checklists, not tests
+    summary: >
+      Nothing here is a test. Each question ends with what you should be able to say before you commit, and
+      every tool shows its working so you can compare it with your own figures. The tools are teaching
+      models, not financial advice.
+    provenance: aa-framework
+    formats:
+      - { name: Before you commit, text: 'The figures and answers you should be able to state, from the tool, before you decide.' }
+      - { name: What the tool cannot tell you, text: 'The judgement left to you, stated beside each question.' }
+      - { name: Rehearse the decision, text: 'Each Decision Room lets you commit, see simulated consequences and read a debrief before the decision is real.' }
+  leavesOut:
+    - "Legal, tax, accounting and regulatory advice for your country."
+    - Real market data, prices or benchmarks. The examples are fictional and their figures simulated.
+    - Funding applications and documents for investors.
+    - Any guarantee. The calculators work classroom models and are not financial advice.
   available:
-    - { label: "Break-even workspace", href: "/finance-desk/break-even/", note: "Price, cost, break-even and margin of safety" }
-    - { label: "Costs and revenue", href: "/finance-desk/costs-and-revenue/", note: "Classify costs and see what drives profit" }
-    - { label: "Growth decision", href: "/decision-room/marigold-growth/", note: "Organic growth, franchising, a joint venture or an acquisition" }
-    - { label: "Leadership decision", href: "/decision-room/halden-leadership/", note: "A new manager's first ninety days" }
+    - { label: 'Break-even workspace', href: '/finance-desk/break-even/', note: 'Price, cost, break-even and margin of safety' }
+    - { label: 'Cash flow lab', href: '/finance-desk/cash-flow/', note: 'Month by month, with the lowest balance named' }
+    - { label: 'Growth decision', href: '/decision-room/marigold-growth/', note: 'Organic growth, franchising, a joint venture or an acquisition' }
+    - { label: 'Leadership decision', href: '/decision-room/halden-leadership/', note: "A new manager's first ninety days" }
   planned:
-    - Cash flow forecasting
-    - Pricing and market research workspaces
+    - Market research and pricing workspaces built on the platform's own fictional data
   principles:
     - Every number shows its working, so you can check it against your own.
     - The numerical answer and the business judgement are kept apart. The calculator gives the first; you supply the second.
@@ -151,19 +883,88 @@
 - id: independent
   name: Independent learners
   audience: Anyone learning business on their own, at any age.
-  promise: A self-paced route from a real decision to the ideas behind it.
+  promise: A guided progression in five levels, from what a business is to the judgement of an advanced manager, with a check to do on your own before you move on.
   status: live
   order: 7
   intro: >
-    Start with a decision rather than a definition. Open a Decision Room, choose, see what happens, then
-    read the topic brief to understand why. Finish with the Revision Brief to check what you can recall.
+    Start with a decision rather than a definition, then build the ideas level by level. Each level says
+    what you will be able to do, links to the pages to work through, and ends with a check you can do on
+    your own. Nothing is tracked: anything you save stays in your browser.
+  depth: >
+    From first principles to advanced thinking, in five levels. Levels 1 and 2 use the platform's notes,
+    level 3 applies them in tools and cases, level 4 asks for analysis and judgement, and level 5 goes
+    beyond the school course with the enrichment maps.
+  terminology: >
+    The glossary gives each term's meaning in plain language, and says where everyday usage differs from
+    the way a course uses it.
+  stageName: Level
+  routeIntro: >
+    Five levels. Move on when you can do the check at the end of a level; there is no timetable.
+  stages:
+    - title: Foundations
+      goal: Explain what a business does, who owns it, what it aims for and who has a stake in it.
+      items:
+        - { label: 'Start with a decision: which way should Marigold grow?', href: '/decision-room/marigold-growth/', kind: Decision Room }
+        - { label: 'What is a business?', href: '/topics/what-is-a-business/', kind: Notes }
+        - { label: Types of business entities, href: '/topics/types-of-business-entities/', kind: Notes }
+        - { label: Stakeholders, href: '/topics/stakeholders/', kind: Notes }
+        - { label: The glossary, href: '/glossary/', kind: Glossary }
+      check: Explain to someone else, without notes, how a business you know adds value and whom its decisions affect.
+    - title: How a business works
+      goal: Describe how businesses manage people, money, marketing and operations.
+      items:
+        - { label: Motivation and demotivation, href: '/topics/motivation-and-demotivation/', kind: Notes }
+        - { label: Cash flow, href: '/topics/cash-flow/', kind: Notes }
+        - { label: Marketing planning, href: '/topics/marketing-planning/', kind: Notes }
+        - { label: Break-even analysis, href: '/topics/break-even-analysis/', kind: Notes }
+        - { label: The diagram library, href: '/diagrams/', kind: Diagrams }
+      check: Use the recall cards at the end of each notes page until you can answer most of them from memory.
+    - title: Applying the ideas
+      goal: Work real calculations and decisions with the tools, and explain what the results mean.
+      items:
+        - { label: The Finance Desk, href: '/finance-desk/', kind: Workspace }
+        - { label: The cash flow lab, href: '/finance-desk/cash-flow/', kind: Workspace }
+        - { label: 'Atelier Barro: the pricing decision', href: '/decision-room/atelier-pricing/', kind: Decision Room }
+        - { label: Operations Floor, href: '/operations-floor/', kind: Room }
+      check: Change one figure in a workspace and say what will happen before you look; then explain any surprise.
+    - title: Analysis and judgement
+      goal: Analyse a case from its data, weigh the options and make a recommendation you can defend.
+      items:
+        - { label: 'Halden Distribution: diagnose before you decide', href: '/case-room/halden-diagnosis/', kind: Case lab }
+        - { label: The Case Vault, href: '/cases/', kind: Case }
+        - { label: SWOT analysis, href: '/toolkit/swot-analysis/', kind: Toolkit guide }
+        - { label: Practice questions, href: '/exam-desk/practice/', kind: Practice }
+      check: Write a recommendation for one case and say what would have to be true for it to be wrong. Compare it with the case's own analysis.
+    - title: Advanced thinking
+      goal: Go beyond the school course into strategy, finance, people and change, the way a university or MBA course would.
+      items:
+        - { label: Strategy formulation, href: '/mindmaps/enrichment/strategy-formulation/', kind: Enrichment map }
+        - { label: Corporate finance, href: '/mindmaps/enrichment/corporate-finance/', kind: Enrichment map }
+        - { label: Leading change, href: '/mindmaps/enrichment/leading-change/', kind: Enrichment map }
+        - { label: The undergraduate pathway, href: '/pathways/undergraduate/', kind: Reference }
+        - { label: The MBA pathway, href: '/pathways/mba/', kind: Reference }
+      check: Pick one framework from a map and explain where it would mislead.
+  assessment:
+    title: Self-checks you can do alone
+    summary: >
+      No grades and no tracking. Each level ends with a check you can mark yourself, and the notes pages have
+      recall cards that keep your ratings on this device. Your progress page shows what this browser has kept.
+    provenance: aa-framework
+    formats:
+      - { name: Level checks, text: 'One task at the end of each level. If you cannot do it yet, go back to the pages it draws on.' }
+      - { name: Recall cards, text: 'At the end of each notes page: answer from memory, reveal the answer and rate yourself.' }
+      - { name: Your progress, text: 'The progress page lists what your browser has kept, and you can clear it at any time.' }
+  leavesOut:
+    - Certificates, grades and any record kept outside your browser.
+    - A timetable. Go at your own pace.
+    - "The rules of any qualification. If you are studying for one, follow its pathway or its specification."
   available:
-    - { label: "Start with a decision", href: "/decision-room/", note: "Three rooms, each about twenty minutes" }
-    - { label: "Topics", href: "/topics/", note: "The ideas behind each decision" }
-    - { label: "Search", href: "/search/", note: "Find a term, a tool or a calculation" }
-    - { label: "Glossary", href: "/glossary/", note: "Plain-language definitions" }
+    - { label: 'Start with a decision', href: '/decision-room/', note: 'Three rooms, each about twenty minutes' }
+    - { label: 'Topics', href: '/topics/', note: 'The ideas behind each decision' }
+    - { label: 'Search', href: '/search/', note: 'Find a term, a tool or a calculation' }
+    - { label: 'Your progress', href: '/progress/', note: 'What this browser has kept' }
   planned:
-    - Guided courses that join several topics in sequence
+    - Guided courses that join several levels into one sequence with checkpoints
   principles:
     - No account is needed and nothing is tracked. Progress you save stays in your browser.
     - Each page says what is established, what is interpretation and what is simulated.

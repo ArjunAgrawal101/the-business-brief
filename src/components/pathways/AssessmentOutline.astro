@@ -1,0 +1,79 @@
+---
+/**
+ * The IB assessment at a glance: each component's time, marks and weighting at
+ * SL and HL, read from the assessment data (checked against the guide's
+ * assessment outlines, pp. 39 to 40), with a link to its room in the
+ * Assessment Centre. Nothing here is typed twice.
+ */
+import type { Corpus } from '../../lib/integrity';
+import VerifyTag from '../ui/VerifyTag.astro';
+
+interface Props {
+  c: Corpus;
+}
+const { c } = Astro.props;
+const ORDER = ['paper-1', 'paper-2', 'paper-3', 'internal-assessment'];
+const rows = ORDER.flatMap((id) => {
+  const a = c.assessment[id];
+  return a ? [{ id, a }] : [];
+});
+const cell = (o?: { duration: string; marks: number; weight: number }) => (o ? `${o.duration}, ${o.marks} marks, ${o.weight}%` : 'Not taken');
+const sum = (lv: 'sl' | 'hl') => rows.reduce((t, r) => t + (r.a.outline?.[lv]?.weight ?? 0), 0);
+---
+
+<div class="table-scroll pao" role="region" aria-label="The IB assessment at SL and HL" tabindex="0">
+  <table class="table">
+    <caption class="sr-only">Each assessment component's time, marks and weighting at SL and HL</caption>
+    <thead>
+      <tr>
+        <th scope="col">Component</th>
+        <th scope="col">At SL</th>
+        <th scope="col">At HL</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map(({ id, a }) => (
+          <tr data-level={a.levels === 'HL only' ? 'HL' : undefined}>
+            <th scope="row">
+              <a href={`/assessment/${id}/`}>{a.name}</a>
+              {a.levels === 'HL only' && <span class="tag tag--hl">HL only</span>}
+            </th>
+            <td>{cell(a.outline?.sl)}</td>
+            <td>{cell(a.outline?.hl)}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+    <tfoot>
+      <tr>
+        <th scope="row">Weighting in all</th>
+        <td>{sum('sl')}%</td>
+        <td>{sum('hl')}%</td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+<p class="small muted pao__src">From the guide's assessment outlines, pp. 39 to 40. <VerifyTag status="primary" /></p>
+
+<style>
+  .pao {
+    margin-top: var(--sp-4);
+  }
+
+  .pao th[scope='row'] {
+    white-space: nowrap;
+  }
+
+  .pao th[scope='row'] .tag {
+    margin-left: var(--sp-2);
+  }
+
+  .pao__src {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    align-items: center;
+    margin-top: var(--sp-2);
+  }
+</style>

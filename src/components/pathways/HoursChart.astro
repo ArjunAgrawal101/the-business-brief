@@ -1,0 +1,154 @@
+---
+/**
+ * The guide's recommended teaching hours for each stage of the IB DP route, SL
+ * against HL: a chart with a legend and the values at the bar tips, then the
+ * same figures in a table. The hours come from the curriculum, which was
+ * checked against the guide's syllabus outline (pp. 21 to 22).
+ */
+import { hoursChartSvg, hoursSummary, SERIES, type HoursRow } from '../../lib/hours-chart';
+
+interface Props {
+  rows: HoursRow[];
+}
+const { rows } = Astro.props;
+const total = rows.reduce((t, r) => ({ sl: t.sl + r.sl, hl: t.hl + r.hl }), { sl: 0, hl: 0 });
+const title = 'Recommended teaching hours for each stage, at SL and HL';
+const svg = hoursChartSvg(rows, { title, idPrefix: 'ib-hours' });
+---
+
+<figure class="hcf">
+  <figcaption class="hcf__cap">
+    <span class="hcf__title">{title}</span>
+    <span class="small muted">{hoursSummary(rows)} From the guide's syllabus outline, pp. 21 to 22.</span>
+  </figcaption>
+  <ul class="hcf__legend" aria-label="Key">
+    {
+      (['sl', 'hl'] as const).map((k) => (
+        <li>
+          <span class="hcf__swatch" style={`--c:${SERIES[k].colour}`} aria-hidden="true" />
+          {SERIES[k].label}
+        </li>
+      ))
+    }
+  </ul>
+  <div class="hcf__chart table-scroll" role="region" aria-label="Chart of teaching hours by stage" tabindex="0">
+    <Fragment set:html={svg} />
+  </div>
+  <div class="table-scroll hcf__table" role="region" aria-label="Teaching hours by stage, as a table" tabindex="0">
+    <table class="table">
+      <caption class="sr-only">Recommended teaching hours for each stage at SL and HL</caption>
+      <thead>
+        <tr>
+          <th scope="col">Stage</th>
+          <th scope="col" class="n">SL hours</th>
+          <th scope="col" class="n">HL hours</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map((r) => (
+            <tr>
+              <th scope="row">{r.label}</th>
+              <td class="n">{r.sl}</td>
+              <td class="n">{r.hl}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+      <tfoot>
+        <tr>
+          <th scope="row">Total</th>
+          <td class="n">{total.sl}</td>
+          <td class="n">{total.hl}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</figure>
+
+<style>
+  .hcf {
+    display: grid;
+    grid-template-columns: minmax(0, 25rem) minmax(0, 1fr);
+    gap: var(--sp-4) var(--sp-7);
+    margin: var(--sp-5) 0 0;
+    padding: var(--sp-5);
+    background: var(--surface-sheet);
+    border-top: 3px solid var(--navy-900);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .hcf__cap {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: var(--sp-1);
+    max-width: var(--text-max);
+  }
+
+  .hcf__title {
+    font-family: var(--font-display);
+    font-size: var(--fs-h4);
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .hcf__legend {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--fs-small);
+  }
+
+  .hcf__legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+  }
+
+  .hcf__swatch {
+    width: 1.25rem;
+    height: 0.75rem;
+    border-radius: 0 3px 3px 0;
+    background: var(--c);
+  }
+
+  .hcf__chart :global(svg) {
+    display: block;
+    width: 100%;
+    min-width: 18.5rem;
+    height: auto;
+  }
+
+  .hcf__chart :global(.hc-label) {
+    font: 560 13.5px/1 var(--font-ui);
+    fill: #0b1a33;
+  }
+
+  .hcf__chart :global(.hc-value) {
+    font: 600 12px/1 var(--font-ui);
+    font-variant-numeric: tabular-nums;
+    fill: #252d3a;
+  }
+
+  .hcf__chart :global(.hc-tick) {
+    font: 500 11.5px/1 var(--font-ui);
+    font-variant-numeric: tabular-nums;
+    fill: #566173;
+  }
+
+  .hcf__table {
+    align-self: start;
+  }
+
+  @media (max-width: 52rem) {
+    .hcf {
+      grid-template-columns: minmax(0, 1fr);
+      padding: var(--sp-4);
+    }
+  }
+</style>

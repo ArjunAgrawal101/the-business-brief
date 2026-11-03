@@ -1,0 +1,116 @@
+---
+/**
+ * The enrichment maps for one audience, as a labelled list: management ideas
+ * beyond the IB course. Each tile shows the map's shape, its field and its size.
+ */
+import ProvenanceTag from '../ui/ProvenanceTag.astro';
+import { href } from '../../lib/content';
+import { nodeCount, renderThumb } from '../../lib/mindmap';
+import type { EnrichmentMap } from '../../lib/schemas';
+
+interface Props {
+  maps: Array<[string, EnrichmentMap]>;
+}
+const { maps } = Astro.props;
+---
+
+<p class="el-note">
+  <ProvenanceTag kind="enrichment" />
+  <span class="small muted">Beyond the IB course and aligned to no university course: the platform's own maps of established ideas.</span>
+</p>
+<ul class="el" role="list">
+  {
+    maps.map(([id, m]) => (
+      <li>
+        <a class="el__link" href={href.enrichmentMap(id)}>
+          <span class="el__thumb" set:html={renderThumb(m)} />
+          <span class="el__field">{m.field}</span>
+          <span class="el__title">{m.title}</span>
+          <span class="el__meta">
+            {nodeCount(m)} ideas in {m.branches.length} branches
+          </span>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .el-note {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-3);
+    align-items: center;
+    margin-top: var(--sp-4);
+  }
+
+  .el {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+    gap: var(--sp-4);
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .el li {
+    margin: 0;
+  }
+
+  .el__link {
+    display: grid;
+    align-content: start;
+    gap: 0.3rem;
+    height: 100%;
+    padding: var(--sp-3);
+    border: 1px solid var(--rule-hair);
+    border-top: 3px solid var(--bb-green);
+    background: var(--surface-sheet);
+    color: var(--text-body);
+    text-decoration: none;
+    transition:
+      border-color var(--dur-fast) var(--ease),
+      box-shadow var(--dur-base) var(--ease);
+  }
+
+  .el__link:hover {
+    border-color: var(--gold-500);
+    border-top-color: var(--bb-green);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .el__thumb {
+    display: block;
+    aspect-ratio: 16 / 9;
+    margin-bottom: var(--sp-2);
+    padding: 0.4rem;
+    border: 1px solid var(--rule-hair);
+    background: var(--ivory-50);
+  }
+
+  .el__thumb :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .el__field {
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--green-text);
+  }
+
+  .el__title {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--navy-900);
+  }
+
+  .el__meta {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+</style>

@@ -32,9 +32,11 @@ const index = maps.findIndex(([x]) => x === id);
 const prev = index > 0 ? maps[index - 1] : undefined;
 const next = index < maps.length - 1 ? maps[index + 1] : undefined;
 const AUDIENCE: Record<EnrichmentMap['audience'][number], { label: string; href: string }> = {
-  undergraduate: { label: 'Undergraduate', href: href.pathway('undergraduate') },
-  mba: { label: 'MBA and advanced', href: href.pathway('mba') },
+  undergraduate: { label: 'For undergraduate learners', href: href.pathway('undergraduate') },
+  mba: { label: 'For MBA and advanced learners', href: href.pathway('mba') },
 };
+// Always in the same order, whatever order the map lists them in.
+const audiences = (['undergraduate', 'mba'] as const).filter((a) => map.audience.includes(a));
 const subs = (c.curricula['ib-dp-bm']?.units ?? []).flatMap((u) => u.subtopics);
 const builds = map.builds.map((b) => ({ ...b, title: subs.find((s) => s.code === b.code)?.title ?? b.code, href: subtopicHref(c, b.code) }));
 const related = map.related.map((r) => ({ ...r, map: c.enrichmentMaps[r.map], id: r.map })).filter((r) => r.map);
@@ -67,9 +69,9 @@ let n = 0;
     <div class="tags">
       <ProvenanceTag kind="enrichment" />
       {
-        map.audience.map((a) => (
+        audiences.map((a) => (
           <a class="tag tag--plain" href={AUDIENCE[a].href}>
-            For {AUDIENCE[a].label.toLowerCase()} learners
+            {AUDIENCE[a].label}
           </a>
         ))
       }

@@ -23,7 +23,12 @@ const done = units.reduce((n, x) => n + x.subs.filter((y) => y.map).length, 0);
 const kinds = Object.keys(BRANCH_COLOURS) as Array<keyof typeof BRANCH_COLOURS>;
 // Maps beyond the IB course, for the undergraduate and MBA pathways: listed apart, never counted in the figures above.
 const enrichment = await enrichmentMapsInOrder();
-const AUDIENCE_LABEL = { undergraduate: 'Undergraduate', mba: 'MBA' } as const;
+const AUDIENCE_LABEL = { undergraduate: 'undergraduate', mba: 'MBA' } as const;
+const audienceText = (list: Array<keyof typeof AUDIENCE_LABEL>) =>
+  (['undergraduate', 'mba'] as const)
+    .filter((a) => list.includes(a))
+    .map((a) => AUDIENCE_LABEL[a])
+    .join(' and ');
 ---
 
 <BaseLayout title="Mindmaps" description="Interactive mindmaps of IB DP Business Management, subtopic by subtopic: the structure of each topic, its theories, tools, calculations and evaluation, in one picture." section="mindmaps">
@@ -129,7 +134,7 @@ const AUDIENCE_LABEL = { undergraduate: 'Undergraduate', mba: 'MBA' } as const;
                   <span class="mmi-tile__code mme-tile__code">Enrichment · {m.field}</span>
                   <span class="mmi-tile__title">{m.title}</span>
                   <span class="mmi-tile__meta">
-                    {nodeCount(m)} ideas · for {m.audience.map((a) => AUDIENCE_LABEL[a]).join(' and ')} learners
+                    {nodeCount(m)} ideas · for {audienceText(m.audience)} learners
                   </span>
                 </a>
               </li>
