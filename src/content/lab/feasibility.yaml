@@ -1,0 +1,72 @@
+# The start-up feasibility assessment. Weighted scoring is a decision-making
+# method, not one of the guide's toolkit tools (guide, pp. 13 to 15), so the
+# tool is enrichment. Refill Round and its two alternatives are fictional and
+# the scores are the founders' simulated judgements. Worked by hand: weights
+# sum to 29, so the maximum is 145; Refill Round 102 (70.3%), Office refills
+# 88 (60.7%), Refill shop 85 (58.6%). Checked in tests/unit/lab-models.test.ts.
+title: Start-up feasibility assessment
+kind: feasibility
+order: 1
+question: Which idea deserves your next six months?
+summary: Score up to three start-up ideas on weighted criteria, with must-haves, a pass mark, sensitivity to the weights and an optimism test.
+lead: >
+  Founders rarely have one idea. They have three, and a favourite. Score each one against the criteria that decide
+  whether a start-up can work, weight the criteria by how much they matter, and see which idea leads, whether it
+  clears the pass mark, and how far the answer rests on judgements you might be getting wrong.
+briefing: opportunity-and-validation
+ib:
+  status: enrichment
+  statement: >
+    Weighted scoring is a decision-making method, not one of the guide's toolkit tools, so this tool is enrichment.
+    It works best beside the toolkit's own situational tools: a [SWOT analysis](/toolkit/swot-analysis/) or a
+    [STEEPLE analysis](/toolkit/steeple-analysis/) supplies the evidence behind the scores. The challenges and
+    opportunities of starting up a business are IB content (1.1, AO2).
+  links:
+    - { code: '1.1', note: 'Entrepreneurship, and the challenges and opportunities for starting up a business (AO2)' }
+    - { code: '4.4', note: 'Market research supplies the evidence that turns a score from a guess into a judgement' }
+steps:
+  - Name up to three ideas, with one line each on who it serves and how.
+  - Weight each criterion from 0 (irrelevant to you) to 5 (decisive). Agree the weights before you look at the totals, or they will drift towards your favourite.
+  - Score each idea from 1 (poor) to 5 (excellent) on each criterion, using the hints. A must-have criterion scored below 2 is a fatal flaw, whatever the total.
+  - Read the ranking, then the sensitivity and the optimism test. If the leader changes with one weight, or drops below the pass mark when its scores fall by a point, the decision is closer than the totals suggest.
+cautions:
+  - The scores are judgements, not measurements. The tool makes them visible and testable; it cannot make them right. Base each one on evidence where you have it, and say where you do not.
+  - A high total does not show that an idea will work. It shows that the idea is worth testing with real customers, which is what the other tools in the Lab are for.
+  - Adding up weighted scores assumes a strength in one place can make up for a weakness in another. Some weaknesses cannot be made up for, which is why the must-have criteria have a floor.
+example:
+  name: Refill Round
+  summary: >
+    Two student founders want to cut single-use plastic in their city, and have three ideas: Refill Round, a
+    subscription that delivers refills of cleaning products in reusable bottles by electric cargo bike; a refill
+    shop with its own premises; and a service supplying refills in bulk to offices and cafés. All three are
+    fictional, and the scores are the founders' simulated judgements.
+definitions:
+  - { term: Weighted total, text: 'The sum, over all the criteria, of each weight times the score. The most an idea could score is the sum of the weights times 5.' }
+  - { term: Pass mark, text: "60% of the maximum: the platform's suggested bar for an idea worth testing further. It is a convention, not a rule." }
+  - { term: Must-have, text: 'A criterion an idea cannot fail and still work, however well it does elsewhere. A must-have scored below 2 is flagged as a fatal flaw.' }
+  - { term: Optimism test, text: "The leading idea's scores each lowered by one point, to see whether the case for it survives the generosity founders usually show their favourite." }
+threshold: 60
+floor: 2
+criteria:
+  - { id: need, label: Customer need, weight: 5, mustHave: true, hint: 'How painful is the problem, and how sure are you? 5: customers already pay to work around it. 1: you assume they care.' }
+  - { id: pay, label: Willingness to pay, weight: 4, mustHave: true, hint: 'Will customers pay enough? 5: customers have paid or pre-ordered at your price. 1: no evidence, or a free alternative is good enough.' }
+  - { id: market, label: Market size and growth, weight: 3, hint: 'Are there enough customers within reach, and is their number growing? 5: large and growing. 1: small or shrinking.' }
+  - { id: edge, label: Competition and differentiation, weight: 3, hint: 'Is there a reason to choose you over the alternatives? 5: a clear difference that rivals cannot easily copy. 1: the same as established rivals.' }
+  - { id: reach, label: Reaching customers, weight: 4, hint: 'Can you find and win customers at a sensible cost? 5: a cheap channel that already works. 1: no clear way to reach them.' }
+  - { id: economics, label: Unit economics, weight: 4, mustHave: true, hint: 'Does each sale or customer contribute well above what it costs to win and serve? 5: strong contribution, cheap to win. 1: every sale loses money.' }
+  - { id: capital, label: Start-up cost and funding, weight: 3, hint: 'Can you fund the start without betting everything? 5: little money needed. 1: far more than you could raise.' }
+  - { id: team, label: "Founders' skills and fit", weight: 3, hint: 'Do the founders have the skills, contacts and commitment it needs? 5: a strong fit. 1: a business the founders know nothing about.' }
+ideas:
+  - id: refill-round
+    name: Refill Round
+    summary: A monthly subscription that delivers refills in reusable bottles by electric cargo bike.
+    scores: { need: 4, pay: 3, market: 3, edge: 4, reach: 3, economics: 4, capital: 3, team: 4 }
+  - id: refill-shop
+    name: Refill shop
+    summary: A shop where customers bring their own containers to refill.
+    scores: { need: 3, pay: 3, market: 3, edge: 2, reach: 4, economics: 3, capital: 2, team: 3 }
+  - id: office-refills
+    name: Office refills
+    summary: Bulk refills of cleaning products for offices and cafés, on contract.
+    scores: { need: 3, pay: 4, market: 2, edge: 3, reach: 2, economics: 4, capital: 4, team: 2 }
+updated: '2026-11-03'

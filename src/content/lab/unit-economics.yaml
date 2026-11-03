@@ -1,0 +1,63 @@
+# The unit economics calculator. None of its measures is on the guide's
+# formula list (pp. 64 to 65), so the tool is enrichment; it builds on
+# contribution per unit (5.5) and the payback idea of investment appraisal
+# (3.8). Refill Round is fictional and its figures are simulated. Worked by
+# hand: CAC = 1,800 ÷ 45 = $40; contribution = 24 − 9.10 = $14.90 a month;
+# lifetime = 1 ÷ 0.08 = 12.5 months; LTV = 14.90 × 12.5 = $186.25;
+# LTV to CAC = 186.25 ÷ 40 = 4.66; payback = 40 ÷ 14.90 = 2.68 months.
+title: Unit economics calculator
+kind: unit-economics
+order: 3
+question: Does each customer pay back what it costs to win them?
+summary: Customer acquisition cost, contribution per customer, lifetime value, the LTV to CAC ratio and the CAC payback period, worked step by step with cautions.
+lead: >
+  A start-up can grow quickly and still be getting poorer with every customer it wins. Unit economics asks the
+  question one customer at a time: what does it cost to win them, what do they contribute each month, how long do
+  they stay, and is the contribution over that time worth the cost of winning them?
+briefing: pricing-and-unit-economics
+ib:
+  status: enrichment
+  statement: >
+    Customer acquisition cost, lifetime value and their ratio are standard start-up measures, but none is in the
+    guide or on its formula list, so this tool is enrichment. Two of its ideas are IB content in another form:
+    contribution per customer is the contribution per unit of break-even analysis (5.5) with a customer-month as the
+    unit, and CAC payback asks the payback question of investment appraisal (3.8) about the cost of winning one
+    customer.
+  links:
+    - { code: '5.5', note: 'Contribution per unit: here the unit is one customer for one month' }
+    - { code: '3.8', note: 'The payback period: here the investment is the cost of winning a customer' }
+    - { code: '4.5', note: 'The price sets the revenue per customer, and promotion drives the acquisition cost' }
+steps:
+  - Enter what was spent on marketing and selling in a period, and the new customers it won in the same period.
+  - Enter the average revenue per customer per month and the variable cost of serving a customer for a month. Leave out fixed costs such as rent.
+  - Enter the share of customers who leave each month, and the longest lifetime you are prepared to count.
+  - Read the figures and the chart, then try the scenarios to see which input the conclusion depends on.
+cautions:
+  - "Churn is the weakest input. A new business has little data on how long customers stay, and a small change in churn moves lifetime value a long way: at 8% a month a customer stays 12.5 months on average, at 16% only 6.25."
+  - "Measure lifetime value on contribution, not revenue. Revenue × lifetime ignores the cost of serving the customer and makes every customer look more valuable than they are."
+  - "A blended CAC divides all marketing spending by all new customers, including those who would have come anyway through friends or search. The cost of winning a customer through paid advertising alone is usually higher."
+  - "The founders' own time selling, posting and phoning is a real cost of acquisition that rarely appears in the spending figure."
+  - "These are averages. Some customers stay for years and some leave after a month, and a business can have a good average while losing money on a whole segment."
+  - Lifetime value here is undiscounted. Money earned in two years is worth less than money today, which at HL is the idea behind net present value (3.8).
+example:
+  name: Refill Round
+  summary: >
+    Refill Round, the fictional subscription refill service, spent $1,800 last month on social media advertising and
+    referral credits and won 45 new subscribers. A box costs $24 a month and $9.10 to fill, wash and deliver. From a
+    pilot, the founders estimate that 8% of subscribers cancel each month. All figures are simulated.
+definitions:
+  - { term: Customer acquisition cost (CAC), text: 'What it costs to win one new customer: marketing and sales spending in a period divided by the new customers won in that period.' }
+  - { term: Contribution per customer, text: 'What a customer pays each month minus the variable cost of serving them: the IB’s contribution per unit with a customer-month as the unit.' }
+  - { term: Churn rate, text: 'The share of customers who leave in a period, usually a month.' }
+  - { term: Expected lifetime, text: 'How long a customer stays on average. With a constant monthly churn rate it is 1 ÷ churn: 8% churn gives 12.5 months.' }
+  - { term: Lifetime value (LTV), text: 'The total contribution a customer is expected to bring over the time they stay.' }
+  - { term: LTV to CAC ratio, text: 'Lifetime value divided by acquisition cost. Below 1, each customer loses money; many investors look for 3 or more in a subscription business, as a rule of thumb.' }
+  - { term: CAC payback period, text: 'The months of contribution needed to earn back the cost of winning a customer.' }
+currency: $
+defaults: { spend: 1800, customers: 45, revenue: 24, variableCost: 9.1, churn: 8, cap: 36 }
+scenarios:
+  - { id: churn-doubles, label: Churn doubles, note: 'The pilot was too optimistic: 16% of subscribers cancel each month.', changes: { churn: 16 } }
+  - { id: paid-ads-only, label: Paid adverts only, note: 'Without referrals and community posts, winning the same 45 subscribers costs $2,700.', changes: { spend: 2700 } }
+  - { id: price-cut, label: Price cut to $20, note: 'A lower price to match a rival, with the same costs and churn.', changes: { revenue: 20 } }
+  - { id: cheaper-delivery, label: Cheaper delivery, note: 'Denser rounds cut the variable cost of a box to $7.60.', changes: { variableCost: 7.6 } }
+updated: '2026-11-03'
