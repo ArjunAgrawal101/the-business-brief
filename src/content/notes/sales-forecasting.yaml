@@ -1,0 +1,484 @@
+# Notes: 4.3 Sales forecasting. HL only, so the notes are HL throughout.
+# Written in the platform's own words from the guide's one content statement,
+# the benefits and limitations of sales forecasting (p. 31, AO3), and from
+# the HL toolkit's simple linear regression, with its scatter diagrams, line
+# of best fit, correlation and extrapolation (pp. 14 to 15), the forecasting
+# technique the guide names. The worked regression example uses the data and
+# the least-squares line of the platform's linear-regression diagram. Time
+# series components are explained from subject knowledge; moving averages,
+# the Delphi method and measures of forecast error are marked as enrichment
+# beyond the guide. The teacher support material lists forecasting numbers
+# among the course's quantitative skills (p. 22); its glossary (pp. 80 to 90)
+# was read to check terms, and nothing from it is reproduced. No coursebook
+# chapter for unit 4 was supplied. Every business named is fictional, and
+# every figure was checked by script.
+code: '4.3'
+title: Sales forecasting
+level: HL
+introduction: |
+  Almost every plan a business makes begins with a guess at how much it will sell. How much to produce, how many people to employ, how much cash it will need, what to spend on marketing: each depends on a **sales forecast**. A good forecast lets a business prepare; a bad one leaves it with empty shelves and lost customers, or with warehouses of stock it cannot sell.
+
+  The guide sets one statement for this HL subtopic, the benefits and limitations of sales forecasting, at AO3, so the examination will ask you to judge how far a forecast can be trusted and how it should be used. To judge a forecast you need to know how it is made, so these notes cover the patterns in past sales, simple linear regression from the HL toolkit, and forecasting by judgement before weighing the benefits and limitations.
+objectives:
+  - '**Explain** what a sales forecast is and how it feeds a business''s plans for production, staffing, cash and marketing.'
+  - '**Describe** the patterns in past sales data: trend, seasonal, cyclical and random variation.'
+  - '**Apply** simple linear regression: read a scatter diagram, **calculate** a forecast from a line of best fit and **comment** on the correlation.'
+  - '**Distinguish** between quantitative and qualitative methods of sales forecasting.'
+  - '**Evaluate** the benefits and limitations of sales forecasting for a business in a given situation.'
+  - '**Discuss** how a business can make good decisions with forecasts that will never be exactly right.'
+situation:
+  title: How many heaters for winter?
+  fictional: true
+  text: |
+    Emberline Heaters, a fictional maker of outdoor heaters for cafés, restaurants and homes, has to decide each July how many heaters to make for the winter. Its factory needs four months to build them, and its retailers place most of their orders in October, so the decision is made long before anyone knows what demand will be.
+
+    Sales have risen for three winters running: 7,500 heaters, then 8,400, then 9,200. Extending that trend gives a forecast of about 10,000. But the regional economy is slowing, two café chains that buy from Emberline have cut their spending, and a rival has launched a cheaper electric model.
+
+    Emberline makes a contribution of $60 on each heater it sells and loses $20 on each one left unsold at the end of the season. How far should it trust a forecast of 10,000, and how should it use the forecast to decide how many heaters to make?
+sections:
+  - id: what-a-sales-forecast-is
+    title: What a sales forecast is, and who uses it
+    kind: concept
+    level: HL
+    body: |
+      A **sales forecast** is an estimate of the sales a business expects to make over a stated future period, in units, in value, or both. It can be made for a single product, a region or the whole business. Forecasts are built from past sales data, from market research and from the judgement of people who know the market, and the best usually combine all three.
+
+      A forecast is not a target or a plan. It is the business's best estimate of what customers will buy; the plans and budgets built on it are the business's commitments. Keeping the two apart matters, because a forecast that is quietly raised to make a plan look good stops being a forecast.
+
+      Forecasts differ by how far ahead they look. **Short-term** forecasts, over weeks or months, guide stock orders, staff rotas and cash management. **Medium-term** forecasts, usually for the year ahead, are the starting point for budgets (3.9) and cash flow forecasts (3.7). **Long-term** forecasts, over several years, support decisions about capacity, new sites and investment. The further ahead a forecast looks, the less reliable it becomes.
+    points:
+      - term: Operations
+        level: HL
+        text: Use the forecast to plan production, capacity and stock, so that goods are ready when customers want them without large amounts of unsold stock.
+      - term: Human resources
+        level: HL
+        text: Use it to plan how many people are needed and when, including recruitment, training and temporary staff for busy periods (2.1).
+      - term: Finance
+        level: HL
+        text: Builds the cash flow forecast and the budgets from it, and uses it to show banks and investors that a plan can repay a loan or earn a return.
+      - term: Marketing
+        level: HL
+        text: Uses it to set sales targets, time promotions and judge whether a campaign has worked.
+    example:
+      title: One forecast, four departments
+      fictional: true
+      text: Tidemark Ices, a fictional ice-cream maker, forecasts sales of 180,000 tubs between May and August, 20% more than the 150,000 it sold last summer. Production schedules its lines and orders cream and packaging months ahead; the HR manager plans to recruit 12 seasonal staff in April; the finance team arranges an overdraft to pay for ingredients before the summer's cash comes in; and marketing books its advertising for the first warm weeks. If the forecast is too high, every department will have overspent; if it is too low, the business will run out in July.
+  - id: patterns-in-past-sales
+    title: Reading past sales
+    kind: concept
+    level: HL
+    body: |
+      Most quantitative forecasts start from the business's own past sales, recorded month by month or quarter by quarter. Such a series of figures over time usually mixes four kinds of movement, and a forecaster's first task is to separate them.
+
+      The **trend** is the underlying direction once short-term ups and downs are set aside. Extending it into the future, **extrapolation**, gives the basic forecast. **Seasonal variation** is a regular pattern that repeats within each year, so the forecast for each month or quarter is adjusted for it. **Cyclical variation** follows the wider economy over several years, rising in booms and falling in recessions, and is harder to predict. **Random variation** comes from one-off events, such as a flood, a strike or a viral social media post, and cannot be predicted at all; a forecaster should recognize it and leave it out when finding the trend.
+
+      There are several ways to find a trend. The simplest is to compare annual totals, which removes the seasonal pattern; another is a line of best fit through the figures over time, the simple linear regression of the next section. Many forecasters also smooth a series with **moving averages**, the average of each run of, say, four quarters, which hides the seasonal swings and leaves the trend; moving averages are enrichment beyond the 2024 guide.
+    points:
+      - term: Trend
+        level: HL
+        text: The long-run direction of sales, upwards, downwards or flat. Extending it is the basis of most quantitative forecasts.
+      - term: Seasonal variation
+        level: HL
+        text: A pattern that repeats within the year, week or day, caused by weather, holidays, school terms or customs. Garden centres peak in spring, toy shops before the year-end holidays, restaurants at weekends.
+      - term: Cyclical variation
+        level: HL
+        text: Rises and falls over several years that follow the economy. Sales of new cars, houses and holidays move strongly with the economic cycle.
+      - term: Random variation
+        level: HL
+        text: Unpredictable one-off movements from events such as extreme weather, a product recall, a strike or a sudden craze. They distort a trend if they are not identified and removed.
+    example:
+      title: Three years at Willowmere Garden Centre
+      fictional: true
+      text: |
+        Willowmere Garden Centre, a fictional garden centre, recorded these quarterly sales, in $000, for quarters 1 to 4:
+
+        - Year 1: 80, 140, 100, 120, a total of 440.
+        - Year 2: 88, 150, 108, 130, a total of 476.
+        - Year 3: 96, 162, 116, 138, a total of 512.
+
+        The **trend** is clear in the annual totals, which rose by 36 in each year, so extending it gives a forecast of 512 + 36 = 548 for year 4. The **seasonal pattern** is just as clear: quarter 2, the spring planting season, is always the peak, and quarter 1 always the low. Quarter 2 took 31.82%, 31.51% and 31.64% of each year's sales, an average of 31.66%, so the forecast for next year's quarter 2 is about 31.66% × 548 = 173. The same method gives about 101 for quarter 1, which took an average of 18.47%.
+
+        The forecast assumes that the next year will behave like the last three. A recession, a new garden centre nearby or an unusually wet spring would each break that assumption.
+  - id: simple-linear-regression
+    title: 'Simple linear regression: scatter diagrams, lines of best fit and correlation'
+    kind: method
+    level: HL
+    body: |
+      **Simple linear regression** is the forecasting tool in the HL toolkit. It looks at two variables: an **independent variable** (x), something the business can observe or control, such as advertising spending, the temperature or simply time, and a **dependent variable** (y), the sales thought to depend on it. Each pair of values is plotted as a point on a **scatter diagram**, with x on the horizontal axis and y on the vertical.
+
+      A **line of best fit** is the straight line that best follows the pattern of the points, with points balanced above and below it. It can be drawn by eye, in which case it should pass through the point given by the mean of x and the mean of y, or calculated, as the line in the diagram is, by the least-squares method, which always passes through that point. Its equation takes the form y = a + bx, where **a** is the intercept, the value of y when x is zero, and **b** is the gradient, the change in y for each one-unit change in x. Reading a value from the line within the range of the data is **interpolation**; extending the line beyond that range to forecast is **extrapolation**, which is riskier, because the relationship may not hold where there are no data. When x is time, the line of best fit is the trend line, and extending it is how a trend is extrapolated.
+
+      **Correlation** describes how closely the points follow a straight line. It can be positive (y tends to rise as x rises) or negative (y tends to fall), and strong (points close to the line) or weak (points widely scattered). A **correlation coefficient**, r, measures it on a scale from −1 to +1, where values near either end mean a strong relationship and values near 0 mean little or none. Correlation is not causation: two variables can move together because a third factor drives both, or by coincidence, so a strong correlation makes a forecast more reliable only if there is a good business reason for the relationship.
+    diagram: linear-regression
+    formulas:
+      - name: Line of best fit
+        expression: y = a + bx
+        note: The standard equation of a straight line, not on the guide's formula list. a is the intercept and b the gradient. The guide's toolkit names scatter diagrams, the line of best fit, and correlation and extrapolation.
+    points:
+      - term: Positive and negative correlation
+        level: HL
+        text: Positive when sales rise with x, for example with advertising or temperature for cold drinks; negative when sales fall as x rises, for example sales of soup as the temperature rises, or sales as a rival's price falls.
+      - term: Strong and weak correlation
+        level: HL
+        text: The closer the points lie to the line, the stronger the correlation and the more reliable a forecast read from the line. Widely scattered points mean other factors matter more than x.
+      - term: Interpolation and extrapolation
+        level: HL
+        text: Interpolation reads the line inside the range of the data and is usually reasonable. Extrapolation reads it beyond the data, assuming the relationship continues, and becomes less reliable the further out it goes.
+    example:
+      title: Advertising and sales at Quillfeather Books
+      fictional: true
+      text: |
+        The diagram shows eight months of data for Quillfeather Books, a fictional online bookshop: its advertising spending, from $2,000 to $9,000 a month, against its sales revenue, from $21,000 to $40,000 a month. The least-squares line of best fit is **y = 15.64 + 2.68x**, in $000, and the correlation coefficient is **0.97**, a strong positive correlation.
+
+        - **The gradient** means that each extra $1,000 of advertising a month has gone with about $2,680 more sales a month.
+        - **Interpolation**: for a planned spend of $6,500, forecast sales are 15.64 + 2.68 × 6.5 = 33.06, about $33,060 a month, a reasonably safe estimate inside the range of the data.
+        - **Extrapolation**: for a spend of $11,000, the open point on the diagram, forecast sales are 15.64 + 2.68 × 11 = 45.12, about $45,100. This assumes that the next $2,000 of advertising works as well as the last, but there are no data above $9,000, and advertising often brings smaller returns as spending rises.
+        - **The intercept**, 15.64, suggests sales of about $15,640 with no advertising at all, but zero spending is also outside the data, so it is itself an extrapolation.
+
+        The strong correlation does not prove that advertising caused the sales. If Quillfeather spent more in months when demand was already high, such as before the holidays, part of the relationship comes from the season, and the line would overstate what extra advertising can achieve.
+  - id: qualitative-methods
+    title: Forecasting by judgement
+    kind: types
+    level: HL
+    body: |
+      **Quantitative** forecasting uses numbers: past sales, or figures that sales depend on, analysed for a pattern and projected forward. It is objective and quick when good data exist. But some of the most important forecasts have no useful past data behind them: a new product, a new market, or a future that is expected to differ from the past because of new technology, a new competitor or a change in the law. Then businesses rely on **qualitative** forecasting, based on opinion and judgement.
+
+      Qualitative methods draw on the knowledge of people close to the market. They can pick up changes that past figures cannot show, such as a competitor's planned launch or a shift in customers' tastes, but they are open to bias. Sales staff may forecast low to make their targets easy to beat, managers may forecast high to win approval for a project, and customers say they will buy far more often than they actually do.
+
+      In practice the two kinds of method are combined. A business might extrapolate its trend, then adjust it with the judgement of its sales team and the results of market research (4.4), checking each method against the others. **Test marketing** sits between the two: the product is sold for real in a small area, and the results are scaled up to estimate sales in the whole market.
+    points:
+      - term: Expert opinion
+        level: HL
+        text: Experienced managers or outside specialists estimate sales from their knowledge of the market. Quick and cheap, but only as good as the experts, and a strong personality can dominate a group.
+      - term: Sales force estimates
+        level: HL
+        text: Sales staff estimate what their own customers will buy, and the estimates are added up. They know customers well, but they may be optimistic, or cautious to keep targets low.
+      - term: Surveys of buying intentions
+        level: HL
+        text: Customers are asked how likely they are to buy, a form of primary market research (4.4). Useful for new products, but stated intentions usually overstate actual purchases, and the sample must represent the market.
+      - term: Test marketing
+        level: HL
+        text: Selling the product in a limited area and scaling up the results. It measures real behaviour rather than opinions, but it is costly, warns competitors, and the test area may not represent the whole market.
+      - term: The Delphi method
+        level: HL
+        text: A panel of experts gives forecasts anonymously over several rounds, seeing a summary of the others' views between rounds, until their views converge. Anonymity reduces the pressure to agree with the most senior voice. It is enrichment beyond the guide.
+    advantages:
+      - Can be used when there are no past data, such as for a new product or market.
+      - Draws on knowledge of changes that past figures cannot reveal.
+      - Often quick and cheap, especially expert opinion and sales force estimates.
+    limitations:
+      - Open to bias, optimism and the interests of the people making the forecast.
+      - Hard to check, since it rests on opinion rather than evidence that can be tested.
+      - Surveys measure what people say, not what they will do.
+    example:
+      title: Forecasting a new scooter
+      fictional: true
+      text: Swiftline Scooters, a fictional maker of electric scooters, has no sales history for its new folding model. Its dealers expect strong demand, and in a survey 40% of commuters said they were likely to buy one, figures Swiftline treats as optimistic upper limits. It then sells the scooter for three months in one region that holds about 2% of the country's likely buyers, where 600 are sold. Scaled up, that suggests 600 ÷ 0.02 = 30,000 a quarter nationally. Swiftline adjusts the figure down, because the test region has more cycle lanes than most, and early sales of a new product are often boosted by curiosity that fades.
+  - id: benefits
+    title: The benefits of sales forecasting
+    kind: evaluation
+    level: HL
+    body: |
+      The guide asks you to evaluate the benefits of sales forecasting, which means showing how a forecast helps in the case, not just listing advantages. The central benefit is that a forecast replaces guesswork with a reasoned, shared estimate, so that every part of the business can prepare for the same future and act before problems arise rather than after.
+
+      The benefits are greatest where the business must commit resources well ahead of sales: where production takes months, where stock is perishable or seasonal, where staff must be recruited and trained, or where cash is tight. They are smallest where a business can respond quickly to demand as it happens, for example a service business with flexible staff and no stock.
+    points:
+      - term: Better operational planning
+        level: HL
+        text: Production, capacity and stock can be matched to expected demand, which avoids both shortages that lose sales and surpluses that tie up cash and may have to be discounted. It supports just-in-time ordering and capacity planning (5.6).
+      - term: Workforce planning
+        level: HL
+        text: The business can recruit, train and schedule staff in time for busy periods, and avoid paying for staff it will not need.
+      - term: Financial planning
+        level: HL
+        text: Cash flow forecasts and budgets start from forecast sales, so the business can arrange an overdraft before a cash shortage, plan investment, and set budgets for every department.
+      - term: Raising finance
+        level: HL
+        text: Banks and investors expect a reasoned sales forecast in a business plan, as evidence that a loan can be repaid or an investment will earn a return.
+      - term: Targets and control
+        level: HL
+        text: The forecast gives targets against which actual sales can be measured, so that a shortfall is noticed early and its causes investigated.
+      - term: Coordination
+        level: HL
+        text: "When every department works from the same forecast, their plans fit together: marketing does not promote a product that operations cannot supply."
+    example:
+      title: Planning a summer of sailings
+      fictional: true
+      text: Saltway Ferries, a fictional ferry operator, forecasts 240,000 passengers between June and August, about 14% more than last summer's 210,000. The forecast lets it add sailings at the busiest times, recruit and train 60 seasonal crew in the spring, buy fuel in advance at a fixed price, and show its bank that the summer's cash will cover the loan on a new ship. Without the forecast it would be choosing the number of sailings, the crew and the fuel contract blind, and correcting mistakes in the middle of the busiest season.
+  - id: limitations
+    title: The limitations of sales forecasting
+    kind: evaluation
+    level: HL
+    body: |
+      Every forecast is an estimate, and its value depends on how far its assumptions hold. Quantitative methods assume that the patterns of the past will continue; qualitative methods depend on the judgement and honesty of the people involved. Either kind can be badly wrong, and a business that treats a forecast as a fact can commit large sums to the wrong plan.
+
+      Judge a forecast by asking what it assumes, who made it and why, what data it rests on, and how far ahead it looks. Then ask what the business would lose if it turned out to be wrong in either direction, too high or too low, because that is what decides how much weight it should bear.
+    points:
+      - term: The future may not follow the past
+        level: HL
+        text: Extrapolation assumes that trends and seasonal patterns continue, but they can change without warning, for example when tastes shift or a market matures.
+      - term: External shocks
+        level: HL
+        text: Changes in the economy, competitors' actions, new technology, new laws, extreme weather or a crisis can transform demand. A STEEPLE analysis can identify such risks, but not predict them precisely.
+      - term: Poor or missing data
+        level: HL
+        text: New products have no sales history, and past figures may be distorted by one-off events, stock shortages that hid true demand, or changes in how sales were recorded.
+      - term: Weaknesses of the method
+        level: HL
+        text: A line of best fit assumes a straight-line relationship; extrapolation beyond the data is risky; and correlation does not prove that one variable drives the other.
+      - term: Bias
+        level: HL
+        text: "Forecasts made by people with an interest in the result can be biased: optimistic to win approval or finance, cautious to make targets easy to beat."
+      - term: Time and cost
+        level: HL
+        text: Good forecasting needs data, analysis and research, which take time and money, and the further ahead a forecast looks, the less accurate it becomes.
+    example:
+      title: When the trend broke
+      fictional: true
+      text: Larkspur Cafés, a fictional chain of four cafés, extended five years of steady growth to forecast sales of $2.5 million for the year and hired staff and signed a supplier contract to match. A national coffee chain then opened two branches nearby, and Larkspur's sales came to $2.05 million, 18% below the forecast. The method was not wrong in itself; it simply could not know about the new competitor. Larkspur's managers had heard about the openings months earlier but had not adjusted the forecast, which is a failure of judgement, not of arithmetic.
+  - id: using-forecasts-well
+    title: Using forecasts well
+    kind: application
+    level: HL
+    body: |
+      Since no forecast will be exactly right, the aim is not a perfect forecast but good decisions made with an imperfect one. Businesses that forecast well tend to do five things.
+
+      They **combine methods**, checking a trend against the judgement of their sales team and the results of market research. They forecast a **range** rather than a single number, for example a low, an expected and a high case, so that managers can see the risk and plan for it. They **update** forecasts as new information arrives, rather than defending last quarter's figure. They **measure** how accurate their past forecasts were, which shows how much weight the next one can bear. And they **build in flexibility**, such as buffer stock, temporary staff, suppliers who can deliver extra at short notice, and contingency plans (5.7), so that a wrong forecast is costly rather than disastrous.
+
+      A useful test of any plan is to ask what happens if sales come in at the low end of the range. A plan that still works, perhaps because the business keeps a healthy margin of safety (5.5), can proceed; one that fails needs a cheaper or more flexible version.
+    points:
+      - term: Low, expected and high cases
+        level: HL
+        text: Showing a range makes the uncertainty visible, and lets managers prepare a response for each case before it happens.
+      - term: Measuring forecast error
+        level: HL
+        text: Comparing each forecast with the actual result, as a percentage of the forecast, shows how accurate past forecasts were and whether they are consistently too high or too low. Measures of forecast error are enrichment beyond the guide.
+      - term: Rolling forecasts
+        level: HL
+        text: Forecasts revised every month or quarter, always looking the same distance ahead, keep plans in step with the latest information.
+    example:
+      title: How good are our forecasts?
+      fictional: true
+      text: |
+        A fictional furniture retailer compares its last four quarterly forecasts with actual sales, in $000: forecast 200, actual 188; forecast 240, actual 252; forecast 220, actual 209; forecast 260, actual 286.
+
+        The errors are −6%, +5%, −5% and +10% of the forecast, an average error of 6.5% either way. So the next forecast should be read as a range of roughly 6.5% either side, not as a single figure. The latest error is also the largest, and positive: demand may be rising faster than the forecasting method assumes, a reason to look again at the trend before ordering stock for the next quarter.
+applications:
+  - industry: Fashion and retail
+    text: Fashion retailers must order many months ahead for products that may sell for only one season, so forecasts drive their profits directly. Too much stock means heavy discounting; too little means lost sales. Many now use sales data from tills and online shops to update forecasts weekly and reorder the lines that sell.
+  - industry: Food, drink and hospitality
+    text: Demand for food and drink swings with the weather, holidays and local events, and much of the stock is perishable, so forecasts are made daily or weekly. Restaurants forecast covers to plan staff rotas and orders, and a wrong forecast shows up at once as waste or as customers turned away.
+  - industry: Manufacturing
+    text: Manufacturers with long lead times for materials and production depend on medium-term forecasts to plan capacity and buy materials. Forecasts are passed along the supply chain, and errors can grow as each firm adds its own safety margin.
+  - industry: Technology and new products
+    text: A genuinely new product has no sales history, so forecasts rely on judgement, surveys and test markets, and the uncertainty is huge. Technology firms often launch in stages and update forecasts quickly as real sales data arrive.
+  - industry: Healthcare and public services
+    text: Hospitals and public services forecast demand rather than sales, such as patient numbers, admissions in winter or pupils starting school, to plan staff, beds and budgets. Seasonal and demographic patterns help, but outbreaks of illness and other shocks can overwhelm any forecast.
+  - industry: Tourism and travel
+    text: Airlines, hotels and tour operators forecast demand seasons ahead to plan capacity, and adjust prices as bookings arrive, so that prices rise when demand runs above forecast. Their capacity cannot be stored, so an empty seat or room is revenue lost for ever.
+stakeholders:
+  - group: Managers
+    text: Managers in every function plan from the forecast and are judged against the targets built on it. That creates pressure to bias it, upwards to win resources or downwards to make targets easy, which conflicts with the business's need for an honest estimate.
+  - group: Employees
+    text: Forecasts decide staffing levels, overtime and temporary contracts. An optimistic forecast that is missed can lead to job cuts; a cautious one can mean overwork in a busy season.
+  - group: Investors and lenders
+    text: Banks and investors use sales forecasts in business plans to judge whether a loan will be repaid or an investment will pay off. Founders seeking finance have an incentive to be optimistic, so lenders test the assumptions and may discount the figures.
+  - group: Suppliers
+    text: Suppliers plan their own production around their customers' forecasts and orders. When a large customer's forecast proves wrong, the supplier may be left with stock or capacity it cannot use, so suppliers value customers who share honest forecasts early.
+  - group: Customers
+    text: Customers benefit when forecasts are accurate, because products are available when they want them and services are properly staffed. Poor forecasting shows up as empty shelves, long waits, or prices that rise sharply when demand exceeds supply.
+  - group: Owners and shareholders
+    text: Owners judge managers partly by whether they deliver the forecast results, and the share price of a public company can fall sharply when results miss forecasts. That can push managers towards short-term actions to hit a number rather than the right long-term decision.
+evaluation:
+  - A forecast is an estimate, never a fact. Its value lies in helping a business prepare and coordinate, not in being exactly right, so judge it by whether its assumptions are reasonable and whether the business can cope if it is wrong.
+  - The method must fit the situation. Quantitative methods work best for established products in stable markets with good past data; qualitative methods are needed for new products and changing markets. Combining them usually beats relying on either alone.
+  - Reliability falls the further ahead a forecast looks, and the more the future differs from the past. Short-term forecasts for stable products can be quite accurate; long-term forecasts in fast-changing markets are little more than informed judgement.
+  - Statistical tools have limits. A strong correlation or a well-fitting trend line describes the past; extrapolation and claims of cause need a business reason to believe the relationship will continue.
+  - Who makes the forecast, and why, matters. Bias from optimism, from targets or from the wish to win approval can be more damaging than any technical weakness, so look for the interests behind a forecast in a case.
+  - The benefits usually outweigh the limitations, because planning with an imperfect forecast is better than planning with none. The strongest answers say how the business should use the forecast in the case, through ranges, updates and flexible plans, rather than simply listing benefits and limitations.
+decision:
+  title: Emberline's production decision
+  fictional: true
+  brief: |
+    Emberline Heaters, the fictional business in the situation, must commit its winter production in July. Its expected forecast is 10,000 heaters, but given the slowing economy and the rival's cheaper model, its managers think demand could be anywhere from 8,000 to 12,000.
+
+    Each heater sells for $150 and costs $90 to make, a contribution of $60. Heaters left at the end of the season are sold off in spring for $70, a loss of $20 each, and a sale missed because Emberline has run out is lost to a rival. Fixed costs are the same whatever it decides, so the options can be compared by total contribution in a low (8,000), an expected (10,000) and a high (12,000) case.
+  options:
+    - label: Make 10,000, the expected forecast
+      text: 'Total contribution: $440,000 if demand is 8,000, with 2,000 heaters left over; $600,000 at 10,000; $600,000 at 12,000, with 2,000 sales lost to rivals.'
+    - label: Make 9,000, to be cautious
+      text: 'Total contribution: $460,000 if demand is 8,000, with 1,000 left over; $540,000 at 10,000 and at 12,000, with 1,000 and 3,000 sales lost.'
+    - label: Make 12,000, to avoid running out
+      text: 'Total contribution: $400,000 if demand is 8,000, with 4,000 left over; $560,000 at 10,000, with 2,000 left over; $720,000 at 12,000.'
+  guidance: |
+    The figures show what a single-number forecast hides. No option is best in every case: option A does best if the forecast is right, option B loses least if demand is low, and option C wins only if demand is high. The decision depends on how confident Emberline is in each part of the range, and on what it can afford to lose.
+
+    Notice the imbalance in the costs of being wrong. Each heater too few costs $60 of lost contribution, but each heater too many costs only $20, so erring on the high side is cheaper, heater for heater, than erring on the low side. That is why option B, the cautious choice, has the lowest average outcome. If low and high demand are equally likely, and the expected forecast twice as likely as either, options A and C both give an average outcome of $560,000 and option B only $520,000. But C's outcomes range from $400,000 to $720,000, while A's range from $440,000 to $600,000: a business short of cash, or one that cannot store a large stock of unsold heaters, should prefer A.
+
+    The figures also leave things out. Running out in a cold spell could cost Emberline its retailers' goodwill and orders for years to come, which favours A or C; unsold heaters need storage and may date as the rival's model improves, which favours A or B. The strongest answer would also look for ways to make the forecast matter less: early orders from retailers, the sales team's view of the café chains, or a subcontractor who could make extra heaters at short notice, so that Emberline could produce for the expected case and top up only if demand proved high. A forecast that can be improved cheaply before a decision is made should be, and a plan that can be adjusted after it is made is worth paying for.
+exam:
+  - q: |
+      Larchmont Toys, a fictional toy maker, makes 60% of its annual sales in the three months before the end-of-year holidays. It must order materials from overseas four months before production starts.
+
+      Explain two benefits of sales forecasting for Larchmont Toys.
+    marks: 4
+    command: explain
+    level: HL
+    paper: '2'
+    answer: |
+      A strong response explains two distinct benefits, each tied to the case:
+
+      - **Production and stock:** a forecast lets Larchmont order materials four months ahead and plan production so that toys are ready for its peak, avoiding lost sales in the busiest months or unsold stock afterwards.
+      - **Workforce or cash:** it can plan temporary staff for the peak, or forecast the cash it will need to pay for materials months before the holiday sales bring cash in, and arrange finance in time.
+      - Other valid benefits include setting targets and timing marketing before the peak.
+
+      Each benefit is worth up to two marks: one for the benefit, one for explaining it in Larchmont's situation.
+  - q: |
+      Coolhaven Kiosks, a fictional business, sells iced drinks at a beach. Over 40 days with average temperatures from 14°C to 30°C, the line of best fit for daily sales of iced drinks (y) against the day's average temperature in °C (x) is y = 120 + 4.5x.
+
+      Calculate the forecast sales of iced drinks for (i) a day with an average temperature of 24°C and (ii) a day with an average temperature of 38°C.
+    marks: 4
+    command: calculate
+    level: HL
+    paper: '2'
+    answer: |
+      A strong response substitutes into the equation and shows the working:
+
+      - (i) y = 120 + 4.5 × 24 = 120 + 108 = **228 drinks**.
+      - (ii) y = 120 + 4.5 × 38 = 120 + 171 = **291 drinks**.
+
+      Two marks for each part, one for the method and one for the answer. A strong answer might add that the second figure is an extrapolation, since 38°C is outside the range of the data.
+  - q: Explain why Coolhaven Kiosks' forecast for a day of 38°C is less reliable than its forecast for a day of 24°C.
+    marks: 4
+    command: explain
+    level: HL
+    paper: '2'
+    answer: |
+      A strong response explains two reasons:
+
+      - **Extrapolation:** 24°C is inside the range of the data (14°C to 30°C), so the forecast is an interpolation; 38°C is outside it, so the forecast assumes the relationship continues where there is no evidence.
+      - **The relationship may change:** on very hot days people may avoid the beach in the middle of the day, the kiosks may run out of drinks or staff, or rivals may attract customers, so sales may not keep rising by 4.5 drinks a degree.
+      - A further point: even within the range, the forecast is only as reliable as the correlation, which the question does not give, and other factors such as weekends and school holidays also affect sales.
+  - q: Distinguish between quantitative and qualitative methods of sales forecasting.
+    marks: 4
+    command: distinguish
+    level: HL
+    paper: '2'
+    answer: |
+      A strong response makes the difference clear for both, with an example of each:
+
+      - **Quantitative** methods use numerical data, usually past sales or a variable that sales depend on, and project a pattern forward, for example extrapolating a trend or using a line of best fit.
+      - **Qualitative** methods use judgement and opinion, for example expert opinion, sales force estimates or surveys of buying intentions.
+      - The key difference is the basis of the forecast, data or judgement, which is why quantitative methods suit established products with a sales history and qualitative methods suit new products or changing markets.
+  - q: |
+      Spokewise, a fictional social enterprise, repairs donated bicycles and sells them at low prices, while training refugees as bicycle mechanics. Its first workshop has sold between 70 and 90 bicycles a month for two years. It now plans to open a second workshop in a city 300 km away, where it has no customers yet and where two bicycle shops already sell second-hand bicycles.
+
+      Explain two challenges Spokewise may face in forecasting sales at its new workshop.
+    marks: 6
+    command: explain
+    level: HL
+    paper: '3'
+    answer: |
+      A strong response explains two distinct challenges, each linked to Spokewise:
+
+      - **No sales history in the new city.** The first workshop's two years of figures may not transfer: the new city has different customers, incomes, cycling habits and competition, so extrapolating 70 to 90 a month could badly overstate or understate demand. Spokewise will need qualitative methods or research, which cost money a social enterprise may not have.
+      - **Supply as well as demand.** Its sales depend on donated bicycles and on trained mechanics, so even accurate demand forecasts may not be met if donations in the new city are low or trainees take time to become productive.
+      - Other valid challenges include the competition from two established shops, whose reaction is hard to predict, and the risk that the founders' commitment to the mission makes their forecasts optimistic.
+
+      Each challenge needs the cause, its effect on the forecast and why it matters for Spokewise: roughly three marks each.
+  - q: |
+      Fernway Fitness, a fictional chain of gyms, has seen its membership grow steadily from 4,000 to 6,000 over the last five years, by about 500 a year. Its managers forecast 20% growth next year, to 7,200 members, and plan to open two new gyms financed by a bank loan. A low-cost gym chain has announced that it will open three branches in the same city, and the local economy is slowing.
+
+      Evaluate the usefulness of Fernway Fitness's sales forecast in planning its expansion.
+    marks: 10
+    command: evaluate
+    level: HL
+    paper: '2'
+    answer: |
+      A strong response would:
+
+      - explain how the forecast helps: it supports planning the size and timing of the new gyms, staffing, and the case to the bank for the loan;
+      - analyse its weaknesses using the figures: the trend of about 500 members a year gives 6,500 next year, growth of 8.33%, so the managers' forecast of 7,200 is 700 above what extrapolation alone would suggest, a sign of optimism, perhaps to justify the expansion;
+      - analyse the external changes the forecast ignores: three low-cost rivals will attract price-sensitive members, and a slowing economy makes gym membership, a discretionary purchase, easier to cancel;
+      - consider the consequences of error: with a bank loan to repay, a shortfall would squeeze cash flow, so the cost of an optimistic forecast is high;
+      - suggest how to make the forecast more useful: a range with a low case that allows for the rivals, market research among current and potential members, and phasing the expansion, opening one gym first;
+      - reach a justified judgement, for example that the forecast is useful as a starting point but unreliable as the basis for committing to two gyms and a loan, because it extends a past trend upwards just as the conditions behind that trend are changing.
+summary:
+  - A sales forecast estimates future sales, in units or value, over a stated period; budgets, cash flow forecasts and production and workforce plans start from it.
+  - Past sales mix a trend, seasonal variation, cyclical variation and random variation; extrapolating the trend and adjusting for the season gives a basic forecast.
+  - "Simple linear regression (HL toolkit): plot x and y on a scatter diagram, fit a line of best fit y = a + bx, and judge the correlation, from −1 to +1."
+  - Interpolation reads the line inside the data; extrapolation goes beyond it and is less reliable. Correlation is not causation.
+  - Qualitative methods, such as expert opinion, sales force estimates and surveys, are needed when there are no useful past data, but are open to bias; test marketing scales up real sales from a trial area.
+  - Benefits include better planning of production, stock, staff and cash, support for raising finance, targets for control, and coordination between departments.
+  - Limitations include the assumption that the past continues, external shocks, poor or missing data, method weaknesses, bias, cost, and falling accuracy the further ahead the forecast looks.
+  - Use forecasts well by combining methods, forecasting a range, updating regularly, measuring past accuracy and building flexibility into plans.
+retrieval:
+  - q: What is a sales forecast?
+    a: An estimate of the sales a business expects to make over a stated future period, in units or in value, based on past data, research or judgement.
+  - q: Name the four components of a series of sales over time.
+    a: Trend, seasonal variation, cyclical variation and random variation.
+  - q: What is the difference between seasonal and cyclical variation?
+    a: Seasonal variation repeats within each year, week or day; cyclical variation follows the economy over several years.
+  - q: What is extrapolation?
+    a: Extending a trend or line of best fit beyond the data already collected, for example into the future, to make a forecast.
+  - q: In the equation y = a + bx, what do a and b represent?
+    a: a is the intercept, the value of y when x is zero; b is the gradient, the change in y for each one-unit change in x.
+  - q: The line of best fit is y = 50 + 3x. Forecast y when x = 20.
+    a: y = 50 + 3 × 20 = 110.
+  - q: What does a correlation coefficient of 0.97 show?
+    a: A strong positive correlation, with the points lying close to a rising straight line.
+  - q: Why does a strong correlation not prove that x causes y?
+    a: The two may move together because a third factor drives both, or by coincidence, so there must be a business reason for believing one affects the other.
+  - q: When is qualitative forecasting most useful?
+    a: When there are no useful past data, as with a new product or market, or when the future is expected to differ from the past.
+  - q: Give three benefits of sales forecasting.
+    a: For example, planning production and stock, planning staff, building cash flow forecasts and budgets, supporting a case for finance, and setting targets.
+  - q: Give three limitations of sales forecasting.
+    a: For example, the future may not follow the past, external shocks, poor or missing data, bias in judgement, cost and time, and lower accuracy further ahead.
+  - q: Why might a business forecast a range rather than a single figure?
+    a: Because a range shows the uncertainty, so managers can see the risk, test their plans against the low case and prepare responses in advance.
+connections:
+  - code: '2.1'
+    text: Human resource planning depends on forecast sales, which set how many staff are needed and when.
+  - code: '3.7'
+    text: A cash flow forecast begins with forecast sales and when customers will pay for them.
+  - code: '3.9'
+    text: At HL, the sales forecast is the starting point for most budgets, so its errors pass into every budgeted figure.
+  - code: '4.4'
+    text: Market research supplies the data and judgement for forecasts, especially surveys of buying intentions and test markets.
+  - code: '5.6'
+    text: At HL, production planning, stock control and capacity utilization follow forecast demand.
+  - code: '5.7'
+    text: At HL, contingency planning prepares a business for the cases a forecast cannot rule out.
+terms:
+  - sales-forecast
+  - quantitative-sales-forecasting
+  - qualitative-sales-forecasting
+  - trend
+  - seasonal-variation
+  - extrapolation
+  - simple-linear-regression
+  - scatter-diagram
+  - line-of-best-fit
+  - correlation
+  - market-research
+  - survey
+  - research-bias
+  - cash-flow-forecast
+  - budget
+  - human-resource-planning
+  - contingency-planning
+  - buffer-stock
+  - steeple-analysis
+  - expected-value
+  - margin-of-safety
+questions: []
+basis:
+  - source: ib-bm-guide-2024
+    pages: 14 to 15, 31, 42 to 47
+    note: The content statement and its assessment objective (p. 31); simple linear regression in the HL toolkit, with scatter diagrams, the line of best fit, and correlation and extrapolation (pp. 14 to 15); the papers on which HL-only content can be examined (pp. 42 to 47)
+  - source: ib-bm-tsm-2022
+    pages: 22, 80 to 90
+    note: Forecasting numbers among the course's quantitative skills (p. 22); the glossary, read to check terms; nothing reproduced
+verification: primary
+updated: '2026-11-03'
