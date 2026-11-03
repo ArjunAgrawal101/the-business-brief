@@ -5,8 +5,12 @@
  * strong-response guidance behind a disclosure, where it lives, and, with
  * JavaScript, a self-rating kept on this device. The guidance is the
  * platform's for its own question; it is never an IB markscheme.
+ *
+ * Case exhibits are not repeated in every card: the page renders each one
+ * once in an inert <template>, and the script copies it into a card when the
+ * reader opens its evidence. Without JavaScript the card links to the
+ * exhibit in its case file.
  */
-import Exhibit from '../blocks/Exhibit.astro';
 import { corpus, href } from '../../lib/content';
 import { excerpt, inline, rich } from '../../lib/markup';
 import { PAPER_LABELS, RATING_HINTS, RATING_LABELS, type Rating } from '../../lib/bank';
@@ -66,25 +70,26 @@ const LONG = 480;
 
     {
       exhibits.length > 0 && theCase && (
-        <details class="bq__more bq__evidence">
+        <details class="bq__more bq__evidence" data-evidence={exhibits.map((e) => `${it.caseId}:${e.id}`).join(' ')}>
           <summary>
             The case evidence: {exhibits.map((e) => `Exhibit ${e.id.replace(/^ex-/, '')}`).join(' and ')}
             <span class="bq__sum-note">{theCase.title}{theCase.kind === 'fictional' ? ', fictional, simulated data' : ''}</span>
           </summary>
-          <div class="bq__more-body stack">
-            {exhibits.map((e) => (
-              <Exhibit exhibit={e} caseTitle={theCase.title} caseHref={href.case(it.caseId ?? '')} headingLevel={4} idPrefix={uid} />
-            ))}
+          <div class="bq__more-body stack" data-evidence-body>
+            <ul class="bq__exlinks">
+              {exhibits.map((e) => (
+                <li>
+                  <a href={`${href.case(it.caseId ?? '')}#${e.id}`}>
+                    Exhibit {e.id.replace(/^ex-/, '')}: {e.title}
+                  </a>{' '}
+                  <span class="muted">in the case file</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </details>
       )
     }
-
-    <div class="field bq__draft js-only">
-      <label for={`${uid}-draft`}>Your answer</label>
-      <textarea class="textarea" id={`${uid}-draft`} rows={it.marks >= 6 ? 8 : 4} aria-describedby={`${uid}-draft-hint`} data-draft></textarea>
-      <span class="field__hint" id={`${uid}-draft-hint`}>For this timed set only: it is cleared when you leave the set.</span>
-    </div>
 
     <details class="bq__more bq__guide" data-guide>
       <summary>Strong-response guidance</summary>

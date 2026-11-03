@@ -32,6 +32,8 @@ import {
 } from '../../lib/bank';
 
 interface Config {
+  /** How many matching questions the list shows at a time. */
+  page: number;
   items: Facets[];
   paces: Pace[];
   terms: Record<string, string>;
@@ -101,18 +103,56 @@ each('[data-ix="bank"]', (root) => {
   };
 
   let visible: Facets[] = cfg.items;
+  /** With scripts, the list shows the matching questions a page at a time; without them, every question is on the page. */
+  const PAGE = Math.max(10, cfg.page || 30);
+  let limit = PAGE;
+  const more = q<HTMLElement>('[data-more]');
+  const moreText = q<HTMLElement>('[data-more-text]');
+  const moreBtn = q<HTMLButtonElement>('[data-more-btn]');
+
+  const paintPage = () => {
+    const shown = new Set(visible.slice(0, limit).map((f) => f.id));
+    const matching = new Set(visible.map((f) => f.id));
+    cards.forEach((el, id) => (el.hidden = !shown.has(id)));
+    groups.forEach((g) => {
+      const inGroup = [...g.querySelectorAll<HTMLElement>('[data-bq]')];
+      g.hidden = !inGroup.some((el) => !el.hidden);
+      const n = inGroup.filter((el) => matching.has(el.dataset.bq ?? '')).length;
+      const c = g.querySelector<HTMLElement>('[data-group-count]');
+      if (c) c.textContent = plural(n, 'question', 'questions');
+    });
+    const left = visible.length - Math.min(limit, visible.length);
+    if (more) more.hidden = left <= 0;
+    if (moreText) moreText.textContent = `Showing ${Math.min(limit, visible.length)} of ${plural(visible.length, 'question', 'questions')}.`;
+    if (moreBtn) moreBtn.textContent = `Show ${Math.min(PAGE, left)} more`;
+  };
+
+  moreBtn?.addEventListener('click', () => {
+    const first = visible[limit];
+    limit += PAGE;
+    paintPage();
+    const el = first ? cards.get(first.id) : undefined;
+    el?.querySelector<HTMLElement>('.bq__term')?.focus();
+    announce(live, moreText?.textContent ?? '');
+  });
+
+  // A unit in the contents may sit beyond the questions shown: show up to it before jumping there.
+  root.querySelectorAll<HTMLAnchorElement>('.bank-contents a').forEach((a) =>
+    a.addEventListener('click', () => {
+      const u = Number(/bank-unit-(\d+)/.exec(a.getAttribute('href') ?? '')?.[1]);
+      const at = visible.findIndex((f) => f.units[0] === u);
+      if (at >= limit) {
+        limit = at + PAGE;
+        paintPage();
+      }
+    }),
+  );
 
   const applyFilters = (say = false) => {
     const filters = readFilters();
     visible = cfg.items.filter((f) => matches(f, filters, state));
-    const shown = new Set(visible.map((f) => f.id));
-    cards.forEach((el, id) => (el.hidden = !shown.has(id)));
-    groups.forEach((g) => {
-      const n = [...g.querySelectorAll<HTMLElement>('[data-bq]')].filter((el) => !el.hidden).length;
-      g.hidden = n === 0;
-      const c = g.querySelector<HTMLElement>('[data-group-count]');
-      if (c) c.textContent = plural(n, 'question', 'questions');
-    });
+    limit = PAGE;
+    paintPage();
     const marks = visible.reduce((s, f) => s + f.marks, 0);
     const text =
       visible.length === cfg.items.length
@@ -163,6 +203,32 @@ each('[data-ix="bank"]', (root) => {
     toggle.setAttribute('aria-expanded', String(open));
     toggle.textContent = open ? 'Hide filters and search' : 'Show filters and search';
   });
+
+  /* ---------- Case evidence, on demand ---------- */
+
+  const loadEvidence = (d: HTMLDetailsElement) => {
+    if (d.classList.contains('is-loaded')) return;
+    const body = d.querySelector<HTMLElement>('[data-evidence-body]');
+    const card = d.closest<HTMLElement>('[data-bq]');
+    if (!body || !card) return;
+    const prefix = `${card.id}-`;
+    for (const key of (d.dataset.evidence ?? '').split(' ').filter(Boolean)) {
+      const t = root.querySelector<HTMLTemplateElement>(`template[data-exhibit="${CSS.escape(key)}"]`);
+      if (!t) continue;
+      const frag = t.content.cloneNode(true) as DocumentFragment;
+      frag.querySelectorAll<HTMLElement>('[id]').forEach((el) => (el.id = prefix + el.id));
+      frag.querySelectorAll<HTMLElement>('[aria-labelledby]').forEach((el) => {
+        el.setAttribute('aria-labelledby', (el.getAttribute('aria-labelledby') ?? '').split(' ').map((x) => prefix + x).join(' '));
+      });
+      body.append(frag);
+    }
+    d.classList.add('is-loaded');
+  };
+  root.querySelectorAll<HTMLDetailsElement>('details[data-evidence]').forEach((d) =>
+    d.addEventListener('toggle', () => {
+      if (d.open) loadEvidence(d);
+    }),
+  );
 
   /* ---------- Ratings and progress ---------- */
 
@@ -342,6 +408,13 @@ each('[data-ix="bank"]', (root) => {
       el.classList.toggle('is-in-set', inSet);
       el.hidden = !inSet;
       el.querySelectorAll('details').forEach((d) => (d.open = false));
+      if (inSet && !el.querySelector('[data-draft]')) {
+        const f = byId.get(id);
+        const wrap = document.createElement('div');
+        wrap.className = 'field bq__draft';
+        wrap.innerHTML = `<label for="${el.id}-draft">Your answer</label><textarea class="textarea" id="${el.id}-draft" rows="${(f?.marks ?? 2) >= 6 ? 8 : 4}" aria-describedby="${el.id}-draft-hint" data-draft></textarea><span class="field__hint" id="${el.id}-draft-hint">For this timed set only: it is cleared when you leave the set.</span>`;
+        el.querySelector('[data-guide]')?.before(wrap);
+      }
     });
     groups.forEach((g) => {
       const n = [...g.querySelectorAll<HTMLElement>('[data-bq]')].filter((el) => ids.has(el.dataset.bq ?? '')).length;
@@ -370,8 +443,7 @@ each('[data-ix="bank"]', (root) => {
     root.classList.remove('is-set', 'is-running');
     cards.forEach((el) => {
       el.classList.remove('is-in-set');
-      const draft = el.querySelector<HTMLTextAreaElement>('[data-draft]');
-      if (draft) draft.value = '';
+      el.querySelector('.bq__draft')?.remove();
     });
     groups.forEach((g) => g.classList.remove('has-set'));
     if (run) run.hidden = true;

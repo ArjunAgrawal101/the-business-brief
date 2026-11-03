@@ -41,8 +41,8 @@ function withFixtures() {
   const [cid, cs] = Object.entries(c.cases)[0]!;
   const ex = cs.exhibits[0]!.id;
   (cs as unknown as Record<string, unknown>).analysisQuestions = [
-    { id: 'aq-1', commandTerm: 'Explain', ao: 'AO2', marks: 4, syllabus: ['3.3'], exhibits: [ex], prompt: 'Explain two costs.', guidance: 'Two costs, each explained.' },
-    { id: 'aq-2', commandTerm: 'Evaluate', ao: 'AO3', marks: 10, level: 'HL', paper: 'paper-2', syllabus: ['3.8'], prompt: 'Evaluate the investment.', guidance: 'Weigh payback against NPV.' },
+    { id: 'aq-1', commandTerm: 'Explain', ao: 'AO2', marks: 4, level: 'SL/HL', syllabus: ['3.3'], exhibits: [ex], prompt: 'Explain two costs.', guidance: 'Two costs, each explained.' },
+    { id: 'aq-2', commandTerm: 'Evaluate', ao: 'AO3', marks: 10, level: 'HL', paper: 'paper-2', syllabus: ['3.8'], exhibits: [], prompt: 'Evaluate the investment.', guidance: 'Weigh payback against NPV.' },
   ];
   return { c, nid, n, cid };
 }
@@ -99,7 +99,8 @@ describe('building the question bank from the corpus', () => {
     const { c, cid } = withFixtures();
     const b = buildBank(c);
     expect(b.problems).toEqual([]);
-    const items = b.items.filter((i) => i.source === 'case');
+    // Other case files may carry analysis questions of their own; these are the fixture's.
+    const items = b.items.filter((i) => i.id.startsWith(`c-${cid}-`));
     expect(items.map((i) => i.id)).toEqual([`c-${cid}-aq-1`, `c-${cid}-aq-2`]);
     expect(items[0]?.command).toBe('explain');
     expect(items[0]?.exhibits.length).toBe(1);
@@ -110,10 +111,10 @@ describe('building the question bank from the corpus', () => {
   it('reports a case question it cannot read, so the build fails instead of dropping it', () => {
     const { c } = withFixtures();
     const cs = Object.values(c.cases)[0]!;
-    (cs as unknown as Record<string, unknown>).analysisQuestions = [{ id: 'bad', commandTerm: 'Explain', marks: 4, syllabus: ['3.3'], prompt: 'Explain.', guidance: 'G.' }];
+    (cs as unknown as Record<string, unknown>).analysisQuestions = [{ id: 'bad', commandTerm: 'Explain', marks: 4, level: 'SL/HL', syllabus: ['3.3'], exhibits: [], prompt: 'Explain.', guidance: 'G.' }];
     expect(buildBank(c).problems.map((p) => p.message).join(' ')).toContain('no assessment objective');
     expect(readCaseQuestion({ id: 'x', commandTerm: 'Ponder', ao: 'AO2', marks: 2, syllabus: ['1.1'], prompt: 'P', guidance: 'G' })).toMatchObject({ commandTerm: 'Ponder' });
-    (cs as unknown as Record<string, unknown>).analysisQuestions = [{ id: 'x', commandTerm: 'Ponder', ao: 'AO2', marks: 2, syllabus: ['1.1'], prompt: 'P', guidance: 'G' }];
+    (cs as unknown as Record<string, unknown>).analysisQuestions = [{ id: 'x', commandTerm: 'Ponder', ao: 'AO2', marks: 2, level: 'SL/HL', syllabus: ['1.1'], exhibits: [], prompt: 'P', guidance: 'G' }];
     expect(buildBank(c).problems.map((p) => p.message)).toContain('command term "Ponder" is not in the register');
     expect(checkIntegrity(c).some((p) => p.message.includes('Ponder'))).toBe(true);
   });

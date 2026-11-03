@@ -11,8 +11,9 @@ import SectionHead from '../../components/layout/SectionHead.astro';
 import CentreHead from '../../components/centre/CentreHead.astro';
 import GuideLabel from '../../components/centre/GuideLabel.astro';
 import BankCard from '../../components/centre/BankCard.astro';
+import Exhibit from '../../components/blocks/Exhibit.astro';
 import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
-import { corpus } from '../../lib/content';
+import { corpus, href } from '../../lib/content';
 import { buildBank, facetsOf } from '../../lib/bank-build';
 import { AO_LABELS, BAND_LABELS, PACE_IDS, PAPER_LABELS, TYPE_LABELS, fmtPace, parseDuration, type Ao, type Band, type Pace, type PaceId, type PaperStyle, type QType } from '../../lib/bank';
 import { jsonForScript } from '../../lib/markup';
@@ -36,6 +37,18 @@ const marks = items.reduce((s, i) => s + i.marks, 0);
 const count = (p: PaperStyle) => items.filter((i) => i.paper === p).length;
 const bySource = (s: string) => items.filter((i) => i.source === s).length;
 const unitItems = (n: number) => items.filter((i) => i.units[0] === n);
+/** Every exhibit a question uses, once, keyed "case:exhibit", for the cards to copy when opened. */
+const evidence = new Map<string, { caseId: string; caseTitle: string; exhibit: NonNullable<(typeof c.cases)[string]>['exhibits'][number] }>();
+for (const it of items) {
+  const cs = it.caseId ? c.cases[it.caseId] : undefined;
+  if (!cs || !it.caseId) continue;
+  for (const id of it.exhibits) {
+    const exhibit = cs.exhibits.find((x) => x.id === id);
+    if (exhibit) evidence.set(`${it.caseId}:${id}`, { caseId: it.caseId, caseTitle: cs.title, exhibit });
+  }
+}
+/** With JavaScript, the list shows this many matching questions at a time. */
+const PAGE = 30;
 
 /* Each paper's time and marks, from the guide's assessment outlines (pp. 39 to 40). */
 const PACE_DEF: Record<PaceId, { comp: string; lv: 'sl' | 'hl'; label: string; paper: Pace['paper']; slOnly: boolean }> = {
@@ -51,6 +64,7 @@ const paces: Pace[] = PACE_IDS.flatMap((id) => {
   return o && minutes ? [{ id, label: d.label, minutes, marks: o.marks, paper: d.paper, slOnly: d.slOnly }] : [];
 });
 const config = {
+  page: PAGE,
   items: items.map(facetsOf),
   paces,
   terms: Object.fromEntries(terms.map(([id, t]) => [id, t.term])),
@@ -311,6 +325,17 @@ const config = {
               <p class="state__title">No questions match.</p>
               <p>Clear a filter or change the search.</p>
             </div>
+            <div class="bank-more js-only" data-more hidden>
+              <p data-more-text></p>
+              <button type="button" class="btn" data-more-btn>Show more questions</button>
+            </div>
+            {
+              [...evidence].map(([key, x]) => (
+                <template data-exhibit={key}>
+                  <Exhibit exhibit={x.exhibit} caseTitle={x.caseTitle} caseHref={href.case(x.caseId)} headingLevel={4} idPrefix={`bt-${key.replace(':', '-')}`} />
+                </template>
+              ))
+            }
           </div>
         </div>
       </div>
