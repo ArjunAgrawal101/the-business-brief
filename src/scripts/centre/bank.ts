@@ -8,6 +8,7 @@ import { announce, each, readConfig, store } from '../ix';
 import {
   activeFilters,
   bankCsv,
+  clearItem,
   drawSet,
   emptyState,
   fmtClock,
@@ -246,6 +247,8 @@ each('[data-ix="bank"]', (root) => {
     el.querySelectorAll<HTMLInputElement>('[data-rate] input').forEach((r) => (r.checked = rec?.rating !== null && rec?.rating !== undefined && r.value === String(rec.rating)));
     const st = el.querySelector<HTMLElement>('[data-status]');
     if (st) st.textContent = statusText(id);
+    const clear = el.querySelector<HTMLElement>('[data-clear-record]');
+    if (clear) clear.hidden = !rec;
     el.classList.toggle('is-secure', statusOf(rec) === 'secure');
   };
 
@@ -323,6 +326,15 @@ each('[data-ix="bank"]', (root) => {
       paintCard(id);
       paintProgress();
       announce(live, `${byId.get(id)?.title ?? 'Question'}: rated ${RATING_LABELS[r].toLowerCase()}. ${statusText(id).split('.')[0]}.`);
+    });
+    // Undo a rating given by mistake: the question's record goes, and focus returns to its ratings.
+    el.querySelector('[data-clear-record]')?.addEventListener('click', () => {
+      state = clearItem(state, id);
+      save();
+      paintCard(id);
+      paintProgress();
+      el.querySelector<HTMLInputElement>('[data-rate] input')?.focus();
+      announce(live, `${byId.get(id)?.title ?? 'Question'}: record cleared. Not attempted yet.`);
     });
     paintCard(id);
   });

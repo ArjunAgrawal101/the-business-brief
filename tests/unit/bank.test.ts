@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   NO_FILTERS,
   bankCsv,
+  clearItem,
   drawSet,
   emptyState,
   fmtClock,
@@ -19,6 +20,7 @@ import {
   rate,
   recordSet,
   setSeconds,
+  statusOf,
   totals,
   type Facets,
   type Pace,
@@ -202,6 +204,16 @@ describe('saved progress', () => {
     const s = parseState({ items: { a: { attempts: 2, rating: 3, last: '2026-11-03' }, b: { attempts: 'x' }, c: { attempts: 1, rating: 7 } }, sets: [{ at: 'x', pace: 'paper-9', ids: [] }] });
     expect(s.items).toEqual({ a: { attempts: 2, rating: 3, last: '2026-11-03' }, c: { attempts: 1, rating: null, last: '' } });
     expect(s.sets).toEqual([]);
+  });
+
+  it('clears one question’s record and leaves the others and the timed sets alone', () => {
+    let s = recordSet(emptyState(), { at: '2026-11-03T10:00:00Z', pace: 'paper-1', ids: ['a', 'b'], marks: 6, allowed: 1080, used: 900, ratings: [3, 1] }, '2026-11-03');
+    s = clearItem(s, 'a');
+    expect(s.items.a).toBeUndefined();
+    expect(statusOf(s.items.a)).toBe('new');
+    expect(s.items.b).toEqual({ attempts: 1, rating: 1, last: '2026-11-03' });
+    expect(s.sets).toHaveLength(1);
+    expect(clearItem(s, 'missing')).toEqual(s);
   });
 
   it('records a timed set and the ratings given in it', () => {
