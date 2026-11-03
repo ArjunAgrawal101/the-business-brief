@@ -17,6 +17,7 @@ import Checklist from '../../components/centre/Checklist.astro';
 import FactList from '../../components/assess/FactList.astro';
 import { corpus } from '../../lib/content';
 import { GUIDES } from '../../lib/guides';
+import { IA_TOOL_PAGES } from '../../lib/ia-tools';
 import '../../styles/centre.css';
 
 const c = await corpus();
@@ -451,8 +452,26 @@ const TOOLS = [
       <p class="small muted">Force field analysis and Porter's generic strategies are HL tools in the guide's toolkit; any relevant tool may be used in the project. <a href="/toolkit/">The toolkit</a> explains each one.</p>
     </section>
 
+    <section class="ce-sec" aria-labelledby="ia-tools5-h">
+      <SectionHead no="09" title="Five tools for your own project" id="ia-tools5-h" dek="Each checks your own plans against the guide and the IA guide, and gives feedback. None writes any part of your project, awards a mark or approves a question: your teacher does that." />
+      <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+      <ol class="ce-toolrow">
+        {
+          IA_TOOL_PAGES.map((t, i) => (
+            <li>
+              <span class="ce-toolrow__n" aria-hidden="true">{i + 1}</span>
+              <div>
+                <h3 class="ce-toolrow__name"><a href={t.href}>{t.name}</a></h3>
+                <p class="ce-toolrow__line">{t.line}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
     <section class="ce-sec" aria-labelledby="ia-plan-h">
-      <SectionHead no="09" title="Plan it, and keep the guide" id="ia-plan-h" />
+      <SectionHead no="10" title="Plan it, and keep the guide" id="ia-plan-h" />
       <div class="ce-cta">
         <a class="btn btn--primary" href="/ia-studio/">Open the ten-step planner <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
         <a class="btn" href={GUIDES['internal-assessment'].file} download>Download the IA guide (PDF, {GUIDES['internal-assessment'].pages} pages)</a>

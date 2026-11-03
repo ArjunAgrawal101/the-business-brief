@@ -1,0 +1,402 @@
+---
+/**
+ * IA tool 2: the supporting document checklist and source evaluation. The
+ * reader lists candidate documents; each is questioned on its origin,
+ * purpose, date, reliability and relevance, and the set is checked against
+ * the guide's rules (pp. 53 to 55) through src/lib/ia.ts and
+ * src/lib/ia-tools.ts. Feedback only: the teacher guides the selection.
+ * Saved in bb:ia-documents.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import CentreHead from '../../../components/centre/CentreHead.astro';
+import GuideLabel from '../../../components/centre/GuideLabel.astro';
+import IaToolNav from '../../../components/centre/IaToolNav.astro';
+import IaIntegrity from '../../../components/centre/IaIntegrity.astro';
+import { PURPOSES, VOICES } from '../../../lib/ia-tools';
+import '../../../styles/centre.css';
+import '../../../styles/ia-tools.css';
+
+const SLOTS = 6;
+const KINDS = [
+  ['secondary', 'Secondary source'],
+  ['primary', 'My own primary research'],
+  ['transcript', 'Transcript of audio or video'],
+  ['textbook', 'Textbook or class notes'],
+] as const;
+const RULES = [
+  ['Three to five supporting documents, from which most of the project’s information comes.', 'Guide, p. 53'],
+  ['Published within three years before you submit; submission is in April or October of the final year.', 'Guide, p. 54'],
+  ['At most one transcript of audio or video, from a reliable organization, traceable to the original.', 'Guide, p. 54'],
+  ['Primary research as a document: the blank questionnaire and a tally, or the interview or focus group questions and a summary.', 'Guide, p. 54'],
+  ['Your own selection: documents must not be provided by your teacher.', 'Guide, p. 55'],
+  ['No document longer than the equivalent of five A4 pages is recommended.', 'Guide, p. 55'],
+  ['Highlight the parts you use; translate highlighted parts not in your registered language; label each document.', 'Guide, p. 55'],
+  ['Textbooks and class notes are referenced, but not accepted as supporting documents.', 'Guide, p. 55'],
+  ['A range of ideas and views is strongly recommended; documents from one company, or surveys of similar people, lack balance.', 'Guide, p. 54'],
+  ['Criterion B, 4 marks: at the top level, relevant, sufficiently in-depth and a range of ideas and views.', 'Guide, p. 57'],
+];
+---
+
+<BaseLayout
+  room="assessment"
+  title="Supporting documents"
+  description="An IB Business Management IA tool: list your candidate supporting documents, question each one's origin, purpose, date, reliability and relevance, and check the set against the guide's rules."
+  section="assessment"
+>
+  <CentreHead
+    crumb="Supporting documents"
+    parent={{ label: 'Internal assessment', href: '/assessment/internal-assessment/' }}
+    kicker="Internal assessment · Tool 2 of 5"
+    title="Supporting documents"
+    lead="List your candidate documents. Each one is questioned on its origin, purpose, date, reliability and relevance, and the set is checked against the guide's rules. The feedback is for your thinking: your teacher guides your selection."
+    stats={[
+      { value: '3 to 5', label: 'Documents', note: 'your own selection' },
+      { value: '3 years', label: 'At most', note: 'before submission' },
+      { value: '4', label: 'Marks', note: 'criterion B' },
+    ]}
+  />
+
+  <div class="wrap page-body it-page">
+    <IaToolNav current="documents" />
+
+    <section class="it-sec" aria-labelledby="sd-rules-h">
+      <SectionHead no="01" title="What the guide requires" id="sd-rules-h" />
+      <p class="ce-labels"><GuideLabel kind="ib" /></p>
+      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s}</span></li>)}</ul>
+    </section>
+
+    <section class="it-sec" aria-labelledby="sd-tool-h">
+      <SectionHead no="02" title="Your documents" id="sd-tool-h" dek="Find more than five candidates, then keep the strongest three to five (TSM, p. 71). Mark the ones you will submit as selected." />
+      <div class="it-tool" data-ix="ia-documents">
+        <p class="state state--error" data-error hidden>The checks could not start. You can still fill in and print the list.</p>
+        <p class="sr-only" aria-live="polite" data-live></p>
+        <div class="it-tool__head">
+          <h3 class="it-tool__title">Your candidate documents</h3>
+          <p class="it-tool__saved js-only">Saved on this device as you type.</p>
+        </div>
+        <div class="field sd-sub">
+          <label for="sd-submission">The month you submit to the IB</label>
+          <input class="input" id="sd-submission" name="submission" type="month" placeholder="2027-04" aria-describedby="sd-submission-hint" />
+          <span class="field__hint" id="sd-submission-hint">April or October of your final year, as year and month, for example 2027-04 (guide, p. 54). The three-year rule counts back from it.</span>
+        </div>
+
+        <a class="sd-jump js-only" href="#sd-out">Jump to the checks of your documents</a>
+        <ol class="sd-docs">
+          {
+            Array.from({ length: SLOTS }, (_, i) => (
+              <li class="sd-doc" data-doc={i}>
+                <fieldset class="it-fs">
+                  <legend class="sd-doc__legend">
+                    <span class="sd-doc__n">SD{i + 1}</span> Document {i + 1}
+                  </legend>
+                  <div class="sd-doc__grid">
+                    <div class="field sd-c4">
+                      <label for={`sd-${i}-title`}>Title</label>
+                      <input class="input" id={`sd-${i}-title`} data-f="title" autocomplete="off" />
+                    </div>
+                    <div class="field sd-c2">
+                      <label for={`sd-${i}-origin`}>Origin: author or publisher</label>
+                      <input class="input" id={`sd-${i}-origin`} data-f="origin" autocomplete="off" />
+                    </div>
+                    <div class="field sd-c2">
+                      <label for={`sd-${i}-voice`}>Whose voice</label>
+                      <select class="select" id={`sd-${i}-voice`} data-f="voice">
+                        <option value="">Choose</option>
+                        {Object.entries(VOICES).map(([v, l]) => <option value={v}>{l}</option>)}
+                      </select>
+                    </div>
+                    <div class="field sd-c2">
+                      <label for={`sd-${i}-kind`}>Type</label>
+                      <select class="select" id={`sd-${i}-kind`} data-f="kind">
+                        {KINDS.map(([v, l]) => <option value={v}>{l}</option>)}
+                      </select>
+                    </div>
+                    <div class="field sd-c2">
+                      <label for={`sd-${i}-published`}>Published</label>
+                      <input class="input" id={`sd-${i}-published`} data-f="published" type="month" placeholder="2026-03" />
+                    </div>
+                    <div class="field sd-c2">
+                      <label for={`sd-${i}-purpose`}>Purpose: why it was produced</label>
+                      <select class="select" id={`sd-${i}-purpose`} data-f="purpose">
+                        <option value="">Choose</option>
+                        {Object.entries(PURPOSES).map(([v, l]) => <option value={v}>{l}</option>)}
+                      </select>
+                    </div>
+                    <div class="field sd-c1">
+                      <label for={`sd-${i}-pages`}>Length in A4 pages</label>
+                      <input class="input input--num" id={`sd-${i}-pages`} data-f="pages" type="number" min="0" max="200" inputmode="numeric" />
+                    </div>
+                    <label class="it-check sd-c3 sd-sel">
+                      <input type="checkbox" data-f="selected" checked={i < 5} />
+                      <span>Selected: one of the three to five I will submit</span>
+                    </label>
+                    <fieldset class="it-fs sd-c6">
+                      <legend>Reliability: what the document shows</legend>
+                      <div class="sd-signs">
+                        <label class="it-check"><input type="checkbox" data-f="named" /> <span>Who wrote or published it</span></label>
+                        <label class="it-check"><input type="checkbox" data-f="method" /> <span>How its figures or findings were gathered</span></label>
+                        <label class="it-check"><input type="checkbox" data-f="sourced" /> <span>Where its data come from</span></label>
+                      </div>
+                    </fieldset>
+                    <div class="field sd-c3">
+                      <label for={`sd-${i}-relevance`}>Relevance: which part of your question it helps answer</label>
+                      <input class="input" id={`sd-${i}-relevance`} data-f="relevance" autocomplete="off" />
+                    </div>
+                    <div class="field sd-c3">
+                      <label for={`sd-${i}-data`}>Data a tool could use</label>
+                      <input class="input" id={`sd-${i}-data`} data-f="data" autocomplete="off" />
+                    </div>
+                  </div>
+                </fieldset>
+              </li>
+            ))
+          }
+        </ol>
+        <button type="button" class="btn btn--small js-only sd-add" data-add>Add another document</button>
+
+        <div class="it-out js-only" id="sd-out" tabindex="-1">
+          <p class="it-out__k">The set, against the guide</p>
+          <ul class="it-list" data-set></ul>
+        </div>
+        <div class="it-out js-only">
+          <p class="it-out__k">Each document, questioned</p>
+          <div class="table-scroll" role="region" aria-label="Source evaluation of each document" tabindex="0">
+            <table class="table sd-eval">
+              <thead>
+                <tr>
+                  <th scope="col">Document</th>
+                  <th scope="col">Origin</th>
+                  <th scope="col">Purpose</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Reliability</th>
+                  <th scope="col">Relevance</th>
+                </tr>
+              </thead>
+              <tbody data-eval></tbody>
+            </table>
+          </div>
+          <div class="sd-notes" data-notes></div>
+          <p class="small muted">The three-year rule and the rules on textbooks and primary research are the guide's. The other questions are the platform's way of weighing a source: a recommended strategy.</p>
+        </div>
+
+        <div class="it-export js-only">
+          <button type="button" class="btn btn--small" data-csv>Download the evaluation (CSV)</button>
+          <button type="button" class="btn btn--small" data-print>Print</button>
+          <button type="button" class="btn btn--small" data-reset>Clear this page</button>
+          <span class="it-export__confirm" data-reset-confirm hidden>
+            <span>This clears every document you listed on this page.</span>
+            <button type="button" class="btn btn--small btn--primary" data-reset-yes>Clear it</button>
+            <button type="button" class="btn btn--small" data-reset-no>Keep it</button>
+          </span>
+        </div>
+        <p class="nojs-only small muted">With JavaScript off you can fill in and print the list, but nothing is checked or saved.</p>
+      </div>
+    </section>
+
+    <section class="it-sec" aria-labelledby="sd-ex-h">
+      <SectionHead no="03" title="A narrow set, and a balanced one" id="sd-ex-h" dek="Two sets for the same question: should Harbour Cycles, a fictional repair shop, open a second workshop? Submission in April 2027." />
+      <div class="it-examples">
+        <article class="it-ex it-ex--weak" aria-labelledby="sd-weak-h">
+          <p class="it-ex__k">Weaker <GuideLabel kind="example" /></p>
+          <h3 id="sd-weak-h">Six documents, one voice</h3>
+          <ul>
+            <li>Harbour Cycles website, "About us", 2026</li>
+            <li>Harbour Cycles website, price list, 2026</li>
+            <li>Harbour Cycles social media post about its busiest week, 2026</li>
+            <li>A textbook chapter on break-even analysis</li>
+            <li>A national article on cycling trends, March 2023</li>
+            <li>A list of links to bike shop reviews</li>
+          </ul>
+          <p class="it-why">More than five documents; the textbook is not accepted; the 2023 article is more than three years before April 2027; links are not documents; and four of the six speak for the business itself. With more than five documents, criterion B can earn at most 1 mark (TSM, p. 71; guide, p. 57).</p>
+        </article>
+        <article class="it-ex it-ex--strong" aria-labelledby="sd-strong-h">
+          <p class="it-ex__k">Stronger <GuideLabel kind="example" /></p>
+          <h3 id="sd-strong-h">Five documents, five voices</h3>
+          <ul>
+            <li><b>SD1</b> Harbour Cycles accounts, 2026: the business, with repair revenue and costs</li>
+            <li><b>SD2</b> Town council cycling survey, 2025: independent, with rider numbers</li>
+            <li><b>SD3</b> Agent's listing for the second site, 2026: commercial, with the rent</li>
+            <li><b>SD4</b> Own survey of 60 riders: blank questionnaire and tally</li>
+            <li><b>SD5</b> Local newspaper report on a rival opening, 2026: a sceptical view</li>
+          </ul>
+          <p class="it-why">All within three years, each adding something the others do not, four with data a tool can use, and one that could prove the decision wrong. The documents are invented for illustration.</p>
+        </article>
+      </div>
+    </section>
+
+    <IaIntegrity no="04" />
+  </div>
+</BaseLayout>
+
+<style>
+  .sd-sub {
+    max-width: 24rem;
+  }
+
+  .sd-docs {
+    display: grid;
+    gap: var(--sp-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sd-doc {
+    margin: 0;
+    padding: var(--sp-4);
+    border: 1px solid var(--rule-hair);
+    border-left: 3px solid var(--navy-900);
+    background: var(--ivory-50);
+  }
+
+  .sd-doc__legend {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-3);
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .sd-doc__n {
+    padding: 0.05rem 0.4rem;
+    background: var(--navy-900);
+    color: var(--gold-400);
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+
+  .sd-doc__grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--sp-3) var(--sp-4);
+    align-items: end;
+  }
+
+  .sd-c1 {
+    grid-column: span 1;
+  }
+
+  .sd-c2 {
+    grid-column: span 2;
+  }
+
+  .sd-c3 {
+    grid-column: span 3;
+  }
+
+  .sd-c4 {
+    grid-column: span 4;
+  }
+
+  .sd-c6 {
+    grid-column: 1 / -1;
+  }
+
+  .sd-sel {
+    align-self: end;
+  }
+
+  .sd-jump {
+    justify-self: start;
+    font-size: 0.875rem;
+  }
+
+  .sd-signs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-2);
+  }
+
+  .sd-add {
+    justify-self: start;
+  }
+
+  .sd-eval td,
+  .sd-eval th {
+    vertical-align: top;
+  }
+
+  .sd-notes {
+    display: grid;
+    gap: var(--sp-3);
+  }
+
+  .sd-notes :global(details) {
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .sd-notes :global(summary) {
+    min-height: 2.75rem;
+    padding: 0.6rem 0;
+    font-weight: 600;
+    color: var(--navy-900);
+    cursor: pointer;
+  }
+
+  .sd-notes :global(dl) {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0 0 var(--sp-3);
+  }
+
+  .sd-notes :global(dl > div) {
+    display: grid;
+    grid-template-columns: 7rem minmax(0, 1fr);
+    gap: var(--sp-3);
+    font-size: 0.9375rem;
+  }
+
+  .sd-notes :global(dt) {
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .sd-notes :global(dd) {
+    margin: 0;
+  }
+
+  @media (max-width: 64rem) {
+    .sd-doc__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .sd-c1,
+    .sd-c2,
+    .sd-c3 {
+      grid-column: span 1;
+    }
+
+    .sd-c4 {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 52rem) {
+    .sd-doc__grid,
+    .sd-signs {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .sd-c1,
+    .sd-c2,
+    .sd-c3,
+    .sd-c4 {
+      grid-column: 1 / -1;
+    }
+
+    .sd-notes :global(dl > div) {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+  }
+</style>
+
+<script>
+  import '../../../scripts/centre/ia-documents';
+</script>

@@ -441,6 +441,69 @@
   gap: var(--sp-4);
 }
 
+/* A numbered list of tools, each a row with its name and what it does */
+.ce-toolrow {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 0 var(--sp-6);
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 3px solid var(--navy-900);
+}
+
+.ce-toolrow li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  gap: var(--sp-3);
+  margin: 0;
+  padding: var(--sp-4) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.ce-toolrow li:focus-within {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.ce-toolrow__n {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--brass-text);
+}
+
+.ce-toolrow__name {
+  font-size: 1.25rem;
+}
+
+.ce-toolrow__name a {
+  color: var(--navy-900);
+  text-decoration: none;
+}
+
+.ce-toolrow__name a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.ce-toolrow__name a:hover {
+  text-decoration: underline;
+}
+
+.ce-toolrow__name a:focus-visible {
+  outline: none;
+}
+
+.ce-toolrow__line {
+  margin-top: 0.2rem;
+  font-size: 0.9375rem;
+  color: var(--text-body);
+}
+
 .ce-cta {
   display: flex;
   flex-wrap: wrap;
