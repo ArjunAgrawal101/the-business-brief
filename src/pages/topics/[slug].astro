@@ -43,9 +43,7 @@ const terms = Object.entries(c.glossary)
 const ixs = Object.entries(c.interactives).filter(([, it]) => it.page && it.syllabus.includes(code));
 const calcs = Object.entries(c.calculations).filter(([, k]) => k.syllabus.some((x) => x.code === code));
 const questions = Object.entries(c.questions).filter(([, q]) => q.syllabus.includes(code));
-// Notes for an SL/HL subtopic can still carry HL material (an HL toolkit tool, an HL question); their notices point to this switch.
-const notesHL = note ? note[1].sections.some((x) => x.level === 'HL' || x.points.some((p) => p.level === 'HL')) || note[1].exam.some((q) => q.level === 'HL') : false;
-const hasHL = s.level !== 'SL/HL' || notesHL;
+const hasHL = s.level !== 'SL/HL';
 const levelText = s.level === 'HL' ? 'HL only' : s.level === 'SL/HL' ? 'SL and HL' : 'SL and HL, with HL-only content';
 const status = note ? 'Full notes' : brief ? 'Taught in a brief' : 'Notes planned';
 const connections = note?.[1].connections ?? map?.[1].connections.map((x) => ({ code: x.code, text: x.label })) ?? [];
