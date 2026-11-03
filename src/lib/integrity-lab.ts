@@ -81,9 +81,11 @@ export function checkLab(lab: LabContent, c: Pick<Corpus, 'curricula' | 'glossar
   /* Tools */
   const kinds = Object.values(lab.tools).map((t) => t.kind);
   TOOL_KINDS.forEach((k) => kinds.filter((x) => x === k).length !== 1 && out.push({ where: 'lab', message: `needs exactly one tool of kind "${k}"` }));
+  if (Object.keys(lab.tools).length !== Object.keys(lab.briefings).length) out.push({ where: 'lab', message: 'the route pairs each briefing with a tool, so there must be as many tools as briefings' });
   for (const [id, t] of Object.entries(lab.tools)) {
     const w = `lab/${id}`;
     if (!lab.briefings[t.briefing]) out.push({ where: w, message: `briefing "${t.briefing}" does not exist` });
+    else if (lab.briefings[t.briefing]?.order !== t.order) out.push({ where: w, message: `is step ${t.order} of the route, so its briefing must be the briefing of order ${t.order}` });
     t.ib.links.forEach((l) => {
       code(l.code, w);
       if (t.ib.status !== 'enrichment') usedCodes.add(l.code);

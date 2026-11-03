@@ -1,0 +1,819 @@
+/*
+  The Entrepreneurship and Innovation Lab: a founder's studio inside the
+  platform's palette. Two surfaces carry the identity: the blueprint (a navy
+  drawing sheet with a fine ivory grid and a title block, for plans and
+  routes) and the whiteboard (a white sheet with a faint dot grid, for work
+  in progress). Everything else is the platform's own components. Imported by
+  the Lab's pages only. The room accent comes from rooms.css when the lead
+  defines one for data-room="enterprise", and falls back to gold.
+*/
+
+.lab {
+  --lab-accent: var(--room-accent, var(--gold-500));
+  --lab-accent-text: var(--room-accent-text, var(--brass-text));
+  --lab-ink: var(--room-ground, var(--surface-ink));
+  --lab-grid-major: rgba(244, 239, 228, 0.085);
+  --lab-grid-minor: rgba(244, 239, 228, 0.04);
+  --lab-dot: rgba(11, 26, 51, 0.11);
+}
+
+/* A scroll region must be the containing block of the visually hidden text
+   inside it, or that text escapes the clipping and widens the page. */
+.lab .table-scroll,
+.lab .chart-scroll {
+  position: relative;
+}
+
+/* ---------- The blueprint sheet ---------- */
+
+.lab-blueprint {
+  position: relative;
+  color: var(--text-on-ink);
+  background-color: var(--lab-ink);
+  background-image:
+    linear-gradient(var(--lab-grid-major) 1px, transparent 1px),
+    linear-gradient(90deg, var(--lab-grid-major) 1px, transparent 1px),
+    linear-gradient(var(--lab-grid-minor) 1px, transparent 1px),
+    linear-gradient(90deg, var(--lab-grid-minor) 1px, transparent 1px);
+  background-size:
+    96px 96px,
+    96px 96px,
+    24px 24px,
+    24px 24px;
+  background-position: -1px -1px;
+  border: 1px solid var(--navy-950);
+  outline: 1px solid rgba(244, 239, 228, 0.18);
+  outline-offset: -8px;
+}
+
+.lab-blueprint a {
+  color: var(--text-on-ink);
+}
+
+.lab-blueprint a:hover {
+  color: var(--gold-300);
+}
+
+.lab-blueprint :focus-visible {
+  outline: var(--focus-ring-on-ink);
+  outline-offset: 2px;
+}
+
+/* ---------- The whiteboard ---------- */
+
+.lab-whiteboard {
+  position: relative;
+  background-color: var(--surface-sheet);
+  background-image: radial-gradient(var(--lab-dot) 1px, transparent 1.3px);
+  background-size: 22px 22px;
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow-sheet);
+}
+
+/* ---------- Page header: the drawing sheet with its title block ---------- */
+
+.lab-hero {
+  display: grid;
+  gap: var(--sp-5) var(--sp-7);
+  margin-top: var(--sp-4);
+  padding: clamp(var(--sp-5), 4vw, var(--sp-7)) clamp(var(--sp-4), 4vw, var(--sp-7));
+}
+
+@media (min-width: 64rem) {
+  .lab-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(17rem, 21rem);
+    align-items: end;
+  }
+}
+
+.lab-hero__kicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-3);
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--gold-400);
+}
+
+.lab-hero__kicker span + span::before {
+  content: "/";
+  margin-right: var(--sp-3);
+  color: var(--text-on-ink-muted);
+}
+
+.lab-hero h1 {
+  margin: var(--sp-3) 0 0;
+  max-width: 24ch;
+  color: var(--text-on-ink);
+  font-size: clamp(2rem, 1.5rem + 2.2vw, 3.25rem);
+  line-height: var(--lh-tight);
+}
+
+.lab-hero__lead {
+  margin-top: var(--sp-4);
+  max-width: 44rem;
+  color: var(--text-on-ink);
+  font-size: var(--fs-lead);
+  line-height: 1.5;
+}
+
+.lab-hero__lead p {
+  margin: 0;
+}
+
+.lab-titleblock {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  margin: 0;
+  border: 1px solid rgba(244, 239, 228, 0.42);
+  font-size: 0.875rem;
+  background: rgba(7, 18, 38, 0.55);
+}
+
+.lab-titleblock > div {
+  display: contents;
+}
+
+.lab-titleblock dt,
+.lab-titleblock dd {
+  margin: 0;
+  padding: 0.45rem 0.7rem;
+  border-bottom: 1px solid rgba(244, 239, 228, 0.22);
+}
+
+.lab-titleblock > div:last-child dt,
+.lab-titleblock > div:last-child dd {
+  border-bottom: 0;
+}
+
+.lab-titleblock dt {
+  border-right: 1px solid rgba(244, 239, 228, 0.22);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-on-ink-muted);
+}
+
+.lab-titleblock dd {
+  color: var(--text-on-ink);
+}
+
+/* ---------- IB status chips ---------- */
+
+.lab-ib {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lab-ib li {
+  margin: 0;
+}
+
+.lab-ib__label {
+  color: var(--text-muted);
+}
+
+.lab-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 24px;
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--rule-control);
+  border-radius: var(--radius-1);
+  background: var(--surface-sheet);
+  color: var(--text-strong);
+  font-size: 0.8125rem;
+  font-weight: 560;
+  text-decoration: none;
+}
+
+a.lab-chip:hover {
+  border-color: var(--bb-ink);
+  color: var(--cobalt-text);
+  text-decoration: underline;
+}
+
+.lab-chip .num {
+  font-family: var(--font-mono);
+  font-weight: 650;
+}
+
+.lab-blueprint .lab-chip {
+  background: transparent;
+  border-color: rgba(244, 239, 228, 0.45);
+  color: var(--text-on-ink);
+}
+
+/* ---------- Lab sheets: the frame for each tool ---------- */
+
+.lab-tool {
+  display: grid;
+  gap: var(--sp-6);
+  padding: clamp(var(--sp-4), 3vw, var(--sp-6));
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--bb-ink);
+  background: var(--surface-sheet);
+}
+
+.lab-tool__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  align-items: center;
+}
+
+.lab-tool__bar .btn {
+  min-height: 44px;
+}
+
+.lab-tool fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.lab-tool legend {
+  padding: 0;
+}
+
+.lab-label {
+  display: block;
+  margin: 0 0 var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-strong);
+}
+
+.lab-cols {
+  display: grid;
+  gap: var(--sp-5);
+}
+
+@media (min-width: 60rem) {
+  .lab-cols--2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lab-cols--split {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+/* Ledger lists: label, amount, and sometimes a kind, per row. */
+.lab-ledger {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.lab-ledger__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding-bottom: var(--sp-2);
+  border-bottom: 2px solid var(--rule-ink);
+}
+
+.lab-ledger__title {
+  margin: 0;
+  font-size: var(--fs-h4);
+}
+
+.lab-ledger__total {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  color: var(--text-strong);
+  white-space: nowrap;
+}
+
+.lab-lines {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lab-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(6.5rem, 8.5rem) auto;
+  gap: var(--sp-2);
+  align-items: start;
+  margin: 0;
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.lab-line--funding {
+  grid-template-columns: minmax(0, 1fr) minmax(6.5rem, 8.5rem) auto;
+}
+
+.lab-line--funding .lab-line__kind {
+  grid-column: 1 / 3;
+}
+
+.lab-line .input,
+.lab-line .select {
+  min-height: 2.75rem;
+}
+
+.lab-line .field__error {
+  grid-column: 1 / -1;
+}
+
+.lab-line .field__error:empty {
+  display: none;
+}
+
+/* On a phone each line stacks: what it is, then the amount beside the remove button, then the kind of funding. */
+@media (max-width: 36rem) {
+  .lab-line,
+  .lab-line--funding {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .lab-line__label,
+  .lab-line--funding .lab-line__kind {
+    grid-column: 1 / -1;
+  }
+
+  .lab-line__amount {
+    grid-column: 1;
+  }
+
+  .lab-line > .lab-remove {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .lab-line--head {
+    display: none !important;
+  }
+}
+
+.lab-remove {
+  display: inline-grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-1);
+  background: var(--surface-sheet);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.lab-remove:hover {
+  border-color: var(--bb-signal);
+  color: var(--signal-text);
+}
+
+.lab-remove:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.lab-add {
+  justify-self: start;
+}
+
+.lab-inline-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--sp-4);
+  align-items: start;
+}
+
+.lab-tool .field {
+  align-content: start;
+}
+
+.lab-tool .field__error {
+  color: var(--signal-text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.lab-tool [aria-invalid="true"] {
+  border-color: var(--bb-signal);
+  box-shadow: inset 0 0 0 1px var(--bb-signal);
+}
+
+/* Results */
+.lab-results {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.lab-results > .lab-label {
+  margin: 0;
+}
+
+.lab-tool .fig {
+  align-content: start;
+}
+
+/* The tools' charts stay at a size where their labels read at body size. */
+.lab .chart {
+  max-width: 54rem;
+  margin-inline: auto;
+}
+
+.lab-reading {
+  padding: var(--sp-4);
+  background: #fff;
+  border: 1px solid var(--rule-hair);
+  border-left: 3px solid var(--bb-cobalt);
+}
+
+.lab-reading p {
+  margin: 0;
+  max-width: var(--text-max);
+}
+
+.lab-reading p + p {
+  margin-top: var(--sp-2);
+}
+
+.lab-figure {
+  margin: 0;
+}
+
+.lab-figure figcaption {
+  margin-top: var(--sp-3);
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.lab-neg {
+  color: var(--signal-text);
+}
+
+.lab-sub {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.lab-base th,
+.lab-base td {
+  color: var(--text-muted);
+}
+
+.lab-tool tr.is-focus th,
+.lab-tool tr.is-focus td {
+  background: var(--surface-gold-wash);
+}
+
+.lab-bar {
+  display: block;
+  min-width: 5rem;
+  height: 0.6rem;
+  background: var(--surface-sunk);
+}
+
+.lab-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--bb-ink);
+  transition: width var(--dur-base) var(--ease);
+}
+
+.lab-mix {
+  display: grid;
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lab-mix li {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0;
+}
+
+.lab-mix__head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  font-size: 0.9375rem;
+}
+
+.lab-mix__label {
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.lab-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-4);
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.875rem;
+}
+
+.lab-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+}
+
+.lab-swatch {
+  flex: none;
+  border: 1px solid var(--rule-control);
+}
+
+.lab-note-nojs {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px dashed var(--rule-control);
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+}
+
+.lab-saved {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+/* Verdict labels: words first, with a shape so colour is never alone. */
+.lab-verdict {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 650;
+}
+
+.lab-verdict::before {
+  content: "";
+  width: 0.6rem;
+  height: 0.6rem;
+  flex: none;
+}
+
+.lab-verdict--go {
+  color: var(--green-text);
+}
+
+.lab-verdict--go::before {
+  background: var(--green-text);
+  border-radius: 50%;
+}
+
+.lab-verdict--fix {
+  color: var(--signal-text);
+}
+
+.lab-verdict--fix::before {
+  background: var(--signal-text);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.lab-verdict--weak {
+  color: var(--brass-text);
+}
+
+.lab-verdict--weak::before {
+  border: 2px solid var(--brass-text);
+}
+
+/* ---------- Supporting sections on tool pages ---------- */
+
+.lab-aside-grid {
+  display: grid;
+  gap: var(--sp-5);
+}
+
+@media (min-width: 60rem) {
+  .lab-aside-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.lab-steps {
+  margin: 0;
+  padding-left: 1.4em;
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.lab-defs {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  border-top: 2px solid var(--rule-ink);
+}
+
+.lab-defs > div {
+  display: grid;
+  gap: var(--sp-1) var(--sp-5);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+@media (min-width: 48rem) {
+  .lab-defs > div {
+    grid-template-columns: minmax(10rem, 15rem) minmax(0, 1fr);
+  }
+}
+
+.lab-defs dt {
+  font-family: var(--font-display);
+  font-weight: 680;
+  color: var(--text-strong);
+}
+
+.lab-defs dd {
+  margin: 0;
+}
+
+.lab-defs dd p {
+  margin: 0;
+}
+
+.lab-cautions {
+  display: grid;
+  gap: var(--sp-2);
+  margin: 0;
+  padding-left: 1.1em;
+}
+
+/* ---------- Moving through the Lab ---------- */
+
+.lab-nav {
+  display: grid;
+  gap: var(--sp-5);
+  padding-top: var(--sp-6);
+  border-top: 2px solid var(--rule-ink);
+}
+
+.lab-nav__pager {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+@media (min-width: 48rem) {
+  .lab-nav__pager {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.lab-nav__step {
+  display: grid;
+  gap: 0.2rem;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--rule);
+  background: var(--surface-sheet);
+  text-decoration: none;
+  color: var(--text-strong);
+}
+
+.lab-nav__step:hover {
+  border-color: var(--bb-ink);
+}
+
+.lab-nav__step:hover .lab-nav__title {
+  color: var(--cobalt-text);
+  text-decoration: underline;
+}
+
+.lab-nav__step--next {
+  text-align: right;
+}
+
+.lab-nav__dir {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.lab-nav__title {
+  font-family: var(--font-display);
+  font-weight: 650;
+  font-size: 1.0625rem;
+}
+
+.lab-nav__all {
+  display: grid;
+  gap: var(--sp-5);
+}
+
+@media (min-width: 48rem) {
+  .lab-nav__all {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.lab-nav__list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: lab;
+  border-top: 1px solid var(--rule-ink);
+}
+
+.lab-nav__list li {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  align-items: baseline;
+  margin: 0;
+  border-bottom: 1px solid var(--rule-hair);
+  counter-increment: lab;
+}
+
+.lab-nav__list li::before {
+  content: counter(lab, decimal-leading-zero);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.lab-nav__list a,
+.lab-nav__list span[aria-current] {
+  display: block;
+  padding: 0.55rem 0;
+  min-height: 24px;
+  text-decoration: none;
+  color: var(--text-strong);
+}
+
+.lab-nav__list a:hover {
+  color: var(--cobalt-text);
+  text-decoration: underline;
+}
+
+.lab-nav__list span[aria-current] {
+  font-weight: 650;
+  color: var(--lab-accent-text);
+}
+
+/* ---------- Print: the work, not the controls ---------- */
+
+@media print {
+  .lab-blueprint {
+    color: #000;
+    background: #fff;
+    border: 1px solid #000;
+    outline: 0;
+  }
+
+  .lab-blueprint * {
+    color: #000 !important;
+  }
+
+  .lab-titleblock {
+    background: #fff;
+    border-color: #000;
+  }
+
+  .lab-nav,
+  .lab-tool__bar,
+  .lab-remove,
+  .lab-add,
+  .lab-no-print {
+    display: none !important;
+  }
+
+  .lab-whiteboard {
+    box-shadow: none;
+    background-image: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-bar > span {
+    transition: none;
+  }
+}

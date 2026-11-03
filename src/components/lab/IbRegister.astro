@@ -1,0 +1,138 @@
+---
+/**
+ * The Lab's register of what is and is not IB content: every idea the
+ * briefings teach, and every tool, with its standing in the IB Business
+ * management guide (first assessment 2024). Built from the briefings' own
+ * idea lists and the tools' IB statements, which the integrity checks verify.
+ */
+import IbChips from './IbChips.astro';
+import ProvenanceTag from '../ui/ProvenanceTag.astro';
+import { labHref, route } from '../../lib/lab/content';
+
+const stations = await route();
+const ideas = stations.flatMap((s) => s.briefing[1].ideas.map((x) => ({ ...x, briefing: s.briefing })));
+const count = (st: string) => ideas.filter((x) => x.status === st).length;
+const STATUS = { ib: 'IB content', toolkit: 'IB toolkit' } as const;
+const TOOL_STATUS = { 'ib-toolkit': 'IB toolkit tool', enrichment: 'Enrichment', mixed: 'IB content and enrichment' } as const;
+---
+
+<div class="lab-register">
+  <h3 class="lab-label">The tools</h3>
+  <div class="table-scroll" role="region" aria-label="IB status of each tool" tabindex="0">
+    <table class="table">
+      <caption class="sr-only">Each tool and its standing in the IB course</caption>
+      <thead>
+        <tr>
+          <th scope="col">Tool</th>
+          <th scope="col">Status</th>
+          <th scope="col">IB subtopics it draws on</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          stations.map((s) => (
+            <tr>
+              <th scope="row">
+                <a href={labHref(s.tool[0])}>{s.tool[1].title}</a>
+              </th>
+              <td>{s.tool[1].ib.status === 'enrichment' ? <ProvenanceTag kind="enrichment" /> : <span class="tag tag--ib">{TOOL_STATUS[s.tool[1].ib.status]}</span>}</td>
+              <td>
+                <IbChips codes={s.tool[1].ib.links.map((l) => l.code)} />
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h3 class="lab-label lab-register__ideas-h">The ideas</h3>
+  <p class="lab-register__count">
+    {ideas.length} ideas across the six briefings: <strong>{count('ib')}</strong> are IB content, <strong>{count('toolkit')}</strong> are toolkit tools and <strong>{count('enrichment')}</strong> go beyond the syllabus. Each briefing ends with its own part of the register.
+  </p>
+  <details class="disclosure lab-register__all">
+    <summary>The full register of {ideas.length} ideas</summary>
+    <div class="disclosure__body">
+  <div class="table-scroll" role="region" aria-label="IB status of every idea in the Lab" tabindex="0">
+    <table class="table lab-register__table">
+      <caption class="sr-only">Each idea taught in the Lab, its status in the IB course, where it sits in the guide, and the briefing that teaches it</caption>
+      <thead>
+        <tr>
+          <th scope="col">Idea</th>
+          <th scope="col">Status</th>
+          <th scope="col">In the guide</th>
+          <th scope="col">Briefing</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          ideas.map((x) => (
+            <tr>
+              <th scope="row">{x.idea}</th>
+              <td>{x.status === 'enrichment' ? <ProvenanceTag kind="enrichment" /> : <span class="tag tag--ib">{STATUS[x.status]}</span>}</td>
+              <td>
+                <div class="lab-register__where">
+                  {x.status === 'toolkit' ? (
+                    <span class="small">
+                      <a href="/toolkit/">Toolkit</a>, guide p. {x.page}
+                    </span>
+                  ) : (
+                    <span class="small">{x.status === 'enrichment' ? (x.codes.length ? 'Not in the guide; related to' : 'Not in the guide') : `Guide, p. ${x.page}`}</span>
+                  )}
+                  <IbChips codes={x.codes} />
+                </div>
+              </td>
+              <td>
+                <a href={labHref(x.briefing[0])}>{x.briefing[1].order}. {x.briefing[1].step}</a>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+    </div>
+  </details>
+</div>
+
+<style>
+  .lab-register {
+    display: grid;
+    gap: var(--sp-4);
+  }
+
+  .lab-register__count {
+    margin: 0;
+    max-width: var(--text-max);
+  }
+
+  .lab-register__table th[scope="row"] {
+    min-width: 14rem;
+    font-weight: 560;
+  }
+
+  .lab-register__where {
+    display: grid;
+    gap: var(--sp-1);
+    justify-items: start;
+    min-width: 10rem;
+  }
+
+  .lab-register__table td:last-child a {
+    display: inline-block;
+    min-height: 24px;
+    white-space: nowrap;
+  }
+
+  .lab-register .lab-label {
+    margin: 0;
+  }
+
+  .lab-register__ideas-h {
+    margin-top: var(--sp-4) !important;
+  }
+
+  .lab-register__all .table-scroll {
+    margin-top: var(--sp-2);
+  }
+</style>

@@ -95,7 +95,8 @@ export function digest(s: LabSummaries): Partial<Record<DigestSection, string[]>
   const add = (k: DigestSection, line: string) => (out[k] ??= []).push(line);
   if (s.feasibility) {
     const f = s.feasibility;
-    add('opportunity', `Feasibility assessment: ${f.idea} scores ${fmtNumber(f.share, 0)}% of the maximum on the weighted criteria${f.of > 1 ? `, ranked ${f.rank} of ${f.of} ideas` : ''}, ${f.passes ? 'above' : 'below'} the pass mark of ${f.threshold}% (${f.verdict.toLowerCase()}).`);
+    const place = ['first', 'second', 'third'][f.rank - 1] ?? `number ${f.rank}`;
+    add('opportunity', `Feasibility assessment: ${f.idea} scores ${fmtNumber(f.share, 0)}% of the maximum on the weighted criteria${f.of > 1 ? `, ranked ${place} of ${f.of} ideas` : ''}, ${f.passes ? 'above' : 'below'} the pass mark of ${f.threshold}% (${f.verdict.toLowerCase()}).`);
   }
   if (s.canvas) {
     const c = s.canvas;

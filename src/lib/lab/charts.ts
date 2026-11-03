@@ -48,69 +48,104 @@ function yAxis(f: Frame, lo: number, hi: number, fmt: (v: number) => string, tar
 
 /* ---------- The cash runway ---------- */
 
+/**
+ * The months the runway chart shows: enough to see the cash run out, reach
+ * its lowest point and recover, but not so many that steady growth, which
+ * compounds, flattens the months that decide the runway. At least 12, at
+ * most the whole projection; the table always shows every month.
+ */
+export function runwaySpan(m: CostModel): number {
+  const all = m.months.length;
+  const be = m.breakEvenMonth ?? all;
+  return Math.min(all, Math.max(12, be + 4, (m.runOut ?? 0) + 4, m.lowest.month + 3));
+}
+
+export function runwayCaption(m: CostModel): string {
+  const n = runwaySpan(m);
+  const span = n < m.months.length ? `The chart shows the first ${n} months, the ones that decide the runway; the table has all ${m.months.length}.` : `The chart and the table show all ${n} months.`;
+  return `Cash in the bank at the end of each month with the expected sales (solid blue) and with no sales at all (dashed red). ${span}`;
+}
+
 export function runwaySvg(m: CostModel, o: { currency: string; id: string }): string {
-  const f: Frame = { W: 640, H: 330, L: 78, R: 18, T: 30, B: 46 };
-  const n = m.months.length;
+  const f: Frame = { W: 640, H: 330, L: 78, R: 18, T: 32, B: 46 };
+  const n = runwaySpan(m);
+  const rows = m.months.slice(0, n);
   const money = (v: number) => fmtMoney(v, o.currency, 0);
-  const balances = [m.cashAtLaunch, ...m.months.map((x) => x.closing)];
+  const balances = [m.cashAtLaunch, ...rows.map((x) => x.closing)];
   const hi = Math.max(0, ...balances);
   const lo = Math.min(0, ...balances);
-  const { y, parts } = yAxis(f, lo, hi, money);
+  // Headroom below the lowest point, so its label sits under it, clear of the line.
+  const { y, parts } = yAxis(f, lo < 0 ? lo - 0.22 * (hi - lo) : lo, hi, money);
   const x = (month: number) => f.L + (month / n) * (f.W - f.L - f.R);
   const y0 = r1(y(0));
+  const right = (px: number) => px > f.W - f.R - 200;
+  /** A label centred on a point, kept inside the plot: about 6.4 px a character. */
+  const centred = (px: number, text: string) => {
+    const half = (text.length * 6.4) / 2;
+    if (px - half < f.L + 4) return { x: f.L + 4, anchor: 'start' };
+    if (px + half > f.W - f.R - 4) return { x: f.W - f.R - 4, anchor: 'end' };
+    return { x: px, anchor: 'middle' };
+  };
+  const lowest = rows.reduce((best, r) => (r.closing < best.balance ? { month: r.month, balance: r.closing } : best), { month: 0, balance: m.cashAtLaunch });
   // Below zero: the business needs more money than it has.
   if (lo < 0) {
     parts.push(`<rect x="${f.L}" y="${y0}" width="${r1(f.W - f.L - f.R)}" height="${r1(f.H - f.B - y0)}" fill="${WASH_RED}" fill-opacity="0.65"/>`);
-    parts.push(`<text x="${f.W - f.R - 6}" y="${r1(f.H - f.B - 8)}" text-anchor="end" class="ch-note" fill="${SIGNAL}">Below zero: more funding needed</text>`);
+    if (f.H - f.B - y0 > 22) parts.push(`<text x="${f.L + 8}" y="${r1(f.H - f.B - 8)}" class="ch-note" fill="${SIGNAL}">Below zero: more funding needed</text>`);
   }
-  for (let mo = 0; mo <= n; mo += 3) parts.push(`<text x="${r1(x(mo))}" y="${f.H - f.B + 18}" text-anchor="middle" class="ch-tick">${mo}</text>`);
+  const step = n <= 12 ? 2 : 3;
+  for (let mo = 0; mo <= n; mo += step) parts.push(`<text x="${r1(x(mo))}" y="${f.H - f.B + 18}" text-anchor="middle" class="ch-tick">${mo}</text>`);
   parts.push(`<text x="${r1((f.L + f.W - f.R) / 2)}" y="${f.H - 6}" text-anchor="middle" class="ch-axis">Month of trading</text>`);
   parts.push(`<text x="14" y="${r1((f.T + f.H - f.B) / 2)}" text-anchor="middle" class="ch-axis" transform="rotate(-90 14 ${r1((f.T + f.H - f.B) / 2)})">${esc(`Cash in the bank, ${o.currency.trim() || 'currency'}`)}</text>`);
-  // The month contribution first covers outgoings.
-  if (m.breakEvenMonth !== null) {
+  // The month sales first cover the outgoings.
+  if (m.breakEvenMonth !== null && m.breakEvenMonth <= n) {
     const bx = r1(x(m.breakEvenMonth));
     parts.push(`<line x1="${bx}" y1="${f.T}" x2="${bx}" y2="${f.H - f.B}" stroke="${GOLD}" stroke-width="1.25" stroke-dasharray="2 4"/>`);
-    const anchor = m.breakEvenMonth > n * 0.7 ? 'end' : 'start';
-    parts.push(`<text x="${bx + (anchor === 'end' ? -6 : 6)}" y="${f.T - 10}" text-anchor="${anchor}" class="ch-note" fill="${GOLD}">${esc(`Sales cover outgoings from month ${m.breakEvenMonth}`)}</text>`);
+    const end = right(bx);
+    parts.push(`<text x="${bx + (end ? -6 : 6)}" y="${f.T - 12}" text-anchor="${end ? 'end' : 'start'}" class="ch-note" fill="${GOLD}">${esc(`Sales cover outgoings from month ${m.breakEvenMonth}`)}</text>`);
   }
-  // With no sales: a straight fall to zero.
+  // With no sales: a straight fall to zero, labelled just below the zero line.
   if (m.zeroSalesRunway !== null && m.cashAtLaunch > 0) {
     const zx = Math.min(n, m.zeroSalesRunway);
     const zy = m.cashAtLaunch - m.monthlyTotal * zx;
     parts.push(`<path d="M${r1(x(0))} ${r1(y(m.cashAtLaunch))}L${r1(x(zx))} ${r1(y(zy))}" fill="none" stroke="${SIGNAL}" stroke-width="2" stroke-dasharray="7 5"/>`);
     if (m.zeroSalesRunway <= n) {
-      parts.push(`<text x="${r1(x(zx)) + 6}" y="${y0 - 8}" class="ch-note" fill="${SIGNAL}">${esc(`No sales: gone after ${fmtNumber(m.zeroSalesRunway, 1)} months`)}</text>`);
+      const text = `No sales: ${fmtNumber(m.zeroSalesRunway, 1)} months`;
+      const at = centred(r1(x(zx)), text);
+      parts.push(`<text x="${r1(at.x)}" y="${y0 + 17}" text-anchor="${at.anchor}" class="ch-note" fill="${SIGNAL}">${esc(text)}</text>`);
     }
   }
   parts.push(`<line x1="${f.L}" y1="${y0}" x2="${f.W - f.R}" y2="${y0}" stroke="${INK}" stroke-width="1.25"/>`);
   // The expected balance.
   const pts = balances.map((b, i) => `${r1(x(i))} ${r1(y(b))}`);
   parts.push(`<path d="M${pts.join('L')}" fill="none" stroke="${COBALT}" stroke-width="2.5" stroke-linejoin="round"/>`);
-  parts.push(`<circle cx="${r1(x(0))}" cy="${r1(y(m.cashAtLaunch))}" r="4" fill="${COBALT}"/>`);
-  parts.push(`<text x="${r1(x(0)) + 8}" y="${r1(y(m.cashAtLaunch)) - 8}" class="ch-label" fill="${INK}">${esc(`At launch ${money(m.cashAtLaunch)}`)}</text>`);
+  const ly = r1(y(m.cashAtLaunch));
+  parts.push(`<circle cx="${r1(x(0))}" cy="${ly}" r="4" fill="${COBALT}"/>`);
+  parts.push(`<text x="${r1(x(0)) + 9}" y="${m.cashAtLaunch >= 0 ? ly - 9 : ly + 18}" class="ch-label" fill="${INK}">${esc(`At launch ${money(m.cashAtLaunch)}`)}</text>`);
   if (m.runOut !== null && m.runOut <= n) {
     const rx = r1(x(m.runOut));
     const ry = r1(y(m.months[m.runOut - 1]?.closing ?? 0));
     parts.push(`<circle cx="${rx}" cy="${ry}" r="5" fill="#fff" stroke="${SIGNAL}" stroke-width="2"/>`);
-    const anchor = m.runOut > n * 0.6 ? 'end' : 'start';
-    parts.push(`<text x="${rx + (anchor === 'end' ? -9 : 9)}" y="${ry + 16}" text-anchor="${anchor}" class="ch-label" fill="${SIGNAL}">${esc(`Runs out in month ${m.runOut}`)}</text>`);
+    const end = right(rx);
+    parts.push(`<text x="${rx + (end ? -9 : 9)}" y="${Math.min(ry, y0) - 10}" text-anchor="${end ? 'end' : 'start'}" class="ch-label" fill="${SIGNAL}">${esc(`Runs out in month ${m.runOut}`)}</text>`);
   }
-  if (m.lowest.balance < 0 && m.lowest.month > 0) {
-    const lx = r1(x(m.lowest.month));
-    const ly = r1(y(m.lowest.balance));
-    parts.push(`<circle cx="${lx}" cy="${ly}" r="3.5" fill="${INK}"/>`);
-    const anchor = m.lowest.month > n * 0.6 ? 'end' : 'start';
-    parts.push(`<text x="${lx + (anchor === 'end' ? -8 : 8)}" y="${ly + 4}" text-anchor="${anchor}" class="ch-label" fill="${INK}">${esc(`Lowest ${money(m.lowest.balance)}`)}</text>`);
+  if (lowest.balance < 0 && lowest.month > 0 && lowest.month !== m.runOut) {
+    const lx = r1(x(lowest.month));
+    const lyy = r1(y(lowest.balance));
+    parts.push(`<circle cx="${lx}" cy="${lyy}" r="3.5" fill="${INK}"/>`);
+    const text = `Lowest ${money(lowest.balance)}, month ${lowest.month}`;
+    const at = centred(lx, text);
+    parts.push(`<text x="${r1(at.x)}" y="${lyy + 20}" text-anchor="${at.anchor}" class="ch-label" fill="${INK}">${esc(text)}</text>`);
   } else {
-    const last = m.months[n - 1];
+    const last = rows[n - 1];
     if (last) parts.push(`<text x="${r1(x(n)) - 4}" y="${r1(y(last.closing)) - 10}" text-anchor="end" class="ch-label" fill="${INK}">${esc(`Month ${n}: ${money(last.closing)}`)}</text>`);
   }
   parts.push(`<line x1="${f.L}" y1="${f.T - 4}" x2="${f.L}" y2="${f.H - f.B}" stroke="${INK}" stroke-width="1.25"/>`);
   const desc = [
     `Cash at launch ${money(m.cashAtLaunch)}.`,
-    m.runOut === null ? `With the expected sales the balance stays above zero for all ${n} months, ending at ${money(m.months[n - 1]?.closing ?? 0)}.` : `With the expected sales the balance runs out in month ${m.runOut}${m.lowest.balance < 0 ? ` and reaches its lowest, ${money(m.lowest.balance)}, at the end of month ${m.lowest.month}` : ''}.`,
+    m.runOut === null ? `With the expected sales the balance stays above zero for all ${m.months.length} months.` : `With the expected sales the balance runs out in month ${m.runOut}${m.lowest.balance < 0 ? ` and reaches its lowest, ${money(m.lowest.balance)}, at the end of month ${m.lowest.month}` : ''}.`,
     m.breakEvenMonth === null ? 'Sales never cover the monthly outgoings in this period.' : `Sales cover the monthly outgoings from month ${m.breakEvenMonth}.`,
     m.zeroSalesRunway === null ? '' : `With no sales the cash would last ${fmtNumber(m.zeroSalesRunway, 1)} months.`,
+    n < m.months.length ? `The chart shows months 0 to ${n}.` : '',
   ]
     .filter(Boolean)
     .join(' ');

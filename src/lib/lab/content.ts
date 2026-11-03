@@ -38,6 +38,26 @@ export function lab(): Promise<Lab> {
   return loaded;
 }
 
+export interface Station {
+  step: number;
+  briefing: [string, Briefing];
+  tool: [string, LabTool];
+}
+
+/** The founder's route: each briefing paired with the tool of the same order (the integrity checks guarantee the pairing). */
+export async function route(): Promise<Station[]> {
+  const l = await lab();
+  return l.briefingList.map((b, i) => ({ step: i + 1, briefing: b, tool: l.toolList[i]! }));
+}
+
+/** Every page of the Lab in route order, briefing then tool, for previous and next links. */
+export async function sequence(): Promise<Array<{ id: string; title: string; kind: 'briefing' | 'tool' }>> {
+  return (await route()).flatMap((s) => [
+    { id: s.briefing[0], title: s.briefing[1].title, kind: 'briefing' as const },
+    { id: s.tool[0], title: s.tool[1].title, kind: 'tool' as const },
+  ]);
+}
+
 /** The tool of a given kind, with its id. */
 export async function toolOf<K extends LabTool['kind']>(kind: K): Promise<[string, LabToolOf<K>]> {
   const l = await lab();

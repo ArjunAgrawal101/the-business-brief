@@ -1,0 +1,232 @@
+---
+/**
+ * The start-up feasibility assessment. The default state is Refill Round and
+ * its two alternatives, assessed on the server by src/lib/lab/feasibility.ts;
+ * the script lets the learner rename and add ideas, change weights and
+ * scores, recalculates the ranking, the sensitivity and the optimism test,
+ * and keeps the assessment on this device.
+ */
+import { assess, readAssessment, DEFAULT_SETTINGS } from '../../lib/lab/feasibility';
+import { rankingHtml } from '../../lib/lab/render';
+import { criteriaRowsHtml, ideaHtml } from '../../lib/lab/forms';
+import type { LabToolOf } from '../../lib/lab/schemas';
+import { jsonForScript } from '../../lib/markup';
+
+interface Props {
+  data: LabToolOf<'feasibility'>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const settings = { ...DEFAULT_SETTINGS, threshold: data.threshold, floor: data.floor };
+const weights = Object.fromEntries(data.criteria.map((c) => [c.id, c.weight]));
+const a = assess(data.ideas, data.criteria, weights, settings);
+const reading = readAssessment(a, data.ideas, data.criteria, weights, settings);
+const config = { uid, criteria: data.criteria, example: { ideas: data.ideas, weights, threshold: data.threshold }, floor: data.floor };
+const MARKS = [50, 55, 60, 65, 70, 75];
+---
+
+<div class="lab-tool lab-feas" data-ix="lab-feasibility" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The assessment could not start. The ranking below is for the example's scores.</p>
+  <p class="lab-note-nojs nojs-only">Without JavaScript the ranking below is for the example's weights and scores, and changing them does not recalculate it.</p>
+
+  <div class="lab-tool__bar js-only" role="group" aria-label="Assessment actions">
+    <button type="button" class="btn btn--small" data-clear>Start from blank</button>
+    <button type="button" class="btn btn--small" data-example>Load the example</button>
+    <button type="button" class="btn btn--small" data-print>Print</button>
+  </div>
+
+  <form class="lab-feas__form" data-form novalidate aria-label="Ideas, weights and scores">
+    <fieldset>
+      <legend class="lab-label">The ideas, up to three</legend>
+      <ol class="lab-feas__ideas" role="list" data-ideas set:html={data.ideas.map((i, n) => ideaHtml(i, n + 1, uid)).join('')} />
+      <button type="button" class="btn btn--small lab-add js-only" data-add>Add an idea</button>
+    </fieldset>
+
+    <fieldset class="lab-feas__criteria">
+      <legend class="lab-label">Weights and scores</legend>
+      <p class="field__hint">Weight each criterion from 0 to {settings.maxWeight}, then score each idea from 1 (poor) to {settings.maxScore} (excellent).</p>
+      <ol class="lab-feas__rows" role="list" data-rows set:html={criteriaRowsHtml(data.criteria, weights, data.ideas, uid, settings.maxWeight)} />
+      <div class="field lab-feas__mark">
+        <label for={`${uid}-mark`}>Pass mark: share of the maximum an idea needs</label>
+        <select class="select" id={`${uid}-mark`} data-mark>
+          {MARKS.map((v) => <option value={String(v)} selected={v === data.threshold}>{v}%</option>)}
+        </select>
+      </div>
+    </fieldset>
+  </form>
+
+  <div class="lab-results">
+    <h3 class="lab-label">Ranking</h3>
+    <div class="table-scroll" role="region" aria-label="Weighted ranking of the ideas" tabindex="0">
+      <table class="table lab-feas__ranking">
+        <caption class="sr-only">Each idea's weighted total, its share of the maximum and the verdict</caption>
+        <thead>
+          <tr>
+            <th scope="col">Idea</th>
+            <th scope="col" class="n">Rank</th>
+            <th scope="col" class="n">Total</th>
+            <th scope="col" class="n">Share</th>
+            <th scope="col" class="lab-barcell"><span class="sr-only">Bar</span></th>
+            <th scope="col">Verdict</th>
+          </tr>
+        </thead>
+        <tbody data-ranking set:html={rankingHtml(a, data.criteria)} />
+      </table>
+    </div>
+    <div class="lab-reading">
+      <p><strong>Reading.</strong> <span data-interp>{reading.reading}</span></p>
+      <p class="muted"><strong>Optimism test.</strong> <span data-impl>{reading.implication}</span></p>
+    </div>
+    <p class="lab-saved js-only">Your assessment is kept on this device only.</p>
+  </div>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/lab/feasibility';
+</script>
+
+<style>
+  .lab-feas__ideas {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0 0 var(--sp-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  .lab-feas :global(.lab-idea) {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    gap: var(--sp-2) var(--sp-3);
+    align-items: start;
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  @media (min-width: 52rem) {
+    .lab-feas :global(.lab-idea) {
+      grid-template-columns: 2.25rem minmax(10rem, 0.8fr) minmax(0, 1.6fr) auto;
+      align-items: end;
+    }
+  }
+
+  .lab-feas :global(.lab-idea > .field),
+  .lab-feas :global(.lab-idea > .lab-idea__remove) {
+    grid-column: 2 / -1;
+  }
+
+  @media (min-width: 52rem) {
+    .lab-feas :global(.lab-idea > .field),
+    .lab-feas :global(.lab-idea > .lab-idea__remove) {
+      grid-column: auto;
+    }
+  }
+
+  .lab-feas :global(.lab-idea__no) {
+    display: inline-grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-top: 1.6rem;
+    border: 1px solid var(--bb-ink);
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  @media (min-width: 52rem) {
+    .lab-feas :global(.lab-idea__no) {
+      margin: 0 0 0.25rem;
+    }
+  }
+
+  .lab-feas__criteria {
+    margin-top: var(--sp-6) !important;
+  }
+
+  .lab-feas__rows {
+    display: grid;
+    gap: 0;
+    margin: var(--sp-3) 0 var(--sp-4);
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .lab-feas :global(.lab-crit) {
+    display: grid;
+    gap: var(--sp-3) var(--sp-5);
+    margin: 0;
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  @media (min-width: 60rem) {
+    .lab-feas :global(.lab-crit) {
+      grid-template-columns: minmax(0, 1.5fr) minmax(10rem, 13rem) minmax(0, 1.3fr);
+      align-items: start;
+    }
+  }
+
+  .lab-feas :global(.lab-crit__about) {
+    display: grid;
+    gap: 0.25rem;
+    justify-items: start;
+  }
+
+  .lab-feas :global(.lab-crit__name) {
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .lab-feas :global(.lab-crit__slider) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 1.75rem;
+    gap: var(--sp-2);
+    align-items: center;
+  }
+
+  .lab-feas :global(.lab-crit__slider input) {
+    width: 100%;
+    min-height: 24px;
+    accent-color: var(--bb-cobalt);
+  }
+
+  .lab-feas :global(.lab-crit__slider output) {
+    font-size: 1.125rem;
+    font-weight: 650;
+    color: var(--cobalt-text);
+    text-align: right;
+  }
+
+  .lab-feas :global(.lab-crit__scores) {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr));
+    gap: var(--sp-2);
+  }
+
+  .lab-feas :global(.lab-crit__score label) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lab-feas__mark {
+    max-width: 22rem;
+  }
+
+  .lab-feas :global(.lab-idea-cell) {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 36rem) {
+    .lab-feas :global(.lab-barcell) {
+      display: none;
+    }
+  }
+</style>

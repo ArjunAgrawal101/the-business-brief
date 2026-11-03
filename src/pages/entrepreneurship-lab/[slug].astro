@@ -1,0 +1,250 @@
+---
+/**
+ * Every briefing and tool page of the Entrepreneurship and Innovation Lab,
+ * from the briefings and labTools collections. The Lab's integrity checks run
+ * before any page is built (src/lib/lab/content.ts), so an address here can
+ * never point at missing content, and a briefing and a tool can never share
+ * one.
+ */
+import LabShell from '../../components/lab/LabShell.astro';
+import BriefingView from '../../components/lab/BriefingView.astro';
+import IbChips from '../../components/lab/IbChips.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import CanvasBuilder from '../../components/lab/CanvasBuilder.astro';
+import CostCalculator from '../../components/lab/CostCalculator.astro';
+import RevenuePlanner from '../../components/lab/RevenuePlanner.astro';
+import UnitEconomics from '../../components/lab/UnitEconomics.astro';
+import Feasibility from '../../components/lab/Feasibility.astro';
+import PlanBuilder from '../../components/lab/PlanBuilder.astro';
+import { lab, labHref } from '../../lib/lab/content';
+import { corpus } from '../../lib/content';
+import { allSubtopics } from '../../lib/learning';
+import { esc, plain, rich } from '../../lib/markup';
+import type { Briefing, LabTool } from '../../lib/lab/schemas';
+
+export async function getStaticPaths() {
+  const l = await lab();
+  return [
+    ...l.briefingList.map(([slug, b]) => ({ params: { slug }, props: { kind: 'briefing' as const, slug, b } })),
+    ...l.toolList.map(([slug, t]) => ({ params: { slug }, props: { kind: 'tool' as const, slug, t } })),
+  ];
+}
+
+type Props = { kind: 'briefing'; slug: string; b: Briefing } | { kind: 'tool'; slug: string; t: LabTool };
+const props = Astro.props;
+const l = await lab();
+const c = await corpus();
+const subs = allSubtopics(c);
+const total = l.briefingList.length;
+const two = (n: number) => String(n).padStart(2, '0');
+const toolTitles = Object.fromEntries(l.toolList.map(([id, t]) => [id, t.title]));
+const pairedTool = (order: number) => l.toolList.find(([, t]) => t.order === order);
+const pairedBriefing = (id: string) => l.briefings[id];
+const STATUS_WORDS = { 'ib-toolkit': 'IB toolkit tool', enrichment: 'Enrichment', mixed: 'IB content and enrichment' } as const;
+const codesText = (codes: string[]) =>
+  codes
+    .map((code) => {
+      const s = subs.find((x) => x.s.code === code)?.s;
+      return s?.level === 'HL' ? `${code} (HL)` : code;
+    })
+    .join(', ');
+
+let title = '';
+let metaTitle = '';
+let description = '';
+let kicker = '';
+let crumb = '';
+let lead = '';
+let block: Array<{ label: string; html: string }> = [];
+
+if (props.kind === 'briefing') {
+  const b = props.b;
+  const words = [b.introduction, ...b.sections.flatMap((s) => [s.body, ...s.points.map((p) => p.text), s.example?.text ?? '', s.callout?.text ?? ''])].join(' ').split(/\s+/).length;
+  const minutes = Math.max(1, Math.round(words / 220));
+  const ib = [...new Set(b.sections.flatMap((s) => s.ib))].sort((x, y) => x.localeCompare(y, 'en', { numeric: true }));
+  const enrich = b.sections.some((s) => s.enrichment);
+  const tool = pairedTool(b.order);
+  title = b.title;
+  metaTitle = `${b.title}: Entrepreneurship and Innovation Lab`;
+  description = b.dek;
+  kicker = `Briefing ${two(b.order)} of ${two(total)}`;
+  crumb = b.title;
+  lead = b.dek;
+  block = [
+    { label: 'Step', html: esc(`${b.order} of ${total}: ${b.step}`) },
+    { label: 'IB status', html: esc(ib.length ? `Maps to ${codesText(ib)}${enrich ? ', with enrichment' : ''}` : 'Enrichment beyond the syllabus') },
+    { label: 'Reading', html: esc(`About ${minutes} minutes`) },
+    ...(tool ? [{ label: 'Tool', html: `<a href="${labHref(tool[0])}">${esc(tool[1].title)}</a>` }] : []),
+  ];
+} else {
+  const t = props.t;
+  const br = pairedBriefing(t.briefing);
+  title = t.question;
+  metaTitle = `${t.title}: Entrepreneurship and Innovation Lab`;
+  description = t.summary;
+  kicker = `Tool ${two(t.order)} of ${two(l.toolList.length)}`;
+  crumb = t.title;
+  lead = t.lead;
+  block = [
+    { label: 'Tool', html: esc(t.title) },
+    { label: 'IB status', html: esc(`${STATUS_WORDS[t.ib.status]}${t.ib.links.length ? `${t.ib.status === 'enrichment' ? '; builds on' : '; draws on'} ${codesText(t.ib.links.map((x) => x.code))}` : ''}`) },
+    { label: 'Example', html: esc(t.kind === 'plan' ? 'Your own venture' : `${t.example.name}, fictional; figures simulated`) },
+    { label: 'Saved', html: esc('On this device only') },
+    ...(br ? [{ label: 'Briefing', html: `<a href="${labHref(t.briefing)}">${esc(br.title)}</a>` }] : []),
+  ];
+}
+const uid = `lab-${props.slug}`;
+---
+
+<LabShell id={props.slug} title={title} metaTitle={metaTitle} description={plain(description)} kicker={kicker} crumb={crumb} lead={lead} block={block}>
+  {props.kind === 'briefing' && <BriefingView id={props.slug} b={props.b} tools={l.tools} />}
+  {
+    props.kind === 'tool' && (
+      <>
+        <section aria-labelledby="tool-h" class="lab-toolpage">
+          <SectionHead no={1} title={props.t.title} id="tool-h">
+            <div class="tags lab-toolpage__tags">
+              {props.t.ib.status === 'enrichment' ? <ProvenanceTag kind="enrichment" /> : <span class="tag tag--ib">{STATUS_WORDS[props.t.ib.status]}</span>}
+              {props.t.ib.status === 'mixed' && <ProvenanceTag kind="enrichment" />}
+              {props.t.kind !== 'plan' && <ProvenanceTag kind="simulated-data" />}
+            </div>
+          </SectionHead>
+          <div class="lab-toolpage__example small" set:html={rich(`**The example.** ${props.t.example.summary}`)} />
+          <div class="lab-toolpage__tool">
+            {props.t.kind === 'canvas' && <CanvasBuilder data={props.t} uid={uid} />}
+            {props.t.kind === 'costs' && <CostCalculator data={props.t} uid={uid} />}
+            {props.t.kind === 'revenue' && <RevenuePlanner data={props.t} uid={uid} />}
+            {props.t.kind === 'unit-economics' && <UnitEconomics data={props.t} uid={uid} />}
+            {props.t.kind === 'feasibility' && <Feasibility data={props.t} uid={uid} />}
+            {props.t.kind === 'plan' && <PlanBuilder data={props.t} uid={uid} toolTitles={toolTitles} />}
+          </div>
+        </section>
+
+        <section aria-labelledby="how-h">
+          <SectionHead no={2} title="How to use it, and what to watch for" id="how-h" />
+          <div class="lab-aside-grid lab-toolpage__how">
+            <div>
+              <h3 class="lab-label">Steps</h3>
+              <ol class="lab-steps">
+                {props.t.steps.map((s) => (
+                  <li set:html={rich(s).replace(/^<p>|<\/p>$/g, '')} />
+                ))}
+              </ol>
+            </div>
+            <aside class="callout callout--caution">
+              <span class="callout__kicker">Cautions</span>
+              <ul class="lab-cautions">
+                {props.t.cautions.map((s) => (
+                  <li set:html={rich(s).replace(/^<p>|<\/p>$/g, '')} />
+                ))}
+              </ul>
+            </aside>
+          </div>
+        </section>
+
+        {props.t.definitions.length > 0 && (
+          <section aria-labelledby="terms-h">
+            <SectionHead no={3} title="What the terms mean here" id="terms-h" />
+            <dl class="lab-defs lab-toolpage__defs">
+              {props.t.definitions.map((d) => (
+                <div>
+                  <dt>{d.term}</dt>
+                  <dd set:html={rich(d.text)} />
+                </div>
+              ))}
+            </dl>
+          </section>
+        )}
+
+        <section aria-labelledby="ib-h">
+          <SectionHead no={props.t.definitions.length > 0 ? 4 : 3} title="Where it sits in the IB course" id="ib-h" />
+          <div class="lab-toolpage__ib">
+            <div class="prose" set:html={rich(props.t.ib.statement)} />
+            <ul class="lab-toolpage__links" role="list">
+              {props.t.ib.links.map((x) => (
+                <li>
+                  <IbChips codes={[x.code]} titles />
+                  <span class="small">{x.note}</span>
+                </li>
+              ))}
+            </ul>
+            {pairedBriefing(props.t.briefing) && (
+              <p class="lab-toolpage__read">
+                The ideas behind the tool are in the briefing <a href={labHref(props.t.briefing)}>{pairedBriefing(props.t.briefing)?.title}</a>.
+              </p>
+            )}
+          </div>
+        </section>
+      </>
+    )
+  }
+</LabShell>
+
+<style>
+  .lab-toolpage__tags {
+    margin-top: var(--sp-3);
+  }
+
+  .lab-toolpage__example {
+    max-width: 52rem;
+    margin-top: var(--sp-4);
+    color: var(--text-body);
+  }
+
+  .lab-toolpage__example :global(p) {
+    margin: 0;
+  }
+
+  .lab-toolpage__tool {
+    margin-top: var(--sp-5);
+  }
+
+  .lab-toolpage__how {
+    margin-top: var(--sp-5);
+  }
+
+  .lab-toolpage__how .callout {
+    margin: 0;
+  }
+
+  .lab-toolpage__defs {
+    margin-top: var(--sp-5);
+    max-width: 60rem;
+  }
+
+  .lab-toolpage__ib {
+    display: grid;
+    gap: var(--sp-4);
+    margin-top: var(--sp-5);
+    max-width: 56rem;
+  }
+
+  .lab-toolpage__links {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-ink);
+  }
+
+  .lab-toolpage__links li {
+    display: grid;
+    gap: var(--sp-1) var(--sp-4);
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  @media (min-width: 52rem) {
+    .lab-toolpage__links li {
+      grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr);
+      align-items: center;
+    }
+  }
+
+  .lab-toolpage__read {
+    margin: 0;
+  }
+</style>

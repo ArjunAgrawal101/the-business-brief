@@ -1,0 +1,42 @@
+---
+/**
+ * IB subtopic chips for the Lab: each code links to its subtopic page, shows
+ * the guide's title on hover and in the accessible name, and says HL when the
+ * subtopic is HL only. Unknown codes cannot reach here: the Lab's integrity
+ * checks reject them first.
+ */
+import { corpus } from '../../lib/content';
+import { allSubtopics, subtopicHref } from '../../lib/learning';
+
+interface Props {
+  codes: string[];
+  /** Words before the chips, such as "IB course" or "Connects to". */
+  label?: string;
+  /** Show each subtopic's title beside its code. */
+  titles?: boolean;
+}
+const { codes, label, titles = false } = Astro.props;
+const c = await corpus();
+const subs = allSubtopics(c);
+const items = codes.map((code) => {
+  const s = subs.find((x) => x.s.code === code)?.s;
+  return { code, title: s?.title ?? code, hl: s?.level === 'HL', href: subtopicHref(c, code) };
+});
+---
+
+{
+  items.length > 0 && (
+    <ul class="lab-ib" role="list">
+      {label && <li class="lab-ib__label small muted">{label}</li>}
+      {items.map((it) => (
+        <li>
+          <a class="lab-chip" href={it.href} title={`${it.code} ${it.title}`}>
+            <span class="num">{it.code}</span>
+            {titles ? <span>{it.title}</span> : <span class="sr-only">{it.title}</span>}
+            {it.hl && <span class="tag tag--hl">HL</span>}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}

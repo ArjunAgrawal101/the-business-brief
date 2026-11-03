@@ -247,7 +247,7 @@ export function readRevenue(m: RevenueModel, sens: Sensitivity[], currency: stri
   const worst = [...sens].sort((a, b) => a.change - b.change)[0];
   const implication =
     worst && worst.change < 0
-      ? `Of the ${sens.length} setbacks tested, ${worst.label.toLowerCase()} costs the year the most: ${money(-worst.change)}, or ${fmtNumber(Math.abs(worst.changePct ?? 0), 0)}% of the forecast. Each setback is a plausible bad case, not a prediction. Test the assumption behind the costliest one with real customers before committing money to it.`
+      ? `Of the ${['no', 'one', 'two', 'three', 'four'][sens.length] ?? sens.length} setbacks tested, ${worst.label.toLowerCase()} costs the year the most: ${money(-worst.change)}, or ${fmtNumber(Math.abs(worst.changePct ?? 0), 0)}% of the forecast. Each setback is a plausible bad case, not a prediction. Test the assumption behind the costliest one with real customers before committing money to it.`
       : '';
   return { reading: parts.join(' '), implication };
 }

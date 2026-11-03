@@ -48,6 +48,8 @@ const briefingSection = z.object({
 export const briefingSchema = z.object({
   title: z.string(),
   order: z.number().int().positive(),
+  /** The step of the founder's route the briefing belongs to, as a short imperative. */
+  step: z.string(),
   /** One sentence under the title. */
   dek: z.string(),
   /** The question a founder is answering. */

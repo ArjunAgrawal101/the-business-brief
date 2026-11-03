@@ -1,0 +1,264 @@
+---
+/**
+ * The start-up cost calculator. The default state is Refill Round's example,
+ * rendered on the server from src/lib/lab/costs.ts; the script lets the
+ * learner add, edit and remove lines, recalculates the runway, the chart, the
+ * funding mix and the monthly table, keeps everything on this device, and
+ * exports the projection as CSV.
+ */
+import { costModel, HORIZON, readCosts, readMix, toDraft } from '../../lib/lab/costs';
+import { runwayCaption, runwaySvg } from '../../lib/lab/charts';
+import { costFiguresHtml, costTableHtml, mixHtml } from '../../lib/lab/render';
+import { costLineHtml, type CostList } from '../../lib/lab/forms';
+import type { LabToolOf } from '../../lib/lab/schemas';
+import { fmtMoney } from '../../lib/format';
+import { jsonForScript } from '../../lib/markup';
+
+interface Props {
+  data: LabToolOf<'costs'>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const cur = data.currency;
+const m = costModel(data);
+const reading = readCosts(m, cur);
+const draft = toDraft(data);
+const config = { uid, currency: cur, example: draft };
+const LISTS: Array<{ id: CostList; title: string; hint: string; total: number; totalLabel: string; head: string[] }> = [
+  { id: 'oneOff', title: 'One-off costs', hint: 'Paid once, before or as trading starts.', total: m.oneOffTotal, totalLabel: 'Total one-off costs', head: ['What it is', 'Amount'] },
+  { id: 'monthly', title: 'Monthly outgoings', hint: 'Paid every month whatever the sales, including loan repayments.', total: m.monthlyTotal, totalLabel: 'Total each month', head: ['What it is', 'Each month'] },
+  { id: 'funding', title: 'Funding', hint: 'Where the money comes from, and what kind it is.', total: m.fundingTotal, totalLabel: 'Total funding', head: ['Source', 'Amount', 'Kind'] },
+];
+---
+
+<div class="lab-tool lab-costs" data-ix="lab-costs" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The calculator could not start. The figures below are Refill Round's example.</p>
+  <p class="lab-note-nojs nojs-only">Without JavaScript the figures below are for Refill Round's example, and changing an input does not recalculate them.</p>
+
+  <div class="lab-tool__bar js-only" role="group" aria-label="Calculator actions">
+    <button type="button" class="btn btn--small" data-clear>Start from blank</button>
+    <button type="button" class="btn btn--small" data-example>Load the example</button>
+    <button type="button" class="btn btn--small" data-csv>Download the projection (CSV)</button>
+    <button type="button" class="btn btn--small" data-print>Print</button>
+  </div>
+
+  <form class="lab-costs__form" data-form novalidate aria-label="Start-up costs, outgoings and funding">
+    <div class="lab-costs__ledgers">
+      {
+        LISTS.map((l) => (
+          <fieldset class="lab-ledger" data-list={l.id}>
+            <legend class="lab-ledger__title">{l.title}</legend>
+            <p class="field__hint lab-costs__hint">{l.hint}</p>
+            <div class={`lab-line lab-line--head lab-line--${l.id === 'funding' ? 'funding' : 'cost'}`} aria-hidden="true">
+              <span>{l.head[0]}</span>
+              <span>{l.head[1]}</span>
+              {l.head[2] && <span class="lab-costs__kind-head">{l.head[2]}</span>}
+            </div>
+            <ol class="lab-lines" role="list" data-lines={l.id} set:html={draft[l.id].map((line, i) => costLineHtml(l.id, line, i + 1, uid, cur)).join('')} />
+            <p class="field__error" data-err={`${l.id}:list`} />
+            <div class="lab-ledger__foot">
+              <button type="button" class="btn btn--small lab-add js-only" data-add={l.id}>Add a line</button>
+              <p class="lab-ledger__sum">
+                <span>{l.totalLabel}</span> <span class="lab-ledger__total" data-total={l.id}>{fmtMoney(l.total, cur, 0)}</span>
+              </p>
+            </div>
+          </fieldset>
+        ))
+      }
+    </div>
+
+    <fieldset class="lab-costs__sales">
+      <legend class="lab-label">Sales and settings</legend>
+      <div class="lab-inline-fields">
+        <div class="field">
+          <label for={`${uid}-contribution`}>Contribution in the first month of sales</label>
+          <div class="affix">
+            <span class="affix__pre" aria-hidden="true" data-cur-label>{cur}</span>
+            <input class="input input--num" id={`${uid}-contribution`} type="number" inputmode="decimal" min="0" step="1" value={String(data.contribution)} data-field="contribution" aria-describedby={`${uid}-contribution-hint ${uid}-contribution-err`} />
+          </div>
+          <span class="field__hint" id={`${uid}-contribution-hint`}>Revenue minus variable costs. The revenue planner and unit economics calculator help.</span>
+          <span class="field__error" id={`${uid}-contribution-err`} data-err="contribution" />
+        </div>
+        <div class="field">
+          <label for={`${uid}-growth`}>Growth in contribution each month</label>
+          <div class="affix">
+            <input class="input input--num" id={`${uid}-growth`} type="number" inputmode="decimal" step="0.1" value={String(data.growth)} data-field="growth" aria-describedby={`${uid}-growth-err`} />
+            <span class="affix__post" aria-hidden="true">%</span>
+          </div>
+          <span class="field__error" id={`${uid}-growth-err`} data-err="growth" />
+        </div>
+        <div class="field">
+          <label for={`${uid}-salesStart`}>Month sales start</label>
+          <div class="affix">
+            <span class="affix__pre" aria-hidden="true">Month</span>
+            <input class="input input--num" id={`${uid}-salesStart`} type="number" inputmode="numeric" min="1" max={String(HORIZON)} step="1" value={String(data.salesStart)} data-field="salesStart" aria-describedby={`${uid}-salesStart-err`} />
+          </div>
+          <span class="field__error" id={`${uid}-salesStart-err`} data-err="salesStart" />
+        </div>
+        <div class="field">
+          <label for={`${uid}-currency`}>Currency symbol</label>
+          <input class="input lab-costs__currency" id={`${uid}-currency`} type="text" maxlength="4" autocomplete="off" value={cur} data-currency />
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+  <div class="lab-results">
+    <h3 class="lab-label">Results</h3>
+    <dl class="figs" data-figures set:html={costFiguresHtml(m, cur)} />
+    <div class="lab-reading">
+      <p><strong>Reading.</strong> <span data-interp>{reading.reading}</span></p>
+      <p class="muted"><strong>Implication.</strong> <span data-impl>{reading.implication}</span></p>
+    </div>
+    <p class="lab-saved js-only">Your figures are kept on this device only.</p>
+  </div>
+
+  <figure class="lab-figure">
+    <div class="chart-scroll" role="region" aria-label="Cash runway chart" tabindex="0" data-chart set:html={runwaySvg(m, { currency: cur, id: `${uid}-chart` })} />
+    <figcaption data-caption>{runwayCaption(m)}</figcaption>
+  </figure>
+
+  <div class="lab-cols lab-cols--2">
+    <section aria-labelledby={`${uid}-mix-h`}>
+      <h3 class="lab-label" id={`${uid}-mix-h`}>What the funding costs the founders</h3>
+      <div data-mix set:html={mixHtml(m, cur)} />
+      <p class="small lab-costs__mix-reading" data-mix-reading>{readMix(m)}</p>
+    </section>
+    <section aria-labelledby={`${uid}-table-h`}>
+      <h3 class="lab-label" id={`${uid}-table-h`}>Month by month</h3>
+      <div class="table-scroll lab-costs__table" role="region" aria-label="Cash month by month" tabindex="0">
+        <table class="table">
+          <caption class="sr-only">Opening balance, outgoings, contribution and closing balance each month, and the closing balance with no sales</caption>
+          <thead>
+            <tr>
+              <th scope="col">Month</th>
+              <th scope="col" class="n">Opening</th>
+              <th scope="col" class="n">Outgoings</th>
+              <th scope="col" class="n">Contribution</th>
+              <th scope="col" class="n">Closing</th>
+              <th scope="col" class="n">No sales</th>
+            </tr>
+          </thead>
+          <tbody data-table set:html={costTableHtml(m, cur)} />
+        </table>
+      </div>
+    </section>
+  </div>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/lab/costs';
+</script>
+
+<style>
+  .lab-costs__ledgers {
+    display: grid;
+    gap: var(--sp-6);
+  }
+
+  @media (min-width: 56rem) {
+    .lab-costs__ledgers {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--sp-6) var(--sp-5);
+    }
+
+    .lab-costs__ledgers > [data-list="funding"] {
+      grid-column: 1 / -1;
+    }
+
+    .lab-costs :global(.lab-line--funding) {
+      grid-template-columns: minmax(0, 1fr) minmax(6.5rem, 9rem) minmax(16rem, 21rem) auto;
+    }
+
+    .lab-costs__kind-head {
+      display: block !important;
+    }
+
+    .lab-costs :global(.lab-line--funding .lab-line__kind) {
+      grid-column: 3;
+      grid-row: 1;
+    }
+
+    .lab-costs :global(.lab-line--funding .lab-remove) {
+      grid-column: 4;
+      grid-row: 1;
+    }
+  }
+
+  .lab-costs .lab-ledger__title {
+    margin-bottom: var(--sp-1);
+    font-family: var(--font-display);
+    font-size: var(--fs-h4);
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .lab-costs__hint {
+    margin: 0 0 var(--sp-3);
+  }
+
+  .lab-costs__kind-head {
+    display: none;
+  }
+
+  .lab-costs :global(.lab-line--head) {
+    padding: 0 0 var(--sp-1);
+    border-bottom: 2px solid var(--rule-ink);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .lab-ledger__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-2) var(--sp-4);
+    margin-top: var(--sp-3);
+  }
+
+  .lab-ledger__sum {
+    display: flex;
+    gap: var(--sp-3);
+    align-items: baseline;
+    margin: 0 0 0 auto;
+    padding-top: var(--sp-2);
+    border-top: 3px double var(--rule-ink);
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .lab-costs__sales {
+    margin-top: var(--sp-6) !important;
+    padding-top: var(--sp-5) !important;
+    border-top: 1px solid var(--rule-hair) !important;
+  }
+
+  .lab-costs__currency {
+    max-width: 6rem;
+  }
+
+  .lab-costs__mix-reading {
+    margin: var(--sp-4) 0 0;
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .lab-costs__table {
+    max-height: 26rem;
+    overflow-y: auto;
+  }
+
+  @media print {
+    .lab-costs__table {
+      max-height: none;
+      overflow: visible;
+    }
+  }
+</style>

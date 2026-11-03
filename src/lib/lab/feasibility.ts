@@ -171,7 +171,7 @@ export function readAssessment(a: Assessment, ideas: Idea[], criteria: Criterion
   let implication = '';
   if (a.optimism) {
     const o = a.optimism;
-    implication = `Optimism test: if every score for ${name(o.id)} is one point too generous, it falls to ${fmtNumber(o.share, 0)}% of the maximum and ${o.passes ? 'still passes' : 'no longer passes'}${a.results.length > 1 ? (o.leads ? ', and it still ranks first' : `, and ${name(o.overtakenBy ?? '')} would rank first instead`) : ''}. ${
+    implication = `If every score for ${name(o.id)} is one point too generous, it falls to ${fmtNumber(o.share, 0)}% of the maximum and ${o.passes ? 'still passes' : 'no longer passes'}${a.results.length > 1 ? (o.leads ? ', and it still ranks first' : `, and ${name(o.overtakenBy ?? '')} would rank first instead`) : ''}. ${
       o.passes && o.leads ? 'The case for it survives a founder’s usual optimism.' : 'The case rests on scores a founder is likely to overrate, so gather evidence for the closest calls before committing.'
     }`;
   }

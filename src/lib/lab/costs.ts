@@ -233,7 +233,7 @@ export function readCosts(m: CostModel, currency: string): { reading: string; im
   );
   const implication =
     m.gap > 0
-      ? `To stay above zero for the ${HORIZON} months shown, the plan needs about ${money(m.gap)} more, lower outgoings or faster growth: the lowest balance is ${money(m.lowest.balance)}${m.lowest.month ? ` at the end of month ${m.lowest.month}` : ' at launch'}. Founders usually raise more than the gap, because sales tend to arrive later and grow more slowly than planned.`
+      ? `To stay above zero for the ${HORIZON} months projected, the plan needs about ${money(m.gap)} more, lower outgoings or faster growth: the lowest balance is ${money(m.lowest.balance)}${m.lowest.month ? ` at the end of month ${m.lowest.month}` : ' at launch'}. Founders usually raise more than the gap, because sales tend to arrive later and grow more slowly than planned.`
       : 'On these figures the cash never runs out. The no-sales line is the stress test: it shows how long the founders would have to put things right if sales stalled.';
   return { reading: parts.join(' '), implication };
 }

@@ -1,0 +1,186 @@
+---
+/**
+ * The unit economics calculator. The default state is Refill Round's example,
+ * rendered on the server from src/lib/lab/unit-economics.ts; the script
+ * recalculates the same figures, chart, table and workings in the browser,
+ * runs the scenarios and keeps the learner's inputs on this device.
+ */
+import { paybackSvg } from '../../lib/lab/charts';
+import { paybackTableHtml, unitFiguresHtml } from '../../lib/lab/render';
+import { readUnit, unitEconomics, unitNotes, unitWorkings, type UnitInputs } from '../../lib/lab/unit-economics';
+import type { LabToolOf } from '../../lib/lab/schemas';
+import { workingHtml } from '../../lib/render';
+import { esc, jsonForScript } from '../../lib/markup';
+import { inputValue } from '../../scripts/ix';
+
+interface Props {
+  data: LabToolOf<'unit-economics'>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const cur = data.currency;
+const d: UnitInputs = data.defaults;
+const u = unitEconomics(d);
+const reading = readUnit(u, cur);
+const w = unitWorkings(u, cur);
+const notes = unitNotes(u, cur);
+const config = { uid, currency: cur, defaults: d, scenarios: data.scenarios };
+const FIELDS = [
+  { key: 'spend', label: 'Marketing and sales spending in the period', pre: true, step: '1', hint: 'Advertising, referral rewards, events, sales commission.' },
+  { key: 'customers', label: 'New customers won in the same period', pre: false, post: 'customers', step: '1', hint: 'Count only customers won in the period the spending covers.' },
+  { key: 'revenue', label: 'Average revenue per customer per month', pre: true, step: '0.01', hint: '' },
+  { key: 'variableCost', label: 'Variable cost of serving a customer for a month', pre: true, step: '0.01', hint: 'Materials, delivery, payment fees: costs that rise with each customer. Leave out rent and salaries.' },
+  { key: 'churn', label: 'Customers who leave each month', pre: false, post: '%', step: '0.1', hint: 'From a pilot if you have one; otherwise a cautious estimate.' },
+  { key: 'cap', label: 'Longest lifetime to count', pre: false, post: 'months', step: '1', hint: 'Stops a very low churn rate promising customers for decades.' },
+] as const;
+const WORKS = [
+  ['cac', 'Customer acquisition cost'],
+  ['contribution', 'Contribution per customer'],
+  ['lifetime', 'Expected lifetime'],
+  ['ltv', 'Lifetime value'],
+  ['ratio', 'LTV to CAC ratio'],
+  ['payback', 'CAC payback period'],
+] as const;
+---
+
+<div class="lab-tool lab-unit" data-ix="lab-unit" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The calculator could not start. The figures below are Refill Round's example.</p>
+  <p class="lab-note-nojs nojs-only">Without JavaScript the figures below are for Refill Round's example, and changing an input does not recalculate them. Every working is shown in full.</p>
+
+  <div class="lab-cols lab-cols--split">
+    <form class="lab-inputs" data-form novalidate aria-label="Unit economics inputs">
+      <fieldset>
+        <legend class="lab-label">Inputs</legend>
+        <div class="lab-unit__fields">
+          <div class="field lab-unit__currency">
+            <label for={`${uid}-currency`}>Currency symbol</label>
+            <input class="input" id={`${uid}-currency`} name="currency" type="text" maxlength="4" value={cur} autocomplete="off" data-currency />
+          </div>
+          {
+            FIELDS.map((f) => (
+              <div class="field">
+                <label for={`${uid}-${f.key}`}>{f.label}</label>
+                <div class="affix">
+                  {f.pre && (
+                    <span class="affix__pre" aria-hidden="true" data-cur-label>
+                      {cur}
+                    </span>
+                  )}
+                  <input
+                    class="input input--num"
+                    id={`${uid}-${f.key}`}
+                    name={f.key}
+                    type="number"
+                    inputmode="decimal"
+                    min="0"
+                    step={f.step}
+                    value={inputValue(d[f.key], f.step)}
+                    data-field={f.key}
+                    aria-describedby={`${uid}-${f.key}-err${f.hint ? ` ${uid}-${f.key}-hint` : ''}`}
+                  />
+                  {'post' in f && (
+                    <span class="affix__post" aria-hidden="true">
+                      {f.post}
+                    </span>
+                  )}
+                </div>
+                {f.hint && (
+                  <span class="field__hint" id={`${uid}-${f.key}-hint`}>
+                    {f.hint}
+                  </span>
+                )}
+                <span class="field__error" id={`${uid}-${f.key}-err`} data-err={f.key} />
+              </div>
+            ))
+          }
+        </div>
+      </fieldset>
+      <fieldset class="js-only lab-unit__scenarios">
+        <legend class="lab-label">Try a scenario</legend>
+        <div class="cluster">
+          {
+            data.scenarios.map((s) => (
+              <button type="button" class="btn btn--small" data-scenario={s.id} aria-pressed="false">
+                {s.label}
+              </button>
+            ))
+          }
+          <button type="button" class="btn btn--small btn--ink" data-reset>Back to the example</button>
+        </div>
+        <p class="small muted" data-scenario-note>Each scenario changes one input of Refill Round's example.</p>
+      </fieldset>
+    </form>
+
+    <div class="lab-results">
+      <h3 class="lab-label">Results</h3>
+      <dl class="figs" data-figures set:html={unitFiguresHtml(u, cur)} />
+      <div class="lab-reading">
+        <p><strong>Reading.</strong> <span data-interp>{reading.reading}</span></p>
+        <p class="muted"><strong>Implication.</strong> <span data-impl>{reading.implication}</span></p>
+      </div>
+      <p class="lab-saved js-only" data-saved>Your inputs are kept on this device only.</p>
+    </div>
+  </div>
+
+  <figure class="lab-figure">
+    <div class="chart-scroll" role="region" aria-label="Payback chart" tabindex="0" data-chart set:html={paybackSvg(u, { currency: cur, id: `${uid}-chart` })} />
+    <figcaption>
+      One customer who stays the expected lifetime: contribution so far (blue line) against the cost of winning them (red dashed line). Redrawn from the inputs above.
+    </figcaption>
+    <details class="disclosure">
+      <summary>The chart's figures as a table</summary>
+      <div class="disclosure__body table-scroll" role="region" aria-label="Payback figures" tabindex="0">
+        <table class="table">
+          <caption class="sr-only">Contribution from one customer so far, and the position after the cost of winning them, month by month</caption>
+          <thead>
+            <tr><th scope="col">Month</th><th scope="col" class="n">Contribution so far</th><th scope="col" class="n">After the acquisition cost</th></tr>
+          </thead>
+          <tbody data-table set:html={paybackTableHtml(u, cur)} />
+        </table>
+      </div>
+    </details>
+  </figure>
+
+  <section class="lab-unit__workings" aria-labelledby={`${uid}-w-h`}>
+    <h3 class="lab-label" id={`${uid}-w-h`}>The workings</h3>
+    <div class="stack">
+      {
+        WORKS.map(([k, label]) => (
+          <details class="disclosure" open={k === 'ltv' ? true : undefined}>
+            <summary>{label}</summary>
+            <div class="disclosure__body" data-working={k} set:html={workingHtml(w[k], esc(notes[k].interpretation), esc(notes[k].implication))} />
+          </details>
+        ))
+      }
+    </div>
+  </section>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/lab/unit-economics';
+</script>
+
+<style>
+  .lab-unit__fields {
+    display: grid;
+    gap: var(--sp-4);
+  }
+
+  .lab-unit__currency .input {
+    max-width: 6rem;
+  }
+
+  .lab-unit__scenarios {
+    margin-top: var(--sp-5);
+  }
+
+  .lab-unit__scenarios .cluster {
+    gap: var(--sp-2);
+  }
+
+  .lab-unit__workings .stack {
+    margin-top: var(--sp-3);
+  }
+</style>

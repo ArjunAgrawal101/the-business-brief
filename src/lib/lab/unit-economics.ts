@@ -235,3 +235,34 @@ export function paybackSeries(u: UnitModel, months: number): Array<[number, numb
   for (let m = 0; m <= months; m += 1) out.push([m, u.contribution * Math.min(m, u.lifetime)]);
   return out;
 }
+
+/** The interpretation and business implication for each working. */
+export function unitNotes(u: UnitModel, currency: string): Record<'cac' | 'contribution' | 'lifetime' | 'ltv' | 'ratio' | 'payback', { interpretation: string; implication: string }> {
+  const m = (v: number) => fmtMoney(v, currency, 2);
+  return {
+    cac: {
+      interpretation: u.cac === null ? 'Not available until at least one customer is won.' : `On average, each new customer cost ${m(u.cac)} in marketing and selling.`,
+      implication: 'Compare it with what a customer is worth, not with the price: a customer who pays little each month can still be worth winning if they stay.',
+    },
+    contribution: {
+      interpretation: `Each customer adds ${m(u.contribution)} a month towards the fixed costs and profit.`,
+      implication: u.contribution > 0 ? 'Every month a customer stays adds this much; keeping customers is worth as much as winning them.' : 'Serving a customer costs at least as much as they pay, so more customers make the loss bigger.',
+    },
+    lifetime: {
+      interpretation: `A customer stays about ${fmtNumber(u.lifetime, 1)} months on average${u.capped ? ', the cap you set' : ''}.`,
+      implication: 'Churn is the input a new business knows least about. Measure it in a pilot before relying on it.',
+    },
+    ltv: {
+      interpretation: `Over that time, a customer is worth ${m(u.ltv)} in contribution.`,
+      implication: 'This is the most the business could spend to win a customer and still break even on them, before any fixed costs.',
+    },
+    ratio: {
+      interpretation: u.ratio === null ? 'Not available.' : `Each customer returns ${fmtNumber(u.ratio, 1)} times what it cost to win them.`,
+      implication: u.ratio === null ? '' : u.ratio < 1 ? 'Below 1, growth destroys value: every customer won loses money over their lifetime.' : 'The ratio says winning customers pays eventually; it says nothing about fixed costs or about when the cash arrives.',
+    },
+    payback: {
+      interpretation: u.payback === null ? 'The acquisition cost is never earned back.' : `The cost of winning a customer is earned back after ${fmtNumber(u.payback, 1)} months of their contribution.`,
+      implication: u.payback !== null && u.payback > u.lifetime ? 'That is longer than a customer stays, so on average each customer loses money.' : 'The shorter the payback, the less cash growth ties up: the business recovers its spending quickly and can spend it again.',
+    },
+  };
+}

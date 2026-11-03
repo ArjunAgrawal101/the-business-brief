@@ -150,3 +150,15 @@ export function boardHtml(c: Canvas, labels: Record<BlockId, string>, order: Rec
 export function ideaScoresHead(ideas: Idea[]): string {
   return ideas.map((i) => `<th scope="col" class="n">${esc(i.name)}</th>`).join('');
 }
+
+/** Rows for the payback chart's table: one customer, month by month. */
+export function paybackTableHtml(u: UnitModel, currency: string): string {
+  const cac = u.cac ?? 0;
+  const span = Math.min(60, Math.max(1, Math.ceil(Math.max(u.lifetime, u.payback ?? 0))));
+  const rows: string[] = [];
+  for (let m = 0; m <= span; m += 1) {
+    const sofar = u.contribution * Math.min(m, u.lifetime);
+    rows.push(`<tr><th scope="row">${m}</th><td class="n">${esc(fmtMoney(sofar, currency, 2))}</td><td class="n">${signed(sofar - cac, currency, 2)}</td></tr>`);
+  }
+  return rows.join('');
+}
