@@ -27,6 +27,8 @@ describe('stored items by family', () => {
       ['bb:strategy:swot', 'work'],
       ['bb:ops:stock-control', 'work'],
       ['bb:bank', 'work'],
+      ['bb:strategy:probe', 'preference'],
+      ['bb:storage-check', 'preference'],
     ];
     for (const [k, f] of cases) expect(familyOf(k), k).toBe(f);
   });

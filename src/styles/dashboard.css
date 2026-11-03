@@ -41,6 +41,23 @@
   color: var(--rule);
 }
 
+.db-statusline__part {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* On a phone each part takes its own line, with no separators left hanging. */
+@media (max-width: 40rem) {
+  .db-statusline {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .db-sep {
+    display: none;
+  }
+}
+
 .db-dot {
   display: inline-block;
   width: 0.55rem;

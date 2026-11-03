@@ -84,6 +84,7 @@ each('[data-ix="progress"]', (root) => {
         `<a href="#data">What is kept, and how to clear it</a>`,
       ]
         .filter(Boolean)
+        .map((part) => `<span class="db-statusline__part">${part}</span>`)
         .join('<span class="db-sep" aria-hidden="true"> · </span>');
     }
 
@@ -92,14 +93,24 @@ each('[data-ix="progress"]', (root) => {
     if (lead)
       lead.innerHTML = `<p class="db-lead__fig"><span class="db-lead__n">${n(f.explored)}</span><span class="db-lead__of"> of ${n(f.subtopics)}</span></p>
         <p class="db-lead__label">subtopics explored</p>
-        <p class="db-lead__note">${f.explored ? `${plural(f.practised, 'of them practised', 'of them practised')}. Of the ${n(f.complete)} subtopics complete on the platform, you have explored ${n(f.completeExplored)}.` : `None yet. Open a subtopic's page or its mindmap and it counts as explored; rate its cards or answer a question on it and it counts as practised.`}</p>`;
+        <p class="db-lead__note">${
+          f.explored
+            ? `${n(f.practised)} of them practised. ${
+                f.explored >= f.subtopics
+                  ? 'You have explored every subtopic of the course.'
+                  : f.complete === f.subtopics
+                    ? `Every subtopic is complete on the platform, so ${n(f.subtopics - f.explored)} more ${f.subtopics - f.explored === 1 ? 'is' : 'are'} ready for you.`
+                    : `Of the ${n(f.complete)} subtopics complete on the platform, you have explored ${n(f.completeExplored)}.`
+              }`
+            : `None yet. Open a subtopic's page or its mindmap and it counts as explored; rate its cards or answer a question on it and it counts as practised.`
+        }</p>`;
     const sum = $('[data-summary]');
     if (sum) {
       const figs: Array<[string, string, string]> = [
         ['Mindmaps viewed', n(f.mindmaps), `of ${n(cfg.totals.mindmaps)}`],
         ['Cases opened', n(f.cases), `of ${n(cfg.totals.cases)} case files`],
         ['Practice questions answered', n(f.answered), `${n(f.marked)} self-marked, of ${n(f.questions)}`],
-        ['Exercise items checked', n(f.checked.checked), f.checked.checked ? tallyWords(f.checked) : 'Checked items appear here'],
+        ['Exercise items checked', n(f.checked.checked), f.checked.checked ? tallyWords(f.checked) : 'None checked yet'],
         ['Retrieval cards rated', n(f.cards.rated), f.cards.rated ? `${n(f.cards.got)} got it, ${n(f.cards.partly)} partly, ${n(f.cards.notYet)} not yet` : ''],
         ['Case lab stages done', `${n(f.labStages)} of ${n(f.labStagesAll)}`, ''],
         ['Decision Rooms finished', `${n(f.roomsDone)} of ${n(f.rooms)}`, ''],

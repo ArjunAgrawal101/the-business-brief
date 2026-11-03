@@ -167,6 +167,8 @@ export type Family =
 
 const FAMILIES: Array<[RegExp, Family]> = [
   [/^bb:(level|intro-seen)$/, 'preference'],
+  // A tool's check that storage works, written and removed at once; never the reader's work.
+  [/^bb:(.+:)?(probe|storage-check)$/, 'preference'],
   [/^bb:learner$/, 'learner'],
   [/^bb:saved$/, 'saved'],
   [/^bb:q:.+$/, 'question'],
