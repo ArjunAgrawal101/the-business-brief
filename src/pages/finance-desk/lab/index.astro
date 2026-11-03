@@ -1,0 +1,167 @@
+---
+/**
+ * The Financial Laboratory: every calculator, grouped as the course groups
+ * the content, each with the question it answers, its level, where its formula
+ * comes from and its result for the example business, computed by the same
+ * functions the calculator uses.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/layout/Breadcrumbs.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import LevelSwitch from '../../../components/ui/LevelSwitch.astro';
+import { corpus } from '../../../lib/content';
+import { allSubtopics, subtopicHref } from '../../../lib/learning';
+import { ACCOUNTS, BUSINESS, PROJECT } from '../../../lib/finance-lab/business';
+import { GROUPS, LAB, inGroup, labHref } from '../../../lib/finance-lab/catalogue';
+import { defaultReport } from '../../../lib/finance-lab/registry';
+import '../../../styles/finance-lab.css';
+
+const c = await corpus();
+const subs = allSubtopics(c);
+const title = (code: string) => subs.find((x) => x.s.code === code)?.s.title ?? code;
+const result = Object.fromEntries(LAB.map((e) => [e.id, defaultReport(e.id).headline]));
+type Headline = { label: string; value: string; note?: string };
+const firstWord = (t?: string) => (t ?? '').split(' ')[0] ?? '';
+const LEDGER: Array<{ id: string; label: string; value: (h: Headline) => string; note: (h: Headline) => string }> = [
+  { id: 'break-even-quantity', label: 'Break-even', value: (h) => h.value.replace(/ a month$/, ''), note: () => 'a month, to cover every cost' },
+  { id: 'margin-of-safety', label: 'Margin of safety', value: (h) => firstWord(h.note), note: (h) => `of forecast sales: ${h.value}` },
+  { id: 'gross-profit-margin', label: `Gross profit margin, ${ACCOUNTS.labels.latest}`, value: (h) => h.value, note: (h) => h.note ?? '' },
+  { id: 'current-ratio', label: `Current ratio, ${ACCOUNTS.labels.latest}`, value: (h) => h.value, note: (h) => h.note ?? '' },
+  { id: 'cash-flow-forecast', label: 'Lowest cash balance, next six months', value: (h) => h.value, note: (h) => h.note ?? '' },
+  { id: 'net-present-value', label: 'NPV of a new packaging line', value: (h) => h.value, note: (h) => `at ${PROJECT.rate}%: ${h.note ?? ''}` },
+];
+const SOURCE = { sheet: 'Formula sheet', standard: 'Standard formula', layout: 'Guide layout' } as const;
+const counts = { all: LAB.length, hl: LAB.filter((e) => e.level === 'HL').length };
+---
+
+<BaseLayout
+  title="Financial Laboratory"
+  description="Twenty finance calculators for IB Business Management: break-even, profit and loss, ratios, cash flow, budgets and investment appraisal, each with the formula, the working, a chart and what the result means."
+  section="finance-desk"
+  room="finance"
+>
+  <div class="wrap">
+    <header class="fl-head fl-head--index">
+      <Breadcrumbs trail={[{ label: 'Finance Desk', href: '/finance-desk/' }, { label: 'Financial Laboratory' }]} />
+      <p class="label label--ink fl-head__kicker">Finance Desk</p>
+      <h1>The Financial Laboratory</h1>
+      <p class="lead fl-head__q">
+        {counts.all} calculators for the finance and break-even content of IB Business Management. Enter your own figures, or start from {BUSINESS.name}, a fictional coffee
+        roaster: every result shows the formula in the guide’s notation, the working step by step, a chart, what the number means and what a manager might do about it.
+      </p>
+    </header>
+  </div>
+
+  <div class="wrap page-body fl-page">
+    <section class="fl-ledger" aria-labelledby="ledger-h">
+      <header class="fl-ledger__head">
+        <h2 class="fl-ledger__title" id="ledger-h">{BUSINESS.name} at a glance</h2>
+        <p class="fl-ledger__note small">
+          <span class="tag tag--simulated">Simulated data</span> A fictional business; every calculator starts from its figures, and every figure below is worked by the calculator it links
+          to.
+        </p>
+      </header>
+      <ul class="fl-ledger__grid" role="list">
+        {
+          LEDGER.map((l) => (
+            <li class="fl-ledger__cell">
+              <a class="fl-ledger__link" href={labHref(l.id)}>
+                <span class="fl-ledger__label">{l.label}</span>
+                <span class="fl-ledger__value">{result[l.id] ? l.value(result[l.id] as Headline) : ''}</span>
+                <span class="fl-ledger__sub">{result[l.id] ? l.note(result[l.id] as Headline) : ''}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="fl-key" aria-labelledby="key-h">
+      <h2 class="label label--ink" id="key-h">How each calculator is labelled</h2>
+      <dl class="fl-key__list">
+        <div>
+          <dt><span class="tag tag--ib">IB 3.5</span></dt>
+          <dd>The subtopic of the IB guide the calculation belongs to, checked against the guide’s content statements.</dd>
+        </div>
+        <div>
+          <dt><span class="tag tag--hl">HL only</span></dt>
+          <dd>Higher level content: {counts.hl} of the calculators, and the HL parts of others.</dd>
+        </div>
+        <div>
+          <dt><span class="tag tag--enrichment">Enrichment</span></dt>
+          <dd>Useful, but beyond the syllabus: margin of safety in value, the internal rate of return, contribution as a share of the price.</dd>
+        </div>
+        <div>
+          <dt><span class="tag tag--plain">Formula sheet</span></dt>
+          <dd>The formula is printed on the guide’s formula sheet (pp. 64 to 65); a standard formula is one the sheet does not list.</dd>
+        </div>
+      </dl>
+    </section>
+
+    <LevelSwitch id="lvl-lab" />
+
+    {
+      GROUPS.map((g, gi) => {
+        const items = inGroup(g.id);
+        const hasHl = items.some((e) => e.level === 'HL');
+        return (
+          <section class="fl-group" aria-labelledby={`grp-${g.id}`}>
+            <SectionHead no={gi + 1} title={g.name} dek={g.dek} id={`grp-${g.id}`} />
+            <p class="fl-group__subs small">
+              {g.subtopics.map((code, k) => (
+                <>
+                  {k > 0 && ' · '}
+                  <a href={subtopicHref(c, code)}>
+                    {code} {title(code)}
+                  </a>
+                </>
+              ))}
+            </p>
+            <ol class="fl-rows" role="list">
+              {items.map((e) => (
+                <li class="fl-row" data-level={e.level === 'HL' ? 'HL' : undefined}>
+                  <span class="fl-row__code">{e.subtopic}</span>
+                  <div class="fl-row__main">
+                    <h3 class="fl-row__name">
+                      <a href={labHref(e.id)}>{e.name}</a>
+                    </h3>
+                    <p class="fl-row__q">{e.question}</p>
+                  </div>
+                  <div class="fl-row__result">
+                    <span class="fl-row__label">Example</span>
+                    <span class="fl-row__value">{result[e.id]?.value}</span>
+                  </div>
+                  <div class="fl-row__tags">
+                    <span class={`tag ${e.level === 'HL' ? 'tag--hl' : 'tag--sl'}`}>{e.level === 'HL' ? 'HL only' : 'SL and HL'}</span>
+                    <span class="tag tag--plain">{SOURCE[e.source]}</span>
+                  </div>
+                </li>
+              ))}
+            </ol>
+            {hasHl && (
+              <p class="hl-notice">
+                <span class="tag tag--hl">HL</span> HL-only calculators in this group are hidden while you are viewing SL content. Switch to HL above to see them.
+              </p>
+            )}
+          </section>
+        );
+      })
+    }
+
+    <aside class="callout callout--framework fl-method">
+      <span class="callout__kicker">How the laboratory works</span>
+      <div class="prose">
+        <p>
+          Every calculator uses the platform’s one set of tested finance functions, the same ones behind the Finance Desk’s case workspaces, the worked examples and the
+          practice answers, so a result here always agrees with the rest of the site. Results update as you type; each page also shows the formula, the working, a chart
+          with its data, a sensitivity table and what the result means. Your figures stay in this browser: nothing is sent anywhere, and you can download them as a CSV
+          file or print the page.
+        </p>
+        <p>
+          The <a href="/finance-desk/">Finance Desk</a> works the same ideas on fictional cases, and the <a href="/resources/formula-sheet/">formula sheet</a> has every
+          formula on one page.
+        </p>
+      </div>
+    </aside>
+  </div>
+</BaseLayout>

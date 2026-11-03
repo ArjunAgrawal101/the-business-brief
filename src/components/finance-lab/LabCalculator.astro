@@ -1,0 +1,288 @@
+---
+/**
+ * One calculator of the Financial Laboratory: the inputs and the result side
+ * by side, then the formula in the guide's notation with the working in
+ * eight parts, a chart with its data table, a sensitivity panel, what the
+ * result means and what a manager might do, and where to learn more. The
+ * whole page is rendered from the example figures on the server; the family's
+ * script makes it live.
+ */
+import Breadcrumbs from '../layout/Breadcrumbs.astro';
+import SectionHead from '../layout/SectionHead.astro';
+import LevelSwitch from '../ui/LevelSwitch.astro';
+import LabInputs from './LabInputs.astro';
+import BreakEvenScript from './scripts/BreakEvenScript.astro';
+import RatiosScript from './scripts/RatiosScript.astro';
+import StatementScript from './scripts/StatementScript.astro';
+import CashScript from './scripts/CashScript.astro';
+import BudgetScript from './scripts/BudgetScript.astro';
+import InvestmentScript from './scripts/InvestmentScript.astro';
+import { corpus, href } from '../../lib/content';
+import { noteFor, subtopicHref, allSubtopics } from '../../lib/learning';
+import { BUSINESS } from '../../lib/finance-lab/business';
+import { GROUPS, LAB, labEntry, labHref } from '../../lib/finance-lab/catalogue';
+import { FORMULAS } from '../../lib/finance-lab/formulas';
+import { OPTIONS_NOTE } from '../../lib/finance-lab/breakeven';
+import { defaultReport } from '../../lib/finance-lab/registry';
+import { formulaHtml, regionsHtml } from '../../lib/finance-lab/render';
+import '../../styles/finance-lab.css';
+
+interface Props {
+  id: string;
+}
+const { id } = Astro.props;
+const e = labEntry(id);
+const group = GROUPS.find((g) => g.id === e.group);
+const c = await corpus();
+const report = defaultReport(id);
+const html = regionsHtml(report, e.name);
+const formulas = FORMULAS[id] ?? [];
+const uid = `fl-${id}`;
+const sub = allSubtopics(c).find((x) => x.s.code === e.subtopic)?.s;
+const notes = noteFor(c, e.subtopic);
+const subHref = subtopicHref(c, e.subtopic);
+const register = e.register ? c.calculations[e.register] : undefined;
+const at = LAB.findIndex((x) => x.id === id);
+const prev = at > 0 ? LAB[at - 1] : undefined;
+const next = at < LAB.length - 1 ? LAB[at + 1] : undefined;
+const siblings = LAB.filter((x) => x.group === e.group && x.id !== id);
+const wide = e.family === 'cash' || e.family === 'budget';
+const linkable = e.family !== 'cash' && e.family !== 'budget';
+// Figures travel between calculators only where they share all their inputs: the break-even group and the investment group.
+const carries = (s: (typeof LAB)[number]) => linkable && s.family === e.family && (e.family === 'breakeven' || e.family === 'investment');
+const hlParts = e.level !== 'HL' && (formulas.some((f) => f.scope === 'hl') || report.figures.some((f) => f.scope === 'hl'));
+const SOURCE: Record<typeof e.source, string> = {
+  sheet: 'Formula as on the guide’s formula sheet',
+  standard: 'Standard formula: not on the formula sheet',
+  layout: 'Layout of the guide’s financial statements',
+};
+const EXTRA_TITLE: Record<string, string> = { statement: 'The statement', cash: 'The forecast', budget: 'The budget' };
+---
+
+<div class="wrap">
+  <header class="fl-head">
+    <Breadcrumbs trail={[{ label: 'Finance Desk', href: '/finance-desk/' }, { label: 'Financial Laboratory', href: '/finance-desk/lab/' }, { label: e.name }]} />
+    <p class="label label--ink fl-head__kicker">Financial Laboratory · {group?.name}</p>
+    <h1>{e.name}</h1>
+    <p class="lead fl-head__q">{e.question}</p>
+    <ul class="fl-scope" role="list">
+      <li>
+        <span class="tag tag--ib">IB {e.subtopic}</span>
+        <span class="fl-scope__text">{sub?.title}</span>
+      </li>
+      <li>
+        <span class={`tag ${e.level === 'HL' ? 'tag--hl' : 'tag--sl'}`}>{e.level === 'HL' ? 'HL only' : 'SL and HL'}</span>
+      </li>
+      <li><span class="tag tag--plain">{SOURCE[e.source]}</span></li>
+      <li>
+        <span class="tag tag--simulated">Simulated data</span>
+        <span class="fl-scope__text">Example: {BUSINESS.name}, fictional</span>
+      </li>
+    </ul>
+    <p class="fl-head__note small">{e.scopeNote ? `${e.sourceNote} ${e.scopeNote}` : e.sourceNote}</p>
+  </header>
+</div>
+
+<div class="wrap page-body fl-page">
+  {
+    e.level === 'HL' && (
+      <aside class="callout callout--note fl-hlnote">
+        <span class="callout__kicker">HL only</span>
+        <p>
+          {e.name} belongs to the HL course: subtopic {e.subtopic}, {sub?.title}, in the Business management guide. SL students do not need it, though the reasoning is worth
+          knowing.
+        </p>
+      </aside>
+    )
+  }
+  {hlParts && <LevelSwitch id={`lvl-${id}`} />}
+
+  <div class:list={['fl', { 'fl--wide': wide }]} data-ix="finance-lab" data-family={e.family} data-calc={id} data-name={e.name} id="calculator">
+    <section class="fl-desk" aria-labelledby={`${uid}-desk`}>
+      <header class="fl-desk__bar">
+        <h2 class="fl-desk__title" id={`${uid}-desk`}>The calculator</h2>
+        <p class="fl-source" data-source>Example figures: {BUSINESS.name}, a fictional business. Simulated data.</p>
+      </header>
+      <p class="state state--error fl-broken" data-error hidden>The calculator could not start. The worked example below uses the example figures.</p>
+      <div class="fl-desk__grid">
+        <div class="fl-desk__inputs">
+          <LabInputs id={id} family={e.family} uid={uid} />
+          <div class="fl-given nojs-only">
+            <p class="label label--ink">The figures</p>
+            <dl class="fl-given__list" data-region="given" set:html={html.given} />
+            <p class="small fl-given__note">Changing these figures needs JavaScript. With it switched off, the page shows the full worked example for the figures above.</p>
+          </div>
+          <div class="fl-tools js-only" role="group" aria-label="Your figures">
+            <button type="button" class="btn btn--small" data-act="reset">Reset to the example</button>
+            <button type="button" class="btn btn--small" data-act="csv">Download CSV</button>
+            <button type="button" class="btn btn--small" data-act="print">Print</button>
+            {
+              linkable && (
+                <button type="button" class="btn btn--small" data-act="link">
+                  Copy a link to these figures
+                </button>
+              )
+            }
+            {linkable && <input class="input fl-link" type="text" readonly hidden data-link-out aria-label="A link to these figures" />}
+          </div>
+        </div>
+        <div class="fl-desk__results">
+          <p class="label label--ink" id={`${uid}-result`}>Result</p>
+          <p class="fl-paused">These results are for the last complete figures. Correct the figure marked in the inputs to update them.</p>
+          <div class="fl-hero" data-region="headline" set:html={html.headline} />
+          {
+            e.family === 'statement' && (
+              <div class="fl-extra fl-extra--inline" data-region="extra" set:html={html.extra} />
+            )
+          }
+          <dl class="figs fl-figs" data-region="figures" aria-labelledby={`${uid}-result`} set:html={html.figures} />
+        </div>
+      </div>
+      {
+        wide && (
+          <div class="fl-extra" aria-labelledby={`${uid}-extra`}>
+            <p class="label label--ink" id={`${uid}-extra`}>
+              {EXTRA_TITLE[e.family]}
+            </p>
+            <div data-region="extra" set:html={html.extra} />
+          </div>
+        )
+      }
+      <p class="sr-only" aria-live="polite" data-status></p>
+    </section>
+
+    <section aria-labelledby={`${uid}-f`}>
+      <SectionHead no={1} title="The formula and the working" dek="Each formula in the guide’s words, then the working with the figures above, step by step." id={`${uid}-f`} />
+      <div class="fl-formulas">
+        <Fragment set:html={formulas.map(formulaHtml).join('')} />
+      </div>
+      {hlParts && <p class="hl-notice"><span class="tag tag--hl">HL</span> The degree of operating leverage is HL (5.6) and is hidden in the SL view.</p>}
+      <div class="fl-workings" data-region="workings" set:html={html.workings} />
+    </section>
+
+    {
+      report.chart && (
+        <section aria-labelledby={`${uid}-c`}>
+          <SectionHead no={2} title="The chart" dek="Drawn from the figures above, with every value also in a table." id={`${uid}-c`} />
+          <div data-region="chart" set:html={html.chart} />
+        </section>
+      )
+    }
+
+    {
+      report.sensitivity && (
+        <section aria-labelledby={`${uid}-s`}>
+          <SectionHead no={report.chart ? 3 : 2} title={report.sensitivity.title} id={`${uid}-s`} />
+          <div class="fl-sens" data-region="sensitivity" set:html={html.sensitivity} />
+        </section>
+      )
+    }
+
+    <section aria-labelledby={`${uid}-i`}>
+      <SectionHead no={2 + (report.chart ? 1 : 0) + (report.sensitivity ? 1 : 0)} title="What it means" dek="For the figures above: the reading, the comparisons that give it meaning, and what a manager might do." id={`${uid}-i`} />
+      <div class="fl-read">
+        <section class="fl-read__part" aria-labelledby={`${uid}-i1`}>
+          <h3 class="fl-read__h" id={`${uid}-i1`}>What the number means</h3>
+          <div data-region="meaning" set:html={html.meaning} />
+        </section>
+        <section class="fl-read__part" aria-labelledby={`${uid}-i2`}>
+          <h3 class="fl-read__h" id={`${uid}-i2`}>What to compare it with</h3>
+          <div data-region="compare" set:html={html.compare} />
+        </section>
+        <section class="fl-read__part" aria-labelledby={`${uid}-i3`}>
+          <h3 class="fl-read__h" id={`${uid}-i3`}>Why benchmarks vary</h3>
+          <div data-region="benchmarks" set:html={html.benchmarks} />
+        </section>
+        <section class="fl-read__part fl-read__part--act" aria-labelledby={`${uid}-i4`}>
+          <h3 class="fl-read__h" id={`${uid}-i4`}>What a manager might do</h3>
+          <p class="fl-read__note small">{OPTIONS_NOTE}</p>
+          <div data-region="actions" set:html={html.actions} />
+        </section>
+      </div>
+    </section>
+  </div>
+
+  <section aria-labelledby={`${uid}-more`}>
+    <SectionHead no={3 + (report.chart ? 1 : 0) + (report.sensitivity ? 1 : 0)} title="Learn more" id={`${uid}-more`} />
+    <div class="fl-more">
+      <ul class="fl-more__links" role="list">
+        <li>
+          <span class="label">Notes</span>
+          <a href={subHref}>{e.subtopic} {sub?.title}</a>
+          <span class="small muted">{notes ? 'The full notes for the subtopic.' : 'The subtopic’s page: what the course asks, key terms and diagrams.'}</span>
+        </li>
+        <li>
+          <span class="label">Formula sheet</span>
+          <a href="/resources/formula-sheet/">The formula sheet</a>
+          <span class="small muted">The formulae the examination provides, and the ones to learn, on one printable page.</span>
+        </li>
+        <li>
+          <span class="label">On a case</span>
+          <a href={e.desk.href}>{e.desk.label}</a>
+          <span class="small muted">The same idea worked on a fictional case at the Finance Desk.</span>
+        </li>
+        {
+          register && e.register && (
+            <li>
+              <span class="label">Register</span>
+              <a href={href.calculation(e.register, register.page)}>{register.name}, worked on a case</a>
+              <span class="small muted">The calculation in eight parts, with the errors that cost marks.</span>
+            </li>
+          )
+        }
+      </ul>
+      {
+        siblings.length > 0 && (
+          <nav class="fl-more__group" aria-label={`Other calculators: ${group?.name}`}>
+            <p class="label label--ink">Also in {group?.name.toLowerCase()}</p>
+            <ul role="list">
+              {siblings.map((s) => (
+                <li>
+                  <a href={labHref(s.id)} data-carry={carries(s) ? labHref(s.id) : undefined}>
+                    {s.name}
+                  </a>
+                  {s.level === 'HL' && <span class="tag tag--hl">HL</span>}
+                </li>
+              ))}
+            </ul>
+            {siblings.some(carries) && <p class="small muted js-only">These calculators use the same inputs, so the links carry your figures with them.</p>}
+          </nav>
+        )
+      }
+    </div>
+  </section>
+
+  <nav class="fl-pager" aria-label="Calculators in order">
+    {
+      prev ? (
+        <a class="fl-pager__link" href={labHref(prev.id)} rel="prev">
+          <span class="label">Previous</span>
+          <span>{prev.name}</span>
+        </a>
+      ) : (
+        <span />
+      )
+    }
+    <a class="fl-pager__link fl-pager__index" href="/finance-desk/lab/">
+      <span class="label">The laboratory</span>
+      <span>All calculators</span>
+    </a>
+    {
+      next ? (
+        <a class="fl-pager__link fl-pager__next" href={labHref(next.id)} rel="next">
+          <span class="label">Next</span>
+          <span>{next.name}</span>
+        </a>
+      ) : (
+        <span />
+      )
+    }
+  </nav>
+</div>
+
+{e.family === 'breakeven' && <BreakEvenScript />}
+{e.family === 'ratios' && <RatiosScript />}
+{e.family === 'statement' && <StatementScript />}
+{e.family === 'cash' && <CashScript />}
+{e.family === 'budget' && <BudgetScript />}
+{e.family === 'investment' && <InvestmentScript />}

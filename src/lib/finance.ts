@@ -67,6 +67,28 @@ export function marginOfSafety(output: number, fixedCosts: number, price: number
   return beq === null ? null : output - beq;
 }
 
+/** Margin of safety as a percentage of actual or forecast output, or null when output is zero. */
+export function marginOfSafetyShare(output: number, marginUnits: number): number | null {
+  return output > 0 ? (marginUnits / output) * 100 : null;
+}
+
+/**
+ * Margin of safety in money: the margin in units times the selling price.
+ * Beyond the guide's list for 5.5 (enrichment); the units figure is the one
+ * the syllabus names.
+ */
+export const marginOfSafetyValue = (marginUnits: number, price: number): number => marginUnits * price;
+
+/**
+ * Degree of operating leverage = total contribution ÷ profit. The guide names
+ * operating leverage in 5.6 (HL) but gives no formula; this is the standard
+ * measure the platform's notes use. It is not meaningful at or below break-even,
+ * so the result is null when profit is zero or negative.
+ */
+export function operatingLeverage(totalContributionValue: number, profitValue: number): number | null {
+  return profitValue > 0 ? totalContributionValue / profitValue : null;
+}
+
 /** Output needed to earn a target profit, in whole units (rounded up). */
 export function targetProfitOutput(fixedCosts: number, targetProfit: number, price: number, variableCostPerUnit: number): number | null {
   const c = price - variableCostPerUnit;

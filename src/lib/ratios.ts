@@ -77,11 +77,23 @@ export interface Derived {
   capitalEmployed: number;
 }
 
-export function derive(s: Statement): Derived {
+/** The lines of a statement of profit or loss, in the guide's order (p. 59). */
+export type ProfitOrLossLines = Pick<Statement, 'salesRevenue' | 'costOfSales' | 'expenses' | 'interest' | 'tax' | 'dividends'>;
+
+/** The subtotals of a statement of profit or loss, each the line above less one deduction. */
+export function profitOrLoss(s: ProfitOrLossLines): Pick<Derived, 'grossProfit' | 'pbit' | 'profitBeforeTax' | 'profitForPeriod' | 'retainedProfit'> {
   const grossProfit = s.salesRevenue - s.costOfSales;
   const pbit = grossProfit - s.expenses;
   const profitBeforeTax = pbit - s.interest;
   const profitForPeriod = profitBeforeTax - s.tax;
+  return { grossProfit, pbit, profitBeforeTax, profitForPeriod, retainedProfit: profitForPeriod - s.dividends };
+}
+
+/** Cost of sales for a business that buys goods to resell: opening stock + purchases − closing stock. */
+export const costOfSalesFromStock = (openingStock: number, purchases: number, closingStock: number): number => openingStock + purchases - closingStock;
+
+export function derive(s: Statement): Derived {
+  const { grossProfit, pbit, profitBeforeTax, profitForPeriod, retainedProfit } = profitOrLoss(s);
   const nonCurrentAssets = s.propertyPlantEquipment - s.accumulatedDepreciation;
   const currentAssets = s.cash + s.debtors + s.stock;
   const currentLiabilities = s.bankOverdraft + s.tradeCreditors + s.otherShortTermLoans;
@@ -94,7 +106,7 @@ export function derive(s: Statement): Derived {
     pbit,
     profitBeforeTax,
     profitForPeriod,
-    retainedProfit: profitForPeriod - s.dividends,
+    retainedProfit,
     nonCurrentAssets,
     currentAssets,
     totalAssets,
