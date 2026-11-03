@@ -1,0 +1,75 @@
+# Market Studio: the product life cycle simulator. A fictional product
+# (Corner Brew's canned cold brew) and an illustrative model with simulated
+# assumptions. tests/unit/market-tools.test.ts pins the figures it produces:
+# profit turns positive in year 2, cash flow in year 3, and the cumulative cash
+# flow pays back everything spent in year 5, after a peak need of $54,725.
+component: plc-simulator
+title: Product life cycle simulator
+purpose: >
+  The learner sets a product's launch sales, peak, the length of growth and maturity, the rate of decline, its
+  costs, its capital spending and the cash tied up in stock and credit, then adds extension strategies in a chosen
+  year. Sales, profit, net cash flow and cumulative cash flow are recalculated for each stage, with two charts and a
+  table. It diagnoses treating profit and cash flow as the same thing, expecting a new product to pay its way from
+  launch, and treating an extension strategy as a cure rather than a delay.
+provenance: simulated-data
+syllabus: ['4.5']
+page: /market-studio/product-life-cycle/
+guide:
+  lead: >
+    A product uses cash before it earns any. Follow one through development, introduction, growth, maturity and
+    decline, see when profit turns positive, when cash flow follows and when everything spent has been paid back,
+    then try extension strategies in maturity and see what they add, and for how long.
+  use:
+    - Set the price, the variable cost per unit and the costs of developing and launching the product.
+    - Shape the life cycle with the launch sales, the peak, the years of growth and maturity, and the rate of decline.
+    - Read the stage of each year against its profit, its net cash flow and the cumulative cash flow. The lowest point of the cumulative line is the most cash the product needs.
+    - Choose extension strategies and the year they start, change their assumptions, and compare the profit and cash they add with what they cost.
+  limits:
+    - An illustrative model. Real sales do not follow a smooth curve, and nobody knows in advance how long a stage will last.
+    - The effects of the extension strategies are assumptions you set, not predictions. Several strategies together simply add their uplifts.
+    - Profit here ignores tax and interest, and cash flow is counted once a year, so it hides shortfalls within a year.
+  status: syllabus
+  serves:
+    - { code: '4.5', statement: 'Product: the product life cycle, investment, profit and cash flow' }
+    - { code: '4.5', statement: 'Product: extension strategies' }
+    - { code: '4.5', statement: 'Product: the product life cycle, the product portfolio and the marketing mix' }
+  beyond:
+    - The sales curve and every strategy's effect are the platform's illustrative model, not a method from the guide. Depreciation (straight line) and working capital are as in unit 3.
+  related:
+    - { label: 'The product life cycle in the 4.5 notes', href: /topics/the-seven-ps-of-the-marketing-mix/#product-life-cycle }
+    - { label: Extension strategies, href: /topics/the-seven-ps-of-the-marketing-mix/#extension-strategies }
+    - { label: 'Cash flow (3.7)', href: /topics/cash-flow/ }
+    - { label: The cash flow lab, href: /finance-desk/cash-flow/ }
+  terms: [product-life-cycle, extension-strategy, product-portfolio, cash-flow, net-cash-flow, working-capital, depreciation]
+  example: >
+    Corner Brew, the fictional café of the 4.2 notes, plans to sell its cold brew in cans through the café and local
+    delis. Every figure is a simulated assumption. In the worked example a new version, an oat-milk cold brew latte,
+    is launched in the last year of maturity.
+  exampleTitle: "Corner Brew's canned cold brew"
+state:
+  product: Corner Brew canned cold brew
+  currency: $
+  unit: cans
+  price: 3.5
+  variableCost: 1.3
+  development: 18000
+  launchPromotion: 10000
+  fixedCosts: 16000
+  promotion: { growth: 10, maturity: 4, decline: 2 }
+  capex: { year: 2, amount: 24000, life: 6 }
+  workingCapital: 12
+  launch: 3600
+  peak: 24000
+  growthYears: 3
+  maturityYears: 3
+  decline: 20
+  horizon: 10
+  extensionYear: 7
+  priceCut: { price: 10, units: 15 }
+  extensions:
+    - { id: new-market, on: false, detail: Sold through cafés in the next town by a distributor, uplift: 25, fade: 5, cost: 4800 }
+    - { id: new-version, on: true, detail: An oat-milk cold brew latte, uplift: 20, fade: 4, cost: 6000 }
+    - { id: packaging, on: false, detail: Four-can multipacks, uplift: 8, fade: 2, cost: 1600 }
+    - { id: promotion, on: false, detail: An online subscription with home delivery, uplift: 12, fade: 3, cost: 2400 }
+    - { id: new-uses, on: false, detail: Sold to bars as a mixer for coffee cocktails, uplift: 10, fade: 2, cost: 1200 }
+    - { id: price-cut, on: false, detail: 10% off the price, uplift: 0, fade: 0, cost: 0 }

@@ -11,6 +11,7 @@ import type { AssessmentComponent, Block, Calculation, CaseEntry, Claim, Command
 import { topoOrder } from './plan';
 import { buildWorking, workings } from './finance';
 import { checkStudioInteractives } from './integrity-studio';
+import { checkMarketTools } from './integrity-market';
 import { checkLearning } from './integrity-learning';
 import { checkCases } from './integrity-cases';
 import { applyAdjustments, balances, derive, type Statement } from './ratios';
@@ -293,6 +294,7 @@ export function checkIntegrity(c: Corpus): Problem[] {
     }
   }
   problems.push(...checkStudioInteractives(c.interactives));
+  problems.push(...checkMarketTools(c));
   problems.push(...checkLearning(c));
   problems.push(...checkCases(c));
 

@@ -1,0 +1,194 @@
+---
+/**
+ * Market Studio: the market metrics calculators (4.1, with customer lifetime
+ * value as enrichment). The worked example is rendered on the server from
+ * src/lib/market-metrics.ts; src/scripts/market/metrics.ts recalculates
+ * everything from the same functions as the reader edits.
+ */
+import ToolBar from './ToolBar.astro';
+import { growthReading, growthWorking, shareWorking } from '../../lib/market';
+import { marketShareSvg } from '../../lib/charts-studio';
+import { marketTableHtml } from '../../lib/render-studio';
+import { workingHtml } from '../../lib/render';
+import { esc, jsonForScript } from '../../lib/markup';
+import { metricsSummary, metricsView, clvWorking } from '../../lib/market-metrics';
+import { clvFiguresHtml, clvReadingHtml, clvRowsHtml, firmRowHtml, focusOptionsHtml, metricsFiguresHtml, metricsReading, relativeWorkingHtml } from '../../lib/market-metrics-view';
+import { numberField, selectField, textField } from '../../lib/market-view';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'market-metrics' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const s = data.state;
+const v = metricsView(s);
+const reading = metricsReading(v, s);
+const clv = clvReadingHtml(v.clv, s.symbol);
+const growth = growthReading(v.model);
+const config = { uid, slug: 'market-metrics', defaults: s };
+const sym = s.symbol || '$';
+---
+
+<div class="mk mk--metrics" data-ix="market-metrics" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The calculators could not start. The worked example below is complete.</p>
+  <ToolBar csv />
+
+  <section class="mk-part" aria-labelledby={`${uid}-share-h`}>
+    <h4 class="mk-part__h" id={`${uid}-share-h`}><span class="mk-part__no">A</span> Market share and market growth</h4>
+    <div class="mk-grid">
+      <form class="mk-form" data-form novalidate aria-label="The market and its sellers">
+        <fieldset class="mk-fieldset">
+          <legend class="label label--ink">The market</legend>
+          <div class="mk-fields">
+            <Fragment set:html={textField({ id: `${uid}-market`, f: 'market', label: 'What is the market?', value: s.market, max: 160, cls: 'mk-span-2' })} />
+            <Fragment set:html={selectField({ id: `${uid}-basis`, f: 'basis', label: 'Sales measured by', value: s.basis, options: [{ value: 'value', label: 'Value (money)' }, { value: 'volume', label: 'Volume (units)' }] })} />
+            <Fragment set:html={textField({ id: `${uid}-unit`, f: 'unit', label: 'Counted in', value: s.unit, max: 30, hint: 'For example dollars, cups or cars.' })} />
+            <Fragment set:html={textField({ id: `${uid}-symbol`, f: 'symbol', label: 'Currency symbol', value: s.symbol, max: 4, hint: 'Used for money, here and in the lifetime value.' })} />
+            <Fragment set:html={textField({ id: `${uid}-last`, f: 'last', label: 'Earlier period', value: s.periods.last, max: 20 })} />
+            <Fragment set:html={textField({ id: `${uid}-now`, f: 'now', label: 'Later period', value: s.periods.now, max: 20 })} />
+          </div>
+        </fieldset>
+        <fieldset class="mk-fieldset">
+          <legend class="label label--ink">Sales by seller</legend>
+          <div class="table-scroll" role="region" aria-label="Sales by seller" tabindex="0">
+            <table class="table mk-firms">
+              <thead>
+                <tr>
+                  <th scope="col">Seller</th>
+                  <th scope="col" class="n" data-head="last">{s.periods.last}</th>
+                  <th scope="col" class="n" data-head="now">{s.periods.now}</th>
+                  <th scope="col">Group</th>
+                  <th scope="col"><span class="sr-only">Remove</span></th>
+                </tr>
+              </thead>
+              <tbody data-rows set:html={s.firms.map((f, i) => firmRowHtml(f, uid, s, i + 1)).join('')} />
+            </table>
+          </div>
+          <p class="field__error" id={`${uid}-firms-err`} data-err-for="firms"></p>
+          <p class="cluster mk-add js-only"><button type="button" class="btn btn--small" data-add>Add a seller</button></p>
+          <div class="field mk-field">
+            <label for={`${uid}-focus`}>Business to focus on</label>
+            <select class="select" id={`${uid}-focus`} data-f="focus" aria-describedby={`${uid}-focus-err`}><Fragment set:html={focusOptionsHtml(s)} /></select>
+            <span class="field__error" id={`${uid}-focus-err`}></span>
+          </div>
+        </fieldset>
+      </form>
+
+      <div class="mk-results">
+        <h5 class="label label--ink">Results</h5>
+        <dl class="figs" data-figures set:html={metricsFiguresHtml(v, s)} />
+        <div class="bew__reading">
+          <p><strong>Reading.</strong> <span data-interp>{reading.reading}</span></p>
+          <p class="muted"><strong>Implication.</strong> <span data-impl>{reading.implication}</span></p>
+        </div>
+      </div>
+    </div>
+
+    <figure class="mk-figure">
+      <div class="chart-scroll" role="region" aria-label="Market share chart" tabindex="0" data-chart set:html={marketShareSvg(v.model, { id: `${uid}-chart`, focus: s.focus, periods: s.periods })} />
+      <figcaption class="exhibit__source"><b>Chart</b> Each seller's share of the market: the earlier period as an outlined bar, the later one solid, the focus business in blue. Redrawn from the sales above.</figcaption>
+      <details class="disclosure">
+        <summary>The chart's figures as a table</summary>
+        <div class="disclosure__body table-scroll" role="region" aria-label="Market share figures" tabindex="0">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Seller</th>
+                <th scope="col" class="n">Sales <span data-head="last">{s.periods.last}</span></th>
+                <th scope="col" class="n">Share <span data-head="last">{s.periods.last}</span></th>
+                <th scope="col" class="n">Sales <span data-head="now">{s.periods.now}</span></th>
+                <th scope="col" class="n">Share <span data-head="now">{s.periods.now}</span></th>
+                <th scope="col" class="n">Change in share (points)</th>
+                <th scope="col" class="n">Sales growth</th>
+                <th scope="col" class="n">Rank</th>
+              </tr>
+            </thead>
+            <tbody data-table set:html={marketTableHtml(v.model, s.focus)} />
+          </table>
+          <p class="small muted">Shares are rounded, so they may not add to exactly 100%. A group of many small sellers is counted in the market but not ranked.</p>
+        </div>
+      </details>
+    </figure>
+
+    <section class="bew__working" aria-labelledby={`${uid}-w1`}>
+      <h5 class="label label--ink" id={`${uid}-w1`}>The working: market share in the later period</h5>
+      <div data-working-share set:html={workingHtml(shareWorking(v.model, s.focus, s.periods.now, s.unit), esc(reading.reading), esc(reading.implication))} />
+    </section>
+    <details class="disclosure">
+      <summary>The working: market growth</summary>
+      <div class="disclosure__body" data-working-growth set:html={workingHtml(growthWorking(v.model, s.periods, s.unit), esc(growth.interpretation), esc(growth.implication))} />
+    </details>
+    <details class="disclosure">
+      <summary>The working: relative market share</summary>
+      <div class="disclosure__body" data-working-relative set:html={relativeWorkingHtml(v, s)} />
+    </details>
+    <aside class="callout callout--note mk-note">
+      <span class="callout__kicker">Standard definitions</span>
+      <div class="prose small">
+        <p>
+          <strong>Market share</strong> = the firm's sales ÷ total market sales × 100. <strong>Market growth</strong> = (sales this period − sales last period) ÷ sales last period × 100. Neither is on the guide's formula list (pp. 64 to 65); the teacher support material describes both and notes that share can be measured by value or by volume. The importance of market share and market leadership is HL content (AO3): the <a href="#ix-market-share-porto">case exercise below</a> asks the question.
+        </p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="mk-part" aria-labelledby={`${uid}-clv-h`}>
+    <h4 class="mk-part__h" id={`${uid}-clv-h`}><span class="mk-part__no">B</span> Customer lifetime value <span class="tag tag--enrichment">Enrichment</span></h4>
+    <p class="small muted mk-part__dek">Not in the IB guide. What one customer is worth over the years they keep buying, set against what it costs to win them.</p>
+    <div class="mk-grid">
+      <form class="mk-form" data-clv novalidate aria-label="Customer lifetime value inputs">
+        <div class="mk-fields">
+          <Fragment set:html={numberField({ id: `${uid}-clv-spend`, f: 'spend', label: 'Spend per visit', value: s.clv.spend, min: 0, step: '0.01', prefix: sym })} />
+          <Fragment set:html={numberField({ id: `${uid}-clv-visits`, f: 'visits', label: 'Visits a year', value: s.clv.visits, min: 0, step: '1' })} />
+          <Fragment set:html={numberField({ id: `${uid}-clv-margin`, f: 'margin', label: 'Gross margin', value: s.clv.margin, min: 0, max: 100, step: '0.1', suffix: '%' })} />
+          <Fragment set:html={numberField({ id: `${uid}-clv-retention`, f: 'retention', label: 'Customers still buying a year later', value: s.clv.retention, min: 0, max: 99, step: '1', suffix: '%' })} />
+          <Fragment set:html={numberField({ id: `${uid}-clv-discount`, f: 'discount', label: 'Discount rate a year', value: s.clv.discount, min: 0, max: 50, step: '0.5', suffix: '%' })} />
+          <Fragment set:html={numberField({ id: `${uid}-clv-cac`, f: 'cac', label: 'Cost of winning one customer', value: s.clv.cac, min: 0, step: '0.01', prefix: sym, hint: 'Here, what the campaign spends on winning customers, per regular it expects.' })} />
+        </div>
+      </form>
+      <div class="mk-results">
+        <dl class="figs" data-clv-figures set:html={clvFiguresHtml(v.clv, s.symbol)} />
+        <div class="bew__reading">
+          <p><strong>Reading.</strong> <span data-clv-interp>{clv.reading}</span></p>
+          <p class="muted"><strong>Implication.</strong> <span data-clv-impl>{clv.implication}</span></p>
+          <p class="small"><strong>Sensitivity.</strong> <span data-clv-sens>{clv.sensitivity}</span></p>
+        </div>
+      </div>
+    </div>
+    <details class="disclosure">
+      <summary>Year by year: how the value builds up</summary>
+      <div class="disclosure__body table-scroll" role="region" aria-label="Lifetime value year by year" tabindex="0">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Year</th>
+              <th scope="col" class="n">Still a customer</th>
+              <th scope="col" class="n">Expected margin</th>
+              <th scope="col" class="n">Discount factor</th>
+              <th scope="col" class="n">Present value</th>
+              <th scope="col" class="n">Running total</th>
+            </tr>
+          </thead>
+          <tbody data-clv-rows set:html={clvRowsHtml(v.clv, s.symbol)} />
+        </table>
+        <p class="small muted">The table stops at ten years; the formula adds every later year too, which is why the lifetime value is a little above the last running total.</p>
+      </div>
+    </details>
+    <details class="disclosure">
+      <summary>The working: customer lifetime value</summary>
+      <div class="disclosure__body" data-clv-working set:html={workingHtml(clvWorking(v.clv, s.symbol), esc(clv.reading), esc(clv.implication))} />
+    </details>
+  </section>
+
+  <details class="disclosure mk-summary" data-no-print>
+    <summary>The summary as text</summary>
+    <pre class="mk-pre" data-kit-summary>{metricsSummary(s)}</pre>
+  </details>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/market/metrics';
+</script>

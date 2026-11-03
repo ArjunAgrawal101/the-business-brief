@@ -1,0 +1,136 @@
+---
+/**
+ * Market Studio: the marketing mix builder (4.5). The consistency table and
+ * the checks for the worked example are rendered on the server from
+ * src/lib/market-mix.ts; src/scripts/market/mix.ts re-runs the same rules as
+ * the reader changes any choice.
+ */
+import ToolBar from './ToolBar.astro';
+import { jsonForScript } from '../../lib/markup';
+import { areaField, checksHtml, selectField, textField } from '../../lib/market-view';
+import { OPTIONS, PRICE_METHODS, PRICE_METHOD_LABELS, mixChecks, mixSummary } from '../../lib/market-mix';
+import { consistencyRowsHtml, mixTallyHtml } from '../../lib/market-mix-view';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'mix-builder' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const s = data.state;
+const config = { uid, slug: 'marketing-mix', defaults: s };
+const opts = (k: keyof typeof OPTIONS) => (OPTIONS[k] as ReadonlyArray<{ value: string; label: string }>).map((o) => ({ value: o.value, label: o.label }));
+const methods = PRICE_METHODS.map((m) => ({ value: m, label: PRICE_METHOD_LABELS[m].label }));
+const desc = (k: string, value: string, label: string) => areaField({ id: `${uid}-${k}-text`, f: `${k}-text`, label, value, rows: 3, max: 600, cls: 'mk-span-2' });
+const service = s.kind === 'service';
+---
+
+<div class="mk mk--mix" data-ix="mix" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The builder could not start. The worked example below is complete, with its checks.</p>
+  <ToolBar csv />
+
+  <form class="mk-form mk-form--stack" data-form novalidate aria-label="Marketing mix">
+    <section class="mk-part" aria-labelledby={`${uid}-offer-h`}>
+      <h4 class="mk-part__h" id={`${uid}-offer-h`}><span class="mk-part__no">A</span> The offer, the target and the position</h4>
+      <div class="mk-fields mk-fields--wide">
+        <Fragment set:html={textField({ id: `${uid}-business`, f: 'business', label: 'Business', value: s.business, max: 80 })} />
+        <Fragment set:html={textField({ id: `${uid}-offer`, f: 'offer', label: 'The product or service', value: s.offer, max: 160 })} />
+        <Fragment set:html={selectField({ id: `${uid}-kind`, f: 'kind', label: 'A good or a service?', value: s.kind, options: opts('kind') })} />
+        <Fragment set:html={selectField({ id: `${uid}-position`, f: 'position', label: 'The position you want', value: s.position, options: opts('position') })} />
+        <Fragment set:html={textField({ id: `${uid}-target`, f: 'target-name', label: 'Target segment', value: s.target.name, max: 120 })} />
+        <Fragment set:html={selectField({ id: `${uid}-sens`, f: 'target-sensitivity', label: 'How sensitive the target is to price', value: s.target.sensitivity, options: opts('sensitivity') })} />
+        <Fragment set:html={selectField({ id: `${uid}-size`, f: 'target-size', label: 'How large the target is', value: s.target.size, options: opts('size') })} />
+      </div>
+    </section>
+
+    <section class="mk-part" aria-labelledby={`${uid}-ps-h`}>
+      <h4 class="mk-part__h" id={`${uid}-ps-h`}><span class="mk-part__no">B</span> The Ps <span class="small muted" data-ps-count>{service ? 'Seven, for a service' : 'Four, for a good'}</span></h4>
+      <div class="mk-ps">
+        <fieldset class="mk-p">
+          <legend class="mk-p__name">Product</legend>
+          <div class="mk-fields">
+            <Fragment set:html={selectField({ id: `${uid}-quality`, f: 'product-quality', label: 'Quality and design', value: s.product.quality, options: opts('quality') })} />
+            <Fragment set:html={selectField({ id: `${uid}-range`, f: 'product-range', label: 'Range', value: s.product.range, options: opts('range') })} />
+            <Fragment set:html={desc('product', s.product.text, 'The product, in your words')} />
+          </div>
+        </fieldset>
+        <fieldset class="mk-p">
+          <legend class="mk-p__name">Price</legend>
+          <div class="mk-fields">
+            <Fragment set:html={selectField({ id: `${uid}-method`, f: 'price-method', label: 'Pricing method', value: s.price.method, options: methods, hint: 'Dynamic, competitive and contribution pricing are HL only.' })} />
+            <Fragment set:html={selectField({ id: `${uid}-level`, f: 'price-level', label: 'Price against rivals', value: s.price.level, options: opts('level') })} />
+            <Fragment set:html={desc('price', s.price.text, 'The price, in your words')} />
+          </div>
+        </fieldset>
+        <fieldset class="mk-p">
+          <legend class="mk-p__name">Promotion</legend>
+          <div class="mk-fields">
+            <Fragment set:html={selectField({ id: `${uid}-line`, f: 'promotion-line', label: 'The line', value: s.promotion.line, options: opts('line'), cls: 'mk-span-2' })} />
+            <Fragment set:html={desc('promotion', s.promotion.text, 'The promotion, in your words')} />
+          </div>
+        </fieldset>
+        <fieldset class="mk-p">
+          <legend class="mk-p__name">Place</legend>
+          <div class="mk-fields">
+            <Fragment set:html={selectField({ id: `${uid}-channel`, f: 'place-channel', label: 'Distribution channel', value: s.place.channel, options: opts('channel') })} />
+            <Fragment set:html={selectField({ id: `${uid}-coverage`, f: 'place-coverage', label: 'Coverage', value: s.place.coverage, options: opts('coverage') })} />
+            <Fragment set:html={desc('place', s.place.text, 'Where customers buy it, in your words')} />
+          </div>
+        </fieldset>
+        <fieldset class="mk-p mk-p--service" data-service-only hidden={!service}>
+          <legend class="mk-p__name">People</legend>
+          <div class="mk-fields">
+            <Fragment set:html={selectField({ id: `${uid}-service`, f: 'people-service', label: 'Service from staff', value: s.people.service, options: opts('service'), cls: 'mk-span-2' })} />
+            <Fragment set:html={desc('people', s.people.text, 'The people, in your words')} />
+          </div>
+        </fieldset>
+        <fieldset class="mk-p mk-p--service" data-service-only hidden={!service}>
+          <legend class="mk-p__name">Processes</legend>
+          <div class="mk-fields">
+            <Fragment set:html={selectField({ id: `${uid}-process`, f: 'processes-style', label: 'How the service is delivered', value: s.processes.style, options: opts('process'), cls: 'mk-span-2' })} />
+            <Fragment set:html={desc('processes', s.processes.text, 'The processes, in your words')} />
+          </div>
+        </fieldset>
+        <fieldset class="mk-p mk-p--service" data-service-only hidden={!service}>
+          <legend class="mk-p__name">Physical evidence</legend>
+          <div class="mk-fields">
+            <Fragment set:html={selectField({ id: `${uid}-evidence`, f: 'physical-standard', label: 'Premises and materials', value: s.physical.standard, options: opts('evidence'), cls: 'mk-span-2' })} />
+            <Fragment set:html={desc('physical', s.physical.text, 'The physical evidence, in your words')} />
+          </div>
+        </fieldset>
+      </div>
+    </section>
+  </form>
+
+  <section class="mk-part" aria-labelledby={`${uid}-fit-h`}>
+    <h4 class="mk-part__h" id={`${uid}-fit-h`}><span class="mk-part__no">C</span> Does the mix hold together?</h4>
+    <p class="mk-tally" data-tally set:html={mixTallyHtml(s)} />
+    <div class="table-scroll" role="region" aria-label="Consistency of the mix" tabindex="0">
+      <table class="table mk-consistency">
+        <caption class="sr-only">For each element of the mix, its choices and whether it is consistent with the target, the position and the other elements</caption>
+        <thead>
+          <tr>
+            <th scope="col">Element</th>
+            <th scope="col">Your choices</th>
+            <th scope="col">With the target</th>
+            <th scope="col">With the position</th>
+            <th scope="col">With the other Ps</th>
+          </tr>
+        </thead>
+        <tbody data-table set:html={consistencyRowsHtml(s)} />
+      </table>
+    </div>
+    <div data-checks set:html={checksHtml(mixChecks(s))} />
+  </section>
+
+  <details class="disclosure mk-summary" data-no-print>
+    <summary>The summary as text</summary>
+    <pre class="mk-pre" data-kit-summary>{mixSummary(s)}</pre>
+  </details>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/market/mix';
+</script>

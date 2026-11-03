@@ -20,6 +20,15 @@ import CashFlowLab from './CashFlowLab.astro';
 import CaseLab from './CaseLab.astro';
 import MarketShareWorkspace from './MarketShareWorkspace.astro';
 import PositionMap from './PositionMap.astro';
+import MarketMetrics from '../market/MarketMetrics.astro';
+import QuestionnaireBuilder from '../market/QuestionnaireBuilder.astro';
+import PersonaCreator from '../market/PersonaCreator.astro';
+import StpPlanner from '../market/StpPlanner.astro';
+import CompetitorMap from '../market/CompetitorMap.astro';
+import MixBuilder from '../market/MixBuilder.astro';
+import PlcSimulator from '../market/PlcSimulator.astro';
+import CampaignPlanner from '../market/CampaignPlanner.astro';
+import BudgetAllocator from '../market/BudgetAllocator.astro';
 import CapacityProductivity from './CapacityProductivity.astro';
 import StockControl from './StockControl.astro';
 import LocationScoring from './LocationScoring.astro';
@@ -71,6 +80,15 @@ const H = headingLevel === 2 ? 'h2' : 'h3';
     {data.component === 'case-lab' && <CaseLab data={data} uid={uid} />}
     {data.component === 'market-share-workspace' && <MarketShareWorkspace data={data} uid={uid} />}
     {data.component === 'position-map' && <PositionMap data={data} uid={uid} />}
+    {data.component === 'market-metrics' && <MarketMetrics data={data} uid={uid} />}
+    {data.component === 'questionnaire-builder' && <QuestionnaireBuilder data={data} uid={uid} />}
+    {data.component === 'persona-creator' && <PersonaCreator data={data} uid={uid} />}
+    {data.component === 'stp-planner' && <StpPlanner data={data} uid={uid} />}
+    {data.component === 'competitor-map' && <CompetitorMap data={data} uid={uid} />}
+    {data.component === 'mix-builder' && <MixBuilder data={data} uid={uid} />}
+    {data.component === 'plc-simulator' && <PlcSimulator data={data} uid={uid} />}
+    {data.component === 'campaign-planner' && <CampaignPlanner data={data} uid={uid} />}
+    {data.component === 'budget-allocator' && <BudgetAllocator data={data} uid={uid} />}
     {data.component === 'capacity-productivity' && <CapacityProductivity data={data} uid={uid} />}
     {data.component === 'stock-control' && <StockControl data={data} uid={uid} />}
     {data.component === 'location-scoring' && <LocationScoring data={data} uid={uid} />}

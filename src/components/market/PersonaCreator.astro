@@ -1,0 +1,85 @@
+---
+/**
+ * Market Studio: the customer persona creator (enrichment, applying 4.2 and
+ * 4.4). The card and the checks for the worked example are rendered on the
+ * server from src/lib/market-persona.ts; src/scripts/market/persona.ts redraws
+ * them as the reader edits.
+ */
+import ToolBar from './ToolBar.astro';
+import { jsonForScript } from '../../lib/markup';
+import { areaField, checksHtml, selectField, textField } from '../../lib/market-view';
+import { BASIS_LABELS, personaChecks, personaMarkdown } from '../../lib/market-persona';
+import { channelRowHtml, personaCardHtml } from '../../lib/market-persona-view';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'persona-creator' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const p = data.state;
+const config = { uid, slug: 'customer-persona', defaults: p };
+const lines = (k: 'needs' | 'pains' | 'behaviour' | 'objections' | 'winners', label: string, hint: string) =>
+  areaField({ id: `${uid}-${k}`, f: k, label, value: p[k].join('\n'), rows: 4, max: 1500, hint, cls: 'mk-span-2' });
+---
+
+<div class="mk mk--persona" data-ix="persona" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The creator could not start. The worked example's card below is complete.</p>
+  <ToolBar csv text="Download as text (.md)" />
+
+  <div class="mk-grid mk-grid--persona">
+    <form class="mk-form" data-form novalidate aria-label="The persona">
+      <fieldset class="mk-fieldset">
+        <legend class="label label--ink">Who they are</legend>
+        <div class="mk-fields">
+          <Fragment set:html={textField({ id: `${uid}-name`, f: 'name', label: 'Name', value: p.name, max: 60 })} />
+          <Fragment set:html={textField({ id: `${uid}-age`, f: 'age', label: 'Age', value: p.age, max: 30 })} />
+          <Fragment set:html={textField({ id: `${uid}-occupation`, f: 'occupation', label: 'Occupation', value: p.occupation, max: 120, cls: 'mk-span-2' })} />
+          <Fragment set:html={textField({ id: `${uid}-location`, f: 'location', label: 'Where they live or work', value: p.location, max: 120, cls: 'mk-span-2' })} />
+          <Fragment set:html={textField({ id: `${uid}-segment`, f: 'segment', label: 'Target segment', value: p.segment, max: 120, cls: 'mk-span-2', hint: 'The segment from your STP plan that this persona stands for.' })} />
+          <Fragment set:html={textField({ id: `${uid}-quote`, f: 'quote', label: 'A quote in their own words', value: p.quote, max: 300, cls: 'mk-span-2' })} />
+          <Fragment set:html={areaField({ id: `${uid}-background`, f: 'background', label: 'Background', value: p.background, rows: 3, max: 800, cls: 'mk-span-2' })} />
+        </div>
+      </fieldset>
+      <fieldset class="mk-fieldset">
+        <legend class="label label--ink">What they need, and what gets in the way</legend>
+        <div class="mk-fields">
+          <Fragment set:html={lines('needs', 'Needs and goals', 'One per line.')} />
+          <Fragment set:html={lines('pains', 'Pains and frustrations', 'One per line: what annoys them about what they use now.')} />
+          <Fragment set:html={lines('behaviour', 'How they buy', 'How often, where, how much, and who they listen to.')} />
+        </div>
+      </fieldset>
+      <fieldset class="mk-fieldset">
+        <legend class="label label--ink">Where to reach them</legend>
+        <div data-rows set:html={p.channels.map((c, i) => channelRowHtml(c, i, uid)).join('')} />
+        <p class="cluster mk-add js-only"><button type="button" class="btn btn--small" data-add>Add a channel</button></p>
+      </fieldset>
+      <fieldset class="mk-fieldset">
+        <legend class="label label--ink">Winning them, and the evidence</legend>
+        <div class="mk-fields">
+          <Fragment set:html={lines('objections', 'What might stop them buying', 'One per line.')} />
+          <Fragment set:html={lines('winners', 'What would win them', 'One per line: answers to their pains.')} />
+          <Fragment set:html={selectField({ id: `${uid}-basis`, f: 'basis', label: 'What the persona rests on', value: p.basis, options: (['research', 'mixed', 'assumption'] as const).map((b) => ({ value: b, label: BASIS_LABELS[b] })), cls: 'mk-span-2' })} />
+          <Fragment set:html={areaField({ id: `${uid}-evidence`, f: 'evidence', label: 'The evidence', value: p.evidence, rows: 3, max: 400, cls: 'mk-span-2', hint: 'Interviews, survey results, sales data: how many, when, and where.' })} />
+        </div>
+      </fieldset>
+    </form>
+    <div class="mk-results mk-results--sticky">
+      <h5 class="label label--ink">The persona card</h5>
+      <div data-card set:html={personaCardHtml(p)} />
+      <h5 class="label label--ink">Checks</h5>
+      <div data-checks set:html={checksHtml(personaChecks(p))} />
+    </div>
+  </div>
+
+  <details class="disclosure mk-summary" data-no-print>
+    <summary>The summary as text</summary>
+    <pre class="mk-pre" data-kit-summary>{personaMarkdown(p)}</pre>
+  </details>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/market/persona';
+</script>

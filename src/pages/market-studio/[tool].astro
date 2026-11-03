@@ -1,0 +1,152 @@
+---
+/**
+ * A Market Studio instrument's page: what it is for, how to use it, its
+ * limits and syllabus status, the instrument itself with its worked example,
+ * any case exercise that lives with it, and where to go next. One template
+ * for all nine; the content comes from each instrument's entry in
+ * src/content/interactives and the order from src/lib/market-tools.ts.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import Interactive from '../../components/interactive/Interactive.astro';
+import ToolBrief from '../../components/market/ToolBrief.astro';
+import LevelSwitch from '../../components/ui/LevelSwitch.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import { corpus } from '../../lib/content';
+import { rich, plain, inline } from '../../lib/markup';
+import { subtopicHref } from '../../lib/learning';
+import { MARKET_STAGES, MARKET_TOOLS, neighbours, toolHref, type MarketTool } from '../../lib/market-tools';
+import type { Interactive as InteractiveData } from '../../lib/schemas';
+import '../../styles/market.css';
+
+export function getStaticPaths() {
+  return MARKET_TOOLS.map((tool) => ({ params: { tool: tool.slug }, props: { tool } }));
+}
+
+interface Props {
+  tool: MarketTool;
+}
+const { tool } = Astro.props;
+const c = await corpus();
+const raw = c.interactives[tool.ix] as InteractiveData | undefined;
+if (!raw || !('guide' in raw)) throw new Error(`Market Studio: ${tool.ix} is not an instrument`);
+const it = raw;
+const index = MARKET_TOOLS.findIndex((t) => t.slug === tool.slug) + 1;
+const stage = MARKET_STAGES.find((s) => s.id === tool.stage);
+const { prev, next } = neighbours(tool.slug);
+const cases = (tool.cases ?? []).map((id) => [id, c.interactives[id]] as const).filter((x): x is readonly [string, InteractiveData] => Boolean(x[1]));
+const hasHL = Boolean(tool.hlNotice);
+const subtopics = it.syllabus.map((code) => ({ code, title: c.curricula['ib-dp-bm']?.units.flatMap((u) => u.subtopics).find((x) => x.code === code)?.title ?? code, href: subtopicHref(c, code) }));
+const CASE_INTRO: Record<string, { title: string; intro: string }> = {
+  'market-share-porto': {
+    title: 'Atelier Barro’s share of a growing market',
+    intro: 'A case exercise on a different fictional market: Atelier Barro sold more mugs this year than last. Did it gain ground? Work out its share in each year and the growth of the market before you trust the answer. The closing question, on the importance of market share and market leadership, is HL.',
+  },
+  'market-position-map-porto': {
+    title: 'Where Atelier Barro sits in customers’ minds',
+    intro: 'A case exercise with fixed survey data: choose two of four attributes for the axes, find the empty part of the map, and decide whether it is worth filling.',
+  },
+};
+let n = 0;
+const no = () => ++n;
+---
+
+<BaseLayout title={`${tool.name}: Market Studio`} description={plain(it.guide.lead)} section="market-studio" room="market">
+  <div class="wrap">
+    <header class="mk-head">
+      <Breadcrumbs trail={[{ label: 'All rooms', href: '/rooms/' }, { label: 'Market Studio', href: '/market-studio/' }, { label: tool.name }]} />
+      <p class="mk-head__kicker">
+        <span class="label label--ink">Market Studio · Instrument {String(index).padStart(2, '0')} of {MARKET_TOOLS.length}</span>
+        {stage && <span class="label">{stage.title}</span>}
+      </p>
+      <h1 class="mk-head__title">{it.title}</h1>
+      <div class="lead mk-head__lead" set:html={rich(it.guide.lead)} />
+      <p class="tags mk-head__tags">
+        <ProvenanceTag kind={it.provenance} />
+        {subtopics.map((s) => <a class="tag tag--plain" href={s.href}>{s.code} {s.title}</a>)}
+        <span class="tag tag--plain">Saved on this device only</span>
+      </p>
+    </header>
+  </div>
+
+  <div class="wrap page-body">
+    <section class="mk-brief-wrap" aria-label="About this instrument">
+      <ToolBrief it={it} idBase={`brief-${tool.slug}`} />
+    </section>
+
+    {hasHL && <LevelSwitch id={`lvl-${tool.slug}`} />}
+
+    <section aria-labelledby="mk-ws-h">
+      <SectionHead no={no()} title="The instrument" dek={it.guide.example} id="mk-ws-h" />
+      <div class="mk-ws">
+        <Interactive component={it.component} refId={tool.ix} title={`Worked example: ${it.guide.exampleTitle}`} provenance={it.provenance} headingLevel={3} />
+      </div>
+    </section>
+
+    {
+      cases.map(([id, ci]) => (
+        <section aria-labelledby={`mk-case-${id}`}>
+          <SectionHead no={no()} title="Case exercise: Atelier Barro" dek="The Porto hand-made mug market from the Case Room. Fixed, simulated data and feedback on your answer." id={`mk-case-${id}`} />
+          <div class="mk-ws">
+            <Interactive component={ci.component} refId={id} title={CASE_INTRO[id]?.title ?? ci.title} intro={CASE_INTRO[id]?.intro} provenance={ci.provenance} headingLevel={3} />
+          </div>
+        </section>
+      ))
+    }
+
+    {
+      hasHL && (
+        <p class="hl-notice">
+          <span class="tag tag--hl">HL</span> {tool.hlNotice}
+        </p>
+      )
+    }
+
+    <section aria-labelledby="mk-next-h">
+      <SectionHead no={no()} title="Read and practise" dek="The notes behind the instrument, and the next instrument in the plan." id="mk-next-h" />
+      <div class="mk-related">
+        <ul class="mk-related__list" role="list">
+          {
+            it.guide.related.map((r) => (
+              <li>
+                <a href={r.href} set:html={inline(r.label)} />
+              </li>
+            ))
+          }
+          {
+            subtopics.map((s) => (
+              <li>
+                <a href={s.href}>
+                  {s.code} {s.title}: the subtopic page
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <nav class="mk-pager" aria-label="Other instruments">
+          {
+            prev && (
+              <a class="mk-pager__link" href={toolHref(prev.slug)}>
+                <span class="label">Previous instrument</span>
+                <span class="mk-pager__name">{prev.name}</span>
+              </a>
+            )
+          }
+          <a class="mk-pager__link mk-pager__link--home" href="/market-studio/">
+            <span class="label">All nine</span>
+            <span class="mk-pager__name">The Market Studio</span>
+          </a>
+          {
+            next && (
+              <a class="mk-pager__link" href={toolHref(next.slug)}>
+                <span class="label">Next instrument</span>
+                <span class="mk-pager__name">{next.name}</span>
+              </a>
+            )
+          }
+        </nav>
+      </div>
+    </section>
+  </div>
+</BaseLayout>

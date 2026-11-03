@@ -1,0 +1,142 @@
+---
+/**
+ * Market Studio: the marketing campaign planner (4.2 and 4.5, with a Gantt
+ * chart from the HL toolkit). The worked example's figures, timeline, funnel
+ * and checks are rendered on the server from src/lib/market-campaign.ts;
+ * src/scripts/market/campaign.ts redraws them as the reader edits.
+ */
+import ToolBar from './ToolBar.astro';
+import { jsonForScript } from '../../lib/markup';
+import { areaField, checksHtml, numberField, textField } from '../../lib/market-view';
+import { campaignChecks, campaignSummary } from '../../lib/market-campaign';
+import { campaignFiguresHtml, channelRowHtml, funnelFiguresHtml, funnelFor, funnelRowsHtml, ganttFor, kpiRowHtml, taskRowHtml } from '../../lib/market-campaign-view';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'campaign-planner' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const s = data.state;
+const config = { uid, slug: 'campaign-planner', defaults: s };
+const cur = s.currency;
+---
+
+<div class="mk mk--campaign" data-ix="campaign" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The planner could not start. The worked example below is complete.</p>
+  <ToolBar csv />
+
+  <form class="mk-form mk-form--stack" data-form novalidate aria-label="Campaign plan">
+    <section class="mk-part" aria-labelledby={`${uid}-obj-h`}>
+      <h4 class="mk-part__h" id={`${uid}-obj-h`}><span class="mk-part__no">A</span> Objective, audience and message</h4>
+      <div class="mk-grid">
+        <div class="mk-fields">
+          <Fragment set:html={textField({ id: `${uid}-name`, f: 'name', label: 'Campaign name', value: s.name, max: 120, cls: 'mk-span-2' })} />
+          <Fragment set:html={textField({ id: `${uid}-metric`, f: 'metric', label: 'Objective: what will change', value: s.objective.metric, max: 120, cls: 'mk-span-2' })} />
+          <Fragment set:html={numberField({ id: `${uid}-baseline`, f: 'baseline', label: 'Starting figure', value: s.objective.baseline, min: 0, step: 'any' })} />
+          <Fragment set:html={numberField({ id: `${uid}-target`, f: 'target', label: 'Target', value: s.objective.target, min: 0, step: 'any' })} />
+          <Fragment set:html={textField({ id: `${uid}-unit`, f: 'unit', label: 'Unit', value: s.objective.unit, max: 30 })} />
+          <Fragment set:html={numberField({ id: `${uid}-weeks`, f: 'weeks', label: 'Deadline, in weeks', value: s.objective.weeks, min: 1, max: 104, step: '1' })} />
+          <Fragment set:html={areaField({ id: `${uid}-audience`, f: 'audience', label: 'Audience', value: s.audience, rows: 2, max: 300, cls: 'mk-span-2' })} />
+          <Fragment set:html={areaField({ id: `${uid}-insight`, f: 'insight', label: 'What you know about them that the message uses', value: s.insight, rows: 2, max: 400, cls: 'mk-span-2' })} />
+          <Fragment set:html={areaField({ id: `${uid}-proposition`, f: 'proposition', label: 'The message: what they get', value: s.message.proposition, rows: 2, max: 240, cls: 'mk-span-2' })} />
+          <Fragment set:html={textField({ id: `${uid}-proof`, f: 'proof', label: 'Because (a reason to believe it)', value: s.message.proof, max: 240, cls: 'mk-span-2' })} />
+          <Fragment set:html={textField({ id: `${uid}-action`, f: 'action', label: 'Call to action', value: s.message.action, max: 160, cls: 'mk-span-2' })} />
+          <Fragment set:html={numberField({ id: `${uid}-budget`, f: 'budget', label: 'Budget', value: s.budget, min: 0, step: '10', prefix: cur })} />
+        </div>
+        <div class="mk-results">
+          <h5 class="label label--ink">The plan at a glance</h5>
+          <dl class="figs mk-figs--compact" data-figures set:html={campaignFiguresHtml(s)} />
+        </div>
+      </div>
+    </section>
+
+    <section class="mk-part" aria-labelledby={`${uid}-ch-h`}>
+      <h4 class="mk-part__h" id={`${uid}-ch-h`}><span class="mk-part__no">B</span> Channels, tasks and timeline</h4>
+      <div class="table-scroll" role="region" aria-label="Channels" tabindex="0">
+        <table class="table mk-edit-table">
+          <caption class="mk-caption">Channels</caption>
+          <thead>
+            <tr><th scope="col">Channel</th><th scope="col">Line</th><th scope="col">Role</th><th scope="col" class="n">Cost</th><th scope="col" class="n">From week</th><th scope="col" class="n">To week</th><th scope="col"><span class="sr-only">Remove</span></th></tr>
+          </thead>
+          <tbody data-channels set:html={s.channels.map((c, i) => channelRowHtml(c, i, uid, s)).join('')} />
+        </table>
+      </div>
+      <p class="cluster mk-add js-only"><button type="button" class="btn btn--small" data-add-channel>Add a channel</button></p>
+      <div class="table-scroll" role="region" aria-label="Other tasks" tabindex="0">
+        <table class="table mk-edit-table">
+          <caption class="mk-caption">Other tasks</caption>
+          <thead>
+            <tr><th scope="col">Task</th><th scope="col" class="n">Cost</th><th scope="col" class="n">From week</th><th scope="col" class="n">To week</th><th scope="col"><span class="sr-only">Remove</span></th></tr>
+          </thead>
+          <tbody data-tasks set:html={s.tasks.map((t, i) => taskRowHtml(t, i, uid, s)).join('')} />
+        </table>
+      </div>
+      <p class="cluster mk-add js-only"><button type="button" class="btn btn--small" data-add-task>Add a task</button></p>
+      <figure class="mk-figure">
+        <div class="chart-scroll" role="region" aria-label="Campaign timeline" tabindex="0" data-gantt set:html={ganttFor(s, `${uid}-gantt`)} />
+        <figcaption class="exhibit__source"><b>Gantt chart</b> Channels are solid blue bars and other tasks hatched; dashed gold lines mark KPI reviews, and the red line the deadline. The Gantt chart is an HL toolkit tool; at SL, read it as a timeline.</figcaption>
+      </figure>
+    </section>
+
+    <section class="mk-part" aria-labelledby={`${uid}-kpi-h`}>
+      <h4 class="mk-part__h" id={`${uid}-kpi-h`}><span class="mk-part__no">C</span> Key performance indicators</h4>
+      <div class="table-scroll" role="region" aria-label="Key performance indicators" tabindex="0">
+        <table class="table mk-edit-table">
+          <thead>
+            <tr><th scope="col">What is measured</th><th scope="col">Stage</th><th scope="col">Measures the objective</th><th scope="col" class="n">Start</th><th scope="col" class="n">Target</th><th scope="col">Unit</th><th scope="col">Reviewed</th><th scope="col"><span class="sr-only">Remove</span></th></tr>
+          </thead>
+          <tbody data-kpis set:html={s.kpis.map((k, i) => kpiRowHtml(k, i, uid)).join('')} />
+        </table>
+      </div>
+      <p class="cluster mk-add js-only"><button type="button" class="btn btn--small" data-add-kpi>Add a KPI</button></p>
+    </section>
+
+    <section class="mk-part" aria-labelledby={`${uid}-fun-h`}>
+      <h4 class="mk-part__h" id={`${uid}-fun-h`}><span class="mk-part__no">D</span> Funnel estimate</h4>
+      <p class="small muted mk-part__dek">Your own arithmetic on your own assumptions: a way to see which assumption the result depends on, not a forecast.</p>
+      <div class="mk-grid">
+        <div class="mk-fields">
+          <Fragment set:html={numberField({ id: `${uid}-reach`, f: 'f-reach', label: 'People reached', value: s.funnel.reach, min: 0, step: '10' })} />
+          <Fragment set:html={numberField({ id: `${uid}-aware`, f: 'f-aware', label: 'Notice the campaign', value: s.funnel.aware, min: 0, max: 100, step: '1', suffix: '%' })} />
+          <Fragment set:html={numberField({ id: `${uid}-trial`, f: 'f-trial', label: 'Of those, try it', value: s.funnel.trial, min: 0, max: 100, step: '1', suffix: '%' })} />
+          <Fragment set:html={numberField({ id: `${uid}-repeat`, f: 'f-repeat', label: 'Of those, come back as regulars', value: s.funnel.repeat, min: 0, max: 100, step: '1', suffix: '%' })} />
+          <Fragment set:html={numberField({ id: `${uid}-visits`, f: 'f-visits', label: 'Visits a week per regular', value: s.funnel.visits, min: 0, step: '0.1' })} />
+          <Fragment set:html={numberField({ id: `${uid}-spend`, f: 'f-spend', label: 'Spend per visit', value: s.funnel.spend, min: 0, step: '0.01', prefix: cur })} />
+        </div>
+        <div class="mk-results">
+          <figure class="mk-figure mk-figure--funnel">
+            <div class="chart-scroll" role="region" aria-label="Funnel estimate" tabindex="0" data-funnel set:html={funnelFor(s, `${uid}-funnel`)} />
+            <figcaption class="exhibit__source"><b>Funnel</b> Bar widths are to scale; each number is printed beside its bar.</figcaption>
+            <details class="disclosure">
+              <summary>The funnel's figures as a table</summary>
+              <div class="disclosure__body table-scroll" role="region" aria-label="Funnel figures" tabindex="0">
+                <table class="table">
+                  <thead><tr><th scope="col">Stage</th><th scope="col" class="n">People</th><th scope="col">How it is worked out</th></tr></thead>
+                  <tbody data-funnel-rows set:html={funnelRowsHtml(s)} />
+                </table>
+              </div>
+            </details>
+          </figure>
+          <dl class="figs mk-figs--compact" data-funnel-figures set:html={funnelFiguresHtml(s)} />
+        </div>
+      </div>
+    </section>
+  </form>
+
+  <section class="mk-part" aria-labelledby={`${uid}-chk-h`}>
+    <h4 class="mk-part__h" id={`${uid}-chk-h`}>Checks on the plan</h4>
+    <div data-checks set:html={checksHtml(campaignChecks(s))} />
+  </section>
+
+  <details class="disclosure mk-summary" data-no-print>
+    <summary>The summary as text</summary>
+    <pre class="mk-pre" data-kit-summary>{campaignSummary(s)}</pre>
+  </details>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/market/campaign';
+</script>

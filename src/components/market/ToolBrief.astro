@@ -1,0 +1,74 @@
+---
+/**
+ * The brief at the top of every Market Studio instrument: how to use it, its
+ * limits, and where it stands in the IB syllabus, with the guide's statements
+ * (their AO levels and HL marking come from the curriculum file) and anything
+ * beyond the syllabus labelled as such.
+ */
+import { corpus, href } from '../../lib/content';
+import { esc, rich, inline } from '../../lib/markup';
+import type { Interactive } from '../../lib/schemas';
+
+type MarketIx = Extract<Interactive, { guide: unknown }>;
+interface Props {
+  it: MarketIx;
+  idBase: string;
+}
+const { it, idBase } = Astro.props;
+const c = await corpus();
+const subs = Object.values(c.curricula).flatMap((cu) => cu.units.flatMap((u) => u.subtopics));
+const served = it.guide.serves.map((s) => {
+  const sub = subs.find((x) => x.code === s.code);
+  const st = sub?.content.find((x) => x.text === s.statement);
+  return { ...s, title: sub?.title ?? '', page: sub?.page, ao: st?.ao ?? [], hl: st?.level === 'HL' || sub?.level === 'HL' };
+});
+const STATUS = {
+  syllabus: { label: 'In the IB syllabus', css: 'tag--ib' },
+  partly: { label: 'In the syllabus, with enrichment', css: 'tag--ib' },
+  enrichment: { label: 'Enrichment: beyond the syllabus', css: 'tag--enrichment' },
+} as const;
+const status = STATUS[it.guide.status];
+const terms = it.guide.terms.map((t) => ({ id: t, term: c.glossary[t]?.term ?? t }));
+---
+
+<div class="mk-brief">
+  <section class="mk-brief__part" aria-labelledby={`${idBase}-use`}>
+    <h2 class="mk-brief__h" id={`${idBase}-use`}>How to use it</h2>
+    <ol class="mk-brief__steps">{it.guide.use.map((u) => <li set:html={inline(u)} />)}</ol>
+  </section>
+  <section class="mk-brief__part" aria-labelledby={`${idBase}-limits`}>
+    <h2 class="mk-brief__h" id={`${idBase}-limits`}>Limitations</h2>
+    <ul class="mk-brief__list">{it.guide.limits.map((u) => <li set:html={inline(u)} />)}</ul>
+  </section>
+  <section class="mk-brief__part mk-brief__part--status" aria-labelledby={`${idBase}-status`}>
+    <h2 class="mk-brief__h" id={`${idBase}-status`}>IB syllabus status</h2>
+    <p class="tags"><span class:list={['tag', status.css]}>{status.label}</span></p>
+    {
+      served.length > 0 && (
+        <ul class="mk-brief__serves" role="list">
+          {served.map((s) => (
+            <li>
+              <span class="mk-brief__code num">{s.code}</span>
+              <span class="mk-brief__stmt">
+                {s.statement}
+                <span class="mk-brief__meta">
+                  <span>{`${s.ao.join(', ')}${s.page ? `; ${s.code} starts on guide p. ${s.page}` : ''}`}</span>
+                  {s.hl && <span class="tag tag--hl">HL only</span>}
+                </span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    {it.guide.beyond.length > 0 && <div class="mk-brief__beyond prose small">{it.guide.beyond.map((b) => <p set:html={inline(b)} />)}</div>}
+  </section>
+  <section class="mk-brief__part" aria-labelledby={`${idBase}-teaches`}>
+    <h2 class="mk-brief__h" id={`${idBase}-teaches`}>What it teaches</h2>
+    <div class="prose small" set:html={rich(it.purpose)} />
+    <p class="small mk-brief__terms">
+      <span class="label">Key terms</span>
+      <Fragment set:html={terms.map((t) => `<a href="${esc(href.glossary(t.id))}">${esc(t.term)}</a>`).join(', ')} />
+    </p>
+  </section>
+</div>

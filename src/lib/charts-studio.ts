@@ -80,7 +80,16 @@ export function positionMapSvg(
   m: MapModel,
   xa: MapAttribute,
   ya: MapAttribute,
-  o: { id: string; focus: string; scale: { min: number; max: number }; highlight?: Quadrant | null },
+  o: {
+    id: string;
+    focus: string;
+    scale: { min: number; max: number };
+    highlight?: Quadrant | null;
+    /** Open spaces to outline (the competitor map instrument): centre and radius in scale units, with a label. */
+    spaces?: Array<{ x: number; y: number; r: number; label: string }>;
+    /** Replace the default title. */
+    title?: string;
+  },
 ): string {
   const W = 560;
   const H = 520;
@@ -101,6 +110,15 @@ export function positionMapSvg(
     const ry = qy === 'high' ? T : my;
     parts.push(`<rect x="${r1(rx)}" y="${r1(ry)}" width="${r1(qx === 'high' ? W - R - mx : mx - L)}" height="${r1(qy === 'high' ? my - T : H - B - my)}" fill="${BRASS}" fill-opacity="0.16"/>`);
   }
+  // Open spaces: dashed ellipses (a circle in scale units, so the axes' different lengths make it an ellipse on screen).
+  const spaceLabels: Box[] = [];
+  for (const sp of o.spaces ?? []) {
+    const rx = (sp.r / (max - min)) * (W - L - R);
+    const ry = (sp.r / (max - min)) * (H - T - B);
+    parts.push(`<ellipse cx="${r1(x(sp.x))}" cy="${r1(y(sp.y))}" rx="${r1(rx)}" ry="${r1(ry)}" fill="${GREEN}" fill-opacity="0.08" stroke="${GREEN}" stroke-width="1.5" stroke-dasharray="6 4"/>`);
+    parts.push(`<text x="${r1(x(sp.x))}" y="${r1(y(sp.y) + 4)}" text-anchor="middle" class="ch-label" fill="${GREEN}">${esc(sp.label)}</text>`);
+    spaceLabels.push({ x: x(sp.x) - sp.label.length * 3.4, y: y(sp.y) - 8, w: sp.label.length * 6.8, h: 16 });
+  }
   parts.push(`<rect x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}" fill="none" stroke="${INK}" stroke-width="1.25"/>`);
   parts.push(`<line x1="${r1(mx)}" y1="${T}" x2="${r1(mx)}" y2="${H - B}" stroke="${SLATE}" stroke-width="1" stroke-dasharray="4 4"/>`);
   parts.push(`<line x1="${L}" y1="${r1(my)}" x2="${W - R}" y2="${r1(my)}" stroke="${SLATE}" stroke-width="1" stroke-dasharray="4 4"/>`);
@@ -112,7 +130,7 @@ export function positionMapSvg(
   parts.push(`<text x="${L - 10}" y="${T}" text-anchor="end" class="ch-note" fill="${MUTED}" transform="rotate(-90 ${L - 10} ${T})">${esc(ya.high)}</text>`);
   parts.push(`<text x="18" y="${(T + H - B) / 2}" text-anchor="middle" class="ch-axis" transform="rotate(-90 18 ${(T + H - B) / 2})">${esc(ya.label)}</text>`);
   // Points, then labels placed where they do not collide with each other or the points.
-  const placed: Box[] = m.points.map((p) => ({ x: x(p.x) - 7, y: y(p.y) - 7, w: 14, h: 14 }));
+  const placed: Box[] = [...m.points.map((p) => ({ x: x(p.x) - 7, y: y(p.y) - 7, w: 14, h: 14 })), ...spaceLabels];
   const sorted = [...m.points].sort((a, b) => (a.id === o.focus ? -1 : b.id === o.focus ? 1 : 0));
   for (const p of sorted) {
     const focus = p.id === o.focus;
@@ -141,10 +159,11 @@ export function positionMapSvg(
     const tx = pick.anchor === 'start' ? pick.bx : pick.anchor === 'end' ? pick.bx + w : pick.bx + w / 2;
     parts.push(`<text x="${r1(tx)}" y="${r1(pick.by + 11)}" text-anchor="${pick.anchor}" class="ch-label" fill="${focus ? COBALT : INK}">${esc(p.name)}</text>`);
   }
+  const spacesDesc = (o.spaces ?? []).map((sp) => `${sp.label} is centred at ${fmtNumber(sp.x, 1)} across and ${fmtNumber(sp.y, 1)} up, with a radius of ${fmtNumber(sp.r, 1)}`).join('; ');
   const desc = `Position map with ${xa.label.toLowerCase()} across, from ${xa.low} to ${xa.high}, and ${ya.label.toLowerCase()} up, from ${ya.low} to ${ya.high}. The dashed lines mark the middle of the scale. ${m.points
     .map((p) => `${p.name}: ${fmtNumber(p.x, 1)} across, ${fmtNumber(p.y, 1)} up`)
-    .join('; ')}.`;
-  return svg(W, H, o.id, 'Position map', desc, parts.join(''));
+    .join('; ')}.${spacesDesc ? ` ${spacesDesc}.` : ''}`;
+  return svg(W, H, o.id, o.title ?? 'Position map', desc, parts.join(''));
 }
 
 /* ---------- Stock control chart ---------- */

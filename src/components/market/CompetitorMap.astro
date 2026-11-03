@@ -1,0 +1,149 @@
+---
+/**
+ * Market Studio: the competitor positioning map (4.2), a generalization of
+ * the Porto position map: the reader's own axes, rivals and scale. Drawn on
+ * the server from src/lib/market-map.ts and the shared position map chart;
+ * src/scripts/market/map.ts redraws it as the reader edits.
+ */
+import ToolBar from './ToolBar.astro';
+import { jsonForScript } from '../../lib/markup';
+import { checksHtml, selectField, textField } from '../../lib/market-view';
+import { SCALES, TEST_QUESTIONS, mapChecks, mapSummary, readMap } from '../../lib/market-map';
+import { brandRowHtml, focusOptions, mapChart, mapTable, spacesHtml, verdictHtml } from '../../lib/market-map-view';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'competitor-map' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const s = data.state;
+const reading = readMap(s);
+const config = { uid, slug: 'positioning-map', defaults: s };
+const ANSWERS = [
+  { value: 'yes', label: 'Yes' },
+  { value: 'no', label: 'No' },
+  { value: 'unsure', label: 'Not sure' },
+] as const;
+---
+
+<div class="mk mk--map" data-ix="competitor-map" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The map could not start. The worked example below is complete.</p>
+  <ToolBar csv />
+
+  <form class="mk-form mk-form--stack" data-form novalidate aria-label="Positioning map">
+    <section class="mk-part" aria-labelledby={`${uid}-axes-h`}>
+      <h4 class="mk-part__h" id={`${uid}-axes-h`}><span class="mk-part__no">A</span> The axes</h4>
+      <div class="mk-fields mk-fields--axes">
+        <Fragment set:html={textField({ id: `${uid}-market`, f: 'market', label: 'The market', value: s.market, max: 160, cls: 'mk-span-3' })} />
+        <Fragment set:html={textField({ id: `${uid}-x-label`, f: 'x-label', label: 'Across: the attribute', value: s.x.label, max: 40 })} />
+        <Fragment set:html={textField({ id: `${uid}-x-low`, f: 'x-low', label: 'Across: a low score means', value: s.x.low, max: 40 })} />
+        <Fragment set:html={textField({ id: `${uid}-x-high`, f: 'x-high', label: 'Across: a high score means', value: s.x.high, max: 40 })} />
+        <Fragment set:html={textField({ id: `${uid}-y-label`, f: 'y-label', label: 'Up: the attribute', value: s.y.label, max: 40 })} />
+        <Fragment set:html={textField({ id: `${uid}-y-low`, f: 'y-low', label: 'Up: a low score means', value: s.y.low, max: 40 })} />
+        <Fragment set:html={textField({ id: `${uid}-y-high`, f: 'y-high', label: 'Up: a high score means', value: s.y.high, max: 40 })} />
+        <Fragment set:html={selectField({ id: `${uid}-scale`, f: 'scale', label: 'Rating scale', value: s.scale, options: SCALES.map((x) => ({ value: x.value, label: x.label })) })} />
+      </div>
+    </section>
+
+    <section class="mk-part" aria-labelledby={`${uid}-map-h`}>
+      <h4 class="mk-part__h" id={`${uid}-map-h`}><span class="mk-part__no">B</span> The sellers and the map</h4>
+      <div class="mk-grid mk-grid--map">
+        <div class="mk-mapside">
+          <div class="table-scroll" role="region" aria-label="Sellers and their ratings" tabindex="0">
+            <table class="table mk-firms">
+              <thead>
+                <tr>
+                  <th scope="col">Seller</th>
+                  <th scope="col" class="n" data-head="x">{s.x.label}</th>
+                  <th scope="col" class="n" data-head="y">{s.y.label}</th>
+                  <th scope="col"><span class="sr-only">Remove</span></th>
+                </tr>
+              </thead>
+              <tbody data-rows set:html={s.brands.map((b, i) => brandRowHtml(b, i, uid, s)).join('')} />
+            </table>
+          </div>
+          <p class="field__error" id={`${uid}-brands-err`} data-err-for="brands"></p>
+          <p class="cluster mk-add js-only"><button type="button" class="btn btn--small" data-add>Add a seller</button></p>
+          <div class="field mk-field">
+            <label for={`${uid}-focus`}>Your business</label>
+            <select class="select" id={`${uid}-focus`} data-f="focus" aria-describedby={`${uid}-focus-err`}><Fragment set:html={focusOptions(s)} /></select>
+            <span class="field__error" id={`${uid}-focus-err`}></span>
+          </div>
+        </div>
+        <figure class="mk-figure mk-figure--map">
+          <div class="chart-scroll" role="region" aria-label="Positioning map" tabindex="0" data-chart set:html={mapChart(s, `${uid}-chart`)} />
+          <figcaption class="exhibit__source"><b>Map</b> Average ratings on the chosen scale; your business is the blue point. Dashed green outlines mark the largest open spaces; the dashed lines mark the middle of the scale.</figcaption>
+        </figure>
+      </div>
+      <div class="mk-grid">
+        <div>
+          <h5 class="label label--ink">Open spaces</h5>
+          <div data-spaces set:html={spacesHtml(s)} />
+          <div class="bew__reading">
+            <p><strong>Reading.</strong> <span data-interp>{reading.reading}</span></p>
+            <p class="muted"><strong>Implication.</strong> <span data-impl>{reading.implication}</span></p>
+          </div>
+        </div>
+        <div>
+          <h5 class="label label--ink">Where each seller sits</h5>
+          <div class="table-scroll" role="region" aria-label="Where each seller sits" tabindex="0">
+            <table class="table">
+              <caption class="sr-only">Each seller's ratings and the part of the map it is in</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Seller</th>
+                  <th scope="col" class="n" data-head="x">{s.x.label}</th>
+                  <th scope="col" class="n" data-head="y">{s.y.label}</th>
+                  <th scope="col">Part of the map</th>
+                </tr>
+              </thead>
+              <tbody data-table set:html={mapTable(s)} />
+            </table>
+          </div>
+          <div data-checks set:html={checksHtml(mapChecks(s))} />
+        </div>
+      </div>
+    </section>
+
+    <section class="mk-part" aria-labelledby={`${uid}-test-h`}>
+      <h4 class="mk-part__h" id={`${uid}-test-h`}><span class="mk-part__no">C</span> The gap test</h4>
+      <p class="small muted mk-part__dek">An open space is a question, not an answer. Answer these four for the space you are considering.</p>
+      <div class="mk-test">
+        {
+          TEST_QUESTIONS.map((q) => (
+            <fieldset class="mk-test__q">
+              <legend>
+                <b>{q.q}</b> <span class="small muted">{q.why}</span>
+              </legend>
+              <div class="choice__opts">
+                {ANSWERS.map((a) => (
+                  <label class="opt">
+                    <input type="radio" name={`${uid}-t-${q.id}`} value={a.value} data-test={q.id} checked={s.test[q.id] === a.value} />
+                    <span class="opt__body">{a.label}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ))
+        }
+      </div>
+      <div class="field mk-field">
+        <label for={`${uid}-t-note`}>The evidence you would need, or have</label>
+        <textarea class="textarea" id={`${uid}-t-note`} rows="3" maxlength="600" data-f="t-note">{s.test.note}</textarea>
+      </div>
+      <div data-verdict set:html={verdictHtml(s)} />
+    </section>
+  </form>
+
+  <details class="disclosure mk-summary" data-no-print>
+    <summary>The summary as text</summary>
+    <pre class="mk-pre" data-kit-summary>{mapSummary(s)}</pre>
+  </details>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/market/map';
+</script>

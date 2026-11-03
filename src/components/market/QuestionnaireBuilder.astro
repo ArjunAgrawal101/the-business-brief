@@ -1,0 +1,83 @@
+---
+/**
+ * Market Studio: the market research questionnaire builder (4.4). The worked
+ * example, its flags, the sampling notes and the preview are rendered on the
+ * server from src/lib/market-research.ts; src/scripts/market/questionnaire.ts
+ * re-runs the same checks as the reader edits.
+ */
+import ToolBar from './ToolBar.astro';
+import { jsonForScript } from '../../lib/markup';
+import { checksHtml, numberField, textField, areaField, selectField } from '../../lib/market-view';
+import { questionnaireText, surveyChecks } from '../../lib/market-research';
+import { dataMixHtml, previewHtml, questionRowHtml, quotaRowHtml, samplingHtml } from '../../lib/market-research-view';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'questionnaire-builder' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const s = data.state;
+const config = { uid, slug: 'research-questionnaire', defaults: s };
+---
+
+<div class="mk mk--survey" data-ix="questionnaire" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The builder could not start. The worked example below is complete, with its flags.</p>
+  <ToolBar csv />
+
+  <section class="mk-part" aria-labelledby={`${uid}-plan-h`}>
+    <h4 class="mk-part__h" id={`${uid}-plan-h`}><span class="mk-part__no">A</span> The research and the sample</h4>
+    <div class="mk-grid">
+      <form class="mk-form" data-plan novalidate aria-label="The research and the sample">
+        <div class="mk-fields">
+          <Fragment set:html={textField({ id: `${uid}-title`, f: 'title', label: 'Title of the questionnaire', value: s.title, max: 120, cls: 'mk-span-2' })} />
+          <Fragment set:html={areaField({ id: `${uid}-objective`, f: 'objective', label: 'Objective: the decision the research will inform', value: s.objective, rows: 3, max: 400, cls: 'mk-span-2' })} />
+          <Fragment set:html={textField({ id: `${uid}-population`, f: 'population', label: 'Population: who you want to learn about', value: s.population, max: 200, cls: 'mk-span-2' })} />
+          <Fragment set:html={numberField({ id: `${uid}-popsize`, f: 'populationSize', label: 'Size of the population', value: s.populationSize, min: 0, step: '1', hint: 'Leave at 0 if you do not know it.' })} />
+          <Fragment set:html={numberField({ id: `${uid}-n`, f: 'sampleSize', label: 'Sample size', value: s.sampleSize, min: 0, step: '1' })} />
+          <Fragment set:html={selectField({ id: `${uid}-method`, f: 'method', label: 'Sampling method', value: s.method, options: [{ value: 'quota', label: 'Quota sampling' }, { value: 'random', label: 'Random sampling' }, { value: 'convenience', label: 'Convenience sampling' }], cls: 'mk-span-2' })} />
+        </div>
+        <fieldset class="mk-fieldset mk-quotas" data-quotas-wrap hidden={s.method !== 'quota'}>
+          <legend class="label label--ink">Quota groups</legend>
+          <div class="mk-quota mk-quota--head" aria-hidden="true"><span>Group</span><span>Share of the population</span><span></span></div>
+          <div data-quotas set:html={s.quotas.map((q, i) => quotaRowHtml(q, i, uid)).join('')} />
+          <p class="cluster mk-add js-only"><button type="button" class="btn btn--small" data-add-quota>Add a quota group</button></p>
+        </fieldset>
+        <Fragment set:html={areaField({ id: `${uid}-intro`, f: 'intro', label: 'Introduction respondents read first', value: s.intro, rows: 3, max: 600, hint: 'Who is asking, why, how long it takes, and that answers are anonymous.' })} />
+      </form>
+      <div class="mk-results">
+        <h5 class="label label--ink">The sample</h5>
+        <div class="mk-sampling prose small" data-sampling set:html={samplingHtml(s)} />
+        <h5 class="label label--ink">The questionnaire as a whole</h5>
+        <dl class="figs mk-figs--compact" data-mix set:html={dataMixHtml(s)} />
+        <div data-survey-checks set:html={checksHtml(surveyChecks(s))} />
+      </div>
+    </div>
+  </section>
+
+  <section class="mk-part" aria-labelledby={`${uid}-q-h`}>
+    <h4 class="mk-part__h" id={`${uid}-q-h`}><span class="mk-part__no">B</span> The questions, and what respondents see</h4>
+    <p class="small muted mk-part__dek">The flags under each question come from rules about wording. They are prompts to look again, not verdicts.</p>
+    <div class="mk-grid mk-grid--survey">
+      <form class="mk-qlist" data-questions novalidate aria-label="Questions">
+        <div data-rows set:html={s.questions.map((q, i) => questionRowHtml(q, i, s.questions.length, uid)).join('')} />
+        <p class="cluster mk-add js-only"><button type="button" class="btn btn--small" data-add>Add a question</button></p>
+      </form>
+      <div class="mk-results mk-results--sticky">
+        <h5 class="label label--ink" id={`${uid}-pv-h`}>Preview: what respondents see</h5>
+        <div class="mk-preview" data-preview role="region" aria-labelledby={`${uid}-pv-h`} tabindex="0" set:html={previewHtml(s)} />
+      </div>
+    </div>
+  </section>
+
+  <details class="disclosure mk-summary" data-no-print>
+    <summary>The summary as text</summary>
+    <pre class="mk-pre" data-kit-summary>{questionnaireText(s)}</pre>
+  </details>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/market/questionnaire';
+</script>
