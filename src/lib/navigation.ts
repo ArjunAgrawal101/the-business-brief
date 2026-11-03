@@ -59,7 +59,7 @@ export const NAV: NavGroup[] = [
     links: [
       { label: 'Finance Desk', href: '/finance-desk/', text: 'Costs, break-even, cash flow, ratios and investment appraisal' },
       { label: 'Strategy Studio', href: '/strategy-studio/', text: 'SWOT, STEEPLE, five forces, Ansoff, BCG, decision trees and a recommendation memo' },
-      { label: 'Market Studio', href: '/market-studio/', text: 'Market share, positioning and the marketing mix' },
+      { label: 'Market Studio', href: '/market-studio/', text: 'STP, personas, positioning, the marketing mix, life cycles, campaigns and budgets' },
       { label: 'People and Culture', href: '/people-and-culture/', text: 'Leadership, motivation, structure and culture' },
       { label: 'Operations Floor', href: '/operations-floor/', text: 'Location, capacity, productivity and stock control' },
       { label: 'Entrepreneurship Lab', href: '/entrepreneurship-lab/', text: 'From an idea to a tested business model: canvas, unit economics, runway and a plan' },
