@@ -1,0 +1,206 @@
+# Glossary: analytics and measurement terms beyond the IB course.
+# Every entry is enrichment (provenance: enrichment): it names no IB subtopic, never carries
+# the ib qualification, and links to the IB terms it builds on through related. Definitions,
+# explanations and examples are the platform's own words; every business named is fictional.
+# Entries are in alphabetical order of term.
+
+- id: ab-test
+  term: "A/B test"
+  aliases: ["Split test", "A/B testing"]
+  definition: "An experiment in which two versions of something, such as a web page, a price or an email, are shown at random to comparable groups of users, to measure which performs better on a chosen measure."
+  simple: "Showing half your customers one version and half another, at random, to see which one works better."
+  technical: "Random assignment makes the groups comparable, so a difference in the result can be put down to the change. The sample size needed for statistical significance should be decided in advance, because stopping a test early or testing many variations at once inflates false positives. A/B tests measure short-term behaviour well but can miss long-term effects, such as damage to a brand."
+  example: "A fictional online bookshop shows half its visitors a green buy button and half a blue one; over two weeks 4.1% of the first group buy against 3.8% of the second, and the shop checks whether the gap is statistically significant before making the change."
+  misconceptions:
+    - claim: "Any difference between the two versions shows which is better."
+      correction: "With small samples, differences arise by chance; the result needs to be statistically significant and large enough to matter."
+  category: tool
+  qualifications: [undergraduate, mba, professional]
+  provenance: enrichment
+  related: [conversion-rate, statistical-significance, market-research, sampling]
+
+- id: churn-rate
+  term: "Churn rate"
+  aliases: ["Customer churn", "Attrition rate"]
+  definition: "The percentage of customers who stop buying or cancel a subscription in a given period."
+  simple: "The share of customers who leave each month or year. If 100 customers become 95 by the end of the month, churn is 5%."
+  technical: "Churn rate = customers lost in a period ÷ customers at the start of the period × 100. Small monthly rates compound: 2% a month loses about 22% of the customers in a year, and 5% a month about 46%. Keeping customers often costs less than replacing them, which is why subscription businesses track churn closely, along with revenue churn, which weights customers by what they pay."
+  example: "A fictional music streaming service starts the month with 50,000 subscribers and loses 1,500, a monthly churn rate of 3%."
+  formula: "Churn rate = customers lost in the period ÷ customers at the start of the period × 100"
+  misconceptions:
+    - claim: "A monthly churn rate of 2% is small."
+      correction: "Compounded over a year it loses more than a fifth of the customers, all of whom must be replaced just to stand still."
+  category: measure
+  qualifications: [undergraduate, mba, professional]
+  provenance: enrichment
+  related: [retention-rate, customer-lifetime-value, labour-turnover, cohort-analysis]
+
+- id: cohort-analysis
+  term: "Cohort analysis"
+  aliases: ["Cohort"]
+  definition: "Analysing the behaviour over time of groups of customers who share a starting point, such as the month they first bought, to see how retention, spending or other measures change."
+  simple: "Following groups of customers who started at the same time, say everyone who joined in January, to see how many keep buying in the months after."
+  technical: "A cohort table has one row per cohort and one column per period since joining, showing, for example, the percentage still active. Comparing the rows shows whether newer customers behave better or worse than older ones, which totals hide: overall sales can grow while every cohort keeps fewer customers. It is central to judging product-market fit and customer lifetime value."
+  example: "A fictional subscription box finds that 70% of its January cohort is still subscribed after three months, but only 55% of its March cohort, which joined during a heavy discount campaign."
+  misconceptions:
+    - claim: "A rising number of customers means customers are staying longer."
+      correction: "Growth from new sign-ups can hide falling retention; cohort analysis separates the two."
+  category: tool
+  qualifications: [undergraduate, mba, professional]
+  provenance: enrichment
+  related: [retention-rate, churn-rate, customer-lifetime-value, product-market-fit, data-analytics]
+
+- id: conversion-rate
+  term: "Conversion rate"
+  definition: "The percentage of people who take a desired action, such as buying or signing up, out of all those who had the chance, such as the visitors to a website."
+  simple: "Out of everyone who visits a shop or website, the percentage who actually buy something or sign up."
+  technical: "Conversion rate = conversions ÷ visitors (or leads) × 100. It is measured at each stage of a sales funnel to find where customers drop out. Comparisons must use the same definition of a conversion and of the starting group, and a rising rate can hide falling sales if fewer people visit."
+  example: "A fictional furniture website has 20,000 visits in a month and 300 orders, a conversion rate of 1.5%."
+  formula: "Conversion rate = conversions ÷ visitors × 100"
+  misconceptions:
+    - claim: "A higher conversion rate always means more sales."
+      correction: "If fewer people visit, a higher rate can still mean fewer sales; the rate and the volume must be read together."
+  category: measure
+  qualifications: [secondary, undergraduate, mba, professional]
+  provenance: enrichment
+  related: [sales-funnel, ab-test, customer-acquisition-cost, e-commerce]
+
+- id: key-performance-indicator
+  term: "Key performance indicator (KPI)"
+  aliases: ["KPI", "KPIs"]
+  definition: "A measure that an organization chooses to track its progress towards an objective that matters to its strategy."
+  simple: "One of the few numbers a business watches closely to see whether it is on track, such as weekly sales, customer satisfaction or staff turnover."
+  technical: "Good KPIs are tied to strategic objectives, few in number, precisely defined (formula, data source, frequency), owned by someone and compared with a target. They mix leading indicators, which predict, with lagging indicators, which confirm. A measure that becomes a target can distort behaviour, so KPIs need balancing, which is the logic of the balanced scorecard."
+  example: "A fictional chain of bike repair shops tracks three KPIs each week: average turnaround time, the share of repeat customers and revenue per mechanic hour."
+  misconceptions:
+    - claim: "The more KPIs a business tracks, the better it is managed."
+      correction: "Too many measures scatter attention; a KPI should be one of the few measures that matter most for the strategy."
+    - claim: "Hitting a KPI target always means the business is doing well."
+      correction: "When a measure becomes a target, people can meet it in ways that harm other goals, such as rushing work to cut response times."
+  category: measure
+  qualifications: [secondary, undergraduate, mba, professional]
+  frameworks: [balanced-scorecard]
+  provenance: enrichment
+  related: [smart-objectives, balanced-scorecard, leading-indicator, lagging-indicator, management-information-system]
+
+- id: lagging-indicator
+  term: "Lagging indicator"
+  aliases: ["Lag indicator"]
+  definition: "A measure that records an outcome after it has happened, such as profit, market share or labour turnover, confirming results but too late to change them."
+  simple: "A number that tells you how you did, after the event, like last quarter's profit."
+  technical: "Lagging indicators are usually the objectives themselves and are reliable to measure, but managing by them alone means reacting late. They are paired with the leading indicators that drive them, as in the chain of cause and effect of a balanced scorecard."
+  example: "A fictional software firm's annual customer churn is a lagging indicator; the number of support requests left unresolved for more than a week is a leading indicator of it."
+  misconceptions:
+    - claim: "Lagging indicators are less useful than leading ones."
+      correction: "They measure the outcomes that matter and confirm whether a strategy worked; they are simply too late to act on alone."
+  category: measure
+  qualifications: [undergraduate, mba, professional]
+  provenance: enrichment
+  related: [leading-indicator, key-performance-indicator, balanced-scorecard, profit]
+
+- id: leading-indicator
+  term: "Leading indicator"
+  aliases: ["Lead indicator"]
+  definition: "A measure that tends to change before the outcome it predicts, giving managers early warning, such as enquiries before sales or staff engagement before labour turnover."
+  simple: "A number that gives an early warning of what is coming, like the number of people asking about a product, which hints at next month's sales."
+  technical: "Leading indicators are valuable because there is still time to act on them, but they predict rather than prove, and they must be checked against the lagging outcomes they are meant to anticipate. A balanced scorecard pairs them with lagging indicators across its perspectives."
+  example: "A fictional estate agency watches the number of valuation requests each week, because a fall in requests is followed about two months later by a fall in completed sales."
+  misconceptions:
+    - claim: "A leading indicator guarantees what will happen."
+      correction: "It signals what is likely; the link must be checked over time and can break when conditions change."
+  category: measure
+  qualifications: [undergraduate, mba, professional]
+  provenance: enrichment
+  related: [lagging-indicator, key-performance-indicator, sales-forecast, balanced-scorecard]
+
+- id: management-dashboard
+  term: "Management dashboard"
+  aliases: ["Dashboard", "KPI dashboard"]
+  definition: "A visual display of an organization's key measures, usually updated automatically from its information systems, that lets managers see performance at a glance."
+  simple: "A screen that shows the most important numbers about a business, often as charts, so that managers can quickly see what is going well and what is not."
+  technical: "A dashboard draws on a management information system and should show a few well-defined KPIs against targets and trends, with the option to look into the detail. Poorly designed dashboards show too many measures, mix leading and lagging indicators without saying so, or use misleading charts, which encourages managers to react to noise."
+  example: "A fictional regional bakery chain's dashboard shows each branch's daily sales, its waste as a percentage of production and its stock-outs, with any branch outside its target flagged in words as well as colour."
+  misconceptions:
+    - claim: "A dashboard tells managers what to do."
+      correction: "It shows what is happening; deciding why, and what to do about it, still needs analysis and judgement."
+  category: tool
+  qualifications: [undergraduate, mba, professional]
+  provenance: enrichment
+  related: [key-performance-indicator, management-information-system, data-analytics, leading-indicator]
+
+- id: net-promoter-score
+  term: "Net promoter score (NPS)"
+  aliases: ["NPS"]
+  definition: "A measure of customer loyalty based on one question, how likely customers are to recommend a business on a scale of 0 to 10, calculated as the percentage of promoters minus the percentage of detractors."
+  simple: "A score from customers' answers to \"How likely are you to recommend us to a friend?\" It takes the share of keen fans and subtracts the share of unhappy customers."
+  technical: "People who answer 9 or 10 are promoters, 7 or 8 passives, and 0 to 6 detractors; NPS = % promoters − % detractors, giving a score from −100 to +100. It is simple and widely compared, but one question cannot say why customers feel as they do, scores vary with culture and survey method, and its link with growth varies by industry, so it is best read with customers' comments and behaviour."
+  example: "A fictional hotel surveys 200 guests: 110 answer 9 or 10, 60 answer 7 or 8 and 30 answer 6 or below, giving an NPS of 55 − 15 = 40."
+  formula: "NPS = % of promoters (9 or 10) − % of detractors (0 to 6)"
+  misconceptions:
+    - claim: "An NPS of 40 means 40% of customers are promoters."
+      correction: "It is the difference between the percentages of promoters and detractors; many different mixes give the same score."
+  category: measure
+  qualifications: [undergraduate, mba, professional]
+  provenance: enrichment
+  related: [brand-loyalty, survey, key-performance-indicator, customer-loyalty-programme]
+
+- id: retention-rate
+  term: "Retention rate"
+  aliases: ["Customer retention"]
+  definition: "The percentage of the customers at the start of a period who are still customers at its end."
+  simple: "The share of customers who stay with a business over a period. It is the opposite of churn."
+  technical: "Retention rate = (customers at the end − new customers gained) ÷ customers at the start × 100, which leaves out the customers won during the period. For a single cohort it equals 100 minus the churn rate. High retention raises customer lifetime value and is a sign of product-market fit and brand loyalty."
+  example: "A fictional gym starts the year with 800 members, gains 300 and ends with 900, so its retention rate is (900 − 300) ÷ 800 × 100 = 75%."
+  formula: "Retention rate = (customers at the end of the period − new customers) ÷ customers at the start × 100"
+  misconceptions:
+    - claim: "Retention can be measured by comparing customer numbers at the start and the end."
+      correction: "The new customers gained during the period must be taken out, or growth will hide the customers who left."
+  category: measure
+  qualifications: [undergraduate, mba, professional]
+  provenance: enrichment
+  related: [churn-rate, cohort-analysis, customer-lifetime-value, brand-loyalty]
+
+- id: return-on-marketing-investment
+  term: "Return on marketing investment (ROMI)"
+  aliases: ["ROMI", "Marketing ROI"]
+  definition: "The extra contribution generated by a marketing activity compared with what the activity cost, expressed as a percentage."
+  simple: "Whether the money spent on a marketing campaign brought back more than it cost, and by how much."
+  technical: "ROMI = (incremental contribution from the campaign − campaign cost) ÷ campaign cost × 100. The hard part is measuring the increment: sales that would have happened anyway must be excluded, which needs control groups or careful modelling. Brand-building effects that arrive over years are easily undervalued by short-term measures."
+  example: "A fictional sports shop spends $10,000 on a campaign that brings $50,000 of extra sales at a contribution of 40% of sales, an incremental contribution of $20,000 and a ROMI of 100%."
+  formula: "ROMI = (incremental contribution − marketing cost) ÷ marketing cost × 100"
+  misconceptions:
+    - claim: "ROMI should be calculated from the sales a campaign brought in."
+      correction: "It should use the extra contribution, after variable costs, and count only the sales that would not have happened without the campaign."
+  category: measure
+  qualifications: [undergraduate, mba, professional]
+  provenance: enrichment
+  related: [promotional-mix, contribution, ab-test, customer-acquisition-cost]
+
+- id: sales-funnel
+  term: "Sales funnel"
+  aliases: ["Conversion funnel", "Marketing funnel"]
+  definition: "A model of the stages a potential customer passes through on the way to buying, from first awareness to purchase, with fewer people remaining at each stage."
+  simple: "The path from first hearing about a product to buying it, drawn as a funnel because many people start and fewer reach the end."
+  technical: "Stages are often labelled awareness, interest, consideration, intent and purchase, sometimes followed by loyalty and advocacy. Measuring conversion between stages shows where the biggest losses occur and which part of the marketing mix to fix. Real customer journeys are rarely linear, and digital tracking can overstate the part played by the last contact before a purchase."
+  example: "A fictional language school's funnel runs from 10,000 people who see its advertisement to 1,200 who visit its website, 240 who book a free trial lesson and 60 who enrol: 25% of trials convert."
+  misconceptions:
+    - claim: "Every customer passes through each stage in order."
+      correction: "Many skip stages, go back or buy on a friend's recommendation; the funnel is a simplification for measuring drop-off."
+  category: tool
+  qualifications: [undergraduate, mba, professional]
+  provenance: enrichment
+  related: [conversion-rate, promotional-mix, customer-acquisition-cost, marketing-plan]
+
+- id: statistical-significance
+  term: "Statistical significance"
+  definition: "A judgement that a result seen in a sample, such as a difference between two groups, is unlikely to have arisen by chance alone, against an agreed threshold."
+  simple: "A way of checking whether a difference you see in data is real or just luck. If it is unlikely to be luck, it is called statistically significant."
+  technical: "A test computes a p-value, the probability of a result at least as extreme as the one observed if there were really no effect; a p-value below a chosen level, often 5%, is called significant. Significance is not importance: with a huge sample a trivial difference can be significant, and with a small one an important difference can fail the test. Testing many comparisons at once raises the chance of false positives."
+  example: "A fictional retailer's test finds conversion of 4.1% for one page and 3.8% for another; with 50,000 visitors in each group the gap is significant at the 5% level, but with 5,000 in each it could easily be chance."
+  misconceptions:
+    - claim: "A statistically significant result is an important one."
+      correction: "Significance says a difference is unlikely to be chance, not that it is large enough to matter."
+  category: measure
+  qualifications: [undergraduate, mba, professional]
+  provenance: enrichment
+  related: [ab-test, sampling, sampling-error, descriptive-statistics]
