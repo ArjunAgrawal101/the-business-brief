@@ -46,6 +46,7 @@ const i = order.findIndex(([x]) => x === id);
 const prev = i > 0 ? order[i - 1] : undefined;
 const next = i < order.length - 1 ? order[i + 1] : undefined;
 const statusClass = f.status === 'enrichment' ? 'tag--enrichment' : 'tag--ib';
+const pageRef = f.guidePages ? `${f.guidePages.includes(' ') ? 'pp.' : 'p.'} ${f.guidePages}` : '';
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'LearningResource',
@@ -78,8 +79,8 @@ const jsonLd = {
             <div>
               <dt>Standing</dt>
               <dd>
-                {f.status === 'syllabus' && <>Named in the IB syllabus ({f.subtopics.join(', ')}); Business management guide, {f.guidePages?.includes(' ') ? 'pp.' : 'p.'} {f.guidePages}.</>}
-                {f.status === 'toolkit' && <>One of the tools in the IB business management toolkit; Business management guide, {f.guidePages?.includes(' ') ? 'pp.' : 'p.'} {f.guidePages}.</>}
+                {f.status === 'syllabus' && `Named in the IB syllabus (${f.subtopics.join(', ')}); Business management guide, ${pageRef}.`}
+                {f.status === 'toolkit' && `One of the tools in the IB business management toolkit; Business management guide, ${pageRef}.`}
                 {f.status === 'enrichment' && <>Enrichment: not part of the IB Business Management course. It is here for going further, at university, in an MBA or at work.</>}
               </dd>
             </div>

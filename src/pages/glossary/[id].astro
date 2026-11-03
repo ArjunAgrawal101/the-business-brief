@@ -45,6 +45,10 @@ const lib = await library();
 const fws = frameworksForTerm(id, g, lib.refs);
 const suggested = suggestTerms(id, c.glossary, 6).map((x) => ({ ...x, e: c.glossary[x.id]! }));
 const ibRelated = beyond ? related.filter((r) => !isEnrichment(r.e!)) : [];
+// "undergraduate, MBA and professional": the qualifications as a phrase in running text.
+const STUDY: Record<string, string> = { secondary: 'secondary school', undergraduate: 'undergraduate', mba: 'MBA', professional: 'professional' };
+const study = quals.filter((q) => q !== 'ib').map((q) => STUDY[q] ?? q);
+const studyList = study.length > 1 ? `${study.slice(0, -1).join(', ')} and ${study[study.length - 1]}` : (study[0] ?? 'further');
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'DefinedTerm',
@@ -208,7 +212,7 @@ const jsonLd = {
           beyond && (
             <div class="gt__beyond">
               <p class="label">Beyond the IB course</p>
-              <p class="small">This term is not in the IB Business Management syllabus. It is here for learners going further: {quals.map((q) => QUALIFICATION_TAG_LABELS[q].toLowerCase()).join(', ')} study.</p>
+              <p class="small">This term is not in the IB Business Management syllabus. It is here for learners going further, in {studyList} study.</p>
               {ibRelated.length > 0 && (
                 <>
                   <p class="small">It builds on these IB terms:</p>
