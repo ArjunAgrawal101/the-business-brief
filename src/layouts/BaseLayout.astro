@@ -53,6 +53,8 @@ const ogImage = Astro.site ? new URL(image ?? '/brand/social-card.png', Astro.si
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {/* The opt-in to page transitions, inline and first so the browser knows it before any script runs or any stylesheet arrives. From a linked stylesheet it was often too late: Chromium skipped the transition ("opt-in disabled") and reported an error. The transition's own styles are in motion.css. */}
+    <style is:inline set:html={'@media (prefers-reduced-motion: no-preference){@view-transition{navigation:auto}}'} />
     <script is:inline set:html={"document.documentElement.classList.add('js')"} />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />

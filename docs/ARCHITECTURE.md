@@ -121,7 +121,7 @@ The quiz engine (`src/scripts/quiz.ts`) dispatches a bubbling `quiz:progress` ev
 
 ## Motion
 
-`src/styles/motion.css` holds the motion patterns and `src/scripts/motion.ts` the scroll reveals; see [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md#motion). Page transitions are native cross-document view transitions (`@view-transition`), so browsers without them simply navigate. Chart animation uses `tween()` from `src/scripts/ix.ts`, which draws the end state at once under reduced motion.
+`src/styles/motion.css` holds the motion patterns and `src/scripts/motion.ts` the scroll reveals; see [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md#motion). Page transitions are native cross-document view transitions (`@view-transition`), so browsers without them simply navigate. The opt-in is an inline style at the top of every page's head (BaseLayout), not in a linked stylesheet: Chromium decides whether the new page takes part before its stylesheets may have arrived, and from a stylesheet it often skipped the transition and reported an error. Chart animation uses `tween()` from `src/scripts/ix.ts`, which draws the end state at once under reduced motion.
 
 ## Routes
 

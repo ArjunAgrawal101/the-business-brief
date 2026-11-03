@@ -17,11 +17,10 @@
 
 /* ---------- Page to page ---------- */
 
+/* The opt-in, @view-transition { navigation: auto }, is inline at the top of
+   every page's head (BaseLayout.astro), so the browser has it before scripts
+   run; these rules style the transition once it has begun. */
 @media (prefers-reduced-motion: no-preference) {
-  @view-transition {
-    navigation: auto;
-  }
-
   ::view-transition-old(root) {
     animation: var(--dur-fast) var(--ease) both bb-fade-out;
   }
