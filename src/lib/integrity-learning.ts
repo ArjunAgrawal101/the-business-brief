@@ -113,6 +113,8 @@ export function checkLearning(c: Corpus): Problem[] {
     }
     n.exam.forEach((q, i) => {
       if (!has(c.commandTerms, q.command)) add(`exam question ${i + 1} uses command term "${q.command}", which is not in the register`);
+      // Paper 1 covers units 1 to 5 excluding the HL extension topics (the guide's assessment outline).
+      if (q.level === 'HL' && q.paper === '1') add(`exam question ${i + 1} is HL, but Paper 1 does not assess HL extension topics`);
       if (q.level === 'HL' && n.level === 'SL/HL' && !n.sections.some((x) => x.level === 'HL' || x.points.some((p) => p.level === 'HL')))
         add(`exam question ${i + 1} is HL, but the notes have no HL material`);
     });
