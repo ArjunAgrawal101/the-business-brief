@@ -1,0 +1,627 @@
+# Tausi Beverages. A fictional organization; every figure is simulated.
+# The retail audit is a fictional panel of shops, not a statistic about any
+# real market. Contribution by product follows the stated model, and the price
+# test gives the price elasticity. scripts/qa/case-figures.py rebuilds every
+# exhibit and checks every figure in the text; tests/unit/vault-cases.test.ts
+# recomputes the shares, growth rates and elasticity with src/lib/market.ts.
+
+title: Tausi Beverages
+dek: A Nairobi drinks and foods maker has four products in four positions, and money to back only part of its portfolio.
+kind: fictional
+dataStatus: simulated
+organization:
+  name: Tausi Beverages
+  sector: Packaged drinks and foods (fast-moving consumer goods)
+  location: Nairobi, Kenya
+  size: One factory and a distribution depot, 310 employees
+  legalForm: Private limited company, owned by the Kamau family
+currency:
+  code: KES
+  symbol: 'KSh'
+  unit: millions of Kenyan shillings (KSh m)
+decision: Where should Tausi spend its KSh 120m marketing and development reserve for 2026?
+brief: >
+  Tausi's original mango nectar still earns most of its money but has started to lose share. Its porridge flour leads
+  a fast-growing segment and has run out of capacity, its ginger drink grows quickly but loses money, and its cheap
+  cola is fading in a shrinking segment. The board has set aside KSh 120m for 2026, and the marketing manager has
+  four plans that each spend all of it. The plans that promise most over three years are the least certain, and the
+  research behind them may not describe Tausi's own customers.
+
+narrative:
+  - >
+    Joseph Kamau started Tausi Beverages in 2009 with a second-hand filling machine and a mango nectar made from fruit
+    bought at a market outside Nairobi. Sixteen years later Tausi employs 310 people at a factory in Nairobi's
+    Industrial Area, and its four products are sold in supermarkets, petrol station shops and thousands of small
+    neighbourhood shops across Nairobi and central Kenya. Joseph's daughter, Wanjiru Kamau, became managing director
+    in 2021; Joseph still chairs the board.
+  - >
+    The four products have very different stories. Mango Nectar, the original, is still the best-selling juice in the
+    shops that Tausi's research agency audits, but its share has started to slip. Uji Power, a fortified millet
+    porridge flour launched in 2018, leads a segment that is growing fast. Ginger Zing, a sharp ginger and lemon drink
+    in a can, launched in 2023, is growing quickly from a small base in the fastest-growing segment of all. Tausi
+    Cola, launched in 2015 to compete on price with the global brands, is losing ground in a shrinking segment
+    (Exhibits 3 and 4).
+  - >
+    The business is still profitable, but less so each year. Revenue has grown, while profit before interest and tax
+    fell from KSh 170m in 2023 to KSh 148m in 2025 (Exhibit 2). Mango Nectar earns most of the money; Ginger Zing
+    loses money once its marketing is paid for, and Tausi Cola earns little (Exhibit 1).
+  - >
+    For 2026 the board has set aside KSh 120m of retained profit for marketing and development, on top of the normal
+    budgets. Brian Otieno, the marketing manager, has worked up four plans, each costing the full amount (Exhibit 7).
+    Hassan Abdi, the head of sales, wants the money behind Ginger Zing, which he believes could be the company's next
+    Mango Nectar. Faith Njeri, the finance manager, points out that the plan with the best two-year return protects
+    the products Tausi already has. And Joseph does not want to drop a product the distributors have stocked for ten
+    years.
+  - >
+    Brian has two more pieces of evidence: a price test of Ginger Zing in 120 shops (Exhibit 5) and a survey of
+    shoppers (Exhibit 6). He is not sure how far to trust either. Wanjiru wants his recommendation for the board in
+    January.
+
+industryContext:
+  - >
+    Packaged drinks and foods are fast-moving consumer goods: bought often, at low prices and in large volumes, with a
+    small margin on each unit. Profit comes from volume and from the brand. A brand that customers ask for earns shelf
+    space, a better price and loyalty, and it costs money to build and to keep.
+  - >
+    In much of East Africa, a large part of these sales goes through small neighbourhood shops supplied by
+    distributors, alongside supermarkets and petrol station shops. Reaching the small shops takes a distribution
+    network, credit for shopkeepers and support at the point of sale, such as branded coolers. Global drinks brands
+    compete in the same shops with far larger budgets for advertising and promotion.
+  - >
+    Tastes change. Concern about sugar is growing among parents and schools, drinks sold for energy, digestion or
+    other benefits are a growing category, and busy households buy more convenient foods. Each product therefore has
+    its own life cycle, and a company with several products has to decide which to build, which to milk for cash and
+    which to let go.
+
+challenge: >
+  Tausi has four products in four different positions, and money to back only part of its portfolio. The product that
+  earns the most is mature and starting to lose share; the fastest-growing one loses money; the most promising one
+  already leads a growing segment but cannot make any more; and the oldest challenger is losing in a shrinking
+  segment. The board has to decide where the reserve will do most for the company over the next three years, on
+  estimates that are least certain for the plans that promise most, and on research that may not reach the shops
+  where most of Tausi's sales are made.
+
+financials:
+  summary: >
+    Revenue grew from KSh 1,980m in 2023 to KSh 2,240m in 2025, but profit before interest and tax fell from KSh 170m
+    to KSh 148m, and the profit margin from 8.6% to 6.6% (Exhibit 2). Exhibit 1 shows where the profit comes from.
+    Mango Nectar earns KSh 462m of contribution after its marketing, more than two thirds of the total; Uji Power earns
+    KSh 198m; Tausi Cola KSh 33m; and Ginger Zing loses KSh 15m, because its marketing costs more than its
+    contribution.
+  exhibits: [ex-1, ex-2]
+
+exhibits:
+  - id: ex-1
+    title: Contribution by product, 2025 (KSh m)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Item }
+      - { label: Mango Nectar, numeric: true, format: money }
+      - { label: Ginger Zing, numeric: true, format: money }
+      - { label: Uji Power, numeric: true, format: money }
+      - { label: Tausi Cola, numeric: true, format: money }
+      - { label: Total, numeric: true, format: money }
+    rows:
+      - [Revenue, 1320, 100, 600, 220, 2240]
+      - [Variable costs, 792, 65, 372, 165, 1394]
+      - [Contribution, 528, 35, 228, 55, 846]
+      - [Marketing, 66, 50, 30, 22, 168]
+      - [Contribution after marketing, 462, -15, 198, 33, 678]
+    totals: [Contribution, Contribution after marketing]
+    note: >
+      Variable costs are ingredients, packaging, filling and delivery, and rise with the volume sold. Marketing is
+      each product's own advertising and promotion. Fixed overheads of KSh 530m (the factory, the distribution depot
+      and administration) are not shared between products: contribution after marketing of KSh 678m less fixed
+      overheads gives a profit before interest and tax of KSh 148m.
+    source: Simulated teaching data, from Tausi's management accounts.
+
+  - id: ex-2
+    title: The company, 2023 to 2025
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Year }
+      - { label: Revenue (KSh m), numeric: true, format: money }
+      - { label: Profit before interest and tax (KSh m), numeric: true, format: money }
+      - { label: Profit margin (%), numeric: true, format: d1 }
+    rows:
+      - ['2023', 1980, 170, 8.6]
+      - ['2024', 2120, 160, 7.5]
+      - ['2025', 2240, 148, 6.6]
+    source: Simulated teaching data, from Tausi's annual accounts.
+
+  - id: ex-3
+    title: The retail audit, sales in the panel shops (KSh m at shelf prices)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Segment }
+      - { label: Segment sales 2024, numeric: true, format: money }
+      - { label: Segment sales 2025, numeric: true, format: money }
+      - { label: "Tausi's brand 2024", numeric: true, format: money }
+      - { label: "Tausi's brand 2025", numeric: true, format: money }
+      - { label: Largest rival 2025, numeric: true, format: money }
+    rows:
+      - [Juices and nectars, 4800, 4944, 1440, 1458, 1020]
+      - [Ginger and functional drinks, 900, 1170, 54, 82, 410]
+      - [Fortified porridge flours, 1250, 1500, 400, 510, 300]
+      - [Colas, 6000, 5880, 240, 206, 3700]
+    note: >
+      The audit records the sales of 1,600 shops of every kind in Nairobi and central Kenya, chosen by a research
+      agency to represent the area. Shares calculated from it are shares of sales in these shops, at shelf prices,
+      not shares of the whole market. Tausi's brand in each segment: Mango Nectar in juices and nectars, Ginger Zing
+      in ginger and functional drinks, Uji Power in fortified porridge flours, and Tausi Cola in colas. The largest
+      rival is the biggest brand in the segment other than Tausi's.
+    source: Simulated teaching data, from a fictional retail audit agency.
+
+  - id: ex-4
+    title: The four products
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Product }
+      - { label: Launched }
+      - { label: Pack and shelf price }
+      - { label: Who buys it }
+      - { label: Notes }
+    rows:
+      - [Mango Nectar, '2009', '500 ml bottle, KSh 90; 1 litre, KSh 160', Families; sold almost everywhere, 'Real fruit, but sweeter than some schools now want in lunchboxes.']
+      - [Ginger Zing, '2023', '330 ml can, KSh 80', Young adults; mainly supermarkets and petrol station shops, 'Few small shops stock it, and fewer have a cooler for it.']
+      - [Uji Power, '2018', '1 kg pack, KSh 210', Parents, 'Millet and sorghum flour with added vitamins and minerals. Its packing line runs at full capacity.']
+      - [Tausi Cola, '2015', '500 ml bottle, KSh 60', Price-conscious buyers, 'Cheaper than the global colas. Its bottling line could also fill Ginger Zing in bottles.']
+    source: Simulated teaching data, from the marketing department.
+
+  - id: ex-5
+    title: The Ginger Zing price test
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Measure }
+      - { label: Before the test, numeric: true, format: d2 }
+      - { label: During the test, numeric: true, format: d2 }
+    rows:
+      - [Shelf price (KSh a can), 80, 70]
+      - [Cans sold per shop per week, 40, 52]
+      - ["Tausi's revenue per can (KSh)", 48, 42]
+      - [Variable cost per can (KSh), 31.2, 31.2]
+      - [Contribution per can (KSh), 16.8, 10.8]
+      - [Contribution per shop per week (KSh), 672, 561.6]
+    note: >
+      In 120 panel shops the shelf price was cut from KSh 80 to KSh 70 for eight weeks; the first column is the same
+      shops in the eight weeks before. Tausi receives 60% of the shelf price; the rest goes to the distributor and the
+      shop. Tausi's variable cost is KSh 31.20 a can at either price.
+    source: Simulated teaching data, from the research agency's test.
+
+  - id: ex-6
+    title: The shopper survey
+    kind: kpis
+    provenance: simulated-data
+    items:
+      - { label: Shoppers interviewed, value: '300', note: 'Outside two Nairobi supermarkets, on two Saturdays' }
+      - { label: Aged 18 to 35, value: '71%' }
+      - { label: 'Would buy Ginger Zing again (of those who had tried it)', value: '62%' }
+      - { label: Find Mango Nectar too sweet, value: '41%' }
+      - { label: Would try a ready-to-drink porridge, value: '55%' }
+    note: Interviewers stopped shoppers who were willing to answer. Most of Tausi's sales are made in small neighbourhood shops, where nobody was asked.
+    source: Simulated teaching data, from a survey run by the marketing department.
+
+  - id: ex-7
+    title: Four plans for the KSh 120m reserve (KSh m)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Plan }
+      - { label: Spending in 2026, numeric: true, format: money }
+      - { label: Extra in 2026, numeric: true, format: money }
+      - { label: Extra in 2027, numeric: true, format: money }
+      - { label: Extra in 2028, numeric: true, format: money }
+      - { label: Three-year total, numeric: true, format: money }
+      - { label: Total less spending, numeric: true, format: money }
+    rows:
+      - [A. Back the challenger, 120, 20, 90, 150, 260, 140]
+      - [B. Protect the core, 120, 60, 85, 90, 235, 115]
+      - [C. Prune and focus, 120, 35, 95, 130, 260, 140]
+      - [D. Launch a new product, 120, 5, 60, 140, 205, 85]
+    note: |
+      Extra is the change in contribution after marketing compared with carrying on as now, before the plan's own spending. The estimates are the marketing manager's; those for 2028 are the least certain.
+
+      - A. Back the challenger: KSh 90m behind Ginger Zing (advertising, sampling at colleges and events, and 400 branded coolers in shops) and KSh 30m for a 250 ml pack of Mango Nectar. Assumes Ginger Zing reaches 15% of its segment by the end of 2027.
+      - B. Protect the core: KSh 70m to extend Mango Nectar's life (a reduced-sugar recipe, the 250 ml pack and new labels) and KSh 50m for a second Uji Power packing line. Assumes Mango Nectar holds its share and Uji Power's segment keeps growing.
+      - C. Prune and focus: drop Tausi Cola, losing its KSh 33m a year of contribution after marketing; KSh 60m for the second Uji Power line and KSh 60m behind Ginger Zing, filled in bottles on the cola line as well as in cans.
+      - D. Launch a new product: KSh 110m to develop and launch Uji Power To Go, a ready-to-drink porridge in bottles, from September 2026, and KSh 10m for new Mango Nectar labels.
+    source: Simulated teaching data, prepared by the marketing manager.
+
+constraints:
+  - The reserve for 2026 is KSh 120m, on top of the normal budgets, and the board will not borrow for marketing.
+  - Uji Power's packing line runs at full capacity. More Uji Power needs a second line, which takes about four months to install.
+  - Distributors expect a full range. Dropping a product means telling them, and some may ask for better terms on the rest.
+  - A new food product needs certification before it can be sold, which Tausi expects to take about four months.
+
+stakeholders:
+  - name: Wanjiru Kamau, managing director
+    interest: Profitable growth, and a portfolio with a future.
+    influence: high
+    stake: high
+    concern: Spending the reserve on the wrong product.
+  - name: Joseph Kamau, founder and chair
+    interest: The brand, and the relationships he built with distributors.
+    influence: high
+    stake: high
+    concern: Dropping a product the distributors have stocked for ten years.
+  - name: Brian Otieno, marketing manager
+    interest: A plan that builds the brands.
+    influence: medium
+    stake: high
+    concern: Estimates he cannot defend if they turn out wrong.
+  - name: Hassan Abdi, head of sales
+    interest: Products his team can sell into shops.
+    influence: medium
+    stake: medium
+    concern: Losing the cola, which gets the sales team into price-conscious shops.
+  - name: Faith Njeri, finance manager
+    interest: A return on the reserve.
+    influence: medium
+    stake: medium
+    concern: A plan that earns back less than it spends for two years.
+  - name: Distributors
+    interest: A full range that sells, on good terms.
+    influence: high
+    stake: medium
+    concern: Fewer products to sell, or new ones that do not move.
+  - name: Small shopkeepers
+    interest: Products that sell fast, credit, and coolers.
+    influence: medium
+    stake: medium
+    concern: Stock that ties up their money.
+  - name: Customers
+    interest: Taste, price and, increasingly, health.
+    influence: medium
+    stake: medium
+    concern: The sugar in drinks, and rising prices.
+  - name: Employees on the cola line
+    interest: Their jobs.
+    influence: low
+    stake: high
+    concern: Being moved or laid off if the cola is dropped.
+
+options:
+  - id: back-challenger
+    label: 'A. Back the challenger'
+    summary: Put KSh 90m behind Ginger Zing, in advertising, sampling and branded coolers, and KSh 30m into a smaller Mango Nectar pack.
+    requires: Ginger Zing reaching 15% of its segment by the end of 2027, and shops willing to give it cooler space.
+    upside: Joint best over three years, at KSh 260m, in the fastest-growing segment Tausi is in.
+    risks: Depends on more than doubling Ginger Zing's share against a rival five times its size; leaves Uji Power's line full and the cola fading.
+    evidence: [ex-3, ex-5, ex-7]
+  - id: protect-core
+    label: 'B. Protect the core'
+    summary: Extend Mango Nectar's life with a reduced-sugar recipe, a smaller pack and new labels, and add a second Uji Power packing line.
+    requires: Mango Nectar holding its share, and the Uji Power segment continuing to grow.
+    upside: The best two-year return and the lowest risk.
+    risks: Spends most on a mature product in a slow-growing segment, and postpones every decision about Ginger Zing and the cola.
+    evidence: [ex-1, ex-3, ex-7]
+  - id: prune-focus
+    label: 'C. Prune and focus'
+    summary: Drop Tausi Cola, and use its line and the reserve for a second Uji Power line and a push behind Ginger Zing.
+    requires: Distributors who accept the loss of the cola, and a new job on the line for its employees.
+    upside: Joint best over three years, at KSh 260m, with the money behind the two products in growing segments.
+    risks: Distributors and price-conscious shops may react badly to losing the cola; Ginger Zing still has to grow.
+    evidence: [ex-1, ex-3, ex-4, ex-7]
+  - id: new-product
+    label: 'D. Launch a new product'
+    summary: Develop and launch Uji Power To Go, a ready-to-drink porridge in bottles, from September 2026.
+    requires: Certification in time, and customers who will buy porridge as a drink.
+    upside: A new product that uses the strength of the Uji Power brand, with the largest promise for 2028.
+    risks: The lowest three-year return, the most uncertainty, and demand evidence from a survey of supermarket shoppers only.
+    evidence: [ex-6, ex-7]
+
+analysis:
+  data:
+    - In the panel shops, Uji Power has 34.0% of a segment growing at 20.0% a year and sells 1.7 times as much as its largest rival; Ginger Zing has 7.0% of a segment growing at 30.0%, a fifth of its largest rival's sales; Mango Nectar leads a segment growing at 3.0%, its share down from 30.0% to 29.5%; and Tausi Cola has 3.5% of a shrinking segment (Exhibit 3).
+    - Mango Nectar earns KSh 462m of the KSh 678m of contribution after marketing, while Ginger Zing loses KSh 15m (Exhibit 1).
+    - The price test shows elastic demand for Ginger Zing. A 12.5% price cut raised sales by 30%, a price elasticity of −2.4, yet Tausi's contribution per shop fell by 16.4% (Exhibit 5).
+    - Over three years Plans A and C are forecast to add KSh 260m each, Plan B KSh 235m and Plan D KSh 205m; over two years Plan B leads (Exhibit 7).
+  insight:
+    - On the BCG matrix, Uji Power is a star, Mango Nectar a cash cow, Ginger Zing a question mark and Tausi Cola a dog. The portfolio's logic is to use the cash cow's cash to build the star and settle the question mark, not to spend most of it on the cash cow.
+    - Ginger Zing's growth will not come from cutting its price. Demand is elastic, so a lower price sells more cans but earns less. Its route is distribution and promotion, which Plans A and C pay for.
+    - The plans that promise most are the least certain, and the evidence behind Plan D, a survey of supermarket shoppers, does not reach the small shops where most of Tausi's sales are made.
+  options:
+    - Plan A backs the question mark hardest and leaves the star short of capacity and the dog in place.
+    - Plan B earns most in two years and leaves the portfolio as it is for another year.
+    - Plan C reshapes the portfolio, dropping the dog and backing both products in growing segments.
+    - Plan D adds a new question mark before the existing one has been settled.
+  recommendation: >
+    One defensible recommendation is Plan C. Drop Tausi Cola, whose small share of a shrinking segment earns KSh 33m a
+    year after marketing, and use its line and budget for the products with a future: the second Uji Power line,
+    which lifts the capacity limit on the company's star, and a push behind Ginger Zing through distribution rather
+    than price. Set Ginger Zing a milestone, such as 10% of its segment by the end of 2026, and stop the extra spending
+    if it misses. Keep Mango Nectar's normal budget and test a reduced-sugar recipe within it, because a cash cow
+    needs care, not a large new investment.
+  caveat: >
+    This rests on two judgements: that Ginger Zing can grow through distribution without price cuts, and that dropping
+    the cola does not cost Tausi shelf space in the shops that bought it with the rest of the range. If the
+    distributors made the cola a condition of stocking the other products, Plan B, which protects what Tausi has,
+    would be the safer choice.
+
+method: >
+  Tausi Beverages, its brands, its rivals, its distributors and everyone in this case are fictional, and every figure
+  is simulated. The retail audit is a panel of shops chosen by a fictional research agency; its figures describe
+  those shops only and are not statistics about any real market. Contribution by product follows one stated model:
+  revenue less variable costs, then less each product's own marketing. The plans' extra contribution is the marketing
+  manager's estimate, stated as an assumption. A script in the repository (`scripts/qa/case-figures.py`) rebuilds
+  every exhibit and checks every figure in the text, and the unit tests recompute the market shares, growth rates and
+  price elasticity with the platform's market functions.
+
+topics: []
+tools: [bcg-matrix, ansoff-matrix]
+concepts: [change, creativity, ethics, sustainability]
+calculations: [total-contribution, contribution-per-unit]
+questions: []
+sources: [method-simulated, ib-bm-guide-2024]
+updated: 2026-11-03
+
+# Case Vault classification (src/lib/case-vault.ts).
+industry: fmcg
+functions: [marketing, finance]
+difficulty: foundation
+qualifications: [ib-dp-sl, ib-dp-hl, undergraduate]
+keyConcepts: [creativity, change]
+caseType: fictional
+syllabus: ['4.1', '4.4', '4.5', '5.5']
+
+analysisQuestions:
+  - id: tb-define
+    commandTerm: Define
+    ao: AO1
+    marks: 2
+    syllabus: ['4.5']
+    prompt: Define the term *product portfolio*.
+    guidance: >
+      One mark for the range of products a business sells, and one for the idea that they are managed together, so
+      that the business can balance products at different stages of their life cycles. Tausi's portfolio is its four
+      products.
+  - id: tb-share
+    commandTerm: Calculate
+    ao: AO4
+    marks: 4
+    paper: paper-2
+    syllabus: ['4.1']
+    exhibits: [ex-3]
+    prompt: Using Exhibit 3, calculate (i) Ginger Zing's market share in the panel shops in 2025 and (ii) the growth of the ginger and functional drinks segment from 2024 to 2025.
+    answer: >
+      (i) Market share = 82 ÷ 1,170 × 100 = 7.0%. (ii) Market growth = (1,170 − 900) ÷ 900 × 100 = 30.0%.
+    guidance: >
+      Two marks for each: one for the method and one for the answer. Say what the share describes: sales in the panel
+      shops, at shelf prices, not the whole market.
+  - id: tb-bcg
+    commandTerm: Analyse
+    ao: AO2
+    marks: 6
+    syllabus: ['4.5', '4.1']
+    exhibits: [ex-1, ex-3]
+    prompt: Using Exhibits 1 and 3, analyse Tausi's product portfolio with the Boston Consulting Group (BCG) matrix.
+    guidance: |
+      A strong answer places each product with figures, then draws the implication.
+
+      - Uji Power: a star, with 34.0% of a segment growing at 20.0%, selling 1.7 times its largest rival.
+      - Mango Nectar: a cash cow, the leader of a segment growing at 3.0%, earning KSh 462m after marketing.
+      - Ginger Zing: a question mark, with 7.0% of a segment growing at 30.0%, a fifth of its largest rival's sales, and a loss after marketing.
+      - Tausi Cola: a dog, with 3.5% of a segment shrinking by 2.0%, a small fraction of its rival's sales.
+
+      The implication earns the higher marks: the cash cow's cash should build the star and decide the question mark, and the dog's future should be questioned. Placing products without figures earns half the marks at most.
+  - id: tb-extension
+    commandTerm: Explain
+    ao: AO2
+    marks: 4
+    syllabus: ['4.5']
+    exhibits: [ex-4, ex-6]
+    prompt: Explain one extension strategy Tausi could use for Mango Nectar.
+    guidance: >
+      Two marks for a relevant extension strategy and two for explaining how it would lengthen the product's life in
+      Tausi's situation. Strong examples from the case: a reduced-sugar recipe, which answers the 41% of surveyed
+      shoppers who find it too sweet and the schools' concern; a 250 ml pack for lunchboxes, which opens a new use;
+      or new labels to refresh a long-established product.
+  - id: tb-survey
+    commandTerm: Explain
+    ao: AO2
+    marks: 4
+    syllabus: ['4.4']
+    exhibits: [ex-6]
+    prompt: Explain two limitations of the shopper survey in Exhibit 6 as evidence for Tausi's decision.
+    guidance: >
+      Two limitations, each explained and tied to the case, for two marks each. The sample is a convenience sample of
+      willing supermarket shoppers on two Saturdays, so it is unlikely to represent the people who buy in small
+      neighbourhood shops, where most of Tausi's sales are made; 71% were aged 18 to 35, so parents, who buy Uji
+      Power, are under-represented; and saying you would try a product is not the same as buying it again.
+  - id: tb-ped
+    commandTerm: Calculate
+    ao: AO4
+    marks: 2
+    level: HL
+    paper: paper-2
+    syllabus: ['4.5']
+    exhibits: [ex-5]
+    prompt: Using Exhibit 5, calculate the price elasticity of demand for Ginger Zing.
+    answer: >
+      Percentage change in quantity = (52 − 40) ÷ 40 × 100 = 30%. Percentage change in price = (70 − 80) ÷ 80 × 100 =
+      −12.5%. Price elasticity of demand = 30 ÷ −12.5 = −2.4.
+    guidance: >
+      One mark for the two percentage changes and one for the answer. The guide does not list this formula on its
+      formula sheet; the standard form divides the percentage change in quantity demanded by the percentage change in
+      price. Demand is price elastic, because the answer is greater than 1 if the sign is ignored.
+  - id: tb-price
+    commandTerm: Explain
+    ao: AO2
+    marks: 4
+    level: HL
+    syllabus: ['4.5']
+    exhibits: [ex-5]
+    prompt: Using Exhibit 5, explain why the price cut raised the shops' revenue from Ginger Zing but reduced Tausi's contribution.
+    guidance: >
+      Demand is elastic, so the percentage rise in cans sold (30%) is larger than the percentage fall in price (12.5%),
+      and revenue per shop rises from KSh 3,200 to KSh 3,640 a week. But Tausi's variable cost per can does not fall
+      with the price, so its contribution per can falls from KSh 16.80 to KSh 10.80, and the extra cans do not make up
+      for it: contribution per shop falls from KSh 672 to KSh 561.60 a week. Two marks for the revenue effect and two
+      for the contribution effect, each with figures.
+  - id: tb-discuss
+    commandTerm: Discuss
+    ao: AO3
+    marks: 10
+    syllabus: ['4.5', '4.1']
+    exhibits: [ex-1, ex-3, ex-5, ex-6, ex-7]
+    prompt: Discuss which of the four plans Tausi should choose for its KSh 120m reserve.
+    guidance: |
+      A strong answer does four things.
+
+      - It uses the portfolio: each product's share, growth and contribution, and what the BCG matrix suggests.
+      - It compares the plans over two and three years, and notices that the plans that promise most are the least certain.
+      - It questions the evidence: the panel's coverage, the convenience sample, and what the price test says about promotion.
+      - It reaches a judgement, with a condition or milestone that would show whether it is working.
+
+      Answers that describe all four plans without weighing them stay in the middle of the range.
+
+exercise:
+  role: You are Brian Otieno, Tausi's marketing manager.
+  brief: >
+    Wanjiru wants your recommendation for the January board meeting. Hassan will argue for Ginger Zing, Faith for the
+    plan with the best two-year return, and Joseph against dropping any product. You have the audit, the product
+    accounts, the price test and the survey, and you know which of them you trust least.
+  task: Choose one plan and defend it with the portfolio, the figures and the limits of the evidence.
+  deliverable: A recommendation of about 250 words, giving the plan, the portfolio reasoning, one milestone that would show it is working, and its main risk.
+  minutes: 30
+  criteria:
+    - Uses the audit to place each product, with its share and its segment's growth (Exhibit 3).
+    - Weighs the return over two years against the return over three (Exhibit 7).
+    - Treats the estimates, the price test and the survey critically.
+    - Sets a measurable milestone, and says what Tausi would do if it were missed.
+
+debrief:
+  summary: >
+    Tausi's four products sit in the four boxes of the BCG matrix, and the plans differ in which box they feed. The
+    strongest answers use the matrix as a starting point rather than a verdict: they check it against contribution,
+    capacity and the evidence on how Ginger Zing can grow, and they set a milestone that turns a three-year hope into
+    a decision that can be reviewed.
+  byOption:
+    - option: back-challenger
+      fit: conditional
+      body: >
+        It puts most of the money behind the question mark in the fastest-growing segment, which portfolio logic
+        allows, and ties with Plan C over three years at KSh 260m. But it depends on Ginger Zing more than doubling its
+        share, from 7.0% to 15%, against a rival five times its size, and it leaves the cola fading and Uji Power's
+        line full. Defensible with a milestone; risky as a single bet.
+    - option: protect-core
+      fit: conditional
+      body: >
+        The best two-year return, KSh 145m against spending of KSh 120m, and the lowest risk. But it spends most on the
+        cash cow, in a segment growing at 3.0%, and leaves the questions of Ginger Zing and the cola for another year.
+        A sound short-term choice that postpones the portfolio decision.
+    - option: prune-focus
+      fit: strong
+      body: >
+        The plan that follows the portfolio: it drops the dog, lifts the capacity limit on the star and backs the
+        question mark, funded by the cash cow. It ties with Plan A over three years at KSh 260m, with less resting on a
+        single forecast. Its risks are the distributors' reaction to losing the cola and the people on its line, which
+        the plan answers by filling Ginger Zing there.
+    - option: new-product
+      fit: weak
+      body: >
+        The most exciting plan and the least supported: the lowest three-year return, KSh 205m, a launch in September
+        with certification still to come, and demand evidence from a convenience sample of supermarket shoppers, 55% of
+        whom said they would try it. Better tested on a small scale once the portfolio is in order.
+  tradeoffs:
+    - Two years against three. Plan B leads over two years; Plans A and C over three.
+    - Building against milking. Portfolio logic uses the cash cow's cash rather than spending it on the cash cow.
+    - Focus against range. Dropping the cola sharpens the portfolio but may cost goodwill with distributors.
+    - Volume against margin. Elastic demand rewards a price cut with volume and punishes it in contribution.
+  evidenceThatMatters:
+    - Each product's share and its segment's growth (Exhibit 3).
+    - Where the contribution comes from, and where it is lost (Exhibit 1).
+    - The price test, which shows that price cuts are the wrong way to grow Ginger Zing (Exhibit 5).
+    - The limits of the survey, which never reached a small shop (Exhibit 6).
+  changeYourMind:
+    - Distributors make the cola a condition of taking the range. Plan B becomes the safer choice.
+    - Ginger Zing's share rises without extra spending. Back it less and Uji Power more.
+    - A proper test of Uji Power To Go in small shops shows strong repeat buying. Plan D deserves a second look.
+  commonErrors:
+    - Placing products on the BCG matrix without figures. Use share against the largest rival and the segment's growth.
+    - Treating the 55% who would try a product as forecast sales.
+    - Assuming that a price cut which raises revenue also raises profit.
+    - Reading the panel's shares as shares of a whole national market.
+
+frameworks:
+  - name: The Boston Consulting Group matrix
+    use: >
+      Places each product by its segment's growth and its share against the largest rival: Uji Power a star, Mango
+      Nectar a cash cow, Ginger Zing a question mark and Tausi Cola a dog. It suggests where the cash should flow, not
+      what each product will earn.
+    terms: [bcg-matrix, bcg-star, bcg-cash-cow, bcg-question-mark, bcg-dog]
+    tool: bcg-matrix
+  - name: The product life cycle and extension strategies
+    use: >
+      Mango Nectar is mature and Tausi Cola in decline; a reduced-sugar recipe or a lunchbox pack are extension
+      strategies that could lengthen Mango Nectar's life without a large investment.
+    terms: [product-life-cycle, extension-strategy, product-portfolio]
+    subtopics: ['4.5']
+  - name: Market share and market growth
+    use: >
+      The two figures behind every placement on the matrix, calculated from the retail audit; the audit's coverage
+      limits what they mean.
+    terms: [market-share, market-growth, market-leader]
+    subtopics: ['4.1']
+  - name: Price elasticity of demand
+    level: HL
+    use: >
+      The price test gives an elasticity of −2.4. Elastic demand explains why the cut raised the shops' revenue, and
+      the fixed cost per can explains why it still reduced Tausi's contribution.
+    terms: [price-elasticity-of-demand, penetration-pricing, competitive-pricing]
+    subtopics: ['4.5']
+  - name: Market research and sampling
+    use: >
+      The survey is primary research on a convenience sample. It is cheap and quick, and it may say little about the
+      small-shop customers who buy most of Tausi's products.
+    terms: [primary-research, survey, convenience-sampling, sampling-error, research-bias]
+    subtopics: ['4.4']
+  - name: Contribution
+    use: >
+      Contribution after marketing shows what each product adds towards fixed overheads, and why the cola, though small,
+      still adds something while Ginger Zing, for now, takes away.
+    terms: [contribution, total-contribution]
+    subtopics: ['5.5']
+  - name: The Ansoff matrix
+    use: >
+      Backing Ginger Zing in Tausi's existing shops is market penetration; Uji Power To Go is product development under
+      an existing brand, with more risk.
+    terms: [ansoff-matrix, market-penetration, product-development]
+    tool: ansoff-matrix
+
+discussion:
+  - >
+    The BCG matrix treats market share as a sign of cost advantage and market growth as a sign of cash needs. How well
+    do those signs fit a regional drinks maker competing with global brands in small shops?
+  - >
+    Tausi's market data come from an audit of 1,600 shops. What would you ask about the panel before trusting a share
+    calculated to one decimal place, and how would the answers change the decision?
+  - >
+    Should a drinks company reformulate a popular, sugary product before customers or regulators insist on it? Weigh
+    the cost of moving first against the risk to the brand of moving late.
+
+furtherReading:
+  - title: The Market Studio
+    href: /market-studio/
+    note: Market share and growth, and position maps, worked on a simulated market.
+  - title: 4.1 Introduction to marketing
+    href: /topics/introduction-to-marketing/
+    note: Market orientation, market share and market growth.
+  - title: 4.4 Market research
+    href: /topics/market-research/
+    note: Primary and secondary research and the sampling methods, with their limits.
+  - title: 4.5 The seven Ps of the marketing mix
+    href: /topics/the-seven-ps-of-the-marketing-mix/
+    note: The product life cycle, extension strategies, pricing and, for HL, price elasticity of demand.
+  - title: 'Toolkit: the BCG matrix'
+    href: /toolkit/#tool-bcg-matrix
+    note: The matrix in the toolkit index; its full guide is in preparation.
+  - title: Business management guide
+    source: ib-bm-guide-2024
+    location: pp. 31 to 32
+    note: The content and depth of teaching for the marketing unit.

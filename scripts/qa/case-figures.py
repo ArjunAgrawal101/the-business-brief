@@ -517,6 +517,162 @@ def quintanilla(k: Check) -> None:
     k.allow(420, 140, 6, 48, 20, 60, 35, 47, 6.5, 100, 18, 120, 55)
 
 
+
+@case('tausi-beverages')
+def tausi(k: Check) -> None:
+    """KSh million. A four-product portfolio: contribution by product, retail audit shares and growth, a price test, four plans."""
+    products = ['Mango Nectar', 'Ginger Zing', 'Uji Power', 'Tausi Cola']
+    revenue = [1320, 100, 600, 220]
+    vc_rate = [0.60, 0.65, 0.62, 0.75]
+    marketing = [66, 50, 30, 22]
+    vc = [rhu(r * v) for r, v in zip(revenue, vc_rate)]
+    contribution = [r - v for r, v in zip(revenue, vc)]
+    after = [c - m for c, m in zip(contribution, marketing)]
+    rows = [
+        ['Revenue', *revenue, sum(revenue)],
+        ['Variable costs', *vc, sum(vc)],
+        ['Contribution', *contribution, sum(contribution)],
+        ['Marketing', *marketing, sum(marketing)],
+        ['Contribution after marketing', *after, sum(after)],
+    ]
+    k.table('ex-1', rows)
+    overheads = 530
+    profit25 = sum(after) - overheads
+    k.allow(overheads, profit25, *[rhu(v * 100) for v in vc_rate], *[rhu(m / r * 100) for m, r in zip(marketing, revenue)],
+            *[rhu(c / r * 100, 1) for c, r in zip(contribution, revenue)])
+
+    history = [[2023, 1980, 170], [2024, 2120, 160], [2025, sum(revenue), profit25]]
+    k.table('ex-2', [[str(y), r, p, rhu(p / r * 100, 1)] for y, r, p in history])
+    k.allow(rhu((2240 / 1980 - 1) * 100, 1), rhu((2240 / 2120 - 1) * 100, 1), 120)
+
+    # The retail audit: sales in the panel shops, at shelf prices.
+    audit = {
+        'Juices and nectars': (4800, 4944, 1440, 1458, 1020),
+        'Ginger and functional drinks': (900, 1170, 54, 82, 410),
+        'Fortified porridge flours': (1250, 1500, 400, 510, 300),
+        'Colas': (6000, 5880, 240, 206, 3700),
+    }
+    k.table('ex-3', [[seg, *vals] for seg, vals in audit.items()])
+    for seg, (s24, s25, t24, t25, rival) in audit.items():
+        k.allow(rhu(t24 / s24 * 100, 1), rhu(t25 / s25 * 100, 1), rhu((s25 / s24 - 1) * 100, 1), rhu((t25 / t24 - 1) * 100, 1),
+                rhu(t25 / rival, 2), rhu(t25 / rival, 1), rhu(rival / s25 * 100, 1), s25 - s24, t25 - t24)
+    k.allow(1600, 15)
+
+    # The price test for Ginger Zing in 120 panel shops.
+    p0, p1, q0, q1 = 80, 70, 40, 52
+    share_to_tausi = 0.6
+    unit_vc = rhu(0.65 * share_to_tausi * p0, 2)
+    rev_can = [share_to_tausi * p0, share_to_tausi * p1]
+    cont_can = [rhu(r - unit_vc, 2) for r in rev_can]
+    test = [
+        ['Shelf price (KSh a can)', p0, p1],
+        ['Cans sold per shop per week', q0, q1],
+        ["Tausi's revenue per can (KSh)", *rev_can],
+        ['Variable cost per can (KSh)', unit_vc, unit_vc],
+        ['Contribution per can (KSh)', *cont_can],
+        ['Contribution per shop per week (KSh)', rhu(q0 * cont_can[0], 2), rhu(q1 * cont_can[1], 2)],
+    ]
+    k.table('ex-5', test)
+    pct_q = (q1 - q0) / q0 * 100
+    pct_p = (p1 - p0) / p0 * 100
+    ped = pct_q / pct_p
+    shop_rev = [q0 * p0, q1 * p1]
+    tausi_rev = [q0 * rev_can[0], q1 * rev_can[1]]
+    k.allow(pct_q, pct_p, rhu(ped, 1), 60, 120, 8, *shop_rev, rhu((shop_rev[1] / shop_rev[0] - 1) * 100, 2), *tausi_rev,
+            rhu((tausi_rev[1] / tausi_rev[0] - 1) * 100, 2), rhu((tausi_rev[1] / tausi_rev[0] - 1) * 100, 1),
+            rhu(q0 * cont_can[0] - q1 * cont_can[1], 1), rhu((1 - q1 * cont_can[1] / (q0 * cont_can[0])) * 100, 1), 12.5, 30, p0 - p1, q1 - q0)
+
+    # The four plans: one-off spending in 2026, and the change in contribution after marketing against carrying on as now.
+    plans = {
+        'A. Back the challenger': (120, [20, 90, 150]),
+        'B. Protect the core': (120, [60, 85, 90]),
+        'C. Prune and focus': (120, [35, 95, 130]),
+        'D. Launch a new product': (120, [5, 60, 140]),
+    }
+    rows = []
+    for name, (spend, extra) in plans.items():
+        rows.append([name, spend, *extra, sum(extra), sum(extra) - spend])
+        k.allow(sum(extra[:2]), sum(extra[:2]) - spend)
+    k.table('ex-7', rows)
+    k.allow(90, 30, 70, 50, 60, 110, 10, 33, 22, 400, 250)
+
+    # The consumer survey.
+    k.allow(300, 71, 62, 41, 55, 18, 35)
+    # Prices and packs quoted in the text.
+    k.allow(90, 160, 500, 330, 210, 1, 2009, 1000, 310)
+
+
+
+@case('silvertree-clinics')
+def silvertree(k: Check) -> None:
+    """R million in the statements; rand for unit costs. Nurse turnover by clinic, its cost, and five ways to reduce it."""
+    years = {2024: (150.00, 81.60, 1500, 21.00, 25.50), 2025: (156.00, 82.80, 2400, 21.84, 26.52)}
+    agency_rate, employed_shift, recruit, shifts_per_leaver, salary = 4200, 2600, 45000, 80, 420000
+    rows = {}
+    for y, (rev, staff, shifts, supplies, premises) in years.items():
+        agency = shifts * agency_rate / 1e6
+        pbit = rev - staff - agency - supplies - premises
+        rows[y] = [rev, staff, rhu(agency, 2), supplies, premises, rhu(pbit, 2)]
+        k.allow(shifts, rhu(pbit / rev * 100, 1), rhu(pbit / rev * 100, 2))
+    labels = ['Revenue', 'Employed staff', 'Agency staff', 'Medical supplies', 'Premises and other costs', 'Profit before interest and tax']
+    k.table('ex-1', [[lab, rows[2024][i], rows[2025][i]] for i, lab in enumerate(labels)])
+    k.allow(rhu((156 / 150 - 1) * 100, 1), 6, rhu(10.08 - 6.30, 2))
+    premium = agency_rate - employed_shift
+    per_leaver = recruit + shifts_per_leaver * premium
+    k.items('ex-2', {
+        'Recruitment and induction, per nurse replaced': f'R{recruit:,}',
+        'Agency shifts to cover each vacancy': str(shifts_per_leaver),
+        "An agency nurse's shift": f'R{agency_rate:,}',
+        "An employed nurse's shift, with on-costs": f'R{employed_shift:,}',
+        'Average nurse salary': f'R{salary:,} a year',
+    })
+    k.allow(recruit, shifts_per_leaver, agency_rate, employed_shift, salary, premium, per_leaver, shifts_per_leaver * premium)
+
+    clinics = [
+        ['Observatory', 18, 3, 1, 140], ['Bellville', 16, 7, 3, 610], ['Mitchells Plain', 17, 6, 2, 520],
+        ['Wynberg', 15, 5, 2, 430], ['Durbanville', 14, 4, 1, 300], ['Sea Point', 16, 5, 2, 400],
+    ]
+    table = [[n, avg, left, rhu(left / avg * 100, 1), vac, shifts] for n, avg, left, vac, shifts in clinics]
+    nurses = sum(r[1] for r in clinics)
+    leavers = sum(r[2] for r in clinics)
+    foot = ['All six clinics', nurses, leavers, rhu(leavers / nurses * 100, 1), sum(r[3] for r in clinics), sum(r[4] for r in clinics)]
+    assert foot[5] == leavers * shifts_per_leaver == years[2025][2]
+    k.table('ex-3', table, foot)
+    base_cost = leavers * per_leaver
+    k.allow(base_cost, rhu(base_cost / 1e6, 2), leavers * recruit, leavers * shifts_per_leaver * premium, rhu(leavers / nurses * 100, 2))
+
+    survey = [
+        ['My pay is fair for the work I do', 31, 52], ['My shift pattern lets me manage my life outside work', 38, 34],
+        ['I have opportunities to develop my skills', 29, 27], ['My manager recognizes good work', 41, 39], ['I intend to be working here in a year', 58, 55],
+    ]
+    k.table('ex-4', survey)
+    k.allow(*[r[2] - r[1] for r in survey], 81, 74)
+    k.items('ex-5', {'Shift patterns and rotas': '9', 'Workload': '6', 'No path to develop or progress': '5', 'Pay': '3', 'The clinic manager': '2', 'Moving away': '1'})
+    k.allow(26, 9 + 6, 9 + 5)
+    patients = [['Observatory', 24, 91], ['Bellville', 51, 72], ['Mitchells Plain', 44, 78], ['Wynberg', 39, 81], ['Durbanville', 31, 86], ['Sea Point', 37, 82]]
+    k.table('ex-6', patients)
+
+    # Five options: the head of people's estimate of turnover, and what follows from it.
+    options = {
+        'Pay rise of 8%': (0.08 * nurses * salary, 28.0, per_leaver, 0),
+        'Self-rostering and flexible shifts': (600000, 22.0, per_leaver, 0),
+        'Clinical career ladder': (2400000, 20.0, per_leaver, 1200000),
+        'Team leaders in every clinic': (1500000, 25.0, per_leaver, 0),
+        'One contracted agency': (0, leavers / nurses * 100, recruit + shifts_per_leaver * (3800 - employed_shift), 0),
+    }
+    rows = []
+    for name, (cost, rate, cost_per, revenue) in options.items():
+        out = rate / 100 * nurses
+        turnover_cost = out * cost_per
+        net = base_cost - turnover_cost + revenue - cost
+        rows.append([name, rhu(cost / 1e6, 2), rhu(rate, 1), rhu(out, 1), rhu(turnover_cost / 1e6, 2), rhu(net / 1e6, 2)])
+        k.allow(rhu((base_cost - turnover_cost) / 1e6, 2), rhu(cost_per), rhu(out, 2))
+    k.table('ex-7', rows)
+    k.allow(1.2, 3800, 3800 - employed_shift, agency_rate - 3800, 12, 8, 2, rhu(0.08 * nurses * salary), rhu(0.08 * nurses * salary / 1e6, 2))
+    # Givens quoted in the text.
+    k.allow(210, 96, 30, 2012, 2019, 6, 16.7, 10, 22, 24)
+
+
 def main(argv: list[str]) -> int:
     emit = '--emit' in argv
     ids = [a for a in argv if not a.startswith('--')]

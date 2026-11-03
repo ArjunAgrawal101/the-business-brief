@@ -9,6 +9,8 @@
 import { describe, expect, it } from 'vitest';
 import { acidTestRatio, balances, creditorDays, currentRatio, derive, gearingRatio, grossProfitMargin, profitMargin, roce, stockTurnoverDays, type Statement } from '../../src/lib/ratios';
 import { arr, npv, payback, type Project } from '../../src/lib/investment';
+import { growthRate, marketShare } from '../../src/lib/market';
+import { labourTurnover, percentChange } from '../../src/lib/finance';
 import type { Exhibit } from '../../src/lib/schemas';
 import { loadCorpus } from './helpers/corpus';
 
@@ -160,5 +162,79 @@ describe('Quintanilla Autopartes', () => {
     expect(Math.round((1 - A.capitalCost / pv) * 100)).toBe(14);
     expect(r1(0.6 * (npv(A, 10) ?? 0) + 0.4 * (npv(low, 10) ?? 0))).toBe(4.8);
     expect(text(id)).toContain('about MX$4.8m');
+  });
+});
+
+describe('Tausi Beverages', () => {
+  const id = 'tausi-beverages';
+  const audit = exhibit(id, 'ex-3');
+
+  it('gives each brand the share, growth and relative share the analysis quotes', () => {
+    const seg = (label: string) => {
+      const [s24, s25, t24, t25, rival] = row(audit, label) as [number, number, number, number, number];
+      return { share24: r1(marketShare(t24, s24)), share25: r1(marketShare(t25, s25)), growth: r1(growthRate(s24, s25)), relative: r2(t25 / rival) };
+    };
+    expect(seg('Juices and nectars')).toEqual({ share24: 30, share25: 29.5, growth: 3, relative: 1.43 });
+    expect(seg('Ginger and functional drinks')).toEqual({ share24: 6, share25: 7, growth: 30, relative: 0.2 });
+    expect(seg('Fortified porridge flours')).toEqual({ share24: 32, share25: 34, growth: 20, relative: 1.7 });
+    expect(seg('Colas')).toEqual({ share24: 4, share25: 3.5, growth: -2, relative: 0.06 });
+    expect(question(id, 'tb-share')).toContain('= 7.0%');
+    expect(question(id, 'tb-share')).toContain('= 30.0%');
+  });
+
+  it('finds elastic demand in the price test, with contribution falling as revenue rises', () => {
+    const test = exhibit(id, 'ex-5');
+    const [p0, p1] = row(test, 'Shelf price (KSh a can)') as [number, number];
+    const [q0, q1] = row(test, 'Cans sold per shop per week') as [number, number];
+    const ped = (percentChange(q0, q1) ?? NaN) / (percentChange(p0, p1) ?? NaN);
+    expect(r1(ped)).toBe(-2.4);
+    expect(question(id, 'tb-ped')).toContain('= −2.4');
+    expect(q1 * p1 - q0 * p0).toBe(440);
+    const [c0, c1] = row(test, 'Contribution per shop per week (KSh)') as [number, number];
+    expect(r1((1 - c1 / c0) * 100)).toBe(16.4);
+  });
+
+  it('adds up the products and the plans', () => {
+    const products = exhibit(id, 'ex-1');
+    const total = (label: string) => row(products, label);
+    for (const k of [0, 1, 2, 3, 4]) expect(total('Contribution')[k]).toBe((total('Revenue')[k] ?? 0) - (total('Variable costs')[k] ?? 0));
+    expect((total('Contribution after marketing')[4] ?? 0) - 530).toBe(148);
+    const plans = exhibit(id, 'ex-7');
+    for (const r of plans.rows ?? []) {
+      const [spend, a, b, c, three, net] = r.slice(1) as number[];
+      expect(three, String(r[0])).toBe((a ?? 0) + (b ?? 0) + (c ?? 0));
+      expect(net, String(r[0])).toBe((three ?? 0) - (spend ?? 0));
+    }
+  });
+});
+
+describe('Silvertree Clinics', () => {
+  const id = 'silvertree-clinics';
+  const nurses = exhibit(id, 'ex-3');
+
+  it('works out labour turnover clinic by clinic and for the network', () => {
+    for (const r of nurses.rows ?? []) {
+      const [avg, left, rate] = r.slice(1) as number[];
+      expect(r1(labourTurnover(left ?? 0, avg ?? 0)), String(r[0])).toBe(rate);
+    }
+    const [avg, left, rate] = (nurses.footer ?? []).slice(1) as number[];
+    expect(r1(labourTurnover(left ?? 0, avg ?? 0))).toBe(rate);
+    expect(question(id, 'sc-turnover')).toContain('= 16.7%');
+    expect(question(id, 'sc-turnover')).toContain('= 43.8%');
+    expect(question(id, 'sc-turnover')).toContain('= 31.3%');
+  });
+
+  it('costs a leaver and each option from the same model', () => {
+    const perLeaver = 45000 + 80 * (4200 - 2600);
+    expect(perLeaver).toBe(173000);
+    const base = 30 * perLeaver;
+    expect(question(id, 'sc-cost')).toContain('R5,190,000');
+    const options = exhibit(id, 'ex-7');
+    const net = (cost: number, rate: number, per: number, revenue = 0) => r2((base - (rate / 100) * 96 * per + revenue - cost) / 1e6);
+    expect(row(options, 'Pay rise of 8%')[4]).toBe(net(0.08 * 96 * 420000, 28, perLeaver));
+    expect(row(options, 'Self-rostering and flexible shifts')[4]).toBe(net(600000, 22, perLeaver));
+    expect(row(options, 'Clinical career ladder')[4]).toBe(net(2400000, 20, perLeaver, 1200000));
+    expect(row(options, 'Team leaders in every clinic')[4]).toBe(net(1500000, 25, perLeaver));
+    expect(row(options, 'One contracted agency')[4]).toBe(net(0, (30 / 96) * 100, 45000 + 80 * (3800 - 2600)));
   });
 });
