@@ -7,6 +7,8 @@ import VerifyTag from '../../components/ui/VerifyTag.astro';
 import StatusTag from '../../components/ui/StatusTag.astro';
 import { corpus, href, toolsInOrder } from '../../lib/content';
 import { studio, studioHref } from '../../lib/strategy/content';
+import { library } from '../../lib/frameworks-content';
+import { frameworkHref } from '../../lib/frameworks';
 
 const c = await corpus();
 const tools = await toolsInOrder();
@@ -15,6 +17,8 @@ const both = tools.filter(([, t]) => t.level === 'SL/HL');
 const hl = tools.filter(([, t]) => t.level === 'HL');
 const CLASSES = { situational: 'Situational', planning: 'Planning', 'decision-making': 'Decision-making' } as const;
 const studioTools = (await studio()).tools;
+// The frameworks library's page for each tool: a short explainer, and the main one while a tool's guide is planned.
+const frameworkFor = Object.entries((await library()).frameworks);
 ---
 
 <BaseLayout title="Toolkit" description="The business management toolkit: what each tool is for, how to build it, what it reveals and what it hides, applied to a case." section="toolkit">
@@ -49,6 +53,7 @@ const studioTools = (await studio()).tools;
             {g.list.map(([id, t]) => {
               const link = href.tool(id, t);
               const build = studioTools.find((x) => x.status.toolkit === id);
+              const fw = frameworkFor.find(([, f]) => f.tool === id);
               return (
                 <li class="index-item" id={`tool-${id}`}>
                   <span class="index-item__code" style="font-size:1rem">{t.classes.map((k) => CLASSES[k]).join(' and ')}</span>
@@ -70,6 +75,11 @@ const studioTools = (await studio()).tools;
                     {build && (
                       <a href={studioHref(build.slug)} class="small">
                         Build one: {build.title}
+                      </a>
+                    )}
+                    {fw && (
+                      <a href={frameworkHref(fw[0])} class="small">
+                        In the frameworks library
                       </a>
                     )}
                   </div>

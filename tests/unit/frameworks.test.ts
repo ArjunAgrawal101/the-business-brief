@@ -14,6 +14,17 @@ import { DIAGRAMS } from '../../src/lib/diagrams';
 import { asCorpus, loadCorpus } from './helpers/corpus';
 
 const DIR = new URL('../../src/content/frameworks/', import.meta.url).pathname;
+const STUDIO = new URL('../../src/content/studio/', import.meta.url).pathname;
+
+/** The Strategy Studio's tools, read as plain data: their slugs and the toolkit tool each applies. */
+function studioTools(): Array<{ slug: string; toolkit?: string }> {
+  if (!existsSync(STUDIO)) return [];
+  return readdirSync(STUDIO)
+    .filter((f) => f.endsWith('.yaml'))
+    .map((f) => parse(readFileSync(join(STUDIO, f), 'utf8')) as { type?: string; slug?: string; status?: { toolkit?: string } })
+    .filter((d) => d.type === 'tool' && d.slug)
+    .map((d) => ({ slug: d.slug!, toolkit: d.status?.toolkit }));
+}
 
 function loadFrameworks(): Record<string, Framework> {
   if (!existsSync(DIR)) return {};
@@ -54,7 +65,15 @@ describe('the frameworks library', () => {
   const fw = loadFrameworks();
 
   it('has no broken references and labels every framework honestly', () => {
-    expect(checkFrameworks(fw, asCorpus(c)).map((p) => `${p.where}: ${p.message}`)).toEqual([]);
+    expect(checkFrameworks(fw, asCorpus(c), studioTools()).map((p) => `${p.where}: ${p.message}`)).toEqual([]);
+  });
+
+  it('links every Strategy Studio tool that applies a framework from that framework', () => {
+    const studio = studioTools();
+    for (const s of studio.filter((x) => x.toolkit)) {
+      const f = Object.values(fw).find((x) => x.tool === s.toolkit);
+      if (f) expect(f.studio, `${s.toolkit} should link to ${s.slug}`).toBe(s.slug);
+    }
   });
 
   it('resolves every framework a glossary term names', () => {
@@ -124,5 +143,8 @@ describe('framework labels and links', () => {
     expect(msgs(sample({ status: 'syllabus', qualifications: ['ib'] }))).toContain('a syllabus framework gives the guide page that names it');
     expect(msgs(sample({ status: 'toolkit', qualifications: ['ib'], guidePages: '14', sources: ['ib-bm-guide-2024'] }))).toContain('a toolkit framework names its tool, whose guide holds the full treatment');
     expect(msgs(sample({ diagram: 'nope' }))).toContain('diagram "nope" is not in the library');
+    const withStudio = (f: Framework) => checkFrameworks({ x: f }, asCorpus(c), [{ slug: 'swot', toolkit: 'swot-analysis' }]).map((p) => p.message);
+    expect(withStudio(sample({ studio: 'nope' }))).toContain('Strategy Studio tool "nope" does not exist');
+    expect(withStudio(sample({ status: 'toolkit', tool: 'ansoff-matrix', studio: 'swot', qualifications: ['ib'], guidePages: '14', sources: ['ib-bm-guide-2024'] }))).toContain('Strategy Studio tool "swot" applies the toolkit tool "swot-analysis", not "ansoff-matrix"');
   });
 });

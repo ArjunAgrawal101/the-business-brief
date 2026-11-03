@@ -13,6 +13,8 @@ import { corpus, href, longDate, toolsInOrder } from '../../lib/content';
 import { inline, rich } from '../../lib/markup';
 import type { Tool } from '../../lib/schemas';
 import { studio, studioHref } from '../../lib/strategy/content';
+import { library } from '../../lib/frameworks-content';
+import { frameworkHref } from '../../lib/frameworks';
 
 type CompleteTool = Extract<Tool, { status: 'complete' }>;
 export async function getStaticPaths() {
@@ -29,6 +31,8 @@ const calcs = Object.entries(c.calculations).filter(([, k]) => k.page === `/tool
 const theCase = c.cases[t.application.case];
 // The Strategy Studio tool that applies this one to the reader's own case, if there is one.
 const build = (await studio()).tools.find((x) => x.status.toolkit === id);
+// The tool's page in the frameworks library, if it has one.
+const fw = Object.entries((await library()).frameworks).find(([, f]) => f.tool === id);
 const lists = [
   { key: 'when', title: 'When to use it', items: t.whenToUse },
   { key: 'construct', title: 'How to build it', items: t.construct, ordered: true },
@@ -142,6 +146,7 @@ const lists = [
           <ul class="link-list">
             {t.topics.map((x) => <li><a href={href.topic(x)}>{c.topics[x]?.code} {c.topics[x]?.title}</a></li>)}
             {t.cases.map((x) => <li><a href={href.case(x)}>Case: {c.cases[x]?.title}</a></li>)}
+            {fw && <li><a href={frameworkHref(fw[0])}>Frameworks library: {fw[1].name}</a></li>}
           </ul>
         </div>
         <div>

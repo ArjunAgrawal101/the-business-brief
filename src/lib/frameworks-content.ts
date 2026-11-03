@@ -10,9 +10,12 @@ import { DIAGRAMS } from './diagrams';
 import type { Framework } from './framework-schema';
 import { checkFrameworks, checkGlossaryDepth } from './integrity-frameworks';
 import type { RefContext } from './frameworks';
+import { studio } from './strategy/content';
 
 export interface Library {
   frameworks: Record<string, Framework>;
+  /** The Strategy Studio's tools, to link a framework to the tool that applies it. */
+  studio: Array<{ slug: string; toolkit?: string; title: string }>;
   /** What a glossary reference resolves against. */
   refs: RefContext;
 }
@@ -21,11 +24,12 @@ let loaded: Promise<Library> | null = null;
 
 export function library(): Promise<Library> {
   loaded ??= (async () => {
-    const [list, c] = await Promise.all([getCollection('frameworks'), corpus()]);
+    const [list, c, st] = await Promise.all([getCollection('frameworks'), corpus(), studio()]);
     const frameworks = Object.fromEntries(list.map((e) => [e.id, e.data]));
-    const problems = [...checkFrameworks(frameworks, c), ...checkGlossaryDepth(c, frameworks)];
+    const studioTools = st.tools.map((t) => ({ slug: t.slug, toolkit: t.status.toolkit, title: t.title }));
+    const problems = [...checkFrameworks(frameworks, c, studioTools), ...checkGlossaryDepth(c, frameworks)];
     if (problems.length) throw new Error(`Frameworks library: ${problems.length} integrity problem(s):\n${problems.map((p) => `  ${p.where}: ${p.message}`).join('\n')}`);
-    return { frameworks, refs: { frameworks, tools: c.tools, diagrams: DIAGRAMS } };
+    return { frameworks, studio: studioTools, refs: { frameworks, tools: c.tools, diagrams: DIAGRAMS } };
   })();
   return loaded;
 }

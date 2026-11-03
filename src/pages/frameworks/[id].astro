@@ -19,6 +19,7 @@ import { STATUS_LABELS, frameworkHref, inLibraryOrder, standing } from '../../li
 import { allSubtopics, subtopicHref } from '../../lib/learning';
 import { inline, jsonForScript, plain, rich } from '../../lib/markup';
 import { QUALIFICATION_TAG_LABELS } from '../../lib/schemas';
+import { studioHref } from '../../lib/strategy/content';
 
 export async function getStaticPaths() {
   const lib = await library();
@@ -37,6 +38,7 @@ const subs = allSubtopics(c);
 const titleOf = (code: string) => subs.find((x) => x.s.code === code)?.s.title ?? code;
 const tool = f.tool ? c.tools[f.tool] : undefined;
 const toolLink = f.tool && tool ? (tool.status === 'complete' ? `/toolkit/${f.tool}/` : `/toolkit/#tool-${f.tool}`) : undefined;
+const studioTool = f.studio ? lib.studio.find((x) => x.slug === f.studio) : undefined;
 const terms = f.terms.map((t) => ({ id: t, e: c.glossary[t]! }));
 const related = f.related.map((r) => ({ id: r, f: lib.frameworks[r]! }));
 const order = inLibraryOrder(lib.frameworks);
@@ -114,6 +116,15 @@ const jsonLd = {
                 <span class="label">{tool.status === 'complete' ? 'The full toolkit guide' : 'In the toolkit'}</span>
                 <span class="fw-guide__name">{tool.name}</span>
                 <span class="fw-guide__text">{tool.status === 'complete' ? 'How to build it, the evidence it needs, what it reveals and hides, and a worked case.' : 'Its entry in the toolkit; the full guide is in preparation.'}</span>
+              </a>
+            )
+          }
+          {
+            studioTool && (
+              <a class="fw-guide" href={studioHref(studioTool.slug)}>
+                <span class="label">Apply it to your own case</span>
+                <span class="fw-guide__name">{studioTool.title}</span>
+                <span class="fw-guide__text">In the Strategy Studio: build it step by step, with your entries checked as you go and kept on this device.</span>
               </a>
             )
           }

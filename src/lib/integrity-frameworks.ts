@@ -54,8 +54,18 @@ export function checkGlossaryDepth(c: Corpus, frameworks?: Record<string, Framew
   return out;
 }
 
-/** The frameworks library against the corpus. */
-export function checkFrameworks(frameworks: Record<string, Framework>, c: Corpus): Problem[] {
+/** What the checks need to know about a Strategy Studio tool. */
+export interface StudioToolRef {
+  slug: string;
+  toolkit?: string;
+}
+
+/**
+ * The frameworks library against the corpus. With `studio`, also checks that
+ * each framework's Strategy Studio tool exists and, for a toolkit tool, is the
+ * studio tool for the same toolkit tool.
+ */
+export function checkFrameworks(frameworks: Record<string, Framework>, c: Corpus, studio?: StudioToolRef[]): Problem[] {
   const out: Problem[] = [];
   const levels = subtopicLevels(c);
   const names = new Map<string, string>();
@@ -74,6 +84,11 @@ export function checkFrameworks(frameworks: Record<string, Framework>, c: Corpus
       const prev = names.get(k);
       if (prev && prev !== id) add(`"${n}" is also the name of ${prev}`);
       names.set(k, id);
+    }
+    if (f.studio && studio) {
+      const st = studio.find((x) => x.slug === f.studio);
+      if (!st) add(`Strategy Studio tool "${f.studio}" does not exist`);
+      else if (f.tool && st.toolkit && st.toolkit !== f.tool) add(`Strategy Studio tool "${f.studio}" applies the toolkit tool "${st.toolkit}", not "${f.tool}"`);
     }
     if (f.status === 'syllabus') {
       if (!f.guidePages) add('a syllabus framework gives the guide page that names it');

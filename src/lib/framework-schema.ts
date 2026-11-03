@@ -76,6 +76,8 @@ export const frameworkSchema = z.object({
   diagram: z.string(),
   /** For a toolkit tool: its entry in src/content/tools, whose guide holds the full treatment. */
   tool: z.string().optional(),
+  /** The Strategy Studio tool that applies the framework to the reader's own case (src/content/studio), by slug. */
+  studio: z.string().optional(),
   /** What it is. */
   explanation: md,
   /** What it is for. */
