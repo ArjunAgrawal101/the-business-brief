@@ -29,7 +29,7 @@ The platform has no accounts and stores nothing on a server. A static site is th
 
 | Collection | Source | Loader |
 | --- | --- | --- |
-| topics, cases, decisions, tools, interactives, curricula, mindmaps, notes | one YAML file per entry | Astro `glob` |
+| topics, cases, decisions, tools, interactives, curricula, mindmaps, notes, boardroom | one YAML file per entry | Astro `glob` |
 | questions, glossary | several YAML files, each a list of entries with ids | custom `yamlList` loader (checks for duplicate ids) |
 | calculations, assessment, commandTerms, concepts, pathways, modules, sources, claims, resources | one YAML file of entries in `src/content/data/` | Astro `file` |
 | studio | one YAML file per Strategy Studio tool, and one for its engagement, in `src/content/studio/` (schema in `src/lib/schemas-strategy.ts`) | Astro `glob` |
@@ -70,6 +70,7 @@ The same checks run in the unit tests (`tests/unit/integrity.test.ts`), which lo
 | `src/lib/scale.ts` | The simulated economies and diseconomies of scale model |
 | `src/lib/force-field.ts` | Force field totals and the effect of weakening a force |
 | `src/lib/decision-room.ts` | Which choices a round offers, how outcomes combine into the board pack, how measures are written and compared |
+| `src/lib/boardroom/` | The Boardroom: `engine.ts` (one business worked period by period: pure, deterministic, its cross-functional links and lags documented at the top), `scenario.ts` (history, rounds, events chosen by the state, scorecards, every path compared), `kpis.ts`, `narrate.ts` (tokens, effects and consequences in words), `charts.ts`, `render.ts` (markup shared by server and browser), `view.ts` (the board pack's statements), `schema.ts` and `roles.ts`; `src/lib/integrity-boardroom.ts` runs every path and fails the build on a broken identity or reference |
 | `src/lib/cashflow.ts` | The cash flow forecast in the guide's layout, ways of paying for an investment, working capital measures, the profit for the period and its reconciliation to cash, worked in cents |
 | `src/lib/ratios.ts`, `src/lib/investment.ts` | The guide's ratios from two years of statements, with strategies applied to the accounts; payback, ARR and NPV with the guide's printed discount factors |
 | `src/lib/plan.ts` | Critical path analysis: earliest and latest times, total and free float, the critical path |
@@ -118,6 +119,7 @@ The quiz engine (`src/scripts/quiz.ts`) dispatches a bubbling `quiz:progress` ev
 | `/downloads/glossary.csv`, `/downloads/mindmaps/[id].svg`, `/downloads/diagrams/[id].svg`, `/downloads/guides/*.pdf` | Downloads (the PDFs are files in `public/`; the rest are written by the build) |
 | `/cases/`, `/cases/[id]/` | Case files |
 | `/decision-room/`, `/decision-room/[id]/` | Decision Rooms |
+| `/boardroom/`, `/boardroom/[id]/` | The Boardroom: multi-round simulations, each a brief, a generated board pack, the simulation (a casebook without JavaScript) and a debrief |
 | `/finance-desk/`, `/finance-desk/costs-and-revenue/`, `/finance-desk/break-even/`, `/finance-desk/contribution/`, `/finance-desk/ratios/`, `/finance-desk/cash-flow/`, `/finance-desk/investment-appraisal/` | Finance Desk |
 | `/rooms/`, `/case-room/`, `/case-room/halden-diagnosis/`, `/strategy-studio/`, `/market-studio/`, `/people-and-culture/`, `/operations-floor/` | All rooms; the rooms with pages of their own; the case lab |
 | `/strategy-studio/[tool]/` | The Strategy Studio's tools: `swot`, `steeple`, `five-forces`, `ansoff`, `bcg-matrix`, `generic-strategies`, `stakeholder-map`, `decision-tree`, `force-field`, `option-appraisal` |

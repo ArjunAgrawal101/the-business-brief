@@ -1,0 +1,141 @@
+---
+import '../../styles/boardroom.css';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import BoardPack from '../../components/boardroom/BoardPack.astro';
+import Simulation from '../../components/boardroom/Simulation.astro';
+import { boardroomScenarios } from '../../lib/boardroom/content';
+import { CHALLENGE_LABELS, type Scenario } from '../../lib/boardroom/schema';
+import { scenarioView } from '../../lib/boardroom/view';
+import { fillTokens } from '../../lib/boardroom/narrate';
+import { corpus } from '../../lib/content';
+import { allSubtopics, subtopicHref } from '../../lib/learning';
+import { inline, rich } from '../../lib/markup';
+
+export async function getStaticPaths() {
+  return (await boardroomScenarios()).map(([id, sc]) => ({ params: { id }, props: { id, sc } }));
+}
+interface Props {
+  id: string;
+  sc: Scenario;
+}
+const { id, sc } = Astro.props;
+const c = await corpus();
+const view = scenarioView(sc);
+/** The brief may quote the engine's figures for the last period before the first round. */
+const fill = (t: string) => fillTokens(t, view.last.kpis, view.history[view.history.length - 2]?.kpis, view.ctx);
+const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+const subs = allSubtopics(c);
+const subtopics = Object.fromEntries(
+  Array.from(new Set([...sc.syllabus, ...sc.debrief.theory.flatMap((t) => t.syllabus)])).map((code) => [code, { href: subtopicHref(c, code), title: subs.find((x) => x.s.code === code)?.s.title ?? code }]),
+);
+const glossary = Object.fromEntries(sc.debrief.terms.map((t) => [t, c.glossary[t]?.term ?? t]));
+const commandTerms = Object.fromEntries(sc.debrief.practice.map((p) => [p.command, c.commandTerms[p.command]?.term ?? p.command]));
+const hlCodes = new Set(subs.filter((x) => x.s.level === 'HL').map((x) => x.s.code));
+const INFLUENCE = { high: 'High influence', medium: 'Medium influence', low: 'Low influence' } as const;
+const periodWord = sc.model.period.unit === 'quarter' ? 'quarters' : 'years';
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LearningResource',
+  name: sc.title,
+  description: sc.dek,
+  educationalLevel: 'IB Diploma Programme Business Management',
+  learningResourceType: 'Simulation',
+  isAccessibleForFree: true,
+};
+---
+
+<BaseLayout title={`${sc.company.name}: Boardroom`} description={`${sc.dek} A multi-round business simulation with a fictional company and simulated figures.`} section="boardroom" room="boardroom" jsonLd={jsonLd}>
+  <header class="bb-hero bb-hero--case">
+    <div class="wrap">
+      <Breadcrumbs trail={[{ label: 'Boardroom', href: '/boardroom/' }, { label: sc.company.name }]} />
+      <div class="bb-hero__grid">
+        <div class="bb-hero__main">
+          <p class="bb-hero__kicker">Boardroom · {CHALLENGE_LABELS[sc.challenge]}</p>
+          <h1 class="bb-hero__title">{sc.title}</h1>
+          <p class="bb-hero__dek">{sc.dek}</p>
+          <p class="bb-hero__tags">
+            <span class="bb-chip">Fictional company</span>
+            <ProvenanceTag kind="simulated-data" />
+            <span class="bb-chip">{sc.rounds.length} rounds, one per {sc.model.period.unit}</span>
+            <span class="bb-chip">{sc.level === 'HL' ? 'HL' : 'SL and HL'}</span>
+          </p>
+        </div>
+        <dl class="bb-facts">
+          <div><dt>Industry</dt><dd>{sc.company.industry}</dd></div>
+          <div><dt>Location</dt><dd>{sc.company.location}</dd></div>
+          <div><dt>Founded</dt><dd>{sc.company.founded}</dd></div>
+          <div><dt>Size</dt><dd>{sc.company.size}</dd></div>
+          <div><dt>Ownership</dt><dd>{sc.company.owners}</dd></div>
+          <div><dt>Figures in</dt><dd>{cap(sc.currency.name)} ({sc.currency.symbol})</dd></div>
+        </dl>
+      </div>
+      <p class="bb-hero__question"><span class="bb-hero__qlabel">The question for the board</span> {sc.question}</p>
+      <nav class="bb-jump" aria-label="On this page">
+        <a href="#brief">The brief</a>
+        <a href="#pack">The board pack</a>
+        <a href="#simulation">The simulation</a>
+        <a href="#debrief">The debrief</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap page-body bb-page">
+    <section class="bb-section" id="brief" aria-labelledby="brief-h">
+      <SectionHead no={1} title="The brief" id="brief-h" dek={`The company, its position, the people with a stake in it, and the ${periodWord} ahead.`} />
+      <div class="bb-brief">
+        <div class="bb-brief__story narrative">
+          {sc.background.map((p) => <Fragment set:html={rich(fill(p))} />)}
+        </div>
+        <aside class="bb-brief__side" aria-labelledby="ctx-h">
+          <h3 class="label label--ink" id="ctx-h">The strategic context</h3>
+          {sc.context.map((p) => <div class="prose small" set:html={rich(fill(p))} />)}
+        </aside>
+      </div>
+      <div class="bb-challenges">
+        <h3 class="label label--ink">The management challenges</h3>
+        <ul class="bb-challenges__list">{sc.challenges.map((ch) => <li set:html={inline(fill(ch))} />)}</ul>
+      </div>
+      <h3 class="label label--ink bb-stake-h">The stakeholders and what they say</h3>
+      <ul class="bb-stakes" role="list">
+        {
+          sc.stakeholders.map((s) => (
+            <li class="bb-stake">
+              <p class="bb-stake__name">{s.name}</p>
+              <p class="bb-stake__meta">
+                {s.group} · {INFLUENCE[s.influence]}
+              </p>
+              <p class="bb-stake__interest" set:html={inline(s.interest)} />
+              <blockquote class="bb-stake__view" set:html={rich(s.view)} />
+            </li>
+          ))
+        }
+      </ul>
+      <div class="bb-syllabus">
+        <h3 class="label label--ink">What it exercises in the IB course</h3>
+        <ul class="bb-syllabus__list">
+          {
+            sc.syllabus.map((code) => (
+              <li>
+                <a href={subtopics[code]?.href}>
+                  <span class="num">{code}</span> {subtopics[code]?.title}
+                </a>
+                {hlCodes.has(code) && <span class="tag tag--hl">HL</span>}
+              </li>
+            ))
+          }
+        </ul>
+        {sc.hlNote && <div class="small muted prose" set:html={rich(sc.hlNote)} />}
+      </div>
+    </section>
+
+    <section class="bb-section" id="pack" aria-labelledby="pack-h">
+      <SectionHead no={2} title="The board pack" id="pack-h" dek={`Every figure here is calculated by the Boardroom's model from ${sc.company.name}'s starting position and its history; the simulation continues from the last column.`} />
+      <BoardPack id={id} sc={sc} view={view} />
+    </section>
+
+    <Simulation id={id} sc={sc} view={view} glossary={glossary} commandTerms={commandTerms} subtopics={subtopics} no={3} />
+  </div>
+</BaseLayout>

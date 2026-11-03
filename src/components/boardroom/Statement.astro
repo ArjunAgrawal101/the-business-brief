@@ -1,0 +1,51 @@
+---
+/**
+ * A financial statement from the engine's figures: rows in the guide's order,
+ * one column per period, money in thousands, losses in brackets. Rows that are
+ * zero in every column (other income in a year without any) are left out.
+ */
+import type { StatementColumn, StatementRow } from '../../lib/boardroom/view';
+import { thousands } from '../../lib/boardroom/view';
+
+interface Props {
+  rows: StatementRow[];
+  columns: StatementColumn[];
+  caption: string;
+  unit: string;
+  id: string;
+}
+const { rows, columns, caption, unit, id } = Astro.props;
+const shown = rows.filter((r) => r.kind === 'heading' || !['otherIncome'].includes(r.key) || columns.some((c) => Math.abs(c.values[r.key] ?? 0) >= 500));
+---
+
+<div class="table-scroll" role="region" aria-labelledby={id} tabindex="0">
+  <table class="table bb-statement">
+    <caption class="sr-only" id={id}>{caption}</caption>
+    <thead>
+      <tr>
+        <th scope="col"><span class="bb-statement__unit">{unit}</span></th>
+        {columns.map((c) => <th scope="col" class="n">{c.label}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {
+        shown.map((r) =>
+          r.kind === 'heading' ? (
+            <tr class="bb-statement__heading">
+              <th scope="row" colspan={columns.length + 1}>
+                {r.label}
+              </th>
+            </tr>
+          ) : (
+            <tr class:list={[r.kind && `bb-statement__${r.kind}`, r.indent && 'bb-statement__indent']}>
+              <th scope="row">{r.label}</th>
+              {columns.map((c) => (
+                <td class="n">{thousands(c.values[r.key] ?? 0)}</td>
+              ))}
+            </tr>
+          ),
+        )
+      }
+    </tbody>
+  </table>
+</div>

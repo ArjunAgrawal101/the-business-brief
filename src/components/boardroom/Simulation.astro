@@ -1,0 +1,316 @@
+---
+/**
+ * The Boardroom simulation and its debrief. With JavaScript the learner takes
+ * a seat, watches the dashboard and decides each round; the browser runs the
+ * same engine and the same renderers as this page. Without JavaScript the
+ * section is a complete casebook: every round with its options and what can
+ * happen next, one path narrated with the engine's figures, the memo as a
+ * worksheet, and the debrief. Progress is kept on this device only, under
+ * bb:boardroom:<id>.
+ */
+import '../../styles/boardroom.css';
+import SectionHead from '../layout/SectionHead.astro';
+import ProvenanceTag from '../ui/ProvenanceTag.astro';
+import type { KpiId } from '../../lib/boardroom/engine';
+import { consequenceHtml, eventHtml, eventVariantsHtml, givenHtml, involvesHtml, kpiTiles, figuresTable, pathsTableHtml, perspectivesHtml, rangeTableHtml, ROLE_LEAD_LABEL, scorecardHtml } from '../../lib/boardroom/render';
+import { fillTokens } from '../../lib/boardroom/narrate';
+import { scorecard } from '../../lib/boardroom/scenario';
+import { ROLE_IDS, ROLE_IN_TEXT, ROLE_TITLES, type Scenario } from '../../lib/boardroom/schema';
+import type { ScenarioView } from '../../lib/boardroom/view';
+import { href } from '../../lib/content';
+import { inline, jsonForScript, rich } from '../../lib/markup';
+
+interface Props {
+  id: string;
+  sc: Scenario;
+  view: ScenarioView;
+  glossary: Record<string, string>;
+  commandTerms: Record<string, string>;
+  subtopics: Record<string, { href: string; title: string }>;
+  no: number;
+}
+const { id, sc, view, glossary, commandTerms, subtopics, no } = Astro.props;
+const { ctx, history, last, walkthrough, named, env } = view;
+const R = sc.rounds.length;
+const FINAL_KPIS: KpiId[] = Array.from(new Set([...(sc.dashboard as KpiId[]), 'pbit', 'netCash', 'brand', 'morale', 'marketShare', 'profit', ...(sc.sustainability ? (['emissionsPerUnit'] as KpiId[]) : [])]));
+const trim = (k: Record<string, number>) => Object.fromEntries(FINAL_KPIS.map((x) => [x, k[x]]));
+const config = {
+  id,
+  company: sc.company.name,
+  question: sc.question,
+  units: sc.units,
+  core: { model: sc.model, start: sc.start, history: sc.history, rounds: sc.rounds, roles: sc.roles },
+  dashboard: sc.dashboard,
+  memo: sc.memo,
+  ctx,
+  env: { count: env.count, allGoals: env.allGoals, everyone: env.everyone, summaries: env.summaries.map((s) => ({ picks: s.picks, cumProfit: s.cumProfit, goals: s.goals, final: trim(s.final as unknown as Record<string, number>) })) },
+  named: named.map((p) => ({ label: p.label, picks: p.picks })),
+  finalKpis: FINAL_KPIS,
+};
+const fillFirst = (t: string) => fillTokens(t, last.kpis, history[history.length - 2]?.kpis, ctx);
+const walkPrev = (k: number) => (k === 0 ? last : walkthrough.rounds[k - 1]?.result) ?? last;
+const walkEnd = walkthrough.rounds[walkthrough.rounds.length - 1]?.result ?? last;
+---
+
+<div class="bb-sim" data-ix="boardroom" id={`bb-${id}`}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+
+  <section class="bb-section" id="simulation" aria-labelledby="sim-h">
+    <SectionHead no={no} title="The simulation" id="sim-h" dek={`${R} rounds, one ${sc.model.period.unit} each, with an event between rounds that the board does not control.`} />
+    <p class="state state--error" data-error hidden>
+      The simulation could not start in this browser. The casebook below has every round, every option and one path narrated with the engine's figures.
+    </p>
+
+    <div class="bb-shell js-only" data-shell>
+      <section class="bb-seats" data-seats aria-labelledby={`bb-${id}-seats-h`}>
+        <h3 class="bb-seats__title" id={`bb-${id}-seats-h`} tabindex="-1">Take a seat at the table</h3>
+        <p class="bb-seats__lead">
+          The decisions belong to the whole board. Your seat decides which measures you watch most closely and what you are judged on at the end. Each director's goals pull a different way; no path through this
+          simulation meets every goal of every director.
+        </p>
+        <fieldset class="bb-seatpick">
+          <legend class="sr-only">Choose your role on the board</legend>
+          {
+            ROLE_IDS.map((r) => (
+              <div class="bb-seatcard">
+                <input type="radio" name={`bb-${id}-role`} id={`bb-${id}-role-${r}`} value={r} aria-describedby={`bb-${id}-role-${r}-goals`} />
+                <label for={`bb-${id}-role-${r}`}>
+                  <span class="bb-seatcard__title">{ROLE_TITLES[r]}</span>
+                  <span class="bb-seatcard__brief" set:html={inline(sc.roles[r].brief)} />
+                </label>
+                <div class="bb-seatcard__goals">
+                  <p class="bb-seatcard__judged" id={`bb-${id}-role-${r}-judged`}>Judged on</p>
+                  <ul id={`bb-${id}-role-${r}-goals`} aria-labelledby={`bb-${id}-role-${r}-judged`}>
+                    {sc.roles[r].goals.map((g) => (
+                      <li>{g.label}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))
+          }
+        </fieldset>
+        <div class="bb-actions">
+          <button type="button" class="btn btn--primary" data-act="seat">Take this seat</button>
+          <span class="field__error" data-seat-msg></span>
+        </div>
+      </section>
+
+      <div class="bb-play" data-play hidden>
+        <section class="bb-board" aria-labelledby={`bb-${id}-board-h`}>
+          <div class="bb-board__head">
+            <h3 class="bb-board__title" id={`bb-${id}-board-h`}>Board dashboard <span class="bb-board__when" data-board-when>{last.label}</span></h3>
+            <p class="bb-board__seat" data-board-seat></p>
+            <ProvenanceTag kind="simulated-data" />
+          </div>
+          <div data-board-tiles set:html={kpiTiles(history, sc.dashboard as KpiId[], [], ctx, `bbd-${id}`, history.length)} />
+          <details class="bb-board__table">
+            <summary>Every figure by {sc.model.period.unit}</summary>
+            <div data-board-table set:html={figuresTable(history, sc.dashboard as KpiId[], ctx, 'Dashboard figures by period', history.length)} />
+          </details>
+        </section>
+        <ol class="bb-rail" data-rail aria-label="Progress through the simulation"></ol>
+        <section class="bb-minutes" data-minutes-wrap aria-labelledby={`bb-${id}-minutes-h`} hidden>
+          <h3 class="label label--ink" id={`bb-${id}-minutes-h`}>Board minutes: decisions so far</h3>
+          <div data-minutes></div>
+        </section>
+        <div class="bb-stage" data-stage></div>
+        <div class="bb-restart">
+          <button type="button" class="btn btn--small" data-act="restart">Start again</button>
+          <button type="button" class="btn btn--small" data-act="change-role">Change seat</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bb-casebook nojs-only">
+      <p class="bb-casebook__note">
+        This is the casebook version of the simulation: every round and its options, what can happen between rounds, and one path narrated with the engine's figures. With JavaScript you can take a seat at the
+        board and decide each round yourself.
+      </p>
+      {
+        sc.rounds.map((r, i) => (
+          <section class="bb-cround" aria-labelledby={`cb-${id}-${r.id}`}>
+            <h3 class="bb-cround__title" id={`cb-${id}-${r.id}`}>
+              <span class="bb-cround__no">
+                Round {i + 1} · {r.period}
+              </span>{' '}
+              {r.title}
+            </h3>
+            <p class="bb-cround__lead">This is a decision for {ROLE_LEAD_LABEL[r.lead]}.</p>
+            <div class="prose" set:html={rich(i === 0 ? fillFirst(r.situation) : r.situation)} />
+            {r.given && (
+              <div class="bb-given">
+                <p class="bb-given__label">Already agreed: {r.given.note}</p>
+                <Fragment set:html={givenHtml(r.given.effects, ctx)} />
+              </div>
+            )}
+            <p class="bb-question">{r.question}</p>
+            <h4 class="label label--ink">Around the table</h4>
+            <Fragment set:html={perspectivesHtml(r, 5, undefined, i === 0 ? fillFirst : undefined)} />
+            <h4 class="label label--ink">The options</h4>
+            <ol class="bb-copts">
+              {r.options.map((o) => (
+                <li class="bb-copt">
+                  <h5 class="bb-copt__name">{o.label}</h5>
+                  <div class="prose small" set:html={rich(o.summary)} />
+                  <p class="bb-involves__label">What it involves</p>
+                  <Fragment set:html={involvesHtml(o, ctx)} />
+                </li>
+              ))}
+            </ol>
+            {r.event && (
+              <>
+                <h4 class="label label--ink">What can happen before the next round</h4>
+                <Fragment set:html={eventVariantsHtml(r, ctx, 5)} />
+              </>
+            )}
+          </section>
+        ))
+      }
+
+      <section class="bb-walk" aria-labelledby={`cb-${id}-walk`}>
+        <h3 class="bb-walk__title" id={`cb-${id}-walk`}>{sc.walkthrough.title}</h3>
+        <div class="prose" set:html={rich(fillTokens(sc.walkthrough.intro, last.kpis, undefined, ctx))} />
+        {
+          walkthrough.rounds.map((rr, k) => (
+            <section class="bb-walk__round" aria-labelledby={`wk-${id}-${k}`}>
+              <h4 class="bb-walk__step" id={`wk-${id}-${k}`}>
+                Round {k + 1} · {rr.round.period}: {rr.option.label}
+              </h4>
+              <Fragment set:html={consequenceHtml(rr, walkPrev(k), k, R, ctx, { level: 5, id: `wk-${id}-${k}-c` })} />
+              {rr.event && <Fragment set:html={eventHtml(rr.event, rr.result, walkPrev(k), ctx, { level: 5, id: `wk-${id}-${k}-e` })} />}
+            </section>
+          ))
+        }
+        <div class="prose" set:html={rich(fillTokens(sc.walkthrough.outro, walkEnd.kpis, last.kpis, ctx))} />
+        <h4 class="label label--ink">The dashboard at the end of this path</h4>
+        <div class="bb-board bb-board--pack" set:html={kpiTiles([...history, ...walkthrough.rounds.map((r) => r.result)], sc.dashboard as KpiId[], [], ctx, `wk-${id}-tile`, history.length)} />
+        <h4 class="label label--ink">How each director's goals came out on this path</h4>
+        <div class="bb-scores">
+          {ROLE_IDS.map((r) => <Fragment set:html={scorecardHtml(r, scorecard(sc, walkthrough, r), ctx, 5)} />)}
+        </div>
+      </section>
+
+      <section class="bb-memo-sheet" aria-labelledby={`cb-${id}-memo`}>
+        <h3 class="bb-walk__title" id={`cb-${id}-memo`}>The board memo</h3>
+        <div class="prose" set:html={rich(sc.memo.intro)} />
+        <ol class="bb-memo-sheet__fields">
+          {
+            sc.memo.fields.map((f) => (
+              <li>
+                <strong>{f.label}.</strong> {f.hint}
+              </li>
+            ))
+          }
+        </ol>
+        <p class="small muted">Write it on paper or in a document; with JavaScript the simulation gives you a form for it, keeps it on this device and lets you print, copy or download it.</p>
+      </section>
+    </div>
+  </section>
+
+  <section class="bb-section bb-debrief" id="debrief" aria-labelledby="debrief-h" tabindex="-1">
+    <SectionHead no={no + 1} title="The debrief" id="debrief-h" dek="What happened, the theory behind it, and what the different paths teach." />
+    <p class="bb-locked js-only" data-debrief-locked>The debrief opens when the board has made its last decision, so that the simulation's surprises stay surprises.</p>
+    <div class="bb-yours js-only" data-yours></div>
+    <div class="bb-debrief__body" data-debrief-body>
+      <div class="bb-debrief__summary prose" set:html={rich(sc.debrief.summary)} />
+
+      <h3 class="bb-debrief__h">The theory behind it</h3>
+      {sc.debrief.theory.some((t) => t.level === 'HL') && <p class="hl-notice"><span class="tag tag--hl">HL</span> Some of the theory below is HL only, and is hidden while you are viewing SL content.</p>}
+      <div class="bb-theory">
+        {
+          sc.debrief.theory.map((t) => (
+            <section class="bb-theory__card" data-level={t.level === 'HL' ? 'HL' : undefined}>
+              <h4 class="bb-theory__title">
+                {t.title}
+                {t.level === 'HL' && <span class="tag tag--hl">HL</span>}
+              </h4>
+              <div class="prose small" set:html={rich(t.body)} />
+              <p class="bb-theory__codes">
+                {t.syllabus.map((code) => (
+                  <a href={subtopics[code]?.href ?? '/topics/'} class="tag tag--plain">
+                    {code} {subtopics[code]?.title}
+                  </a>
+                ))}
+              </p>
+            </section>
+          ))
+        }
+      </div>
+
+      <h3 class="bb-debrief__h">What different paths teach</h3>
+      <p class="small muted">The figures are the engine's, for each path played from the start. Goals met are out of each director's goals.</p>
+      <Fragment set:html={pathsTableHtml(named.map((p) => ({ label: p.label, picks: p.picks, summary: p.summary })), sc.rounds, sc.roles, ctx, 'Named paths compared')} />
+      <div class="bb-lessons">
+        {
+          named.map((p) => (
+            <section class="bb-lesson">
+              <h4 class="bb-lesson__title">{p.label}</h4>
+              <div class="prose small" set:html={rich(p.lesson)} />
+            </section>
+          ))
+        }
+      </div>
+
+      <h3 class="bb-debrief__h">Every possible board, compared</h3>
+      <p class="small muted">
+        There are {env.count} paths through the {R} rounds. The table shows the lowest and highest final figure any of them reaches. Paths that meet every goal of one director: {ROLE_IDS.map((r) => `${ROLE_IN_TEXT[r]} ${env.allGoals[r]}`).join(', ')}. Paths that meet every goal of all five: {env.everyone}.
+      </p>
+      <Fragment set:html={rangeTableHtml(sc.dashboard as KpiId[], last, env.summaries, ctx, 'The range of final figures across every path')} />
+
+      <h3 class="bb-debrief__h">Misconceptions this tests</h3>
+      <ul class="bb-misc">
+        {
+          sc.debrief.misconceptions.map((m) => (
+            <li class="bb-misc__item">
+              <p class="bb-misc__claim">
+                <span class="bb-misc__label">The claim</span> {m.claim}
+              </p>
+              <div class="bb-misc__fix">
+                <span class="bb-misc__label">The correction</span>
+                <div class="prose small" set:html={rich(m.correction)} />
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+
+      <h3 class="bb-debrief__h">Exam link and practice</h3>
+      <div class="prose" set:html={rich(sc.debrief.examLink)} />
+      <p class="small"><ProvenanceTag kind="original-practice" /> These are the platform's own practice questions, written for this scenario; they are not IB questions.</p>
+      {sc.debrief.practice.some((p) => p.level === 'HL') && <p class="hl-notice"><span class="tag tag--hl">HL</span> One or more questions are HL only, and are hidden while you are viewing SL content.</p>}
+      <ol class="bb-practice">
+        {
+          sc.debrief.practice.map((p) => (
+            <li data-level={p.level === 'HL' ? 'HL' : undefined}>
+              <span set:html={inline(p.prompt)} /> <span class="bb-practice__meta">
+                [{p.marks} marks] <a href={href.commandTerm(commandTerms[p.command] ?? p.command)}>{commandTerms[p.command] ?? p.command}</a>
+                {p.level === 'HL' && <span class="tag tag--hl">HL</span>}
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+
+      <h3 class="bb-debrief__h">Key terms</h3>
+      <ul class="bb-terms">
+        {
+          sc.debrief.terms.map((t) => (
+            <li>
+              <a href={href.glossary(t)}>{glossary[t] ?? t}</a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <h3 class="bb-debrief__h">How the figures were made</h3>
+      <div class="prose small" set:html={rich(sc.method)} />
+      <p class="small"><a href="/boardroom/#model">How the Boardroom's model works: every mechanism and lag</a></p>
+    </div>
+  </section>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/boardroom';
+</script>

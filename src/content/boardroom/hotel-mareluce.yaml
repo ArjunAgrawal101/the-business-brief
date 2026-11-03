@@ -1,0 +1,783 @@
+# Boardroom scenario: Hotel Mareluce. A fictional company on a fictional
+# island; every figure is simulated. The board pack, the dashboard and every
+# figure in the narrative are computed by the Boardroom engine
+# (src/lib/boardroom/engine.ts) from the model, the starting position and the
+# history below.
+
+title: 'Hotel Mareluce: full rooms or a future'
+dek: A family resort hotel on a small island must choose between filling every room and protecting the place its guests come for.
+question: Can a resort hotel grow its profit and cut its footprint at the same time, and which should it put first when it cannot?
+challenge: profit-versus-sustainability
+order: 3
+company:
+  name: Hotel Mareluce
+  industry: Resort hotel and hospitality
+  sector: tertiary
+  location: Isola Brezza, a fictional island in the Mediterranean
+  legalForm: Private limited company
+  founded: '1988'
+  size: 140 rooms, open from April to October, with 46 staff in the season
+  owners: The Serra family owns every share; Giulia Serra is the second generation to run the hotel.
+currency: { code: EUR, symbol: '€', name: euro }
+units: { singular: room night, plural: room nights }
+sustainability:
+  label: Carbon per room night
+  unit: kg CO₂e per room night
+  note: Emissions from electricity, hot water, laundry and food for each room night sold. Isola Brezza's electricity comes mostly from diesel generators. The figures are simulated.
+syllabus: ['1.3', '1.4', '4.2', '4.5', '3.8', '2.4', '3.5', '5.6']
+concepts: [sustainability, ethics, change]
+level: SL/HL
+hlNote: >
+  Capacity utilization (5.6) and dynamic pricing (4.5) are HL only. SL students can play every round; those parts
+  of the debrief are marked HL.
+
+background:
+  - >
+    Hotel Mareluce stands above the only sandy bay on Isola Brezza, a small island an hour by ferry from the mainland.
+    Paolo and Lucia Serra opened it in 1988 with forty rooms; it now has 140, open from April to October. Their
+    daughter Giulia runs it, with her brother Marco in charge of the building and the grounds. Two-thirds of its staff
+    are islanders.
+  - >
+    For years the hotel has filled its rooms two ways: guests who book directly, often returning families who pay
+    full price, and a block of rooms sold in advance to a tour operator at a discount. The block guarantees occupancy
+    in the shoulder months and brings the hotel guests it would never reach on its own.
+  - >
+    Profit has stopped growing. Operating profit fell to {{pbit}} in 2026, from {{pbit.prev}} the year before: food and
+    energy cost more, a new resort on the other side of the island has pulled prices down, and in the busiest weeks the
+    pool is crowded and reviews mention it. The island has its own limits too: its
+    electricity comes from diesel generators, and in dry summers its water is trucked in.
+  - >
+    Now the tour operator wants a bigger block for the next three years, a sustainability certifier has approached the
+    hotel, and the island council is talking about a levy on high-emission hotels. The simulation runs from 2027 to
+    2030, one season a round. You take one seat at the board table; your seat decides what you are judged on.
+
+context:
+  - >
+    **Occupancy is not profit.** A room sold to the tour operator brings in €126 for room and half board; a room sold
+    directly, about €225. Filling a room at a discount makes sense when it would otherwise stand empty; it costs money
+    when a full-price guest is turned away for it.
+  - >
+    **The product is the place and the people.** Guests come for the bay, the quiet and the staff who remember them.
+    Crowding, tired seasonal staff or a dry pool show up in reviews, and reviews drive direct bookings.
+  - >
+    **Sustainability as cost, risk and selling point.** Cutting energy and water use costs money now. It also cuts
+    bills, protects the hotel against fuel prices, droughts and levies, and attracts guests who choose hotels on their
+    footprint.
+
+challenges:
+  - '**Margins.** The profit margin fell to {{profitMargin}} in 2026 as costs rose and a new competitor pulled prices down.'
+  - '**The block.** The tour operator wants 14,000 room nights a year for three years, at €128.'
+  - '**Footprint.** Each room night emits {{emissionsPerUnit}} of CO₂e, mostly from diesel-generated electricity.'
+  - '**People.** Seasonal staff turn over quickly, and service suffers in the busiest weeks.'
+  - '**The island.** Water, energy and the council''s patience are all limited.'
+
+stakeholders:
+  - name: Giulia Serra and the Serra family
+    group: Owners and directors
+    interest: A hotel that stays in the family, earns enough to reinvest, and is still welcome on the island.
+    influence: high
+    view: '“My parents built this for people who love the island. I will not turn it into a place that uses the island up.”'
+  - name: The tour operator
+    group: Largest single customer
+    interest: Guaranteed rooms at a price it can package.
+    influence: high
+    view: '“We filled your shoulder months for twenty years. Give us more rooms and we will fill them.”'
+  - name: Returning guests
+    group: Direct customers
+    interest: The quiet bay, good food and staff who know them.
+    influence: medium
+    view: '“We come back for how it feels. Last August it felt like an airport.”'
+  - name: Island staff and seasonal workers
+    group: Employees
+    interest: Fair pay, secure seasons and somewhere to live.
+    influence: medium
+    view: '“The islanders come back every year. The agency staff come once.”'
+  - name: Isola Brezza council
+    group: Local government
+    interest: Jobs, a living island, and limits on water and energy use.
+    influence: high
+    view: '“Tourism keeps this island alive. It must not drink it dry.”'
+  - name: The sustainability certifier
+    group: External body
+    interest: Hotels that meet and prove its standards.
+    influence: low
+    view: '“Certification is earned with meters and invoices, not with brochures.”'
+
+market:
+  summary: >
+    The figures are simulated. Isola Brezza sells about 600,000 room nights a year across hotels, resorts and rentals,
+    growing about 3% a year. Guests booking directly compare reviews, the setting and, increasingly, a hotel's
+    footprint; tour operators compare price. Mareluce's share is {{marketShare}}.
+  competitors:
+    - { name: Grand Hotel Brezza (fictional), share: 6, price: 290, position: 'Luxury hotel in the island''s harbour town' }
+    - { name: Club Sole resort (fictional), share: 14, price: 150, position: 'Large all-inclusive resort, sold mostly through tour operators' }
+    - { name: 'Holiday apartments and rentals (various, fictional)', share: 38, price: 120, position: 'Self-catering, booked online' }
+  trends:
+    - More guests say they choose hotels partly on their environmental record, and certification schemes are spreading.
+    - Tour operators are buying larger blocks from fewer hotels, at lower prices.
+    - Small islands are putting limits and levies on water and energy use in the peak season.
+
+model:
+  period: { unit: year, days: 365, perYear: 1 }
+  taxRate: 0.24
+  elasticity: 1.4
+  brandWeight: 0.012
+  greenWeight: 0.003
+  marketingNorm: 220000
+  marketingEffect: 7
+  serviceWeight: 1.0
+  lostSalesPenalty: 0.5
+  hoursPerWorker: 1500
+  overtimePremium: 0.4
+  newStarterOutput: 0.6
+  moraleProductivity: 0.002
+  moraleNorm: 60
+  moraleRecovery: 0.35
+  overtimeStrain: 0.6
+  idleStrain: 0.3
+  layoffShock: 0.5
+  wageMorale: 1.2
+  turnoverBase: 22
+  turnoverPerPoint: 0.8
+  turnoverMin: 8
+  recruitCost: 2500
+  penaltyRate: 0.04
+
+start:
+  label: Start of 2024
+  marketSize: 600000
+  marketGrowth: 0.03
+  channels:
+    - { id: direct, label: Direct and online bookings, price: 225, demand: 13500, debtorDays: 5 }
+    - { id: tourop, label: Tour operator block, price: 130, demand: 9500, debtorDays: 60, contracted: true }
+  marketing: 220000
+  brand: 64
+  materialCost: 32
+  energyCost: 9
+  otherCost: 11
+  overheads: 650000
+  maintenance: 200000
+  plantCapacity: 29960
+  hoursPerUnit: 2.4
+  overtimeMax: 0.12
+  emissionsPerUnit: 38
+  headcount: 46
+  wage: 27000
+  morale: 62
+  cash: 400000
+  loans: [{ label: Mortgage on the hotel (2018), principal: 2200000, rate: 0.045 }]
+  assets:
+    - { id: hotel, label: Hotel buildings and grounds, cost: 6000000, nbv: 4800000, life: 40 }
+    - { id: fittings, label: 'Fixtures, fittings and equipment', cost: 1200000, nbv: 500000, life: 5 }
+  shareCapital: 1000000
+  payout: 0.3
+  creditorDays: 30
+  stockDays: 10
+  overdraftLimit: 300000
+  overdraftRate: 0.065
+  loanRate: 0.05
+
+history:
+  - label: '2024'
+    note: A good season. The hotel sells about 23,400 room nights, four in five of its rooms, and the family takes 30% of the profit as dividends.
+    effects: {}
+  - label: '2025'
+    note: The tour operator enlarges its block to 10,500 room nights at €126, and food prices rise 4%.
+    effects: { demand: { tourop: { to: 10500 } }, prices: { tourop: { to: 126 } }, materialCost: { pct: 4 } }
+  - label: '2026'
+    note: Diesel and electricity rise 12%, pay rises 3%, and a new resort opens across the island, pulling prices down about 3%.
+    effects: { energyCost: { pct: 12 }, wage: { pct: 3 }, competitorPrice: { pct: -3 } }
+
+rounds:
+  - id: position
+    title: What kind of hotel?
+    period: '2027'
+    lead: marketing
+    situation: >
+      The tour operator's contract is up for renewal, and it wants 14,000 room nights a year for three years at €128,
+      nearly two in three of the hotel's busiest-season rooms. A sustainability certifier has shown Giulia what it
+      would take to qualify. And the bank's relationship manager has suggested simply cutting costs. The board must
+      decide what kind of hotel Mareluce is going to be.
+    question: Which direction should Mareluce take?
+    perspectives:
+      ceo: >
+        I want a hotel that is still full and still welcome on this island in twenty years. I do not want to choose
+        between them if I can help it, and I do not want to pretend we have not chosen if we must.
+      finance: >
+        The bigger block is guaranteed income at a fair price; in a bad year that matters. Certification costs money
+        up front and gives up guaranteed rooms for guests we hope will come. Cost cutting is the quickest gain, and the
+        least certain to last.
+      marketing: >
+        Every room we give the tour operator at €128 is a room a returning family cannot book at €225. Our direct
+        guests pay more, come back and tell their friends. Certification gives them another reason to choose us.
+      operations: >
+        At 14,000 block nights we will be full from June to September: more laundry, more water, more crowding round
+        the pool. The retrofit would cut our energy and water bills, and our diesel use, for good.
+      hr: >
+        A fuller hotel needs more staff, and we already struggle to find and keep good people for the peak. If we
+        cut costs, cut them somewhere other than the people guests see.
+    options:
+      - id: volume
+        label: Expand the tour-operator block
+        summary: Sign a three-year contract for 14,000 room nights a year at €128, and hire six more staff for the season.
+        effects:
+          demand: { tourop: { to: 14000 } }
+          prices: { tourop: { to: 128 } }
+          hire: 6
+          later: [{ after: 1, effects: { brand: -3 }, note: 'Reviews of the crowded peak weeks begin to mention the pool, the queues and the noise.' }]
+          flags: { bigBlock: true }
+        outcome:
+          headline: A full hotel, guaranteed
+          narrative: >
+            The new block fills the hotel: it sells {{volume}} room nights and runs at {{utilization}} of capacity.
+            Revenue is {{revenue}} and operating profit {{pbit}}. Direct guests find fewer rooms in the summer: the
+            average price per room night is {{avgPrice}}. Total emissions rise with the extra guests, to {{emissions}}
+            tonnes of CO₂e.
+          stakeholders:
+            - { name: The tour operator, reaction: 'Has the rooms it wanted at a price it can sell.', mood: positive }
+            - { name: Returning guests, reaction: 'Find August full and the pool crowded.', mood: negative }
+            - { name: Isola Brezza council, reaction: 'Welcomes the jobs, and worries about water in August.', mood: mixed }
+          theory: >
+            Selling a block at a discount trades price for certainty: guaranteed occupancy against a lower average
+            price. It is mass-market positioning. When demand is strong, each discounted room has an opportunity cost:
+            the full-price guest who could not book it.
+      - id: eco
+        label: Reposition as an eco-certified hotel
+        summary: Halve the block to 6,000 room nights, invest €750k in solar hot water, water recycling and insulation, seek certification and raise direct prices 6%.
+        effects:
+          demand: { tourop: { to: 6000 } }
+          prices: { direct: { pct: 6 } }
+          capex: [{ id: retrofit, label: 'Solar hot water, water recycling and insulation', cost: 750000, life: 12, after: 0, effects: { energyCost: { pct: -25 }, emissionsPerUnit: { pct: -30 }, otherCost: { by: -2 } } }]
+          overheads: { by: 60000 }
+          marketing: { by: 80000 }
+          brand: 3
+          flags: { eco: true }
+        outcome:
+          headline: Fewer guests, paying more, for a smaller footprint
+          narrative: >
+            The retrofit is finished before the season and the hotel is certified in June. Emissions fall to
+            {{emissionsPerUnit}} kg per room night ({{emissionsPerUnit.change}}), and guests who choose hotels on their
+            footprint start to find Mareluce. With half the block gone, occupancy falls: the hotel sells {{volume}}
+            room nights at {{utilization}} of capacity, at an average {{avgPrice}}. Operating profit, after the
+            certification costs and the relaunch, is {{pbit}}.
+          stakeholders:
+            - { name: Returning guests, reaction: 'Like the quieter summer and the solar panels on the roof.', mood: positive }
+            - { name: The tour operator, reaction: 'Takes its other rooms to Club Sole.', mood: negative }
+            - { name: The sustainability certifier, reaction: 'Certifies the hotel, and will audit it every year.', mood: positive }
+          theory: >
+            Repositioning towards a niche of guests who value sustainability uses differentiation and premium pricing.
+            Corporate social responsibility can be a source of competitive advantage, but it costs money before it
+            earns any, and claims must be backed by evidence to avoid accusations of greenwashing.
+      - id: steady
+        label: Keep the mix, and cut costs
+        summary: Renew the block at its present size, outsource the laundry, switch energy contract and defer some maintenance.
+        effects:
+          materialCost: { by: -3 }
+          energyCost: { pct: -5 }
+          maintenance: { by: -40000 }
+          morale: -1
+          later: [{ after: 1, effects: { brand: -2 }, note: 'Deferred maintenance begins to show: tired rooms appear in reviews.' }]
+          flags: { costcut: true }
+        outcome:
+          headline: The same hotel, a little cheaper to run
+          narrative: >
+            The block stays as it was and the savings arrive at once: operating profit is {{pbit}}, with a profit
+            margin of {{profitMargin}}. The hotel sells {{volume}} room nights. Deferred maintenance saves money this
+            year; its cost will show later, in the rooms and the reviews.
+          stakeholders:
+            - { name: The bank, reaction: 'Likes the improved margin.', mood: positive }
+            - { name: Island staff and seasonal workers, reaction: 'Lose the laundry jobs to a mainland contractor.', mood: negative }
+            - { name: Returning guests, reaction: 'Notice nothing yet.', mood: mixed }
+          theory: >
+            Cost cutting improves the profit margin quickly, but some savings only move a cost into the future:
+            deferred maintenance is a cost postponed, not removed. Outsourcing turns a fixed cost into a variable one
+            and gives up direct control of quality.
+    event:
+      variants:
+        - id: fuel-shock
+          title: Fuel and electricity prices rise sharply
+          text: >
+            Diesel prices rise, and the island's electricity tariff with them: energy costs about 30% more per room night
+            from the 2028 season. Hotels that use less energy feel it less.
+          effects:
+            energyCost: { pct: 30 }
+
+  - id: people
+    title: Who serves the guests?
+    period: '2028'
+    lead: hr
+    situation: >
+      Every spring Mareluce recruits for the season, and every year it finds it harder. Island families want secure
+      work; seasonal workers from the mainland want somewhere affordable to live. Service in the peak weeks is the
+      first thing reviews mention. The board must decide how to staff the hotel from now on.
+    question: How should Mareluce staff the season?
+    perspectives:
+      ceo: >
+        Guests remember people, not policies. I want the staff who serve them to want to be here.
+      finance: >
+        Agency staff cost less per hour and nothing in the winter. Year-round contracts and training cost more, and
+        pay back only if people stay and service improves. A profit share costs money only in a good year.
+      marketing: >
+        Our reviews rise and fall with service. A guest who is remembered by name books again; one served by a stranger
+        who leaves in July does not.
+      operations: >
+        New staff need time to learn the hotel. With high turnover we spend every June training people who will be gone
+        by September.
+      hr: >
+        Island staff come back year after year if we give them a reason to. Agency workers are cheaper and do not
+        stay. Housing is the biggest reason mainland staff turn us down.
+    options:
+      - id: agency
+        label: Staff the season through an agency
+        summary: Fill most seasonal posts through a staffing agency, at lower cost per hour and with no commitment beyond the season.
+        effects:
+          wage: { pct: -6 }
+          hoursPerUnit: { pct: 5 }
+          morale: -4
+          brand: -2
+          flags: { agency: true }
+        outcome:
+          headline: Cheaper hours, and strangers at the front desk
+          narrative: >
+            The agency fills every post on time, at a lower cost per hour, but its staff are new to the hotel and take
+            longer to do the work. Staff costs are {{staffCosts}}. Morale is {{morale}} and labour turnover {{turnover}}
+            a year; brand strength is {{brand}} ({{brand.change}}). Operating profit is {{pbit}}.
+          stakeholders:
+            - { name: Island staff and seasonal workers, reaction: 'Island staff feel replaced by cheaper strangers.', mood: negative }
+            - { name: Returning guests, reaction: 'Miss the faces they knew.', mood: negative }
+            - { name: The bank, reaction: 'Sees the wage bill fall.', mood: positive }
+          theory: >
+            A flexible, temporary workforce cuts labour costs and commitment, at the cost of experience, loyalty and
+            service quality. In a service business, people are part of the marketing mix: the staff are part of what
+            the customer buys.
+      - id: local
+        label: Hire locally and train year-round
+        summary: Offer islanders year-round contracts, raise pay 5%, and train every new member of staff before the season.
+        effects:
+          training: 60000
+          wage: { pct: 5 }
+          morale: 5
+          brand: 1
+          later: [{ after: 1, effects: { skill: { pct: 4 } }, note: 'Trained, returning staff work faster and better in their second season.' }]
+          flags: { local: true }
+        outcome:
+          headline: Staff who come back, and guests who notice
+          narrative: >
+            Islanders take the year-round contracts and the training. Staff costs rise to {{staffCosts}}, but morale
+            reaches {{morale}} ({{morale.change}}) and labour turnover falls to {{turnover}} a year. Brand strength is
+            {{brand}}. Operating profit is {{pbit}}, and the training pays off in next season's productivity.
+          stakeholders:
+            - { name: Island staff and seasonal workers, reaction: 'Have secure work on their own island.', mood: positive }
+            - { name: Isola Brezza council, reaction: 'Praises a business that keeps young islanders on the island.', mood: positive }
+            - { name: The bank, reaction: 'Asks when higher costs turn into higher income.', mood: mixed }
+          theory: >
+            Investing in people (secure contracts, fair pay, training) raises morale and cuts labour turnover. In
+            Herzberg's terms it removes sources of dissatisfaction and adds motivators such as growth and recognition.
+            Its return comes through service and retention, and takes time.
+      - id: share
+        label: A profit share and staff housing
+        summary: Share 6% of profit before interest and tax with the staff, and rent apartments in the village for seasonal workers.
+        effects:
+          profitShare: { to: 0.06 }
+          overheads: { by: 80000 }
+          morale: 3
+        outcome:
+          headline: Pay that rises with a good season, and somewhere to live
+          narrative: >
+            Seasonal workers have somewhere affordable to stay, and everyone shares in a good year. Morale is {{morale}}
+            ({{morale.change}}) and labour turnover {{turnover}} a year. Operating profit, after the profit share and
+            the apartments, is {{pbit}}.
+          stakeholders:
+            - { name: Island staff and seasonal workers, reaction: 'Value the housing most of all.', mood: positive }
+            - { name: Giulia Serra and the Serra family, reaction: 'Like a cost that falls in a bad year.', mood: positive }
+            - { name: Returning guests, reaction: 'Notice a cheerful team.', mood: positive }
+          theory: >
+            Profit-related pay links staff rewards to the business's results, and fringe benefits such as housing meet
+            needs that pay alone may not. Both can strengthen commitment; neither guarantees better service on its own.
+    event:
+      variants:
+        - id: drought-eased
+          if: { flag: eco }
+          title: A dry summer, and the hotel recycles its water
+          text: >
+            The island has its driest summer in years and the council restricts water use. Mareluce's recycling covers
+            most of its needs, so it trucks in only a little water, at a small extra cost per room night.
+          effects:
+            otherCost: { by: 1 }
+        - id: drought
+          title: A dry summer, and water by the truckload
+          text: >
+            The island has its driest summer in years and the council restricts water use. Mareluce must truck water in
+            at about €6 a room night, and the pool closes for six weeks at the height of the season.
+          effects:
+            otherCost: { by: 6 }
+            brand: -2
+
+  - id: energy
+    title: Power for the hotel
+    period: '2029'
+    lead: operations
+    situation: >
+      The hotel's electricity comes from the island grid, which is fed by diesel generators, backed by the hotel's own
+      generator. Energy is now one of its largest costs, and the council has announced a levy, from 2030, on hotels
+      that emit more than 25 kg of CO₂e per room night. The board must decide where the hotel's power comes from.
+    question: Where should Mareluce's power come from?
+    perspectives:
+      ceo: >
+        Energy is our biggest uncontrolled cost and our biggest footprint. I want a decision that settles both for a
+        decade.
+      finance: >
+        The solar farm is the largest investment we have made since the new wing, mostly borrowed. It pays for itself
+        if energy stays expensive. The generators are cheap and buy us little. The tariff costs more every year and
+        nothing up front.
+      marketing: >
+        A hotel that runs on its own sunshine is a story guests tell their friends. A green tariff is a line in a
+        brochure.
+      operations: >
+        Solar with batteries would cover most of our daytime load and cut our diesel use by half. New generators burn
+        less fuel, but still burn it.
+      hr: >
+        Whatever we choose, the people who maintain it will be ours to train.
+    options:
+      - id: solar
+        label: Build a solar farm with batteries
+        summary: A solar farm and battery store on the hotel's land, €1.3m, mostly financed by a loan.
+        effects:
+          capex: [{ id: solar, label: Solar farm and batteries, cost: 1300000, life: 20, after: 0, effects: { energyCost: { pct: -55 }, emissionsPerUnit: { pct: -45 }, maintenance: { by: 20000 } } }]
+          borrow: { amount: 1000000, label: Solar loan }
+        outcome:
+          headline: The hotel makes most of its own power
+          narrative: >
+            The solar farm runs from the start of the season. Energy costs fall by more than half and emissions to
+            {{emissionsPerUnit}} kg per room night ({{emissionsPerUnit.change}}). Loans rise to {{debt}} and gearing to
+            {{gearing}}. Operating profit is {{pbit}}.
+          stakeholders:
+            - { name: Isola Brezza council, reaction: 'Holds the hotel up as an example.', mood: positive }
+            - { name: Returning guests, reaction: 'Ask for a tour of the panels.', mood: positive }
+            - { name: The bank, reaction: 'Lends, and watches gearing.', mood: mixed }
+          theory: >
+            Investment appraisal compares the cost of the solar farm with the energy savings it brings over its life.
+            Payback and the average rate of return judge it on cash; for HL, net present value allows for the timing of
+            the savings. Lower emissions are a benefit that the cash figures alone do not show.
+      - id: generator
+        label: Upgrade the diesel generators
+        summary: Replace the hotel's generator with a more efficient one, €350k from cash.
+        effects:
+          capex: [{ id: generators, label: Upgraded diesel generators, cost: 350000, life: 10, after: 0, effects: { energyCost: { pct: -12 }, emissionsPerUnit: { pct: -8 } } }]
+        outcome:
+          headline: A cheaper fix, and still diesel
+          narrative: >
+            The new generator burns less fuel. Energy costs fall a little and emissions to {{emissionsPerUnit}} kg per
+            room night ({{emissionsPerUnit.change}}). Operating profit is {{pbit}} and net cash {{netCash}}.
+          stakeholders:
+            - { name: The bank, reaction: 'Approves of a small investment paid from cash.', mood: positive }
+            - { name: Isola Brezza council, reaction: 'Notes that the hotel is still above its new limit.', mood: mixed }
+            - { name: Returning guests, reaction: 'Notice nothing.', mood: mixed }
+          theory: >
+            An incremental improvement lowers costs with little risk and little capital, but it locks the business into
+            the old technology for another decade. Whether that is wise depends on how fuel prices and regulation move.
+      - id: tariff
+        label: Buy certified renewable electricity
+        summary: Switch to a certified renewable tariff from the island's new solar cooperative, at a premium over the diesel tariff.
+        effects:
+          energyCost: { pct: 12 }
+          emissionsPerUnit: { pct: -35 }
+        outcome:
+          headline: Cleaner power, at a higher price and no investment
+          narrative: >
+            From the start of the season the hotel's grid electricity is certified renewable. Emissions fall to
+            {{emissionsPerUnit}} kg per room night ({{emissionsPerUnit.change}}), at a higher cost per room night.
+            Operating profit is {{pbit}}.
+          stakeholders:
+            - { name: The island's solar cooperative, reaction: 'Gains its largest customer.', mood: positive }
+            - { name: The bank, reaction: 'Likes that no money is borrowed.', mood: positive }
+            - { name: Giulia Serra and the Serra family, reaction: 'Wonder about paying a premium every year instead of owning the asset.', mood: mixed }
+          theory: >
+            Buying a service instead of owning an asset turns a capital cost into a running cost: no investment, no
+            debt, and a higher cost every year. It is the same choice as leasing against buying, applied to energy.
+    event:
+      variants:
+        - id: levy-exempt
+          if: { kpi: emissionsPerUnit, op: '<=', value: 25 }
+          title: The council's levy, and Mareluce is exempt
+          text: >
+            The council's levy on high-emission hotels takes effect in 2030. With emissions of {{emissionsPerUnit}} kg
+            per room night, Mareluce is below the limit, pays nothing and is named in the council's list of approved
+            hotels.
+          effects:
+            brand: 1
+        - id: levy
+          title: The council's levy, and Mareluce pays it
+          text: >
+            The council's levy on high-emission hotels takes effect in 2030. With emissions of {{emissionsPerUnit}} kg
+            per room night, Mareluce is above the limit and pays €3 for every room night it sells.
+          effects:
+            otherCost: { by: 3 }
+
+  - id: future
+    title: The hotel's next decade
+    period: '2030'
+    lead: ceo
+    situation: >
+      The family board meets before the 2030 season. The hotel can grow, give back to the island, or reward the family
+      after a decade of reinvestment. Each is a claim on the same cash, and each says something about what the hotel
+      is for.
+    question: What should Mareluce do with its next decade?
+    perspectives:
+      ceo: >
+        My parents never took much out. I want my children to inherit a hotel the island is glad of, and a business
+        that can pay for its own future.
+      finance: >
+        The villas earn the highest prices on the island and need a large loan. The community programme costs money
+        every year. A dividend costs the business cash and nothing else.
+      marketing: >
+        Twenty eco-villas would put us at the top of the market. Local sourcing and staff housing are what guests and
+        the council will talk about.
+      operations: >
+        The villas add twenty units to clean, light and supply. Local sourcing means smaller deliveries and more
+        suppliers to manage, and food that has not crossed the sea.
+      hr: >
+        Staff housing would end our hardest recruitment problem. A dividend in a year of rising pay demands would be
+        noticed.
+    options:
+      - id: villas
+        label: Build twenty eco-villas
+        summary: Twenty eco-villas on the hillside, €2.4m with a €1.8m loan, sold at premium prices from this season.
+        effects:
+          capex: [{ id: villas, label: Twenty eco-villas, cost: 2400000, life: 30, after: 0, effects: { plantCapacity: { by: 4280 } } }]
+          borrow: { amount: 1800000, label: Villa loan }
+          addChannels: [{ id: villas, label: Eco-villa stays, price: 320, demand: 3000, debtorDays: 5, greenWeight: 0.006, extraCost: 10 }]
+        outcome:
+          headline: The top of the island's market, financed by the bank
+          narrative: >
+            The villas open in June and fill at premium prices. Revenue reaches {{revenue}} and the average price per
+            room night {{avgPrice}}. Loans rise to {{debt}} and gearing to {{gearing}}. Operating profit is {{pbit}}.
+          stakeholders:
+            - { name: Returning guests, reaction: 'Some move up to the villas.', mood: positive }
+            - { name: Isola Brezza council, reaction: 'Approves the planning, and asks about the water.', mood: mixed }
+            - { name: The bank, reaction: 'Holds a larger loan against a stronger business.', mood: mixed }
+          theory: >
+            Internal growth through new capacity raises revenue and fixed costs together, and is financed here with
+            debt. Product development into a premium segment uses the brand built by earlier decisions.
+      - id: community
+        label: Invest in the island
+        summary: Buy food from island farms and fishers, and fund housing for island staff, at about €60k a year plus a higher cost per room night.
+        effects:
+          materialCost: { by: 2 }
+          overheads: { by: 60000 }
+          brand: 3
+          morale: 4
+          emissionsPerUnit: { pct: -5 }
+        outcome:
+          headline: The hotel spends more of its money on the island
+          narrative: >
+            Island farms and fishers supply the kitchen and the staff housing fund opens. Each room night costs more to
+            serve, but brand strength reaches {{brand}} ({{brand.change}}) and morale {{morale}}. Emissions fall to
+            {{emissionsPerUnit}} kg per room night. Operating profit is {{pbit}}.
+          stakeholders:
+            - { name: Isola Brezza council, reaction: 'Names the hotel a partner of the island.', mood: positive }
+            - { name: Island staff and seasonal workers, reaction: 'Have homes they can afford.', mood: positive }
+            - { name: Giulia Serra and the Serra family, reaction: 'Accept a lower margin for a hotel they are proud of.', mood: positive }
+          theory: >
+            Corporate social responsibility goes beyond what the law requires, and spends shareholders' money on other
+            stakeholders. It can strengthen the brand and staff commitment; whether it pays depends on whether
+            customers and staff value it.
+      - id: dividend
+        label: Pay the family a special dividend
+        summary: A special dividend of €500k to the Serra family, on top of the usual payout.
+        effects:
+          dividend: 500000
+        outcome:
+          headline: A reward for the family, and nothing else changes
+          narrative: >
+            The family receives €500k. Net cash falls to {{netCash}}; the hotel itself is unchanged, and operating
+            profit is {{pbit}}.
+          stakeholders:
+            - { name: Giulia Serra and the Serra family, reaction: 'Receive a reward after years of reinvestment.', mood: positive }
+            - { name: Island staff and seasonal workers, reaction: 'Wonder about their own pay.', mood: mixed }
+            - { name: The bank, reaction: 'Notes the lower cash balance.', mood: mixed }
+          theory: >
+            A dividend rewards shareholders and leaves less for reinvestment. Shareholders are stakeholders too: how a
+            business divides its surplus between them and others is a choice about its objectives.
+
+dashboard: [revenue, pbit, netCash, utilization, avgPrice, brand, morale, turnover, emissionsPerUnit, marketShare]
+
+roles:
+  ceo:
+    brief: >
+      You chair the family board. You are judged on a hotel that earns its keep and keeps its place on the island:
+      enough profit over the four seasons, a strong brand and a footprint below the council's limit.
+    pinned: [pbit, brand, emissionsPerUnit]
+    goals:
+      - { metric: 'sum:profit', op: '>=', value: 2000000, label: Profit after tax of at least €2.0m over the four seasons }
+      - { metric: 'final:brand', op: '>=', value: 66, label: Brand strength of 66 or more in 2030 }
+      - { metric: 'final:emissionsPerUnit', op: '<=', value: 25, label: Emissions below the council's limit of 25 kg per room night }
+  finance:
+    brief: >
+      You run the money. You are judged on returns and risk: a fair return on capital, gearing in hand and no overdraft
+      beyond its limit.
+    pinned: [roce, gearing, netCash]
+    goals:
+      - { metric: 'final:roce', op: '>=', value: 8, label: Return on capital employed of 8% or more in 2030 }
+      - { metric: 'final:gearing', op: '<=', value: 45, label: Gearing of 45% or less in 2030 }
+      - { metric: 'max:overdraftExcess', op: '<=', value: 0, label: Never go over the overdraft limit }
+  marketing:
+    brief: >
+      You own the guests and the brand. You are judged on reputation, price and the hotel's place in its market.
+    pinned: [brand, avgPrice, marketShare]
+    goals:
+      - { metric: 'final:brand', op: '>=', value: 68, label: Brand strength of 68 or more in 2030 }
+      - { metric: 'final:avgPrice', op: '>=', value: 195, label: An average price of €195 or more per room night in 2030 }
+      - { metric: 'change:marketShare', op: '>=', value: 0, label: A market share no smaller than in 2026 }
+  operations:
+    brief: >
+      You run the building and its resources. You are judged on a hotel that is never overcrowded, uses less energy
+      per guest, and uses its staff well.
+    pinned: [utilization, emissionsPerUnit, productivity]
+    goals:
+      - { metric: 'max:utilization', op: '<=', value: 92, label: Never more than 92% full over the season }
+      - { metric: 'final:emissionsPerUnit', op: '<=', value: 20, label: Emissions of 20 kg per room night or less in 2030 }
+      - { metric: 'final:productivity', op: '>=', value: 540, label: At least 540 room nights per member of staff in 2030 }
+  hr:
+    brief: >
+      You look after the people. You are judged on a team that wants to be there: morale, labour turnover and jobs.
+    pinned: [morale, turnover, headcount]
+    goals:
+      - { metric: 'final:morale', op: '>=', value: 62, label: Morale of 62 or more in 2030 }
+      - { metric: 'max:turnover', op: '<=', value: 20, label: Labour turnover never above 20% a year }
+      - { metric: 'final:headcount', op: '>=', value: 46, label: At least 46 staff in the 2030 season }
+
+memo:
+  intro: >
+    The 2030 season is over. Write to the Serra family board as the director whose seat you took: what Mareluce should
+    do in the next decade, on the evidence of the last four seasons, and how it should balance profit against the
+    island it depends on.
+  fields:
+    - { id: recommendation, label: Recommendation, hint: 'One or two sentences: the hotel''s direction for the next decade.', rows: 3 }
+    - { id: evidence, label: The evidence, hint: 'The figures that matter most, including profit, the brand and the footprint, and what they show.', rows: 4 }
+    - { id: tradeoffs, label: Trade-offs and risks, hint: 'Where profit and sustainability pulled apart, and how you would weigh them.', rows: 4 }
+    - { id: stakeholders, label: Stakeholders, hint: 'The family, guests, staff, the tour operator and the island: who gains and who loses?', rows: 4 }
+    - { id: conditions, label: What would change your mind, hint: 'The figure or event that would make you recommend something else.', rows: 3 }
+    - { id: steps, label: The first ninety days, hint: 'Three things you would do first, in order.', rows: 4 }
+
+walkthrough:
+  title: 'One path, narrated: certification, island staff, solar, investing in the island'
+  picks: [eco, local, solar, community]
+  intro: >
+    This is one path through the four seasons, chosen to show how the decisions interact, not as the right answer. At
+    the end of 2026 the hotel runs at {{utilization}} of capacity, emits {{emissionsPerUnit}} kg of CO₂e per room
+    night, and earns operating profit of {{pbit}}.
+  outro: >
+    By 2030 operating profit is {{pbit}}, emissions are {{emissionsPerUnit}} kg per room night, brand strength is
+    {{brand}} and morale {{morale}}. This path earned less than the others in its first season and more in its last:
+    the debrief compares it with the paths that kept the tour operator's block.
+
+debrief:
+  summary: >
+    Profit and sustainability pulled apart in the first season and came back together later. Repositioning cost the
+    guaranteed block and the money for the retrofit, so the eco-certified hotel earned less in 2027 than the full one.
+    Then fuel prices, a drought and the council's levy each cost the high-footprint hotel more than the low-footprint
+    one, and the brand built by certification and island staff kept direct bookings rising. That is a feature of this
+    simulation's events, not a law: in a world of cheap fuel and plentiful water the full hotel would have kept its
+    lead. No path meets every director's goals, because occupancy, price, footprint, jobs and returns pull against
+    each other.
+  theory:
+    - title: Objectives, CSR and stakeholders
+      body: >
+        A hotel's objectives can include profit, growth and ethical objectives at once, and they conflict. Corporate
+        social responsibility spends money on stakeholders beyond the shareholders. The Serra family, the guests, the
+        staff, the tour operator and the council want different things, and each round favours some of them over
+        others.
+      syllabus: ['1.3', '1.4']
+    - title: Positioning, niche and mass markets
+      body: >
+        The tour operator's block is mass-market positioning: volume at a lower price. Eco-certification is a niche
+        position: fewer guests who pay more for a difference they value. A position map of price against footprint
+        would place Mareluce's options far apart.
+      syllabus: ['4.2']
+    - title: Price, people, process and physical evidence
+      body: >
+        In a service business the marketing mix extends to people (the staff guests meet), processes (how a stay is
+        delivered) and physical evidence (the rooms, the pool, the solar panels guests can see). Crowding, tired rooms
+        and changing staff each weakened the brand in the simulation; certification and trained island staff
+        strengthened it.
+      syllabus: ['4.5']
+    - title: Investment appraisal for sustainability
+      body: >
+        The retrofit and the solar farm can be judged by payback and average rate of return on their energy savings,
+        and for HL by net present value. Their benefits also include protection from fuel prices, droughts and levies,
+        which appraisals based on today's prices leave out.
+      syllabus: ['3.8']
+    - title: Motivation and service
+      body: >
+        Agency staff, island contracts with training, and a profit share with housing are different mixes of financial
+        and non-financial rewards. In a service business the effect on morale reaches the customer.
+      syllabus: ['2.4']
+    - title: Capacity utilization in a hotel
+      body: >
+        Occupancy is a hotel's capacity utilization. Above about nine in ten rooms, crowding and strain begin to cost
+        reviews; well below it, fixed costs are spread thinly. The right occupancy depends on the price of each room
+        filled.
+      syllabus: ['5.6']
+      level: HL
+  paths:
+    - id: green
+      label: The green path
+      picks: [eco, local, solar, community]
+      lesson: >
+        Certification, island staff, solar and investment in the island. It earns the least of these paths in its
+        first season and close to the most by its last, with the strongest brand and the smallest footprint.
+    - id: full
+      label: The full-house path
+      picks: [volume, agency, generator, dividend]
+      lesson: >
+        The bigger block, agency staff, a cheaper generator and a dividend. It fills the most rooms and spends the
+        least, and it pays the drought, the levy and the crowding in its reviews.
+    - id: middle
+      label: The careful-cost path
+      picks: [steady, local, tariff, villas]
+      lesson: >
+        Cost cuts, island staff, a green tariff and the villas. It shows that a hotel can cut its footprint without
+        repositioning, and that growth funded by debt raises gearing.
+    - id: volume-green
+      label: The full-and-green path
+      picks: [volume, local, solar, community]
+      lesson: >
+        The bigger block, with island staff, solar and investment in the island. It keeps the guaranteed income and
+        still cuts emissions, but the crowded peak and the drought cost it more than the green path paid for its
+        certification.
+  misconceptions:
+    - claim: A full hotel is a profitable hotel.
+      correction: >
+        Occupancy counts rooms, not money. Filling rooms at a discount can push out guests who would have paid full
+        price, and crowding can cost future bookings.
+    - claim: Sustainability is always a cost to profit.
+      correction: >
+        Here it cost money first and then saved it, because energy, water and regulation cost a high-footprint hotel
+        more. Whether it pays depends on prices, events and what customers value.
+    - claim: Sustainability always pays.
+      correction: >
+        In this simulation the events favoured the low-footprint hotel. With cheap fuel, plentiful water and no levy, the
+        full hotel would have kept its profit lead. Claims about sustainability must be tested, not assumed.
+  examLink: >
+    Paper 1 and Paper 2 questions on objectives and stakeholders ask candidates to analyse conflict between
+    stakeholders and to evaluate CSR in context; marketing questions ask about positioning and the extended marketing
+    mix for services. Mareluce gives a context for each. HL candidates can extend the analysis with capacity
+    utilization and dynamic pricing.
+  practice:
+    - { prompt: 'Explain one advantage and one disadvantage for Hotel Mareluce of selling a block of rooms to a tour operator.', command: explain, marks: 4 }
+    - { prompt: 'Analyse the conflict between two of Hotel Mareluce''s stakeholders over the tour operator''s contract.', command: analyse, marks: 6 }
+    - { prompt: 'Discuss whether Hotel Mareluce should reposition itself as an eco-certified hotel.', command: discuss, marks: 10 }
+    - { prompt: 'Evaluate the importance of people, processes and physical evidence in Hotel Mareluce''s marketing mix.', command: evaluate, marks: 10 }
+    - { prompt: 'Using the board pack, calculate Hotel Mareluce''s capacity utilization rate in 2026, and comment on your answer.', command: calculate, marks: 4, level: HL }
+  terms: [corporate-social-responsibility, ethical-objectives, stakeholder-conflict, triple-bottom-line, niche-market, mass-market, positioning, premium-pricing, people-marketing-mix, processes-marketing-mix, physical-evidence, outsourcing, investment-appraisal, payback-period, capacity-utilization-rate, non-financial-rewards, profit-related-pay, opportunity-cost]
+
+method: >
+  Hotel Mareluce, Isola Brezza, the tour operator, the competitors and every person in this scenario are fictional,
+  and every figure is simulated. A unit is one room night: a room sold for one night, with breakfast and dinner. The
+  figures come from the Boardroom's model, stated in full on the Boardroom's page; in a service business the model lets
+  morale move the brand, because staff are part of the product. The seasons 2024 to 2026 are the model run forward from
+  the start of 2024 with the changes listed in the history, so the board pack's statements cannot disagree with the
+  simulation. The family takes 30% of each year's profit as dividends. Tax is a flat simulated 24% of positive profit;
+  real tax rules are more complex.
+updated: 2026-11-03

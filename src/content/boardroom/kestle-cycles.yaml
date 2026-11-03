@@ -1,0 +1,815 @@
+# Boardroom scenario: Kestle Cycles. A fictional company; every figure is
+# simulated. The board pack, the dashboard and every figure in the narrative
+# are computed by the Boardroom engine (src/lib/boardroom/engine.ts) from the
+# model, the starting position and the history below. Nothing is typed twice:
+# change a number here and every exhibit follows. tests/unit/boardroom.test.ts
+# runs every path and checks the accounting identities.
+
+title: 'Kestle Cycles: the cash runs out first'
+dek: A profitable, growing e-bike maker has a year to stop its overdraft swallowing the business.
+question: How does a profitable business that is running out of cash get through the next year without giving up what made it profitable?
+challenge: liquidity-crisis
+order: 1
+company:
+  name: Kestle Cycles
+  industry: Electric bicycle design and assembly
+  sector: secondary
+  location: Sheffield, United Kingdom
+  legalForm: Private limited company
+  founded: '2016'
+  size: 46 assembly staff, and 14 more in design, sales and administration
+  owners: The two founders, Hannah Kestle and Dev Malhotra, own every share.
+currency: { code: GBP, symbol: '£', name: pounds sterling }
+units: { singular: bike, plural: bikes }
+syllabus: ['3.7', '3.5', '3.6', '3.2', '5.6', '1.4', '2.4', '4.5']
+concepts: [change, ethics]
+level: SL/HL
+hlNote: >
+  Efficiency ratios and insolvency (3.6), and just-in-time, just-in-case and capacity utilization (5.6), are HL only.
+  SL students can play every round; the parts of the debrief that depend on them are marked HL.
+
+background:
+  - >
+    Kestle Cycles designs and assembles electric bicycles in a workshop on the edge of Sheffield. Hannah Kestle and
+    Dev Malhotra, two engineers who met at a car parts maker, started it in 2016 to build city e-bikes for people who
+    commute up hills. Frames, motors and batteries come from suppliers in Asia; Kestle designs the bikes, assembles
+    them, tests every one and sells them through about 120 independent bike shops, which have done most of its
+    marketing for it.
+  - >
+    In 2026 the business changed shape. Fellside Outdoor, a national chain of outdoor stores, began selling two Kestle
+    models under a contract: 250 bikes in the first quarter, rising to 650 a quarter by the end of the year. Fellside
+    pays less than the shops do and pays later, 90 days after delivery against the shops' 30. To keep up, Kestle took
+    on twelve assemblers, and after a shortage of motors in the spring it began holding much more stock of parts.
+  - >
+    On paper 2026 was Kestle's best year: sales up by about a third, and a profit in every quarter. In the bank account
+    it was the worst. Money went out to suppliers months before it came back from Fellside, and the overdraft that
+    used to be a cushion ended the year close to its £1m limit. The bank has asked for a plan.
+  - >
+    This simulation is Kestle's next year, one quarter at a time: four decisions for the board, with an event after
+    each that nobody on the board controls. You take one seat at the table. The decisions are the whole board's; your
+    seat decides what you are judged on.
+
+context:
+  - >
+    **Growth eats cash.** Kestle pays for parts long before it is paid for bikes. Every extra bike sold to Fellside
+    needs about £900 of parts and freight bought weeks earlier, and brings in its £1,330 three months after delivery. Profit says
+    the Fellside contract is working; the bank balance says each new order makes the problem worse. This is
+    overtrading: growing faster than the cash to support the growth.
+  - >
+    **Two channels, two kinds of customer.** The independent shops pay more, pay sooner and sell Kestle on its quality.
+    Fellside brings volume and national visibility at a lower price, and the shops have noticed. Any decision about
+    Fellside is also a decision about the shops.
+  - >
+    **A workshop near its limit.** Forty-six assemblers can build about 2,000 bikes a quarter in normal hours, and a
+    little more with overtime. Above about 90% of capacity, quality starts to slip and warranty returns rise.
+
+challenges:
+  - '**Liquidity.** The overdraft stands at {{overdraft}} against a £1m limit, and the bank reviews the account every quarter.'
+  - '**Working capital.** Kestle holds {{stockDays}} of parts, and its customers owe it {{debtors}}, most of it Fellside''s.'
+  - '**Capacity.** The workshop runs at {{utilization}} of capacity; a bigger Fellside order would push it towards its limit.'
+  - '**People.** The annual pay review falls in the third quarter, and staff expect a rise in line with living costs.'
+  - '**Ownership.** The founders have never given up a share of the company, and say they would rather not.'
+
+stakeholders:
+  - name: Hannah Kestle and Dev Malhotra
+    group: Founders and owners
+    interest: A company that survives, stays theirs and keeps its name for quality.
+    influence: high
+    view: '“We built this on the shops. Fellside got us noticed, but I did not start a company to work for one customer.”'
+  - name: Northern Counties Bank
+    group: Lender
+    interest: Interest, and an overdraft that comes back down.
+    influence: high
+    view: '“The business is profitable, but profit does not repay an overdraft. We need to see the balance falling, not a forecast that says it will.”'
+  - name: Fellside Outdoor
+    group: The largest customer
+    interest: Reliable supply of bikes it can sell at a good margin.
+    influence: high
+    view: '“Kestle sells well in our stores. We would like more, and we would like it at a better price.”'
+  - name: Independent bike shops
+    group: The established channel
+    interest: A brand they can recommend without being undercut down the road.
+    influence: medium
+    view: '“When a customer has seen the same bike cheaper at Fellside, the conversation in the shop gets harder.”'
+  - name: Assembly staff
+    group: Employees
+    interest: Fair pay, manageable hours and secure jobs.
+    influence: medium
+    view: '“Last year was flat out. People will put up with overtime in a busy spring; they will not put up with it for ever.”'
+  - name: Component suppliers
+    group: Suppliers
+    interest: Prompt payment and steady orders.
+    influence: medium
+    view: '“Small, frequent orders cost us more to pack and ship, and we will charge for it.”'
+
+market:
+  summary: >
+    The figures are simulated. Kestle competes in the market for mid-priced electric bicycles, which in this
+    simulation grows about 1.5% a quarter. Buyers compare price, range, reliability and the advice of the shop that
+    sells it. Kestle's share is {{marketShare}} of the market by volume.
+  competitors:
+    - { name: Brightline E-Bikes (fictional), share: 9, price: 1350, position: 'Mass market, sold through national chains' }
+    - { name: Strata Electric (fictional), share: 6, price: 1750, position: 'Premium, sold online direct to riders' }
+    - { name: Moorland Mobility (fictional), share: 3.5, price: 1450, position: 'Regional, sold through independent shops' }
+  trends:
+    - Commuters are replacing second cars with e-bikes, which keeps the market growing even when spending is tight.
+    - National chains are pressing suppliers for lower prices and longer payment terms.
+    - Shipping times from Asia have become less predictable, so assemblers hold more stock than they used to.
+
+model:
+  period: { unit: quarter, days: 91.25, perYear: 4 }
+  taxRate: 0.25
+  elasticity: 1.6
+  brandWeight: 0.012
+  marketingNorm: 60000
+  marketingEffect: 6
+  lostSalesPenalty: 1.5
+  hoursPerWorker: 455
+  overtimePremium: 0.5
+  newStarterOutput: 0.5
+  moraleProductivity: 0.003
+  moraleNorm: 62
+  moraleRecovery: 0.25
+  overtimeStrain: 0.6
+  idleStrain: 0.5
+  layoffShock: 0.8
+  wageMorale: 1.2
+  turnoverBase: 14
+  turnoverPerPoint: 0.8
+  turnoverMin: 6
+  recruitCost: 3500
+  penaltyRate: 0.04
+  defects: { threshold: 90, strain: 0.2, morale: 0.08, brand: 0.6 }
+
+start:
+  label: Start of 2026
+  marketSize: 40000
+  marketGrowth: 0.015
+  channels:
+    - { id: dealers, label: Independent bike shops, price: 1520, demand: 1050, debtorDays: 30 }
+  marketing: 60000
+  brand: 56
+  materialCost: 820
+  energyCost: 8
+  otherCost: 47
+  overheads: 290000
+  maintenance: 12000
+  plantCapacity: 2300
+  hoursPerUnit: 10.5
+  overtimeMax: 0.15
+  defectBase: 2.5
+  headcount: 34
+  wage: 8250
+  morale: 64
+  cash: 300000
+  loans: [{ label: Bank loan (2022), principal: 400000, rate: 0.07 }]
+  assets:
+    - { id: premises, label: Freehold workshop, cost: 900000, nbv: 760000, life: 152 }
+    - { id: equipment, label: Assembly and test equipment, cost: 420000, nbv: 260000, life: 24 }
+  shareCapital: 300000
+  creditorDays: 30
+  stockDays: 95
+  overdraftLimit: 1000000
+  overdraftRate: 0.09
+  loanRate: 0.075
+
+history:
+  - label: Q1 2026
+    note: Fellside Outdoor's first order arrives, 250 bikes on 90-day terms. Kestle hires four assemblers.
+    effects:
+      addChannels: [{ id: fellside, label: Fellside Outdoor, price: 1330, demand: 250, debtorDays: 90, contracted: true }]
+      hire: 4
+  - label: Q2 2026
+    note: Fellside raises its order to 450 bikes. After a shortage of motors, Kestle holds 105 days of parts instead of 95, and hires five more assemblers.
+    effects: { demand: { fellside: { to: 450 } }, hire: 5, stockDays: { to: 105 } }
+  - label: Q3 2026
+    note: Fellside takes 600 bikes. Suppliers, facing higher shipping costs, ask to be paid in 25 days instead of 30. Three more assemblers join.
+    effects: { demand: { fellside: { to: 600 } }, hire: 3, creditorDays: { to: 25 } }
+  - label: Q4 2026
+    note: Fellside takes 650 bikes. Stock of parts reaches 112 days, and the overdraft ends the year close to its limit.
+    effects: { demand: { fellside: { to: 650 } }, stockDays: { to: 112 } }
+
+rounds:
+  - id: cash
+    title: Find the cash
+    period: Q1 2027
+    lead: finance
+    situation: >
+      The bank will not raise the overdraft limit, and the new season's parts must be paid for this quarter. The board
+      needs cash quickly, and there are three ways to find it: turn what Fellside owes into money now, hold less stock,
+      or bring in an investor. Each solves the same problem in a different part of the business, and each has a price.
+    question: How will Kestle find the cash it needs this quarter?
+    perspectives:
+      ceo: >
+        I want the business through the year and still ours at the end of it. I will listen to any option, but I need
+        to know what each one costs us next year, not just this quarter.
+      finance: >
+        Our customers owe us {{debtors}}, most of it Fellside's, and Fellside pays in 90 days. A factor would pay us
+        most of Fellside's share now. It costs nearly 3% of every Fellside invoice, but it scales with the contract,
+        and it is the one fix that grows with the problem.
+      marketing: >
+        Whatever we do, it must not reach the customer. The shops already feel undercut by Fellside. If the cure for
+        cash is running short of popular models, we will pay for it in sales.
+      operations: >
+        We hold {{stockDays}} of parts. The spring shortage scared us into it. Ordering little and often would free a lot of
+        cash, but the suppliers will charge more for small shipments, and we lose our buffer if shipping goes wrong again.
+      hr: >
+        The team worked flat out last year. A business angel or a factor does not change their week; running short of
+        parts means stop-start days on the line, and that is when mistakes and resentment start.
+    options:
+      - id: factor
+        label: Factor Fellside's invoices
+        summary: Sell Fellside's invoices to a factoring company, which pays most of their value straight away and collects the money from Fellside itself.
+        effects:
+          factoring: { channel: fellside, days: 25, feeRate: 0.028 }
+          costs: [{ label: Factoring set-up fee, amount: 8000 }]
+          flags: { factoring: true }
+        outcome:
+          headline: The factor pays now, and takes a slice of every Fellside sale
+          narrative: >
+            The factor advances most of the value of each Fellside invoice within days and collects the rest from
+            Fellside. What Fellside owes Kestle stops piling up on the balance sheet: debtor days fall to
+            {{debtorDays}}, and net cash moves to {{netCash}} ({{netCash.change}}). The cost is permanent while the
+            agreement lasts: a fee on every Fellside invoice, so operating profit for the quarter is {{pbit}}.
+          stakeholders:
+            - { name: Northern Counties Bank, reaction: 'Relieved to see the overdraft fall within a quarter.', mood: positive }
+            - { name: Hannah Kestle and Dev Malhotra, reaction: 'Glad to keep every share, uneasy about paying a fee on their biggest customer for as long as the contract runs.', mood: mixed }
+            - { name: Fellside Outdoor, reaction: 'Pays the factor instead of Kestle, and notices.', mood: mixed }
+          theory: >
+            Debt factoring turns debtors into cash at a price. It does not make the business more profitable: it
+            changes **when** cash arrives, and the fee lowers the profit margin. It suits a business whose problem is
+            the timing of cash rather than its profitability, and its cost grows with the sales it is attached to.
+      - id: stock
+        label: Order parts little and often
+        summary: Move towards just-in-time buying, cutting the stock of parts from 112 days to 90 now and 75 next quarter, accepting higher prices for smaller shipments.
+        effects:
+          stockDays: { to: 90 }
+          materialCost: { pct: 2 }
+          later: [{ after: 1, effects: { stockDays: { to: 75 } }, note: 'Stock of parts falls to 75 days, the second step of the just-in-time plan.' }]
+          flags: { leanStock: true }
+        outcome:
+          headline: Cash comes off the shelves, and the buffer goes with it
+          narrative: >
+            Parts arrive in smaller, more frequent shipments, so less money sits on the shelves: stock is
+            {{stockDays}} worth at the end of the quarter, and net cash moves to {{netCash}} ({{netCash.change}}).
+            Smaller orders cost more to ship and lose the bulk discount, so every bike costs a little more to build.
+            Operating profit is {{pbit}}, and Kestle now depends on every delivery arriving on time.
+          stakeholders:
+            - { name: Component suppliers, reaction: 'Accept smaller, more frequent orders, at a higher price per part.', mood: mixed }
+            - { name: Assembly staff, reaction: 'Find the line stops more often while they wait for parts.', mood: mixed }
+            - { name: Northern Counties Bank, reaction: 'Likes a fix that does not add debt.', mood: positive }
+          theory: >
+            Holding less stock releases cash tied up in working capital. Just-in-time stock control cuts holding
+            costs, but it raises the risk of a stock-out when supply is uncertain; just-in-case holds a buffer, at the
+            cost of cash and storage. Stock turnover in days measures how long money sits on the shelves.
+      - id: angel
+        label: Bring in a business angel
+        summary: Sell 20% of the company to a business angel for £600k, who joins the board.
+        effects:
+          equity: { amount: 600000, stake: 20 }
+          overheads: { by: 6000 }
+          flags: { angel: true }
+        outcome:
+          headline: £600k of patient money, and a fifth of the company gone
+          narrative: >
+            The angel's money arrives at once and costs no interest. Net cash moves to {{netCash}}
+            ({{netCash.change}}), with no fee on future sales. The founders now own {{ownership}} of the company, and
+            the new director expects monthly reports and a say in the plan. Operating profit is {{pbit}}.
+          stakeholders:
+            - { name: Hannah Kestle and Dev Malhotra, reaction: 'Have breathing space, and a partner they must now persuade.', mood: mixed }
+            - { name: The business angel, reaction: 'Sees a profitable company with a cash problem, bought at a fair price.', mood: positive }
+            - { name: Northern Counties Bank, reaction: 'Reassured by new equity behind its lending.', mood: positive }
+          theory: >
+            A business angel provides share capital, external finance that does not have to be repaid and carries no
+            interest. The price is ownership and control: the founders give up a share of future profits and of every
+            decision. Equity also lowers gearing, which makes lenders more comfortable.
+    event:
+      variants:
+        - id: fellside-late-factored
+          if: { flag: factoring }
+          title: Fellside moves its suppliers to 120-day terms
+          text: >
+            Fellside writes to every supplier: from now on it will pay in 120 days, not 90. Because Kestle's invoices go
+            to the factor, the factor waits instead, and raises its fee to reflect the longer wait.
+          effects:
+            factoring: { channel: fellside, days: 30, feeRate: 0.032 }
+        - id: fellside-late
+          title: Fellside moves its suppliers to 120-day terms
+          text: >
+            Fellside writes to every supplier: from now on it will pay in 120 days, not 90. Kestle now waits four
+            months for Fellside's money, and every bike it sends Fellside ties up cash for a month longer.
+          effects:
+            channelDays: { fellside: { to: 120 } }
+
+  - id: offer
+    title: The Fellside offer
+    period: Q2 2027
+    lead: marketing
+    situation: >
+      Fellside's buyer wants more: half as many bikes again, 975 a quarter, at £1,290 instead of £1,330. It would make
+      Kestle bigger, fill the workshop, and put Kestle in front of many more riders. It would also deepen Kestle's
+      dependence on one customer that pays late, and the shops have started to complain about being undercut.
+    question: How should Kestle answer Fellside?
+    perspectives:
+      ceo: >
+        One customer already takes more than a third of our bikes. I am tempted by the scale, and frightened by what
+        happens to us if Fellside changes its mind next year.
+      finance: >
+        Every extra Fellside bike is cash out now and cash in months later. Unless the invoices are factored, the full
+        order needs hundreds of thousands more in working capital, and we do not have it. If we take more, I want
+        better payment terms in exchange.
+      marketing: >
+        Fellside puts us in front of riders the shops never reach. But the shops are our brand: if they stop
+        recommending us because the same bike is cheaper at Fellside, we lose more than we gain. I would rather spend
+        on the shops.
+      operations: >
+        At 975 a quarter we would run close to the limit of the workshop, on overtime. Quality slips when we rush.
+        Part of the order we can build in normal hours; all of it we cannot.
+      hr: >
+        People will do overtime for a busy season. Built into every quarter, it will wear them down, and in the
+        third quarter the pay review lands on top of it.
+    options:
+      - id: accept
+        label: Accept the full order
+        summary: Supply 975 bikes a quarter at £1,290, on Fellside's standard terms.
+        effects:
+          prices: { fellside: { to: 1290 } }
+          demand: { fellside: { to: 975 } }
+          brand: -2
+          flags: { bigFellside: true }
+        outcome:
+          headline: The workshop fills, and so do the debtors
+          narrative: >
+            Kestle sells {{volume}} bikes, {{volume.change}} on the quarter, and its market share reaches
+            {{marketShare}}. The workshop runs at {{utilization}} of capacity, on overtime, and the defect rate is
+            {{defectRate}}. Some shops quietly push other brands now that Kestle is cheaper at Fellside. Operating profit
+            is {{pbit}}; net cash is {{netCash}}, because the extra bikes are paid for long before Fellside pays for
+            them.
+          stakeholders:
+            - { name: Fellside Outdoor, reaction: 'Delighted: more stock, at a better price.', mood: positive }
+            - { name: Independent bike shops, reaction: 'Feel undercut, and some steer customers elsewhere.', mood: negative }
+            - { name: Assembly staff, reaction: 'Work overtime most weeks.', mood: negative }
+          theory: >
+            Accepting more orders than the business can finance is overtrading: sales and profit can rise while cash
+            runs out. A big discounted order also creates channel conflict when the same product is sold more cheaply
+            elsewhere. Near full capacity, the cost of each extra unit rises because of overtime and rushed work.
+      - id: partial
+        label: Take part of it, on better terms
+        summary: Offer 800 bikes a quarter at £1,305, if Fellside pays in 90 days.
+        effects:
+          prices: { fellside: { to: 1305 } }
+          demand: { fellside: { to: 800 } }
+          channelDays: { fellside: { to: 90 } }
+          brand: -1
+        outcome:
+          headline: A bigger contract on terms Kestle can carry
+          narrative: >
+            Fellside agrees to 800 bikes a quarter and to pay in 90 days. Kestle sells {{volume}} bikes; the workshop
+            runs at {{utilization}} of capacity, mostly in normal hours. Operating profit is {{pbit}} and net cash
+            {{netCash}}. The shops grumble, but less than they would have.
+          stakeholders:
+            - { name: Fellside Outdoor, reaction: 'Gets more bikes, though not all it wanted.', mood: mixed }
+            - { name: Northern Counties Bank, reaction: 'Approves of the shorter payment terms.', mood: positive }
+            - { name: Independent bike shops, reaction: 'Notice Fellside''s bigger range, and live with it.', mood: mixed }
+          theory: >
+            Negotiating payment terms is a working capital decision as much as a sales one: the same order financed in
+            90 days instead of 120 ties up a quarter less cash. Growth matched to capacity avoids the cost of overtime
+            and the quality problems of running flat out.
+      - id: decline
+        label: Decline, and invest in the shops
+        summary: Keep Fellside at 650 bikes, and spend more on supporting the independent shops, with a demonstration fleet and joint promotions.
+        effects:
+          marketing: { by: 45000 }
+          costs: [{ label: Demonstration fleet for the shops, amount: 30000 }]
+          flags: { dealerPush: true }
+        outcome:
+          headline: Smaller, slower growth through the shops
+          narrative: >
+            Fellside stays at 650 bikes a quarter. More marketing and a demonstration fleet lift Kestle's standing with
+            the shops: brand strength is {{brand}} ({{brand.change}}). Kestle sells {{volume}} bikes, and the
+            workshop runs at {{utilization}} of capacity. Operating profit is {{pbit}}, after the extra spending; net
+            cash is {{netCash}}.
+          stakeholders:
+            - { name: Independent bike shops, reaction: 'Feel backed, and recommend Kestle more readily.', mood: positive }
+            - { name: Fellside Outdoor, reaction: 'Disappointed, and starts talking to another supplier.', mood: negative }
+            - { name: Assembly staff, reaction: 'Have a steadier quarter.', mood: positive }
+          theory: >
+            Choosing not to grow through a channel is a strategic choice about positioning and risk. Marketing builds a
+            brand slowly: its effect arrives over more than one period. Spreading sales across many customers reduces
+            dependence on any one of them.
+    event:
+      variants:
+        - id: shortage
+          if: { kpi: stockDays, op: '<', value: 80 }
+          title: A shipping disruption, and the shelves are thin
+          text: >
+            A disruption in container shipping adds six weeks to deliveries from Asia. With only {{stockDays}} of
+            parts in hand, Kestle runs out of motors: for a quarter it can build only part of its usual output, and it
+            flies some parts in at a premium.
+          effects:
+            plantCapacity: { by: -500 }
+            materialCost: { by: 25 }
+            later: [{ after: 1, effects: { plantCapacity: { by: 500 }, materialCost: { by: -25 } }, note: 'Shipping returned to normal and the parts shortage ended.' }]
+        - id: buffer
+          title: A shipping disruption, and the buffer holds
+          text: >
+            A disruption in container shipping adds six weeks to deliveries from Asia. Kestle's stock of parts carries
+            it through, though it pays more for freight for a quarter.
+          effects:
+            otherCost: { by: 12 }
+            later: [{ after: 1, effects: { otherCost: { by: -12 } }, note: 'Freight costs returned to normal.' }]
+
+  - id: pay
+    title: The pay review
+    period: Q3 2027
+    lead: hr
+    situation: >
+      Kestle reviews pay once a year, in the third quarter. Living costs have risen about 5%, and the assemblers expect
+      their pay to keep up. Every option costs something: money now, money later, or goodwill. Whatever the board
+      decides lands on a workforce that may already be tired.
+    question: What will Kestle do about pay this year?
+    perspectives:
+      ceo: >
+        I want a decision we can explain to the staff face to face. Whatever we give, or do not give, they should see
+        why.
+      finance: >
+        A 5% rise is a permanent cost of about £19k a quarter. A freeze saves it. A share of profit costs money only
+        when we make money, which is exactly when we can afford it.
+      marketing: >
+        The people who build the bikes are the people the shops phone with problems. A tired, resentful workshop shows
+        up in the warranty returns, and the returns show up in the reviews.
+      operations: >
+        If people leave, we lose more than a wage. A new assembler takes a quarter to reach full speed, and every
+        leaver costs us recruitment and training.
+      hr: >
+        Pay is a hygiene factor: a fair rise will not make anyone love the job, but a freeze after the year they have
+        had will make some of them leave. A profit share tells them they are part of the recovery.
+    options:
+      - id: freeze
+        label: Freeze pay this year
+        summary: No rise this year, with a promise to look again when the cash position recovers.
+        effects:
+          wage: { pct: 0 }
+          morale: -5
+        outcome:
+          headline: The cash is kept, and the mood sours
+          narrative: >
+            Pay stays where it is. Morale moves to {{morale}} ({{morale.change}}), and labour turnover runs at
+            {{turnover}} a year. Each leaver costs recruitment and a new starter's slower first weeks; output per
+            worker is {{productivity}} bikes. Operating profit is {{pbit}}.
+          stakeholders:
+            - { name: Assembly staff, reaction: 'Feel taken for granted after a hard year.', mood: negative }
+            - { name: Northern Counties Bank, reaction: 'Approves of the cost control.', mood: positive }
+            - { name: Hannah Kestle and Dev Malhotra, reaction: 'Explain the freeze in person, and are not convinced they were believed.', mood: mixed }
+          theory: >
+            In Herzberg's motivation-hygiene theory, pay is a hygiene factor: when it falls behind what people see as
+            fair it causes dissatisfaction, even though a rise does not motivate for long. Labour turnover rises when
+            morale falls, and each leaver costs recruitment, induction and lost output.
+      - id: share
+        label: A small rise and a profit share
+        summary: A 2% rise now, and 8% of each quarter's profit before interest and tax shared among the staff.
+        effects:
+          wage: { pct: 2 }
+          profitShare: { to: 0.08 }
+          morale: 2
+        outcome:
+          headline: Pay that rises and falls with the business
+          narrative: >
+            Pay rises 2%, and the staff now share in each quarter's profit: the profit share paid out depends on how the
+            business does. Morale moves to {{morale}} ({{morale.change}}); labour turnover runs at {{turnover}} a year.
+            Operating profit, after the profit share, is {{pbit}}.
+          stakeholders:
+            - { name: Assembly staff, reaction: 'Like seeing the link between their effort and the results.', mood: positive }
+            - { name: Hannah Kestle and Dev Malhotra, reaction: 'Prefer a cost that falls when profit does.', mood: positive }
+            - { name: Northern Counties Bank, reaction: 'Neutral: the cost moves with profit.', mood: mixed }
+          theory: >
+            Profit-related pay is a financial reward that links part of pay to the organization's results. It makes
+            staff costs partly variable, which protects cash when profit falls, and it can strengthen commitment. Its
+            weakness is the weak link between one person's effort and the whole company's profit.
+      - id: raise
+        label: Match living costs, and cross-train
+        summary: A 5% rise, and £20k of training so that assemblers can cover each other's stations.
+        effects:
+          wage: { pct: 5 }
+          training: 20000
+          later: [{ after: 1, effects: { skill: { pct: 3 } }, note: 'Cross-training pays off: assemblers cover more stations, and output per hour rises.' }]
+        outcome:
+          headline: A full rise, and a workforce that can cover for itself
+          narrative: >
+            Pay rises 5% and the training starts this quarter; its effect on output arrives next quarter. Morale moves
+            to {{morale}} ({{morale.change}}), and labour turnover runs at {{turnover}} a year. Staff costs are
+            {{staffCosts}} for the quarter, and operating profit is {{pbit}}.
+          stakeholders:
+            - { name: Assembly staff, reaction: 'Feel the hard year was recognized.', mood: positive }
+            - { name: Northern Counties Bank, reaction: 'Asks why costs are rising while the overdraft is high.', mood: mixed }
+            - { name: Component suppliers, reaction: 'Notice fewer errors in the orders they receive.', mood: positive }
+          theory: >
+            Training is an investment in people whose benefit arrives later: here as higher productivity next quarter.
+            A pay rise that keeps up with living costs removes a source of dissatisfaction; job enlargement through
+            cross-training can make the work more varied as well as more flexible.
+    event:
+      variants:
+        - id: bank-penalty
+          if: { any: [{ flag: overdraftBreached }, { kpi: acidTest, op: '<', value: 0.75 }] }
+          title: The bank moves Kestle to its business support team
+          text: >
+            At its quarterly review the bank sees an acid test of {{acidTest}} and net cash of {{netCash}}, and a
+            history that worries it. It cuts the overdraft limit to £600k from next quarter, raises the overdraft rate
+            by three points, and says any new loan will cost 10.5% a year.
+          effects:
+            overdraftLimit: { to: 600000 }
+            overdraftRate: { by: 0.03 }
+            loanRate: { to: 0.105 }
+            flags: { bankWatch: true }
+        - id: bank-offer
+          title: The bank offers to help
+          text: >
+            At its quarterly review the bank sees an acid test of {{acidTest}} and net cash of {{netCash}}. Reassured,
+            it offers to convert part of any overdraft into a five-year loan at 7.5% a year.
+          effects:
+            loanRate: { to: 0.075 }
+
+  - id: fix
+    title: A long-term fix
+    period: Q4 2027
+    lead: ceo
+    situation: >
+      The year is nearly over. Whatever happened in the first three quarters, the board wants a structure that will
+      not put the company back in the same position next year. There are three ideas on the table: restructure the
+      debt, sell the workshop and rent it back, or make the business itself need less cash by cutting its range.
+    question: What is Kestle's long-term fix?
+    perspectives:
+      ceo: >
+        I want the next spring to start with headroom, not a phone call from the bank. I also want us to still own
+        the things that make us Kestle.
+      finance: >
+        An overdraft is short-term money that can be withdrawn. Turning it into a term loan moves the debt from
+        current to non-current liabilities. Selling the workshop raises the most cash, and the gain on the sale will
+        flatter this quarter's profit; do not mistake that for a better business.
+      marketing: >
+        Nine models are too many for the shops to stock and too many for riders to choose between. Five well-chosen
+        models would be easier to sell. Cut the wrong ones and we lose customers.
+      operations: >
+        Fewer models means fewer different parts, smaller stocks and longer runs on the line. It is the only option
+        that makes the business itself need less cash.
+      hr: >
+        Selling the building worries people: it feels like a business selling the furniture. Whatever we choose,
+        explain it.
+    options:
+      - id: term-loan
+        label: Convert the overdraft into a term loan
+        summary: Convert up to £600k of the overdraft into a five-year loan at the bank's current rate for new loans.
+        effects:
+          refinance: { max: 600000, label: Five-year term loan }
+        when:
+          - if: { kpi: overdraft, op: '<', value: 1 }
+            effects: {}
+            note: There was no overdraft to convert, so the bank's loan was not needed and nothing changed.
+        outcome:
+          headline: Short-term debt becomes long-term debt
+          narrative: >
+            The term loan replaces as much of the overdraft as there is to replace, up to £600k. Loans now stand at
+            {{debt}} and gearing at {{gearing}}; net cash is {{netCash}}. The current ratio is {{currentRatio}},
+            because a loan due in five years is not a current liability. Operating profit is {{pbit}}.
+          stakeholders:
+            - { name: Northern Counties Bank, reaction: 'Prefers a scheduled loan to a hard-core overdraft.', mood: positive }
+            - { name: Hannah Kestle and Dev Malhotra, reaction: 'Sleep better with the overdraft headroom restored.', mood: positive }
+            - { name: The finance team, reaction: 'Note that the debt has moved, not gone.', mood: mixed }
+          theory: >
+            Matching finance to its use: an overdraft is short-term finance for short-term needs, and a permanent need
+            for working capital is better financed long term. Refinancing improves the current ratio by moving debt out
+            of current liabilities, while gearing rises. The debt still has to be repaid.
+      - id: leaseback
+        label: Sell the workshop and lease it back
+        summary: Sell the freehold workshop to a property investor for £950k and rent it back at £19k a quarter.
+        effects:
+          sellAsset: { asset: premises, proceeds: 950000, rent: 19000 }
+          costs: [{ label: Legal and survey fees, amount: 15000 }]
+        outcome:
+          headline: The building's value turns into cash, and into rent
+          narrative: >
+            The workshop sells for £950k, more than its book value, so this quarter's profit includes a one-off gain:
+            operating profit is {{pbit}}. Net cash moves to {{netCash}} ({{netCash.change}}). From now on Kestle pays
+            rent every quarter, and it no longer owns the place it works in.
+          stakeholders:
+            - { name: Northern Counties Bank, reaction: 'Pleased with the cash, wary of the lost security for its loan.', mood: mixed }
+            - { name: Assembly staff, reaction: 'Wonder what else might be sold.', mood: mixed }
+            - { name: The property investor, reaction: 'Has a tenant with a long lease.', mood: positive }
+          theory: >
+            Sale and leaseback raises cash from a non-current asset while keeping its use. It is an internal source of
+            finance (the sale of assets) combined with leasing. It adds a fixed cost, the rent, and a one-off gain on
+            the sale can make profit look better for one period without making the business stronger.
+      - id: range
+        label: Cut the range from nine models to five
+        summary: Drop the four slowest-selling models, clear their parts, and buy the remaining parts in larger batches.
+        effects:
+          stockDays: { by: -25 }
+          materialCost: { pct: -1.5 }
+          demand: { dealers: { pct: -4 } }
+          costs: [{ label: Parts for discontinued models written off, amount: 70000 }]
+        outcome:
+          headline: A simpler range that needs less money to run
+          narrative: >
+            With fewer models, Kestle holds fewer kinds of part: stock falls to {{stockDays}} worth, and larger batches
+            of the remaining parts cost a little less. Some shop customers wanted the models that went, so shop sales
+            dip. Writing off the old parts costs £70k this quarter: operating profit is {{pbit}}, and net cash
+            {{netCash}}.
+          stakeholders:
+            - { name: Independent bike shops, reaction: 'Find the range easier to sell, and miss two popular models.', mood: mixed }
+            - { name: Assembly staff, reaction: 'Welcome longer runs and fewer changeovers.', mood: positive }
+            - { name: Component suppliers, reaction: 'Get larger orders for fewer parts.', mood: positive }
+          theory: >
+            Rationalizing the product portfolio reduces the working capital the business needs and can lower costs
+            through longer production runs. It is a strategy for liquidity that works on the operations, not the
+            finance: the business needs less cash rather than borrowing more.
+
+dashboard: [revenue, pbit, netCash, acidTest, utilization, morale, brand, marketShare, stockDays, debtorDays]
+
+roles:
+  ceo:
+    brief: >
+      You chair the board. You are judged on the company's survival and its standing at the end of the year: no
+      breach of the overdraft limit, a profit for the year, a market share at least as large as now, and a company
+      still wholly owned by its founders.
+    pinned: [netCash, pbit, marketShare]
+    goals:
+      - { metric: 'max:overdraftExcess', op: '<=', value: 0, label: Stay within the overdraft limit at every quarter end }
+      - { metric: 'sum:profit', op: '>=', value: 550000, label: Profit after tax of at least £550k over the four quarters }
+      - { metric: 'change:marketShare', op: '>=', value: 0, label: Hold market share at least where it was }
+      - { metric: 'final:ownership', op: '>=', value: 100, label: Keep the company wholly owned by its founders }
+  finance:
+    brief: >
+      You run the money. You are judged on liquidity and on the structure you leave behind: never over the overdraft
+      limit, a small overdraft by the year end, and borrowing kept to a sensible share of long-term finance.
+    pinned: [netCash, acidTest, gearing]
+    goals:
+      - { metric: 'max:overdraftExcess', op: '<=', value: 0, label: Stay within the overdraft limit at every quarter end }
+      - { metric: 'final:netCash', op: '>=', value: -150000, label: End the year with an overdraft of no more than £150k }
+      - { metric: 'final:gearing', op: '<=', value: 30, label: Gearing of 30% or less at the year end }
+  marketing:
+    brief: >
+      You own the brand and the customers. You are judged on growth and reputation: a bigger market share, a brand
+      at least as strong as now, and customers who are not turned away for lack of bikes.
+    pinned: [marketShare, brand, revenue]
+    goals:
+      - { metric: 'change:marketShare', op: '>=', value: 0.2, label: Grow market share by at least 0.2 points }
+      - { metric: 'final:brand', op: '>=', value: 56, label: Brand strength of 56 or more at the year end }
+      - { metric: 'sum:lostSales', op: '<=', value: 100, label: Turn away no more than 100 orders in the year }
+  operations:
+    brief: >
+      You run the workshop and the stock. You are judged on running it well: never overloaded, with quality under
+      control and less money sitting on the shelves.
+    pinned: [utilization, defectRate, stockDays]
+    goals:
+      - { metric: 'max:utilization', op: '<=', value: 92, label: Never run above 92% of capacity }
+      - { metric: 'final:defectRate', op: '<=', value: 3, label: A defect rate of 3% or less at the year end }
+      - { metric: 'final:stockDays', op: '<=', value: 90, label: Hold no more than 90 days of stock at the year end }
+  hr:
+    brief: >
+      You look after the people. You are judged on how the workforce comes through the year: morale that ends where
+      it should, labour turnover kept down, and no quarter in which morale collapses.
+    pinned: [morale, turnover, headcount]
+    goals:
+      - { metric: 'final:morale', op: '>=', value: 60, label: Morale of 60 or more at the year end }
+      - { metric: 'max:turnover', op: '<=', value: 16, label: Labour turnover never above 16% a year }
+      - { metric: 'min:morale', op: '>=', value: 52, label: Morale never below 52 in any quarter }
+
+memo:
+  intro: >
+    The year is over. Write to the board as the director whose seat you took: what Kestle should do next year, on the
+    evidence of this one. Use the figures on the dashboard, and say what you would watch.
+  fields:
+    - { id: recommendation, label: Recommendation, hint: 'One or two sentences: what should Kestle do next year about cash, Fellside and the shops?', rows: 3 }
+    - { id: evidence, label: The evidence, hint: 'The two or three figures that matter most, and what they show. Quote them from the dashboard.', rows: 4 }
+    - { id: tradeoffs, label: Trade-offs and risks, hint: 'What your recommendation costs, and what could go wrong.', rows: 4 }
+    - { id: stakeholders, label: Stakeholders, hint: 'Who gains, who loses, and how you would handle the bank, Fellside, the shops and the staff.', rows: 4 }
+    - { id: conditions, label: What would change your mind, hint: 'The figure or event that would make you recommend something else.', rows: 3 }
+    - { id: steps, label: The first ninety days, hint: 'Three things you would do first, in order.', rows: 4 }
+
+walkthrough:
+  title: 'One path, narrated: factor, take part of the order, share the profit, refinance'
+  picks: [factor, partial, share, term-loan]
+  intro: >
+    This is one path through the year, chosen to show how the decisions interact, not as the right answer. At the
+    start, net cash is {{netCash}} against a £1m overdraft limit, the acid test is {{acidTest}}, and the workshop
+    runs at {{utilization}} of capacity.
+  outro: >
+    By the end of the year net cash is {{netCash}}, the acid test {{acidTest}} and morale {{morale}}. The crisis was
+    eased in the first quarter, and every later decision was easier because of it. The cost is a factoring fee on
+    every Fellside invoice for as long as the agreement runs, which the debrief weighs against the other routes.
+
+debrief:
+  summary: >
+    Kestle's problem was never profit; it was the timing of cash. Each first-round option fixes that timing in a
+    different part of the business: factoring in finance, just-in-time buying in operations, an investor in the
+    ownership. What followed depended on that choice. The Fellside order is cheap to accept with factored invoices
+    and dangerous without them. A thin stock of parts is cheap until a delivery fails. An investor's money disappears
+    quickly into Fellside's debtors if the order grows. No path meets every director's goals, because the goals pull
+    against each other: growth against liquidity, pay against cash, ownership against safety.
+  theory:
+    - title: Profit is not cash
+      body: >
+        Kestle made a profit in every quarter of 2026 and still came close to its overdraft limit. Profit records sales
+        when they are made; cash arrives when customers pay. Between the two sit debtors, stock and creditors, the
+        working capital cycle. A growing business needs more working capital every quarter, which is why overtrading
+        can sink a profitable business.
+      syllabus: ['3.7']
+    - title: Liquidity ratios, and what they miss
+      body: >
+        The current ratio looked comfortable throughout, because Kestle's current assets were large. Most of them were
+        stock and money owed by Fellside, which pay no bills this week. The acid test, which leaves stock out, told the
+        truer story. Neither ratio shows timing: a business can have healthy ratios and still be unable to pay on
+        Friday.
+      syllabus: ['3.5']
+    - title: Stock, debtors and creditors in days
+      body: >
+        Stock turnover, debtor days and creditor days measure how long cash is tied up at each step of the cycle.
+        Cutting stock days or debtor days releases cash; lengthening creditor days borrows it from suppliers. Gearing
+        shows how far long-term finance is borrowed. Insolvency, being unable to pay debts as they fall due, can come
+        before any loss.
+      syllabus: ['3.6']
+      level: HL
+    - title: Sources of finance, matched to the need
+      body: >
+        Factoring, an overdraft, a term loan, a business angel's share capital and the sale of an asset each raise
+        cash with a different cost: fees, interest, ownership, or the asset itself. A permanent need for working
+        capital is better met by long-term finance than by an overdraft the bank can withdraw.
+      syllabus: ['3.2']
+    - title: Just-in-time and just-in-case
+      body: >
+        Holding less stock frees cash, but leaves no buffer when supply fails. In this simulation the shipping
+        disruption punishes thin stocks and spares the business that kept a buffer. The right stock policy depends on
+        how reliable supply is, not only on the cost of holding stock.
+      syllabus: ['5.6']
+      level: HL
+    - title: Pay, morale and the workforce
+      body: >
+        The pay review shows a hygiene factor at work: the freeze saves money and costs goodwill, labour turnover and
+        output, especially in a workshop already on overtime. Profit-related pay makes part of the wage bill rise and
+        fall with the business, which suits a company whose problem is cash.
+      syllabus: ['2.4']
+  paths:
+    - id: cautious
+      label: The cautious path
+      picks: [factor, partial, share, term-loan]
+      lesson: >
+        Fix the timing of cash first, grow within capacity, and share profit rather than fixing pay. It never breaches
+        the limit and keeps morale healthy; it pays a factoring fee every quarter and gives up some of Fellside's
+        volume.
+    - id: growth
+      label: The growth path
+      picks: [angel, accept, raise, leaseback]
+      lesson: >
+        Raise equity, take every order, pay well and sell the building. It grows market share fastest and reports
+        a strong final quarter, partly because of the one-off gain on the sale. The angel's money is swallowed by
+        Fellside's slower payments, the overdraft goes over its limit and the bank tightens its terms.
+    - id: lean
+      label: The lean path
+      picks: [stock, decline, share, range]
+      lesson: >
+        Make the business need less cash: thin stocks, a simpler range and no extra Fellside volume. It ends with
+        the least stock, but the shipping disruption finds the thin shelves and costs sales.
+    - id: squeeze
+      label: The squeeze
+      picks: [stock, accept, freeze, range]
+      lesson: >
+        Cut stock, take the big order and freeze pay. Each step saves cash on its own; together they collide. The
+        shipping disruption hits a full order book with no buffer, the freeze lands on a tired workforce, and the bank
+        loses patience.
+  misconceptions:
+    - claim: A profitable business cannot run out of cash.
+      correction: >
+        Kestle was profitable every quarter and still nearly ran out of cash. Profit and cash differ by the money tied
+        up in working capital, and by spending such as investment and loan repayments.
+    - claim: A healthy current ratio means a business can pay its bills.
+      correction: >
+        Kestle's current ratio stayed well above 1 while the overdraft neared its limit, because its current assets
+        were mostly stock and debtors. The acid test, and the cash flow itself, gave the warning.
+    - claim: Selling more always helps a business with a cash problem.
+      correction: >
+        Each extra Fellside bike was paid for months before Fellside paid for it. Without faster payment, more sales
+        made the cash problem worse: overtrading.
+    - claim: The gain on selling the workshop shows the business is doing better.
+      correction: >
+        The gain is a one-off. It raises one quarter's profit, while the rent lowers every quarter's after it.
+  examLink: >
+    Paper 1 and Paper 2 questions on cash flow ask candidates to distinguish profit from cash, to calculate and
+    interpret liquidity ratios, and to evaluate strategies for dealing with cash flow problems in context. Kestle gives
+    a context for each. HL candidates can extend the analysis with efficiency ratios and stock control.
+  practice:
+    - { prompt: 'Using Kestle Cycles, explain the difference between profit and cash flow.', command: explain, marks: 4 }
+    - { prompt: 'From the board pack, calculate Kestle''s acid test (quick) ratio at the end of 2026, and comment on your answer.', command: calculate, marks: 4 }
+    - { prompt: 'Discuss whether Kestle Cycles should have accepted Fellside Outdoor''s expanded order.', command: discuss, marks: 10 }
+    - { prompt: 'Evaluate two strategies Kestle Cycles could use to improve its liquidity.', command: evaluate, marks: 10 }
+    - { prompt: 'Examine the impact of a just-in-time approach to stock on Kestle Cycles.', command: examine, marks: 10, level: HL }
+  terms: [working-capital, liquidity, overtrading, debt-factoring, cash-flow-forecast, acid-test-ratio, current-ratio, gearing-ratio, debtor-days, creditor-days, stock-turnover, just-in-time, just-in-case, business-angel, overdraft, sale-and-leaseback, capacity-utilization-rate, profit-related-pay, hygiene-factors, insolvency]
+
+method: >
+  Kestle Cycles, Fellside Outdoor, Northern Counties Bank, the competitors and every person in this scenario are
+  fictional, and every figure is simulated. The figures come from the Boardroom's model, stated in full on the
+  Boardroom's page: demand follows price, brand and the market; capacity is the lower of the workshop's and the
+  workforce's; working capital follows its days; morale, turnover and productivity follow pay, workload and change.
+  The quarters of 2026 are the model run forward from the start of the year with the changes listed in the history,
+  so the board pack's statements and ratios cannot disagree with the simulation. Tax is a flat simulated 25% of
+  positive profit; real tax rules are more complex.
+updated: 2026-11-03

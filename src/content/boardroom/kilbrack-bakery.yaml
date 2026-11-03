@@ -1,0 +1,799 @@
+# Boardroom scenario: Kilbrack Bakery. A fictional company; every figure is
+# simulated. The board pack, the dashboard and every figure in the narrative
+# are computed by the Boardroom engine (src/lib/boardroom/engine.ts) from the
+# model, the starting position and the history below.
+
+title: 'Kilbrack Bakery: machines, people and the price of bread'
+dek: A family bakery must double its output for the supermarkets, and decide whether people or machines will make it.
+question: Should a family bakery automate production to win the volume its customers want, and what does it owe the people whose jobs the machines would do?
+challenge: automation
+order: 2
+company:
+  name: Kilbrack Bakery
+  industry: Bread and bakery products
+  sector: secondary
+  location: Kilbrack, a fictional market town in County Limerick, Ireland
+  legalForm: Private limited company
+  founded: '1971'
+  size: 63 production staff, and 22 more in sales, delivery and the office
+  owners: The Hartigan family owns every share; three generations sit on the board.
+currency: { code: EUR, symbol: '€', name: euro }
+units: { singular: loaf, plural: loaves }
+sustainability:
+  label: Carbon per loaf
+  unit: kg CO₂e per loaf
+  note: Emissions from the ovens, the refrigeration and the delivery vans, for each loaf made. The figures are simulated.
+syllabus: ['5.2', '5.6', '5.3', '3.8', '2.1', '2.7', '5.5', '1.3']
+concepts: [change, ethics, sustainability]
+level: SL/HL
+hlNote: >
+  Capacity utilization, productivity and operating leverage (5.6), lean production and quality (5.3), industrial
+  relations (2.7) and net present value (3.8) are HL only. SL students can play every round; those parts of the
+  debrief are marked HL.
+
+background:
+  - >
+    Kilbrack Bakery has baked bread in the same market town since 1971. Seamus and Brigid Hartigan started it with one
+    oven and a van; their granddaughter Niamh Hartigan runs it now, and her father and aunt still sit on the board.
+    It bakes sliced pan, soda bread, wholemeal and seeded loaves for two supermarket chains, and fresher, crustier bread
+    for cafés, hotels and delis across the region. It is the largest employer in Kilbrack.
+  - >
+    The bakery is full. Its ovens and lines can make about eleven million loaves a year in two shifts, and for two years
+    demand has run past that. The supermarkets have kept asking for more, and each year the bakery has turned away
+    orders from its own cafés and hotels, its best-paying customers, to keep the contracts it signed.
+  - >
+    This autumn the larger supermarket chain renewed its contract: nine million loaves in 2027 and nearly ten million
+    in 2028, at €1.06 a loaf instead of €1.10. The board has agreed to it. What it has not agreed is how the bakery
+    will make that much bread.
+  - >
+    The simulation runs from 2027 to 2030, one year a round. You take one seat at the board table. The decisions are the
+    whole board's; your seat decides what you are judged on.
+
+context:
+  - >
+    **Three ways to make more bread.** An automated line would double the plant's capacity and need far fewer people
+    per loaf, at a cost of €4.6m and a year to install. Robotic cells for dividing and packing would add less capacity
+    for a third of the money. A third shift would use the ovens through the night with the people the bakery already
+    knows how to train, and no new machines at all.
+  - >
+    **Fixed against variable.** Machines turn wages, which can be flexed, into depreciation, maintenance and interest,
+    which cannot. That makes profit rise faster when volume is high, and fall faster when it is not: operating
+    leverage.
+  - >
+    **A town's employer.** About one household in twelve in Kilbrack has someone working at the bakery. Its workforce is
+    represented by a union, and the board has always prided itself on never having made a compulsory redundancy.
+
+challenges:
+  - '**Capacity.** The plant is at its limit and the new contract needs over a million more loaves a year.'
+  - '**Price.** The supermarket price has fallen to €1.06 a loaf, and the next tender will push it lower.'
+  - '**People.** Labour is the largest cost the bakery controls, and the workforce is skilled, loyal and unionized.'
+  - '**Quality.** Running flat out, the bakery scraps or has rejected {{defectRate}} of what it makes, and the supermarkets have noticed.'
+  - '**Energy.** Gas ovens make the bakery exposed to energy prices, and its customers have started to ask about carbon.'
+
+stakeholders:
+  - name: Niamh Hartigan and the family board
+    group: Owners and directors
+    interest: A bakery that survives and grows, a fair dividend, and the family's name in the town.
+    influence: high
+    view: '“My grandparents built this with the town. I want it here in fifty years. That may need machines; it does not need us to forget who works here.”'
+  - name: The supermarket buyer
+    group: The largest customer
+    interest: Consistent bread, delivered on time, at a falling price.
+    influence: high
+    view: '“Kilbrack makes good bread. At the next tender we will compare price, reliability and how many loaves we reject, in that order.”'
+  - name: The bakery's union branch
+    group: Employees' representatives
+    interest: Jobs, pay and a say in how change happens.
+    influence: medium
+    view: '“Nobody here is against machines. We are against finding out about them from the newspaper.”'
+  - name: Production staff
+    group: Employees
+    interest: Secure work, fair pay and work they can take pride in.
+    influence: medium
+    view: '“Two years of overtime. We want the help; we want to still have jobs when it arrives.”'
+  - name: Cafés, hotels and delis
+    group: Food-service customers
+    interest: Fresh, distinctive bread every morning.
+    influence: medium
+    view: '“We buy Kilbrack because it does not taste like factory bread. If it starts to, we will buy elsewhere.”'
+  - name: The bank
+    group: Lender
+    interest: A loan that is serviced and repaid.
+    influence: medium
+    view: '“We would lend against the line. We would want to see the volume that pays for it.”'
+
+market:
+  summary: >
+    The figures are simulated. Kilbrack sells into the market for bread made in Ireland for supermarkets and food
+    service, about 120 million loaves a year, growing about 2% a year. Supermarkets buy on price and reliability; cafés
+    and hotels buy on freshness and character. Kilbrack's share is {{marketShare}}.
+  competitors:
+    - { name: Cairnfield Foods (fictional), share: 22, price: 0.98, position: 'National plant bakery, fully automated, supermarket bread' }
+    - { name: Contract bakeries for supermarket own brands (fictional), share: 18, price: 0.92, position: 'Low-cost own-label loaves' }
+    - { name: Ardrigh Artisan (fictional), share: 4, price: 1.65, position: 'Premium sourdough for delis and cafés' }
+  trends:
+    - Supermarkets are consolidating their suppliers and tendering contracts every three years.
+    - Demand for sourdough and seeded bread is growing faster than for sliced pan.
+    - Large customers are starting to ask suppliers for figures on carbon emissions.
+
+model:
+  period: { unit: year, days: 365, perYear: 1 }
+  taxRate: 0.15
+  elasticity: 1.2
+  brandWeight: 0.01
+  greenWeight: 0.002
+  marketingNorm: 150000
+  marketingEffect: 8
+  lostSalesPenalty: 2
+  hoursPerWorker: 1700
+  overtimePremium: 0.5
+  newStarterOutput: 0.6
+  moraleProductivity: 0.003
+  moraleNorm: 60
+  moraleRecovery: 0.35
+  overtimeStrain: 0.5
+  idleStrain: 0.8
+  layoffShock: 0.45
+  wageMorale: 1.0
+  turnoverBase: 15
+  turnoverPerPoint: 0.6
+  turnoverMin: 5
+  recruitCost: 4000
+  penaltyRate: 0.04
+  defects: { threshold: 88, strain: 0.3, morale: 0.08, brand: 0.8 }
+
+start:
+  label: Start of 2024
+  marketSize: 120000000
+  marketGrowth: 0.02
+  channels:
+    - { id: supermarket, label: Supermarket contracts, price: 1.10, demand: 7000000, debtorDays: 45, contracted: true }
+    - { id: foodservice, label: 'Cafés, hotels and delis', price: 1.45, demand: 2600000, debtorDays: 35, elasticity: 1.1, brandWeight: 0.012 }
+  marketing: 150000
+  brand: 58
+  materialCost: 0.32
+  energyCost: 0.07
+  otherCost: 0.16
+  overheads: 2300000
+  maintenance: 300000
+  plantCapacity: 11000000
+  hoursPerUnit: 0.0095
+  overtimeMax: 0.12
+  defectBase: 4
+  emissionsPerUnit: 0.24
+  headcount: 58
+  wage: 36000
+  morale: 63
+  cash: 900000
+  loans: [{ label: Bank loan (2021 oven upgrade), principal: 600000, rate: 0.05 }]
+  assets:
+    - { id: bakery, label: Bakery building, cost: 3000000, nbv: 2100000, life: 35 }
+    - { id: lines, label: Ovens and production lines, cost: 2400000, nbv: 900000, life: 6 }
+  shareCapital: 500000
+  payout: 0.5
+  creditorDays: 40
+  stockDays: 12
+  overdraftLimit: 500000
+  overdraftRate: 0.07
+  loanRate: 0.055
+
+history:
+  - label: '2024'
+    note: A steady year. The plant runs at just over 90% of its capacity, and the family takes half the profit as dividends, as it always has.
+    effects: {}
+  - label: '2025'
+    note: The supermarket contract grows to 7.6 million loaves. Three bakers join; overtime becomes routine and more loaves are rejected.
+    effects: { demand: { supermarket: { to: 7600000 } }, hire: 3 }
+  - label: '2026'
+    note: The contract reaches 8.1 million loaves. The plant is at its limit, orders from cafés and hotels are turned away, and pay rises 3%.
+    effects: { demand: { supermarket: { to: 8100000 } }, hire: 2, wage: { pct: 3 } }
+
+rounds:
+  - id: capacity
+    title: How to make more bread
+    period: '2027'
+    lead: operations
+    situation: >
+      The renewed contract starts in January: nine million loaves this year, nearly ten million next, at €1.06. The
+      plant cannot make that much and still serve the cafés and hotels. The board must choose how the bakery grows its
+      capacity. Whatever it chooses, the machines take a year to arrive; a night shift could start in weeks.
+    given:
+      note: The supermarket contract for 2027, already signed.
+      effects: { demand: { supermarket: { to: 9000000 } }, prices: { supermarket: { to: 1.06 } } }
+    question: How will Kilbrack make more bread?
+    perspectives:
+      ceo: >
+        This is the biggest decision the family has taken since the second oven. I want the bakery that can win the
+        next tender, and I want to be able to walk down the main street afterwards.
+      finance: >
+        The line is the cheapest way to make a loaf once it is running, but it is €4.6m, mostly borrowed, and it is
+        paid for by volume. If we lose the contract, its costs stay. A night shift costs nothing to install and stops
+        costing the day we stop it.
+      marketing: >
+        The cafés and hotels pay us €1.45 a loaf and we keep turning them away. Whatever we do should give their bread
+        back to them. And they buy us because we are not a factory.
+      operations: >
+        We are scrapping {{defectRate}} of what we make because we run flat out. The line would make a loaf with less than
+        half the labour and far less waste. The cells are a smaller step. The night shift keeps everything as it is,
+        including the waste.
+      hr: >
+        The line means fewer jobs: perhaps half as many bakers per loaf. If we choose it, we must decide now what we
+        owe the people it replaces. The night shift means hiring twenty people who will work nights, and keeping them.
+    options:
+      - id: automate
+        label: Install a fully automated line
+        summary: A new automated line for mixing, dividing, baking and packing, in use from 2028, financed mostly by an equipment loan.
+        effects:
+          capex: [{ id: line, label: Automated bread line, cost: 4600000, life: 10, after: 1, effects: { plantCapacity: { by: 5000000 }, hoursPerUnit: { pct: -55 }, energyCost: { pct: -15 }, defectBase: { by: -2.5 }, emissionsPerUnit: { pct: -12 }, maintenance: { by: 200000 }, brand: -2 } }]
+          borrow: { amount: 3800000, rate: 0.055, label: Equipment loan }
+          morale: -6
+          flags: { automated: true }
+        outcome:
+          headline: A year of waiting for the machines, and a workforce that knows what they mean
+          narrative: >
+            The line is ordered and the loan drawn, but it will not run until 2028. This year the old plant is still
+            full: the contract takes priority, so {{lostSales}} loaves of café and hotel orders are turned away, and
+            operating profit is {{pbit}}. Everyone in the bakery has worked out what a line that needs half the labour
+            means for their job: morale is {{morale}} ({{morale.change}}).
+          stakeholders:
+            - { name: The supermarket buyer, reaction: 'Impressed by the investment, and already thinking about the next price.', mood: positive }
+            - { name: The bakery's union branch, reaction: 'Asks for talks on what happens to the jobs.', mood: negative }
+            - { name: The bank, reaction: 'Lends against the line, and watches the volume.', mood: mixed }
+          theory: >
+            Automation moves production from labour-intensive to capital-intensive. It raises fixed costs
+            (depreciation, maintenance, interest) and cuts variable labour per unit, so the break-even point rises and
+            operating leverage increases. Its benefits depend on high, steady volume, and the change it brings to jobs
+            is the main source of resistance.
+      - id: cobots
+        label: Add robotic cells and retrain
+        summary: Robotic cells for dividing and packing, beside the existing ovens, with training for the bakers who will run them, in use from 2028.
+        effects:
+          capex: [{ id: cells, label: Robotic dividing and packing cells, cost: 1600000, life: 8, after: 1, effects: { plantCapacity: { by: 2000000 }, hoursPerUnit: { pct: -25 }, defectBase: { by: -1 }, maintenance: { by: 60000 } } }]
+          borrow: { amount: 1000000, rate: 0.055, label: Equipment loan }
+          training: 120000
+          morale: -1
+          flags: { cobots: true }
+        outcome:
+          headline: A smaller step, and bakers learning to run robots
+          narrative: >
+            The cells are ordered and the training starts, but the extra capacity arrives only in 2028. This year the
+            plant is still full and {{lostSales}} loaves of orders go unmet; operating profit is {{pbit}}. Because the
+            bakers who run the cells are the bakers already here, morale holds at {{morale}}.
+          stakeholders:
+            - { name: Production staff, reaction: 'See a future in running the new equipment.', mood: positive }
+            - { name: The supermarket buyer, reaction: 'Wants to know whether it is enough for 2028.', mood: mixed }
+            - { name: The bank, reaction: 'Comfortable with a smaller loan.', mood: positive }
+          theory: >
+            Partial automation keeps people in the process while removing its most repetitive tasks. Training
+            existing staff to run new equipment is a strategy for reducing resistance to change, and a smaller capital
+            cost carries less operating leverage and less risk.
+      - id: shift
+        label: Add a night shift
+        summary: Run the ovens through the night with twenty newly hired bakers, a night supervisor and a pay premium for unsocial hours, starting this winter.
+        effects: { hire: 20, plantCapacity: { by: 2500000 }, wage: { pct: 1.5 }, overheads: { by: 120000 }, morale: 2, brand: 2, flags: { thirdShift: true } }
+        outcome:
+          headline: The ovens never cool, and the cafés get their bread back
+          narrative: >
+            The night shift starts within weeks. With the ovens running round the clock, the bakery meets the contract
+            and the cafés' orders: it sells {{volume}} loaves and turns away {{lostSales}}. Fresh bread at dawn pleases
+            the cafés and hotels, and brand strength is {{brand}}. Twenty more wages mean operating profit of {{pbit}};
+            morale is {{morale}}.
+          stakeholders:
+            - { name: 'Cafés, hotels and delis', reaction: 'Get bread baked hours before it reaches them.', mood: positive }
+            - { name: The bakery's union branch, reaction: 'Welcomes twenty new jobs and negotiates the night premium.', mood: positive }
+            - { name: The supermarket buyer, reaction: 'Content for now, and notes the bakery''s costs have not fallen.', mood: mixed }
+          theory: >
+            Adding a shift raises capacity without capital: the plant works more hours, and labour, a variable cost
+            the business can reduce later, carries the growth. Unit costs stay high, so the business stays exposed to
+            price pressure, but it keeps flexibility and the batch production that suits varied products.
+    event:
+      variants:
+        - id: install-delay
+          if: { flag: automated }
+          title: The line is commissioned late
+          text: >
+            The supplier's engineers arrive three months late, and the line spends its first months being tuned. In
+            2028 it can run at only part of its rated capacity; the supplier says it will be at full speed in 2029.
+          effects:
+            plantCapacity: { by: -2000000 }
+            later: [{ after: 1, effects: { plantCapacity: { by: 2000000 } }, note: 'The line reached its full rated speed.' }]
+        - id: cells-bed-in
+          if: { flag: cobots }
+          title: The cells take time to bed in
+          text: >
+            The robotic cells arrive on time but stop often in their first months while the bakers and the supplier
+            learn them. They will lose some of their extra capacity in 2028 and run as planned in 2029.
+          effects:
+            plantCapacity: { by: -500000 }
+            later: [{ after: 1, effects: { plantCapacity: { by: 500000 } }, note: 'The robotic cells settled down and ran at their planned speed.' }]
+        - id: night-recruitment
+          title: The night shift is hard to staff
+          text: >
+            Recruiting for nights takes longer than planned, and the new bakers are slower than the old hands. For
+            2028 the bakery's output per hour is lower than expected; by 2029 the night shift has found its rhythm.
+          effects:
+            skill: { pct: -4 }
+            later: [{ after: 1, effects: { skill: { pct: 4.1667 } }, note: 'The night shift found its rhythm and output per hour recovered.' }]
+
+  - id: workforce
+    title: The workforce plan
+    period: '2028'
+    lead: hr
+    situation: >
+      The contract rises to nearly ten million loaves this year. Whatever the bakery chose last year, it now needs a
+      different number of people from the number it employs, and the union has asked for the plan. The board must decide
+      how the workforce changes over the next three years, and how it tells them.
+    given:
+      note: The supermarket contract for 2028, already signed.
+      effects: { demand: { supermarket: { to: 9900000 } } }
+    question: What is Kilbrack's workforce plan?
+    perspectives:
+      ceo: >
+        We have never made a compulsory redundancy. I do not want to start, and I do not want to pay people to stand
+        beside machines that do their work. I want to hear the honest version of each plan.
+      finance: >
+        People with no work to do are the most expensive cost in the bakery. Redundancy pay is a one-off; idle wages
+        are every year. Natural wastage is cheapest in cash and slowest in savings.
+      marketing: >
+        The cafés can taste the difference between bread made by people who care and bread made by people who are
+        frightened. Whatever we do, the bread has to stay good.
+      operations: >
+        I need the right people, not just the right number: engineers for the machines, bakers for the bread that the
+        machines cannot make, and enough hands to cover the busy weeks.
+      hr: >
+        In a normal year about one person in seven leaves. If we stop replacing them, numbers fall without anyone
+        being pushed. If we cut, the people who stay will judge us by how we treat the people who go.
+    options:
+      - id: redundancies
+        label: Cut to what the bakery needs now
+        summary: Make the posts the bakery no longer needs redundant now, with enhanced redundancy pay, and keep replacing leavers in the posts that remain.
+        effects:
+          redundancyPay: 22000
+          morale: -4
+          flags: { cuts: true }
+        when:
+          - { if: { flag: automated }, effects: { redundancies: 24, redundancyPay: 22000 }, note: 'With the automated line chosen, 24 posts are no longer needed: 24 redundancies at €22k each.' }
+          - { if: { flag: cobots }, effects: { redundancies: 8, redundancyPay: 22000 }, note: 'With the robotic cells chosen, 8 posts are no longer needed: 8 redundancies at €22k each.' }
+          - { if: { flag: thirdShift }, effects: { redundancies: 3, redundancyPay: 22000 }, note: 'With the night shift chosen, only 3 day-shift posts are no longer needed: 3 redundancies at €22k each.' }
+        outcome:
+          headline: The bakery is the right size, and the town notices how it got there
+          narrative: >
+            The posts go this year, with enhanced pay. The workforce ends the year at {{headcount}}, and output per
+            worker is {{productivity}} loaves. The people who stay saw colleagues leave: morale is {{morale}}
+            ({{morale.change}}) and labour turnover {{turnover}} a year. Operating profit, after redundancy pay, is
+            {{pbit}}.
+          stakeholders:
+            - { name: The bakery's union branch, reaction: 'Opposes compulsory redundancies, and says so in public.', mood: negative }
+            - { name: Niamh Hartigan and the family board, reaction: 'Feel the weight of breaking a fifty-year record.', mood: negative }
+            - { name: The bank, reaction: 'Sees costs matched to the new process.', mood: positive }
+          theory: >
+            Redundancy reduces labour costs quickly at a one-off cost, but it damages the morale and trust of those who
+            remain, and labour turnover often rises after it. How change is managed (consultation, communication,
+            fairness) affects how much resistance it meets.
+      - id: redeploy
+        label: Retrain and redeploy everyone
+        summary: Keep every job. Train bakers as machine operators, maintenance technicians and quality checkers, and bring maintenance in house.
+        effects:
+          training: 250000
+          defectBase: { by: -0.8 }
+          maintenance: { by: -60000 }
+          morale: 4
+          flags: { redeploy: true }
+        outcome:
+          headline: Nobody loses a job, and the bakery carries the cost
+          narrative: >
+            Every baker is offered a new role and training for it. Quality improves and outside maintenance contracts
+            shrink, but where the new process needs fewer hands the bakery is paying for more people than it needs:
+            output per worker is {{productivity}} loaves. Morale is {{morale}} ({{morale.change}}). Operating profit,
+            after training, is {{pbit}}.
+          stakeholders:
+            - { name: Production staff, reaction: 'Relieved, and proud to learn new skills.', mood: positive }
+            - { name: The bakery's union branch, reaction: 'Praises the plan in the local paper.', mood: positive }
+            - { name: The bank, reaction: 'Asks when the savings from the investment will show.', mood: mixed }
+          theory: >
+            Retraining and redeployment reduce resistance to change by giving people a future in the new process.
+            They keep skills and goodwill, at the cost of slower savings. Job enrichment, giving people more varied and
+            responsible work, can raise motivation.
+      - id: wastage
+        label: Let numbers fall through leavers
+        summary: Freeze recruitment. As people leave or retire they are not replaced, so the workforce shrinks without redundancies.
+        effects:
+          replaceLeavers: false
+          morale: -2
+          flags: { wastage: true }
+        outcome:
+          headline: Fewer people each year, and nobody pushed
+          narrative: >
+            Nobody is made redundant, but nobody is hired either: the workforce ends the year at {{headcount}}, and
+            will keep shrinking as people leave. Output per worker is {{productivity}} loaves. Some worry about who
+            will be next to go and why nobody is replacing them: morale is {{morale}}. Operating profit is {{pbit}}.
+          stakeholders:
+            - { name: Production staff, reaction: 'Grateful for no redundancies, uneasy about the gaps on the rota.', mood: mixed }
+            - { name: The bakery's union branch, reaction: 'Accepts the freeze, and watches the workload.', mood: mixed }
+            - { name: Niamh Hartigan and the family board, reaction: 'Keep their record, and wonder whether the bakery shrinks in the right places.', mood: mixed }
+          theory: >
+            Natural wastage reduces the workforce through leavers rather than redundancies. It avoids redundancy costs
+            and conflict, but it is slow, and the business cannot choose who leaves: skills can go where they are
+            needed most.
+    event:
+      variants:
+        - id: input-shock
+          title: Wheat and energy prices rise
+          text: >
+            A poor harvest and a cold winter push up the price of flour by 6% and gas by 30%. Every loaf costs more to
+            make, and the supermarket contract price does not move.
+          effects:
+            materialCost: { pct: 6 }
+            energyCost: { pct: 30 }
+
+  - id: growth
+    title: Use the capacity
+    period: '2029'
+    lead: marketing
+    situation: >
+      The bakery has more capacity than it had, or a different kind. The marketing director has two offers on the table:
+      a discount chain wants own-label bread at a low price, and the bakery could launch its own premium sourdough
+      range under the Kilbrack name. Or the bakery can hold, raise café prices a little and look after the customers it
+      has.
+    question: How should Kilbrack use its capacity?
+    perspectives:
+      ceo: >
+        I want the bakery to be known for something, not just to be busy. But I also know what the bank is waiting to
+        see.
+      finance: >
+        The discount chain pays only €0.82 a loaf, but it pays for itself if we have spare capacity, because the fixed
+        costs are already paid. If it pushes out café orders at €1.45, it loses money. Sourdough sells at €2.20 and
+        costs more to make.
+      marketing: >
+        Sourdough is growing faster than anything else in the market, and the Kilbrack name means something to people
+        who buy it. Own-label bread for a discounter means nothing to anyone.
+      operations: >
+        A long run of identical own-label loaves suits a line. Sourdough suits bakers: long fermentation, hand
+        shaping, small batches. If we chose the automated line, sourdough will be awkward to make on it.
+      hr: >
+        A premium range gives the best bakers something to be proud of. Own-label work is the work people get bored of.
+    options:
+      - id: discounter
+        label: Supply the discount chain
+        summary: A contract for 1.8 million own-label loaves a year at €0.82, delivered to the discounter's depots.
+        effects:
+          addChannels: [{ id: discounter, label: Discount chain own-label, price: 0.82, demand: 1800000, debtorDays: 30, contracted: true }]
+        outcome:
+          headline: Volume at a thin margin, served first
+          narrative: >
+            The discounter's loaves are under contract, so they come first in the schedule. The bakery sells
+            {{volume}} loaves and runs at {{utilization}} of capacity. Where capacity is short, café and hotel orders are
+            the ones turned away: {{lostSales}} loaves this year. Operating profit is {{pbit}} and the profit margin
+            {{profitMargin}}.
+          stakeholders:
+            - { name: The discount chain, reaction: 'Has a reliable supplier at a low price.', mood: positive }
+            - { name: 'Cafés, hotels and delis', reaction: 'Find their orders cut back when the bakery is busy.', mood: negative }
+            - { name: Production staff, reaction: 'Run long, repetitive batches.', mood: mixed }
+          theory: >
+            Contribution pricing accepts a low price when it covers variable cost and there is spare capacity. When
+            capacity is full, the real cost of the order includes the contribution from the sales it pushes out: an
+            opportunity cost.
+      - id: premium
+        label: Launch a Kilbrack sourdough range
+        summary: A premium sourdough range under the Kilbrack name, sold to delis and independent shops, with €300k a year of marketing.
+        effects:
+          addChannels: [{ id: premium, label: Kilbrack sourdough range, price: 2.2, demand: 1000000, debtorDays: 35, elasticity: 1.6, brandWeight: 0.015, extraCost: 0.3 }]
+          marketing: { by: 300000 }
+          brand: 2
+        when:
+          - { if: { flag: automated }, effects: { channelCost: { premium: { by: 0.15 } } }, note: 'Because the automated line is built for long runs, sourdough has to be shaped and finished by hand around it, adding €0.15 to the cost of each loaf.' }
+        outcome:
+          headline: The Kilbrack name on a loaf people choose
+          narrative: >
+            The sourdough range launches at €2.20 a loaf with a campaign behind it. Brand strength reaches {{brand}}
+            ({{brand.change}}), and revenue is {{revenue}}. Sourdough costs more to make and to market, but it earns far
+            more per loaf than the contract bread: the gross profit margin is {{gpm}}, and operating profit {{pbit}}.
+          stakeholders:
+            - { name: Delis and independent shops, reaction: 'Stock it and ask for more.', mood: positive }
+            - { name: Production staff, reaction: 'Take pride in bread with their bakery''s name on it.', mood: positive }
+            - { name: The supermarket buyer, reaction: 'Wonders whether Kilbrack is still interested in its contract.', mood: mixed }
+          theory: >
+            Differentiation and premium pricing build value through the brand rather than through volume. A premium
+            product needs consistent quality and marketing support, and it suits flexible batch production better
+            than a line built for mass production.
+      - id: hold
+        label: Hold, and look after the customers it has
+        summary: No new channel. Raise café and hotel prices by 4%, spend a little more on service, and keep spare capacity for the busy weeks.
+        effects:
+          prices: { foodservice: { pct: 4 } }
+          marketing: { by: 50000 }
+        outcome:
+          headline: A quieter year, and prices that stick
+          narrative: >
+            Cafés and hotels accept the rise; a few buy less. The bakery runs at {{utilization}} of capacity, with room
+            for the busy weeks. Revenue is {{revenue}}, operating profit {{pbit}} and the profit margin
+            {{profitMargin}}.
+          stakeholders:
+            - { name: 'Cafés, hotels and delis', reaction: 'Grumble about the price, and keep ordering.', mood: mixed }
+            - { name: Production staff, reaction: 'Have the first year without constant overtime.', mood: positive }
+            - { name: The bank, reaction: 'Sees margins hold.', mood: positive }
+          theory: >
+            Spare capacity is not always waste: it absorbs peaks and protects quality. Raising price works when
+            customers value the product enough that demand is relatively inelastic.
+    event:
+      variants:
+        - id: tender-won
+          if: { all: [{ kpi: defectRate, op: '<=', value: 5 }, { kpi: lostSales, op: '<=', value: 300000 }] }
+          title: Kilbrack wins the supermarket tender
+          text: >
+            The supermarket re-tenders its bread contract. Kilbrack's defect rate of {{defectRate}} and its record of
+            full deliveries win it the renewal: a tenth more volume from 2030, at a slightly lower price.
+          effects:
+            demand: { supermarket: { pct: 10 } }
+            prices: { supermarket: { to: 1.02 } }
+        - id: tender-lost
+          title: Kilbrack loses part of the supermarket contract
+          text: >
+            The supermarket re-tenders its bread contract and splits it. With a defect rate of {{defectRate}}, or orders
+            it could not fill, Kilbrack keeps its price but loses 15% of the volume to a rival from 2030.
+          effects:
+            demand: { supermarket: { pct: -15 } }
+
+  - id: future
+    title: The next five years
+    period: '2030'
+    lead: ceo
+    situation: >
+      The family board meets to set the course for the next five years. The bakery has cash in the bank, and three
+      claims on it: pay down the loans, invest in solar panels and heat recovery for the ovens, or pay the family a
+      special dividend after four hard years.
+    question: Where should Kilbrack's cash go?
+    perspectives:
+      ceo: >
+        The family has waited four years for a reward. I also know that the next tender will ask about carbon, and that
+        the bank would sleep better with less debt.
+      finance: >
+        Repaying debt saves interest from next year and lowers gearing at once. Solar cuts the energy bill this year and
+        every year after. A dividend pays the owners and does nothing for the business.
+      marketing: >
+        The supermarkets now score suppliers on carbon. Lower emissions per loaf are something we can sell.
+      operations: >
+        Gas is our most volatile cost. Panels and heat recovery would take a third off the energy bill and more off
+        our emissions.
+      hr: >
+        If we made people redundant and then pay the family a large dividend, everyone in Kilbrack will notice the
+        order those things happened in.
+    options:
+      - id: repay
+        label: Pay down the loans
+        summary: Use €1.5m of cash to repay loans, starting with the equipment loan.
+        effects:
+          repay: 1500000
+        outcome:
+          headline: Less debt, and the same bakery
+          narrative: >
+            The loans fall to {{debt}} and gearing to {{gearing}}. The interest saving arrives from next year, so this
+            year's profit is unchanged by it: operating profit is {{pbit}}. Net cash is {{netCash}}.
+          stakeholders:
+            - { name: The bank, reaction: 'Pleased, and ready to lend again if needed.', mood: positive }
+            - { name: Niamh Hartigan and the family board, reaction: 'Feel safer, and a little impatient.', mood: mixed }
+            - { name: Production staff, reaction: 'Notice nothing.', mood: mixed }
+          theory: >
+            Reducing debt lowers gearing and financial risk, and saves interest in later years. Gearing measures how
+            much of the long-term finance is borrowed; a lower ratio leaves the business more room to borrow when it
+            needs to.
+      - id: solar
+        label: Invest in solar and heat recovery
+        summary: A €900k solar array on the bakery roof and heat recovery on the ovens, in use this year.
+        effects:
+          capex: [{ id: solar, label: Solar array and oven heat recovery, cost: 900000, life: 15, after: 0, effects: { energyCost: { pct: -30 }, emissionsPerUnit: { pct: -35 } } }]
+          flags: { solar: true }
+        outcome:
+          headline: A smaller energy bill, and a smaller footprint
+          narrative: >
+            The panels and heat recovery run from the spring. Energy costs fall by about a third and emissions per loaf
+            to {{emissionsPerUnit}} ({{emissionsPerUnit.change}}). Operating profit is {{pbit}}, after depreciation on
+            the new equipment; net cash is {{netCash}}.
+          stakeholders:
+            - { name: The supermarket buyer, reaction: 'Notes the lower carbon figure for the next tender.', mood: positive }
+            - { name: Niamh Hartigan and the family board, reaction: 'Like an investment that pays back and that they can talk about.', mood: positive }
+            - { name: The bank, reaction: 'Neutral: paid from cash.', mood: mixed }
+          theory: >
+            An investment that cuts both cost and emissions shows that sustainability and profit can point the same
+            way. Investment appraisal (payback, average rate of return and, for HL, net present value) judges whether
+            the savings justify the cost.
+      - id: dividend
+        label: Pay the family a special dividend
+        summary: A special dividend of €800k to the family shareholders, on top of the usual payout.
+        effects:
+          dividend: 800000
+        when:
+          - { if: { flag: cuts }, effects: { morale: -5 }, note: 'Staff who saw colleagues made redundant two years ago read about the family''s dividend in the local paper: morale falls.' }
+        outcome:
+          headline: A reward for the owners, and a question from the staff
+          narrative: >
+            The family receives a special dividend of €800k. Net cash falls to {{netCash}}. The business is otherwise
+            unchanged: operating profit is {{pbit}}. Morale is {{morale}}.
+          stakeholders:
+            - { name: Niamh Hartigan and the family board, reaction: 'Receive the reward for four years of risk.', mood: positive }
+            - { name: The bakery's union branch, reaction: 'Points out who paid for the savings.', mood: negative }
+            - { name: The bank, reaction: 'Notes the lower cash balance.', mood: mixed }
+          theory: >
+            Dividends reward shareholders for the risk they carry, and they are a claim on profit that competes with
+            reinvestment and debt repayment. How a business divides its surplus between stakeholders is an ethical as
+            well as a financial decision.
+
+dashboard: [revenue, pbit, netCash, utilization, productivity, defectRate, morale, headcount, brand, emissionsPerUnit]
+
+roles:
+  ceo:
+    brief: >
+      You chair the family board. You are judged on the bakery's results over the four years: enough profit to
+      justify the risk, a brand at least as strong as now, and a share of the market no smaller.
+    pinned: [pbit, brand, netCash]
+    goals:
+      - { metric: 'sum:profit', op: '>=', value: 2000000, label: Profit after tax of at least €2.0m over the four years }
+      - { metric: 'final:brand', op: '>=', value: 55, label: Brand strength of 55 or more in 2030 }
+      - { metric: 'change:marketShare', op: '>=', value: 0, label: A market share no smaller than in 2026 }
+  finance:
+    brief: >
+      You run the money. You are judged on returns and risk: a strong return on the capital employed by 2030, gearing
+      kept in hand, and no overdraft beyond its limit.
+    pinned: [roce, gearing, netCash]
+    goals:
+      - { metric: 'final:roce', op: '>=', value: 15, label: Return on capital employed of 15% or more in 2030 }
+      - { metric: 'final:gearing', op: '<=', value: 35, label: Gearing of 35% or less in 2030 }
+      - { metric: 'max:overdraftExcess', op: '<=', value: 0, label: Never go over the overdraft limit }
+  marketing:
+    brief: >
+      You own the customers and the brand. You are judged on a stronger brand, a bigger share of the market and orders
+      that are not turned away.
+    pinned: [brand, marketShare, lostSales]
+    goals:
+      - { metric: 'final:brand', op: '>=', value: 60, label: Brand strength of 60 or more in 2030 }
+      - { metric: 'change:marketShare', op: '>=', value: 0.5, label: Grow market share by at least half a point }
+      - { metric: 'sum:lostSales', op: '<=', value: 1000000, label: Turn away no more than a million loaves in four years }
+  operations:
+    brief: >
+      You run the bakery floor. You are judged on quality, productivity and the footprint of every loaf.
+    pinned: [defectRate, productivity, emissionsPerUnit]
+    goals:
+      - { metric: 'final:defectRate', op: '<=', value: 3.5, label: A defect rate of 3.5% or less in 2030 }
+      - { metric: 'final:productivity', op: '>=', value: 200000, label: 'At least 200,000 loaves per worker in 2030' }
+      - { metric: 'final:emissionsPerUnit', op: '<=', value: 0.2, label: Emissions of 0.2 kg CO₂e per loaf or less in 2030 }
+  hr:
+    brief: >
+      You look after the people. You are judged on jobs and on how the workforce comes through the change: enough
+      jobs kept, morale where it should be, and labour turnover under control.
+    pinned: [headcount, morale, turnover]
+    goals:
+      - { metric: 'final:headcount', op: '>=', value: 60, label: At least 60 production jobs in 2030 }
+      - { metric: 'final:morale', op: '>=', value: 55, label: Morale of 55 or more in 2030 }
+      - { metric: 'max:turnover', op: '<=', value: 20, label: Labour turnover never above 20% a year }
+
+memo:
+  intro: >
+    It is the end of 2030. Write to the family board as the director whose seat you took: what Kilbrack should do in
+    the next five years, on the evidence of the last four, and what it owes the town.
+  fields:
+    - { id: recommendation, label: Recommendation, hint: 'One or two sentences: the bakery''s direction for the next five years.', rows: 3 }
+    - { id: evidence, label: The evidence, hint: 'The figures that matter most from 2027 to 2030, and what they show about the choice between people and machines.', rows: 4 }
+    - { id: tradeoffs, label: Trade-offs and risks, hint: 'What your recommendation costs, and what could go wrong, including operating leverage.', rows: 4 }
+    - { id: stakeholders, label: Stakeholders, hint: 'The family, the staff and the union, the supermarket, the cafés and the town: who gains and who loses?', rows: 4 }
+    - { id: conditions, label: What would change your mind, hint: 'The figure or event that would make you recommend something else.', rows: 3 }
+    - { id: steps, label: The first ninety days, hint: 'Three things you would do first, in order.', rows: 4 }
+
+walkthrough:
+  title: 'One path, narrated: robotic cells, retraining, a sourdough range, solar'
+  picks: [cobots, redeploy, premium, solar]
+  intro: >
+    This is one path through the four years, chosen to show how the decisions interact, not as the right answer. At
+    the end of 2026 the plant runs at {{utilization}} of capacity, {{lostSales}} loaves of orders are being turned
+    away, the defect rate is {{defectRate}} and morale is {{morale}}.
+  outro: >
+    By 2030 operating profit is {{pbit}}, the defect rate {{defectRate}}, morale {{morale}} and the workforce
+    {{headcount}}. This path gave up the lowest cost per loaf to keep its people and its flexibility, and found its
+    reward in the premium range. The debrief compares it with the fully automated paths.
+
+debrief:
+  summary: >
+    Automation is not one decision but a chain of them. The line makes the cheapest loaf once it runs, but it arrives a
+    year after it is paid for, it raises fixed costs, and it only pays if the bakery either cuts the labour it replaces
+    or finds the volume to fill it. The workforce plan decides which, and how the town remembers it. The night shift
+    keeps people and flexibility at a higher cost per loaf; the robotic cells sit between. Later decisions depend on
+    the first: a premium range suits bakers better than a line, and the supermarket tender rewards the consistency that
+    machines bring. No path meets every director's goals, because the goals pull against each other: cost per loaf
+    against jobs, return on capital against risk, volume against brand.
+  theory:
+    - title: Operations methods
+      body: >
+        The automated line moves the bakery towards mass (flow) production: long runs of standard loaves at low unit
+        cost. Batch production, which the craft bakery and the sourdough range rely on, makes varied products in
+        smaller runs. The choice between them depends on volume, variety and how standard the product is.
+      syllabus: ['5.2']
+    - title: Fixed costs, variable costs and break-even
+      body: >
+        Machines replace a variable cost (labour per loaf) with fixed costs (depreciation, maintenance, interest). The
+        contribution per loaf rises and so does the break-even output. Above break-even, profit grows faster; below
+        it, losses grow faster.
+      syllabus: ['5.5']
+    - title: Capacity, productivity and operating leverage
+      body: >
+        Labour productivity and capacity utilization show how well the bakery uses its people and its plant. Running
+        close to full capacity raises defects and overtime; spare capacity wastes fixed costs. Operating leverage
+        measures how strongly profit responds to a change in sales, and automation raises it.
+      syllabus: ['5.6']
+      level: HL
+    - title: Investment appraisal
+      body: >
+        Payback and the average rate of return (and, for HL, net present value) judge an investment on the cash it
+        returns. The line's returns depend on the workforce plan and on volume, which is why an appraisal is only as
+        good as the assumptions behind it.
+      syllabus: ['3.8']
+    - title: Resistance to change and industrial relations
+      body: >
+        People resist change they fear, do not understand or were not consulted about. Retraining, redeployment,
+        natural wastage and honest communication reduce resistance; compulsory redundancy can provoke conflict. For
+        HL, collective bargaining and conciliation are the tools for resolving it.
+      syllabus: ['2.1', '2.7']
+    - title: Lean production and quality
+      body: >
+        Scrapped loaves are waste in the lean sense: materials, energy and labour for nothing. Automation and
+        trained quality checkers both cut the defect rate, and the supermarket tender shows that quality is a source
+        of competitive advantage, not just a cost.
+      syllabus: ['5.3']
+      level: HL
+  paths:
+    - id: craft
+      label: The craft path
+      picks: [cobots, redeploy, premium, solar]
+      lesson: >
+        Partial automation, everyone retrained, a premium range and solar panels. It keeps the most jobs and the
+        highest morale, and wins its reward in the brand, at a higher cost per loaf than the line.
+    - id: factory
+      label: The factory path
+      picks: [automate, redundancies, discounter, dividend]
+      lesson: >
+        The line, cuts to match it, own-label volume and a dividend for the family. It makes the cheapest loaf and
+        fills the line, and it pays for that in morale, in the brand and in the town's view of the family.
+    - id: balanced
+      label: The automated, people-first path
+      picks: [automate, wastage, premium, solar]
+      lesson: >
+        The line, with the workforce reduced through leavers rather than redundancies, a premium range and solar
+        panels. It earns the most profit of these paths: the savings arrive more slowly than with redundancies, but
+        without the cost to morale.
+    - id: nights
+      label: The night-shift path
+      picks: [shift, redeploy, hold, repay]
+      lesson: >
+        A night shift, everyone kept, steady prices and less debt. It is the lowest-risk path and keeps the most
+        jobs, and its high cost per loaf leaves little profit when wheat and energy prices rise.
+  misconceptions:
+    - claim: Automation always cuts costs.
+      correction: >
+        It cuts the variable cost of each unit and raises fixed costs. If the labour it replaces is still paid, or
+        volume falls, total costs can rise.
+    - claim: The investment with the highest profit is always the best choice.
+      correction: >
+        The line's higher profit comes with higher fixed costs, more debt and fewer jobs. Which path is best depends on
+        the objectives, the risks a business will accept and its responsibilities to its stakeholders.
+    - claim: Natural wastage is a painless way to cut a workforce.
+      correction: >
+        It avoids redundancies, but the business cannot choose who leaves, savings come slowly, and those who stay can
+        be overstretched.
+  examLink: >
+    Paper 2 and Paper 1 questions on operations ask candidates to compare methods of production, to analyse the effect
+    of capital-intensive production on costs and break-even, and to evaluate the human resource consequences of
+    change. HL candidates can extend the analysis with capacity utilization, productivity, operating leverage and net
+    present value.
+  practice:
+    - { prompt: 'Distinguish between batch production and mass production, using Kilbrack Bakery as an example.', command: distinguish, marks: 4 }
+    - { prompt: 'Explain how installing the automated line would affect Kilbrack''s break-even output.', command: explain, marks: 4 }
+    - { prompt: 'Discuss whether Kilbrack Bakery should have automated its production.', command: discuss, marks: 10 }
+    - { prompt: 'Evaluate the workforce plans available to Kilbrack after automation.', command: evaluate, marks: 10 }
+    - { prompt: 'Examine the impact of automation on Kilbrack''s operating leverage and capacity utilization.', command: examine, marks: 10, level: HL }
+  terms: [mass-production, batch-production, capital-intensive-production, labour-intensive-production, operating-leverage, break-even-quantity, capacity-utilization-rate, labour-productivity, defect-rate, investment-appraisal, payback-period, net-present-value, resistance-to-change, redundancy, collective-bargaining, contribution-pricing, premium-pricing, opportunity-cost, corporate-social-responsibility, waste]
+
+method: >
+  Kilbrack Bakery, its customers, competitors and every person in this scenario are fictional, and every figure is
+  simulated. The figures come from the Boardroom's model, stated in full on the Boardroom's page. The years 2024 to
+  2026 are the model run forward from the start of 2024 with the changes listed in the history, so the board pack's
+  statements and ratios cannot disagree with the simulation. The family takes half of each year's profit as
+  dividends. Tax is a flat simulated 15% of positive profit; real tax rules are more complex.
+updated: 2026-11-03

@@ -26,6 +26,7 @@ import {
   topicSchema,
 } from './lib/schemas';
 import { studioSchema } from './lib/schemas-strategy';
+import { scenarioSchema } from './lib/boardroom/schema';
 
 /**
  * Loads every `.yaml` file in a folder, each holding a list of entries with an
@@ -92,4 +93,5 @@ export const collections = {
   claims: defineCollection({ loader: file('./src/content/data/claims.yaml'), schema: claimSchema }),
   resources: defineCollection({ loader: file('./src/content/data/resources.yaml'), schema: resourceSchema }),
   studio: defineCollection({ loader: yamlFiles('./src/content/studio'), schema: studioSchema }),
+  boardroom: defineCollection({ loader: yamlFiles('./src/content/boardroom'), schema: scenarioSchema }),
 };
