@@ -1,0 +1,581 @@
+---
+/**
+ * One framework: its diagram, what it is and what it is for, how to use it
+ * step by step, a fictional example, its strengths and limits, an exercise
+ * with guidance (the reader's draft is kept on this device), and its links to
+ * the glossary, the toolkit, the course and other frameworks. Its standing,
+ * IB syllabus with the guide's page, IB toolkit or enrichment, is stated at
+ * the top. A toolkit tool's full guide lives in the toolkit, linked here.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import Diagram from '../../components/diagrams/Diagram.astro';
+import LevelTag from '../../components/ui/LevelTag.astro';
+import { corpus, href } from '../../lib/content';
+import { library } from '../../lib/frameworks-content';
+import { FRAMEWORK_GROUP_INFO, type Framework } from '../../lib/framework-schema';
+import { STATUS_LABELS, frameworkHref, inLibraryOrder, standing } from '../../lib/frameworks';
+import { allSubtopics, subtopicHref } from '../../lib/learning';
+import { inline, jsonForScript, plain, rich } from '../../lib/markup';
+import { QUALIFICATION_TAG_LABELS } from '../../lib/schemas';
+
+export async function getStaticPaths() {
+  const lib = await library();
+  return Object.entries(lib.frameworks).map(([id, framework]) => ({ params: { id }, props: { id, framework } }));
+}
+
+interface Props {
+  id: string;
+  framework: Framework;
+}
+const { id, framework: f } = Astro.props;
+const c = await corpus();
+const lib = await library();
+const group = FRAMEWORK_GROUP_INFO[f.group];
+const subs = allSubtopics(c);
+const titleOf = (code: string) => subs.find((x) => x.s.code === code)?.s.title ?? code;
+const tool = f.tool ? c.tools[f.tool] : undefined;
+const toolLink = f.tool && tool ? (tool.status === 'complete' ? `/toolkit/${f.tool}/` : `/toolkit/#tool-${f.tool}`) : undefined;
+const terms = f.terms.map((t) => ({ id: t, e: c.glossary[t]! }));
+const related = f.related.map((r) => ({ id: r, f: lib.frameworks[r]! }));
+const order = inLibraryOrder(lib.frameworks);
+const i = order.findIndex(([x]) => x === id);
+const prev = i > 0 ? order[i - 1] : undefined;
+const next = i < order.length - 1 ? order[i + 1] : undefined;
+const statusClass = f.status === 'enrichment' ? 'tag--enrichment' : 'tag--ib';
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LearningResource',
+  name: f.name,
+  description: f.summary,
+  learningResourceType: 'Framework explainer',
+  isAccessibleForFree: true,
+};
+---
+
+<BaseLayout title={`${f.name}: Frameworks`} description={`${f.name}: ${f.summary}`} section="toolkit" jsonLd={jsonLd}>
+  <PageIntro trail={[{ label: 'Frameworks', href: '/frameworks/' }, { label: f.name }]} kicker={`Frameworks · ${group.title}`} title={f.name} lead={f.summary}>
+    <div class="tags">
+      <span class={`tag ${statusClass}`}>{standing(f)}</span>
+      {f.status !== 'enrichment' && <LevelTag level={f.level} always />}
+      {f.qualifications.map((q) => <span class="tag tag--plain">{QUALIFICATION_TAG_LABELS[q]}</span>)}
+    </div>
+  </PageIntro>
+
+  <div class="wrap page-body fw">
+    <section aria-labelledby="fw-glance">
+      <SectionHead no={1} title="The framework at a glance" id="fw-glance" />
+      <div class="fw-glance">
+        <div class="fw-glance__art">
+          <Diagram id={f.diagram} />
+        </div>
+        <aside class="fw-facts" aria-label="About this framework">
+          <p class="fw-facts__q"><span class="label">The question it answers</span>{f.question}</p>
+          <dl>
+            <div>
+              <dt>Standing</dt>
+              <dd>
+                {f.status === 'syllabus' && <>Named in the IB syllabus ({f.subtopics.join(', ')}); Business management guide, {f.guidePages?.includes(' ') ? 'pp.' : 'p.'} {f.guidePages}.</>}
+                {f.status === 'toolkit' && <>One of the tools in the IB business management toolkit; Business management guide, {f.guidePages?.includes(' ') ? 'pp.' : 'p.'} {f.guidePages}.</>}
+                {f.status === 'enrichment' && <>Enrichment: not part of the IB Business Management course. It is here for going further, at university, in an MBA or at work.</>}
+              </dd>
+            </div>
+            {f.origin && (
+              <div>
+                <dt>Credited to</dt>
+                <dd>{f.origin}</dd>
+              </div>
+            )}
+            <div>
+              <dt>Purpose</dt>
+              <dd>{group.title}</dd>
+            </div>
+            {f.subtopics.length > 0 && (
+              <div>
+                <dt>{f.status === 'syllabus' ? 'In the course' : 'Use it with'}</dt>
+                <dd>
+                  <ul class="fw-facts__links">
+                    {f.subtopics.map((code) => (
+                      <li>
+                        <a href={subtopicHref(c, code)}>
+                          <span class="fw-code">{code}</span> {titleOf(code)}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            )}
+          </dl>
+          {
+            toolLink && tool && (
+              <a class="fw-guide" href={toolLink}>
+                <span class="label">{tool.status === 'complete' ? 'The full toolkit guide' : 'In the toolkit'}</span>
+                <span class="fw-guide__name">{tool.name}</span>
+                <span class="fw-guide__text">{tool.status === 'complete' ? 'How to build it, the evidence it needs, what it reveals and hides, and a worked case.' : 'Its entry in the toolkit; the full guide is in preparation.'}</span>
+              </a>
+            )
+          }
+        </aside>
+      </div>
+    </section>
+
+    <section aria-labelledby="fw-what">
+      <SectionHead no={2} title="What it is, and what it is for" id="fw-what" />
+      <div class="fw-what">
+        <div class="prose fw-what__body" set:html={rich(f.explanation)} />
+        <div class="fw-purpose">
+          <p class="label">What it is for</p>
+          <div class="prose" set:html={rich(f.purpose)} />
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="fw-how">
+      <SectionHead no={3} title="How to use it, step by step" id="fw-how" dek={f.status === 'toolkit' && tool?.status === 'complete' ? 'A short method. The toolkit guide gives the full one, with the evidence each step needs.' : undefined} />
+      <ol class="fw-steps">
+        {f.steps.map((s, n) => (
+          <li>
+            <span class="fw-steps__no" aria-hidden="true">{String(n + 1).padStart(2, '0')}</span>
+            <div set:html={inline(s)} />
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section aria-labelledby="fw-example">
+      <SectionHead no={4} title={`Applied: ${f.example.title}`} id="fw-example" />
+      <div class="fw-example">
+        <div class="tags"><span class="tag tag--simulated">Fictional business</span></div>
+        <div class="prose narrative" set:html={rich(f.example.body)} />
+        <div class="fw-result">
+          <p class="label">What it showed</p>
+          <div class="prose" set:html={rich(f.example.result)} />
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="fw-weigh">
+      <SectionHead no={5} title="Strengths and limits" id="fw-weigh" />
+      <div class="fw-weigh">
+        <div>
+          <h3 class="fw-weigh__h fw-weigh__h--plus">Why it helps</h3>
+          <ul class="prose">{f.advantages.map((x) => <li set:html={inline(x)} />)}</ul>
+        </div>
+        <div>
+          <h3 class="fw-weigh__h fw-weigh__h--minus">Where it falls short</h3>
+          <ul class="prose">{f.limitations.map((x) => <li set:html={inline(x)} />)}</ul>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="fw-try">
+      <SectionHead no={6} title="Try it" id="fw-try" dek="The platform's own exercise. Write your answer, then open the guidance." />
+      <div class="fw-try" data-ix="fw-exercise" data-key={`framework:${id}`}>
+        <div class="prose fw-try__prompt" set:html={rich(f.exercise.prompt)} />
+        <div class="field">
+          <label for="fw-answer">Your answer</label>
+          <p class="field__hint" id="fw-answer-hint">
+            <span class="js-only">Kept on this device as you type, and nowhere else.</span>
+            <span class="nojs-only">Your answer is not saved without JavaScript; copy it before you leave.</span>
+          </p>
+          <textarea id="fw-answer" class="textarea fw-try__box" rows="8" aria-describedby="fw-answer-hint" data-answer></textarea>
+        </div>
+        <div class="fw-try__actions js-only">
+          <button class="btn btn--small" type="button" data-download>Download as text</button>
+          <button class="btn btn--small" type="button" data-clear>Clear</button>
+          <p class="fw-try__status small muted" aria-live="polite" data-status></p>
+        </div>
+        <p class="small" data-error hidden>The draft could not be restored on this page; you can still write and copy your answer.</p>
+        <details class="disclosure fw-try__guide">
+          <summary>Guidance: what a strong answer does</summary>
+          <ul class="prose">{f.exercise.guidance.map((x) => <li set:html={inline(x)} />)}</ul>
+        </details>
+        <script type="application/json" data-config set:html={jsonForScript({ title: f.name, prompt: plain(f.exercise.prompt) })} />
+      </div>
+    </section>
+
+    <section aria-labelledby="fw-related">
+      <SectionHead no={7} title="Related concepts" id="fw-related" />
+      <div class="fw-rel">
+        {
+          terms.length > 0 && (
+            <div>
+              <h3 class="label label--ink">In the glossary</h3>
+              <ul class="fw-rel__terms">
+                {terms.map((t) => (
+                  <li>
+                    <a href={href.glossary(t.id)}>{t.e.term}</a>
+                    {t.e.provenance === 'enrichment' && <span class="tag tag--enrichment">Beyond IB</span>}
+                    <span set:html={inline(t.e.definition)} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+        {
+          related.length > 0 && (
+            <div>
+              <h3 class="label label--ink">Read with</h3>
+              <ul class="fw-rel__fws">
+                {related.map((r) => (
+                  <li>
+                    <a href={frameworkHref(r.id)}>{r.f.name}</a>
+                    <span class="fw-rel__kind">{STATUS_LABELS[r.f.status]}</span>
+                    <span class="fw-rel__sum">{r.f.summary}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      </div>
+      <p class="small muted fw-note">
+        {f.status === 'enrichment'
+          ? "The explanation, method, example and exercise are the platform's own, written as enrichment beyond the IB course. The business in the example is fictional."
+          : "The explanation, method, example and exercise are the platform's own. Statements about the IB course cite the Business management guide; the business in the example is fictional."}
+      </p>
+    </section>
+
+    <nav class="fw-pager" aria-label="Neighbouring frameworks">
+      {prev ? <a href={frameworkHref(prev[0])}>&larr; {prev[1].name}</a> : <span />}
+      <a href="/frameworks/">All frameworks</a>
+      {next ? <a href={frameworkHref(next[0])}>{next[1].name} &rarr;</a> : <span />}
+    </nav>
+  </div>
+</BaseLayout>
+
+<style>
+  .fw section + section {
+    margin-top: var(--sp-8);
+  }
+
+  .fw-glance {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(15rem, 20rem);
+    gap: var(--sp-6);
+    align-items: start;
+    margin-top: var(--sp-5);
+  }
+
+  .fw-glance__art {
+    min-width: 0;
+  }
+
+  .fw-facts {
+    display: grid;
+    gap: var(--sp-4);
+    padding: var(--sp-5);
+    background: var(--surface-sheet);
+    border-top: 3px solid var(--navy-900);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .fw-facts__q {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-style: italic;
+    line-height: 1.35;
+    color: var(--navy-900);
+  }
+
+  .fw-facts__q .label {
+    font-style: normal;
+  }
+
+  .fw-facts dl {
+    margin: 0;
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .fw-facts dl > div {
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .fw-facts dt {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .fw-facts dd {
+    margin: var(--sp-1) 0 0;
+    font-size: var(--fs-small);
+  }
+
+  .fw-facts__links {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fw-facts__links li + li {
+    margin-top: var(--sp-1);
+  }
+
+  .fw-code {
+    font-weight: 700;
+    color: var(--brass-text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fw-guide {
+    display: grid;
+    gap: var(--sp-1);
+    padding: var(--sp-4);
+    border: 1px solid var(--navy-900);
+    background: var(--ivory-50);
+    color: var(--text-body);
+    text-decoration: none;
+  }
+
+  .fw-guide:hover {
+    background: var(--surface-gold-wash);
+  }
+
+  .fw-guide__name {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--cobalt-text);
+    text-decoration: underline;
+    text-decoration-color: var(--gold-500);
+  }
+
+  .fw-guide__text {
+    font-size: var(--fs-small);
+    color: var(--text-muted);
+  }
+
+  .fw-what {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: var(--sp-6);
+    margin-top: var(--sp-5);
+    align-items: start;
+  }
+
+  .fw-what__body {
+    max-width: var(--text-max);
+  }
+
+  .fw-purpose {
+    padding: var(--sp-4) var(--sp-5);
+    border-left: 3px solid var(--gold-500);
+    background: var(--surface-gold-wash);
+  }
+
+  .fw-purpose .label {
+    display: block;
+    margin-bottom: var(--sp-2);
+    color: var(--brass-text);
+  }
+
+  .fw-steps {
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+    max-width: 52rem;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .fw-steps li {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    gap: var(--sp-4);
+    align-items: baseline;
+    margin: 0;
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .fw-steps__no {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-style: italic;
+    line-height: 1;
+    color: var(--gold-600);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .fw-example {
+    display: grid;
+    gap: var(--sp-4);
+    margin-top: var(--sp-5);
+    max-width: 52rem;
+  }
+
+  .fw-result {
+    padding: var(--sp-4) var(--sp-5);
+    border-left: 3px solid var(--bb-cobalt);
+    background: var(--surface-sheet);
+  }
+
+  .fw-result .label {
+    display: block;
+    margin-bottom: var(--sp-1);
+    color: var(--cobalt-text);
+  }
+
+  .fw-weigh {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-6);
+    margin-top: var(--sp-5);
+  }
+
+  .fw-weigh > div {
+    padding-top: var(--sp-3);
+    border-top: 2px solid var(--rule);
+  }
+
+  .fw-weigh__h {
+    margin-bottom: var(--sp-2);
+    font-size: 1.1875rem;
+  }
+
+  .fw-weigh__h--plus {
+    color: var(--green-text);
+  }
+
+  .fw-weigh__h--minus {
+    color: var(--signal-text);
+  }
+
+  .fw-weigh ul {
+    padding-left: 1.2em;
+  }
+
+  .fw-try {
+    display: grid;
+    gap: var(--sp-4);
+    margin-top: var(--sp-5);
+    padding: var(--sp-5);
+    max-width: 52rem;
+    background: var(--surface-sheet);
+    border: 1px solid var(--rule-hair);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .fw-try__prompt {
+    font-size: 1.0625rem;
+  }
+
+  .fw-try__box {
+    width: 100%;
+    min-height: 10rem;
+    resize: vertical;
+  }
+
+  .fw-try__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  .fw-try__actions .btn {
+    min-height: 2.75rem;
+  }
+
+  .fw-try__status {
+    margin: 0;
+  }
+
+  .fw-try__guide ul {
+    margin-top: var(--sp-3);
+    padding-left: 1.2em;
+  }
+
+  .fw-rel {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: var(--sp-6);
+    margin-top: var(--sp-5);
+  }
+
+  .fw-rel ul {
+    margin: var(--sp-2) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .fw-rel li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.6rem;
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .fw-rel li > a {
+    font-weight: 600;
+  }
+
+  .fw-rel__terms li > span:last-child,
+  .fw-rel__sum {
+    flex-basis: 100%;
+    font-size: var(--fs-small);
+    color: var(--text-muted);
+  }
+
+  .fw-rel__kind {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .fw-note {
+    margin-top: var(--sp-5);
+    max-width: var(--text-max);
+  }
+
+  .fw-pager {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    margin-top: var(--sp-8);
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  @media (max-width: 60rem) {
+    .fw-glance,
+    .fw-what,
+    .fw-rel {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .fw-weigh {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .fw-steps li {
+      grid-template-columns: 2.5rem minmax(0, 1fr);
+      gap: var(--sp-3);
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/framework-exercise';
+</script>

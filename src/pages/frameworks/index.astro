@@ -1,0 +1,433 @@
+---
+/**
+ * The frameworks library: a visual index of every framework, grouped by what
+ * it helps a manager do (analyse the environment, choose strategy, organize
+ * people, manage change, measure performance). An overview matrix shows each
+ * framework's standing (IB syllabus, IB toolkit or enrichment) against its
+ * purpose; below, each group lists its frameworks with a miniature of the
+ * diagram. Filters by purpose and level narrow both; without JavaScript
+ * everything is listed.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import { library } from '../../lib/frameworks-content';
+import { FRAMEWORK_GROUPS, FRAMEWORK_GROUP_INFO } from '../../lib/framework-schema';
+import { LEVEL_KEY_LABELS, STATUS_LABELS, frameworkHref, grouped, levelKey, matrix, standing } from '../../lib/frameworks';
+import { DIAGRAMS } from '../../lib/diagrams';
+
+const lib = await library();
+const groups = grouped(lib.frameworks);
+const grid = matrix(lib.frameworks);
+const all = Object.values(lib.frameworks);
+const count = (s: string) => all.filter((f) => f.status === s).length;
+const STATUS_TEXT = {
+  syllabus: "Named in the guide's syllabus",
+  toolkit: "In the guide's business management toolkit",
+  enrichment: 'Beyond the IB course',
+} as const;
+---
+
+<BaseLayout title="Frameworks" description={`${all.length} business frameworks, each with a diagram, a step-by-step method, a fictional example, strengths and limits and an exercise, labelled IB syllabus, IB toolkit or enrichment.`} section="toolkit">
+  <PageIntro
+    trail={[{ label: 'Frameworks' }]}
+    kicker="The frameworks library"
+    title="Frameworks for business decisions"
+    lead={`${all.length} frameworks, models and tools, each with a diagram, a method you can follow, a fictional example, its strengths and limits, and an exercise. ${count('syllabus')} are named in the IB syllabus, ${count('toolkit')} are IB toolkit tools and ${count('enrichment')} are enrichment beyond the course, for university, MBA and professional study.`}
+  />
+
+  <div class="wrap page-body" data-ix="frameworks">
+    <section aria-labelledby="fwi-map">
+      <SectionHead no={1} title="The library at a glance" id="fwi-map" dek="Each framework by what it helps you do, and by its standing in the IB course." />
+      <p class="fwi-swipe small muted" aria-hidden="true">Scroll the table sideways to see all five purposes.</p>
+      <div class="table-scroll fwi-map" role="region" aria-label="Frameworks by purpose and standing" tabindex="0">
+        <table class="fwi-table">
+          <caption class="sr-only">Every framework in the library, by its purpose (columns) and its standing in the IB course (rows).</caption>
+          <thead>
+            <tr>
+              <td></td>
+              {
+                FRAMEWORK_GROUPS.map((g, n) => (
+                  <th scope="col" data-col={g}>
+                    <span class="fwi-table__no" aria-hidden="true">{String(n + 1).padStart(2, '0')}</span>
+                    <a href={`#group-${g}`}>{FRAMEWORK_GROUP_INFO[g].title}</a>
+                  </th>
+                ))
+              }
+            </tr>
+          </thead>
+          <tbody>
+            {
+              (['syllabus', 'toolkit', 'enrichment'] as const).map((s) => (
+                <tr class={`fwi-row fwi-row--${s}`}>
+                  <th scope="row">
+                    <span class={`tag ${s === 'enrichment' ? 'tag--enrichment' : 'tag--ib'}`}>{STATUS_LABELS[s]}</span>
+                    <span class="fwi-table__sub">{STATUS_TEXT[s]}</span>
+                  </th>
+                  {FRAMEWORK_GROUPS.map((g) => (
+                    <td data-col={g}>
+                      <ul>
+                        {grid[s][g].map(([id, f]) => (
+                          <li data-fw data-group={f.group} data-level={levelKey(f)}>
+                            <a href={frameworkHref(id)}>{f.name}</a>
+                            {f.level === 'HL' && f.status !== 'enrichment' && <span class="fwi-hl">HL</span>}
+                          </li>
+                        ))}
+                      </ul>
+                    </td>
+                  ))}
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="fwi-filters js-only" role="group" aria-labelledby="fwi-filter-h">
+      <p class="label label--ink" id="fwi-filter-h">Narrow the library</p>
+      <div class="fwi-filter">
+        <label class="label" for="fwi-group">Purpose</label>
+        <select id="fwi-group" data-filter="group">
+          <option value="">Every purpose</option>
+          {FRAMEWORK_GROUPS.map((g) => <option value={g}>{FRAMEWORK_GROUP_INFO[g].title}</option>)}
+        </select>
+      </div>
+      <div class="fwi-filter">
+        <label class="label" for="fwi-level">Level</label>
+        <select id="fwi-level" data-filter="level">
+          <option value="">Every level</option>
+          {(['sl', 'hl', 'beyond'] as const).map((k) => <option value={k}>{LEVEL_KEY_LABELS[k]}</option>)}
+        </select>
+      </div>
+      <p class="fwi-count" aria-live="polite" data-count>{all.length} frameworks</p>
+    </div>
+
+    <p class="state" data-none hidden>No framework matches both filters. Choose another level or purpose.</p>
+
+    {
+      groups.map((g, n) => (
+        <section class="fwi-group" id={`group-${g.id}`} aria-labelledby={`fwi-${g.id}`} data-group-section={g.id}>
+          <SectionHead no={n + 2} title={g.title} id={`fwi-${g.id}`} dek={`*${g.question}* ${g.text}`} />
+          <ol class="fwi-list">
+            {g.items.map(([id, f]) => (
+              <li class="fwi-item" data-fw data-group={f.group} data-level={levelKey(f)}>
+                <a class="fwi-item__thumb" href={frameworkHref(id)} tabindex="-1" aria-hidden="true">
+                  <span set:html={DIAGRAMS[f.diagram]!.render(`thumb-${id}`)} />
+                </a>
+                <div class="fwi-item__body">
+                  <h3 class="fwi-item__name">
+                    <a href={frameworkHref(id)}>{f.name}</a>
+                  </h3>
+                  <p class="fwi-item__sum">{f.summary}</p>
+                  <div class="tags">
+                    <span class={`tag ${f.status === 'enrichment' ? 'tag--enrichment' : 'tag--ib'}`}>{standing(f)}</span>
+                    {f.level === 'HL' && f.status !== 'enrichment' && <span class="tag tag--hl">HL only</span>}
+                  </div>
+                </div>
+                <p class="fwi-item__q">
+                  <span class="label">It answers</span>
+                  {f.question}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))
+    }
+
+    <aside class="callout callout--note fwi-about">
+      <span class="callout__kicker">How the library is labelled</span>
+      <div class="prose">
+        <p>
+          <strong>IB syllabus</strong> frameworks are named in the Business management guide's content statements, with the page. <strong>IB toolkit</strong> tools are listed in the guide's toolkit (pp. 13 to 15), and each links to its full toolkit guide rather than repeating it. <strong>Enrichment</strong> frameworks are not part of the IB course: they are here for students going further and for university, MBA and professional learners. Every explanation, example and exercise is the platform's own, and every business in them is fictional.
+        </p>
+      </div>
+    </aside>
+  </div>
+</BaseLayout>
+
+<style>
+  .fwi-map {
+    margin-top: var(--sp-5);
+  }
+
+  .fwi-swipe {
+    display: none;
+    margin: var(--sp-4) 0 0;
+  }
+
+  @media (max-width: 60rem) {
+    .fwi-swipe {
+      display: block;
+    }
+
+    .fwi-map {
+      margin-top: var(--sp-2);
+    }
+
+    .fwi-table {
+      min-width: 50rem;
+    }
+
+    .fwi-table thead td {
+      width: 8rem;
+    }
+  }
+
+  .fwi-table {
+    width: 100%;
+    min-width: 60rem;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .fwi-table thead th {
+    padding: var(--sp-3) var(--sp-3) var(--sp-3);
+    vertical-align: bottom;
+    text-align: left;
+    border-bottom: 2px solid var(--rule-ink);
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .fwi-table thead td {
+    width: 11rem;
+    border-bottom: 2px solid var(--rule-ink);
+  }
+
+  .fwi-table thead a {
+    color: var(--navy-900);
+    text-decoration: none;
+  }
+
+  .fwi-table thead a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--gold-500);
+  }
+
+  .fwi-table__no {
+    display: block;
+    margin-bottom: 0.2rem;
+    font-size: 1.25rem;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--brass-text);
+  }
+
+  .fwi-table tbody th {
+    padding: var(--sp-4) var(--sp-3) var(--sp-4) 0;
+    vertical-align: top;
+    text-align: left;
+    border-bottom: 1px solid var(--rule);
+    font-weight: 400;
+  }
+
+  .fwi-table__sub {
+    display: block;
+    margin-top: var(--sp-2);
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    color: var(--text-muted);
+  }
+
+  .fwi-table td {
+    padding: var(--sp-4) var(--sp-3);
+    vertical-align: top;
+    border-bottom: 1px solid var(--rule);
+    border-left: 1px solid var(--rule-hair);
+  }
+
+  .fwi-row--enrichment td,
+  .fwi-row--enrichment th {
+    background: rgba(229, 239, 234, 0.45);
+  }
+
+  .fwi-table ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fwi-table li {
+    margin: 0 0 0.45rem;
+    font-size: 0.9375rem;
+    line-height: 1.3;
+  }
+
+  .fwi-table li[hidden] {
+    display: none;
+  }
+
+  .fwi-table li a {
+    font-weight: 500;
+  }
+
+  .fwi-hl {
+    margin-left: 0.35rem;
+    padding: 0 0.3rem;
+    border-radius: 2px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--text-on-ink);
+    background: var(--navy-900);
+    vertical-align: 0.1em;
+  }
+
+  .fwi-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--sp-3) var(--sp-5);
+    margin-top: var(--sp-7);
+    padding: var(--sp-4) 0;
+    border-top: 1px solid var(--rule-hair);
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .fwi-filters > .label {
+    flex-basis: 100%;
+    margin: 0;
+  }
+
+  .fwi-filter {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .fwi-filter select {
+    min-height: 2.75rem;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--rule-control);
+    border-radius: var(--radius-2);
+    background: var(--surface-sheet);
+    color: var(--text-strong);
+    font: 500 0.9375rem/1.2 var(--font-ui);
+    max-width: 20rem;
+  }
+
+  .fwi-count {
+    margin-left: auto;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .fwi-group {
+    margin-top: var(--sp-8);
+  }
+
+  .fwi-group[hidden] {
+    display: none;
+  }
+
+  .fwi-list {
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .fwi-item {
+    display: grid;
+    grid-template-columns: 12rem minmax(0, 1fr) minmax(12rem, 17rem);
+    gap: var(--sp-5);
+    align-items: start;
+    margin: 0;
+    padding: var(--sp-5) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .fwi-item[hidden] {
+    display: none;
+  }
+
+  .fwi-item__thumb {
+    display: block;
+    aspect-ratio: 16 / 10;
+    padding: 0.4rem;
+    overflow: hidden;
+    background: var(--surface-sheet);
+    border: 1px solid var(--rule-hair);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .fwi-item__thumb span,
+  .fwi-item__thumb :global(svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .fwi-item__name {
+    font-size: 1.375rem;
+  }
+
+  .fwi-item__name a {
+    color: var(--navy-900);
+    text-decoration: none;
+  }
+
+  .fwi-item__name a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--gold-500);
+  }
+
+  .fwi-item__sum {
+    margin: var(--sp-2) 0 var(--sp-3);
+    max-width: 40rem;
+    color: var(--text-body);
+  }
+
+  .fwi-item__q {
+    display: grid;
+    gap: var(--sp-1);
+    margin: 0;
+    padding-left: var(--sp-4);
+    border-left: 2px solid var(--gold-500);
+    font-family: var(--font-serif);
+    font-style: italic;
+    line-height: 1.4;
+    color: var(--navy-900);
+  }
+
+  .fwi-item__q .label {
+    font-style: normal;
+  }
+
+  .fwi-about {
+    margin-top: var(--sp-8);
+    max-width: 52rem;
+  }
+
+  @media (max-width: 64rem) {
+    .fwi-item {
+      grid-template-columns: 10rem minmax(0, 1fr);
+    }
+
+    .fwi-item__q {
+      grid-column: 2;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .fwi-item {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sp-3);
+    }
+
+    .fwi-item__thumb {
+      max-width: 16rem;
+    }
+
+    .fwi-item__q {
+      grid-column: 1;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/frameworks';
+</script>

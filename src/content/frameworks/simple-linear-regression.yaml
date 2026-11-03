@@ -1,0 +1,54 @@
+name: Simple linear regression
+aliases: [Linear regression, Line of best fit]
+summary: "Fitting the straight line that best describes how one variable changes with another, with a scatter diagram, the correlation and, with care, extrapolation."
+question: "How closely are these two things linked, and what might happen next?"
+group: performance
+status: toolkit
+guidePages: '15'
+subtopics: ['4.3']
+level: HL
+qualifications: [ib, undergraduate, mba, professional]
+tool: simple-linear-regression
+diagram: linear-regression
+explanation: |
+  The guide's tool includes scatter diagrams, the line of best fit, correlation and extrapolation. A scatter diagram plots pairs of values, such as advertising spend and sales, one on each axis. The line of best fit, found by least squares, is the straight line y = a + bx that makes the squared vertical distances from the points to the line as small as possible; b, the gradient, shows how much y changes for each extra unit of x. The correlation coefficient r, from −1 to +1, shows the strength and direction of the linear relationship.
+
+  Extrapolation extends the line beyond the data to forecast, which assumes the relationship holds outside the range observed. Correlation shows that two variables move together, not that one causes the other.
+purpose: |
+  To test whether two business variables are linked and to make cautious forecasts, such as sales from advertising spend or demand from temperature. The toolkit lists it as an HL tool for units 1, 4 and 5; its full guide is in preparation.
+steps:
+  - "Choose the two variables and decide which is the independent variable, x."
+  - "Plot the data on a scatter diagram and look at the pattern."
+  - "Fit the line of best fit and read its gradient in business terms."
+  - "Judge the strength of the relationship from the correlation."
+  - "If you extrapolate, stay close to the data and state the assumption that the relationship continues."
+example:
+  fictional: true
+  business: Willow and Oak
+  title: Willow and Oak tests its advertising
+  body: |
+    Willow and Oak, a fictional garden furniture maker, plots eight months of data, as in the diagram above: advertising spend from $2,000 to $9,000 a month against sales revenue from $21,000 to $40,000. The line of best fit is y = 15.64 + 2.68x, in thousands of dollars, and the correlation coefficient is 0.97, a strong positive relationship.
+
+    Each extra $1,000 of advertising is associated with about $2,680 of extra sales revenue. Extrapolated to a spend of $11,000, beyond any month observed, the line predicts sales of about $45,100.
+  result: |
+    The link is strong, but the firm treats it with care: sales also rise in spring, when it advertises most, so the season may explain part of the pattern. It raises spending gradually and checks each month's result, rather than trusting the extrapolated figure.
+advantages:
+  - "It turns a pattern in data into a measured relationship that can be compared and tested."
+  - "The gradient gives a figure managers can use in planning."
+  - "Correlation summarizes the strength of the link in one number."
+limitations:
+  - "Correlation does not show causation; a third factor may drive both variables."
+  - "Extrapolation beyond the data assumes the relationship continues, which may not hold."
+  - "It captures straight-line relationships only, and a few outliers can distort the line."
+exercise:
+  prompt: |
+    An ice-cream kiosk believes its daily sales rise with the temperature. Describe how it should use simple linear regression to test this belief and forecast sales, and give two reasons to be cautious about a forecast for a day hotter than any it has recorded.
+  guidance:
+    - "Name the dependent and independent variables and the data the kiosk would need."
+    - "Explain what the gradient and the correlation coefficient would tell it."
+    - "For caution, consider extrapolation and other factors such as weekends or school holidays."
+    - "Suggest how the kiosk could check the forecast in practice."
+terms: [simple-linear-regression, scatter-diagram, line-of-best-fit, correlation, extrapolation, sales-forecast]
+related: [descriptive-statistics, balanced-scorecard, decision-trees]
+sources: [ib-bm-guide-2024]
+order: 4
