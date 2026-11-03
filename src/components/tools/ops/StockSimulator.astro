@@ -175,7 +175,7 @@ const costs = data.costs as Record<string, number>;
               <th scope="col">Note</th>
             </tr>
           </thead>
-          <tbody data-rows set:html={stockSimRowsHtml(r)} />
+          <tbody data-rows set:html={stockSimRowsHtml(r)}></tbody>
         </table>
       </div>
     </div>
@@ -190,7 +190,7 @@ const costs = data.costs as Record<string, number>;
               <th scope="col" class="n">Amount</th>
             </tr>
           </thead>
-          <tbody data-costs set:html={stockCostRowsHtml(r, cur)} />
+          <tbody data-costs set:html={stockCostRowsHtml(r, cur)}></tbody>
         </table>
       </div>
       <p class="tool-note">A bigger buffer raises the cost of holding stock and cuts the cost of running out. Just in time pushes one way, just in case the other.</p>

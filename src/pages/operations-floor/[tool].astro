@@ -7,6 +7,7 @@ import ToolPage from '../../components/tools/ToolPage.astro';
 import CapacityCalculator from '../../components/tools/ops/CapacityCalculator.astro';
 import StockSimulator from '../../components/tools/ops/StockSimulator.astro';
 import EoqCalculator from '../../components/tools/ops/EoqCalculator.astro';
+import LocationAssessment from '../../components/tools/ops/LocationAssessment.astro';
 import { corpus } from '../../lib/content';
 import { TOOL_FRAME, roomTools, type RoomTool } from '../../lib/room-tools';
 
@@ -28,4 +29,5 @@ const f = TOOL_FRAME[t.component];
   {t.component === 'capacity-calculator' && <CapacityCalculator id={id} data={t} />}
   {t.component === 'stock-simulator' && <StockSimulator id={id} data={t} />}
   {t.component === 'eoq-calculator' && <EoqCalculator id={id} data={t} />}
+  {t.component === 'location-assessment' && <LocationAssessment id={id} data={t} />}
 </ToolPage>

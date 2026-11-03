@@ -1,0 +1,222 @@
+---
+/**
+ * The weighted location assessment (5.4) with the reader's own factors and
+ * sites. The worked example is scored on the server with the Operations
+ * Floor's functions (src/lib/operations.ts, through src/lib/location-tool.ts);
+ * src/scripts/location-assessment.ts rescores it as the matrix changes.
+ */
+import { MAX_FACTORS, MAX_SITES, assessLocation, contributionRowsHtml, locationSvg, lowListHtml, matrixHtml, type LocationMatrix } from '../../../lib/location-tool';
+import { jsonForScript, rich } from '../../../lib/markup';
+import type { RoomTool } from '../../../lib/room-tools';
+
+interface Props {
+  id: string;
+  data: Extract<RoomTool, { component: 'location-assessment' }>;
+}
+const { id, data } = Astro.props;
+const uid = `la-${id}`;
+const m: LocationMatrix = { factors: data.factors, sites: data.sites.map((s) => ({ id: s.id, name: s.name, scores: s.scores })), maxScore: data.maxScore, maxWeight: data.maxWeight, lowThreshold: data.lowThreshold };
+const r = assessLocation(m);
+const config = { uid, key: data.guide.storageKey, matrix: m, maxFactors: MAX_FACTORS, maxSites: MAX_SITES };
+---
+
+<script type="application/json" data-config set:html={jsonForScript(config)} />
+
+<div class="la">
+  <div class="la__decision">
+    <p class="label label--ink">The decision</p>
+    <div class="prose" set:html={rich(data.decision)} />
+    <ul class="la__sites" role="list">
+      {
+        data.sites.map((s) => (
+          <li>
+            <span class="la__site-name">{s.name}</span>
+            <span class="small">{s.summary}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <form class="tool-panel" data-form novalidate aria-labelledby={`${uid}-m-h`}>
+    <h3 id={`${uid}-m-h`}>The factors, weights and scores</h3>
+    <p class="tool-panel__dek">Weight each factor from 0 to {data.maxWeight} for how much it matters, and score each site from 0 to {data.maxScore} on it. Rename, add or remove factors and sites to make the assessment your own.</p>
+    <div class="table-scroll" role="region" aria-label="Factors, weights and scores" tabindex="0">
+      <table class="table tool-table la__matrix" data-matrix set:html={matrixHtml(m, uid, [])}></table>
+    </div>
+    <p class="cluster js-only">
+      <button type="button" class="btn btn--small" data-add-factor>Add a factor</button>
+      <button type="button" class="btn btn--small" data-add-site>Add a site</button>
+    </p>
+    <p class="nojs-only tool-note">This is the worked example. With JavaScript on, you can change any weight, score or name, and add or remove factors and sites.</p>
+  </form>
+
+  <div class="tool-problems" data-problems hidden></div>
+
+  <section class="tool-panel" aria-labelledby={`${uid}-r-h`} data-results>
+    <h3 id={`${uid}-r-h`}>The ranking</h3>
+    <div class="la__pair">
+      <figure class="la__figure">
+        <div class="chart-scroll" role="region" aria-label="Weighted total for each site" tabindex="0" data-chart set:html={locationSvg(r, `${uid}-chart`)} />
+        <figcaption class="exhibit__source"><b>Chart</b> Each site's weighted total: the sum of weight × score over the factors. The site ranked first is drawn darkest. Simulated teaching data.</figcaption>
+      </figure>
+      <div class="tool-reading">
+        <p><strong>Reading.</strong> <span data-interp>{r.reading.reading}</span></p>
+        <p class="muted"><strong>Implication.</strong> <span data-impl>{r.reading.implication}</span></p>
+      </div>
+    </div>
+    <h4 class="label label--ink la__h">The working: weight × score</h4>
+    <div class="table-scroll" role="region" aria-label="Weighted scores for each factor and site" tabindex="0">
+      <table class="table tool-table la__contrib">
+        <thead>
+          <tr>
+            <th scope="col">Factor and weight</th>
+            {data.sites.map((s) => <th scope="col" class="n" data-site-head={s.id}>{s.name}</th>)}
+          </tr>
+        </thead>
+        <tbody data-contrib set:html={contributionRowsHtml(m, r)}></tbody>
+      </table>
+    </div>
+    <p class="tool-note">Each cell is weight × score, with the score in brackets. Scores of {data.lowThreshold} or below are underlined.</p>
+    <h4 class="label label--ink la__h">Scores of {data.lowThreshold} or below: could any rule a site out?</h4>
+    <div data-low set:html={lowListHtml(m, r)} />
+  </section>
+
+  <div class="field la__note">
+    <label for={`${uid}-note`}>Your recommendation, and what would have to be true for it to be right</label>
+    <textarea class="textarea" id={`${uid}-note`} data-note rows="4"></textarea>
+    <span class="field__hint js-only">Kept on this device with the assessment.</span>
+  </div>
+
+  <aside class="callout callout--caution">
+    <span class="callout__kicker">What the scores leave out</span>
+    <div class="prose">
+      <ul>{data.qualitative.map((q) => <li set:html={rich(q).replace(/^<p>|<\/p>$/g, '')} />)}</ul>
+    </div>
+  </aside>
+</div>
+
+<script>
+  import '../../../scripts/location-assessment';
+</script>
+
+<style>
+  .la {
+    display: grid;
+    gap: var(--sp-6);
+  }
+
+  .la__decision {
+    display: grid;
+    gap: var(--sp-3);
+    max-width: 60rem;
+  }
+
+  .la__decision .label {
+    margin: 0;
+  }
+
+  .la__sites {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .la__sites li {
+    display: grid;
+    gap: var(--sp-1);
+    margin: 0;
+    padding: var(--sp-3) var(--sp-4);
+    border: 1px solid var(--rule-hair);
+    border-top: 3px solid var(--room-accent);
+    background: #fff;
+  }
+
+  .la__site-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  .la__matrix {
+    min-width: 40rem;
+  }
+
+  .la__matrix :global(.input) {
+    min-height: 2.5rem;
+    padding: 0.35rem 0.5rem;
+  }
+
+  .la__matrix :global(.loc-factor) {
+    min-width: 16rem;
+  }
+
+  .la__matrix :global(.loc-weight),
+  .la__matrix :global(.loc-cell) {
+    width: 4.5rem;
+  }
+
+  .la__matrix :global(.loc-site) {
+    min-width: 9rem;
+  }
+
+  .la__matrix :global(.loc-site__name) {
+    font-weight: 650;
+  }
+
+  .la__matrix :global(.loc-x) {
+    margin-top: var(--sp-1);
+    min-height: 2rem;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.8125rem;
+  }
+
+  .la__pair {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  @media (min-width: 64rem) {
+    .la__pair {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      align-items: start;
+    }
+  }
+
+  .la__figure {
+    margin: 0;
+  }
+
+  .la__h {
+    margin: var(--sp-3) 0 0;
+  }
+
+  .la__contrib :global(td.is-low) {
+    color: var(--signal-text);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+  }
+
+  .la__contrib :global(.loc-of) {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .la__contrib :global(.loc-w) {
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  .la :global(.loc-low) {
+    margin: 0;
+    padding-left: 1.1em;
+  }
+
+  .la__note {
+    max-width: 48rem;
+  }
+</style>

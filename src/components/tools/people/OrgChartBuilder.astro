@@ -120,7 +120,7 @@ const chainText = (ids: string[]) => ids.map(titleOf).join(' → ');
                 <th scope="col" class="n">Average span</th>
               </tr>
             </thead>
-            <tbody data-levels set:html={orgLevelRowsHtml(model)} />
+            <tbody data-levels set:html={orgLevelRowsHtml(model)}></tbody>
           </table>
         </div>
       </div>
@@ -143,7 +143,7 @@ const chainText = (ids: string[]) => ids.map(titleOf).join(' → ');
             <th scope="col">After delayering</th>
           </tr>
         </thead>
-        <tbody data-compare set:html={d ? delayerRowsHtml(model, d) : ''} />
+        <tbody data-compare set:html={d ? delayerRowsHtml(model, d) : ''}></tbody>
       </table>
     </div>
     <details class="disclosure">

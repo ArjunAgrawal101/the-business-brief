@@ -1,0 +1,92 @@
+# The weighted location assessment. Wrenhurst Cycles and its sites are
+# fictional; the eight-week sea crossing for frames is from the notes on
+# production planning. Totals, weight × score summed: Site A 165, Site B 167,
+# Site C 145, so Site B leads by 2 and the ranking turns on the weights.
+# tests/unit/location-tool.test.ts checks the totals and the sensitivity.
+component: location-assessment
+title: Weighted location assessment
+purpose: >
+  The learner builds a weighted scoring assessment of possible sites with their own factors, weights and scores, and
+  sees the ranking, how sensitive it is to each weight, and which low scores could rule a site out. It diagnoses the
+  belief that the highest total settles a location decision: a close ranking rests on the weights, which are
+  judgements.
+provenance: simulated-data
+syllabus: ['5.4']
+page: /operations-floor/location-assessment/
+guide:
+  room: operations
+  slug: location-assessment
+  order: 2
+  kind: Calculator
+  question: Where should we produce?
+  summary: Score possible sites on your own weighted factors and see the ranking, how far it depends on the weights, and the low scores that could rule a site out.
+  lead: >
+    Weighted scoring turns a location decision into numbers you can argue about. Choose the factors that matter, weight
+    them, score each site, and the tool ranks the sites, shows the working, finds the weights that would change the
+    answer, and flags the scores so low they might rule a site out whatever its total.
+  status: SL/HL
+  statusNote: >
+    Subtopic 5.4, Location (guide, p. 34), for SL and HL: the reasons for a specific location of production (AO2) and
+    ways of reorganizing production nationally and internationally, namely outsourcing or subcontracting, offshoring,
+    insourcing and reshoring (AO3). Weighted scoring is a decision-making method, not one of the guide's toolkit tools
+    or formulas.
+  ao: [AO2, AO3]
+  howTo:
+    - Read the decision and the sites. Each score is out of 10, where 10 is best for the business, so the cheapest land scores highest on land cost.
+    - Weight each factor from 0 to 5 for how much it matters, and score every site on it. Rename, add or remove factors and sites to build your own assessment.
+    - Read the ranking, the working (weight × score) and the weights at which the site ranked first would change.
+    - Check the low scores, write your recommendation, and weigh what the numbers leave out. Your assessment is kept on this device; download it as JSON or CSV, or print it.
+  limitations:
+    - Weights and scores are judgements. Two managers with the same facts can reach different totals, so agree the weights before seeing the results.
+    - A high total can hide a fatal weakness. A site that scores 1 on access to skilled staff may be impossible whatever else it offers.
+    - The method adds factors as if they were independent and could make up for each other, which they often cannot.
+    - Qualitative factors, such as the views of staff and the community, ethics and the environment, are hard to score and easy to leave out.
+  inAnswer: >
+    A weighted score supports a recommendation; it does not make it. Say which factors drove the ranking, how close it
+    is, and what would change it, then bring in the qualitative factors and the business's objectives before you
+    recommend a site.
+  storageKey: ops:location
+  example:
+    name: Wrenhurst Cycles, a fictional bicycle maker
+    note: >
+      Wrenhurst buys its frames from a partner overseas, eight weeks away by sea, as the notes on
+      [production planning](/topics/production-planning/) describe. Here it weighs making frames itself at one of three
+      sites. The sites, scores and weights are simulated.
+  related:
+    subtopics: ['5.6', '1.6']
+    interactives: [ops-location-marigold]
+    cases: [marigold-kitchens]
+    decisions: [marigold-growth]
+decision: >
+  One delayed ship could stop Wrenhurst's assembly line, because every frame comes from a partner factory eight weeks
+  away by sea. The directors are considering making frames themselves: insourcing the work, and reshoring it if the
+  frames are made at home. Three sites are on the shortlist.
+maxScore: 10
+maxWeight: 5
+lowThreshold: 3
+factors:
+  - { id: land, label: Cost of land and buildings, weight: 3 }
+  - { id: labour, label: Labour costs, weight: 4 }
+  - { id: skills, label: Skilled welders nearby, weight: 5 }
+  - { id: lead-time, label: Lead time to the assembly line, weight: 4 }
+  - { id: transport, label: Transport links, weight: 3 }
+  - { id: grants, label: Government grants and incentives, weight: 2 }
+  - { id: risk, label: Low political and currency risk, weight: 3 }
+sites:
+  - id: site-a
+    name: Site A
+    summary: Next to the assembly plant. The town has welders from an old engineering works, but wages and land are expensive.
+    scores: { land: 4, labour: 3, skills: 8, lead-time: 10, transport: 8, grants: 5, risk: 9 }
+  - id: site-b
+    name: Site B
+    summary: An industrial estate in a port city two hours away, with grants for new manufacturers.
+    scores: { land: 6, labour: 5, skills: 8, lead-time: 6, transport: 9, grants: 7, risk: 8 }
+  - id: site-c
+    name: Site C
+    summary: The partner's region overseas, in a factory Wrenhurst would own, which is offshoring. Cheapest, but frames still take eight weeks to arrive.
+    scores: { land: 9, labour: 9, skills: 7, lead-time: 2, transport: 5, grants: 6, risk: 4 }
+qualitative:
+  - Making frames ends a long partnership with the overseas factory, and the partner may stop supplying parts Wrenhurst still needs.
+  - Frames are safety-critical, so the quality of welding in the first months matters more than any score for labour costs.
+  - Making frames nearer home would cut shipping emissions and make it easier to check working conditions, which customers increasingly ask about.
+  - Insourcing needs capital and management time, and the directors must decide whether frames should be a core activity at all.

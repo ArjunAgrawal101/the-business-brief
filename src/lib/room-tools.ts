@@ -53,7 +53,9 @@ export interface ToolFrame {
 
 export const TOOL_FRAME: Record<RoomTool['component'], ToolFrame> = {
   'org-chart-builder': { ix: 'org-chart', csv: true, open: true, what: 'the chart' },
+  'workforce-planner': { ix: 'workforce-planner', csv: true, open: true, what: 'the plan', levelSwitch: true },
   'capacity-calculator': { ix: 'capacity-calculator', csv: true, open: true, what: 'the figures' },
   'stock-simulator': { ix: 'stock-simulator', csv: true, open: true, what: 'the plan' },
   'eoq-calculator': { ix: 'eoq-calculator', csv: true, open: true, what: 'the figures' },
+  'location-assessment': { ix: 'location-assessment', csv: true, open: true, what: 'the assessment' },
 };

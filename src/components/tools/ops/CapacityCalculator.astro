@@ -158,7 +158,7 @@ const unitFor = (k: keyof PeriodInputs) => (MONEY.has(k) ? '' : k === 'labour' ?
           <th scope="col" class="n" data-col="change">Change</th>
         </tr>
       </thead>
-      <tbody data-measures set:html={measureRowsHtml(a, b, u, cur, s, data.capitalLabel)} />
+      <tbody data-measures set:html={measureRowsHtml(a, b, u, cur, s, data.capitalLabel)}></tbody>
     </table>
   </div>
   <p class="tool-note">"Guide formula" marks the two formulas the guide gives (p. 65); the others are standard forms, as in the notes on production planning. Changes in rates are in percentage points.</p>
@@ -187,7 +187,7 @@ const unitFor = (k: keyof PeriodInputs) => (MONEY.has(k) ? '' : k === 'labour' ?
               <th scope="col" class="n">Fixed cost per unit</th>
             </tr>
           </thead>
-          <tbody data-curve set:html={fixedCostRowsHtml(pa.values.fixedCosts, pa.values.capacity, cur)} />
+          <tbody data-curve set:html={fixedCostRowsHtml(pa.values.fixedCosts, pa.values.capacity, cur)}></tbody>
         </table>
       </div>
     </details>

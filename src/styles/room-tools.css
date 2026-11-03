@@ -161,6 +161,12 @@ body[data-room] .tool-facts {
   margin-top: var(--sp-6);
 }
 
+/* A scrolling region contains its visually hidden labels (absolutely positioned), so they never widen the page. */
+.tool-frame .table-scroll,
+.tool-frame .chart-scroll {
+  position: relative;
+}
+
 /* A labelled panel inside a tool: a short heading on a rule. */
 .tool-panel {
   display: grid;
@@ -169,7 +175,6 @@ body[data-room] .tool-facts {
 }
 
 .tool-panel > h3,
-.tool-panel > h4,
 .tool-panel > header > h3 {
   margin: 0;
   padding-top: var(--sp-3);

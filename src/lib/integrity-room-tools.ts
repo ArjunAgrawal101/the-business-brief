@@ -10,6 +10,8 @@ import { delayerLevels, orgModel, validateOrg } from './org-chart';
 import { validatePeriod } from './productivity';
 import { validatePlan } from './stock-sim';
 import { validateEoq } from './eoq';
+import { validateTurnover, validateWorkforce } from './workforce';
+import { validateMatrix } from './location-tool';
 import { ROOM_INFO, isRoomTool, toolHref } from './room-tools';
 
 export function checkRoomTools(c: Corpus): Problem[] {
@@ -62,6 +64,20 @@ export function checkRoomTools(c: Corpus): Problem[] {
 
     if (it.component === 'stock-simulator') {
       validatePlan({ ...it.plan, ...it.costs, demand: it.demand, late: it.late ?? null }).forEach((x) => add(`the plan: ${x.field}: ${x.message}`));
+    }
+
+    if (it.component === 'workforce-planner') {
+      validateTurnover(it.lastYear).forEach((x) => add(`last year: ${x.field}: ${x.message}`));
+      validateWorkforce({ ...it.plan, recruitLimit: it.plan.recruitLimit ?? 'none' }).forEach((x) => add(`the plan: ${x.field}${x.year !== undefined ? ` (year ${x.year + 1})` : ''}: ${x.message}`));
+      if (it.plan.staffNow !== it.lastYear.end) add('staff now should equal the staff at the end of last year');
+    }
+
+    if (it.component === 'location-assessment') {
+      const ids = it.factors.map((f) => f.id);
+      if (new Set(ids).size !== ids.length) add('two factors share an id');
+      if (new Set(it.sites.map((x) => x.id)).size !== it.sites.length) add('two sites share an id');
+      it.sites.forEach((x) => Object.keys(x.scores).forEach((k) => ids.includes(k) || add(`${x.name} has a score for "${k}", which is not a factor`)));
+      validateMatrix({ factors: it.factors, sites: it.sites, maxScore: it.maxScore, maxWeight: it.maxWeight, lowThreshold: it.lowThreshold }).forEach((x) => add(`${x.site ?? x.factor ?? 'the matrix'}: ${x.message}`));
     }
 
     if (it.component === 'eoq-calculator') {

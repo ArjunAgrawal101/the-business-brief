@@ -76,6 +76,8 @@ const orgPost = z.object({
   grouping: z.enum(ORG_GROUPINGS).optional(),
 });
 
+const wholeNumber = z.number().int().nonnegative();
+
 /* ---------- Operations Floor ---------- */
 
 const nonNeg = z.number().nonnegative();
@@ -111,6 +113,25 @@ export function roomToolSchemas<B extends z.ZodRawShape>(base: B) {
       delayer: z.number().int().min(2).optional(),
     }),
     z.object({
+      component: z.literal('workforce-planner'),
+      ...base,
+      guide,
+      organization: text,
+      /** Last year's staffing, for labour turnover (HL). */
+      lastYear: z.object({ start: wholeNumber, end: wholeNumber, leavers: wholeNumber, retired: wholeNumber }),
+      /** A rate to compare the leaving rate with, such as a similar organization's labour turnover. */
+      benchmark: z.object({ rate: z.number().min(0).max(100), label: text }).optional(),
+      plan: z.object({
+        staffNow: wholeNumber,
+        /** Leavers other than retirements, per cent of the staff at the start of each year. */
+        rate: z.number().min(0).max(100),
+        recruitLimit: z.number().int().positive().optional(),
+        years: z.array(z.object({ label: text, demand: wholeNumber, retirements: wholeNumber })).min(1).max(6),
+      }),
+      /** The guide's internal and external factors, and what each means for this plan. */
+      factors: z.array(z.object({ name: text, effect: text })).min(3),
+    }),
+    z.object({
       component: z.literal('capacity-calculator'),
       ...base,
       guide,
@@ -142,6 +163,21 @@ export function roomToolSchemas<B extends z.ZodRawShape>(base: B) {
       costs: z.object({ holding: nonNeg, ordering: nonNeg, shortage: nonNeg }),
       /** Where the costs come from. */
       costNote: text,
+    }),
+    z.object({
+      component: z.literal('location-assessment'),
+      ...base,
+      guide,
+      /** The decision, in a sentence or two. */
+      decision: text,
+      maxScore: z.number().int().positive().default(10),
+      maxWeight: z.number().int().positive().default(5),
+      /** Scores at or below this are flagged as possible deal-breakers. */
+      lowThreshold: z.number().int().nonnegative().default(3),
+      factors: z.array(z.object({ id: z.string().regex(/^[a-z0-9-]+$/), label: text, weight: z.number().int().nonnegative() })).min(2).max(10),
+      sites: z.array(z.object({ id: z.string().regex(/^[a-z0-9-]+$/), name: text, summary: text, scores: z.record(z.string(), z.number()) })).min(2).max(6),
+      /** What the scores leave out, for the judgement. */
+      qualitative: z.array(text).min(2),
     }),
     z.object({
       component: z.literal('eoq-calculator'),
