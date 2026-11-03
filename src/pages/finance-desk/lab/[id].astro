@@ -1,11 +1,11 @@
 ---
 /**
  * A calculator of the Financial Laboratory: /finance-desk/lab/<id>/, one page
- * for each entry in src/lib/lab/catalogue.ts.
+ * for each entry in src/lib/finance-lab/catalogue.ts.
  */
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import LabCalculator from '../../../components/lab/LabCalculator.astro';
-import { LAB, labEntry } from '../../../lib/lab/catalogue';
+import LabCalculator from '../../../components/finance-lab/LabCalculator.astro';
+import { LAB, labEntry } from '../../../lib/finance-lab/catalogue';
 
 export function getStaticPaths() {
   return LAB.map((e) => ({ params: { id: e.id } }));

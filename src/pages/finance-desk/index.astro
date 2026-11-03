@@ -11,10 +11,10 @@ import SectionHead from '../../components/layout/SectionHead.astro';
 import LevelTag from '../../components/ui/LevelTag.astro';
 import { corpus, href } from '../../lib/content';
 import { allSubtopics, noteFor, subtopicHref } from '../../lib/learning';
-import { BUSINESS } from '../../lib/lab/business';
-import { GROUPS, LAB, inGroup, labForRegister, labHref } from '../../lib/lab/catalogue';
-import { defaultReport } from '../../lib/lab/registry';
-import '../../styles/lab.css';
+import { BUSINESS } from '../../lib/finance-lab/business';
+import { GROUPS, LAB, inGroup, labForRegister, labHref } from '../../lib/finance-lab/catalogue';
+import { defaultReport } from '../../lib/finance-lab/registry';
+import '../../styles/finance-lab.css';
 
 const c = await corpus();
 const calcs = Object.entries(c.calculations).sort((a, b) => a[1].order - b[1].order);
