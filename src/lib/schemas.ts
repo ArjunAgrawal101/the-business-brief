@@ -11,6 +11,7 @@
  */
 import { z } from 'astro/zod';
 import { RATIO_IDS, STATEMENT_FIELDS } from './ratios';
+import { roomToolSchemas } from './schemas-room-tools';
 
 /* ------------------------------------------------------------------ */
 /* Shared vocabularies                                                 */
@@ -1011,6 +1012,9 @@ const statementFigures = z.object({
   retainedEarnings: z.number(),
 });
 
+/** The working tools of People and Culture and the Operations Floor (src/lib/schemas-room-tools.ts). */
+const ROOM_TOOLS = roomToolSchemas(interactiveBase);
+
 export const interactiveSchema = z.discriminatedUnion('component', [
   z.object({
     component: z.literal('cost-classifier'),
@@ -1444,6 +1448,7 @@ export const interactiveSchema = z.discriminatedUnion('component', [
     limits: z.array(md).min(2),
     questions: z.array(z.string()).min(2),
   }),
+  ...ROOM_TOOLS,
 ]);
 export type Interactive = z.infer<typeof interactiveSchema>;
 export type Assessment = AssessmentComponent;

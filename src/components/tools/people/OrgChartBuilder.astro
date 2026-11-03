@@ -1,0 +1,404 @@
+---
+/**
+ * The organization chart creator (2.2). The worked example is drawn on the
+ * server from src/lib/org-chart.ts; src/scripts/org-chart.ts lets the reader
+ * edit the posts, follow a chain of command and remove a layer of management,
+ * with the same functions.
+ */
+import { MAX_POSTS, delayerLevels, delayerResult, describeStructure, orgModel, readOrg, validateOrg, type OrgPost } from '../../../lib/org-chart';
+import { delayerRowsHtml, orgChartSvg, orgEditorHtml, orgFiguresHtml, orgLevelRowsHtml, orgOutlineHtml, treeOrder } from '../../../lib/org-chart-view';
+import { jsonForScript } from '../../../lib/markup';
+import type { RoomTool } from '../../../lib/room-tools';
+
+interface Props {
+  id: string;
+  data: Extract<RoomTool, { component: 'org-chart-builder' }>;
+}
+const { id, data } = Astro.props;
+const uid = `oc-${id}`;
+const posts: OrgPost[] = treeOrder(data.posts.map((p) => ({ id: p.id, title: p.title, reportsTo: p.reportsTo ?? null, count: p.count, grouping: p.grouping ?? null })));
+const problems = validateOrg(posts);
+if (problems.length) throw new Error(`${id}: the worked example's chart is not valid: ${problems.map((p) => p.message).join(' ')}`);
+const model = orgModel(posts);
+const titleOf = (pid: string) => posts.find((p) => p.id === pid)?.title ?? pid;
+const levels = delayerLevels(model);
+const d = data.delayer ? delayerResult(posts, model, data.delayer) : null;
+const reading = readOrg(model, titleOf, d);
+const structure = describeStructure(model);
+const chain = model.longestChain;
+const config = { uid, key: data.guide.storageKey, organization: data.organization, posts, delayer: data.delayer ?? null, maxPosts: MAX_POSTS };
+const chainText = (ids: string[]) => ids.map(titleOf).join(' → ');
+---
+
+<script type="application/json" data-config set:html={jsonForScript(config)} />
+
+<div class="oc">
+  <div class="oc__work">
+    <section class="tool-panel oc__view" aria-labelledby={`${uid}-ch-h`}>
+      <h3 id={`${uid}-ch-h`}>The chart</h3>
+      <div class="tool-problems" data-problems hidden></div>
+      <div class="oc__controls js-only">
+        <div class="field">
+          <label for={`${uid}-chain`}>Trace the chain of command from</label>
+          <select class="select" id={`${uid}-chain`} data-chain>
+            {treeOrder(posts).map((p) => <option value={p.id} selected={p.id === chain[0]}>{p.title}</option>)}
+          </select>
+        </div>
+        <div class="field">
+          <label for={`${uid}-delayer`}>Remove a layer of management</label>
+          <select class="select" id={`${uid}-delayer`} data-delayer aria-describedby={`${uid}-delayer-hint`}>
+            <option value="">Keep every level</option>
+            {
+              levels.map((l) => (
+                <option value={String(l.level)} selected={l.level === data.delayer}>
+                  Level {l.level}: {l.posts.map(titleOf).join(', ')}
+                </option>
+              ))
+            }
+          </select>
+          <span class="field__hint" id={`${uid}-delayer-hint`}>The managers at that level go; their staff report to the next manager up.</span>
+        </div>
+      </div>
+      <div data-results>
+        <p class="oc__chain small" data-chain-text>
+          <span class="label">Chain of command</span>
+          {chainText(chain)}: {chain.length} posts, {chain.length - 1} {chain.length - 1 === 1 ? 'step' : 'steps'} from the bottom to the top.
+        </p>
+        <figure class="oc__figure">
+          <div class="chart-scroll" role="region" aria-label={`Organization chart of ${data.organization}`} tabindex="0" data-chart set:html={orgChartSvg(model, { id: `${uid}-chart`, organization: data.organization, chain, removed: d?.removed.map((p) => p.id) ?? [] })} />
+          <figcaption class="exhibit__source">
+            <b>Chart</b> One row per level. A box with a coloured top edge is a manager, shown with its span of control; a stacked box is a post held by several people. The chain of command is drawn in blue; posts removed by delayering are dashed and labelled. Simulated teaching data.
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <form class="tool-panel oc__editor" data-form novalidate aria-labelledby={`${uid}-ed-h`}>
+      <h3 id={`${uid}-ed-h`}>The posts</h3>
+      <p class="tool-panel__dek">Each post reports to one manager. Identical jobs under one manager are one post, with the number of people who hold it.</p>
+      <div class="field oc__org">
+        <label for={`${uid}-org`}>Organization</label>
+        <input class="input" id={`${uid}-org`} name="organization" type="text" maxlength="80" autocomplete="off" value={data.organization} />
+      </div>
+      <ol class="oc__rows" role="list" data-rows set:html={orgEditorHtml(posts, uid, [], model.depth, MAX_POSTS)} />
+      <p class="nojs-only tool-note">This is the worked example. With JavaScript on, you can change the posts, and the chart, figures and readings follow.</p>
+    </form>
+  </div>
+
+  <section class="tool-panel" aria-labelledby={`${uid}-sum-h`} data-results>
+    <h3 id={`${uid}-sum-h`}>What the chart shows</h3>
+    <div class="oc__summary">
+      <dl class="figs" data-figures set:html={orgFiguresHtml(model)} />
+      <div class="oc__structure">
+        <p class="label label--ink">The structure it resembles</p>
+        <p class="oc__name" data-structure-name>{structure.name}</p>
+        <ul class="oc__reasons" data-structure-reasons>
+          {structure.reasons.map((r) => <li>{r}</li>)}
+        </ul>
+        <div class="tool-reading">
+          <p><strong>Reading.</strong> <span data-interp>{reading.reading}</span></p>
+          <p class="muted"><strong>Implication.</strong> <span data-impl>{reading.implication}</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="tool-panel" aria-labelledby={`${uid}-lv-h`} data-results>
+    <h3 id={`${uid}-lv-h`}>Level by level</h3>
+    <div class="oc__pair">
+      <div>
+        <h4 class="label label--ink">Span of control at each level</h4>
+        <div class="table-scroll" role="region" aria-label="Span of control at each level" tabindex="0">
+          <table class="table tool-table">
+            <thead>
+              <tr>
+                <th scope="col">Level</th>
+                <th scope="col" class="n">Posts</th>
+                <th scope="col" class="n">People</th>
+                <th scope="col" class="n">Managers</th>
+                <th scope="col" class="n">Spans of control</th>
+                <th scope="col" class="n">Average span</th>
+              </tr>
+            </thead>
+            <tbody data-levels set:html={orgLevelRowsHtml(model)} />
+          </table>
+        </div>
+      </div>
+      <div class="oc__outline">
+        <h4 class="label label--ink">The chart as a list</h4>
+        <div data-outline set:html={orgOutlineHtml(model)} />
+      </div>
+    </div>
+  </section>
+
+  <section class="tool-panel" aria-labelledby={`${uid}-dl-h`} data-delayering hidden={!d}>
+    <h3 id={`${uid}-dl-h`} data-delayer-title>{d ? `Delayering: removing level ${d.level}` : 'Delayering'}</h3>
+    <p class="tool-panel__dek nojs-only">The worked example compares the chart with and without its level {data.delayer} managers.</p>
+    <div class="table-scroll oc__compare" role="region" aria-label="The chart before and after delayering" tabindex="0">
+      <table class="table tool-table">
+        <thead>
+          <tr>
+            <th scope="col">Measure</th>
+            <th scope="col">Now</th>
+            <th scope="col">After delayering</th>
+          </tr>
+        </thead>
+        <tbody data-compare set:html={d ? delayerRowsHtml(model, d) : ''} />
+      </table>
+    </div>
+    <details class="disclosure">
+      <summary>The chart after delayering</summary>
+      <div class="disclosure__body">
+        <div class="chart-scroll" role="region" aria-label="Organization chart after delayering" tabindex="0" data-after-chart set:html={d ? orgChartSvg(d.after, { id: `${uid}-after`, organization: `${data.organization} after delayering` }) : ''} />
+      </div>
+    </details>
+  </section>
+</div>
+
+<script>
+  import '../../../scripts/org-chart';
+</script>
+
+<style>
+  .oc {
+    display: grid;
+    gap: var(--sp-7);
+  }
+
+  .oc__work {
+    display: grid;
+    gap: var(--sp-6);
+  }
+
+  /* On wide screens the chart stays beside the posts while they are edited. */
+  @media (min-width: 64rem) {
+    .oc__work {
+      grid-template-columns: minmax(20rem, 25rem) minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .oc__view {
+      grid-column: 2;
+      grid-row: 1;
+      position: sticky;
+      top: 5.5rem;
+      max-height: calc(100vh - 7rem);
+      overflow-y: auto;
+    }
+
+    .oc__editor {
+      grid-column: 1;
+      grid-row: 1;
+    }
+  }
+
+  .oc__org {
+    max-width: 24rem;
+  }
+
+  .oc__rows {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .oc__rows :global(.org-row) {
+    margin: 0 0 0 calc(var(--lvl, 0) * 0.75rem);
+    padding: var(--sp-2) var(--sp-3) var(--sp-3);
+    border: 1px solid var(--rule-hair);
+    border-left: 3px solid var(--rule);
+    background: #fff;
+  }
+
+  .oc__rows :global(.org-row--top) {
+    border-left-color: var(--bb-ink);
+  }
+
+  .oc__rows :global(.org-row__set) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 5.25rem;
+    grid-template-areas:
+      "head head"
+      "title count"
+      "reports reports"
+      "actions actions";
+    gap: var(--sp-2) var(--sp-3);
+    min-width: 0;
+  }
+
+  .oc__rows :global(.org-row--dept .org-row__set) {
+    grid-template-areas:
+      "head head"
+      "title count"
+      "reports group"
+      "actions actions";
+    grid-template-columns: minmax(0, 1fr) 7.5rem;
+  }
+
+  .oc__rows :global(.org-row__head) {
+    grid-area: head;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.45rem;
+    margin: 0;
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .oc__rows :global(.org-row__no) {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .oc__rows :global(.org-row__lvl) {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--room-accent-text);
+  }
+
+  .oc__rows :global(.org-row__title) {
+    grid-area: title;
+  }
+
+  .oc__rows :global(.org-row__count) {
+    grid-area: count;
+  }
+
+  .oc__rows :global(.org-row__reportsTo) {
+    grid-area: reports;
+  }
+
+  .oc__rows :global(.org-row__grouping) {
+    grid-area: group;
+  }
+
+  .oc__rows :global(.org-row__actions) {
+    grid-area: actions;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+  }
+
+  .oc__rows :global(.org-row label) {
+    font-size: 0.8125rem;
+  }
+
+  .oc__rows :global(.org-row .input),
+  .oc__rows :global(.org-row .select) {
+    min-height: 2.5rem;
+    padding-block: 0.4rem;
+  }
+
+  .oc__controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    align-items: start;
+    gap: var(--sp-3) var(--sp-4);
+  }
+
+  .oc__chain {
+    margin: 0 0 var(--sp-3);
+  }
+
+  .oc__chain .label {
+    margin-right: var(--sp-2);
+  }
+
+  .oc__figure {
+    margin: 0;
+  }
+
+  .oc__figure :global(.chart) {
+    margin-inline: auto;
+  }
+
+  .oc__summary {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  @media (min-width: 64rem) {
+    .oc__summary {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      align-items: start;
+    }
+  }
+
+  .oc :global(.figs .fig) {
+    align-content: start;
+  }
+
+  .oc__name {
+    margin: var(--sp-1) 0 var(--sp-2);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: var(--lh-snug);
+    color: var(--text-strong);
+  }
+
+  .oc__reasons {
+    display: grid;
+    gap: var(--sp-1);
+    margin: 0 0 var(--sp-4);
+    padding-left: 1.1em;
+    font-size: 0.9375rem;
+  }
+
+  .oc__pair {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  @media (min-width: 60rem) {
+    .oc__pair {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+
+  .oc__pair h4 {
+    margin: 0 0 var(--sp-2);
+  }
+
+  .oc__compare {
+    max-width: 52rem;
+  }
+
+  .oc__outline :global(.org-outline) {
+    margin: 0;
+    padding-left: 1.1em;
+    font-size: 0.9375rem;
+  }
+
+  .oc__outline :global(.org-outline ul) {
+    margin: var(--sp-1) 0 0;
+    padding-left: 1.2em;
+    border-left: 1px solid var(--rule-hair);
+  }
+
+  .oc__outline :global(.org-outline__post) {
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .oc__outline :global(.org-outline__meta) {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  /* Box labels sit on white or navy, so they need no halo. */
+  .oc :global(.org-ch text.org-ch__t),
+  .oc :global(.org-ch text.org-ch__s) {
+    stroke: none;
+  }
+
+  .oc :global(.org-ch .org-ch__s) {
+    font-size: 11px;
+  }
+</style>

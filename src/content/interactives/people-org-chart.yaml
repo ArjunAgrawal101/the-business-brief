@@ -1,0 +1,72 @@
+# The organization chart creator. Marrick Cycles is fictional; its chart is the
+# one described in the notes on organizational structure (2.2), so the tool and
+# the notes agree: 27 people, four levels, the owner's span of control three,
+# each supervisor's eight. tests/unit/org-chart.test.ts checks the figures.
+component: org-chart-builder
+title: Organization chart creator
+purpose: >
+  The learner constructs an organization chart post by post and reads it: the levels of the hierarchy, the span of
+  control at each level, the chain of command from any post, the effect of removing a layer of management and the
+  structure the chart resembles. It diagnoses the belief that a flatter chart is always better: delayering shortens the
+  chain of command but can leave one manager with a span no one could supervise.
+provenance: simulated-data
+syllabus: ['2.2']
+page: /people-and-culture/organization-chart/
+guide:
+  room: people
+  slug: organization-chart
+  order: 1
+  kind: Builder
+  question: Who reports to whom, and how many layers does it take?
+  summary: Build an organization chart post by post and see its levels of hierarchy, spans of control and chains of command, what delayering would change, and the structure it resembles.
+  lead: >
+    An organization chart is a model of who reports to whom. Build one post by post, or start from the worked example,
+    and the tool counts the levels of the hierarchy, measures every span of control, traces any chain of command, shows
+    what removing a layer of management would change and names the kind of structure the chart resembles.
+  status: SL/HL
+  statusNote: >
+    Subtopic 2.2, Organizational structure (guide, p. 25), for SL and HL. The guide asks for the terms of structure,
+    including span of control, levels of the hierarchy, chain of command and delayering (AO2), for organization charts
+    that are flat, tall, or organized by function, product or region (AO2 and AO4, so you may be asked to construct one),
+    and for judging which structure suits a change in external factors (AO3). The HL statement on project-based
+    organization and the Shamrock Organization is not modelled here.
+  ao: [AO2, AO4]
+  howTo:
+    - Start from the worked example, or replace it. Give each post a title, the number of people who hold it and the post it reports to. Identical jobs under one manager are one post held by several people.
+    - For each department directly under the top post, say whether it is grouped by function, by product or by region.
+    - Read the figures, the structure the chart resembles and the spans at each level. Choose any post to trace its chain of command to the top.
+    - Remove a layer of management and compare the chart before and after. Your chart is kept on this device; download it as JSON or CSV, open a saved file, or print it.
+  limitations:
+    - A chart shows formal reporting lines only. Informal networks, and where decisions are really made, can look quite different, so it cannot tell you how centralized or how bureaucratic an organization is.
+    - Every post here has one manager, so the tool cannot draw a matrix structure, in which people report to a functional manager and a project manager at once.
+    - "Tall, flat and between are the platform's rule of thumb, not an IB definition: flat means two levels, or three or fewer with five or more direct reports per manager; tall means five or more levels, or fewer than three direct reports per manager. The terms are relative, so compare charts rather than label one alone."
+    - Spans of control count people, not workload. Eight assemblers doing one routine task are easier to supervise than eight specialists, and the numbers cannot show the difference.
+    - Delayering here removes every manager at one level and moves their staff up a line. A real restructuring also changes jobs, pay, morale and the knowledge that leaves with the managers.
+  inAnswer: >
+    When a case gives you a chart, use its numbers: count the levels, state the spans of control that matter and trace
+    the chain of command the question is about. Then judge the structure against the business's situation, which is
+    where AO3 marks are earned: a span of sixteen may suit routine assembly work but not a team of new starters.
+  storageKey: people:org-chart
+  example:
+    name: Marrick Cycles, a fictional bicycle maker
+    note: >
+      Marrick Cycles employs 27 people. Its chart is the one described in the notes on
+      [organizational structure](/topics/organizational-structure/): the owner manages production, sales and finance,
+      and two supervisors each run eight assemblers. The comparison removes the supervisors. Every figure is simulated.
+  related:
+    subtopics: ['2.3', '2.4']
+    interactives: [lead-functions-sorter]
+    tools: [steeple-analysis]
+organization: Marrick Cycles
+posts:
+  - { id: owner, title: Owner }
+  - { id: production, title: Production manager, reportsTo: owner, grouping: function }
+  - { id: sales, title: Sales manager, reportsTo: owner, grouping: function }
+  - { id: finance, title: Finance manager, reportsTo: owner, grouping: function }
+  - { id: supervisor-a, title: 'Supervisor, team A', reportsTo: production }
+  - { id: supervisor-b, title: 'Supervisor, team B', reportsTo: production }
+  - { id: assemblers-a, title: 'Assembler, team A', reportsTo: supervisor-a, count: 8 }
+  - { id: assemblers-b, title: 'Assembler, team B', reportsTo: supervisor-b, count: 8 }
+  - { id: sales-staff, title: Sales adviser, reportsTo: sales, count: 3 }
+  - { id: finance-clerks, title: Finance clerk, reportsTo: finance, count: 2 }
+delayer: 3
