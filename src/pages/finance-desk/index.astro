@@ -1,79 +1,252 @@
 ---
+/**
+ * The Finance Desk as a whole: the Financial Laboratory for the reader's own
+ * figures, the six case workspaces, the subtopics of unit 3 and 5.5 with their
+ * notes, and the formulas: the formula sheet and the calculation register.
+ * Every address the desk has had still works.
+ */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import LevelTag from '../../components/ui/LevelTag.astro';
 import { corpus, href } from '../../lib/content';
+import { allSubtopics, noteFor, subtopicHref } from '../../lib/learning';
+import { BUSINESS } from '../../lib/lab/business';
+import { GROUPS, LAB, inGroup, labForRegister, labHref } from '../../lib/lab/catalogue';
+import { defaultReport } from '../../lib/lab/registry';
+import '../../styles/lab.css';
 
 const c = await corpus();
 const calcs = Object.entries(c.calculations).sort((a, b) => a[1].order - b[1].order);
 const DESKS = [
-  { href: '/finance-desk/costs-and-revenue/', title: 'Costs and revenue', body: 'Classify costs by behaviour and by traceability, then calculate revenue, total cost and profit.', ix: 'Cost classifier' },
-  { href: '/finance-desk/break-even/', title: 'Break-even', body: 'Contribution, break-even quantity and revenue, margin of safety, and the output or price for a target profit, with a live chart.', ix: 'Break-even workspace and error diagnosis' },
-  { href: '/finance-desk/contribution/', title: 'Contribution decisions', body: 'Judge a special order on contribution, and see when the rule of thumb fails because capacity runs out.', ix: 'Special order panel', hl: true },
-  { href: '/finance-desk/ratios/', title: 'Ratio analysis', body: 'Profitability and liquidity ratios, and at HL the efficiency ratios and gearing, from two years of accounts in the IB layout, with strategies to try.', ix: 'Ratio desk' },
-  { href: '/finance-desk/cash-flow/', title: 'Cash flow', body: 'A six-month forecast in the IB layout: find when the cash runs short, reconcile profit with cash, and test ways of paying for a new kiln.', ix: 'Cash flow lab' },
-  { href: '/finance-desk/investment-appraisal/', title: 'Investment appraisal', body: 'Payback period and average rate of return, and at HL net present value with the guide\'s discount factors, on two projects you can change.', ix: 'Investment appraisal desk' },
+  { href: '/finance-desk/costs-and-revenue/', title: 'Costs and revenue', codes: ['3.3'], caseName: 'Atelier Barro', body: 'Classify costs by behaviour and by traceability, then calculate revenue, total cost and profit.', ix: 'Cost classifier' },
+  { href: '/finance-desk/break-even/', title: 'Break-even', codes: ['5.5'], caseName: 'Atelier Barro', body: 'Contribution, break-even quantity and revenue, margin of safety, and the output or price for a target profit, with a live chart.', ix: 'Break-even workspace and error diagnosis' },
+  { href: '/finance-desk/contribution/', title: 'Contribution decisions', codes: ['5.5'], caseName: 'Atelier Barro', body: 'Judge a special order on contribution, and see when the rule of thumb fails because capacity runs out.', ix: 'Special order panel', hl: true },
+  { href: '/finance-desk/ratios/', title: 'Ratio analysis', codes: ['3.4', '3.5', '3.6'], caseName: 'Halden Distribution', body: 'Profitability and liquidity ratios, and at HL the efficiency ratios and gearing, from two years of accounts in the IB layout, with strategies to try.', ix: 'Ratio desk' },
+  { href: '/finance-desk/cash-flow/', title: 'Cash flow', codes: ['3.7'], caseName: 'Atelier Barro', body: 'A six-month forecast in the IB layout: find when the cash runs short, reconcile profit with cash, and test ways of paying for a new kiln.', ix: 'Cash flow lab' },
+  { href: '/finance-desk/investment-appraisal/', title: 'Investment appraisal', codes: ['3.8'], caseName: 'Halden Distribution', body: 'Payback period and average rate of return, and at HL net present value with the guide’s discount factors, on two projects you can change.', ix: 'Investment appraisal desk' },
 ];
+const unit3 = allSubtopics(c).filter((x) => x.unit.number === 3 || x.s.code === '5.5');
+const rows = unit3.map(({ s }) => ({
+  s,
+  notes: noteFor(c, s.code),
+  href: subtopicHref(c, s.code),
+  desks: DESKS.filter((d) => d.codes.includes(s.code)),
+  lab: LAB.filter((e) => e.subtopic === s.code),
+}));
+const glance = ['break-even-quantity', 'gross-profit-margin', 'cash-flow-forecast', 'net-present-value'].map((id) => ({ id, entry: LAB.find((e) => e.id === id), h: defaultReport(id).headline }));
 ---
 
-<BaseLayout title="Finance Desk" description="Business calculations worked in eight parts: given, formula, substitution, working, answer, unit, interpretation and business implication." section="finance-desk">
+<BaseLayout
+  title="Finance Desk"
+  description="Finance and break-even for IB Business Management: the Financial Laboratory for your own figures, six case workspaces, notes for every unit 3 subtopic and 5.5, the formula sheet and the calculation register."
+  section="finance-desk"
+  room="finance"
+>
   <PageIntro
     trail={[{ label: 'Finance Desk' }]}
     kicker="Finance Desk"
     title="The numbers, and what they mean"
-    lead="Every calculation on the platform is done by one set of tested functions and shown in eight parts: given, formula, substitution, working, answer, unit, interpretation and business implication. The last two are where marks for judgement are earned."
+    lead="Finance is where a business decision becomes a number you can test. The desk has three parts: a laboratory for your own figures, case workspaces where the numbers belong to a business in a situation, and the notes and formulas behind both. Every figure comes from one set of tested functions, shown with its working and what it means."
   />
   <div class="wrap page-body">
-    <div class="feature-briefs">
-      {
-        DESKS.map((d) => (
-          <article class="feature">
-            <span class="feature__code">Desk {d.hl && <span class="tag tag--hl">HL</span>}</span>
-            <h2 style="margin:0;font-size:var(--fs-h3)">
-              <a href={d.href} style="color:var(--text-strong);text-decoration:none">{d.title}</a>
-            </h2>
-            <p>{d.body}</p>
-            <p class="feature__meta">Interaction: {d.ix}</p>
-          </article>
-        ))
-      }
-    </div>
+    <section class="fd-lab" aria-labelledby="fd-lab-h">
+      <div class="fd-lab__text">
+        <p class="fd-lab__kicker">Your own figures</p>
+        <h2 class="fd-lab__title" id="fd-lab-h">The Financial Laboratory</h2>
+        <p class="fd-lab__lead">
+          {LAB.length} calculators for break-even, statements, ratios, cash flow, budgets and investment appraisal. Each shows the formula in the guide’s notation, the
+          working step by step, a chart, a sensitivity table and what a manager might do. The example figures belong to {BUSINESS.name}, a fictional coffee roaster.
+        </p>
+        <ol class="fd-lab__groups" role="list">
+          {
+            GROUPS.map((g) => (
+              <li>
+                <a href={`/finance-desk/lab/#grp-${g.id}`}>{g.name}</a>
+                <span class="fd-lab__count">
+                  {inGroup(g.id).length} {inGroup(g.id).length === 1 ? 'calculator' : 'calculators'}
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+        <p class="fd-lab__cta">
+          <a class="btn btn--gold" href="/finance-desk/lab/">Open the laboratory</a>
+        </p>
+      </div>
+      <dl class="fd-lab__panel">
+        {
+          glance.map((x) => (
+            <div>
+              <dt>
+                <a href={labHref(x.id)}>{x.h.label}</a>
+              </dt>
+              <dd>
+                <span class="fd-lab__value">{x.h.value}</span>
+                {x.h.note && <span class="fd-lab__note">{x.h.note}</span>}
+              </dd>
+            </div>
+          ))
+        }
+        <div class="fd-lab__panel-foot">
+          <dt class="sr-only">Data</dt>
+          <dd>{BUSINESS.name}: fictional, simulated data.</dd>
+        </div>
+      </dl>
+    </section>
 
-    <section aria-labelledby="register-h">
-      <SectionHead no={1} title="The calculation register" dek="Every calculation, its formula, and where it is worked." id="register-h" />
-      <div class="table-scroll" role="region" aria-label="Calculation register" tabindex="0" style="margin-top:var(--sp-4)">
-        <table class="table">
+    <section aria-labelledby="fd-desks-h">
+      <SectionHead no={1} title="The case workspaces" dek="Six desks, each working part of the course on a fictional case with simulated data, so the numbers have a business and a decision behind them." id="fd-desks-h" />
+      <ol class="fd-desks" role="list">
+        {
+          DESKS.map((d, k) => (
+            <li class="fd-desk" data-level={d.hl ? 'HL' : undefined}>
+              <span class="fd-desk__no" aria-hidden="true">
+                {String(k + 1).padStart(2, '0')}
+              </span>
+              <div class="fd-desk__main">
+                <h3 class="fd-desk__title">
+                  <a href={d.href}>{d.title}</a>
+                  {d.hl && <span class="tag tag--hl">HL</span>}
+                </h3>
+                <p class="fd-desk__body">{d.body}</p>
+              </div>
+              <dl class="fd-desk__meta">
+                <div>
+                  <dt>Case</dt>
+                  <dd>{d.caseName}</dd>
+                </div>
+                <div>
+                  <dt>IB</dt>
+                  <dd class="num">{d.codes.join(', ')}</dd>
+                </div>
+                <div>
+                  <dt>Interaction</dt>
+                  <dd>{d.ix}</dd>
+                </div>
+              </dl>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="hl-notice"><span class="tag tag--hl">HL</span> The contribution decisions desk is HL-only material, hidden while you are viewing SL content.</p>
+    </section>
+
+    <section aria-labelledby="fd-subs-h">
+      <SectionHead no={2} title="The subtopics" dek="Unit 3, Finance and accounts, and subtopic 5.5, Break-even analysis: where each is explained and where it is practised." id="fd-subs-h" />
+      <div class="table-scroll fd-subs-wrap" role="region" aria-label="Subtopics of unit 3 and 5.5" tabindex="0">
+        <table class="table fd-subs">
+          <caption class="sr-only">Each subtopic with its notes, case workspaces and calculators</caption>
           <thead>
             <tr>
-              <th scope="col">Calculation</th>
-              <th scope="col">Formula</th>
+              <th scope="col">Subtopic</th>
               <th scope="col">Level</th>
-              <th scope="col">IB</th>
+              <th scope="col">Learn</th>
+              <th scope="col">Practise on a case</th>
+              <th scope="col">Calculators</th>
             </tr>
           </thead>
           <tbody>
             {
-              calcs.map(([id, k]) => (
+              rows.map((r) => (
                 <tr>
                   <th scope="row">
-                    <a href={href.calculation(id, k.page)}>{k.name}</a>
+                    <span class="fd-subs__code num">{r.s.code}</span> {r.s.title}
                   </th>
-                  <td class="small" style="font-family:var(--font-mono)">
-                    {k.formula}
+                  <td>
+                    <LevelTag level={r.s.level === 'HL' ? 'HL' : 'SL/HL'} always />
                   </td>
                   <td>
-                    <LevelTag level={k.level} always />
+                    <a href={r.href}>{r.notes ? 'Notes' : 'Subtopic page'}</a>
                   </td>
-                  <td class="num">{k.syllabus.map((s) => s.code).join(', ')}</td>
+                  <td>
+                    {r.desks.length ? (
+                      r.desks.map((d, k) => (
+                        <>
+                          {k > 0 && <br />}
+                          <a href={d.href}>{d.title}</a>
+                        </>
+                      ))
+                    ) : (
+                      <span class="muted">None yet</span>
+                    )}
+                  </td>
+                  <td>
+                    {r.lab.length ? (
+                      <span class="fd-subs__calcs">
+                        {r.lab.map((e, k) => (
+                          <>
+                            {k > 0 && ', '}
+                            <a href={labHref(e.id)}>{e.name}</a>
+                          </>
+                        ))}
+                      </span>
+                    ) : (
+                      <span class="muted">None yet</span>
+                    )}
+                  </td>
                 </tr>
               ))
             }
           </tbody>
         </table>
       </div>
+      <p class="small muted fd-subs-note">
+        Notes are written one subtopic at a time and only when complete; a subtopic without them has a page with what the course asks, its key terms and diagrams.
+      </p>
+    </section>
+
+    <section aria-labelledby="register-h">
+      <SectionHead no={3} title="The formulas" dek="The formula sheet on one printable page, and every calculation on the platform with its formula and where it is worked." id="register-h" />
+      <div class="fd-formula">
+        <div>
+          <p class="label label--ink">Formula sheet</p>
+          <p>
+            The formulae the examination provides (Business management guide, pp. 64 to 65), and the standard ones it does not list but questions use, with the HL-only
+            formulae marked.
+          </p>
+        </div>
+        <a class="btn" href="/resources/formula-sheet/">Open the formula sheet</a>
+      </div>
+      <div class="table-scroll" role="region" aria-label="Calculation register" tabindex="0" style="margin-top:var(--sp-5)">
+        <table class="table">
+          <caption class="sr-only">The calculation register: each calculation, its formula, its level, its subtopic and the calculator that works it with your own figures</caption>
+          <thead>
+            <tr>
+              <th scope="col">Calculation</th>
+              <th scope="col">Formula</th>
+              <th scope="col">Level</th>
+              <th scope="col">IB</th>
+              <th scope="col">Your figures</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              calcs.map(([id, k]) => {
+                const lab = labForRegister(id);
+                return (
+                  <tr>
+                    <th scope="row">
+                      <a href={href.calculation(id, k.page)}>{k.name}</a>
+                    </th>
+                    <td class="small" style="font-family:var(--font-mono)">
+                      {k.formula}
+                    </td>
+                    <td>
+                      <LevelTag level={k.level} always />
+                    </td>
+                    <td class="num">{k.syllabus.map((s) => s.code).join(', ')}</td>
+                    <td class="small">{lab ? <a href={labHref(lab.id)}>{lab.name}</a> : <span class="muted">Not in the laboratory</span>}</td>
+                  </tr>
+                );
+              })
+            }
+          </tbody>
+        </table>
+      </div>
       <p class="small muted" style="margin-top:var(--sp-3)">
-        The formulas are standard business arithmetic. Where a calculation sits in the IB syllabus is marked with its verification status on each card.
+        The formulas are standard business arithmetic. Where a calculation sits in the IB syllabus is marked, with its verification status, on its card in the case
+        workspaces.
       </p>
     </section>
 
@@ -81,10 +254,9 @@ const DESKS = [
       <span class="callout__kicker">Arjun Agrawal framework</span>
       <div class="prose">
         <p>
-          <strong>Given, formula, substitution, working, answer, unit, interpretation, business implication.</strong> Writing all
-          eight is slower than writing the answer alone, and it is how a calculation question is answered well: the method
-          earns marks when the arithmetic slips, the unit shows what the number is, and the last two lines turn the number into
-          a reason for a decision.
+          <strong>Given, formula, substitution, working, answer, unit, interpretation, business implication.</strong> Writing all eight is slower than writing the answer
+          alone, and it is how a calculation question is answered well: the method earns marks when the arithmetic slips, the unit shows what the number is, and the last two
+          lines turn the number into a reason for a decision. Every working on the desk, and in the laboratory, is set out this way.
         </p>
       </div>
     </aside>
