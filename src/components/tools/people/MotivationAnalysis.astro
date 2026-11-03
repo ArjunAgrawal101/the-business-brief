@@ -1,0 +1,405 @@
+---
+/**
+ * The motivation analysis (2.4): a job rated on the factors the theories look
+ * at, read through each theory the guide names, with the rewards that fit.
+ * The worked example is analysed on the server by src/lib/motivation.ts;
+ * src/scripts/motivation-analysis.ts reruns it as the ratings change. The
+ * HL-only theories and beliefs sit in HL sections, hidden in the SL view.
+ */
+import { FACTORS, readMotivation, rewards } from '../../../lib/motivation';
+import { lensCards, ratingsRowsHtml, rewardsHtml } from '../../../lib/motivation-view';
+import { jsonForScript } from '../../../lib/markup';
+import type { RoomTool } from '../../../lib/room-tools';
+
+interface Props {
+  id: string;
+  data: Extract<RoomTool, { component: 'motivation-analysis' }>;
+}
+const { id, data } = Astro.props;
+const uid = `mo-${id}`;
+const input = { ratings: data.ratings, job: data.job, need: data.need };
+const lens = lensCards(input, uid);
+const read = readMotivation(input);
+const config = { uid, key: data.guide.storageKey, ratings: data.ratings, job: data.job, need: data.need };
+const sl = FACTORS.filter((f) => !f.hl);
+const hlf = FACTORS.filter((f) => f.hl);
+const JOB = [
+  { key: 'countable', label: "Each person's output can be counted" },
+  { key: 'sales', label: 'Pay could follow the sales each person makes' },
+  { key: 'teams', label: 'The work is done in teams' },
+  { key: 'shares', label: 'The business is a company that could offer shares to staff' },
+] as const;
+---
+
+<script type="application/json" data-config set:html={jsonForScript(config)} />
+
+<form class="mo" data-form novalidate aria-label="Ratings of the job">
+  <p class="mo__subject"><span class="label">The job</span> {data.subject}</p>
+  <details class="disclosure mo__evidence">
+    <summary>Why the worked example is rated this way</summary>
+    <div class="disclosure__body">
+      <dl class="mo__ev">
+        {
+          data.evidence.map((e) => (
+            <div>
+              <dt>{e.factor}</dt>
+              <dd>{e.note}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </details>
+
+  <div class="mo__grid">
+    <fieldset class="mo__set">
+      <legend class="label label--ink">What the job offers now, from 1 (poorly) to 5 (very well)</legend>
+      <ol class="mo__ratings" role="list">
+        {
+          sl.map((f) => (
+            <li class="mo-rate">
+              <label class="mo-rate__label" for={`${uid}-r-${f.id}`}>{f.label}</label>
+              <div class="mo-rate__control">
+                <input type="range" id={`${uid}-r-${f.id}`} name={f.id} min="1" max="5" step="1" value={String(data.ratings[f.id])} aria-valuetext={`${data.ratings[f.id]} of 5`} />
+                <output class="mo-rate__v" for={`${uid}-r-${f.id}`} data-out={f.id}>{data.ratings[f.id]}</output>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </fieldset>
+    <div class="mo__side">
+      <fieldset class="mo__set" data-level="HL">
+        <legend class="label label--ink">Beliefs about rewards, 1 to 5 <span class="tag tag--hl">HL</span></legend>
+        <ol class="mo__ratings" role="list">
+          {
+            hlf.map((f) => (
+              <li class="mo-rate">
+                <label class="mo-rate__label" for={`${uid}-r-${f.id}`}>{f.label}</label>
+                <div class="mo-rate__control">
+                  <input type="range" id={`${uid}-r-${f.id}`} name={f.id} min="1" max="5" step="1" value={String(data.ratings[f.id])} aria-valuetext={`${data.ratings[f.id]} of 5`} />
+                  <output class="mo-rate__v" for={`${uid}-r-${f.id}`} data-out={f.id}>{data.ratings[f.id]}</output>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+        <div class="field mo__need">
+          <label for={`${uid}-need`}>The staff's dominant need, if the evidence shows one</label>
+          <select class="select" id={`${uid}-need`} name="need">
+            <option value="unknown" selected={data.need === 'unknown'}>Not clear from the evidence</option>
+            <option value="achievement" selected={data.need === 'achievement'}>Achievement</option>
+            <option value="affiliation" selected={data.need === 'affiliation'}>Affiliation</option>
+            <option value="power" selected={data.need === 'power'}>Power</option>
+          </select>
+        </div>
+      </fieldset>
+      <fieldset class="mo__set">
+        <legend class="label label--ink">The job</legend>
+        <ul class="mo__checks" role="list">
+          {
+            JOB.map((j) => (
+              <li>
+                <label class="mo__check">
+                  <input type="checkbox" name={j.key} checked={data.job[j.key]} /> {j.label}
+                </label>
+              </li>
+            ))
+          }
+        </ul>
+      </fieldset>
+    </div>
+  </div>
+  <p class="nojs-only tool-note">This is the worked example. With JavaScript on, you can change every rating and the analysis follows.</p>
+</form>
+
+<section class="tool-panel" aria-labelledby={`${uid}-res-h`} data-results>
+  <h3 id={`${uid}-res-h`}>What the theories see</h3>
+  <div class="tool-reading">
+    <p><strong>Reading.</strong> <span data-interp>{read.reading}</span></p>
+    <p class="muted"><strong>Implication.</strong> <span data-impl>{read.implication}</span></p>
+  </div>
+  <div class="mo__lenses">
+    <div data-lens="taylor" set:html={lens.taylor}></div>
+    <div data-lens="maslow" set:html={lens.maslow}></div>
+    <div data-lens="herzberg" set:html={lens.herzberg}></div>
+  </div>
+  <div class="mo__lenses" data-level="HL">
+    <div data-lens="mcclelland" set:html={lens.mcclelland}></div>
+    <div data-lens="sdt" set:html={lens.sdt}></div>
+    <div data-lens="equity" set:html={lens.equity}></div>
+    <div data-lens="expectancy" set:html={lens.expectancy}></div>
+  </div>
+  <p class="hl-notice"><span class="tag tag--hl">HL</span> McClelland, Deci and Ryan, equity theory and expectancy theory are HL-only content, hidden while you are viewing SL content.</p>
+  <details class="disclosure">
+    <summary>The ratings as a table</summary>
+    <div class="disclosure__body table-scroll" role="region" aria-label="The ratings" tabindex="0">
+      <table class="table tool-table mo__table">
+        <thead>
+          <tr>
+            <th scope="col">Factor</th>
+            <th scope="col" class="n">Rating, 1 to 5</th>
+          </tr>
+        </thead>
+        <tbody data-ratings set:html={ratingsRowsHtml(data.ratings)}></tbody>
+      </table>
+    </div>
+  </details>
+  <p class="tool-note">Which factor speaks to which theory, the threshold of 3 for a need that is met and the expectancy index are the platform's teaching model. The theories themselves set no numbers.</p>
+</section>
+
+<section class="tool-panel" aria-labelledby={`${uid}-rw-h`} data-results>
+  <h3 id={`${uid}-rw-h`}>The rewards that fit</h3>
+  <p class="tool-panel__dek">The financial and non-financial rewards the guide names, and its types of training, chosen by the platform's rules from the ratings and the job.</p>
+  <div class="mo__rewards" data-rewards set:html={rewardsHtml(rewards(input))}></div>
+</section>
+
+<script>
+  import '../../../scripts/motivation-analysis';
+</script>
+
+<style>
+  .mo {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .mo__subject {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    color: var(--text-strong);
+  }
+
+  .mo__subject .label {
+    margin-right: var(--sp-2);
+    font-family: var(--font-ui);
+  }
+
+  .mo__ev {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+  }
+
+  .mo__ev dt {
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  .mo__ev dd {
+    margin: 0 0 var(--sp-2);
+    font-size: 0.9375rem;
+  }
+
+  .mo__grid {
+    display: grid;
+    gap: var(--sp-6);
+  }
+
+  @media (min-width: 60rem) {
+    .mo__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  .mo__side {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .mo__set {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .mo__set > legend {
+    padding: 0;
+    margin-bottom: var(--sp-3);
+  }
+
+  .mo__ratings {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .mo-rate {
+    display: grid;
+    gap: var(--sp-1);
+    margin: 0;
+  }
+
+  .mo-rate__label {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .mo-rate__control {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 2rem;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  .mo-rate__control input[type="range"] {
+    width: 100%;
+    min-height: 24px;
+    accent-color: var(--bb-cobalt);
+  }
+
+  .mo-rate__v {
+    font-size: 1.125rem;
+    font-weight: 700;
+    text-align: right;
+    color: var(--cobalt-text);
+  }
+
+  .mo__need {
+    margin-top: var(--sp-4);
+  }
+
+  .mo__checks {
+    display: grid;
+    gap: var(--sp-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .mo__check {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    min-height: 44px;
+    font-size: 0.9375rem;
+    color: var(--text-strong);
+  }
+
+  .mo__check input {
+    flex: none;
+    width: 1.15rem;
+    height: 1.15rem;
+    accent-color: var(--bb-cobalt);
+  }
+
+  .mo__lenses {
+    display: grid;
+    gap: var(--sp-4);
+  }
+
+  /* Two columns on wider screens, so each chart has room; Taylor, with no chart, spans both. */
+  @media (min-width: 48rem) {
+    .mo__lenses {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .mo__lenses > [data-lens="taylor"] {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .mo__lenses :global(.mo-lens) {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+    height: 100%;
+    padding: var(--sp-4);
+    border: 1px solid var(--rule-hair);
+    border-top: 3px solid var(--room-accent);
+    background: #fff;
+  }
+
+  .mo__lenses :global(.mo-lens p) {
+    max-width: var(--text-max);
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  .mo__lenses :global(.mo-lens .chart) {
+    margin-inline: auto;
+  }
+
+  :global(.chart text.mo-ch__in) {
+    stroke: none;
+    font-weight: 700;
+  }
+
+  .mo__lenses :global(.mo-lens p.mo-lens__figs) {
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
+  }
+
+  .mo__lenses :global(.mo-lens__name) {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+  }
+
+  .mo__rewards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap: var(--sp-5);
+  }
+
+  .mo__rewards :global(.mo-rewards__list) {
+    display: grid;
+    gap: 0;
+    margin: var(--sp-2) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .mo__rewards :global(.mo-reward) {
+    display: grid;
+    gap: var(--sp-1);
+    margin: 0;
+    padding: var(--sp-3) 0 var(--sp-3) var(--sp-3);
+    border-bottom: 1px solid var(--rule-hair);
+    border-left: 3px solid var(--bb-brass);
+  }
+
+  .mo__rewards :global(.mo-reward--strong) {
+    border-left-color: var(--bb-green);
+  }
+
+  .mo__rewards :global(.mo-reward p) {
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  .mo__rewards :global(.mo-reward__name) {
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  .mo__rewards :global(.mo-reward__fit) {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .mo__rewards :global(.mo-reward--strong .mo-reward__fit) {
+    color: var(--green-text);
+  }
+
+  .mo__rewards :global(.mo-reward__but) {
+    color: var(--text-muted);
+  }
+
+  .mo__rewards :global(.mo-reward__theory) {
+    font-size: 0.8125rem;
+    font-style: italic;
+    color: var(--text-muted);
+  }
+</style>

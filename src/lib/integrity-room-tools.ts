@@ -12,6 +12,7 @@ import { validatePlan } from './stock-sim';
 import { validateEoq } from './eoq';
 import { validateTurnover, validateWorkforce } from './workforce';
 import { validateMatrix } from './location-tool';
+import { validateRatings } from './motivation';
 import { ROOM_INFO, isRoomTool, toolHref } from './room-tools';
 
 export function checkRoomTools(c: Corpus): Problem[] {
@@ -54,6 +55,18 @@ export function checkRoomTools(c: Corpus): Problem[] {
       if (!problems.length && it.delayer !== undefined) {
         const m = orgModel(posts);
         if (!delayerLevels(m).some((l) => l.level === it.delayer)) add(`level ${it.delayer} has no managers to remove`);
+      }
+    }
+
+    if (it.component === 'motivation-analysis') {
+      if (g.room !== 'people') add('the motivation analysis belongs in People and Culture');
+      validateRatings(it.ratings).forEach((f) => add(`the rating for "${f}" must be a whole number from 1 to 5`));
+      // Evidence that cites an exhibit must cite one that a related case has.
+      const exhibits = new Set(g.related.cases.flatMap((x) => (c.cases[x]?.exhibits ?? []).map((e) => e.id)));
+      for (const e of it.evidence) {
+        for (const m of e.note.matchAll(/Exhibits? (\d+)(?: and (\d+))?/g)) {
+          [m[1], m[2]].forEach((n) => n === undefined || exhibits.has(`ex-${n}`) || add(`the evidence for "${e.factor}" cites Exhibit ${n}, which no related case has`));
+        }
       }
     }
 

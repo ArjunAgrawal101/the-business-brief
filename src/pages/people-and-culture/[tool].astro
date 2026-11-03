@@ -7,6 +7,7 @@ import ToolPage from '../../components/tools/ToolPage.astro';
 import ScenarioChooser from '../../components/tools/ScenarioChooser.astro';
 import OrgChartBuilder from '../../components/tools/people/OrgChartBuilder.astro';
 import WorkforcePlanner from '../../components/tools/people/WorkforcePlanner.astro';
+import MotivationAnalysis from '../../components/tools/people/MotivationAnalysis.astro';
 import { corpus } from '../../lib/content';
 import { TOOL_FRAME, roomTools, type RoomTool } from '../../lib/room-tools';
 
@@ -27,5 +28,6 @@ const f = TOOL_FRAME[t.component];
 <ToolPage id={id} ix={f.ix} csv={f.csv} open={f.open} what={f.what} levelSwitch={f.levelSwitch} reset={f.reset}>
   {t.component === 'org-chart-builder' && <OrgChartBuilder id={id} data={t} />}
   {t.component === 'workforce-planner' && <WorkforcePlanner id={id} data={t} />}
+  {t.component === 'motivation-analysis' && <MotivationAnalysis id={id} data={t} />}
   {t.component === 'scenario-chooser' && <ScenarioChooser id={id} data={t} />}
 </ToolPage>
