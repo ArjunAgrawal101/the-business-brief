@@ -472,9 +472,29 @@
   font-size: 0.875rem;
 }
 
-.vault-index dd a + a::before {
-  content: "; ";
-  color: var(--text-muted);
+.vault-index__cases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--sp-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vault-index__cases li {
+  margin: 0;
+}
+
+.vault-index__cases a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+
+.vault-index dt a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
 }
 
 .vault-use {
@@ -499,6 +519,19 @@
 }
 
 /* ---------- The case file: contents, questions, exercise, debrief, frameworks ---------- */
+
+#story .case-narrative {
+  margin-top: var(--sp-4);
+}
+
+/* A statement with one or two columns of figures reads better at the width of a page than across the screen. */
+.exhibit-stack .table-scroll:not(:has(thead th:nth-child(4))) {
+  max-width: 50rem;
+}
+
+.exhibit-stack .exhibit__note > * + * {
+  margin-top: var(--sp-2);
+}
 
 .case-contents {
   margin-top: var(--sp-6);
@@ -539,7 +572,22 @@
 }
 
 .case-industry {
-  max-width: var(--text-max);
+  max-width: 64rem;
+}
+
+@media (min-width: 64rem) {
+  .case-industry {
+    columns: 2;
+    column-gap: var(--sp-7);
+  }
+
+  .case-industry > div {
+    break-inside: avoid-column;
+  }
+}
+
+.case-industry > div + div {
+  margin-top: 1em;
 }
 
 .case-challenge {
@@ -693,6 +741,11 @@
 
 .exercise__work {
   grid-column: 1 / -1;
+}
+
+.exercise-form,
+.exercise-result {
+  max-width: 52rem;
 }
 
 .exercise-form fieldset {

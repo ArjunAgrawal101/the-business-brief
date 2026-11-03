@@ -77,6 +77,12 @@ export function checkCases(c: Corpus): Problem[] {
       problem('a case offered to undergraduate or MBA readers needs at least three seminar prompts (discussion)');
     }
 
+    /* ---------- Exhibits ---------- */
+    for (const e of cs.exhibits) {
+      const labels = new Set((e.rows ?? []).map((r) => String(r[0])));
+      for (const t of e.totals) if (!labels.has(t)) problem(`total row "${t}" is not a row of the exhibit`, `${w} ${e.id}`);
+    }
+
     /* ---------- The industry, in general terms ---------- */
     // The industry context describes how the industry works without statistics about real markets: no figures at all.
     cs.industryContext.forEach((p, i) => {

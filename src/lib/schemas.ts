@@ -251,6 +251,8 @@ export const exhibitSchema = z.object({
   footer: z.array(cell).optional(),
   /** When true, the footer must equal the column sums of the numeric columns (checked by tests). */
   footerIsSum: z.boolean().default(false),
+  /** Rows (by their first cell) that are subtotals or totals, set in bold with a rule above, as in a set of accounts. */
+  totals: z.array(z.string()).default([]),
   items: z.array(z.object({ label: z.string(), value: z.string(), note: z.string().optional() })).optional(),
   quote: z.object({ text: md, attribution: z.string() }).optional(),
   source: md,

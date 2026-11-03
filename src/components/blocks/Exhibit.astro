@@ -45,7 +45,7 @@ const titleId = `${caseTitle ? caseTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-
           </thead>
           <tbody>
             {e.rows.map((r) => (
-              <tr>
+              <tr class={e.totals.includes(String(r[0])) ? 'is-total' : undefined}>
                 {r.map((cell, i) => {
                   const col = e.columns?.[i];
                   const text = formatCell(cell, col?.format);
@@ -115,6 +115,13 @@ const titleId = `${caseTitle ? caseTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-
 </figure>
 
 <style>
+  .is-total th,
+  .is-total td {
+    border-top: 1px solid var(--rule-ink);
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
   .kpis {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 11.5rem), 1fr));

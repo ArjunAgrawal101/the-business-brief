@@ -305,11 +305,15 @@ const description = `An archive of ${total} business cases for IB Diploma, under
                       {s.level === 'HL' && <span class="tag tag--hl">HL</span>}
                     </dt>
                     <dd>
-                      {cases
-                        .filter((x) => x.syllabus.includes(s.code))
-                        .map((x) => (
-                          <a href={x.href}>{x.title}</a>
-                        ))}
+                      <ul class="vault-index__cases" role="list">
+                        {cases
+                          .filter((x) => x.syllabus.includes(s.code))
+                          .map((x) => (
+                            <li>
+                              <a href={x.href}>{x.title}</a>
+                            </li>
+                          ))}
+                      </ul>
                     </dd>
                   </div>
                 ))}

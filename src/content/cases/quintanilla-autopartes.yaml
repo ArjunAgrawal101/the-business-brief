@@ -1,0 +1,643 @@
+# Quintanilla Autopartes. A fictional organization; every figure is simulated.
+# Exhibit 3's cash flows are appraised by payback, ARR and NPV with the
+# discount factors printed in the IB guide (p. 66). scripts/qa/case-figures.py
+# rebuilds every exhibit and checks every figure in the text;
+# tests/unit/vault-cases.test.ts recomputes the appraisals with
+# src/lib/investment.ts.
+
+title: Quintanilla Autopartes
+dek: A family parts maker in Monterrey must choose one investment as the engines its products are made for start to disappear.
+kind: fictional
+dataStatus: simulated
+organization:
+  name: Quintanilla Autopartes
+  sector: Automotive components (pressed and welded steel parts)
+  location: Monterrey, Mexico
+  size: One plant with two welding lines and a press shop, 420 employees
+  legalForm: Privately held company (S.A. de C.V.), owned by the Quintanilla family
+currency:
+  code: MXN
+  symbol: 'MX$'
+  unit: millions of Mexican pesos (MX$m)
+decision: Which investment should Quintanilla make, and which way of appraising it should the board trust?
+brief: >
+  Two thirds of Quintanilla's sales are parts that exist only because cars have combustion engines, and its
+  customers expect to order far fewer of them each year. The board can afford one investment: rebuild a line to make
+  battery-enclosure frames for a nearby carmaker's electric pickup, automate welding to make the combustion business
+  as efficient as possible, or diversify into parts for farm machinery. Payback, the average rate of return and net
+  present value do not agree on which is best, and the project with the highest value carries the most risk.
+
+narrative:
+  - >
+    Rodrigo Quintanilla started pressing exhaust brackets in a rented workshop in Apodaca, on the edge of Monterrey, in
+    1987. Today Quintanilla Autopartes employs 420 people in a plant of its own, making exhaust brackets, heat shields,
+    fuel-tank straps and body stampings for two carmakers and a large parts supplier. Rodrigo's daughter, Ana Sofía,
+    has run the company since 2018. The family owns all of it and has never sold a share.
+  - >
+    Most of what Quintanilla makes exists only because cars have engines that burn fuel. Exhaust parts, heat shields
+    and fuel-tank parts were two thirds of sales in 2025, and their sales have fallen in each of the last three years
+    (Exhibit 4). The customers' own forecasts say that their orders for these parts will fall to 40% of the 2025 level
+    by 2031 (Exhibit 6). Profit before interest and tax fell from MX$86.8m to MX$58.0m in 2025 (Exhibit 1).
+  - >
+    Norvalia Motors, whose plant forty kilometres away buys more than half of Quintanilla's output, will build an
+    electric pickup there from 2028. It needs a local supplier for the frames that hold the battery pack: large
+    welded structures that must protect the cells in a crash, keep water out and be built to tight tolerances.
+    Norvalia has invited Quintanilla to bid (Exhibit 8). Winning would mean rebuilding Line 2, retraining welders who
+    have worked with steel all their lives, and borrowing more than the company ever has.
+  - >
+    Two other projects are on the table. Héctor Salinas, the plant manager, wants to automate welding on both lines.
+    The combustion market is shrinking, he argues, but rivals are leaving it faster, and the last efficient supplier
+    will keep the orders that remain. Ana Sofía's brother, who sits on the board, has found a maker of tractors and
+    farm implements, Agrimaq del Norte, that is looking for a supplier of frames and brackets. Each project would use
+    most of the money the company can raise, so the board can choose only one (Exhibits 3 and 5).
+  - >
+    Mónica Treviño, the finance director, has forecast the cash flows of each project, and the board meets in two
+    weeks. Norvalia wants bids within six months. The board has always liked projects that pay back quickly, and
+    Mónica suspects that the three methods she has been asked to use will not agree.
+
+industryContext:
+  - >
+    Carmakers are moving from vehicles with combustion engines to electric ones, at a pace that differs from market to
+    market and maker to maker, and that depends on regulation, the cost of batteries and what buyers choose. Parts
+    that exist only in combustion vehicles, such as exhaust systems and fuel tanks, face falling demand over the
+    coming decade, while electric vehicles need new parts, such as battery enclosures, cooling plates and
+    high-voltage cabling.
+  - >
+    Carmakers buy through tiers of suppliers. Large first-tier suppliers deliver complete systems; smaller firms
+    supply parts to them or straight to the assembly plant. Contracts are usually awarded for the life of a vehicle
+    programme, the volumes in them are forecasts rather than guarantees, and buyers expect prices to fall a little
+    each year. Winning a new part means passing the carmaker's quality approval, which can take many months.
+  - >
+    Many assembly plants work on just-in-time delivery, so suppliers of large, heavy parts are often expected to be
+    close by. A battery enclosure is large, heavy and safety-critical, which calls for precise welding and sealing,
+    often in aluminium rather than steel. Skills and equipment built for steel parts do not transfer automatically.
+
+challenge: >
+  Quintanilla's core products are in decline, and it must choose one investment that decides what kind of company it
+  becomes. The project with the best forecast returns depends on one customer's volumes, which nobody can guarantee,
+  and on skills the workforce does not yet have. The safest project makes the company more efficient at something
+  the market is leaving. The third spreads the risk but barely earns what the money costs. The board has to decide
+  which method of appraisal to trust, and how much risk a family company should take.
+
+financials:
+  summary: >
+    Sales fell by 5.0% in 2025 and the gross profit margin from 19.0% to 17.0%, as lower volumes of combustion parts
+    spread the plant's fixed costs over less output. Profit before interest and tax fell by a third. The balance
+    sheet is strong: borrowing is low and the company holds MX$84.0m of cash, so it can fund one project with a new
+    bank loan. Exhibit 3 gives each project's forecast net cash flows, the figures the board will appraise.
+  exhibits: [ex-1, ex-2, ex-3]
+
+exhibits:
+  - id: ex-1
+    title: Statement of profit or loss, years to 31 December (MX$m)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Item }
+      - { label: '2024', numeric: true, format: d1 }
+      - { label: '2025', numeric: true, format: d1 }
+    rows:
+      - [Sales revenue, 1240, 1178]
+      - [Cost of sales, 1004.4, 978]
+      - [Gross profit, 235.6, 200]
+      - [Expenses, 148.8, 142]
+      - [Profit before interest and tax, 86.8, 58]
+      - [Interest, 9.6, 9.6]
+      - [Profit before tax, 77.2, 48.4]
+      - [Tax, 23.2, 14.5]
+      - [Profit for the period, 54, 33.9]
+      - [Dividends, 20, 15]
+      - [Retained profit, 34, 18.9]
+    totals: [Gross profit, Profit before interest and tax, Profit before tax, Profit for the period, Retained profit]
+    note: Tax is charged at 30% of profit before tax, rounded to one decimal place.
+    source: Simulated teaching data, from Quintanilla's accounts, set out in the layout the IB uses for a profit-making entity.
+
+  - id: ex-2
+    title: Extract from the statement of financial position at 31 December 2025 (MX$m)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Item }
+      - { label: 'MX$m', numeric: true, format: d1 }
+    rows:
+      - [Cash, 84]
+      - [Bank loans (non-current), 96]
+      - [Total equity, 612]
+      - [Capital employed, 708]
+    totals: [Capital employed]
+    note: Capital employed is non-current liabilities plus equity, as the IB defines it. The bank loans carry interest at 10% a year.
+    source: Simulated teaching data, from Quintanilla's accounts.
+
+  - id: ex-3
+    title: The three projects, forecast net cash flows by year (MX$m)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Year }
+      - { label: 'A: battery-enclosure frames', numeric: true, format: d1 }
+      - { label: 'B: automated welding', numeric: true, format: d1 }
+      - { label: 'C: farm machinery parts', numeric: true, format: d1 }
+    rows:
+      - [0 (2026), -180, -90, -120]
+      - [1 (2027), 12, 30, 14]
+      - [2 (2028), 28, 28, 20]
+      - [3 (2029), 42, 24, 24]
+      - [4 (2030), 50, 19, 26]
+      - [5 (2031), 54, 14, 26]
+      - [6 (2032), 54, 8, 26]
+      - [7 (2033), 50, '', 26]
+      - [8 (2034), 44, '', 26]
+    note: >
+      Year 0 is 2026, when the money is spent. Net cash flows are the extra cash each project brings in, after its own
+      running costs, in each year of its life; Project B's equipment lasts six years. Project A's figures assume
+      Norvalia's forecast volumes and the renewal of its contract after the first five years. The board appraises
+      projects at 10%, close to what the company pays to borrow. Discount factors at 10%, from the IB's table: year 1,
+      0.9091; year 2, 0.8264; year 3, 0.7513; year 4, 0.6830; year 5, 0.6209; year 6, 0.5645; year 7, 0.5132; year 8,
+      0.4665.
+    source: Simulated teaching data, prepared by the finance director.
+
+  - id: ex-4
+    title: Sales by product family (MX$m)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Product family }
+      - { label: '2022', numeric: true, format: money }
+      - { label: '2023', numeric: true, format: money }
+      - { label: '2024', numeric: true, format: money }
+      - { label: '2025', numeric: true, format: money }
+    rows:
+      - [Exhaust brackets and heat shields, 520, 505, 470, 430]
+      - [Fuel-tank straps and fuel-line clips, 410, 400, 380, 350]
+      - [Chassis and body stampings, 310, 330, 350, 360]
+      - [Tooling and repairs, 30, 32, 40, 38]
+    footer: [Total, 1270, 1267, 1240, 1178]
+    footerIsSum: true
+    note: The first two families are used only in vehicles with combustion engines. Norvalia Motors bought 55% of the company's output in 2025.
+    source: Simulated teaching data, from the sales ledger.
+
+  - id: ex-5
+    title: What each project involves
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Project }
+      - { label: What it involves }
+      - { label: Money needed and where it comes from }
+      - { label: Jobs }
+      - { label: What could go wrong }
+    rows:
+      - - 'A: battery-enclosure frames'
+        - Rebuild Line 2 to make the frames for Norvalia's electric pickup, from 2028.
+        - MX$180m, of which MX$60m is cash and MX$120m a bank loan at 10%.
+        - 48 welders retrained for eight weeks each; 20 jobs added.
+        - Volumes below Norvalia's forecast; the contract not renewed after five years; failing the quality approval.
+      - - 'B: automated welding'
+        - Robotic welding on Lines 1 and 2, to cut the cost of combustion parts and win orders as rivals leave the market.
+        - MX$90m, of which MX$30m is cash and MX$60m a bank loan.
+        - 60 fewer jobs within two years, through retirements and redundancies.
+        - Combustion volumes falling faster than forecast; equipment with no use once the parts end.
+      - - 'C: farm machinery parts'
+        - Frames and brackets for Agrimaq del Norte's tractors and implements, made in a new bay of the plant.
+        - MX$120m, of which MX$40m is cash and MX$80m a bank loan.
+        - 35 jobs added.
+        - A new market with a single customer, whose sales rise and fall with harvests and the cost of credit.
+    source: Simulated teaching data, prepared for the board.
+
+  - id: ex-6
+    title: The customers' forecast of their orders for combustion parts (index, 2025 = 100)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Year }
+      - { label: Volume index, numeric: true }
+    rows:
+      - ['2025', 100]
+      - ['2026', 94]
+      - ['2027', 85]
+      - ['2028', 74]
+      - ['2029', 62]
+      - ['2030', 50]
+      - ['2031', 40]
+    note: The customers' combined forecast for the exhaust and fuel-tank parts Quintanilla makes. Forecasts like this one have been revised downwards twice in the last three years.
+    source: Simulated teaching data, from the customers' planning schedules.
+
+  - id: ex-7
+    title: The workforce
+    kind: kpis
+    provenance: simulated-data
+    items:
+      - { label: Employees, value: '420' }
+      - { label: Welders, value: '140' }
+      - { label: Welders qualified to weld aluminium, value: '6' }
+      - { label: Training to qualify a welder in aluminium, value: 'About eight weeks', note: Off the job }
+      - { label: Average age of the welders, value: '47 years' }
+      - { label: Labour turnover in 2025, value: '6.5%' }
+    source: Simulated teaching data, from the personnel records.
+
+  - id: ex-8
+    title: Norvalia's invitation to bid
+    kind: quote
+    provenance: simulated-data
+    quote:
+      text: >
+        Our electric pickup will be built in this plant from 2028. We will award the contract for its battery-enclosure
+        frames to one supplier within 100 kilometres of the plant, for the five years of the first model, after our
+        quality approval, which takes about eighteen months. The volumes in this letter are our forecast, not a
+        commitment: they depend on how many electric pickups our customers buy.
+      attribution: Daniela Ortiz, purchasing director, Norvalia Motors
+    source: Fictional letter, written for this case.
+
+  - id: ex-9
+    title: The welders' view
+    kind: quote
+    provenance: simulated-data
+    quote:
+      text: >
+        Our welders built this company's name on steel. If the company wants them to learn aluminium, they will learn
+        it, but they need to know that the training leads to a job and not to a robot. Nobody here is against the
+        future. People are against hearing about it last.
+      attribution: Raúl Garza, workers' representative, Quintanilla Autopartes
+    source: Fictional interview, written for this case.
+
+constraints:
+  - The company can fund one of the three projects, not two. The bank will lend up to MX$120m at 10% a year.
+  - Norvalia wants bids within six months, and its quality approval takes about eighteen months, so a decision on Project A cannot wait a year.
+  - The family will not sell shares to an outside investor.
+  - Qualifying a welder in aluminium takes about eight weeks off the job.
+
+stakeholders:
+  - name: Ana Sofía Quintanilla, chief executive
+    interest: A future for the company her father founded, and its independence.
+    influence: high
+    stake: high
+    concern: Betting the company on one customer, or presiding over its slow decline.
+  - name: The Quintanilla family, shareholders
+    interest: The value of the company and steady dividends.
+    influence: high
+    stake: high
+    concern: A large loan that puts the family's wealth at risk.
+  - name: Mónica Treviño, finance director
+    interest: A decision based on sound appraisal, with its risks understood.
+    influence: medium
+    stake: medium
+    concern: A board that chooses on payback alone.
+  - name: Héctor Salinas, plant manager
+    interest: An efficient plant that wins orders.
+    influence: medium
+    stake: high
+    concern: Learning a new product and a new metal while the old lines still need running.
+  - name: Welders and the workers' representative
+    interest: Secure jobs, and training that leads somewhere.
+    influence: medium
+    stake: high
+    concern: Being replaced by robots under Project B, or retrained for work that does not last under Project A.
+  - name: Norvalia Motors
+    interest: A reliable, approved local supplier for its electric pickup.
+    influence: high
+    stake: medium
+    concern: A supplier without the skills to pass its quality approval in time.
+  - name: The bank
+    interest: Interest, and repayment of a larger loan.
+    influence: medium
+    stake: medium
+    concern: Lending against the forecasts of one customer.
+  - name: Agrimaq del Norte
+    interest: A local supplier of frames and brackets.
+    influence: low
+    stake: medium
+    concern: A supplier whose attention stays on carmakers.
+
+options:
+  - id: project-a
+    label: 'Project A: battery-enclosure frames'
+    summary: Rebuild Line 2 to make battery-enclosure frames for Norvalia's electric pickup from 2028.
+    requires: MX$180m, a winning bid, quality approval within eighteen months and 48 welders retrained in aluminium.
+    upside: The highest ARR and NPV, and a product with a future in a market where demand is growing.
+    risks: The value depends on Norvalia's volumes, which are a forecast, not a commitment, and on renewal of the contract after five years.
+    evidence: [ex-3, ex-5, ex-8, ex-9]
+  - id: project-b
+    label: 'Project B: automated welding'
+    summary: Automate welding on both lines to make the combustion business as efficient as possible.
+    requires: MX$90m and 60 fewer jobs within two years.
+    upside: The fastest payback and the least money at risk.
+    risks: Makes the company better at making parts the market is leaving; little to show for the investment once combustion volumes are gone.
+    evidence: [ex-3, ex-5, ex-6]
+  - id: project-c
+    label: 'Project C: farm machinery parts'
+    summary: Diversify into frames and brackets for Agrimaq del Norte's tractors and implements.
+    requires: MX$120m, a new bay in the plant and a new customer relationship.
+    upside: Spreads the company's risk beyond carmakers, and adds 35 jobs.
+    risks: The weakest returns of the three, and a single customer in a market that rises and falls with farming.
+    evidence: [ex-3, ex-5]
+  - id: wait
+    label: Wait a year
+    summary: Invest in none of the projects this year, keep the cash and decide when the market is clearer.
+    requires: Nothing now.
+    upside: No new borrowing and no risk taken on forecasts.
+    risks: Norvalia's bids close in six months, so waiting gives the electric pickup to another supplier while the combustion business shrinks.
+    evidence: [ex-6, ex-8]
+
+analysis:
+  data:
+    - Combustion parts were two thirds of sales in 2025 and have fallen for three years; the customers forecast their orders at 40% of the 2025 level by 2031 (Exhibits 4 and 6).
+    - Payback favours Project B, at 3 years 5.1 months against 4 years 10.7 months for A and 5 years 4.6 months for C; the average rate of return and net present value favour A, with an ARR of 10.7% and an NPV of MX$30.0m at 10% (Exhibit 3).
+    - If Norvalia's volumes are 30% below forecast, Project A's NPV falls to −MX$33.0m; it turns negative once volumes are about 14% short.
+    - Six of the 140 welders are qualified in aluminium, and gearing is 13.6% before any new loan (Exhibits 2 and 7).
+  insight:
+    - The methods disagree because they measure different things. Payback rewards speed and so favours B's early returns; NPV counts every year and when it arrives, and so favours A's larger, later returns.
+    - Project B is efficient harvesting. It pays back fast because it squeezes a shrinking business, and after 2031 there is little left to squeeze.
+    - Project A's value rests on one customer's volumes. On the board's own estimate of a 40% chance that volumes are 30% lower, its expected NPV is about MX$4.8m, close to B's MX$4.6m, but with a far wider spread of outcomes.
+  options:
+    - Project A builds the company's future, at the price of a large bet on one customer and a demanding change for the workforce.
+    - Project B is safe and quick, and leaves the company smaller and more dependent on a declining product.
+    - Project C reduces dependence on carmakers, but with an NPV of MX$1.3m it barely earns the 10% the money costs.
+    - Waiting keeps the cash and loses the only contract for an electric-vehicle part on offer.
+  recommendation: >
+    One defensible recommendation: bid for the Norvalia contract and rebuild Line 2 (Project A), but only on terms
+    that cut its volume risk, such as a minimum yearly volume or a price that rises if volumes fall short, and with
+    enclosure cells designed so that other electric-vehicle makers could be served too. Start the aluminium training
+    now, with a promise that retrained welders keep their jobs, and agree the plan with the workers' representative
+    before the bid goes in. Keep the combustion lines running without further investment while they still earn cash.
+  caveat: >
+    If Norvalia will give no protection on volumes, Project A's downside is large for a family company: a 30%
+    shortfall would destroy MX$33.0m of value. In that case Project C, which reduces the dependence on carmakers,
+    would be the more prudent choice, and the family should accept that Quintanilla will be a smaller company in
+    2031.
+
+method: >
+  Quintanilla Autopartes, Norvalia Motors, Agrimaq del Norte and everyone in this case are fictional, and every
+  figure is simulated. Each project's net cash flows are stated assumptions. Payback assumes that each year's cash
+  arrives evenly through the year; the average rate of return and net present value use the formulas the IB gives,
+  and net present value uses the discount factors printed in the IB's table. A script in the repository
+  (`scripts/qa/case-figures.py`) rebuilds every exhibit and checks every figure in the text, and the unit tests
+  recompute every appraisal with the platform's investment functions.
+
+topics: []
+tools: [ansoff-matrix, decision-trees, force-field-analysis, steeple-analysis]
+concepts: [change, creativity, ethics, sustainability]
+calculations: [payback-period, average-rate-of-return, net-present-value, gross-profit-margin, profit-margin, gearing-ratio, expected-value]
+questions: []
+sources: [method-simulated, ib-bm-guide-2024]
+updated: 2026-11-03
+
+# Case Vault classification (src/lib/case-vault.ts).
+industry: automobile
+functions: [finance, operations, strategy]
+difficulty: advanced
+qualifications: [ib-dp-sl, ib-dp-hl, undergraduate, mba]
+keyConcepts: [change, sustainability]
+caseType: fictional
+syllabus: ['2.1', '3.2', '3.8', '4.5', '5.4']
+
+analysisQuestions:
+  - id: qa-define
+    commandTerm: Define
+    ao: AO1
+    marks: 2
+    syllabus: ['3.8']
+    prompt: Define the term *payback period*.
+    guidance: >
+      One mark for the time it takes for a project's net cash flows to repay its capital cost, and one for a complete,
+      precise statement (for example, measured from the start of the project, in years and months). Do not confuse it
+      with the life of the project.
+  - id: qa-payback
+    commandTerm: Calculate
+    ao: AO4
+    marks: 4
+    paper: paper-2
+    syllabus: ['3.8']
+    exhibits: [ex-3]
+    prompt: Using Exhibit 3, calculate the payback period of Project A and of Project B, in years and months.
+    answer: >
+      Project A: cumulative net cash flow is −168, −140, −98 and −48 at the end of years 1 to 4, so MX$48m is still to
+      recover when year 5 brings MX$54m. Payback = 4 years + (48 ÷ 54) × 12 months = 4 years 10.7 months. Project B:
+      cumulative −60, −32 and −8, then MX$19m in year 4. Payback = 3 years + (8 ÷ 19) × 12 months = 3 years 5.1 months.
+    guidance: >
+      Two marks for each project: one for the cumulative cash flow and one for the answer. State the assumption that
+      cash arrives evenly through the year; without it the months cannot be calculated.
+  - id: qa-arr
+    commandTerm: Calculate
+    ao: AO4
+    marks: 4
+    paper: paper-2
+    syllabus: ['3.8']
+    exhibits: [ex-3]
+    prompt: Using Exhibit 3, calculate the average rate of return (ARR) of Project A and of Project C.
+    answer: >
+      Project A: total returns MX$334m, so ARR = ((334 − 180) ÷ 8) ÷ 180 × 100 = 10.7%. Project C: total returns
+      MX$188m, so ARR = ((188 − 120) ÷ 8) ÷ 120 × 100 = 7.1%.
+    guidance: >
+      Two marks for each project, one for the method and one for the answer. Use the guide's formula: the average
+      yearly profit (total returns less the capital cost, divided by the years of use) as a percentage of the capital
+      cost. A common slip is to forget to subtract the capital cost before dividing.
+  - id: qa-npv
+    commandTerm: Calculate
+    ao: AO4
+    marks: 4
+    level: HL
+    paper: paper-2
+    syllabus: ['3.8']
+    exhibits: [ex-3]
+    prompt: Using Exhibit 3 and the discount factors given, calculate the net present value (NPV) of Project A at 10%, and its NPV if every year's net cash flow is 30% lower than forecast.
+    answer: >
+      The present values of the returns add up to MX$209.95m, so NPV = 209.95 − 180 = MX$30.0m. If every return is 30%
+      lower, the present values add up to 0.7 × 209.95 = MX$146.97m, so NPV = 146.97 − 180 = −MX$33.0m.
+    guidance: >
+      Two marks for each NPV. Multiply each year's net cash flow by that year's factor, add the present values and
+      subtract the capital cost. For the second part, every present value falls by 30%, so the total can be found in
+      one step. The best answers say what the result means: the project creates value only if volumes come close to
+      the forecast.
+  - id: qa-resist
+    commandTerm: Explain
+    ao: AO2
+    marks: 4
+    syllabus: ['2.1']
+    exhibits: [ex-7, ex-9]
+    prompt: Using Exhibits 7 and 9, explain two reasons why Quintanilla's welders might resist the plan to rebuild Line 2.
+    guidance: >
+      Two reasons, each explained and tied to the case, for two marks each. Strong reasons: fear for their jobs, since
+      the same board is considering robotic welding (Project B); uncertainty about whether experienced steel welders,
+      with an average age of 47, can qualify in aluminium; loss of the status that comes from being the best at the
+      old work; and poor communication, since the workers' representative says people hear about change last. A
+      reason that could apply to any business, without the case, earns one mark at most.
+  - id: qa-life-cycle
+    commandTerm: Explain
+    ao: AO2
+    marks: 4
+    syllabus: ['4.5']
+    exhibits: [ex-4, ex-6]
+    prompt: Using Exhibits 4 and 6, explain the stage of the product life cycle reached by Quintanilla's combustion parts, and what this means for Project B.
+    guidance: >
+      The combustion parts are in decline: their sales have fallen for three years, and the customers forecast
+      volumes at 40% of the 2025 level by 2031. Two marks for identifying the stage with evidence. Two marks for the
+      implication: Project B invests to cut costs on a product whose market is shrinking, so it earns its returns
+      early and has little value after the products end, which is why its payback is quick and its NPV small.
+  - id: qa-recommend
+    commandTerm: Recommend
+    ao: AO3
+    marks: 10
+    paper: paper-2
+    syllabus: ['3.8', '2.1', '5.4']
+    exhibits: [ex-3, ex-5, ex-6, ex-8, ex-9]
+    prompt: Recommend which of the three projects Quintanilla should invest in.
+    guidance: |
+      A strong answer does four things.
+
+      - It uses all three methods and explains why they disagree: B pays back first; A has the highest ARR and NPV.
+      - It treats the forecasts as forecasts: A's NPV becomes −MX$33.0m if volumes are 30% lower, and B's returns depend on a declining market.
+      - It weighs what the numbers leave out: the welders' retraining, the 60 jobs B would cut, the distance rule in Norvalia's letter, and the company's future after 2031.
+      - It makes a clear recommendation, with the conditions under which it holds and what would change it.
+
+      Answers that recommend a project on one method alone, or that list the methods without a judgement, stay in the middle of the range.
+
+exercise:
+  role: You are Mónica Treviño, Quintanilla's finance director.
+  brief: >
+    The board meets in two weeks and expects a recommendation it can vote on. Ana Sofía wants the company to have a
+    future, Héctor wants the plant to stay efficient, and the family wants its wealth protected. You have the three
+    projects' forecasts, the appraisal methods the board knows, and Norvalia's letter.
+  task: Choose one alternative and defend it with the appraisal, the risks behind the forecasts and the people it affects.
+  deliverable: A recommendation to the board of about 250 words, using payback, ARR and, at HL, NPV, with the condition on which it depends.
+  minutes: 40
+  criteria:
+    - Uses the appraisal methods correctly and explains why they rank the projects differently.
+    - Treats the forecasts as uncertain, with a sense of what happens if volumes fall short (Exhibit 3).
+    - Weighs the effect on the workforce and what the change would need from them (Exhibits 7 and 9).
+    - States the condition on which the recommendation depends, and what the board should do if it fails.
+
+debrief:
+  summary: >
+    The case turns on two questions: what each appraisal method measures, and how much risk a family company should
+    take with the forecasts of one customer. Payback, ARR and NPV disagree for good reasons. The strongest answers use
+    that disagreement rather than choosing a favourite method, and treat the project with the best forecast as
+    worth having only if its risk can be shared.
+  byOption:
+    - option: project-a
+      fit: conditional
+      body: >
+        The best on the forecast, with payback in 4 years 10.7 months, an ARR of 10.7% and an NPV of MX$30.0m, and the
+        only project that gives the company a future product. But it is a bet on Norvalia's volumes: 30% below
+        forecast, the NPV becomes −MX$33.0m, and the project stops creating value once volumes are about 14% short. It
+        is the right choice if the contract shares that risk, and a gamble if it does not.
+    - option: project-b
+      fit: weak
+      body: >
+        The fastest payback, 3 years 5.1 months, and little money at risk in the early years, but an NPV of only
+        MX$4.6m on a product that is disappearing. It cuts 60 jobs to make a shrinking business efficient, and leaves
+        Quintanilla with nothing to make when the combustion parts end.
+    - option: project-c
+      fit: conditional
+      body: >
+        Diversification that reduces the dependence on carmakers, but with the weakest returns: an NPV of MX$1.3m at
+        10% and payback in 5 years 4.6 months. One customer in a cyclical market replaces one customer in a declining
+        one. Defensible as the prudent choice if Norvalia offers no protection on volumes.
+    - option: wait
+      fit: weak
+      body: >
+        It keeps the cash, but the decision cannot wait: Norvalia's approval takes eighteen months and bids close in
+        six. Waiting gives the electric pickup to another supplier and leaves the company riding the combustion
+        decline with nothing to replace it.
+  tradeoffs:
+    - Speed against value. B returns its money first; A creates the most value if the forecast holds.
+    - A visible decline against an uncertain forecast. B's returns depend on a market everyone can see shrinking; A's depend on volumes nobody can guarantee.
+    - Jobs now against jobs later. B cuts 60 jobs; A retrains 48 welders and adds 20.
+    - Spreading risk against earning returns. C reduces the dependence on cars but earns least.
+  evidenceThatMatters:
+    - The volume index, which puts combustion orders at 40% of today's by 2031 (Exhibit 6).
+    - Project A's sensitivity, negative once volumes are about 14% short (Exhibit 3, with the discount factors).
+    - Norvalia's letter, which calls its volumes a forecast, not a commitment (Exhibit 8).
+    - The welders' position, willing to retrain if it leads to a job (Exhibit 9).
+  changeYourMind:
+    - Norvalia agrees a minimum volume or a price that rises with any shortfall. A's downside shrinks and it becomes the clear choice.
+    - Norvalia refuses any protection, or delays its electric pickup. C, or a smaller automation of one line, becomes the safer course.
+    - Combustion volumes fall faster than the index. B's returns shrink and its quick payback disappears.
+  commonErrors:
+    - Treating payback as the answer. It ignores everything after the money is repaid, which is where A earns most.
+    - Quoting an NPV without its risk. An NPV on forecast volumes describes one scenario, not the future.
+    - Ignoring the people. Retraining 48 welders in aluminium is a condition of Project A, not a detail.
+    - Comparing ARRs without noticing that Project B lasts six years and the others eight.
+
+frameworks:
+  - name: Investment appraisal
+    use: >
+      Payback, the average rate of return and net present value (HL) rank the three projects differently, because
+      they measure speed, average profitability and the value of every future year respectively.
+    terms: [payback-period, average-rate-of-return, net-present-value, discount-factor, time-value-of-money]
+    subtopics: ['3.8']
+  - name: Decision trees and expected value
+    use: >
+      The board's estimate of a 40% chance that volumes are 30% lower turns Project A into a decision with two
+      outcomes, whose expected value can be compared with Project B's.
+    terms: [decision-tree, expected-value]
+    tool: decision-trees
+  - name: The product life cycle
+    use: >
+      Quintanilla's combustion parts are in decline. Investing to cut their costs (Project B) is a way of managing
+      decline, not of escaping it.
+    terms: [product-life-cycle, extension-strategy]
+    subtopics: ['4.5']
+  - name: The Ansoff matrix
+    use: >
+      Project B is market penetration with existing products, Project A is product development for an existing
+      customer, and Project C is diversification, the riskiest quadrant in theory, though here the safest by
+      dependence on one market.
+    terms: [ansoff-matrix, market-penetration, product-development, diversification]
+    tool: ansoff-matrix
+  - name: Resistance to change
+    use: >
+      Retraining welders in a new metal, while the board considers replacing them with robots, invites resistance.
+      Involvement, communication and training are the human resource strategies that reduce it.
+    terms: [resistance-to-change, change-management, off-the-job-training]
+    subtopics: ['2.1']
+  - name: Force field analysis
+    level: HL
+    use: >
+      The forces for rebuilding Line 2 (the decline of combustion parts, Norvalia's invitation) can be set against the
+      forces against it (the volume risk, the skills gap, the welders' fears) to find which force is worth weakening.
+    terms: [force-field-analysis]
+    tool: force-field-analysis
+  - name: Location
+    use: >
+      Norvalia will buy only from a supplier within 100 kilometres, because large parts are delivered just in time.
+      Quintanilla's plant is forty kilometres away, a location advantage that a distant rival cannot match.
+    terms: [location-factors]
+    subtopics: ['5.4']
+  - name: STEEPLE analysis
+    use: >
+      The external forces behind the decline of combustion parts (technological, environmental, legal and economic)
+      explain why the volume index falls, and why the timing is uncertain.
+    terms: [steeple-analysis]
+    tool: steeple-analysis
+
+discussion:
+  - >
+    Payback, ARR and NPV rank the projects differently. Which ranking should a family-owned supplier in a shrinking
+    market trust, and when might a board's preference for quick payback be rational rather than naive?
+  - >
+    Project A's NPV turns negative if volumes are about 14% short of Norvalia's forecast. What contract terms, staging
+    of the investment or design choices would reduce that exposure, and what would each one cost?
+  - >
+    Is harvesting the combustion business, as Project B does, a legitimate strategy for a company with 420 employees
+    in one city? Weigh the job losses against the risk of investing in a market the company does not control.
+
+furtherReading:
+  - title: 'The Finance Desk: investment appraisal'
+    href: /finance-desk/investment-appraisal/
+    note: Payback, ARR and NPV worked side by side, with the effect of changing the discount rate and the estimates.
+  - title: 3.8 Investment appraisal
+    href: /topics/investment-appraisal/
+    note: The three methods, what each shows, and their limitations.
+  - title: 2.1 Introduction to human resource management
+    href: /topics/introduction-to-human-resource-management/
+    note: Resistance to change, and strategies that reduce it.
+  - title: 'Toolkit: decision trees'
+    href: /toolkit/decision-trees/
+    note: Expected values and how sensitive a decision is to its probabilities.
+  - title: 'Toolkit: the Ansoff matrix'
+    href: /toolkit/ansoff-matrix/
+    note: Market penetration, product development, market development and diversification, and their risks.
+  - title: Business management guide
+    source: ib-bm-guide-2024
+    location: pp. 65 to 66
+    note: The formulas for the average rate of return and net present value, and the discount factors used in examinations.
