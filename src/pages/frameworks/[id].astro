@@ -12,6 +12,7 @@ import PageIntro from '../../components/layout/PageIntro.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import Diagram from '../../components/diagrams/Diagram.astro';
 import LevelTag from '../../components/ui/LevelTag.astro';
+import SaveButton from '../../components/ui/SaveButton.astro';
 import { corpus, href } from '../../lib/content';
 import { library } from '../../lib/frameworks-content';
 import { FRAMEWORK_GROUP_INFO, type Framework } from '../../lib/framework-schema';
@@ -57,12 +58,13 @@ const jsonLd = {
 };
 ---
 
-<BaseLayout title={`${f.name}: Frameworks`} description={`${f.name}: ${f.summary}`} section="toolkit" jsonLd={jsonLd}>
+<BaseLayout title={`${f.name}: Framework`} description={`${f.name}: ${f.summary}`} section="toolkit" jsonLd={jsonLd}>
   <PageIntro trail={[{ label: 'Frameworks', href: '/frameworks/' }, { label: f.name }]} kicker={`Frameworks · ${group.title}`} title={f.name} lead={f.summary}>
     <div class="tags">
       <span class={`tag ${statusClass}`}>{standing(f)}</span>
       {f.status !== 'enrichment' && <LevelTag level={f.level} always />}
       {f.qualifications.map((q) => <span class="tag tag--plain">{QUALIFICATION_TAG_LABELS[q]}</span>)}
+      <SaveButton title={f.name} kind="framework" />
     </div>
   </PageIntro>
 

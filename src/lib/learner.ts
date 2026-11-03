@@ -39,7 +39,7 @@ export const SAVED_KIND_LABELS: Record<SavedKind, string> = {
   term: 'Glossary term',
   case: 'Case',
   mindmap: 'Mindmap',
-  framework: 'Toolkit guide',
+  framework: 'Toolkit guide or framework',
   diagram: 'Diagram',
   question: 'Practice question',
   tool: 'Tool',

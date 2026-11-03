@@ -11,6 +11,7 @@ import { frameworkSchema, FRAMEWORK_GROUPS, type Framework } from '../../src/lib
 import { grouped, inLibraryOrder, levelKey, matrix, resolveRef, standing, frameworksForTerm } from '../../src/lib/frameworks';
 import { checkFrameworks, checkGlossaryDepth } from '../../src/lib/integrity-frameworks';
 import { DIAGRAMS } from '../../src/lib/diagrams';
+import { buildSearchIndex, type SearchLinks } from '../../src/lib/search-index';
 import { asCorpus, loadCorpus } from './helpers/corpus';
 
 const DIR = new URL('../../src/content/frameworks/', import.meta.url).pathname;
@@ -146,5 +147,56 @@ describe('framework labels and links', () => {
     const withStudio = (f: Framework) => checkFrameworks({ x: f }, asCorpus(c), [{ slug: 'swot', toolkit: 'swot-analysis' }]).map((p) => p.message);
     expect(withStudio(sample({ studio: 'nope' }))).toContain('Strategy Studio tool "nope" does not exist');
     expect(withStudio(sample({ status: 'toolkit', tool: 'ansoff-matrix', studio: 'swot', qualifications: ['ib'], guidePages: '14', sources: ['ib-bm-guide-2024'] }))).toContain('Strategy Studio tool "swot" applies the toolkit tool "swot-analysis", not "ansoff-matrix"');
+  });
+});
+
+describe('the frameworks in search', () => {
+  const c = loadCorpus();
+  const fw = loadFrameworks();
+  const at = (path: string) => () => path;
+  const links: SearchLinks = {
+    subtopic: (code) => `/topics/${code}/`,
+    topic: (id) => `/topics/${id}/`,
+    case: (id) => `/cases/${id}/`,
+    decision: (id) => `/decision-room/${id}/`,
+    toolEntry: (id) => `/toolkit/${id}/`,
+    question: (id) => `/q/${id}/`,
+    glossary: (id) => `/glossary/${id}/`,
+    mindmap: (id) => `/mindmaps/${id}/`,
+    commandTerm: at('/examiner-lens/'),
+    concept: at('/ib/concepts/'),
+    revision: (id) => `/revision/${id}/`,
+    calculation: (id, page) => `${page}#calc-${id}`,
+    pathway: (id) => `/pathways/${id}/`,
+  };
+  const entries = buildSearchIndex({ c: asCorpus(c), nav: [], links, frameworks: fw }).filter((e) => e.url.startsWith('/frameworks/'));
+
+  it('indexes every framework page once, under Frameworks, with its standing as its type', () => {
+    expect(entries).toHaveLength(Object.keys(fw).length);
+    for (const [id, f] of Object.entries(fw)) {
+      const e = entries.find((x) => x.url === `/frameworks/${id}/`);
+      expect(e?.kind, id).toBe('frameworks');
+      expect(e?.title).toBe(f.name);
+      expect(e?.type).toContain(f.status === 'syllabus' ? 'IB syllabus' : f.status === 'toolkit' ? 'IB toolkit' : 'beyond the IB course');
+    }
+  });
+
+  it('gives an IB framework its units and level, and an enrichment framework none', () => {
+    for (const [id, f] of Object.entries(fw)) {
+      const e = entries.find((x) => x.url === `/frameworks/${id}/`)!;
+      if (f.status === 'enrichment') {
+        expect(e.units, id).toEqual([]);
+        expect(e.codes, id).toEqual([]);
+        expect(e.hl, id).toBe(false);
+      } else {
+        expect(e.units.length, id).toBeGreaterThan(0);
+        expect(e.units.includes('toolkit'), id).toBe(f.status === 'toolkit');
+        expect(e.hl, id).toBe(f.level === 'HL');
+      }
+    }
+  });
+
+  it('adds nothing when no frameworks are given', () => {
+    expect(buildSearchIndex({ c: asCorpus(c), nav: [], links }).some((e) => e.url.startsWith('/frameworks/'))).toBe(false);
   });
 });
