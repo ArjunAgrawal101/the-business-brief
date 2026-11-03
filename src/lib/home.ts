@@ -187,7 +187,7 @@ export const OBJECTIVES: Objective[] = [
     verb: 'Analyse businesses',
     text: 'Read exhibits, find the evidence that matters and test a diagnosis against it.',
     links: [
-      { label: 'Case studies', href: '/cases/' },
+      { label: 'Case Vault', href: '/case-vault/' },
       { label: 'Case Room', href: '/case-room/' },
       { label: 'SWOT analysis', href: '/toolkit/swot-analysis/' },
     ],
@@ -254,6 +254,7 @@ export interface Addition {
  * new notes are added to this list automatically from their `updated` dates.
  */
 export const ADDITIONS: Addition[] = [
+  { date: '2026-11-03', kind: 'Cases', title: 'The Case Vault and six new cases', text: 'Retail, automobile, FMCG, healthcare, technology and a social enterprise, filtered by industry, function and topic, with a Case of the Week.', href: '/case-vault/' },
   { date: '2026-11-03', kind: 'Room', title: 'The Entrepreneurship and Innovation Lab', text: 'Six briefings and six tools for founders, from validating an idea to a business plan, worked on one fictional start-up.', href: '/entrepreneurship-lab/' },
   { date: '2026-11-03', kind: 'Simulation', title: 'The Boardroom', text: 'Three multi-round simulations: take a seat on the board of a fictional company and follow each decision through every function.', href: '/boardroom/' },
   { date: '2026-11-03', kind: 'Room', title: 'The Strategy Studio', text: 'Ten analysis tools on one consulting engagement, from SWOT to a recommendation memo.', href: '/strategy-studio/' },

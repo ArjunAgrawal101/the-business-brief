@@ -10,9 +10,13 @@
 import { corpus, href } from '../../lib/content';
 import { CHALLENGES, FRAMEWORKS, INSIGHTS, isoWeek } from '../../lib/home';
 import { DIAGRAMS } from '../../lib/diagrams';
+import { calendarDate, caseOfTheWeek, rotationOrder } from '../../lib/case-vault';
 
 const c = await corpus();
-const cases = Object.entries(c.cases).sort((a, b) => a[0].localeCompare(b[0]));
+// The case of the week is the Case Vault's own, from the same rotation, so the two pages always agree.
+const order = rotationOrder(Object.keys(c.cases));
+const cases = order.map((id) => [id, c.cases[id]!] as const);
+const casePick = caseOfTheWeek(order, calendarDate(new Date()))?.position ?? 0;
 const decisions = Object.entries(c.decisions).sort((a, b) => a[0].localeCompare(b[0]));
 // Only tools whose guide page exists (status complete) are featured.
 const frameworks = FRAMEWORKS.filter((f) => c.tools[f.tool]?.status === 'complete' && DIAGRAMS[f.diagram]);
@@ -27,10 +31,10 @@ const pick = (n: number) => (n ? week % n : 0);
   </p>
 
   <div class="hbf__grid">
-    <article class="hbf__case" data-rotate={cases.length}>
+    <article class="hbf__case" data-rotate={cases.length} data-rotate-by="vault">
       {
         cases.map(([id, cs], i) => (
-          <div class="hbf__variant" data-variant={i} hidden={i !== pick(cases.length)}>
+          <div class="hbf__variant" data-variant={i} data-id={id} hidden={i !== casePick}>
             <p class="hbf__kicker">Case of the week <span class="tag tag--simulated">Fictional</span></p>
             <h3 class="hbf__case-title">
               <a href={href.case(id)}>{cs.title}</a>
@@ -41,6 +45,9 @@ const pick = (n: number) => (n ? week % n : 0);
             </p>
             <a class="hbf__cta" href={href.case(id)}>
               Open the case file <span aria-hidden="true">&rarr;</span>
+            </a>
+            <a class="hbf__cta hbf__cta--quiet" href="/case-vault/">
+              The Case Vault <span aria-hidden="true">&rarr;</span>
             </a>
           </div>
         ))
@@ -246,6 +253,11 @@ const pick = (n: number) => (n ? week % n : 0);
     margin-top: var(--sp-2);
     font-weight: 600;
     font-size: 0.9375rem;
+  }
+
+  .hbf__cta--quiet {
+    margin-left: var(--sp-4);
+    color: var(--text-muted);
   }
 
   .hbf__answer {

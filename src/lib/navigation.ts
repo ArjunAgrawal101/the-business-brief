@@ -46,7 +46,7 @@ export const NAV: NavGroup[] = [
     intro: 'Work real problems: diagnose a business, make the call, and see what your decision does to everyone it touches.',
     links: [
       { label: 'Case Room', href: '/case-room/', text: 'Diagnose a business stage by stage, against the evidence' },
-      { label: 'Case studies', href: '/cases/', text: 'Fictional businesses with complete, consistent exhibits' },
+      { label: 'Case Vault', href: '/case-vault/', text: 'An archive of cases by industry and topic, with a Case of the Week' },
       { label: 'Decision Room', href: '/decision-room/', text: 'Commit to a decision, then live with its consequences' },
       { label: 'Boardroom', href: '/boardroom/', text: 'Multi-round simulations: take a seat on the board and follow each decision through' },
       { label: 'Practice questions', href: '/exam-desk/practice/', text: 'Original questions in the style of the papers, with guidance' },

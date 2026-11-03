@@ -1,17 +1,25 @@
 ---
 /**
- * A case file: the situation, the evidence, the people, the options and a
- * worked analysis that follows DATA, INSIGHT, OPTIONS, RECOMMENDATION.
+ * A case file: the situation, the industry and the key challenge, the evidence
+ * and the financial information, the people, the strategic alternatives, then
+ * questions for analysis, a decision exercise and a debrief that follows DATA,
+ * INSIGHT, OPTIONS, RECOMMENDATION. Each part is shown only when the case has
+ * it, so the earliest cases keep the layout they were written for.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import Exhibit from '../../components/blocks/Exhibit.astro';
+import DecisionExercise from '../../components/cases/DecisionExercise.astro';
+import LevelSwitch from '../../components/ui/LevelSwitch.astro';
 import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
 import { casesInOrder, corpus, href, longDate } from '../../lib/content';
-import { CONCEPT_NAMES } from '../../lib/labels';
+import { CONCEPT_NAMES, PROVENANCE_LABELS } from '../../lib/labels';
+import { allSubtopics, codeKey, subtopicHref } from '../../lib/learning';
 import { inline, rich } from '../../lib/markup';
+import { CASE_TYPE_LABELS, DIFFICULTY_LABELS, FIT_LABELS, FUNCTION_LABELS, INDUSTRY_LABELS, QUALIFICATION_LABELS } from '../../lib/case-vault';
 import type { CaseEntry } from '../../lib/schemas';
+import '../../styles/vault.css';
 
 export async function getStaticPaths() {
   return (await casesInOrder()).map(([id, cs]) => ({ params: { id }, props: { id, cs } }));
@@ -20,75 +28,188 @@ interface Props {
   id: string;
   cs: CaseEntry;
 }
-const { cs } = Astro.props;
+const { id, cs } = Astro.props;
 const c = await corpus();
+const subs = allSubtopics(c);
+const subtopic = (code: string) => subs.find((x) => x.s.code === code)?.s;
 const exhibitTitle = (e: string) => {
   const ex = cs.exhibits.find((x) => x.id === e);
   return ex ? `Exhibit ${e.replace(/^ex-/, '')}` : e;
 };
 const groups = [...new Set(cs.options.map((o) => o.group ?? ''))];
 const LEVELS = { high: 'High', medium: 'Medium', low: 'Low' } as const;
+const PAPERS = { 'paper-1': 'Paper 1 style', 'paper-2': 'Paper 2 style', 'paper-3': 'Paper 3 style' } as const;
 const tools = cs.tools.map((t) => ({ id: t, data: c.tools[t] })).filter((t) => t.data);
 const questions = cs.questions.map((q) => ({ id: q, data: c.questions[q] })).filter((q) => q.data);
+const financialIds = new Set(cs.financials?.exhibits ?? []);
+const financialExhibits = cs.exhibits.filter((e) => financialIds.has(e.id));
+const otherExhibits = cs.exhibits.filter((e) => !financialIds.has(e.id));
+const syllabus = [...cs.syllabus].sort((a, b) => codeKey(a) - codeKey(b));
+const hasHLQuestions = cs.analysisQuestions.some((q) => q.level === 'HL');
+const optionLabel = (oid: string) => {
+  const o = cs.options.find((x) => x.id === oid);
+  return o ? (o.group ? `${o.group}: ${o.label}` : o.label) : oid;
+};
+
+// The sections this case has, numbered in order, for the headings and the contents list.
+const plan = [
+  { id: 'story', title: 'The story so far', show: true },
+  { id: 'industry', title: 'The industry', show: cs.industryContext.length > 0 },
+  { id: 'challenge', title: 'The key challenge', show: Boolean(cs.challenge) },
+  { id: 'financials', title: 'Financial information', show: financialExhibits.length > 0 },
+  { id: 'evidence', title: financialExhibits.length ? 'The rest of the evidence' : 'The evidence', show: otherExhibits.length > 0 },
+  { id: 'constraints', title: 'Constraints', show: true },
+  { id: 'people', title: 'The people with a stake', show: true },
+  { id: 'options', title: 'Strategic alternatives', show: true },
+  { id: 'questions', title: 'Questions for analysis', show: cs.analysisQuestions.length > 0 },
+  { id: 'exercise', title: 'The decision exercise', show: Boolean(cs.exercise) },
+  { id: cs.debrief ? 'debrief' : 'analysis', title: cs.debrief ? 'The debrief' : 'A worked analysis', show: true },
+  { id: 'frameworks', title: 'Theories and frameworks', show: cs.frameworks.length > 0 },
+  { id: 'discussion', title: 'For seminar discussion', show: cs.discussion.length > 0 },
+  { id: 'links', title: cs.furtherReading.length ? 'Use this case, and further reading' : 'Use this case', show: true },
+]
+  .filter((s) => s.show)
+  .map((s, i) => ({ ...s, no: i + 1 }));
+const no = (sid: string) => plan.find((s) => s.id === sid)?.no ?? 0;
+const title = (sid: string) => plan.find((s) => s.id === sid)?.title ?? '';
+const full = Boolean(cs.exercise || cs.analysisQuestions.length || cs.industryContext.length);
 ---
 
-<BaseLayout title={`${cs.title}: case file`} description={cs.dek} section="cases">
-  <PageIntro trail={[{ label: 'Cases', href: '/cases/' }, { label: cs.title }]} kicker={`Case file · ${cs.organization.sector}`} title={cs.title} lead={cs.dek}>
+<BaseLayout title={`${cs.title}: case file`} description={cs.dek} section="cases" room="cases">
+  <PageIntro
+    trail={[{ label: 'Case Vault', href: '/case-vault/' }, { label: cs.title }]}
+    kicker={`Case file · ${cs.industry ? INDUSTRY_LABELS[cs.industry] : cs.organization.sector}`}
+    title={cs.title}
+    lead={cs.dek}
+  >
     <div class="tags">
       <ProvenanceTag kind={cs.dataStatus === 'simulated' ? 'simulated-data' : 'external-evidence'} />
       <span class="tag tag--plain">{cs.kind === 'fictional' ? 'Fictional organization' : 'Real organization'}</span>
+      {cs.difficulty && <span class="tag tag--plain">{DIFFICULTY_LABELS[cs.difficulty].label}</span>}
       <span class="tag tag--plain">Updated {longDate(cs.updated)}</span>
     </div>
   </PageIntro>
 
   <div class="wrap page-body">
-    <div class="casefile-head">
-      <div class="stack">
-        <div class="case-decision">
-          <p class="label">The decision</p>
-          <p>{cs.decision}</p>
+    <div>
+      <div class="casefile-head">
+        <div class="stack">
+          <div class="case-decision">
+            <p class="label">The decision</p>
+            <p>{cs.decision}</p>
+          </div>
+          <div class="prose narrative" set:html={rich(cs.brief)} />
         </div>
-        <div class="prose narrative" set:html={rich(cs.brief)} />
+        <dl class="casefile-facts">
+          <div><dt>Organization</dt><dd>{cs.organization.name}</dd></div>
+          <div><dt>Sector</dt><dd>{cs.organization.sector}</dd></div>
+          <div><dt>Location</dt><dd>{cs.organization.location}</dd></div>
+          <div><dt>Size</dt><dd>{cs.organization.size}</dd></div>
+          {cs.organization.legalForm && <div><dt>Legal form</dt><dd>{cs.organization.legalForm}</dd></div>}
+          <div><dt>Figures in</dt><dd>{cs.currency.code} ({cs.currency.symbol}), {cs.currency.unit}</dd></div>
+          {cs.functions.length > 0 && <div><dt>Functions</dt><dd>{cs.functions.map((f) => FUNCTION_LABELS[f]).join(', ')}</dd></div>}
+          {
+            syllabus.length > 0 && (
+              <div>
+                <dt>Subtopics</dt>
+                <dd>
+                  {syllabus.map((code, k) => <>{k > 0 && ', '}<a href={subtopicHref(c, code)}>{code}<span class="sr-only">{` ${subtopic(code)?.title ?? ''}`}</span></a>{subtopic(code)?.level === 'HL' ? ' (HL)' : ''}</>)}
+                </dd>
+              </div>
+            )
+          }
+          {cs.qualifications.length > 0 && <div><dt>For</dt><dd>{cs.qualifications.map((q) => QUALIFICATION_LABELS[q].short).join(', ')}</dd></div>}
+          {cs.keyConcepts.length > 0 && <div><dt>Key concepts</dt><dd>{cs.keyConcepts.map((k) => CONCEPT_NAMES[k]).join(', ')}</dd></div>}
+          {
+            cs.kind === 'fictional' && (
+              <div>
+                <dt>Status</dt>
+                <dd>{cs.caseType ? `${CASE_TYPE_LABELS[cs.caseType].label} case. ${CASE_TYPE_LABELS[cs.caseType].description}` : 'Fictional. Every figure is simulated for teaching and internally consistent.'}</dd>
+              </div>
+            )
+          }
+        </dl>
       </div>
-      <dl class="casefile-facts">
-        <div><dt>Organization</dt><dd>{cs.organization.name}</dd></div>
-        <div><dt>Sector</dt><dd>{cs.organization.sector}</dd></div>
-        <div><dt>Location</dt><dd>{cs.organization.location}</dd></div>
-        <div><dt>Size</dt><dd>{cs.organization.size}</dd></div>
-        {cs.organization.legalForm && <div><dt>Legal form</dt><dd>{cs.organization.legalForm}</dd></div>}
-        <div><dt>Figures in</dt><dd>{cs.currency.code} ({cs.currency.symbol}), {cs.currency.unit}</dd></div>
-        {
-          cs.kind === 'fictional' && (
-            <div>
-              <dt>Status</dt>
-              <dd>Fictional. Every figure is simulated for teaching and internally consistent.</dd>
-            </div>
-          )
-        }
-      </dl>
+      {
+        full && (
+          <nav class="case-contents" aria-label="In this case file">
+            <p class="label label--ink">In this case file</p>
+            <ol>
+              {plan.map((s) => (
+                <li>
+                  <a href={`#${s.id}`}>{s.title}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
     </div>
 
-    <section aria-labelledby="story-h">
-      <SectionHead no={1} title="The story so far" id="story-h" />
+    <section id="story" aria-labelledby="story-h">
+      <SectionHead no={no('story')} title={title('story')} id="story-h" />
       <div class="case-narrative prose narrative stack">
         {cs.narrative.map((p) => <div set:html={rich(p)} />)}
       </div>
     </section>
 
-    <section aria-labelledby="exhibits-h">
-      <SectionHead no={2} title="The evidence" dek={`${cs.exhibits.length} exhibits. Each is labelled with what kind of evidence it is.`} id="exhibits-h" />
-      <div class="exhibit-stack" style="margin-top:var(--sp-5)">
-        {cs.exhibits.map((e) => <Exhibit exhibit={e} />)}
-      </div>
-    </section>
+    {
+      cs.industryContext.length > 0 && (
+        <section id="industry" aria-labelledby="industry-h">
+          <SectionHead no={no('industry')} title={title('industry')} dek="How the industry works and what is changing in it, in general terms. The figures in this case are the business's own, and simulated." id="industry-h" />
+          <div class="case-industry prose" style="margin-top:var(--sp-4)">
+            {cs.industryContext.map((p) => <div set:html={rich(p)} />)}
+          </div>
+        </section>
+      )
+    }
 
-    <section aria-labelledby="constraints-h">
-      <SectionHead no={3} title="Constraints" id="constraints-h" />
+    {
+      cs.challenge && (
+        <section id="challenge" aria-labelledby="challenge-h">
+          <SectionHead no={no('challenge')} title={title('challenge')} id="challenge-h" />
+          <div class="case-challenge">
+            <div class="narrative" set:html={rich(cs.challenge)} />
+          </div>
+        </section>
+      )
+    }
+
+    {
+      cs.financials && financialExhibits.length > 0 && (
+        <section id="financials" aria-labelledby="financials-h">
+          <SectionHead no={no('financials')} title={title('financials')} id="financials-h" />
+          <div class="prose" style="margin-top:var(--sp-4)" set:html={rich(cs.financials.summary)} />
+          <div class="exhibit-stack" style="margin-top:var(--sp-5)">
+            {financialExhibits.map((e) => <Exhibit exhibit={e} />)}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      otherExhibits.length > 0 && (
+        <section id="evidence" aria-labelledby="exhibits-h">
+          <SectionHead
+            no={no('evidence')}
+            title={title('evidence')}
+            dek={`${otherExhibits.length} ${otherExhibits.length === 1 ? 'exhibit' : 'exhibits'}. Each is labelled with what kind of evidence it is.`}
+            id="exhibits-h"
+          />
+          <div class="exhibit-stack" style="margin-top:var(--sp-5)">
+            {otherExhibits.map((e) => <Exhibit exhibit={e} />)}
+          </div>
+        </section>
+      )
+    }
+
+    <section id="constraints" aria-labelledby="constraints-h">
+      <SectionHead no={no('constraints')} title={title('constraints')} id="constraints-h" />
       <ul class="prose" style="margin-top:var(--sp-4)">{cs.constraints.map((k) => <li set:html={inline(k)} />)}</ul>
     </section>
 
-    <section aria-labelledby="people-h">
-      <SectionHead no={4} title="The people with a stake" id="people-h" />
+    <section id="people" aria-labelledby="people-h">
+      <SectionHead no={no('people')} title={title('people')} id="people-h" />
       <div class="table-scroll" role="region" aria-label="Stakeholders" tabindex="0" style="margin-top:var(--sp-4)">
         <table class="table stakeholder-table">
           <thead>
@@ -117,8 +238,8 @@ const questions = cs.questions.map((q) => ({ id: q, data: c.questions[q] })).fil
       </div>
     </section>
 
-    <section aria-labelledby="options-h">
-      <SectionHead no={5} title="The options" id="options-h" />
+    <section id="options" aria-labelledby="options-h">
+      <SectionHead no={no('options')} title={title('options')} id="options-h" />
       <div style="margin-top:var(--sp-5)">
         {
           groups.map((g) => (
@@ -147,13 +268,7 @@ const questions = cs.questions.map((q) => ({ id: q, data: c.questions[q] })).fil
                       </dl>
                       {o.evidence.length > 0 && (
                         <p class="small muted">
-                          Evidence:{' '}
-                          {o.evidence.map((e, k) => (
-                            <>
-                              {k > 0 && ', '}
-                              <a href={`#${e}`}>{exhibitTitle(e)}</a>
-                            </>
-                          ))}
+                          Evidence: {o.evidence.map((e, k) => <>{k > 0 && ', '}<a href={`#${e}`}>{exhibitTitle(e)}</a></>)}
                         </p>
                       )}
                     </article>
@@ -165,66 +280,367 @@ const questions = cs.questions.map((q) => ({ id: q, data: c.questions[q] })).fil
       </div>
     </section>
 
-    <section aria-labelledby="analysis-h">
-      <SectionHead no={6} title="A worked analysis" dek="From data to a recommendation, in the order an examiner rewards. Try your own before you read it." id="analysis-h" />
-      <details class="disclosure" style="margin-top:var(--sp-4)">
-        <summary>Show the worked analysis</summary>
-        <div class="disclosure__body">
-          <div class="tags" style="margin-bottom:var(--sp-3)">
-            <ProvenanceTag kind="aa-framework" />
-          </div>
-          <div class="analysis">
-            <div class="analysis__step">
-              <p class="analysis__label">Data<span>What the exhibits say</span></p>
-              <ul>{cs.analysis.data.map((x) => <li set:html={inline(x)} />)}</ul>
+    {
+      cs.analysisQuestions.length > 0 && (
+        <section id="questions" aria-labelledby="questions-h">
+          <SectionHead
+            no={no('questions')}
+            title={title('questions')}
+            dek="Original practice questions written for this case, not IB examination questions. The marks are each question's own allocation, set to the size of the task. Answer first, then open the guidance."
+            id="questions-h"
+          >
+            <div class="tags">
+              <ProvenanceTag kind="original-practice" />
+              {hasHLQuestions && <LevelSwitch id={`lvl-${id}`} />}
             </div>
-            <div class="analysis__step">
-              <p class="analysis__label">Insight<span>What it means</span></p>
-              <ul>{cs.analysis.insight.map((x) => <li set:html={inline(x)} />)}</ul>
-            </div>
-            <div class="analysis__step">
-              <p class="analysis__label">Options<span>What each choice does</span></p>
-              <ul>{cs.analysis.options.map((x) => <li set:html={inline(x)} />)}</ul>
-            </div>
-            <div class="analysis__step">
-              <p class="analysis__label">Recommendation<span>One defensible answer</span></p>
-              <div class="prose" set:html={rich(cs.analysis.recommendation)} />
-            </div>
-            <div class="analysis__step">
-              <p class="analysis__label">Caveat<span>When it would change</span></p>
-              <div class="prose" set:html={rich(cs.analysis.caveat)} />
-            </div>
-          </div>
-        </div>
-      </details>
-      {
-        cs.decisionRoom && (
-          <p style="margin-top:var(--sp-5)">
-            <a class="btn btn--primary" href={href.decision(cs.decisionRoom)}>
-              Make the decision in the Decision Room
-            </a>
-          </p>
-        )
-      }
-    </section>
+          </SectionHead>
+          <ol class="case-questions">
+            {cs.analysisQuestions.map((q, k) => (
+              <li class="case-question" id={`q-${q.id}`} data-level={q.level === 'HL' ? 'HL' : undefined}>
+                <span class="case-question__no" aria-hidden="true">
+                  {k + 1}
+                </span>
+                <div class="case-question__body">
+                  <div class="case-question__prompt prose" set:html={rich(q.prompt)} />
+                  <p class="case-question__meta">
+                    <a href={href.commandTerm(q.commandTerm)}>{q.commandTerm}</a>
+                    <span>{q.ao}</span>
+                    {q.paper && <span>{PAPERS[q.paper]}</span>}
+                    <span>
+                      {q.syllabus
+                        .map((code) => `${code} ${subtopic(code)?.title ?? ''}`.trim())
+                        .join('; ')}
+                    </span>
+                    {q.exhibits.length > 0 && <span>{q.exhibits.map((e, j) => <>{j > 0 && ', '}<a href={`#${e}`}>{exhibitTitle(e)}</a></>)}</span>}
+                    {q.level === 'HL' && <span class="tag tag--hl">HL</span>}
+                  </p>
+                  <details class="disclosure">
+                    <summary>Guidance for a strong answer</summary>
+                    <div class="disclosure__body stack">
+                      <div class="tags">
+                        <ProvenanceTag kind="assessment-explanation" />
+                        <span class="small muted">The platform's guidance, not an official markscheme.</span>
+                      </div>
+                      {q.answer && <div class="prose small case-answer" set:html={rich(q.answer)} />}
+                      <div class="prose small" set:html={rich(q.guidance)} />
+                    </div>
+                  </details>
+                </div>
+                <p class="case-question__marks">
+                  [{q.marks} {q.marks === 1 ? 'mark' : 'marks'}]
+                </p>
+              </li>
+            ))}
+          </ol>
+          {hasHLQuestions && <p class="hl-notice">HL-only questions are hidden in the SL view. Choose HL above to see them.</p>}
+        </section>
+      )
+    }
 
-    <section aria-labelledby="links-h">
-      <SectionHead no={7} title="Use this case" id="links-h" />
-      <div class="connections">
-        <div>
-          <h3 class="label label--ink">Briefs</h3>
-          <ul class="link-list">
-            {
-              cs.topics.map((t) => (
-                <li>
-                  <a href={href.topic(t)}>
-                    {c.topics[t]?.code} {c.topics[t]?.title}
-                  </a>
+    {
+      cs.exercise && (
+        <section id="exercise" aria-labelledby="exercise-h">
+          <SectionHead
+            no={no('exercise')}
+            title={title('exercise')}
+            dek="Decide before you read the debrief. The exercise is the platform's own; it is not an IB task."
+            id="exercise-h"
+          />
+          <DecisionExercise id={id} cs={cs} />
+        </section>
+      )
+    }
+
+    {
+      cs.debrief ? (
+        <section id="debrief" aria-labelledby="analysis-h">
+          <SectionHead
+            no={no('debrief')}
+            title={title('debrief')}
+            dek="The worked analysis, then every alternative judged against the evidence. One defensible reading, not the only one: try your own first."
+            id="analysis-h"
+          />
+          <details class="disclosure" data-debrief style="margin-top:var(--sp-4)">
+            <summary>Read the debrief</summary>
+            <div class="disclosure__body">
+              <div class="tags" style="margin-bottom:var(--sp-3)">
+                <ProvenanceTag kind="aa-framework" />
+              </div>
+              <div class="prose narrative" set:html={rich(cs.debrief.summary)} />
+              <h3 class="label label--ink" style="margin-top:var(--sp-5)">
+                The worked analysis
+              </h3>
+              <div class="analysis" style="margin-top:var(--sp-2)">
+                <div class="analysis__step">
+                  <p class="analysis__label">
+                    Data<span>What the exhibits say</span>
+                  </p>
+                  <ul>
+                    {cs.analysis.data.map((x) => (
+                      <li set:html={inline(x)} />
+                    ))}
+                  </ul>
+                </div>
+                <div class="analysis__step">
+                  <p class="analysis__label">
+                    Insight<span>What it means</span>
+                  </p>
+                  <ul>
+                    {cs.analysis.insight.map((x) => (
+                      <li set:html={inline(x)} />
+                    ))}
+                  </ul>
+                </div>
+                <div class="analysis__step">
+                  <p class="analysis__label">
+                    Options<span>What each choice does</span>
+                  </p>
+                  <ul>
+                    {cs.analysis.options.map((x) => (
+                      <li set:html={inline(x)} />
+                    ))}
+                  </ul>
+                </div>
+                <div class="analysis__step">
+                  <p class="analysis__label">
+                    Recommendation<span>One defensible answer</span>
+                  </p>
+                  <div class="prose" set:html={rich(cs.analysis.recommendation)} />
+                </div>
+                <div class="analysis__step">
+                  <p class="analysis__label">
+                    Caveat<span>When it would change</span>
+                  </p>
+                  <div class="prose" set:html={rich(cs.analysis.caveat)} />
+                </div>
+              </div>
+              <h3 class="label label--ink" style="margin-top:var(--sp-6)">
+                Every alternative, judged
+              </h3>
+              <ol class="debrief-options" role="list">
+                {cs.debrief.byOption.map((b) => (
+                  <li class="debrief-option" data-debrief-option={b.option}>
+                    <div>
+                      <h4>{optionLabel(b.option)}</h4>
+                      <span class="debrief-option__yours" data-yours hidden>
+                        Your choice
+                      </span>
+                    </div>
+                    <div class="stack stack-sm">
+                      <p>
+                        <span class={`fit fit--${b.fit}`} data-fit>
+                          {FIT_LABELS[b.fit]}
+                        </span>
+                      </p>
+                      <div class="prose small" data-body set:html={rich(b.body)} />
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              <div class="debrief-grid">
+                <div>
+                  <h4>The trade-offs</h4>
+                  <ul>
+                    {cs.debrief.tradeoffs.map((x) => (
+                      <li set:html={inline(x)} />
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h4>The evidence that matters most</h4>
+                  <ul>
+                    {cs.debrief.evidenceThatMatters.map((x) => (
+                      <li set:html={inline(x)} />
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h4>What would change the recommendation</h4>
+                  <ul>
+                    {cs.debrief.changeYourMind.map((x) => (
+                      <li set:html={inline(x)} />
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <h4>Common errors</h4>
+                  <ul>
+                    {cs.debrief.commonErrors.map((x) => (
+                      <li set:html={inline(x)} />
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </details>
+        </section>
+      ) : (
+        <section id="analysis" aria-labelledby="analysis-h">
+          <SectionHead
+            no={no('analysis')}
+            title={title('analysis')}
+            dek="From data to a recommendation, in the order an examiner rewards. Try your own before you read it."
+            id="analysis-h"
+          />
+          <details class="disclosure" style="margin-top:var(--sp-4)">
+            <summary>Show the worked analysis</summary>
+            <div class="disclosure__body">
+              <div class="tags" style="margin-bottom:var(--sp-3)">
+                <ProvenanceTag kind="aa-framework" />
+              </div>
+              <div class="analysis">
+                <div class="analysis__step">
+                  <p class="analysis__label">
+                    Data<span>What the exhibits say</span>
+                  </p>
+                  <ul>
+                    {cs.analysis.data.map((x) => (
+                      <li set:html={inline(x)} />
+                    ))}
+                  </ul>
+                </div>
+                <div class="analysis__step">
+                  <p class="analysis__label">
+                    Insight<span>What it means</span>
+                  </p>
+                  <ul>
+                    {cs.analysis.insight.map((x) => (
+                      <li set:html={inline(x)} />
+                    ))}
+                  </ul>
+                </div>
+                <div class="analysis__step">
+                  <p class="analysis__label">
+                    Options<span>What each choice does</span>
+                  </p>
+                  <ul>
+                    {cs.analysis.options.map((x) => (
+                      <li set:html={inline(x)} />
+                    ))}
+                  </ul>
+                </div>
+                <div class="analysis__step">
+                  <p class="analysis__label">
+                    Recommendation<span>One defensible answer</span>
+                  </p>
+                  <div class="prose" set:html={rich(cs.analysis.recommendation)} />
+                </div>
+                <div class="analysis__step">
+                  <p class="analysis__label">
+                    Caveat<span>When it would change</span>
+                  </p>
+                  <div class="prose" set:html={rich(cs.analysis.caveat)} />
+                </div>
+              </div>
+            </div>
+          </details>
+          {cs.decisionRoom && (
+            <p style="margin-top:var(--sp-5)">
+              <a class="btn btn--primary" href={href.decision(cs.decisionRoom)}>
+                Make the decision in the Decision Room
+              </a>
+            </p>
+          )}
+        </section>
+      )
+    }
+
+    {
+      cs.frameworks.length > 0 && (
+        <section id="frameworks" aria-labelledby="frameworks-h">
+          <SectionHead
+            no={no('frameworks')}
+            title={title('frameworks')}
+            dek="The theories and tools this case calls for, each with how it applies here and where the platform teaches it."
+            id="frameworks-h"
+          />
+          <ul class="frameworks" role="list">
+            {cs.frameworks.map((f) => {
+              const tool = f.tool ? c.tools[f.tool] : undefined;
+              return (
+                <li class="framework" data-level={f.level === 'HL' ? 'HL' : undefined}>
+                  <div class="stack stack-sm">
+                    <h3>{f.name}</h3>
+                    <div class="tags">
+                      <span class={`tag ${PROVENANCE_LABELS[f.provenance].css}`}>{PROVENANCE_LABELS[f.provenance].label}</span>
+                      {f.level === 'HL' && <span class="tag tag--hl">HL</span>}
+                    </div>
+                  </div>
+                  <div>
+                    <div class="prose small" set:html={rich(f.use)} />
+                    <ul class="framework__links" role="list">
+                      {tool && f.tool && (
+                        <li>
+                          <span>Toolkit: </span>
+                          <a href={href.toolEntry(f.tool, tool)}>{tool.status === 'complete' ? `${tool.name} guide` : `${tool.name} (guide in preparation)`}</a>
+                        </li>
+                      )}
+                      {f.subtopics.map((code) => (
+                        <li>
+                          <span>Subtopic: </span>
+                          <a href={subtopicHref(c, code)}>
+                            {code} {subtopic(code)?.title}
+                          </a>
+                        </li>
+                      ))}
+                      {f.terms.map((t) => (
+                        <li>
+                          <span>Glossary: </span>
+                          <a href={href.glossary(t)}>{c.glossary[t]?.term}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </li>
-              ))
-            }
+              );
+            })}
           </ul>
-        </div>
+          {cs.frameworks.some((f) => f.level === 'HL') && <p class="hl-notice">HL-only frameworks are hidden in the SL view.</p>}
+        </section>
+      )
+    }
+
+    {
+      cs.discussion.length > 0 && (
+        <section id="discussion" aria-labelledby="discussion-h">
+          <SectionHead
+            no={no('discussion')}
+            title={title('discussion')}
+            dek="Prompts for undergraduate and MBA seminars. They go beyond the IB course and are labelled as enrichment."
+            id="discussion-h"
+          >
+            <div class="tags">
+              <ProvenanceTag kind="enrichment" />
+            </div>
+          </SectionHead>
+          <ol class="prose" style="margin-top:var(--sp-4)">
+            {cs.discussion.map((d) => (
+              <li set:html={inline(d)} />
+            ))}
+          </ol>
+        </section>
+      )
+    }
+
+    <section id="links" aria-labelledby="links-h">
+      <SectionHead no={no('links')} title={title('links')} id="links-h" />
+      <div class="connections">
+        {
+          cs.topics.length > 0 && (
+            <div>
+              <h3 class="label label--ink">Briefs</h3>
+              <ul class="link-list">
+                {cs.topics.map((t) => (
+                  <li>
+                    <a href={href.topic(t)}>
+                      {c.topics[t]?.code} {c.topics[t]?.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
         {
           tools.length > 0 && (
             <div>
@@ -267,10 +683,42 @@ const questions = cs.questions.map((q) => ({ id: q, data: c.questions[q] })).fil
           )
         }
       </div>
+      {
+        cs.furtherReading.length > 0 && (
+          <div style="margin-top:var(--sp-6)">
+            <h3 class="label label--ink">Further reading</h3>
+            <p class="small muted" style="margin-top:var(--sp-1)">
+              Pages on this platform and the supplied sources it was built from.
+            </p>
+            <ul class="reading" role="list">
+              {cs.furtherReading.map((r) => {
+                const src = r.source ? c.sources[r.source] : undefined;
+                return (
+                  <li>
+                    <span class="reading__kind">{r.source ? 'Source' : 'On the platform'}</span>
+                    {r.href ? (
+                      <a href={r.href}>{r.title}</a>
+                    ) : (
+                      <>
+                        <a href={href.source(r.source ?? '')}>{r.title}</a>
+                        {src?.author && `, ${src.author}`}
+                        {src?.year && ` (${src.year})`}
+                        {r.location && `, ${r.location}`}
+                      </>
+                    )}
+                    . <span set:html={inline(r.note)} />
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )
+      }
       <aside class="callout callout--note" style="margin-top:var(--sp-6)">
         <span class="callout__kicker">How this case was made</span>
         <div class="prose small" set:html={rich(cs.method)} />
       </aside>
+      <p class="small" style="margin-top:var(--sp-5)"><a href="/case-vault/">Back to the Case Vault</a>: every case, with filters and the Case of the Week.</p>
     </section>
   </div>
 </BaseLayout>

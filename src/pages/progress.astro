@@ -7,7 +7,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/layout/PageIntro.astro';
 import SectionHead from '../components/layout/SectionHead.astro';
-import { corpus, decisionsInOrder, href, questionsInOrder, topicsInOrder } from '../lib/content';
+import { casesInOrder, corpus, decisionsInOrder, href, questionsInOrder, topicsInOrder } from '../lib/content';
 import { boardroomHref, boardroomScenarios } from '../lib/boardroom/content';
 import { jsonForScript } from '../lib/markup';
 import { studio, studioHref } from '../lib/strategy/content';
@@ -16,6 +16,8 @@ const c = await corpus();
 const topics = await topicsInOrder();
 const questions = await questionsInOrder();
 const decisions = await decisionsInOrder();
+/** Case files with a decision exercise, which keeps the reader's decision as bb:case:<id>. */
+const exercises = (await casesInOrder()).filter(([, cs]) => cs.exercise);
 /** Interactions that keep something between visits, and the storage keys they use. */
 const tracked = Object.entries(c.interactives)
   .filter(([, it]) => it.page)
@@ -45,6 +47,7 @@ const config = {
   ia: { href: '/ia-studio/', steps: 10 },
   strategy: (await studio()).sequence.map((t) => ({ slug: t.slug, title: t.title, href: studioHref(t.slug) })),
   boardroom: (await boardroomScenarios()).map(([id, sc]) => ({ id, title: sc.title, href: boardroomHref(id), rounds: sc.rounds.length })),
+  cases: exercises.map(([id, cs]) => ({ id, title: cs.title, href: `${href.case(id)}#exercise` })),
 };
 ---
 

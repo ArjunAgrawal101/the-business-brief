@@ -3,6 +3,7 @@
  * own ISO week, and the break-even preview answers as the figures change.
  */
 import { isoWeek } from '../lib/home';
+import { calendarDate, caseOfTheWeek } from '../lib/case-vault';
 import { previewChart, previewLines, previewModel, type PreviewInputs } from '../lib/home-preview';
 import { fmtNumber } from '../lib/format';
 
@@ -12,7 +13,11 @@ document.querySelectorAll<HTMLElement>('[data-rotate-root]').forEach((root) => {
   root.querySelectorAll<HTMLElement>('[data-rotate]').forEach((box) => {
     const variants = [...box.querySelectorAll<HTMLElement>(':scope > [data-variant]')];
     if (!variants.length) return;
-    const show = week % variants.length;
+    // The case follows the Case Vault's rotation; the other features follow the week number.
+    const show =
+      box.dataset.rotateBy === 'vault'
+        ? (caseOfTheWeek(variants.map((v) => v.dataset.id ?? ''), calendarDate(new Date()))?.position ?? 0)
+        : week % variants.length;
     variants.forEach((v, i) => (v.hidden = i !== show));
   });
   const label = root.querySelector('[data-week-label]');

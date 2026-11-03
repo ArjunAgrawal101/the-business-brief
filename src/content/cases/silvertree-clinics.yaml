@@ -1,0 +1,635 @@
+# Silvertree Clinics. A fictional organization; every figure is simulated.
+# Labour turnover is leavers divided by the average number of nurses, times
+# 100. Each leaver costs recruitment plus 80 agency shifts at the agency
+# premium, and each option in Exhibit 7 applies the head of people's estimate
+# of turnover to that cost. scripts/qa/case-figures.py rebuilds every exhibit
+# and checks every figure in the text; tests/unit/vault-cases.test.ts
+# recomputes turnover with src/lib/finance.ts.
+
+title: Silvertree Clinics
+dek: A Cape Town clinic network is losing nearly a third of its nurses a year, and a pay rise has already failed to stop them.
+kind: fictional
+dataStatus: simulated
+organization:
+  name: Silvertree Clinics
+  sector: Private primary health care (family medicine clinics)
+  location: Cape Town, South Africa
+  size: Six clinics, 210 employees, of whom 96 are nurses
+  legalForm: Private company, owned by its two founding doctors and an investor
+currency:
+  code: ZAR
+  symbol: 'R'
+  unit: millions of rand (R m), and rand for costs per nurse or shift
+decision: How should Silvertree keep its nurses, now that a pay rise has not worked?
+brief: >
+  Thirty nurses left Silvertree's six clinics in 2025, and every vacancy was covered by agency nurses who cost more
+  and do not know the patients. Agency costs rose by more than half, waiting times lengthened, and patients rated
+  their care lower at the clinics that lost most staff. A pay rise in January made more nurses feel fairly paid, but
+  turnover rose anyway. The new head of people has evidence on why nurses leave and five costed options, and the
+  cheapest one on paper does nothing about the cause.
+
+narrative:
+  - >
+    Two doctors, Pieter van Wyk and Aisha Patel, opened the first Silvertree clinic in Observatory in 2012, offering
+    family medicine at prices that working families could afford. There are now six Silvertree clinics across Cape
+    Town, from Sea Point to Mitchells Plain, with 210 employees. In 2019 the founders sold a share of the company to an
+    investor, Atlantic Health Partners, to fund the last three clinics. Patients pay for each visit or through their
+    medical insurance.
+  - >
+    Nurses are the business. They run the triage, the chronic medicine reviews, the vaccinations and most of the
+    follow-up care, and patients come back to the nurses they know. In 2025, 30 of Silvertree's 96 nurses left (Exhibit
+    3). Each vacancy was covered by agency nurses until it was filled, and agency spending rose from R6.30m to R10.08m
+    (Exhibit 1). At the clinics that lost most nurses, patients waited longest and rated their care lowest (Exhibit 6).
+  - >
+    The owners had seen the problem coming. In January 2025 they gave every nurse a 6% pay rise, the largest in
+    Silvertree's history. The staff survey a few months later showed that far more nurses now felt fairly paid; but
+    turnover rose and fewer nurses said they intended to stay (Exhibit 4).
+  - >
+    Thandiwe Mokoena joined as head of people in September. Her first act was to read the exit interviews (Exhibit 5).
+    Her second was to visit Observatory, the one clinic where nurses stay. Its manager, Grace Adams, lets the nurses
+    plan the rota together and swap shifts among themselves, and sends one nurse a year on a course of their choosing
+    (Exhibit 8).
+  - >
+    Thandiwe has costed five options, from another pay rise to a single contracted agency (Exhibit 7). The investor
+    wants the profit margin back above 10% (Exhibit 9); the founders want clinics where nurses stay and patients see
+    the same faces. The board meets next month.
+
+industryContext:
+  - >
+    Primary care clinics are the first stop for most patients: consultations, chronic medicines, vaccinations and
+    minor procedures. In South Africa, private clinics serve patients who pay for each visit or are covered by medical
+    insurance, alongside a large public health system.
+  - >
+    Nurses are central to the work and in demand far beyond any one city, so experienced nurses can move between
+    employers, between public and private health care, and between countries. Clinics that cannot keep nurses fill
+    the gaps with agency staff, who cost more and do not know the clinic's patients or systems.
+  - >
+    Clinic work runs on rosters of early, late and weekend shifts that must cover the opening hours. For many nurses,
+    how rotas are set, how much say they have in them, and whether there is a path to more skilled work matter as much
+    as pay.
+
+challenge: >
+  Silvertree is losing nurses faster than it can replace them, and the cost appears three times over: in agency fees,
+  in recruitment, and in patients who wait longer to see staff who do not know them. The obvious remedy, more pay, has
+  been tried. The board must choose how to keep its nurses on the evidence of why they leave, at a cost the business
+  can sustain, and without mistaking a cheaper way of covering vacancies for a way of preventing them.
+
+financials:
+  summary: >
+    Revenue grew by 4.0% in 2025, but profit before interest and tax fell from R15.60m to R14.76m, and the profit
+    margin from 10.4% to 9.5%, mainly because agency staff cost R3.78m more. Each nurse who leaves costs Silvertree
+    about R173,000: R45,000 to recruit and induct a replacement, and 80 agency shifts at R1,600 more than an employed
+    nurse's shift while the post is empty. Thirty leavers cost about R5.19m in 2025.
+  exhibits: [ex-1, ex-2]
+
+exhibits:
+  - id: ex-1
+    title: Summary of the operating statement (R m)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Item }
+      - { label: '2024', numeric: true, format: d2 }
+      - { label: '2025', numeric: true, format: d2 }
+    rows:
+      - [Revenue, 150, 156]
+      - [Employed staff, 81.6, 82.8]
+      - [Agency staff, 6.3, 10.08]
+      - [Medical supplies, 21, 21.84]
+      - [Premises and other costs, 25.5, 26.52]
+      - [Profit before interest and tax, 15.6, 14.76]
+    totals: [Profit before interest and tax]
+    note: >
+      Agency staff were 1,500 shifts in 2024 and 2,400 in 2025, at R4,200 a shift. Employed staff costs include the
+      6% pay rise for nurses from January 2025, offset by the pay saved on empty posts.
+    source: Simulated teaching data, from Silvertree's management accounts.
+
+  - id: ex-2
+    title: What a nurse's departure costs
+    kind: kpis
+    provenance: simulated-data
+    items:
+      - { label: 'Recruitment and induction, per nurse replaced', value: 'R45,000' }
+      - { label: Agency shifts to cover each vacancy, value: '80' }
+      - { label: "An agency nurse's shift", value: 'R4,200' }
+      - { label: "An employed nurse's shift, with on-costs", value: 'R2,600' }
+      - { label: Average nurse salary, value: 'R420,000 a year' }
+    note: Each vacancy takes about four months to fill, covered meanwhile by agency nurses. The head of people believes Silvertree's pay is in line with other private clinics in the city.
+    source: Simulated teaching data, from the people team's records.
+
+  - id: ex-3
+    title: Nurses by clinic, 2025
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Clinic }
+      - { label: Average number of nurses, numeric: true }
+      - { label: Nurses who left, numeric: true }
+      - { label: Labour turnover (%), numeric: true, format: d1 }
+      - { label: Vacancies at the year end, numeric: true }
+      - { label: Agency shifts, numeric: true }
+    rows:
+      - [Observatory, 18, 3, 16.7, 1, 140]
+      - [Bellville, 16, 7, 43.8, 3, 610]
+      - [Mitchells Plain, 17, 6, 35.3, 2, 520]
+      - [Wynberg, 15, 5, 33.3, 2, 430]
+      - [Durbanville, 14, 4, 28.6, 1, 300]
+      - [Sea Point, 16, 5, 31.3, 2, 400]
+    footer: [All six clinics, 96, 30, 31.3, 11, 2400]
+    totals: []
+    note: >
+      Labour turnover is the number who left divided by the average number employed, multiplied by 100. Each clinic's
+      manager is a senior nurse who manages all of the clinic's nurses and six administrative staff directly.
+    source: Simulated teaching data, from the personnel records.
+
+  - id: ex-4
+    title: Nurses agreeing with each statement in the staff survey (%)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Statement }
+      - { label: '2024', numeric: true }
+      - { label: '2025', numeric: true }
+    rows:
+      - [My pay is fair for the work I do, 31, 52]
+      - [My shift pattern lets me manage my life outside work, 38, 34]
+      - [I have opportunities to develop my skills, 29, 27]
+      - [My manager recognizes good work, 41, 39]
+      - [I intend to be working here in a year, 58, 55]
+    note: 81 nurses answered in 2024 and 74 in 2025. The 2025 survey was run in May, four months after the pay rise.
+    source: Simulated teaching data.
+
+  - id: ex-5
+    title: Why nurses left in 2025 (exit interviews with 26 of the 30)
+    kind: kpis
+    provenance: simulated-data
+    items:
+      - { label: Shift patterns and rotas, value: '9' }
+      - { label: Workload, value: '6' }
+      - { label: No path to develop or progress, value: '5' }
+      - { label: Pay, value: '3' }
+      - { label: The clinic manager, value: '2' }
+      - { label: Moving away, value: '1' }
+    note: Each leaver gave one main reason.
+    source: Simulated teaching data, from exit interview notes.
+
+  - id: ex-6
+    title: Patients by clinic, 2025
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Clinic }
+      - { label: Average wait to be seen (minutes), numeric: true }
+      - { label: Patients rating their care good or very good (%), numeric: true }
+    rows:
+      - [Observatory, 24, 91]
+      - [Bellville, 51, 72]
+      - [Mitchells Plain, 44, 78]
+      - [Wynberg, 39, 81]
+      - [Durbanville, 31, 86]
+      - [Sea Point, 37, 82]
+    source: Simulated teaching data, from the booking system and the patient feedback cards.
+
+  - id: ex-7
+    title: Five ways to keep nurses, with the head of people's estimates
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Option }
+      - { label: Yearly cost (R m), numeric: true, format: d2 }
+      - { label: Forecast labour turnover (%), numeric: true, format: d1 }
+      - { label: Nurses leaving a year, numeric: true, format: d1 }
+      - { label: Yearly cost of turnover (R m), numeric: true, format: d2 }
+      - { label: Net yearly effect (R m), numeric: true, format: d2 }
+    rows:
+      - ['Pay rise of 8%', 3.23, 28, 26.9, 4.65, -2.69]
+      - [Self-rostering and flexible shifts, 0.6, 22, 21.1, 3.65, 0.94]
+      - [Clinical career ladder, 2.4, 20, 19.2, 3.32, 0.67]
+      - [Team leaders in every clinic, 1.5, 25, 24, 4.15, -0.46]
+      - [One contracted agency, 0, 31.3, 30, 4.23, 0.96]
+    note: |
+      Turnover in 2025 cost R5.19m. The net yearly effect is that cost less the option's cost of turnover, less the option's own cost, plus any new revenue; a negative figure leaves Silvertree worse off. Turnover forecasts are the head of people's estimates.
+
+      - Pay rise of 8%: a second rise for all 96 nurses.
+      - Self-rostering and flexible shifts: nurses plan each clinic's rota together, with rostering software and an hour a week of a manager's time, as at Observatory.
+      - Clinical career ladder: senior nurse posts, mentoring, and training towards nurse-led clinics for minor illness, which would bring in about R1.2m a year of new revenue. The effect on turnover is expected from the second year.
+      - Team leaders in every clinic: a team leader for every six or so nurses, to narrow each manager's span of control.
+      - One contracted agency: a single agency at R3,800 a shift in place of R4,200. Turnover is unchanged.
+    source: Simulated teaching data, prepared by the head of people.
+
+  - id: ex-8
+    title: How Observatory does it
+    kind: quote
+    provenance: simulated-data
+    quote:
+      text: >
+        I don't set the rota. The nurses sit down once a month and build it together, and they swap among themselves
+        when life happens. My job is to check that every shift is covered and that nobody always gets the worst ones.
+        And every year one of them goes on a course they choose. It costs me an afternoon a month and one course fee.
+      attribution: Grace Adams, clinic manager, Silvertree Observatory
+    source: Fictional interview, written for this case.
+
+  - id: ex-9
+    title: The investor's view
+    kind: quote
+    provenance: simulated-data
+    quote:
+      text: >
+        We backed Silvertree because it runs good clinics at a fair price and earns a margin above 10%. Agency costs
+        have taken that margin away. We will support any plan that brings it back, but not another pay rise without
+        evidence that it will keep people.
+      attribution: Lindiwe Dube, partner, Atlantic Health Partners
+    source: Fictional email, written for this case.
+
+constraints:
+  - The nurses' pay was raised by 6% in January 2025. The investor will not support another rise without evidence that it would reduce turnover.
+  - Every shift must be covered by a registered nurse, so a vacancy must be filled by an agency nurse until it is filled permanently.
+  - A vacancy takes about four months to fill.
+  - The board wants a plan it can start within three months, and results it can measure within a year.
+
+stakeholders:
+  - name: Dr Pieter van Wyk and Dr Aisha Patel, founders and shareholders
+    interest: Good clinics at a fair price, where patients see the same faces.
+    influence: high
+    stake: high
+    concern: A business that runs on agency staff and loses the continuity of care it was built on.
+  - name: Atlantic Health Partners, investor
+    interest: A margin above 10% and a return on its investment.
+    influence: high
+    stake: medium
+    concern: Rising costs, and spending that does not change anything.
+  - name: Thandiwe Mokoena, head of people
+    interest: A plan that deals with why nurses leave.
+    influence: medium
+    stake: high
+    concern: Being asked for a quick saving rather than a lasting fix.
+  - name: Nurses
+    interest: Workable rotas, a manageable workload, development and fair pay.
+    influence: medium
+    stake: high
+    concern: Rotas that leave no room for life outside work, and no way to progress.
+  - name: Clinic managers
+    interest: Fully staffed clinics they have time to run.
+    influence: medium
+    stake: high
+    concern: Giving up control of the rota, or adding work to an already wide span of control.
+  - name: Patients
+    interest: Short waits and staff who know them.
+    influence: low
+    stake: high
+    concern: Longer waits and a different nurse at every visit.
+  - name: Nursing agencies
+    interest: Selling shifts.
+    influence: low
+    stake: medium
+    concern: Losing business if Silvertree keeps its nurses.
+
+options:
+  - id: pay-rise
+    label: A further pay rise of 8%
+    summary: Raise every nurse's pay again, by 8%.
+    requires: R3.23m a year, and the investor's agreement.
+    upside: A clear signal that nurses are valued; simple to do at once.
+    risks: The survey shows that pay is no longer the main complaint, and only 3 of 26 leavers named it; the forecast effect is small for the cost.
+    evidence: [ex-4, ex-5, ex-7]
+  - id: self-rostering
+    label: Self-rostering and flexible shifts
+    summary: Let each clinic's nurses plan the rota together and swap shifts among themselves, as Observatory does.
+    requires: Rostering software, an hour a week of each manager's time, and rules that keep the rota fair.
+    upside: The cheapest option that acts on the main reason nurses give for leaving, with evidence from Silvertree's own best clinic.
+    risks: Rotas could become unfair to nurses with less say; managers must accept giving up control; it does nothing for development.
+    evidence: [ex-3, ex-5, ex-7, ex-8]
+  - id: career-ladder
+    label: A clinical career ladder
+    summary: Create senior nurse posts, mentoring and training towards nurse-led clinics for minor illness.
+    requires: R2.4m a year, training places, and doctors willing to support nurse-led clinics.
+    upside: Acts on development, which nurses rate lowest, and adds about R1.2m a year of revenue from nurse-led clinics.
+    risks: Slow, with the effect on turnover expected from the second year; better-trained nurses are also more attractive to other employers.
+    evidence: [ex-4, ex-5, ex-7]
+  - id: team-leaders
+    label: Team leaders in every clinic
+    summary: Appoint team leaders so that each manager oversees fewer people directly.
+    requires: R1.5m a year in allowances, and nurses ready to lead.
+    upside: Narrows a span of control of more than twenty, giving nurses someone with time to support them.
+    risks: The smallest forecast effect after the pay rise, and it leaves rotas as they are.
+    evidence: [ex-3, ex-7]
+  - id: agency-deal
+    label: One contracted agency
+    summary: Buy all agency shifts from one agency at a discounted rate of R3,800 a shift.
+    requires: A contract with one agency.
+    upside: Saves about R0.96m a year at once, the largest saving on paper.
+    risks: Does nothing to keep nurses; turnover, waiting times and the loss of familiar faces continue.
+    evidence: [ex-6, ex-7]
+
+analysis:
+  data:
+    - 30 of 96 nurses left in 2025, a labour turnover of 31.3%, from 16.7% at Observatory to 43.8% at Bellville (Exhibit 3).
+    - Turnover cost about R5.19m, R173,000 for each leaver, and agency spending rose from R6.30m to R10.08m (Exhibits 1 and 2).
+    - After the pay rise, nurses agreeing that their pay is fair rose from 31% to 52%, but those intending to stay fell from 58% to 55%; agreement fell on rotas (34%) and development (27%) (Exhibit 4).
+    - Rotas were the main reason for 9 of 26 leavers, workload for 6, development for 5 and pay for 3 (Exhibit 5).
+  insight:
+    - In Herzberg's terms, pay was a hygiene factor. Raising it removed a source of dissatisfaction, but it did not make nurses want to stay, because what drives them out is the rota and the lack of a future.
+    - Observatory shows what works at Silvertree itself. Nurses who control their rota and can develop stay, and its patients wait least and rate their care highest.
+    - The contracted agency and self-rostering save almost the same on paper, R0.96m and R0.94m a year, but only one of them reduces the number of nurses who leave.
+  options:
+    - A further pay rise costs R3.23m a year and leaves Silvertree R2.69m worse off on the head of people's estimates.
+    - Self-rostering is the cheapest real fix, at R0.60m a year, and acts on the main reason for leaving.
+    - The career ladder acts on development and brings in new revenue, but slowly.
+    - Team leaders narrow the span of control at a net cost of R0.46m a year.
+    - The contracted agency saves money and changes nothing else.
+  recommendation: >
+    One defensible recommendation: introduce self-rostering in every clinic now, using Observatory's method, with
+    rules that keep weekend and late shifts fair and Grace Adams to help the other managers. Start the career ladder in
+    the two clinics with the highest turnover, Bellville and Mitchells Plain, and extend it if turnover there falls.
+    Negotiate a single-agency rate as well, because vacancies will continue for a while and it saves money on cover
+    without pretending to solve the problem. Measure each clinic's turnover, agency shifts and waiting times every
+    quarter.
+  caveat: >
+    The estimates of turnover are judgements, not results, and Observatory may be different in ways that do not
+    transfer: a manager with Grace Adams's skills, or nurses who live nearby. If self-rostering does not reduce
+    turnover at the first clinics within six months, the explanation is probably workload or management rather than
+    the rota, and the board should look again at team leaders and staffing levels.
+
+method: >
+  Silvertree Clinics, Atlantic Health Partners and everyone in this case are fictional, and every figure is simulated.
+  Labour turnover is calculated from the leavers and the average number of nurses in Exhibit 3. Each leaver costs
+  recruitment and induction plus 80 agency shifts at the difference between an agency shift and an employed nurse's
+  shift, and each option in Exhibit 7 applies the head of people's estimate of turnover to that cost. The estimates of
+  turnover are stated assumptions, not predictions. A script in the repository (`scripts/qa/case-figures.py`) rebuilds
+  every exhibit and checks every figure in the text, and the unit tests recompute labour turnover with the platform's
+  finance functions.
+
+topics: [leadership-and-management]
+tools: [force-field-analysis]
+concepts: [change, creativity, ethics, sustainability]
+calculations: [labour-turnover]
+questions: []
+sources: [method-simulated, ib-bm-guide-2024]
+updated: 2026-11-03
+
+# Case Vault classification (src/lib/case-vault.ts).
+industry: healthcare
+functions: [human-resources, finance]
+difficulty: intermediate
+qualifications: [ib-dp-sl, ib-dp-hl, undergraduate]
+keyConcepts: [ethics, sustainability]
+caseType: fictional
+syllabus: ['2.1', '2.2', '2.3', '2.4', '2.5']
+
+analysisQuestions:
+  - id: sc-define
+    commandTerm: Define
+    ao: AO1
+    marks: 2
+    syllabus: ['2.4']
+    prompt: Define the term *non-financial rewards*.
+    guidance: >
+      One mark for rewards that are not paid in money, and one for an example or a fuller statement of what they
+      include, such as job enrichment, empowerment or teamwork. At Silvertree, a say in the rota and a course each year
+      are non-financial rewards.
+  - id: sc-turnover
+    commandTerm: Calculate
+    ao: AO4
+    marks: 4
+    level: HL
+    paper: paper-2
+    syllabus: ['2.4']
+    exhibits: [ex-3]
+    prompt: Using Exhibit 3, calculate the labour turnover in 2025 at Observatory, at Bellville and across all six clinics.
+    answer: >
+      Observatory: 3 ÷ 18 × 100 = 16.7%. Bellville: 7 ÷ 16 × 100 = 43.8%. All six clinics: 30 ÷ 96 × 100 = 31.3%.
+    guidance: >
+      One mark for the method and one for each correct answer, with no more than four in all. Divide by the average
+      number employed, not the number at the end of the year.
+  - id: sc-cost
+    commandTerm: Calculate
+    ao: AO4
+    marks: 4
+    paper: paper-2
+    syllabus: ['3.3', '2.4']
+    exhibits: [ex-2, ex-3]
+    prompt: Using Exhibits 2 and 3, calculate the cost to Silvertree of the nurses who left in 2025.
+    answer: >
+      Agency premium per shift = R4,200 − R2,600 = R1,600. Cost per leaver = R45,000 + 80 × R1,600 = R173,000. Cost of
+      30 leavers = 30 × R173,000 = R5,190,000, or R5.19m.
+    guidance: >
+      One mark for the premium, one for the cost per leaver, one for multiplying by the leavers and one for the answer.
+      The premium, not the whole agency rate, is the extra cost: Silvertree would have paid an employed nurse for the
+      shift anyway.
+  - id: sc-herzberg
+    commandTerm: Explain
+    ao: AO2
+    marks: 4
+    syllabus: ['2.4']
+    exhibits: [ex-4, ex-5]
+    prompt: Using Herzberg's motivation-hygiene theory, explain why the 2025 pay rise did not reduce nurse turnover.
+    guidance: >
+      Two marks for the theory: hygiene factors, such as pay and working conditions, cause dissatisfaction when they are
+      poor but do not motivate when they are good; motivators, such as achievement, recognition and growth, do. Two
+      marks for applying it with the evidence: the share who felt fairly paid rose from 31% to 52%, yet intention to
+      stay fell from 58% to 55%; the leavers named rotas and development far more often than pay.
+  - id: sc-span
+    commandTerm: Explain
+    ao: AO2
+    marks: 4
+    syllabus: ['2.2']
+    exhibits: [ex-3]
+    prompt: Using Exhibit 3, explain how the clinic managers' span of control might contribute to nurses leaving.
+    guidance: >
+      Each manager directly manages all of a clinic's nurses (between fourteen and eighteen) and six administrative
+      staff, a span of control of more than twenty. Two marks for explaining what a wide span means; two for the effect
+      in the case: little time for each nurse, little recognition or coaching, and rotas set from above, all of which
+      appear in the survey and the exit interviews.
+  - id: sc-sdt
+    commandTerm: Explain
+    ao: AO2
+    marks: 4
+    level: HL
+    syllabus: ['2.4']
+    exhibits: [ex-8]
+    prompt: Explain how Deci and Ryan's self-determination theory supports the self-rostering option.
+    guidance: >
+      Two marks for the theory: people are motivated from within when three needs are met, autonomy, competence and
+      relatedness. Two marks for applying it: building the rota together gives nurses autonomy over their working
+      lives; swapping among themselves builds relatedness; and Observatory's yearly course supports competence. Answers
+      that name the three needs without the case earn two marks at most.
+  - id: sc-evaluate
+    commandTerm: Evaluate
+    ao: AO3
+    marks: 10
+    syllabus: ['2.4', '2.1']
+    exhibits: [ex-4, ex-5, ex-7, ex-8]
+    prompt: Evaluate self-rostering and the clinical career ladder as ways for Silvertree to reduce nurse turnover.
+    guidance: |
+      A strong answer does four things.
+
+      - It uses the evidence on why nurses leave: rotas (9 of 26), workload (6), development (5) and pay (3).
+      - It weighs self-rostering: cheap, at R0.60m a year, quick, tested at Observatory and aimed at the main reason; but dependent on managers giving up control, and silent on development.
+      - It weighs the career ladder: aimed at development, with new revenue, but slow, dearer and at risk of training nurses for other employers.
+      - It reaches a judgement, such as using both in sequence, and says how Silvertree would know within a year whether it had worked.
+
+      Answers that treat the estimates in Exhibit 7 as certain, or that ignore the cause of turnover, stay in the middle of the range.
+
+exercise:
+  role: You are Thandiwe Mokoena, Silvertree's head of people.
+  brief: >
+    The board meets next month: the two founders and the investor's partner, Lindiwe Dube. The investor will not fund
+    another pay rise without evidence; the founders want clinics where nurses stay. You have the exit interviews, two
+    years of surveys, the clinic figures and your estimates of five options.
+  task: Recommend one option, or a sequence led by one, and show why it will keep nurses.
+  deliverable: A recommendation to the board of about 250 words, with the evidence for it, its yearly cost and effect, and how you will measure it.
+  minutes: 35
+  criteria:
+    - Links the choice to why nurses actually leave (Exhibits 4 and 5).
+    - Uses motivation theory accurately, for example Herzberg or, at HL, self-determination theory.
+    - Uses the costs and estimates in Exhibit 7, and treats the estimates as judgements.
+    - Sets out how success would be measured, clinic by clinic, within a year.
+
+debrief:
+  summary: >
+    Silvertree's problem is not pay. The pay rise moved the measure it was meant to move, and turnover rose anyway.
+    The evidence from the exit interviews, the survey and Observatory points to the rota, the workload and the lack of
+    a future. The strongest answers follow that evidence, and notice that the cheapest option on paper, a contracted
+    agency, is a way of paying less for the problem rather than solving it.
+  byOption:
+    - option: pay-rise
+      fit: weak
+      body: >
+        Pay is no longer the main complaint: the share who feel fairly paid rose from 31% to 52% after the last rise, and
+        only 3 of 26 leavers named it. A further rise of 8% costs R3.23m a year and, on the head of people's estimate,
+        leaves Silvertree R2.69m worse off. It treats a hygiene factor that is already largely fixed.
+    - option: self-rostering
+      fit: strong
+      body: >
+        The cheapest real fix, at R0.60m a year, with a net gain of R0.94m on the estimates. It acts on the most common
+        reason for leaving, gives nurses autonomy, and has worked at Silvertree's own best clinic, where turnover is
+        16.7%. Its risks are fairness between nurses and managers who resist giving up control, which clear rules and
+        Grace Adams's example can address.
+    - option: career-ladder
+      fit: conditional
+      body: >
+        It acts on development, which nurses rate lowest, and adds about R1.2m a year of revenue, for a net gain of R0.67m
+        from the second year. But it is slow, and it makes nurses more employable elsewhere. Strong as a second step,
+        after the rota, in the clinics that lose most nurses.
+    - option: team-leaders
+      fit: conditional
+      body: >
+        A span of control of more than twenty is a real problem, and team leaders would give nurses support. But the
+        forecast effect is modest, the net cost is R0.46m a year, and it leaves the rota as it is. Worth doing if
+        self-rostering shows that management, not the rota, is the cause.
+    - option: agency-deal
+      fit: weak
+      body: >
+        The largest saving on paper, R0.96m a year, and no effect at all on why nurses leave. Turnover stays at 31.3%,
+        the agency shifts continue, and patients keep meeting staff who do not know them. A sensible purchase alongside a
+        real fix, not instead of one.
+  tradeoffs:
+    - Cost of cover against cost of causes. A cheaper agency lowers the cost of each vacancy; only the other options reduce the number of vacancies.
+    - Speed against depth. Self-rostering can start in weeks; the career ladder builds a future but takes two years.
+    - Control against autonomy. Self-rostering asks managers to give up a source of control to keep their teams.
+    - Money against meaning. Pay addresses a hygiene factor; development and autonomy address motivators.
+  evidenceThatMatters:
+    - The pay rise that worked on the survey and not on turnover (Exhibit 4).
+    - The exit interviews, led by rotas and workload (Exhibit 5).
+    - Observatory, with the lowest turnover, the shortest waits and the best ratings (Exhibits 3, 6 and 8).
+    - The cost of a leaver, which is mostly agency premium (Exhibit 2).
+  changeYourMind:
+    - Self-rostering at the first clinics does not reduce turnover within six months. Look at workload and management instead.
+    - Observatory's results turn out to depend on Grace Adams rather than on the method. Invest in the managers.
+    - Other employers raise nurses' pay sharply. Pay could become a reason for leaving again.
+  commonErrors:
+    - Recommending more pay because pay usually motivates, without reading the survey and the exit interviews.
+    - Treating the contracted agency's saving as a solution.
+    - Calculating labour turnover with the number of nurses at the end of the year rather than the average.
+    - Using Herzberg to label factors without showing which ones the evidence points to.
+
+frameworks:
+  - name: Herzberg's motivation-hygiene theory
+    use: >
+      Explains why the pay rise failed: it improved a hygiene factor without adding a motivator. Rotas and workload are
+      hygiene factors too, which is why they drive nurses out; development and recognition are motivators.
+    terms: [herzbergs-motivation-hygiene-theory, hygiene-factors, motivators]
+    subtopics: ['2.4']
+  - name: Maslow's hierarchy of needs
+    use: >
+      Fair pay meets lower needs; the evidence suggests that the nurses' unmet needs are higher ones, for esteem and
+      growth.
+    terms: [maslows-hierarchy-of-needs]
+    subtopics: ['2.4']
+  - name: Self-determination theory and equity theory
+    level: HL
+    use: >
+      Self-rostering gives autonomy and relatedness; the career ladder builds competence. Equity theory warns that a
+      rota seen as unfair, where some nurses always get the worst shifts, can undo the benefit.
+    terms: [self-determination-theory, autonomy, competence, relatedness, equity-theory]
+    subtopics: ['2.4']
+  - name: Non-financial rewards
+    use: >
+      Empowerment over the rota, job enrichment through nurse-led clinics, and teamwork in swapping shifts are the
+      non-financial rewards the options offer.
+    terms: [non-financial-rewards, empowerment, job-enrichment, teamwork, flexible-working]
+    subtopics: ['2.4']
+  - name: Labour turnover
+    level: HL
+    use: >
+      The measure of the problem, and of any solution: 31.3% across the network, with a spread from 16.7% to 43.8% that
+      points to differences between clinics.
+    terms: [labour-turnover]
+    subtopics: ['2.4']
+  - name: Span of control
+    use: >
+      Each clinic manager oversees more than twenty people directly, which limits the time available for each nurse.
+    terms: [span-of-control, delegation]
+    subtopics: ['2.2']
+  - name: Leadership styles
+    use: >
+      Grace Adams's democratic approach to the rota contrasts with rotas set from above elsewhere; the choice of style
+      is part of the solution.
+    terms: [democratic-leadership, autocratic-leadership]
+    subtopics: ['2.3']
+  - name: Organizational culture
+    level: HL
+    use: >
+      Observatory's culture of shared responsibility differs from the other clinics', and culture explains why a method
+      that works there may not transfer at once.
+    terms: [organizational-culture, task-culture, role-culture]
+    subtopics: ['2.5']
+  - name: Force field analysis
+    level: HL
+    use: >
+      The forces for self-rostering (the exit interviews, Observatory's evidence) and against it (managers' control,
+      fears of unfairness) show which force to weaken first.
+    terms: [force-field-analysis]
+    tool: force-field-analysis
+
+discussion:
+  - >
+    Silvertree's investor sees turnover as a cost problem; its founders see it as a problem of care. How should a board
+    weigh a saving that leaves patients meeting unfamiliar staff against a fix whose financial effect is uncertain?
+  - >
+    The career ladder makes nurses more valuable to other employers. Is investing in people who may leave a mistake,
+    or the price of being an employer they want to stay with?
+  - >
+    Observatory may work because of Grace Adams rather than her method. How would you design the roll-out so that the
+    board learns which it is?
+
+furtherReading:
+  - title: 2.4 Motivation and demotivation
+    href: /topics/motivation-and-demotivation/
+    note: The motivation theories, financial and non-financial rewards and, for HL, labour turnover.
+  - title: 2.3 Leadership and management
+    href: /topics/leadership-and-management/
+    note: The leadership styles, and how to choose one for a situation.
+  - title: 2.2 Organizational structure
+    href: /topics/organizational-structure/
+    note: Span of control, delegation and the shapes of organizations.
+  - title: 2.5 Organizational (corporate) culture
+    href: /topics/organizational-corporate-culture/
+    note: Types of culture and cultural clashes, for HL.
+  - title: 'Toolkit: force field analysis'
+    href: /toolkit/force-field-analysis/
+    note: Weighing the forces for and against a change, for HL.
+  - title: Business management guide
+    source: ib-bm-guide-2024
+    location: pp. 25 to 27
+    note: The content and depth of teaching for the human resource management unit.

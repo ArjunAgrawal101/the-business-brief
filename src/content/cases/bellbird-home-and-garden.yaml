@@ -1,0 +1,682 @@
+# Bellbird Home and Garden. A fictional organization; every figure is simulated.
+# The statements balance and link across the two years, the cash flow forecast
+# starts from the overdraft at 30 June 2026, and each option in Exhibit 6 is the
+# base forecast plus that option's stated cash flows. scripts/qa/case-figures.py
+# rebuilds every exhibit and checks every figure in the text;
+# tests/unit/vault-cases.test.ts recomputes the ratios with src/lib/ratios.ts.
+
+title: Bellbird Home and Garden
+dek: A profitable family hardware chain in Brisbane will run out of overdraft just as its spring stock arrives.
+kind: fictional
+dataStatus: simulated
+organization:
+  name: Bellbird Home and Garden
+  sector: Home improvement and garden retail
+  location: Brisbane, Australia
+  size: Seven stores and a central warehouse, 186 employees
+  legalForm: Proprietary limited company (Pty Ltd), owned by one family
+currency:
+  code: AUD
+  symbol: 'A$'
+  unit: thousands of Australian dollars (A$000)
+decision: How should Bellbird fund its spring stock without breaching its overdraft, and what must change so that the problem does not return next year?
+brief: >
+  Bellbird made a profit last year and its sales grew by 15.8%, helped by two new stores. But the expansion was
+  paid for partly with the overdraft, and the stores and the warehouse are full of stock. The cash flow forecast
+  shows the overdraft limit of A$1,500k breached from August to October, as the spring range arrives and has to be
+  paid for before it sells. The bank will not raise the limit. The finance manager has costed four ways out, and
+  each one changes something the family cares about.
+
+narrative:
+  - >
+    Jim Marsh opened the first Bellbird store in Mount Gravatt, on Brisbane's south side, in 1994: timber, tools,
+    paint, and a plant nursery out the back. Thirty-two years later there are seven stores, a warehouse behind the
+    original site and 186 employees. Jim has retired but is still a director. His daughter, Helen Marsh, has been
+    managing director since 2019. She and her father own forty per cent of the company each, and her brother Peter,
+    who does not work in the business, owns the rest.
+  - >
+    Under Helen, Bellbird has grown faster than at any time in its history. In the year to 30 June 2026 it opened
+    two stores: at Coralwood, a new housing estate on the city's southern edge, in August 2025, and at North Lakes
+    in October. Sales rose from A$18.4m to A$21.3m. The new stores were fitted out for A$2.4m, paid for with a new
+    bank loan and the overdraft, and stocked from the warehouse, which was already holding more than in earlier
+    years.
+  - >
+    The profit did not follow the sales. Gross profit margin slipped as the new stores opened with discounts,
+    expenses rose with two more sets of staff and rent, and profit before interest and tax fell from A$920k to
+    A$426k (Exhibit 1). Coralwood lost A$307k in its first year (Exhibit 4). The cash, meanwhile, went into stock and
+    fittings. At 30 June the bank account was overdrawn by A$1.2m against a limit of A$1.5m, and Bellbird owed its
+    suppliers A$2.96m, more than a year earlier, partly because some invoices were being paid late (Exhibit 2).
+  - >
+    Now the spring range is on the water. Outdoor furniture, barbecues and pots were ordered from overseas in the
+    autumn, and the invoices fall due as the containers land in August and September, before customers buy the
+    goods in October, November and December. Lena Kowalski, the finance manager, has built a cash flow forecast for
+    the six months to December (Exhibit 3). It shows the overdraft passing its limit in August, reaching A$2.28m in
+    September, and coming back within the limit only in November.
+  - >
+    The bank has said no to a higher limit (Exhibit 7), and Bellbird's largest supplier wants its September
+    invoices paid on time (Exhibit 8). Lena has costed four ways out (Exhibit 6): sell the Mount Gravatt freehold
+    and lease it back; a working capital package of a clearance sale and longer credit from suppliers; close the
+    Coralwood store; or sell a fifth of the company to a family friend for A$1.5m. Helen has to put one plan to the
+    board next week, and the bank wants to see it by Friday.
+
+industryContext:
+  - >
+    Home improvement and garden retail sells to two kinds of customer: households improving their homes and gardens,
+    and trade customers such as builders, landscapers and handymen, who buy in larger quantities and usually on
+    credit. Households pay at the till, so most of a store's sales turn into cash at once; trade customers pay
+    later, on agreed terms.
+  - >
+    The business is seasonal and heavy with stock. In much of Australia, demand for plants, outdoor furniture and
+    barbecues peaks in spring and summer, and much of that range is imported, ordered months ahead and paid for
+    before it sells. A retailer's cash therefore falls as the season approaches and recovers only as customers buy.
+    Customers expect range and availability, so running out is costly; but every line bought ties up cash until it
+    is sold.
+  - >
+    Independent chains compete with large national chains that buy in great volume and compete on price. They tend
+    to win on advice, service and their relationships with trade customers rather than on price. Growth means new
+    stores, and each new store needs fittings and a full range of stock before it sells anything, so a chain that
+    grows quickly can run short of cash even while its sales and profits rise. Accountants call this overtrading.
+
+challenge: >
+  Bellbird is short of cash, not of customers. Its forecast says the overdraft will pass its limit for three months
+  while the spring stock is paid for and sold. Any plan must keep the account within the limit in August,
+  September and October, keep the suppliers and the bank on side, and leave the business able to trade next year.
+  Beneath the seasonal problem lies a structural one: two new stores and a build-up of slow-moving stock have
+  stretched the business's working capital, and one of the new stores is losing money. The board has to decide how
+  far to treat the symptom and how far the cause.
+
+financials:
+  summary: >
+    The accounts show a business that grew and became less liquid at the same time. Sales rose by 15.8% in the year
+    to 30 June 2026, but profit before interest and tax fell from A$920k to A$426k, and the statement of financial
+    position took on A$1.2m of overdraft and A$1.1m of new long-term borrowing. Stock rose from A$3.15m to A$4.88m.
+    The cash flow forecast turns those balances into months: on present plans the account is over its limit from
+    August to October.
+  exhibits: [ex-1, ex-2, ex-3]
+
+exhibits:
+  - id: ex-1
+    title: Statement of profit or loss, years to 30 June (A$000)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Item }
+      - { label: '2025', numeric: true, format: money }
+      - { label: '2026', numeric: true, format: money }
+    rows:
+      - [Sales revenue, 18400, 21300]
+      - [Cost of sales, 11960, 14271]
+      - [Gross profit, 6440, 7029]
+      - [Expenses, 5520, 6603]
+      - [Profit before interest and tax, 920, 426]
+      - [Interest, 120, 186]
+      - [Profit before tax, 800, 240]
+      - [Tax, 240, 72]
+      - [Profit for the period, 560, 168]
+      - [Dividends, 200, 100]
+      - [Retained profit, 360, 68]
+    totals: [Gross profit, Profit before interest and tax, Profit before tax, Profit for the period, Retained profit]
+    note: Expenses include depreciation of A$542k in 2026. Tax is charged at 30% of profit before tax.
+    source: Simulated teaching data, from Bellbird's annual accounts, set out in the layout the IB uses for a profit-making entity.
+
+  - id: ex-2
+    title: Statement of financial position at 30 June (A$000)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Item }
+      - { label: '2025', numeric: true, format: money }
+      - { label: '2026', numeric: true, format: money }
+    rows:
+      - ['Property, plant and equipment', 6800, 9200]
+      - [Less accumulated depreciation, 2100, 2642]
+      - [Non-current assets, 4700, 6558]
+      - [Cash, 420, 0]
+      - [Debtors, 610, 790]
+      - [Stock, 3150, 4880]
+      - [Current assets, 4180, 5670]
+      - [Total assets, 8880, 12228]
+      - [Bank overdraft, 0, 1200]
+      - [Trade creditors, 1980, 2960]
+      - [Other short-term loans, 640, 640]
+      - [Current liabilities, 2620, 4800]
+      - [Long-term borrowings, 1500, 2600]
+      - [Non-current liabilities, 1500, 2600]
+      - [Total liabilities, 4120, 7400]
+      - [Net assets, 4760, 4828]
+      - [Share capital, 1000, 1000]
+      - [Retained earnings, 3760, 3828]
+      - [Total equity, 4760, 4828]
+    totals: [Non-current assets, Current assets, Total assets, Current liabilities, Non-current liabilities, Total liabilities, Net assets, Total equity]
+    note: >
+      Stock at 30 June 2024 was A$2,900k. Other short-term loans are the part of the bank loan repayable within a
+      year. Debtors are trade customers, who are given 30 days to pay.
+    source: Simulated teaching data, from Bellbird's annual accounts, set out in the layout the IB uses for a profit-making entity.
+
+  - id: ex-3
+    title: Cash flow forecast, July to December 2026 (A$000)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Item }
+      - { label: July, numeric: true, format: money }
+      - { label: August, numeric: true, format: money }
+      - { label: September, numeric: true, format: money }
+      - { label: October, numeric: true, format: money }
+      - { label: November, numeric: true, format: money }
+      - { label: December, numeric: true, format: money }
+    rows:
+      - [Opening balance, -1200, -1380, -1640, -2280, -1900, -1250]
+      - [Cash and card sales, 1320, 1410, 1860, 2240, 2380, 2610]
+      - [Receipts from trade customers, 260, 240, 270, 300, 330, 340]
+      - [Total cash inflows, 1580, 1650, 2130, 2540, 2710, 2950]
+      - [Payments to suppliers, 1180, 1330, 2190, 1580, 1480, 1630]
+      - [Wages, 330, 330, 330, 330, 330, 380]
+      - [Rent and other expenses, 185, 185, 185, 185, 185, 185]
+      - [Loan repayments and interest, 65, 65, 65, 65, 65, 65]
+      - [Total cash outflows, 1760, 1910, 2770, 2160, 2060, 2260]
+      - [Net cash flow, -180, -260, -640, 380, 650, 690]
+      - [Closing balance, -1380, -1640, -2280, -1900, -1250, -560]
+    totals: [Total cash inflows, Total cash outflows, Net cash flow, Closing balance]
+    note: >
+      A negative balance is an overdraft; the limit is A$1,500k. The forecast assumes that suppliers are paid on
+      their 60-day terms, that the five established stores trade as they did last spring, and that the two new
+      stores reach their plans. Wages rise in December for extra Christmas staff.
+    source: Simulated teaching data, prepared by the finance manager in the layout the IB uses for a cash flow forecast.
+
+  - id: ex-4
+    title: The stores, year to 30 June 2026 (A$000)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Store }
+      - { label: Opened }
+      - { label: Sales, numeric: true, format: money }
+      - { label: Store profit, numeric: true, format: money }
+      - { label: Stock at 30 June, numeric: true, format: money }
+    rows:
+      - [Mount Gravatt, '1994', 4600, 640, 600]
+      - [Capalaba, '2001', 3700, 470, 560]
+      - [Indooroopilly, '2006', 3400, 420, 520]
+      - [Springwood, '2011', 3100, 350, 500]
+      - [Kedron, '2016', 2800, 290, 480]
+      - [Coralwood, August 2025, 2040, -307, 420]
+      - [North Lakes, October 2025, 1660, 63, 470]
+    footer: [Total, '', 21300, 1926, 3550]
+    footerIsSum: true
+    note: >
+      Store profit is the store's gross profit less its own wages, rent, running costs and depreciation. Central
+      costs of A$1,500k (head office, the warehouse, buying and marketing) are not shared out: store profits of
+      A$1,926k less central costs give the profit before interest and tax of A$426k. The warehouse holds a further
+      A$1,330k of stock, making A$4,880k in all. Coralwood's first year: sales A$2,040k, gross profit A$612k (a
+      margin of 30.0% after its opening discounts), wages A$480k, rent and running costs A$324k, and depreciation of
+      its fittings A$115k. It employs 24 people.
+    source: Simulated teaching data, from Bellbird's management accounts.
+
+  - id: ex-5
+    title: Stock by age since delivery, 30 June 2026
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Age of stock }
+      - { label: 'A$000', numeric: true, format: money }
+      - { label: Share of stock (%), numeric: true, format: d1 }
+    rows:
+      - [Up to 90 days, 2900, 59.4]
+      - [91 to 180 days, 980, 20.1]
+      - [Over 180 days, 1000, 20.5]
+    footer: [Total, 4880, 100.0]
+    footerIsSum: true
+    note: >
+      Most of the stock more than 180 days old is outdoor furniture and pots left from last spring, and lines that
+      did not sell. A clearance sale could turn it into about A$800k of cash in August and September, at a loss of
+      about A$200k against what it cost.
+    source: Simulated teaching data, from the stock system.
+
+  - id: ex-6
+    title: Four ways to fix the overdraft, with the forecast closing balance each month (A$000)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Option }
+      - { label: July, numeric: true, format: money }
+      - { label: August, numeric: true, format: money }
+      - { label: September, numeric: true, format: money }
+      - { label: October, numeric: true, format: money }
+      - { label: November, numeric: true, format: money }
+      - { label: December, numeric: true, format: money }
+      - { label: Change in yearly profit before interest, numeric: true, format: money }
+    rows:
+      - [No action, -1380, -1640, -2280, -1900, -1250, -560, 0]
+      - [Sale and leaseback, -1380, -1640, 120, 482, 1114, 1786, -156]
+      - [Working capital package, -1380, -1140, -880, -500, -150, 240, -200]
+      - [Close Coralwood, -1380, -1880, -2364, -1828, -1022, -316, 307]
+      - [New share capital, -1380, -1640, -780, -400, 250, 940, 0]
+    note: |
+      Each option is the forecast in Exhibit 3 with these cash flows added.
+
+      - Sale and leaseback: the Mount Gravatt store and warehouse sold for A$2,400k, paid in September, and leased back for 15 years at A$216k a year (A$18k a month from October). Depreciation of A$60k a year on the buildings stops.
+      - Working capital package: stock that cost A$1,000k sold for A$500k in August and A$300k in September (a one-off loss of A$200k), and A$600k of September's supplier payments moved, half to November and half to December.
+      - Close Coralwood: closure costs of A$240k in August. From September, each month, A$170k of sales are lost, A$119k less is paid to suppliers, and A$40k of wages and A$27k of rent and running costs are saved; the store's A$420k of stock is used in the other stores in place of A$140k of purchases in each of September, October and November. The profit change is the store's loss removed, from the first full year.
+      - New share capital: A$1,500k for a fifth of the enlarged company, paid in September.
+
+      Interest is left out. The overdraft costs 9% a year, so every option that reduces it also saves interest.
+    source: Simulated teaching data, prepared by the finance manager.
+
+  - id: ex-7
+    title: The bank's reply
+    kind: quote
+    provenance: simulated-data
+    quote:
+      text: >
+        We have supported Bellbird's growth and we want to keep doing so. But we cannot raise the overdraft limit
+        above A$1.5m without more security or more equity in the business. We will accept a short excess over the
+        limit only if a plan that clears it within a month has been agreed with us in advance. Please send us your
+        plan by Friday.
+      attribution: Aaron Webb, relationship manager, Moreton Commercial Bank
+    source: Fictional letter, written for this case.
+
+  - id: ex-8
+    title: The largest supplier's position
+    kind: quote
+    provenance: simulated-data
+    quote:
+      text: >
+        Your invoices for the spring range come to more than you have ever ordered from us. We were patient when
+        payments slipped this year, but we need September's invoices paid on our 60-day terms. If you want longer
+        terms on part of the order, talk to us now, before the containers land.
+      attribution: Sofia Bianchi, finance director, Harbourline Outdoor Imports
+    source: Fictional email, written for this case.
+
+constraints:
+  - The overdraft limit is A$1,500k and the bank will not raise it. A short excess is accepted only under a plan, agreed in advance, that clears it within a month (Exhibit 7).
+  - The spring range has already been ordered and shipped. The invoices will arrive whatever Bellbird decides.
+  - New shares need the agreement of all three shareholders, and the family has said it will not give up control of the company.
+  - A sale and leaseback takes about eight weeks to complete, so its cash cannot arrive before September.
+  - Closing a store means paying out the rest of its lease and redundancy pay to its staff.
+
+stakeholders:
+  - name: Helen Marsh, managing director and shareholder
+    interest: Growth, with the business still in the family's hands.
+    influence: high
+    stake: high
+    concern: Being the generation that sold the land, gave away control or closed a store a year after opening it.
+  - name: Jim Marsh, founder, director and shareholder
+    interest: The business he built, and the Mount Gravatt site where it began.
+    influence: high
+    stake: high
+    concern: Selling the freehold to solve a problem that lasts three months.
+  - name: Peter Marsh, shareholder outside the business
+    interest: Dividends and the value of his shares.
+    influence: medium
+    stake: medium
+    concern: Dilution if new shares are sold, or a cut in dividends.
+  - name: Lena Kowalski, finance manager
+    interest: A plan the bank will accept, and a forecast that holds.
+    influence: medium
+    stake: high
+    concern: A breach of the limit that damages her credibility with the bank.
+  - name: Moreton Commercial Bank
+    interest: Repayment, and security for what it lends.
+    influence: high
+    stake: medium
+    concern: Lending more to a business whose liquidity has fallen.
+  - name: Harbourline Outdoor Imports and other suppliers
+    interest: Payment on time.
+    influence: medium
+    stake: medium
+    concern: Being used as a free source of finance by a customer that already pays late.
+  - name: Coralwood staff (24)
+    interest: Their jobs.
+    influence: low
+    stake: high
+    concern: Closure after a single year.
+  - name: Trade customers
+    interest: Stock on the shelves and credit on their accounts.
+    influence: medium
+    stake: medium
+    concern: Empty shelves in spring, or credit tightened to save cash.
+  - name: Kerry Tan, possible investor
+    interest: A return on A$1.5m and a say in how it is used.
+    influence: medium
+    stake: medium
+    concern: Buying into a business that is short of cash.
+
+options:
+  - id: sale-leaseback
+    label: Sell and lease back the Mount Gravatt site
+    summary: Sell the freehold of the Mount Gravatt store and warehouse to a property investor for A$2.4m and lease it back for fifteen years.
+    requires: A buyer within eight weeks, and the family's agreement to sell the land the business started on.
+    upside: Raises far more cash than any other option, clears the overdraft from September and leaves money to spare.
+    risks: Too late for August, so the bank must accept a short excess. Adds rent of A$216k a year for fifteen years, and loses the main asset behind the business's borrowing.
+    evidence: [ex-6, ex-7]
+  - id: working-capital
+    label: Working capital package
+    summary: Clear the slow-moving stock in a sale, and ask suppliers to take A$600k of September's payments in November and December.
+    requires: Harbourline's agreement before the containers land, and a clearance sale that does not undercut full-price lines.
+    upside: Keeps the overdraft within the limit in every month and turns stock that is not selling into cash.
+    risks: A one-off loss of A$200k on the cleared stock; depends on suppliers who have already been paid late; leaves the causes of the problem in place.
+    evidence: [ex-3, ex-5, ex-6, ex-8]
+  - id: close-coralwood
+    label: Close the Coralwood store
+    summary: Close the loss-making store opened in August 2025 and move its stock to the other stores.
+    requires: Paying out the lease and redundancy pay, and telling 24 staff that their store will close after a year.
+    upside: Removes a store that lost A$307k in its first year, and improves profit in every year after.
+    risks: Costs A$240k in August, so the overdraft is worse this spring, not better. The store may have been about to turn the corner.
+    evidence: [ex-4, ex-6]
+  - id: new-equity
+    label: Sell a fifth of the company
+    summary: Issue new shares worth A$1.5m to Kerry Tan, a family friend, for a fifth of the enlarged company.
+    requires: All three shareholders to agree, and terms on dividends and a seat on the board.
+    upside: Permanent finance that carries no interest, lowers gearing and brings the balance within the limit from September.
+    risks: August is still over the limit; the family gives up a fifth of the business and some of its control; the investor will expect a return.
+    evidence: [ex-2, ex-6]
+
+analysis:
+  data:
+    - Sales rose by 15.8% to A$21.3m, but profit before interest and tax fell from A$920k to A$426k, and the profit margin from 5.0% to 2.0% (Exhibit 1).
+    - The current ratio fell from 1.60 to 1.18 and the acid test ratio from 0.39 to 0.16. Stock rose from A$3.15m to A$4.88m, and A$1,000k of it is more than 180 days old (Exhibits 2 and 5).
+    - On present plans the overdraft passes its A$1,500k limit in August, reaches A$2,280k in September and is still A$400k over the limit in October (Exhibit 3).
+    - Coralwood lost A$307k in its first year, while the five established stores earned A$2,170k between them (Exhibit 4).
+  insight:
+    - Two problems sit on top of each other. One is seasonal, because spring stock is paid for in August and September and sold from October. The other is structural, because rapid expansion and slow-moving stock have used up the cash that once carried the business through spring. That is overtrading.
+    - The gap is about A$780k at its worst, in September, and it lasts three months. A measure that adds cash permanently is larger than the problem needs; a measure whose cash arrives after August cannot prevent the first breach.
+    - Closing Coralwood is the right question for profit and the wrong answer for this spring, because it costs cash before it saves any.
+  options:
+    - The sale and leaseback raises A$2.4m, far more than the gap, and arrives in September, after the first breach. It swaps a seasonal problem for a fifteen-year commitment.
+    - The working capital package keeps every month within the limit, with the lowest balance A$1,380k overdrawn in July, at a one-off cost of A$200k. It depends on Harbourline agreeing now.
+    - Closing Coralwood makes the lowest balance worse, A$2,364k overdrawn in September, but adds A$307k a year to profit from then on.
+    - New shares fix September onwards and lower gearing, but leave August over the limit and cost the family a fifth of the company.
+  recommendation: >
+    One defensible recommendation: take the working capital package now, because it matches a short-term remedy to
+    a problem that lasts three months. Agree the deferral with Harbourline before the containers land, run the
+    clearance sale in August on lines more than 180 days old, and send the bank the revised forecast, which never
+    passes the limit. Then deal with the cause after the season: set Coralwood a target for spring, with closure in
+    the new year if it misses it; open no new store until the current ratio is back above 1.5; and buy next
+    spring's range in smaller, later orders.
+  caveat: >
+    This rests on Harbourline agreeing to the deferral and on the clearance sale raising A$800k without drawing
+    customers away from full-price lines. If either fails, September would be over the limit again, and the choice
+    would be between new shares, which keep the land, and the sale and leaseback, which keeps the family's share of
+    the company. If Coralwood trades as weakly this spring as in its first year, it should close in the new year
+    whatever happens to the overdraft.
+
+method: >
+  Bellbird Home and Garden, its stores, its bank, its supplier, its investor and everyone in this case are
+  fictional, and every figure is simulated. The statements follow the layout the IB uses; the statement of
+  financial position balances in both years, and retained earnings rise by exactly the retained profit. The cash
+  flow forecast starts from the overdraft at 30 June, and each option in Exhibit 6 is the base forecast with that
+  option's stated cash flows added. Taxes on the options, interest on the overdraft and the accounting gain on a
+  sale of the property are left out so that the comparison stays visible. A script in the repository
+  (`scripts/qa/case-figures.py`) rebuilds every exhibit from these assumptions and checks every figure in the
+  text, and the unit tests recompute the ratios with the platform's finance functions.
+
+topics: []
+tools: []
+concepts: [change, creativity, ethics, sustainability]
+calculations: [gross-profit-margin, profit-margin, roce, current-ratio, acid-test-ratio, stock-turnover-days, creditor-days, gearing-ratio, net-cash-flow, closing-balance]
+questions: []
+sources: [method-simulated, ib-bm-guide-2024]
+updated: 2026-11-03
+
+# Case Vault classification (src/lib/case-vault.ts).
+industry: retail
+functions: [finance, strategy]
+difficulty: intermediate
+qualifications: [ib-dp-sl, ib-dp-hl, undergraduate]
+keyConcepts: [sustainability, change]
+caseType: fictional
+syllabus: ['1.4', '3.2', '3.4', '3.5', '3.6', '3.7']
+
+analysisQuestions:
+  - id: bb-define
+    commandTerm: Define
+    ao: AO1
+    marks: 2
+    syllabus: ['3.7']
+    prompt: Define the term *working capital*.
+    guidance: >
+      One mark for the idea that working capital is the money available to run the business day to day, and one
+      for how it is measured: current assets minus current liabilities. At 30 June 2026 Bellbird's working capital
+      was A$870k (A$5,670k less A$4,800k), down from A$1,560k a year earlier.
+  - id: bb-ratios
+    commandTerm: Calculate
+    ao: AO4
+    marks: 4
+    paper: paper-2
+    syllabus: ['3.5']
+    exhibits: [ex-2]
+    prompt: Using Exhibit 2, calculate Bellbird's current ratio and acid test ratio at 30 June 2025 and at 30 June 2026.
+    answer: >
+      Current ratio: 2025, 4,180 ÷ 2,620 = 1.60; 2026, 5,670 ÷ 4,800 = 1.18. Acid test ratio: 2025,
+      (4,180 − 3,150) ÷ 2,620 = 0.39; 2026, (5,670 − 4,880) ÷ 4,800 = 0.16.
+    guidance: >
+      One mark for each ratio, with its working. Write the ratios as numbers (1.18), not percentages. The fall in the
+      acid test ratio is the more serious: leaving out stock, Bellbird has about sixteen cents of liquid assets for
+      every dollar it owes in the short term.
+  - id: bb-profit-cash
+    commandTerm: Explain
+    ao: AO2
+    marks: 4
+    syllabus: ['3.7']
+    exhibits: [ex-1, ex-3]
+    prompt: Explain why Bellbird made a profit in the year to 30 June 2026 and is still forecast to breach its overdraft limit.
+    guidance: >
+      A strong answer separates the two measures. Profit is revenue less the costs of the period, whether or not
+      they have been paid; cash flow is money in and out when it moves. It then uses the case: the A$2,400k spent on
+      fitting out the stores is capital expenditure, so only depreciation reaches the statement of profit or loss;
+      stock rose by A$1,730k, cash spent on goods not yet sold; and the spring range is paid for in August and
+      September but sold from October. Two reasons, each developed and tied to the exhibits, earn the marks.
+  - id: bb-efficiency
+    commandTerm: Calculate
+    ao: AO4
+    marks: 4
+    level: HL
+    paper: paper-2
+    syllabus: ['3.6']
+    exhibits: [ex-1, ex-2]
+    prompt: Using Exhibits 1 and 2, calculate for the year to 30 June 2026 (i) the stock turnover in days and (ii) the creditor days.
+    answer: >
+      (i) Average stock = (3,150 + 4,880) ÷ 2 = 4,015. Stock turnover = 4,015 ÷ 14,271 × 365 = 102.7 days.
+      (ii) Creditor days = 2,960 ÷ 14,271 × 365 = 75.7 days.
+    guidance: >
+      Two marks for each: one for the method and one for the answer. Both use the cost of sales, as the guide's
+      formulas do, not sales revenue. For comparison, the figures for 2025 are 92.3 days and 60.4 days.
+  - id: bb-suppliers
+    commandTerm: Explain
+    ao: AO2
+    marks: 4
+    level: HL
+    syllabus: ['3.6', '1.4']
+    exhibits: [ex-8]
+    prompt: Explain one risk to Bellbird of paying its suppliers in 75.7 days when their terms are 60 days.
+    guidance: >
+      Paying suppliers late is a source of short-term finance, but it is borrowed goodwill. A strong answer explains
+      a risk in Bellbird's situation: Harbourline may refuse the deferral that the working capital package depends
+      on, insist on payment before it ships, or cut Bellbird's credit, which would turn a timing problem into a
+      supply problem just before the spring peak. It may also raise its prices to cover the cost of waiting. One
+      risk, explained and tied to the case, earns the marks.
+  - id: bb-coralwood
+    commandTerm: Explain
+    ao: AO2
+    marks: 4
+    syllabus: ['3.7']
+    exhibits: [ex-4, ex-6]
+    prompt: Using Exhibits 4 and 6, explain why closing the Coralwood store would improve Bellbird's profit but worsen its cash position this spring.
+    guidance: >
+      Profit: the store lost A$307k in its first year, so closing it removes that loss from later years. Cash:
+      closure costs A$240k in August, the store's sales of A$170k a month stop, and the monthly saving is only A$16k
+      because most of the store's costs were wages, rent and stock that brought sales in. The lowest balance becomes
+      A$2,364k overdrawn in September, worse than doing nothing. The best answers notice that the store's
+      depreciation of A$115k is a cost but not a cash outflow, which is why its cash loss of A$192k a year is smaller
+      than its accounting loss.
+  - id: bb-evaluate
+    commandTerm: Evaluate
+    ao: AO3
+    marks: 10
+    paper: paper-2
+    syllabus: ['3.2', '3.7']
+    exhibits: [ex-3, ex-6, ex-7, ex-8]
+    prompt: Evaluate the sale and leaseback and the working capital package as ways for Bellbird to deal with its liquidity problem.
+    guidance: |
+      A strong answer does four things.
+
+      - It sizes the problem first: about A$780k over the limit at worst, for three months, on top of a structural squeeze from expansion.
+      - It weighs the sale and leaseback: A$2.4m is far more than the gap, arrives after the August breach, adds A$216k of rent a year for fifteen years and sells the asset that secures the bank's lending; but it lowers gearing and leaves room for next year.
+      - It weighs the package: within the limit every month at a one-off cost of A$200k, matched to a short-term need, but dependent on Harbourline and on a clearance sale that does not draw customers away from full-price lines.
+      - It reaches a judgement that depends on whether the problem is seasonal or structural, and says what evidence would change it.
+
+      Answers that describe both options without weighing them against the size and timing of the gap stay in the middle of the range.
+
+exercise:
+  role: You are Lena Kowalski, Bellbird's finance manager.
+  brief: >
+    The board meets on Tuesday, and the bank wants a plan by Friday. Helen has asked you to recommend one of the
+    options in Exhibit 6 and to say what Bellbird must change before next spring. The family will read your memo
+    closely: Jim does not want to sell the land, Peter does not want his share diluted, and Helen does not want to
+    close a store she opened a year ago.
+  task: Choose one alternative and defend it against the forecast, the bank's terms and the family's aims.
+  deliverable: A memo to the board of about 250 words, giving your choice, the forecast it produces, its main risk and two changes for next year.
+  minutes: 35
+  criteria:
+    - Uses the forecast, stating the lowest closing balance and the months over the limit under the chosen option (Exhibit 6).
+    - Separates the seasonal problem from the structural one, and says which one the choice deals with.
+    - Weighs the stakeholders whose agreement the choice needs, above all the bank, Harbourline and the family.
+    - Says what would make the choice wrong, and what Bellbird would do then.
+
+debrief:
+  summary: >
+    Bellbird's problem is a three-month shortfall of about A$780k at its worst, sitting on top of a year of fast
+    growth that used up the business's working capital. The strongest plans match the remedy to that shape:
+    short-term finance for the seasonal gap now, and a separate decision, after the season, about the expansion that
+    caused it.
+  byOption:
+    - option: sale-leaseback
+      fit: conditional
+      body: >
+        It solves the problem with room to spare, but it is a long-term answer to a short-term gap. The cash arrives
+        in September, so August is still A$140k over the limit, and the business takes on A$216k of rent a year for
+        fifteen years in exchange for the asset that secures its borrowing. Defensible if you read the problem as
+        structural and expect to need the money for several springs, or if the family plans further growth; weak if
+        the gap is seasonal.
+    - option: working-capital
+      fit: strong
+      body: >
+        The only option that keeps every month within the limit: the lowest balance is A$1,380k overdrawn, in July,
+        and the account is in credit by December. The cost is a one-off loss of A$200k on stock that was not
+        selling. Its weakness is that it depends on Harbourline, which has already been paid late, and it leaves the
+        causes in place, so it must come with changes to buying and to expansion.
+    - option: close-coralwood
+      fit: weak
+      body: >
+        Right for profit, wrong for this spring. Closure costs A$240k in August and then saves only A$16k a month,
+        so the lowest balance becomes A$2,364k overdrawn in September, worse than doing nothing. Coralwood's future
+        is a real question, best decided on its spring trading rather than in a cash crisis.
+    - option: new-equity
+      fit: conditional
+      body: >
+        Permanent finance that lowers gearing and clears the account from September, without the rent of a
+        leaseback. But August is still over the limit, and the family gives up a fifth of the company to solve a
+        problem that lasts three months. Strong if Bellbird wants to keep growing; expensive if it does not.
+  tradeoffs:
+    - Speed against size. The package acts in August with modest sums; the leaseback and the new shares raise more, but only from September.
+    - Once against every year. The package costs A$200k once; the leaseback costs A$216k a year for fifteen years.
+    - Control against cost. New shares carry no interest or rent, but cost a fifth of the company.
+    - Profit against cash. Closing Coralwood helps the first and hurts the second this spring.
+  evidenceThatMatters:
+    - The size and length of the gap, A$780k over the limit at worst and for three months (Exhibit 3).
+    - When each option's cash arrives, month by month (Exhibit 6).
+    - The A$1,000k of stock more than 180 days old, which is cash waiting to be released (Exhibit 5).
+    - The supplier's offer to talk about terms before the containers land (Exhibit 8).
+  changeYourMind:
+    - Harbourline refuses the deferral. The package then fails in September, and the choice is between new shares and the leaseback.
+    - The forecast is too hopeful about spring sales. A larger, longer gap points to permanent finance.
+    - The family decides to keep opening stores. New shares or the leaseback would then fund that growth as well as this spring.
+  commonErrors:
+    - Treating profit as cash. Bellbird is profitable and still short of cash.
+    - Choosing the option that raises the most money rather than the one that fits the size and timing of the gap.
+    - Missing that the leaseback and the new shares arrive after the August breach.
+    - Recommending the closure of Coralwood as a cash measure without reading its month-by-month effect.
+
+frameworks:
+  - name: The working capital cycle
+    use: >
+      Cash leaves Bellbird when it pays for stock and comes back when the stock sells. The spring range lengthens
+      the cycle just as the business has least cash in it, and slow-moving stock lengthens it all year.
+    terms: [working-capital, working-capital-cycle]
+    subtopics: ['3.7']
+  - name: Profit and cash flow
+    use: >
+      The key distinction in the case: a profitable year can end with an overdraft, because fittings and stock use
+      cash without appearing as expenses, and because sales and payments fall in different months.
+    terms: [profit, cash-flow, cash-flow-forecast, net-cash-flow, closing-balance]
+    subtopics: ['3.7']
+  - name: Liquidity ratios
+    use: >
+      The current ratio and the acid test ratio measure the squeeze at the year end; the acid test ratio, which
+      leaves stock out, shows it most clearly.
+    terms: [current-ratio, acid-test-ratio, liquidity]
+    subtopics: ['3.5']
+  - name: Efficiency ratios
+    level: HL
+    use: >
+      Stock turnover in days and creditor days show where the cash went: into stock that sells more slowly, partly
+      financed by paying suppliers later than their terms. Gearing shows how much of the expansion was borrowed.
+    terms: [stock-turnover, creditor-days, debtor-days, gearing-ratio]
+    subtopics: ['3.6']
+  - name: Overtrading
+    use: >
+      Growth that outruns the working capital needed to support it. Bellbird's two new stores needed fittings and
+      stock before they sold anything, and one of them lost money.
+    terms: [overtrading]
+    subtopics: ['3.7']
+  - name: Matching sources of finance to the need
+    use: >
+      A seasonal gap suits short-term finance; a permanent need suits long-term finance. The case's options span the
+      range, from supplier credit and a clearance sale to a sale and leaseback and new share capital.
+    terms: [short-term-finance, long-term-finance, sale-and-leaseback, share-capital, overdraft, trade-credit]
+    subtopics: ['3.2']
+  - name: Stakeholder conflict
+    use: >
+      Each option needs a different stakeholder's agreement and costs a different stakeholder something: the bank's
+      security, the supplier's patience, the family's land or control, or the Coralwood staff's jobs.
+    terms: [stakeholder-conflict, stakeholder]
+    subtopics: ['1.4']
+
+discussion:
+  - >
+    Overtrading is often called a problem of success. Using Bellbird's figures, separate the part of the cash
+    shortfall caused by growth from the part caused by the season, and say which part each option addresses.
+  - >
+    A sale and leaseback turns an owned asset into a long lease. How would a lender and an equity investor each read
+    the transaction, and how would the lease appear in Bellbird's accounts under the accounting standards you study?
+  - >
+    Set out, as measurable targets, what next spring's forecast and this spring's trading would need to show before
+    the board approves another store.
+
+furtherReading:
+  - title: 'The Finance Desk: ratio analysis'
+    href: /finance-desk/ratios/
+    note: Every ratio on the guide's formula sheet, worked from two years of statements, with strategies that change the accounts.
+  - title: 'The Finance Desk: the cash flow lab'
+    href: /finance-desk/cash-flow/
+    note: A cash flow forecast in the IB layout, with the effect of different ways of paying for an investment.
+  - title: 3.7 Cash flow
+    href: /topics/cash-flow/
+    note: Profit and cash flow, working capital, forecasts and strategies for cash flow problems.
+  - title: 3.5 Profitability and liquidity ratio analysis
+    href: /topics/profitability-and-liquidity-ratio-analysis/
+    note: The profitability and liquidity ratios, and strategies to improve them.
+  - title: 3.6 Efficiency ratio analysis
+    href: /topics/efficiency-ratio-analysis/
+    note: Stock turnover, debtor and creditor days and gearing, for HL.
+  - title: 3.2 Sources of finance
+    href: /topics/sources-of-finance/
+    note: Internal and external, short-term and long-term finance, and which suits a given situation.
+  - title: Business management guide
+    source: ib-bm-guide-2024
+    location: pp. 63 to 65
+    note: The layout of a cash flow forecast and the formulas for every ratio, as used in examinations.
+  - title: The Paper 2 assessment guide
+    href: /downloads/guides/business-brief-paper-2-assessment-guide.pdf
+    note: The creator's guide to the quantitative paper, where questions like this case's calculations are set.

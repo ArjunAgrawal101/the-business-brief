@@ -251,11 +251,74 @@ export const exhibitSchema = z.object({
   footer: z.array(cell).optional(),
   /** When true, the footer must equal the column sums of the numeric columns (checked by tests). */
   footerIsSum: z.boolean().default(false),
+  /** Rows (by their first cell) that are subtotals or totals, set in bold with a rule above, as in a set of accounts. */
+  totals: z.array(z.string()).default([]),
   items: z.array(z.object({ label: z.string(), value: z.string(), note: z.string().optional() })).optional(),
   quote: z.object({ text: md, attribution: z.string() }).optional(),
   source: md,
 });
 export type Exhibit = z.infer<typeof exhibitSchema>;
+
+/* Case Vault: how a case is classified for the archive (labels in src/lib/case-vault.ts). */
+
+/** Industries a case can belong to. Add a value here, with its label in src/lib/case-vault.ts, for a new industry. */
+export const INDUSTRIES = [
+  'technology',
+  'automobile',
+  'retail',
+  'banking',
+  'fmcg',
+  'healthcare',
+  'e-commerce',
+  'education',
+  'aviation',
+  'sports',
+  'fashion',
+  'renewable-energy',
+  'social-enterprise',
+  'hospitality',
+  'logistics',
+  'manufacturing',
+] as const;
+export type Industry = (typeof INDUSTRIES)[number];
+
+/** Business functions, following the course's units: unit 1 (strategy), 2 (human resources), 3 (finance), 4 (marketing), 5 (operations). */
+export const BUSINESS_FUNCTIONS = ['strategy', 'human-resources', 'finance', 'marketing', 'operations'] as const;
+export type BusinessFunction = (typeof BUSINESS_FUNCTIONS)[number];
+
+export const DIFFICULTIES = ['foundation', 'intermediate', 'advanced'] as const;
+export type Difficulty = (typeof DIFFICULTIES)[number];
+
+/** Who a case is written for. A case for IB DP SL is also for HL, because HL students study the SL course. */
+export const QUALIFICATIONS = ['ib-dp-sl', 'ib-dp-hl', 'undergraduate', 'mba'] as const;
+export type Qualification = (typeof QUALIFICATIONS)[number];
+
+/** How a case was made: an invented organization with simulated data, or a real one from cited, dated sources. */
+export const CASE_TYPES = ['fictional', 'sourced'] as const;
+export type CaseType = (typeof CASE_TYPES)[number];
+
+/**
+ * A question for analysis inside a case: original, with a command term at the
+ * guide's AO level, a mark allocation and guidance on a strong answer (never
+ * called a markscheme). Checked by src/lib/integrity-cases.ts.
+ */
+export const caseQuestionSchema = z.object({
+  id: z.string(),
+  commandTerm: z.string(),
+  ao,
+  marks: z.number().int().positive(),
+  level: level.default('SL/HL'),
+  /** The paper whose style the question follows, where it clearly fits. */
+  paper: z.enum(['paper-1', 'paper-2', 'paper-3']).optional(),
+  syllabus: z.array(z.string()).min(1),
+  exhibits: ids,
+  prompt: md,
+  /** What a strong answer does, point by point. Guidance, not a markscheme. */
+  guidance: md,
+  /** For a calculation: the worked answer, recomputed by the tests. */
+  answer: md.optional(),
+});
+export type CaseQuestion = z.infer<typeof caseQuestionSchema>;
 
 export const caseSchema = z.object({
   title: z.string(),
@@ -317,6 +380,79 @@ export const caseSchema = z.object({
   decisionRoom: z.string().optional(),
   sources: ids,
   updated: z.coerce.date(),
+
+  /* Case Vault classification. Optional, so a case written without it still builds; a case that carries any of it must carry all of it (src/lib/integrity-cases.ts). */
+  industry: z.enum(INDUSTRIES).optional(),
+  functions: z.array(z.enum(BUSINESS_FUNCTIONS)).default([]),
+  difficulty: z.enum(DIFFICULTIES).optional(),
+  qualifications: z.array(z.enum(QUALIFICATIONS)).default([]),
+  /** The one or two concepts the case puts at its centre (`concepts` lists every concept it can be read through). */
+  keyConcepts: z.array(conceptId).max(2).default([]),
+  caseType: z.enum(CASE_TYPES).optional(),
+  /** IB DP subtopic codes ("3.5") the case serves; the vault's topic filter. */
+  syllabus: z.array(z.string()).default([]),
+
+  /* The fuller case structure. Each part is optional and is shown only when present. */
+  /** The industry in general terms: how it works and what is changing, with no statistics about real markets. */
+  industryContext: z.array(md).default([]),
+  /** The key challenge, in a paragraph. */
+  challenge: md.optional(),
+  /** The financial information: a summary and the exhibits that hold the figures. */
+  financials: z.object({ summary: md, exhibits: z.array(z.string()).min(1) }).optional(),
+  analysisQuestions: z.array(caseQuestionSchema).default([]),
+  /** The decision exercise: a role, a task and a time, judged against stated criteria, then compared with the debrief. */
+  exercise: z
+    .object({
+      role: z.string(),
+      brief: md,
+      task: md,
+      deliverable: md,
+      minutes: z.number().int().positive(),
+      criteria: z.array(md).min(3),
+    })
+    .optional(),
+  debrief: z
+    .object({
+      summary: md,
+      /** Every strategic alternative, judged against the evidence. */
+      byOption: z.array(z.object({ option: z.string(), fit: z.enum(['strong', 'conditional', 'weak']), body: md })).min(2),
+      tradeoffs: z.array(md).min(2),
+      evidenceThatMatters: z.array(md).min(2),
+      changeYourMind: z.array(md).min(2),
+      commonErrors: z.array(md).min(2),
+    })
+    .optional(),
+  /** Theories and frameworks that apply, linked to glossary terms, toolkit guides and subtopic pages. */
+  frameworks: z
+    .array(
+      z.object({
+        name: z.string(),
+        provenance: z.enum(['subject-knowledge', 'source-derived', 'aa-framework', 'enrichment']).default('subject-knowledge'),
+        level: level.default('SL/HL'),
+        use: md,
+        terms: ids,
+        tool: z.string().optional(),
+        subtopics: ids,
+      }),
+    )
+    .default([]),
+  /** Seminar prompts for undergraduate and MBA readers (enrichment). */
+  discussion: z.array(md).default([]),
+  /** Further reading: the platform's own pages (`href`) or supplied sources in the register (`source`, with a location). */
+  furtherReading: z
+    .array(
+      z.object({
+        title: z.string(),
+        href: z
+          .string()
+          .regex(/^\/(?!\/)\S*$/)
+          .optional(),
+        source: z.string().optional(),
+        location: z.string().optional(),
+        note: md,
+      }),
+    )
+    .default([]),
 });
 export type CaseEntry = z.infer<typeof caseSchema>;
 

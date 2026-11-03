@@ -1,0 +1,470 @@
+---
+/**
+ * The Case Vault: an editorial archive of business cases. A Case of the Week,
+ * the archive as a ruled list with filters, an index by subtopic, and how to
+ * use the cases. Without JavaScript the whole archive is listed and the Case
+ * of the Week is the one for the week of the build, and says so; with it, the
+ * filters work (and are kept in the address, so a selection can be shared),
+ * and the Case of the Week follows the ISO week of the reader's own date.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import { casesInOrder, corpus, href } from '../../lib/content';
+import { allSubtopics, codeKey, subtopicHref } from '../../lib/learning';
+import { jsonForScript } from '../../lib/markup';
+import {
+  CASE_TYPE_LABELS,
+  CONCEPT_LABELS,
+  DIFFICULTY_LABELS,
+  FUNCTION_LABELS,
+  INDUSTRY_LABELS,
+  QUALIFICATION_LABELS,
+  SORTS,
+  calendarDate,
+  caseOfTheWeek,
+  countText,
+  renderFeature,
+  rotationOrder,
+  toVaultCase,
+} from '../../lib/case-vault';
+import { BUSINESS_FUNCTIONS, CASE_TYPES, CONCEPTS, DIFFICULTIES, INDUSTRIES, QUALIFICATIONS } from '../../lib/schemas';
+import '../../styles/vault.css';
+
+const c = await corpus();
+const entries = await casesInOrder();
+const cases = entries.map(([id, cs]) => toVaultCase(id, cs, href.case(id)));
+const byId = new Map(cases.map((vc) => [vc.id, vc]));
+const order = rotationOrder(cases.map((vc) => vc.id));
+const built = calendarDate(new Date(), 'utc');
+const pick = caseOfTheWeek(order, built);
+const featured = pick ? byId.get(pick.id) : undefined;
+
+// Only the values some case carries are offered as filters.
+const present = <T extends string>(all: readonly T[], has: (v: T) => boolean) => all.filter(has);
+const industries = present(INDUSTRIES, (v) => cases.some((x) => x.industry === v));
+const functions = present(BUSINESS_FUNCTIONS, (v) => cases.some((x) => x.functions.includes(v)));
+const difficulties = present(DIFFICULTIES, (v) => cases.some((x) => x.difficulty === v));
+const qualifications = present(QUALIFICATIONS, (v) => cases.some((x) => x.qualifications.includes(v)));
+const concepts = present(CONCEPTS, (v) => cases.some((x) => x.keyConcepts.includes(v)));
+const types = present(CASE_TYPES, (v) => cases.some((x) => x.caseType === v));
+const subtopics = allSubtopics(c);
+const served = new Set(cases.flatMap((x) => x.syllabus));
+const units = (c.curricula['ib-dp-bm']?.units ?? [])
+  .map((u) => ({ id: `unit-${u.number}`, number: u.number, title: u.title, subs: u.subtopics.filter((s) => served.has(s.code)) }))
+  .filter((u) => u.subs.length);
+const subtopicTitle = (code: string) => subtopics.find((x) => x.s.code === code)?.s.title ?? code;
+const isHL = (code: string) => subtopics.find((x) => x.s.code === code)?.s.level === 'HL';
+const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+const total = cases.length;
+const evidence = (vc: (typeof cases)[number]) =>
+  [count(vc.exhibits, 'exhibit', 'exhibits'), vc.questions > 0 ? count(vc.questions, 'question', 'questions') : '']
+    .filter(Boolean)
+    .join(', ') + (vc.caseType ? `; ${CASE_TYPE_LABELS[vc.caseType].label.toLowerCase()}` : '');
+const sorted = (codes: string[]) => [...codes].sort((a, b) => codeKey(a) - codeKey(b));
+
+// The Case of the Week needs what it shows, not the search text the archive uses.
+const config = { order, cases: cases.map((vc) => ({ ...vc, text: '' })), built };
+const description = `An archive of ${total} business cases for IB Diploma, undergraduate and MBA study, with filters by industry, function, difficulty, qualification, topic and concept, and a Case of the Week.`;
+---
+
+<BaseLayout title="Case Vault" description={description} section="cases" room="cases">
+  <div class="wrap">
+    <header class="vault-head">
+      <Breadcrumbs trail={[{ label: 'Case Room', href: '/case-room/' }, { label: 'Case Vault' }]} />
+      <div class="vault-head__grid">
+        <div class="vault-head__text">
+          <p class="label label--ink">Case Room · The archive</p>
+          <h1>Case Vault</h1>
+          <p class="lead">
+            Business cases for IB Diploma, undergraduate and MBA study. Each one is a decision with the evidence to make it: the business and its industry,
+            exhibits and financial information, the people with a stake, the alternatives, questions with marks, a decision exercise and a debrief.
+          </p>
+          <div class="tags">
+            <ProvenanceTag kind="simulated-data" />
+            <span class="tag tag--plain">Fictional organizations</span>
+          </div>
+        </div>
+        <dl class="vault-ledger" aria-label="The archive in figures">
+          <div><dt>Cases</dt><dd>{total}</dd></div>
+          <div><dt>Industries</dt><dd>{industries.length}</dd></div>
+          <div><dt>IB subtopics served</dt><dd>{served.size}</dd></div>
+          <div><dt>Exhibits</dt><dd>{cases.reduce((n, x) => n + x.exhibits, 0)}</dd></div>
+          <div><dt>Questions with marks</dt><dd>{cases.reduce((n, x) => n + x.questions, 0)}</dd></div>
+          <div><dt>Decision exercises</dt><dd>{cases.filter((x) => x.hasExercise).length}</dd></div>
+        </dl>
+      </div>
+    </header>
+  </div>
+
+  {
+    pick && featured && (
+      <section class="band band--ink on-ink cotw" aria-labelledby="cotw-title" data-ix="case-of-the-week">
+        <script type="application/json" data-config set:html={jsonForScript(config)} />
+        <div class="wrap">
+          <div class="cotw__inner" data-feature set:html={renderFeature(featured, pick, { basis: 'build', built })} />
+        </div>
+      </section>
+    )
+  }
+
+  <div class="wrap page-body vault-body">
+    <section aria-labelledby="archive-h" data-ix="case-vault" id="archive">
+      <SectionHead
+        no={1}
+        title="The archive"
+        dek="Every case in the vault. Filter by what you teach or study; your choices stay in the address, so a filtered list can be shared."
+        id="archive-h"
+      />
+      <script type="application/json" data-config set:html={jsonForScript({ cases })} />
+      <p class="state state--error" data-error hidden>The filters could not start. Every case is still listed below.</p>
+
+      <form class="vault-filters js-only" data-filters aria-label="Filter the archive">
+        <div class="vault-filters__top">
+          <div class="field vault-filters__search">
+            <label for="vf-q">Search the archive</label>
+            <input class="input" id="vf-q" name="q" type="search" autocomplete="off" aria-describedby="vf-q-hint" />
+            <span class="field__hint" id="vf-q-hint">A title, an organization, a place or an industry.</span>
+          </div>
+          <div class="field vault-filters__order">
+            <label for="vf-sort">Order</label>
+            <select class="select" id="vf-sort" name="sort">
+              {Object.entries(SORTS).map(([k, label]) => <option value={k}>{label}</option>)}
+            </select>
+          </div>
+        </div>
+        <details class="vault-filters__more" data-more open>
+          <summary>Filter by industry, function, difficulty, qualification, topic, concept and type <span class="vault-filters__active" data-active></span></summary>
+          <div class="vault-filters__grid">
+            <div class="field">
+              <label for="vf-industry">Industry</label>
+              <select class="select" id="vf-industry" name="industry">
+                <option value="">All industries</option>
+                {industries.map((v) => <option value={v} data-label={INDUSTRY_LABELS[v]}>{INDUSTRY_LABELS[v]}</option>)}
+              </select>
+            </div>
+            <div class="field">
+              <label for="vf-function">Business function</label>
+              <select class="select" id="vf-function" name="function">
+                <option value="">All functions</option>
+                {functions.map((v) => <option value={v} data-label={FUNCTION_LABELS[v]}>{FUNCTION_LABELS[v]}</option>)}
+              </select>
+            </div>
+            <div class="field">
+              <label for="vf-difficulty">Difficulty</label>
+              <select class="select" id="vf-difficulty" name="difficulty">
+                <option value="">All levels of difficulty</option>
+                {difficulties.map((v) => <option value={v} data-label={DIFFICULTY_LABELS[v].label}>{DIFFICULTY_LABELS[v].label}</option>)}
+              </select>
+            </div>
+            <div class="field">
+              <label for="vf-qualification">Qualification</label>
+              <select class="select" id="vf-qualification" name="qualification">
+                <option value="">All qualifications</option>
+                {qualifications.map((v) => <option value={v} data-label={QUALIFICATION_LABELS[v].label}>{QUALIFICATION_LABELS[v].label}</option>)}
+              </select>
+            </div>
+            <div class="field">
+              <label for="vf-topic">Topic</label>
+              <select class="select" id="vf-topic" name="topic">
+                <option value="">All topics</option>
+                {
+                  units.map((u) => (
+                    <optgroup label={`Unit ${u.number}: ${u.title}`}>
+                      <option value={u.id} data-label={`Any of unit ${u.number}`}>{`Any of unit ${u.number}`}</option>
+                      {u.subs.map((s) => {
+                        const label = `${s.code} ${s.title}${s.level === 'HL' ? ' (HL)' : ''}`;
+                        return (
+                          <option value={s.code} data-label={label}>
+                            {label}
+                          </option>
+                        );
+                      })}
+                    </optgroup>
+                  ))
+                }
+              </select>
+            </div>
+            <div class="field">
+              <label for="vf-concept">Key concept</label>
+              <select class="select" id="vf-concept" name="concept">
+                <option value="">All key concepts</option>
+                {concepts.map((v) => <option value={v} data-label={CONCEPT_LABELS[v]}>{CONCEPT_LABELS[v]}</option>)}
+              </select>
+            </div>
+            <div class="field">
+              <label for="vf-type">Case type</label>
+              <select class="select" id="vf-type" name="type">
+                <option value="">All case types</option>
+                {types.map((v) => <option value={v} data-label={CASE_TYPE_LABELS[v].label}>{CASE_TYPE_LABELS[v].label}</option>)}
+              </select>
+            </div>
+          </div>
+        </details>
+        <div class="vault-filters__foot">
+          <p class="vault-count" data-count aria-live="polite">{countText(total, total)}</p>
+          <button class="btn btn--small" type="button" data-clear>Clear the filters</button>
+        </div>
+      </form>
+      <p class="nojs-only small muted vault-nojs">All {total} cases are listed below, in order of title. The filters need JavaScript.</p>
+
+      <ol class="vault-list" data-list>
+        {
+          cases.map((vc) => {
+            const d = vc.difficulty ? DIFFICULTY_LABELS[vc.difficulty] : undefined;
+            return (
+              <li data-case={vc.id}>
+                <article class="vault-item" aria-labelledby={`vc-${vc.id}`}>
+                  <div class="vault-item__lead">
+                    <p class="vault-item__industry">{vc.industry ? INDUSTRY_LABELS[vc.industry] : 'Not yet classified'}</p>
+                    <p class="vault-item__place">{vc.location}</p>
+                  </div>
+                  <div class="vault-item__body">
+                    <h3 class="vault-item__title" id={`vc-${vc.id}`}>
+                      <a href={vc.href}>{vc.title}</a>
+                    </h3>
+                    <p class="vault-item__dek">{vc.dek}</p>
+                    <p class="vault-item__decision">
+                      <span>The decision</span> {vc.decision}
+                    </p>
+                  </div>
+                  <dl class="vault-item__meta">
+                    {vc.functions.length > 0 && (
+                      <div>
+                        <dt>Functions</dt>
+                        <dd>{vc.functions.map((f) => FUNCTION_LABELS[f]).join(', ')}</dd>
+                      </div>
+                    )}
+                    {vc.syllabus.length > 0 && (
+                      <div>
+                        <dt>Topics</dt>
+                        <dd>
+                          <ul class="vault-codes" role="list">
+                            {sorted(vc.syllabus).map((code) => (
+                              <li>
+                                {code}
+                                <span class="sr-only"> {subtopicTitle(code)}</span>
+                                {isHL(code) && <span class="tag tag--hl">HL</span>}
+                              </li>
+                            ))}
+                          </ul>
+                        </dd>
+                      </div>
+                    )}
+                    {d && (
+                      <div>
+                        <dt>Difficulty</dt>
+                        <dd>
+                          <span class="difficulty">
+                            <span class="difficulty__bars" aria-hidden="true">
+                              {[1, 2, 3].map((k) => (
+                                <i class={k <= d.rank ? 'on' : undefined} />
+                              ))}
+                            </span>
+                            {d.label}
+                          </span>
+                        </dd>
+                      </div>
+                    )}
+                    {vc.qualifications.length > 0 && (
+                      <div>
+                        <dt>For</dt>
+                        <dd>{vc.qualifications.map((q) => QUALIFICATION_LABELS[q].short).join(', ')}</dd>
+                      </div>
+                    )}
+                    {vc.keyConcepts.length > 0 && (
+                      <div>
+                        <dt>Concepts</dt>
+                        <dd>{vc.keyConcepts.map((k) => CONCEPT_LABELS[k]).join(', ')}</dd>
+                      </div>
+                    )}
+                    <div>
+                      <dt>Evidence</dt>
+                      <dd>{evidence(vc)}</dd>
+                    </div>
+                  </dl>
+                </article>
+              </li>
+            );
+          })
+        }
+      </ol>
+      <div class="state" data-empty hidden>
+        <p class="state__title">No case matches every filter.</p>
+        <p>Remove a filter, or clear them all, to see more of the archive.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="index-h">
+      <SectionHead
+        no={2}
+        title="The index by subtopic"
+        dek="Which cases serve each IB Diploma subtopic, unit by unit. The subtopic opens its page in the topic library; the case opens its case file."
+        id="index-h"
+      />
+      <div class="vault-index">
+        {
+          units.map((u) => (
+            <div>
+              <h3>
+                Unit {u.number}: {u.title}
+              </h3>
+              <dl>
+                {u.subs.map((s) => (
+                  <div>
+                    <dt>
+                      <a href={subtopicHref(c, s.code)}>
+                        {s.code} {s.title}
+                      </a>{' '}
+                      {s.level === 'HL' && <span class="tag tag--hl">HL</span>}
+                    </dt>
+                    <dd>
+                      <ul class="vault-index__cases" role="list">
+                        {cases
+                          .filter((x) => x.syllabus.includes(s.code))
+                          .map((x) => (
+                            <li>
+                              <a href={x.href}>{x.title}</a>
+                            </li>
+                          ))}
+                      </ul>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section aria-labelledby="use-h">
+      <SectionHead no={3} title="How to use the vault" dek="One set of cases, read at three depths." id="use-h" />
+      <div class="vault-use">
+        <div>
+          <h3>For IB Diploma students</h3>
+          <p>
+            Read the case, then answer its questions for analysis before you open the guidance. The command terms and marks follow the style of the papers;
+            the questions are the platform's own practice, not IB questions. HL-only questions are marked, and the SL view hides them.
+          </p>
+          <p><a href="/examiner-lens/">What each command term asks for</a></p>
+        </div>
+        <div>
+          <h3>For teachers</h3>
+          <p>
+            Each case runs as a lesson: the narrative and exhibits as reading, the questions as practice, and the decision exercise as a timed task with
+            criteria, followed by the debrief. The index above finds a case for the subtopic you are teaching.
+          </p>
+          <p><a href="/case-room/">The Case Room and the case lab</a></p>
+        </div>
+        <div>
+          <h3>For undergraduate and MBA seminars</h3>
+          <p>
+            Cases marked for undergraduate or MBA study carry seminar prompts and frameworks beyond the IB course, labelled as enrichment. They work best
+            argued in a group, with the debrief kept back until a decision has been made.
+          </p>
+          <p><a href="/pathways/mba/">The MBA and advanced management pathway</a></p>
+        </div>
+        <div>
+          <h3>How the cases are made</h3>
+          <p>
+            The organizations are fictional, so every figure can be complete and consistent. Each case says how its figures were built, a script and the
+            unit tests recompute them, and the industry is described in general terms, without statistics about real markets.
+          </p>
+          <p><a href="/sources/">The sources register</a></p>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../scripts/case-vault';
+</script>
+
+<style>
+  .vault-head {
+    padding-block: clamp(var(--sp-6), 5vw, var(--sp-8)) clamp(var(--sp-6), 4vw, var(--sp-7));
+  }
+
+  .vault-head__grid {
+    display: grid;
+    gap: var(--sp-6) var(--sp-8);
+    margin-top: var(--sp-5);
+    align-items: end;
+  }
+
+  @media (min-width: 60rem) {
+    .vault-head__grid {
+      grid-template-columns: minmax(0, 1.55fr) minmax(18rem, 1fr);
+    }
+  }
+
+  .vault-head__text h1 {
+    margin-top: var(--sp-3);
+    font-size: var(--fs-display);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+  }
+
+  .vault-head__text .lead {
+    margin-top: var(--sp-4);
+    max-width: 44rem;
+  }
+
+  .vault-head__text .tags {
+    margin-top: var(--sp-5);
+  }
+
+  .vault-ledger {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .vault-ledger > div {
+    display: grid;
+    gap: 0.1rem;
+    padding: var(--sp-3) var(--sp-4) var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .vault-ledger > div:nth-child(odd) {
+    border-right: 1px solid var(--rule-hair);
+  }
+
+  .vault-ledger > div:nth-child(even) {
+    padding-left: var(--sp-4);
+  }
+
+  .vault-ledger dt {
+    order: 2;
+    font-family: var(--font-ui);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .vault-ledger dd {
+    order: 1;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.5rem);
+    font-weight: 500;
+    line-height: 1.05;
+    color: var(--text-strong);
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  .vault-nojs {
+    margin-top: var(--sp-4);
+  }
+
+  .cotw {
+    margin-bottom: clamp(var(--sp-6), 5vw, var(--sp-8));
+  }
+</style>

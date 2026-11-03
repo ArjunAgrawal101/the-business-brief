@@ -1,0 +1,596 @@
+# Larkspur Software. A fictional organization; every figure is simulated.
+# Revenue is active workers times the price per worker per month, times 12.
+# Each response in Exhibit 6 changes revenue as stated, earns the 75% gross
+# margin on that change, and adds its own running costs.
+# scripts/qa/case-figures.py rebuilds every exhibit and checks every figure in
+# the text; tests/unit/vault-cases.test.ts recomputes the margins and effects.
+
+title: Larkspur Software
+dek: A Toronto scheduling app built to give shift workers control over their time is asked by its biggest clients to watch them instead.
+kind: fictional
+dataStatus: simulated
+organization:
+  name: Larkspur Software
+  sector: Workforce scheduling software, sold as a subscription
+  location: Toronto, Canada
+  size: 140 employees, of whom 58 are engineers; 990 client organizations
+  legalForm: Privately held company, owned by its founders, employees and a venture capital investor
+currency:
+  code: CAD
+  symbol: 'C$'
+  unit: thousands of Canadian dollars (C$000), and dollars for prices
+decision: Should Larkspur build the worker-monitoring features its largest clients demand, and if not, what should it offer instead?
+brief: >
+  Larkspur's app lets people who work in shifts see their rotas, swap shifts and record their hours, and its clients
+  pay for each active worker each month. Its three largest clients, logistics firms that provide more than a fifth of
+  its revenue, want Pulse: productivity scores, idle-time alerts and rankings for every worker. They will move to a
+  rival if Larkspur will not build it. Building it pays best, but it contradicts the company's mission, most of its
+  engineers have signed a letter against it, and the workers who use the app say they do not want it.
+
+narrative:
+  - >
+    Priya Nandakumar spent eight years building nurses' rotas in a Toronto hospital, on spreadsheets that nobody liked.
+    In 2018 she and Owen Kalu, a software engineer, founded Larkspur to build something better: an app that lets
+    people who work in shifts see their schedules, swap shifts with colleagues and record their hours, and that lets
+    managers fill gaps without phoning around. Its mission, printed on the wall of the office, is to give people who
+    work in shifts more control over their time.
+  - >
+    Larkspur now has 990 client organizations: care homes and clinics, shops and restaurants, and warehouses. They pay
+    for each active worker each month, and the workers use the app free (Exhibit 2). Revenue grew by 20.0% in 2025,
+    and Larkspur made its first profit (Exhibit 1). A venture capital investor owns 35% of the company and expects to
+    lead a new funding round in 2027, if growth continues (Exhibit 9).
+  - >
+    In the spring of 2026 Larkspur's three largest clients, all logistics firms, made a joint request. They want Pulse:
+    an add-on that scores each warehouse worker's productivity hour by hour, alerts managers when a worker is idle,
+    tracks where workers are during a shift and ranks them against one another. They will pay C$2.00 a worker a month
+    for it, and they say that if Larkspur will not build it within a year they will move to a rival platform that will
+    (Exhibit 7).
+  - >
+    The request split the company. Thirty-four of the 58 engineers signed an open letter saying that Pulse would turn
+    a tool for workers into a tool for watching them (Exhibit 8). A survey of the people who use the app found most of
+    them uncomfortable with being ranked (Exhibit 5). The sales team warned that some care and retail clients chose
+    Larkspur precisely because it is not a surveillance tool.
+  - >
+    Priya has asked her team to cost four responses: build Pulse as the clients asked; build Pulse Lite, with team-level
+    data, no rankings and individual data only for workers who choose to share it; open an interface that lets clients
+    plug in their own analytics tools; or decline and win more care and retail clients instead (Exhibit 6). The board
+    meets in June.
+
+industryContext:
+  - >
+    Workforce management software helps employers with many hourly workers plan rotas, record hours and pay people
+    correctly. It is usually sold as a subscription, priced for each user each month and run on the supplier's own
+    servers. Revenue recurs, so keeping clients matters as much as winning them, and the extra cost of serving one more
+    user is low, which is why gross margins in software tend to be high.
+  - >
+    Apps that workers carry on their phones collect detailed data about when and where people work. Employers
+    increasingly want to use such data to measure productivity, and suppliers compete to offer analytics. Workers,
+    unions and regulators are increasingly concerned about monitoring at work: what is collected, whether people know,
+    and how decisions about them are made.
+  - >
+    A scheduling app needs workers to use it as well as employers to buy it. Its ratings in the app stores, and what
+    workers say about it to one another, affect whether employers choose it. Large suppliers of human resources
+    software offer scheduling as part of wider suites, so smaller specialists compete on how well they serve
+    particular industries and the people who use them.
+
+challenge: >
+  Larkspur must answer its largest clients without losing either them or itself. Saying yes would keep more than a
+  fifth of its revenue and add a profitable product, but it would make the company a supplier of the kind of
+  monitoring its mission was meant to replace, and it risks its engineers, its reputation with workers and its other
+  clients. Saying no protects all of that and turns a profit into a loss a year before the company needs investors'
+  confidence. The board has to decide what Larkspur is for, and what that is worth.
+
+financials:
+  summary: >
+    Larkspur's revenue grew by 20.0% in 2025, to C$4,752k, and it earned its first profit before interest and tax,
+    C$184k, a profit margin of 3.9%. Its gross profit margin is high, 75.0%, because serving one more worker costs
+    little; most of its costs are engineers' salaries. The three logistics clients pay C$1,080k a year, 22.7% of
+    revenue. If they left and nothing replaced them, Larkspur would lose three quarters of that in gross profit and
+    return to a loss. It has C$2,900k of cash to pay for any development.
+  exhibits: [ex-1, ex-2, ex-6]
+
+exhibits:
+  - id: ex-1
+    title: Summary statement of profit or loss, years to 31 December (C$000)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Item }
+      - { label: '2024', numeric: true, format: money }
+      - { label: '2025', numeric: true, format: money }
+    rows:
+      - [Revenue, 3960, 4752]
+      - [Cost of sales, 1030, 1188]
+      - [Gross profit, 2930, 3564]
+      - [Expenses, 3020, 3380]
+      - [Profit before interest and tax, -90, 184]
+    totals: [Gross profit, Profit before interest and tax]
+    note: >
+      Cost of sales is hosting, customer support and payment fees, and is about a quarter of revenue. Expenses in 2025
+      were C$2,100k for product development, C$900k for sales and marketing and C$380k for administration. Larkspur has
+      no borrowing, and C$2,900k of cash at the end of 2025.
+    source: Simulated teaching data, from Larkspur's accounts.
+
+  - id: ex-2
+    title: Clients and revenue by segment, 2025
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Segment }
+      - { label: Clients, numeric: true }
+      - { label: Active workers, numeric: true }
+      - { label: Price per worker per month (C$), numeric: true, format: d2 }
+      - { label: Revenue (C$000), numeric: true, format: money }
+    rows:
+      - [Care and health, 380, 31000, 4.5, 1674]
+      - [Retail and hospitality, 520, 27000, 4.5, 1458]
+      - [Logistics and warehousing, 90, 37500, 3.6, 1620]
+    footer: [All clients, 990, 95500, '', 4752]
+    note: >
+      Revenue is active workers times the price, times twelve months. Logistics clients pay less per worker because
+      they buy in volume. Of the 37,500 logistics workers, 25,000 work for three clients: Northgate Logistics (12,500),
+      Halvorsen Freight (7,500) and Bayline Distribution (5,000).
+    source: Simulated teaching data, from the billing system.
+
+  - id: ex-3
+    title: What Pulse would do
+    kind: list
+    provenance: simulated-data
+    items:
+      - { label: 'Productivity scores.', value: 'A score for each worker for each hour, from scans, picks and tasks completed.' }
+      - { label: 'Idle-time alerts.', value: 'A message to the manager when a worker has done nothing measurable for a set number of minutes.' }
+      - { label: 'Location during the shift.', value: "Where in the building each worker is, from the phone's position." }
+      - { label: 'Rankings.', value: 'Each worker ranked against colleagues, shown to managers every day.' }
+    source: Simulated teaching data, from the clients' specification.
+
+  - id: ex-4
+    title: Pulse Lite and the interface, as the product team proposes them
+    kind: list
+    provenance: simulated-data
+    items:
+      - { label: 'Pulse Lite.', value: "Productivity data for teams and sites, never ranked by worker. Each worker sees their own data and decides whether to share it with a manager. C$1.50 a worker a month." }
+      - { label: 'The interface.', value: "A connection that lets a client send Larkspur's data to an analytics tool of its own choosing. Larkspur builds no monitoring itself. C$0.50 a worker a month." }
+    source: Simulated teaching data, from the product team's proposal.
+
+  - id: ex-5
+    title: The people who use the app
+    kind: kpis
+    provenance: simulated-data
+    items:
+      - { label: Rating in the app stores, value: '4.6 out of 5' }
+      - { label: Workers who say Larkspur helps them get shifts that fit their lives, value: '78%' }
+      - { label: Workers who would be uncomfortable if their employer used the app to rank them, value: '81%' }
+      - { label: Workers who would consider leaving a job that tracked them minute by minute, value: '46%' }
+    note: An in-app survey of 2,400 workers in April 2026. Those who answer surveys in an app they use may not represent all its users.
+    source: Simulated teaching data.
+
+  - id: ex-6
+    title: Four responses to the request, forecast effect from 2027 (C$000)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Response }
+      - { label: Development in 2026, numeric: true, format: money }
+      - { label: Change in revenue, numeric: true, format: money }
+      - { label: Change in gross profit, numeric: true, format: money }
+      - { label: Change in other costs, numeric: true, format: money }
+      - { label: Change in yearly profit before interest and tax, numeric: true, format: money }
+      - { label: Profit before interest and tax in 2027, numeric: true, format: money }
+    rows:
+      - [A. Build Pulse as asked, 1800, 588, 441, 200, 241, 425]
+      - [B. Build Pulse Lite, 1500, 324, 243, 150, 93, 277]
+      - [C. Open an API for clients, 600, 96, 72, 50, 22, 206]
+      - [D. Decline and refocus, 0, -864, -648, 300, -948, -764]
+    note: |
+      Changes are against 2025, at the 75% gross margin on any change in revenue; other costs are each response's own running costs. The estimates are the product and sales teams' judgements.
+
+      - A. Pulse at C$2.00 a worker a month for the three clients' 25,000 workers and for half of the other 12,500 logistics workers (6,250); clients in care and retail with 3,000 workers leave.
+      - B. Pulse Lite at C$1.50 a month for Northgate and Halvorsen (20,000 workers) and for 10,000 workers in care and retail; Bayline, with 5,000 workers, leaves.
+      - C. The interface at C$0.50 a month for the three clients' 25,000 workers; clients in care and retail with 1,000 workers leave.
+      - D. The three clients leave; an extra C$300k a year of sales and marketing wins clients in care and retail with 4,000 workers.
+
+      Development is paid once, in 2026, from cash.
+    source: Simulated teaching data, prepared by the product and sales teams.
+
+  - id: ex-7
+    title: The clients' request
+    kind: quote
+    provenance: simulated-data
+    quote:
+      text: >
+        Our margins depend on productivity, and we need data by worker, by hour, with alerts and rankings our managers
+        can act on. Your scheduling is the best we have used. But if Larkspur will not build this within twelve months,
+        we will move to a platform that will when our contracts come up for renewal.
+      attribution: Marcus Leclerc, chief operating officer, Northgate Logistics, writing for the three clients
+    source: Fictional letter, written for this case.
+
+  - id: ex-8
+    title: The engineers' letter
+    kind: quote
+    provenance: simulated-data
+    quote:
+      text: >
+        We built Larkspur to give people who work in shifts more control over their time. Pulse would use the same app,
+        on the same phones, to watch them minute by minute and rank them against each other. We do not think a company
+        with our mission should build it, and some of us will not.
+      attribution: Open letter to the founders, signed by 34 of Larkspur's 58 engineers
+    source: Fictional letter, written for this case.
+
+  - id: ex-9
+    title: The investor's view
+    kind: quote
+    provenance: simulated-data
+    quote:
+      text: >
+        We invested in Larkspur because workers love it, and that is still its advantage. But we need to see revenue
+        growing by at least 20% a year before we lead the next round. Losing a fifth of revenue in one go would be very
+        hard to explain.
+      attribution: Hannah Osei, partner, Lakeshore Ventures
+    source: Fictional email, written for this case.
+
+constraints:
+  - The three clients' contracts come up for renewal in twelve months, and they have said they will not renew without worker-level monitoring.
+  - Larkspur has C$2,900k of cash and no borrowing; any development must be paid for from it until the next funding round.
+  - The investor expects revenue growth of at least 20% a year ahead of the round planned for 2027.
+  - "Larkspur's legal adviser has warned that clients must tell workers what is monitored and why, and that a supplier that designs the monitoring may share responsibility if the data is misused."
+
+stakeholders:
+  - name: Priya Nandakumar and Owen Kalu, founders
+    interest: A growing company that stays true to its mission.
+    influence: high
+    stake: high
+    concern: Building the thing they founded the company to replace, or losing the company by refusing.
+  - name: Lakeshore Ventures, investor
+    interest: Growth and a return on its investment.
+    influence: high
+    stake: medium
+    concern: Losing a fifth of revenue before the next funding round.
+  - name: Engineers
+    interest: Building software they believe in.
+    influence: medium
+    stake: high
+    concern: Being asked to build surveillance; some say they will leave rather than do it.
+  - name: The three logistics clients
+    interest: Productivity data by worker, by hour.
+    influence: high
+    stake: medium
+    concern: Margins that depend on productivity, and a supplier that will not provide the data.
+  - name: Workers who use the app
+    interest: Control over their shifts, and fair treatment.
+    influence: low
+    stake: high
+    concern: Being watched, scored and ranked through an app they rely on.
+  - name: Care and retail clients
+    interest: Good scheduling that their staff are happy to use.
+    influence: medium
+    stake: medium
+    concern: A supplier whose reputation with workers changes.
+  - name: Unions and regulators
+    interest: Lawful, transparent and proportionate monitoring at work.
+    influence: medium
+    stake: low
+    concern: Monitoring that workers do not know about or cannot challenge.
+
+options:
+  - id: build-pulse
+    label: 'A. Build Pulse as asked'
+    summary: Build productivity scores, idle-time alerts, location tracking and rankings for each worker.
+    requires: C$1,800k of development and engineers willing to build it.
+    upside: Keeps the three clients and adds the most profit, C$241k a year from 2027.
+    risks: Contradicts the mission; some engineers may leave; workers may turn against the app; more care and retail clients may leave than the 3,000 workers forecast; legal exposure if the data is misused.
+    evidence: [ex-3, ex-5, ex-6, ex-8]
+  - id: build-lite
+    label: 'B. Build Pulse Lite'
+    summary: Offer team-level productivity data with no rankings, and individual data only for workers who choose to share it.
+    requires: C$1,500k of development, and clients who accept data without rankings.
+    upside: Keeps two of the three clients, sells to care and retail clients too, and fits the mission.
+    risks: Bayline leaves, so the gain is smaller, C$93k a year; the other two may want more later.
+    evidence: [ex-4, ex-5, ex-6]
+  - id: open-api
+    label: 'C. Open an interface for clients'
+    summary: Let clients send Larkspur's data to analytics tools of their own choosing; build no monitoring.
+    requires: C$600k of development and an interface that is secure.
+    upside: Keeps the three clients at little cost, and Larkspur does not design the monitoring itself.
+    risks: The monitoring happens anyway, on Larkspur's data; the gain is small, C$22k a year; the legal adviser's warning still applies.
+    evidence: [ex-4, ex-6]
+  - id: decline
+    label: 'D. Decline, and win more care and retail clients'
+    summary: Refuse the request, let the three clients go, and spend more on winning clients in care and retail.
+    requires: An extra C$300k a year of sales and marketing, and the investor's patience.
+    upside: Keeps the mission, the engineers and the trust of workers intact.
+    risks: Revenue falls by C$864k and profit by C$948k a year, a loss of C$764k in 2027, a year before the funding round.
+    evidence: [ex-2, ex-6, ex-9]
+
+analysis:
+  data:
+    - The three logistics clients pay C$1,080k a year, 22.7% of revenue (Exhibit 2).
+    - Larkspur's gross profit margin is 75.0% and its profit margin 3.9%, so losing those clients would turn its first profit into a loss (Exhibit 1).
+    - From 2027, Pulse would add C$241k a year to profit, Pulse Lite C$93k and the interface C$22k, while declining would cost C$948k (Exhibit 6).
+    - 81% of surveyed workers would be uncomfortable being ranked, and 34 of the 58 engineers signed the letter against Pulse (Exhibits 5 and 8).
+  insight:
+    - The real comparison is not with today but with losing the clients. Against declining, Pulse is worth C$1,189k a year and Pulse Lite C$1,041k, so the extra profit from full monitoring is only C$148k a year.
+    - Pulse is digital Taylorism. It measures workers minute by minute and ranks them, which is the opposite of the autonomy that Larkspur's mission promises and that workers say they value.
+    - The interface looks like a way to keep the clients without building the monitoring, but the monitoring would still run on Larkspur's data, and the legal adviser's warning applies to it too.
+  options:
+    - Building Pulse earns most and puts the company's mission, engineers and reputation with workers at risk for C$148k a year more than Pulse Lite.
+    - Pulse Lite keeps most of the revenue, fits the mission and sells beyond logistics, at the cost of Bayline.
+    - The interface keeps the clients cheaply and leaves Larkspur's data doing the watching.
+    - Declining keeps everything except the money, and the money matters before a funding round.
+  recommendation: >
+    One defensible recommendation is Pulse Lite. Offer the logistics clients team and site data, no rankings, and
+    individual data only where a worker chooses to share it, and sell the same product to care and retail clients as
+    evidence that productivity and fairness can go together. Publish the rules on what Larkspur's data may be used
+    for. Accept that Bayline may leave, and tell the investor why the company's advantage, the trust of the people who
+    use it, is worth more than the difference.
+  caveat: >
+    This depends on Northgate and Halvorsen accepting data without rankings, which the product team expects but has
+    not confirmed. If all three would leave rather than accept Pulse Lite, the choice becomes a stark one between the
+    mission and survival before the funding round, and the founders would have to decide whether a smaller,
+    consistent Larkspur, funded for longer, is a company the investor will back.
+
+method: >
+  Larkspur Software, its clients, its investor and everyone in this case are fictional, and every figure is simulated.
+  Revenue is active workers times the price per worker per month, times twelve. Each response in Exhibit 6 changes
+  revenue as its note states, earns the 75% gross margin on that change, and adds its own running costs; the
+  estimates of which clients stay and leave are stated assumptions. A script in the repository
+  (`scripts/qa/case-figures.py`) rebuilds every exhibit and checks every figure in the text, and the unit tests
+  recompute the margins and the effect of each response.
+
+topics: []
+tools: [force-field-analysis, steeple-analysis]
+concepts: [change, creativity, ethics, sustainability]
+calculations: [gross-profit-margin, profit-margin]
+questions: []
+sources: [method-simulated, ib-bm-guide-2024, hodder-bm-2022]
+updated: 2026-11-03
+
+# Case Vault classification (src/lib/case-vault.ts).
+industry: technology
+functions: [strategy, operations, finance]
+difficulty: advanced
+qualifications: [ib-dp-sl, ib-dp-hl, undergraduate, mba]
+keyConcepts: [ethics, change]
+caseType: fictional
+syllabus: ['1.3', '1.4', '2.4', '3.5', '5.9']
+
+analysisQuestions:
+  - id: lk-define
+    commandTerm: Define
+    ao: AO1
+    marks: 2
+    level: HL
+    syllabus: ['5.9']
+    prompt: Define the term *digital Taylorism*.
+    guidance: >
+      One mark for the use of digital technology to monitor and measure workers' tasks in detail, and one for the link
+      to scientific management: work broken into measured units, with workers controlled through targets and data.
+      Pulse's scores, alerts and rankings are an example.
+  - id: lk-margins
+    commandTerm: Calculate
+    ao: AO4
+    marks: 4
+    paper: paper-2
+    syllabus: ['3.5']
+    exhibits: [ex-1]
+    prompt: Using Exhibit 1, calculate Larkspur's gross profit margin and profit margin for 2025.
+    answer: >
+      Gross profit margin = 3,564 ÷ 4,752 × 100 = 75.0%. Profit margin = 184 ÷ 4,752 × 100 = 3.9%.
+    guidance: >
+      Two marks for each: one for the method and one for the answer. The profit margin uses profit before interest and
+      tax, as the guide's formula does. The gap between the two margins shows that most of Larkspur's costs are
+      expenses, mainly engineers, rather than the cost of serving each worker.
+  - id: lk-concentration
+    commandTerm: Calculate
+    ao: AO4
+    marks: 2
+    syllabus: ['3.3']
+    exhibits: [ex-2]
+    prompt: Using Exhibit 2, calculate the percentage of Larkspur's 2025 revenue that came from the three largest logistics clients.
+    answer: >
+      The three clients have 25,000 workers at C$3.60 a month: 25,000 × 3.60 × 12 = C$1,080k. Share = 1,080 ÷ 4,752 ×
+      100 = 22.7%.
+    guidance: One mark for the clients' revenue and one for the percentage.
+  - id: lk-conflict
+    commandTerm: Explain
+    ao: AO2
+    marks: 4
+    syllabus: ['1.4']
+    exhibits: [ex-5, ex-7, ex-8, ex-9]
+    prompt: Explain two sources of conflict between Larkspur's stakeholders over the Pulse request.
+    guidance: >
+      Two conflicts, each between named stakeholders and explained with the case, for two marks each. Strong examples:
+      the logistics clients want worker-level data, while the workers who use the app do not want to be ranked; the
+      investor wants revenue growth, while the engineers will not build Pulse; the founders' mission conflicts with the
+      clients' demand. Naming stakeholders without the reason for the conflict earns one mark each at most.
+  - id: lk-motivation
+    commandTerm: Explain
+    ao: AO2
+    marks: 4
+    syllabus: ['2.4']
+    exhibits: [ex-3, ex-5]
+    prompt: Using a motivation theory, explain how Pulse could affect the motivation of the warehouse workers it monitors.
+    guidance: >
+      Two marks for the theory and two for applying it. Taylor's scientific management would predict that measured
+      targets raise output; Herzberg would warn that close supervision is a hygiene factor that causes dissatisfaction
+      when it is felt as control; at HL, self-determination theory predicts that taking away autonomy weakens the
+      motivation that comes from within. The survey's 46%, who would consider leaving a job that tracked them, is
+      strong evidence.
+  - id: lk-ethics
+    commandTerm: Discuss
+    ao: AO3
+    marks: 10
+    level: HL
+    syllabus: ['5.9', '1.3']
+    exhibits: [ex-3, ex-5, ex-6, ex-8]
+    prompt: Discuss the benefits, risks and ethical implications of Pulse for Larkspur and its stakeholders.
+    guidance: |
+      A strong answer covers each part of the question with the case.
+
+      - Benefits: C$241k a year of extra profit, three clients kept, and data the clients say they need.
+      - Risks: engineers leaving, workers turning against the app, more care and retail clients leaving than forecast, and shared responsibility if the data is misused.
+      - Ethical implications: monitoring that workers did not choose, decisions about people made by scores, possible bias in what is measured, and a company acting against its own mission.
+      - A judgement that weighs them, for example that the ethical cost falls mainly on the people with least power to object.
+
+      Answers that list points without weighing them stay in the middle of the range.
+  - id: lk-decline
+    commandTerm: Evaluate
+    ao: AO3
+    marks: 10
+    syllabus: ['1.3', '1.4', '3.5']
+    exhibits: [ex-1, ex-6, ex-9]
+    prompt: Evaluate the option of declining the request and refocusing on care and retail clients.
+    guidance: |
+      A strong answer does four things.
+
+      - It quantifies the cost: revenue down C$864k and profit down C$948k a year, a loss of C$764k in 2027.
+      - It weighs what declining protects: the mission, the engineers, the workers' trust, the reputation that wins care and retail clients.
+      - It considers timing and the investor: a loss a year before the funding round, against a growth target of 20%.
+      - It reaches a judgement, perhaps that declining is principled but avoidable if Pulse Lite keeps most of the revenue.
+
+      Answers that treat the decision as purely financial or purely ethical stay in the middle of the range.
+
+exercise:
+  role: You are Priya Nandakumar, Larkspur's chief executive and co-founder.
+  brief: >
+    The board meets in June: Owen, you and Hannah Osei from Lakeshore Ventures. The clients want an answer within the
+    month, the engineers are waiting to hear whether they will be asked to build Pulse, and the investor wants growth.
+    You wrote the mission on the wall yourself.
+  task: Choose one response and defend it to the board, with its money, its people and its principles.
+  deliverable: A decision memo of about 250 words, giving the response, its effect on profit against the alternatives, its ethical justification and the safeguards you would set.
+  minutes: 40
+  criteria:
+    - Compares each response with the right alternative, losing the clients, not with today (Exhibit 6).
+    - Weighs the ethical implications for workers, not only the effect on the company.
+    - Considers the engineers, the investor and the clients, and what each needs to hear.
+    - Sets safeguards or conditions that would make the chosen response acceptable, and says what would change the decision.
+
+debrief:
+  summary: >
+    Larkspur's dilemma is real because both sides of it are. The clients' revenue matters a year before a funding
+    round, and the mission, the engineers and the workers' trust are the company's advantage, not decoration. The
+    strongest answers compare each response with the loss of the clients, notice how little extra full monitoring adds
+    over Pulse Lite, and treat the ethics as part of the business case rather than an afterthought.
+  byOption:
+    - option: build-pulse
+      fit: conditional
+      body: >
+        The most profitable response, C$241k a year, and it keeps all three clients. But compared with Pulse Lite it adds
+        only C$148k a year, and it buys that with digital Taylorism the mission rejects, an engineering team that may
+        lose members, workers 81% of whom do not want to be ranked, and legal exposure. Defensible only if the board
+        believes the non-financial risks are small, which the evidence does not suggest.
+    - option: build-lite
+      fit: strong
+      body: >
+        It keeps two of the three clients and most of the revenue, gives workers control over their own data, fits the
+        mission and can be sold to care and retail clients as well. Its gain is smaller, C$93k a year, because Bayline
+        leaves; against declining it is still worth C$1,041k a year. It depends on Northgate and Halvorsen accepting
+        data without rankings.
+    - option: open-api
+      fit: weak
+      body: >
+        It keeps the clients at little cost and lets Larkspur say it built no monitoring. But the monitoring runs on
+        Larkspur's data all the same, the gain is only C$22k a year, and the legal adviser's warning still applies. It
+        avoids the decision rather than making it.
+    - option: decline
+      fit: weak
+      body: >
+        The cleanest response in principle and the costliest in practice: revenue down C$864k, profit down C$948k a
+        year and a loss of C$764k in 2027, a year before a funding round that needs growth of 20%. Principled, but
+        unnecessary if Pulse Lite can keep most of the revenue.
+  tradeoffs:
+    - Revenue against mission. The most profitable response contradicts what the company exists to do.
+    - The clients against the users. The people who pay and the people who use the app want opposite things.
+    - Now against later. Declining protects the long-term advantage and endangers the short-term funding.
+    - Control against responsibility. The interface hands control to clients without handing over the responsibility.
+  evidenceThatMatters:
+    - The three clients' share of revenue, 22.7% (Exhibit 2).
+    - The small difference between Pulse and Pulse Lite, against the large cost of declining (Exhibit 6).
+    - The workers' and engineers' views (Exhibits 5 and 8).
+    - The legal adviser's warning, in the constraints.
+  changeYourMind:
+    - All three clients refuse Pulse Lite. The choice becomes Pulse or declining, and the funding round decides it.
+    - Care and retail clients ask for worker-level monitoring too. The mission's commercial value is less than it seemed.
+    - The investor agrees to fund a smaller, slower Larkspur. Declining becomes affordable.
+  commonErrors:
+    - Comparing each response with 2025 rather than with losing the clients.
+    - Treating ethics as a final paragraph rather than a cost and a risk in the decision.
+    - Assuming that the interface removes Larkspur's responsibility for how its data is used.
+    - Defining digital Taylorism without showing how Pulse fits it.
+
+frameworks:
+  - name: Management information systems and digital Taylorism
+    level: HL
+    use: >
+      Pulse is data analytics used to monitor and manage employees: the benefits, risks and ethical implications of
+      such systems are the heart of the case.
+    terms: [digital-taylorism, employee-monitoring, management-information-system, data-analytics, data-privacy, algorithmic-bias]
+    subtopics: ['5.9']
+  - name: Scientific management and motivation theory
+    use: >
+      Taylor would see Pulse as measurement that raises output; Herzberg and, at HL, self-determination theory explain
+      why workers who lose autonomy may work less willingly and leave.
+    terms: [scientific-management, herzbergs-motivation-hygiene-theory, self-determination-theory, autonomy]
+    subtopics: ['2.4']
+  - name: Stakeholder mapping and conflict
+    use: >
+      The clients and the investor have high influence; the workers who use the app have a high stake and little
+      influence. Mapping them shows whose interests the decision must protect deliberately.
+    terms: [stakeholder-mapping, stakeholder-conflict, internal-stakeholder, external-stakeholder]
+    subtopics: ['1.4']
+  - name: Mission, ethical objectives and corporate social responsibility
+    use: >
+      Larkspur's mission is a promise to the people who use its app. Ethical objectives and corporate social
+      responsibility ask whether a business keeps such promises when they cost money.
+    terms: [mission-statement, ethical-objectives, corporate-social-responsibility, business-ethics]
+    subtopics: ['1.3']
+  - name: Profitability ratios
+    use: >
+      A gross profit margin of 75.0% and a profit margin of 3.9% explain why losing revenue hurts so much: most costs
+      are fixed, so lost revenue falls almost straight to the bottom line.
+    terms: [gross-profit-margin, profit-margin]
+    subtopics: ['3.5']
+  - name: STEEPLE analysis
+    use: >
+      The ethical, legal and social forces around monitoring at work are external factors Larkspur cannot control and
+      must read before it decides.
+    terms: [steeple-analysis]
+    tool: steeple-analysis
+  - name: Force field analysis
+    level: HL
+    use: >
+      The forces for Pulse (revenue, the funding round) against the forces against it (the mission, the engineers, the
+      workers) show which force the board could weaken, for example through Pulse Lite.
+    terms: [force-field-analysis]
+    tool: force-field-analysis
+
+discussion:
+  - >
+    Is a supplier responsible for how its customers use its product? Compare building Pulse with opening the interface,
+    and say where you would draw the line.
+  - >
+    Larkspur's investor backed it because workers love the app. How should a founder value an advantage that does not
+    appear in the accounts when it conflicts with revenue that does?
+  - >
+    Design the rules you would publish for Pulse Lite: what data, seen by whom, for what decisions, and how a worker
+    could challenge a decision made from it.
+
+furtherReading:
+  - title: 5.9 Management information systems
+    href: /topics/management-information-systems/
+    note: Data analytics, monitoring employees and digital Taylorism, and the ethics of information systems, for HL.
+  - title: 1.4 Stakeholders
+    href: /topics/stakeholders/
+    note: Internal and external stakeholders, and conflict between them.
+  - title: 1.3 Business objectives
+    href: /topics/business-objectives/
+    note: Vision and mission statements, ethical objectives and corporate social responsibility.
+  - title: 2.4 Motivation and demotivation
+    href: /topics/motivation-and-demotivation/
+    note: Taylor, Herzberg and, for HL, self-determination theory.
+  - title: 'Toolkit: STEEPLE analysis'
+    href: /toolkit/steeple-analysis/
+    note: The external forces, including the ethical and legal ones, and how to choose those that matter.
+  - title: Business Management for the IB Diploma
+    source: hodder-bm-2022
+    location: chapter 5.9, pp. 549 to 559
+    note: The coursebook's chapter on management information systems, including monitoring employees and the ethics of data.
