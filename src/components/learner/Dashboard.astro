@@ -1,0 +1,381 @@
+---
+/**
+ * The learner dashboard: what this reader has done on The Business Brief, on
+ * this device. It reads the items this browser keeps (src/lib/dashboard.ts):
+ * the pages opened and the exercises checked (bb:learner, kept by the
+ * recorder in src/scripts/learner.ts), the saved items (bb:saved), and what
+ * every tool and room keeps of its own. Nothing is collected beyond that,
+ * nothing is sent anywhere, and every figure is a count of something stored.
+ * Without JavaScript the page says what it would show and lists the course
+ * with the platform's coverage. Rendered at /dashboard/ and at the old
+ * address, /progress/, so every link to either keeps working.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../layout/PageIntro.astro';
+import SectionHead from '../layout/SectionHead.astro';
+import { casesInOrder, corpus, decisionsInOrder, href, modulesInOrder, questionsInOrder, toolsInOrder, topicsInOrder } from '../../lib/content';
+import { STATE_LABEL, subtopicCoverage } from '../../lib/coverage';
+import { mindmapFor, mindmapsInOrder, noteFor, subtopicHref } from '../../lib/learning';
+import { jsonForScript } from '../../lib/markup';
+import { NAV } from '../../lib/navigation';
+import { LIMITS } from '../../lib/learner';
+import { studio, studioHref } from '../../lib/strategy/content';
+import { lab, labHref } from '../../lib/lab/content';
+import { boardroomHref, boardroomScenarios } from '../../lib/boardroom/content';
+import { MARKET_TOOLS, toolHref as marketHref, toolKey as marketKey } from '../../lib/market-tools';
+import type { DashConfig, DashExercise, DashLab, DashRoomTool, DashTool } from '../../lib/dashboard';
+import '../../styles/dashboard.css';
+
+const c = await corpus();
+const cur = c.curricula['ib-dp-bm'];
+const coverage = subtopicCoverage(c);
+const topics = await topicsInOrder();
+const QUIZ_COMPONENTS = ['cost-classifier', 'error-diagnosis', 'ansoff-placer', 'style-matcher', 'functions-sorter'];
+
+const modules = (await modulesInOrder()).map((m) => ({ id: m.id, ...m.data }));
+const navLinks = NAV.flatMap((g) => g.links.map((l) => ({ href: l.href, title: l.label, group: g.id })));
+/** The room a page belongs to: the menu link or room whose address is the longest start of the page's. */
+const roomOf = (url: string) => {
+  const path = url.split('#')[0] ?? url;
+  const best = [...navLinks, ...modules.filter((m) => m.href).map((m) => ({ href: m.href as string, title: m.name }))]
+    .filter((x) => x.href !== '/' && path.startsWith(x.href))
+    .sort((a, b) => b.href.length - a.href.length)[0];
+  return best?.title ?? 'Tools';
+};
+const roomName = (id: string, fallback: string) => modules.find((m) => m.id === id)?.name ?? fallback;
+
+const exercises: DashExercise[] = [];
+const labs: DashLab[] = [];
+const tools: DashTool[] = [];
+for (const [id, it] of Object.entries(c.interactives)) {
+  if (!it.page) continue;
+  const uid = `ix-${id}`;
+  const url = `${it.page}#${uid}`;
+  const codes = it.syllabus;
+  if (QUIZ_COMPONENTS.includes(it.component) && 'items' in it) exercises.push({ uid, title: it.title, url, total: it.items.length, codes });
+  if (it.component === 'cash-flow-lab') {
+    exercises.push({ uid: `${uid}-q`, title: `${it.title}: reading the forecast`, url, total: it.questions.length, codes });
+    tools.push({ keys: [`bb:cash-flow:${uid}`], title: it.title, url, detail: 'Your way of paying for the investment, and the measures you chose', room: roomOf(url) });
+  }
+  if (it.component === 'case-lab') {
+    labs.push({ uid, title: it.title, url, stages: it.stages.length, codes });
+    for (const st of it.stages)
+      for (const t of st.tasks)
+        if (t.kind === 'sort' || t.kind === 'choose') exercises.push({ uid: `${uid}-${t.id}`, title: `${it.title}: ${st.step}, ${st.title}`, url: `${it.page}#${uid}-${st.id}`, total: t.kind === 'sort' ? t.items.length : 1, codes });
+  }
+  if (it.component === 'force-field-builder') tools.push({ keys: [`bb:ff:${uid}`], title: it.title, url, detail: 'Your weights for the forces, and your note', room: roomOf(url) });
+  if (it.component === 'position-map' || it.component === 'location-scoring' || it.component === 'market-share-workspace')
+    tools.push({ keys: [`bb:studio:${uid}`, `bb:studio:${uid}:note`], title: it.title, url, detail: 'Your choices and your note', room: roomOf(url) });
+}
+const centre = 'Assessment Centre';
+tools.push(
+  { keys: ['bb:ia-plan'], title: 'Your research project plan', url: '/ia-studio/', detail: 'Your plan', room: centre },
+  { keys: ['bb:ia:rq'], title: 'Research question builder', url: '/assessment/internal-assessment/#ia-rq-h', detail: 'Your research question and its parts', room: centre },
+  { keys: ['bb:ia:sd'], title: 'Supporting documents', url: '/assessment/internal-assessment/#ia-sd-h', detail: 'Your documents', room: centre },
+  { keys: ['bb:p3:plan'], title: 'Paper 3 plan builder', url: '/assessment/paper-3/#p3-board-h', detail: 'Your plan of action across the functions', room: centre },
+);
+
+// The rooms' own tools that keep work under keys of their own: the Strategy Studio's analyses, the Market Studio's instruments and the Lab's tools.
+const strategy = await studio();
+const theLab = await lab();
+const LAB_SUMMARY: Record<string, string> = { 'unit-economics': 'unit' };
+const roomTools: DashRoomTool[] = [
+  ...strategy.sequence.map((t) => ({ key: `bb:strategy:${t.slug}`, title: t.title, url: studioHref(t.slug), room: roomName('strategy-studio', 'Strategy Studio') })),
+  ...MARKET_TOOLS.map((t) => ({ key: `bb:${marketKey(t.slug)}`, title: t.name, url: marketHref(t.slug), room: roomName('market-studio', 'Market Studio') })),
+  ...theLab.toolList.map(([id, t]) => ({
+    key: `bb:lab:${t.kind}`,
+    title: t.title,
+    url: labHref(id),
+    room: roomName('entrepreneurship-lab', 'Entrepreneurship and Innovation Lab'),
+    summary: t.kind === 'plan' ? undefined : `bb:lab:summary:${LAB_SUMMARY[t.kind] ?? t.kind}`,
+  })),
+];
+
+const subtopics: DashConfig['subtopics'] = coverage.map((r) => {
+  const s = r.subtopic;
+  const note = noteFor(c, s.code);
+  const map = mindmapFor(c, s.code);
+  const own = s.topic && c.topics[s.topic]?.code === s.code ? s.topic : undefined;
+  const sets: Array<[string, number]> = [];
+  if (note) sets.push([`bb:rc:notes-${s.code.replace('.', '-')}`, note[1].retrieval.length]);
+  if (own) {
+    const n = c.topics[own]?.revision.retrieval.length ?? 0;
+    sets.push([`bb:rc:${own}`, n], [`bb:rc:rev-${own}`, n]);
+  }
+  return {
+    code: s.code,
+    title: s.title,
+    unit: r.unit.number,
+    url: subtopicHref(c, s.code),
+    level: s.level,
+    state: r.state,
+    mindmap: map ? href.mindmap(map[0]) : undefined,
+    cards: sets.map(([k]) => k),
+    cardCount: Math.max(0, ...sets.map(([, n]) => n)),
+  };
+});
+
+const retrieval: DashConfig['retrieval'] = [
+  ...Object.values(c.notes)
+    .sort((a, b) => a.code.localeCompare(b.code, 'en', { numeric: true }))
+    .map((n) => ({ key: `bb:rc:notes-${n.code.replace('.', '-')}`, title: `${n.code} ${n.title}: notes`, url: `${subtopicHref(c, n.code)}#sh-rev-h`, count: n.retrieval.length, codes: [n.code] })),
+  ...topics.flatMap(([id, t]) => [
+    { key: `bb:rc:${id}`, title: `${t.code} ${t.title}: brief`, url: `${href.topic(id)}#revision`, count: t.revision.retrieval.length, codes: [t.code] },
+    { key: `bb:rc:rev-${id}`, title: `${t.code} ${t.title}: revision brief`, url: href.revision(id), count: t.revision.retrieval.length, codes: [t.code] },
+  ]),
+];
+
+const caseCodes = (caseId: string) => {
+  const cs = c.cases[caseId];
+  return cs?.syllabus.length ? cs.syllabus : (cs?.topics ?? []).map((t) => c.topics[t]?.code).filter((x): x is string => Boolean(x));
+};
+const maps = await mindmapsInOrder();
+const firstTool = (await toolsInOrder()).find(([, t]) => t.status === 'complete');
+const firstCase = (await casesInOrder())[0];
+const firstSub = coverage[0];
+const firstRoom = NAV.find((g) => g.id === 'tools')?.links[0];
+
+const config: DashConfig = {
+  units: (cur?.units ?? []).map((u) => ({ number: u.number, title: u.title })),
+  subtopics,
+  questions: (await questionsInOrder()).map(([id, q]) => ({
+    id,
+    title: q.title,
+    url: href.question(id),
+    marks: q.marks,
+    kind: q.markscheme.kind,
+    points: q.markscheme.points.map((p) => p.marks),
+    criteria: q.markscheme.criteria.map((k) => ({ id: k.id, marks: k.marks })),
+    codes: q.syllabus,
+  })),
+  exercises,
+  labs,
+  decisions: (await decisionsInOrder()).map(([id, d]) => ({ id, title: d.title, url: href.decision(id), rounds: d.rounds.map((r) => r.id), codes: caseCodes(d.case) })),
+  retrieval,
+  tools,
+  roomTools,
+  simulations: (await boardroomScenarios()).map(([id, sc]) => ({ id, title: sc.title, url: boardroomHref(id), rounds: sc.rounds.length, codes: sc.syllabus })),
+  caseDecisions: (await casesInOrder())
+    .filter(([, cs]) => cs.exercise)
+    .map(([id, cs]) => ({ id, title: cs.title, url: `${href.case(id)}#exercise`, codes: caseCodes(id) })),
+  checklists: [
+    { prefix: 'ia-', title: 'Internal assessment checklists', href: '/assessment/internal-assessment/#ia-sub-h', room: centre },
+    { prefix: 'p1-', title: 'Paper 1 checklist', href: '/assessment/paper-1/#p1-band-h', room: centre },
+    { prefix: 'p2-', title: 'Paper 2 checklist', href: '/assessment/paper-2/#p2-con-h', room: centre },
+    { prefix: 'p3-', title: 'Paper 3 checklist', href: '/assessment/paper-3/#p3-ready-h', room: centre },
+  ],
+  // Rooms first from the menu's Tools group, then the rest of the menu and the rooms' own entries.
+  rooms: [
+    ...navLinks.filter((l) => l.group === 'tools'),
+    ...navLinks.filter((l) => l.group !== 'tools'),
+    ...modules.filter((m) => m.href).map((m) => ({ href: m.href as string, title: m.name })),
+  ].map(({ href: h, title }) => ({ href: h, title })),
+  pages: [
+    ...navLinks.map(({ href: h, title }) => ({ href: h, title })),
+    ...modules.flatMap((m) => m.items.map((it) => ({ href: it.href, title: it.title }))),
+    ...Object.entries(c.cases).map(([id, cs]) => ({ href: href.case(id), title: cs.title })),
+    ...Object.entries(c.decisions).map(([id, d]) => ({ href: href.decision(id), title: d.title })),
+    ...Object.entries(c.interactives)
+      .filter(([, it]) => it.page)
+      .map(([id, it]) => ({ href: `${it.page}#ix-${id}`, title: it.title })),
+  ],
+  starts: {
+    topic: firstSub ? { href: subtopicHref(c, firstSub.subtopic.code), title: `${firstSub.subtopic.code} ${firstSub.subtopic.title}` } : { href: '/topics/', title: 'The topic library' },
+    mindmap: maps[0] ? { href: href.mindmap(maps[0][0]), title: maps[0][1].scope === 'unit' ? `Unit ${maps[0][1].unit}: ${maps[0][1].title}` : `${maps[0][1].code} ${maps[0][1].title}` } : { href: '/mindmaps/', title: 'The mindmaps' },
+    case: firstCase ? { href: href.case(firstCase[0]), title: firstCase[1].title } : { href: '/cases/', title: 'The case files' },
+    framework: firstTool ? { href: `/toolkit/${firstTool[0]}/`, title: firstTool[1].name } : { href: '/toolkit/', title: 'The toolkit' },
+    tool: firstRoom ? { href: firstRoom.href, title: firstRoom.label } : { href: '/rooms/', title: 'The rooms' },
+  },
+  totals: { mindmaps: maps.length, cases: Object.keys(c.cases).length, frameworks: Object.values(c.tools).filter((t) => t.status === 'complete').length },
+  ia: { href: '/ia-studio/', steps: 10 },
+};
+const units = config.units.map((u) => ({ ...u, rows: subtopics.filter((s) => s.unit === u.number) }));
+const complete = subtopics.filter((s) => s.state === 'complete').length;
+---
+
+<BaseLayout title="Your dashboard" description="What you have read, practised and saved on The Business Brief, read from this browser only. Nothing is sent anywhere." section="platform" noindex>
+  <PageIntro
+    trail={[{ label: 'Your dashboard' }]}
+    kicker="On this device"
+    title="Your dashboard"
+    lead="What you have read, practised and saved here, read from this browser's own storage. There is no account and nothing is sent anywhere; another browser or device starts with nothing."
+  />
+
+  <div class="wrap page-body db" data-ix="progress">
+    <script type="application/json" data-config set:html={jsonForScript(config)} />
+    <p class="db-statusline js-only" data-statusline data-needs-storage></p>
+
+    <div class="db-nojs nojs-only">
+      <p class="db-nojs__lead">This page reads what this browser keeps for The Business Brief, and it needs JavaScript to do that. Nothing is kept anywhere else. With JavaScript on, it shows:</p>
+      <ol class="db-nojs__list">
+        <li><span class="db-nojs__no" aria-hidden="true">01</span> <strong>At a glance:</strong> the subtopics you have explored, the mindmaps and cases you have opened, your practice answers, the exercises you checked, the cards you rated and the pages you saved.</li>
+        <li><span class="db-nojs__no" aria-hidden="true">02</span> <strong>Your course:</strong> each of the 37 subtopics with what you have read, recalled and practised, beside what the platform has for it. The platform's side is listed below.</li>
+        <li><span class="db-nojs__no" aria-hidden="true">03</span> <strong>Where you have been:</strong> the subtopics, mindmaps, cases, toolkit guides and tools you opened, most recent first.</li>
+        <li><span class="db-nojs__no" aria-hidden="true">04</span> <strong>Practice and activities:</strong> your answers and self-checks, what was right in the exercises you checked, the case labs, the Decision Rooms and your recall.</li>
+        <li><span class="db-nojs__no" aria-hidden="true">05</span> <strong>Saved, and your work:</strong> the pages you saved and the work the tools keep, with a link back to each.</li>
+        <li><span class="db-nojs__no" aria-hidden="true">06</span> <strong>Your data:</strong> what is kept and where, with a copy to download, a copy to import, and a way to clear it. What is kept is described below.</li>
+      </ol>
+    </div>
+
+    <p class="state state--error" data-error hidden>The dashboard could not start. Your work is still kept by each tool, and the <a href="/privacy/">privacy page</a> can clear it.</p>
+
+    <div class="state db-unavailable js-only" data-unavailable hidden>
+      <p class="state__title">This browser is not letting the site keep anything.</p>
+      <p>That happens in some private windows and when a browser blocks site storage. Nothing can be recorded or shown here, and the tools keep your work only for the visit. Everything else on the platform works as usual.</p>
+    </div>
+
+    <div class="db-empty js-only" data-empty hidden>
+      <p class="db-empty__title">Nothing is recorded on this device yet.</p>
+      <p>Open a subtopic, read a mindmap, answer a practice question or save a page, and it will appear here. Each section below says what it is waiting for. Good places to start:</p>
+      <ul class="db-empty__starts">
+        <li><a href={config.starts.topic.href}>{config.starts.topic.title}</a>, the first subtopic</li>
+        <li><a href="/topics/">The topic library</a>, all 37 subtopics</li>
+        <li><a href="/exam-desk/practice/">Practice questions</a>, with a self-check against each mark scheme</li>
+        <li><a href="/case-room/">The Case Room</a>, where a case is worked stage by stage</li>
+      </ul>
+    </div>
+
+    <section class="db-sec js-only" aria-labelledby="db-glance-h" data-needs-storage>
+      <SectionHead no={1} title="At a glance" id="db-glance-h" dek="Counted from what this browser keeps. Nothing here is estimated." />
+      <div class="db-glance">
+        <div class="db-lead" data-lead></div>
+        <dl class="figs db-figs" data-summary></dl>
+      </div>
+    </section>
+
+    <section class="db-sec" id="course" aria-labelledby="db-course-h">
+      <SectionHead no={2} title="Your course" id="db-course-h" dek={`The ${subtopics.length} subtopics of IB DP Business Management. Each row shows what you have done here beside what the platform has for that subtopic: ${complete} are complete, with full notes or a complete brief.`} />
+      <div class="db-course-top js-only" data-needs-storage>
+        <figure class="db-chart" data-course-chart></figure>
+        <div class="table-scroll db-units-wrap" role="region" aria-label="Your progress by unit" tabindex="0">
+          <table class="table db-units" data-course-table></table>
+        </div>
+      </div>
+      <ul class="db-key" aria-label="What the marks mean">
+        <li class="js-only" data-needs-storage><span class="db-mark db-mark--practised" aria-hidden="true"></span><span>Practised: cards rated, a question answered or an activity done</span></li>
+        <li class="js-only" data-needs-storage><span class="db-mark db-mark--explored" aria-hidden="true"></span><span>Explored: its page or its mindmap opened</span></li>
+        <li class="js-only" data-needs-storage><span class="db-mark" aria-hidden="true"></span><span>Not started</span></li>
+        <li><span class="db-key__chips"><span class="db-cov db-cov--complete">Complete</span> <span class="db-cov db-cov--partial">Partly built</span> <span class="db-cov db-cov--planned">Planned</span></span><span>What the platform has, from the <a href="/ib/coverage/">coverage tracker</a></span></li>
+      </ul>
+      <div class="db-ledger">
+        {
+          units.map((u) => (
+            <section class="db-unit" aria-labelledby={`db-u${u.number}`}>
+              <h3 class="db-unit__h" id={`db-u${u.number}`}>
+                <span class="db-unit__no">Unit {u.number}</span> {u.title}
+              </h3>
+              <p class="db-unit__sum js-only" data-unit-sum={u.number} />
+              <ol class="db-rows" role="list">
+                {u.rows.map((s) => (
+                  <li class="db-row" data-code={s.code}>
+                    <span class="db-mark js-only" data-mark aria-hidden="true" />
+                    <span class="db-row__code">{s.code}</span>
+                    <span class="db-row__main">
+                      <a class="db-row__title" href={s.url}>
+                        {s.title}
+                      </a>
+                      <span class="db-row__you js-only" data-you />
+                    </span>
+                    <span class:list={['db-cov', `db-cov--${s.state}`]}>{STATE_LABEL[s.state]}</span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ))
+        }
+      </div>
+      <p class="db-note nojs-only">With JavaScript, each row also shows what you have read, recalled and practised on this device.</p>
+    </section>
+
+    <section class="db-sec js-only" aria-labelledby="db-visits-h" data-needs-storage>
+      <SectionHead no={3} title="Where you have been" id="db-visits-h" dek="The pages you opened on this device, most recent first. Visits are noted from the first time you open a page after the dashboard arrived; earlier visits were never recorded." />
+      <div class="db-visits" data-visits></div>
+    </section>
+
+    <section class="db-sec js-only" aria-labelledby="db-practice-h" data-needs-storage>
+      <SectionHead no={4} title="Practice and activities" id="db-practice-h" dek="Your answers and self-checks, what was right in the exercises you checked, the case labs, the Decision Rooms and your recall. A self-check is your own judgement against the platform's mark scheme, not a grade." />
+      <div class="db-groups" data-groups></div>
+    </section>
+
+    <section class="db-sec js-only" id="saved" aria-labelledby="db-saved-h" data-needs-storage>
+      <SectionHead no={5} title="Saved, and your work" id="db-saved-h" dek="The pages you saved, and the work the tools keep for you, with a link back to each." />
+      <div class="db-two">
+        <div class="db-panel">
+          <h3 class="db-panel__h" id="db-saved-list-h" tabindex="-1">Saved <span class="db-count" data-saved-n></span></h3>
+          <div data-saved></div>
+        </div>
+        <div class="db-panel">
+          <h3 class="db-panel__h">Your work <span class="db-count" data-work-n></span></h3>
+          <div data-work></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="db-sec" id="data" aria-labelledby="db-data-h">
+      <SectionHead no={6} title="Your data" id="db-data-h" dek="What is kept, where it is, and what you can do with it." />
+      <div class="db-data">
+        <div class="prose db-data__text">
+          <p>
+            Everything on this page is read from this browser's local storage, on this device. Nothing is sent to the platform or to anyone else, there is no account, and the platform cannot see it. Every item's name starts with <code>bb:</code>.
+          </p>
+          <p>Two items belong to the dashboard:</p>
+          <ul>
+            <li>
+              <code>bb:learner</code>: the subtopic, mindmap, case, toolkit and tool pages you open, each with the time of your first and latest visit and a count of visits (at most one in any half hour), and the exercise items you check, with whether each was right. It keeps the {LIMITS.visits} most recent pages and stays under {Math.round(LIMITS.bytes / 1000)} KB.
+            </li>
+            <li><code>bb:saved</code>: the pages and items you saved, with the date, up to {LIMITS.saved}.</li>
+          </ul>
+          <p>
+            The rest is kept by the tools themselves, so that your work is there when you return: answers and self-checks, ratings, choices, plans and notes. The <a href="/privacy/">privacy page</a> lists every item and can clear them all.
+          </p>
+        </div>
+        <div class="db-controls js-only" data-needs-storage>
+          <div class="db-control">
+            <label class="db-switch">
+              <input type="checkbox" data-record checked aria-describedby="db-record-hint" />
+              <span class="db-switch__track" aria-hidden="true"></span>
+              <span class="db-switch__label">Note the pages I open</span>
+            </label>
+            <p class="db-control__hint" id="db-record-hint">When this is off, nothing new is noted. What is already kept stays until you clear it.</p>
+          </div>
+          <div class="db-control">
+            <button type="button" class="btn" data-export>Download a copy</button>
+            <p class="db-control__hint">A JSON file of everything this site keeps in this browser, to keep or to import elsewhere.</p>
+          </div>
+          <div class="db-control">
+            <input type="file" id="db-import" class="db-file" accept="application/json,.json" data-import aria-describedby="db-import-hint db-import-err" />
+            <label for="db-import" class="btn db-file__label">Import a copy</label>
+            <p class="db-control__hint" id="db-import-hint">A file this dashboard downloaded. You are asked before anything is changed.</p>
+            <p class="field__error" id="db-import-err" data-import-err hidden></p>
+          </div>
+          <div class="db-control">
+            <button type="button" class="btn" data-reset>Clear what is kept</button>
+            <p class="db-control__hint">The visit history, the saved items, or everything. You choose, then confirm.</p>
+          </div>
+        </div>
+      </div>
+      <p class="db-msg js-only" data-msg aria-live="polite"></p>
+    </section>
+
+    <dialog class="db-dialog" data-dialog aria-labelledby="db-dialog-h" aria-describedby="db-dialog-body">
+      <form method="dialog" class="db-dialog__form">
+        <h2 class="db-dialog__h" id="db-dialog-h" data-dialog-title>Confirm</h2>
+        <div class="db-dialog__body" id="db-dialog-body" data-dialog-body></div>
+        <fieldset class="db-dialog__choice" data-dialog-choice hidden>
+          <legend class="label">What to clear</legend>
+          <label><input type="radio" name="scope" value="visits" checked /> The visit history: the pages opened and the exercises checked</label>
+          <label><input type="radio" name="scope" value="saved" /> The saved items</label>
+          <label><input type="radio" name="scope" value="all" /> Everything this site keeps in this browser, including your answers, ratings, plans and notes</label>
+        </fieldset>
+        <div class="db-dialog__actions">
+          <button type="submit" value="cancel" class="btn" autofocus>Cancel</button>
+          <button type="submit" value="confirm" class="btn btn--primary" data-dialog-confirm>Confirm</button>
+        </div>
+      </form>
+    </dialog>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../scripts/dashboard';
+</script>

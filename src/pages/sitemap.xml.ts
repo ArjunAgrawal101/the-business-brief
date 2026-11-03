@@ -7,8 +7,8 @@ export const GET: APIRoute = async ({ site }) => {
   const c = await corpus();
   const paths = new Set<string>();
   for (const key of Object.keys(pages)) {
-    // Skip routes with parameters (added below), the 404 page and the progress page, which only shows what one browser has kept.
-    if (key.includes('[') || key.endsWith('404.astro') || key.endsWith('progress.astro')) continue;
+    // Skip routes with parameters (added below), the 404 page and the dashboard, which only shows what one browser has kept.
+    if (key.includes('[') || key.endsWith('404.astro') || key.endsWith('progress.astro') || key.endsWith('dashboard.astro')) continue;
     // /cases/ is a redirect to the Case Vault, not a page of its own.
     if (key === './cases/index.astro') continue;
     const p = key.replace(/^\.\//, '/').replace(/index\.astro$/, '').replace(/\.astro$/, '/');
