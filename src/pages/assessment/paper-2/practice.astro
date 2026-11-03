@@ -14,18 +14,14 @@ import ProvenanceTag from '../../../components/ui/ProvenanceTag.astro';
 import { corpus } from '../../../lib/content';
 import { GROUPS, GROUP_IDS, KINDS, KIND_IDS, generate, type GroupId } from '../../../lib/p2-practice';
 import { questionHtml, workingHtml } from '../../../lib/p2-render';
-import { fmtPace, parseDuration, type Pace } from '../../../lib/bank';
+import { fmtPace, pacesFrom } from '../../../lib/bank';
 import { jsonForScript } from '../../../lib/markup';
 import '../../../styles/centre.css';
 import '../../../styles/p2-practice.css';
 
 const c = await corpus();
-const outline = c.assessment['paper-2']?.outline;
-const paces: Pace[] = (['sl', 'hl'] as const).flatMap((lv) => {
-  const o = outline?.[lv];
-  const minutes = o ? parseDuration(o.duration) : null;
-  return o && minutes ? [{ id: lv === 'sl' ? ('paper-2-sl' as const) : ('paper-2-hl' as const), label: `Paper 2, ${lv.toUpperCase()}`, minutes, marks: o.marks, paper: 'paper-2' as const, slOnly: lv === 'sl' }] : [];
-});
+/* Paper 2's time and marks at SL and HL, from the guide's assessment outlines (pp. 39 to 40). */
+const paces = pacesFrom(c.assessment).filter((p) => p.paper === 'paper-2');
 const first = generate('break-even-quantity', 24680);
 /** A worked set for every reader, with or without JavaScript: one question from each topic. */
 const WORKED: Array<[string, number]> = [

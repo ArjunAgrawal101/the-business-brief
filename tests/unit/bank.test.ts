@@ -13,6 +13,7 @@ import {
   matches,
   matchesQuery,
   minutesPerMark,
+  pacesFrom,
   parseDuration,
   parseState,
   progressBy,
@@ -27,6 +28,7 @@ import {
 } from '../../src/lib/bank';
 import { buildBank, facetsOf, readCaseQuestion, subtopicPage } from '../../src/lib/bank-build';
 import { checkIntegrity } from '../../src/lib/integrity';
+import { checkAssessment } from '../../src/lib/integrity-assessment';
 import { asCorpus, loadCorpus } from './helpers/corpus';
 
 const real = loadCorpus();
@@ -119,6 +121,20 @@ describe('building the question bank from the corpus', () => {
     (cs as unknown as Record<string, unknown>).analysisQuestions = [{ id: 'x', commandTerm: 'Ponder', ao: 'AO2', marks: 2, level: 'SL/HL', syllabus: ['1.1'], exhibits: [], prompt: 'P', guidance: 'G' }];
     expect(buildBank(c).problems.map((p) => p.message)).toContain('command term "Ponder" is not in the register');
     expect(checkIntegrity(c).some((p) => p.message.includes('Ponder'))).toBe(true);
+  });
+});
+
+describe('the papers’ scope', () => {
+  it('fails the build on an HL-only question labelled Paper 1, from a case file or from HL notes', () => {
+    const { c, n } = withFixtures();
+    n.level = 'SL/HL';
+    expect(checkAssessment(c).filter((p) => p.message.includes('Paper 1'))).toEqual([]);
+    const cs = Object.values(c.cases)[0]!;
+    (cs as unknown as Record<string, unknown>).analysisQuestions = [{ id: 'hl-p1', commandTerm: 'Explain', ao: 'AO2', marks: 4, level: 'HL', paper: 'paper-1', syllabus: ['3.3'], exhibits: [], prompt: 'Explain.', guidance: 'G.' }];
+    n.level = 'HL';
+    const found = checkAssessment(c).filter((p) => p.message.includes('Paper 1 does not assess the HL extension topics'));
+    expect(found.map((p) => p.where).sort()).toEqual([`question bank/c-${Object.keys(c.cases)[0]}-hl-p1`, `question bank/n-${Object.keys(c.notes)[0]}-1`].sort());
+    expect(checkIntegrity(c).some((p) => p.message.includes('HL extension topics'))).toBe(true);
   });
 });
 
@@ -249,9 +265,9 @@ describe('saved progress', () => {
 
 describe('timed sets at the paper’s pace', () => {
   const outline = (id: string, level: 'sl' | 'hl') => real.assessment[id]?.outline?.[level];
-  const pace = (id: string, level: 'sl' | 'hl', paper: Pace['paper'], slOnly: boolean): Pace => {
+  const pace = (id: string, level: 'sl' | 'hl', paper: Pace['paper'], excludesHl: boolean): Pace => {
     const o = outline(id, level)!;
-    return { id: 'paper-1', label: id, minutes: parseDuration(o.duration)!, marks: o.marks, paper, slOnly };
+    return { id: 'paper-1', label: id, minutes: parseDuration(o.duration)!, marks: o.marks, paper, excludesHl };
   };
 
   it('takes each paper’s time and marks from the guide’s outlines: 3, 2.25, 2.1 and 3 minutes a mark', () => {
@@ -264,6 +280,21 @@ describe('timed sets at the paper’s pace', () => {
     expect(minutesPerMark(pace('paper-2', 'hl', 'paper-2', false))).toBe(2.1);
     expect(minutesPerMark(pace('paper-3', 'hl', 'paper-3', false))).toBe(3);
     expect(fmtPace(pace('paper-2', 'sl', 'paper-2', true))).toBe('2.25 minutes a mark');
+  });
+
+  it('reads each pace from the register, leaving HL-only questions out of Paper 1 and SL Paper 2 (guide, pp. 39 to 40)', () => {
+    const paces = pacesFrom(real.assessment);
+    expect(paces.map((p) => [p.id, p.minutes, p.marks, p.excludesHl])).toEqual([
+      ['paper-1', 90, 30, true],
+      ['paper-2-sl', 90, 40, true],
+      ['paper-2-hl', 105, 50, false],
+      ['paper-3', 75, 25, false],
+    ]);
+    const [p1, , p2hl] = paces;
+    expect(inPace(f({ level: 'HL', paper: 'general' }), p1!, true)).toBe(false);
+    expect(inPace(f({ paper: 'general' }), p1!, true)).toBe(true);
+    expect(inPace(f({ level: 'HL', paper: 'paper-2' }), p2hl!, false)).toBe(true);
+    expect(pacesFrom({})).toEqual([]);
   });
 
   it('allows the marks times the pace', () => {

@@ -342,8 +342,8 @@ export interface Pace {
   minutes: number;
   marks: number;
   paper: Extract<PaperStyle, 'paper-1' | 'paper-2' | 'paper-3'>;
-  /** Questions an SL student would not meet are left out of an SL set. */
-  slOnly: boolean;
+  /** The paper does not assess the HL extension topics, so its sets leave out HL-only questions. */
+  excludesHl: boolean;
 }
 
 /** "1 hour 30 minutes" is 90; "1 hour 45 minutes" is 105; "75 minutes" is 75. */
@@ -352,6 +352,33 @@ export function parseDuration(s: string): number | null {
   const m = /(\d+)\s*minutes?/.exec(s);
   if (!h && !m) return null;
   return (h ? Number(h[1]) * 60 : 0) + (m ? Number(m[1]) : 0);
+}
+
+/**
+ * Each pace and the outline it reads. Paper 1, at both levels, and Paper 2 at
+ * SL cover units 1 to 5 without the HL extension topics; Paper 2 at HL and
+ * Paper 3 include them (guide, pp. 39 to 40).
+ */
+export const PACE_DEFS: Record<PaceId, { component: string; level: 'sl' | 'hl'; label: string; paper: Pace['paper']; excludesHl: boolean }> = {
+  'paper-1': { component: 'paper-1', level: 'sl', label: 'Paper 1', paper: 'paper-1', excludesHl: true },
+  'paper-2-sl': { component: 'paper-2', level: 'sl', label: 'Paper 2, SL', paper: 'paper-2', excludesHl: true },
+  'paper-2-hl': { component: 'paper-2', level: 'hl', label: 'Paper 2, HL', paper: 'paper-2', excludesHl: false },
+  'paper-3': { component: 'paper-3', level: 'hl', label: 'Paper 3, HL', paper: 'paper-3', excludesHl: false },
+};
+
+interface Outline {
+  duration: string;
+  marks: number;
+}
+
+/** The paces the assessment register's outlines give; a paper without an outline has no pace. */
+export function pacesFrom(assessment: Record<string, { outline?: { sl?: Outline; hl?: Outline } } | undefined>): Pace[] {
+  return PACE_IDS.flatMap((id) => {
+    const d = PACE_DEFS[id];
+    const o = assessment[d.component]?.outline?.[d.level];
+    const minutes = o ? parseDuration(o.duration) : null;
+    return o && minutes ? [{ id, label: d.label, minutes, marks: o.marks, paper: d.paper, excludesHl: d.excludesHl }] : [];
+  });
 }
 
 export const minutesPerMark = (p: Pace): number => p.minutes / p.marks;
@@ -389,7 +416,7 @@ export function fmtClock(seconds: number): string {
 
 /** Questions a timed set at this pace can draw on. */
 export function inPace(f: Facets, p: Pace, includeGeneral: boolean): boolean {
-  if (p.slOnly && f.level === 'HL') return false;
+  if (p.excludesHl && f.level === 'HL') return false;
   if (f.paper === p.paper) return true;
   return includeGeneral && f.paper === 'general';
 }

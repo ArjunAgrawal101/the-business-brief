@@ -15,7 +15,7 @@ import Exhibit from '../../components/blocks/Exhibit.astro';
 import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
 import { corpus, href } from '../../lib/content';
 import { buildBank, facetsOf } from '../../lib/bank-build';
-import { AO_LABELS, BAND_LABELS, PACE_IDS, PAPER_LABELS, TYPE_LABELS, fmtPace, parseDuration, type Ao, type Band, type Pace, type PaceId, type PaperStyle, type QType } from '../../lib/bank';
+import { AO_LABELS, BAND_LABELS, PAPER_LABELS, TYPE_LABELS, fmtPace, pacesFrom, type Ao, type Band, type PaperStyle, type QType } from '../../lib/bank';
 import { jsonForScript } from '../../lib/markup';
 import '../../styles/centre.css';
 import '../../styles/bank.css';
@@ -50,19 +50,8 @@ for (const it of items) {
 /** With JavaScript, the list shows this many matching questions at a time. */
 const PAGE = 30;
 
-/* Each paper's time and marks, from the guide's assessment outlines (pp. 39 to 40). */
-const PACE_DEF: Record<PaceId, { comp: string; lv: 'sl' | 'hl'; label: string; paper: Pace['paper']; slOnly: boolean }> = {
-  'paper-1': { comp: 'paper-1', lv: 'sl', label: 'Paper 1', paper: 'paper-1', slOnly: false },
-  'paper-2-sl': { comp: 'paper-2', lv: 'sl', label: 'Paper 2, SL', paper: 'paper-2', slOnly: true },
-  'paper-2-hl': { comp: 'paper-2', lv: 'hl', label: 'Paper 2, HL', paper: 'paper-2', slOnly: false },
-  'paper-3': { comp: 'paper-3', lv: 'hl', label: 'Paper 3, HL', paper: 'paper-3', slOnly: false },
-};
-const paces: Pace[] = PACE_IDS.flatMap((id) => {
-  const d = PACE_DEF[id];
-  const o = c.assessment[d.comp]?.outline?.[d.lv];
-  const minutes = o ? parseDuration(o.duration) : null;
-  return o && minutes ? [{ id, label: d.label, minutes, marks: o.marks, paper: d.paper, slOnly: d.slOnly }] : [];
-});
+/* Each paper's time, marks and scope, from the guide's assessment outlines (pp. 39 to 40). */
+const paces = pacesFrom(c.assessment);
 const config = {
   page: PAGE,
   items: items.map(facetsOf),
@@ -478,7 +467,10 @@ const config = {
               ))
             }
           </dl>
-          <p class="small muted">Guide, pp. 39 to 40. Every paper also starts with five minutes' reading time (guide, p. 41).</p>
+          <p class="small muted">
+            Paper 1, at both levels, and Paper 2 at SL do not assess the HL extension topics, so sets at their pace leave out HL-only questions. Guide, pp. 39
+            to 40. Every paper also starts with five minutes' reading time (guide, p. 41).
+          </p>
         </div>
         <div class="ce-card">
           <p class="ce-labels"><GuideLabel kind="strategy" /></p>

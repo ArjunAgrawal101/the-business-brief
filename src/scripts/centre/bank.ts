@@ -367,7 +367,7 @@ each('[data-ix="bank"]', (root) => {
     const n = Math.min(Number(nSel?.value ?? 3), list.length);
     startBtn.disabled = list.length === 0;
     if (!list.length) {
-      info.textContent = `None of the questions your filters show is in the style of ${p.label}${p.slOnly ? ' at SL' : ''}. Change the filters or the pace.`;
+      info.textContent = `None of the questions your filters show is in the style of ${p.label}${p.excludesHl ? ', which leaves out the HL extension topics' : ''}. Change the filters or the pace.`;
       return;
     }
     const avg = list.reduce((s, f) => s + f.marks, 0) / list.length;
