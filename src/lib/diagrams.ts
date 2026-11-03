@@ -10,13 +10,14 @@ import { UNIT3 } from './figures/unit3';
 import { UNIT4 } from './figures/unit4';
 import { UNIT5 } from './figures/unit5';
 import { TOOLKIT } from './figures/toolkit';
+import { FRAMEWORK_FIGURES } from './figures/frameworks';
 
-export type DiagramGroup = 'unit-1' | 'unit-2' | 'unit-3' | 'unit-4' | 'unit-5' | 'toolkit';
+export type DiagramGroup = 'unit-1' | 'unit-2' | 'unit-3' | 'unit-4' | 'unit-5' | 'toolkit' | 'enrichment';
 
 export interface DiagramDef {
   title: string;
   caption?: string;
-  /** IB subtopic codes the diagram teaches. */
+  /** IB subtopic codes the diagram teaches. Empty for an enrichment diagram, which is beyond the course. */
   syllabus: string[];
   level: 'SL/HL' | 'HL';
   group: DiagramGroup;
@@ -33,9 +34,10 @@ export const DIAGRAM_GROUPS: Array<{ id: DiagramGroup; title: string }> = [
   { id: 'unit-4', title: 'Unit 4: Marketing' },
   { id: 'unit-5', title: 'Unit 5: Operations management' },
   { id: 'toolkit', title: 'The business management toolkit' },
+  { id: 'enrichment', title: 'Enrichment: frameworks beyond the syllabus' },
 ];
 
-export const DIAGRAMS: Record<string, DiagramDef> = { ...UNIT1, ...UNIT2, ...UNIT3, ...UNIT4, ...UNIT5, ...TOOLKIT };
+export const DIAGRAMS: Record<string, DiagramDef> = { ...UNIT1, ...UNIT2, ...UNIT3, ...UNIT4, ...UNIT5, ...TOOLKIT, ...FRAMEWORK_FIGURES };
 
 /** The text description inside a rendered diagram, for a visible disclosure. */
 export function describe(svg: string): string {

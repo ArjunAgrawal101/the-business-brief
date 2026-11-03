@@ -12,6 +12,8 @@ import SaveButton from '../../components/ui/SaveButton.astro';
 import { DIAGRAMS, DIAGRAM_GROUPS } from '../../lib/diagrams';
 import { corpus } from '../../lib/content';
 import { allSubtopics, codeKey, subtopicHref } from '../../lib/learning';
+import { library } from '../../lib/frameworks-content';
+import { frameworkHref } from '../../lib/frameworks';
 
 const c = await corpus();
 const subs = allSubtopics(c);
@@ -22,6 +24,10 @@ const groups = DIAGRAM_GROUPS.map((g) => ({
   items: all.filter(([, d]) => d.group === g.id).sort((a, b) => codeKey(a[1].syllabus[0] ?? '0') - codeKey(b[1].syllabus[0] ?? '0')),
 })).filter((g) => g.items.length);
 const hl = all.filter(([, d]) => d.level === 'HL').length;
+// The frameworks library page that explains each diagram, for diagrams beyond the course.
+const lib = await library();
+const frameworkOf = (did: string) => Object.entries(lib.frameworks).find(([, f]) => f.diagram === did);
+const beyond = all.filter(([, d]) => d.group === 'enrichment').length;
 ---
 
 <BaseLayout title="Diagrams and infographics" description="Original diagrams for IB DP Business Management: models, processes, structures and charts, each drawn from data, with a text description and an SVG download." section="topics">
@@ -29,7 +35,7 @@ const hl = all.filter(([, d]) => d.level === 'HL').length;
     trail={[{ label: 'Topics', href: '/topics/' }, { label: 'Diagrams' }]}
     kicker="Diagrams and infographics"
     title="See how the ideas fit together"
-    lead={`${all.length} original diagrams: models, processes, structures and charts across the five units and the toolkit, ${hl} of them for HL. Each is drawn from data, so every line and label is exact, and each has a text description and an SVG download. Charts use fictional figures, and say so.`}
+    lead={`${all.length} original diagrams: models, processes, structures and charts across the five units and the toolkit, ${hl} of them for HL${beyond ? `, and ${beyond} enrichment frameworks beyond the course` : ''}. Each is drawn from data, so every line and label is exact, and each has a text description and an SVG download. Charts use fictional figures, and say so.`}
   />
 
   <div class="wrap page-body">
@@ -55,17 +61,24 @@ const hl = all.filter(([, d]) => d.level === 'HL').length;
             {g.items.map(([id, d]) => (
               <li>
                 <Diagram id={id} download />
-                <p class="dgl-uses">
-                  <span class="label">Used in</span>
-                  {d.syllabus.map((code, i) => (
-                    <>
-                      {i > 0 && ', '}
-                      <a href={subtopicHref(c, code)}>
-                        {code} {titleOf(code)}
-                      </a>
-                    </>
-                  ))}
-                </p>
+                {d.syllabus.length > 0 ? (
+                  <p class="dgl-uses">
+                    <span class="label">Used in</span>
+                    {d.syllabus.map((code, i) => (
+                      <>
+                        {i > 0 && ', '}
+                        <a href={subtopicHref(c, code)}>
+                          {code} {titleOf(code)}
+                        </a>
+                      </>
+                    ))}
+                  </p>
+                ) : (
+                  <p class="dgl-uses">
+                    <span class="tag tag--enrichment">Beyond the IB course</span>{' '}
+                    {frameworkOf(id) ? <a href={frameworkHref(frameworkOf(id)![0])}>{frameworkOf(id)![1].name}: the framework explained</a> : 'Enrichment'}
+                  </p>
+                )}
                 <SaveButton compact title={d.title} kind="diagram" url={`/diagrams/#diagram-${id}`} />
               </li>
             ))}
