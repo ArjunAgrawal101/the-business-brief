@@ -10,31 +10,49 @@ test('the skip link moves focus to the main content', async ({ page }) => {
 });
 
 test('the current section is marked in the navigation', async ({ page, isMobile }) => {
-  test.skip(isMobile, 'The primary navigation is in the menu on small screens.');
+  test.skip(isMobile, 'On small screens the groups are in the drawer, tested below.');
   await page.goto('/mindmaps/');
-  await expect(page.locator('.primary-nav a[aria-current="page"]')).toHaveText('Mindmaps');
+  await expect(page.locator('.mega.is-current > summary')).toContainText('Explore');
+  await expect(page.locator('.mega-nav a[aria-current="page"]')).toContainText('Mindmaps');
   await page.goto('/assessment/paper-2/');
-  await expect(page.locator('.primary-nav a[aria-current="page"]')).toHaveText('Assessment');
+  await expect(page.locator('.mega.is-current > summary')).toContainText('Assess');
+  await expect(page.locator('.mega-nav a[aria-current="page"]')).toContainText('Paper 2');
   await page.goto('/glossary/break-even-quantity/');
-  await expect(page.locator('.primary-nav a[aria-current="page"]')).toHaveText('Glossary');
+  await expect(page.locator('.mega.is-current > summary')).toContainText('Explore');
+  await expect(page.locator('.mega-nav a[aria-current="true"]')).toContainText('Glossary');
 });
 
-test('the menu lists every room, opens, closes with Escape and returns focus', async ({ page, isMobile }) => {
+test('the mega menu opens one group at a time and closes with Escape, returning focus', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'The mega menu is for wide screens; the drawer is tested below.');
   await page.goto('/');
-  const toggle = page.locator('[data-menu-toggle]');
-  await expect(toggle).toHaveAccessibleName(isMobile ? 'Menu' : 'Explore');
-  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
-  await toggle.click();
-  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-  const panel = page.locator('#menu-panel');
-  await expect(panel).toBeVisible();
-  const rooms = panel.locator('.rooms-menu__item');
-  await expect(rooms).toHaveCount(14);
-  // A planned room is listed, but is not a link that leads nowhere.
-  await expect(panel.locator('.rooms-menu__item.is-planned a')).toHaveCount(0);
+  const tools = page.locator('.mega--tools');
+  const assess = page.locator('.mega--assess');
+  await tools.locator('summary').click();
+  await expect(tools).toHaveAttribute('open', '');
+  await expect(tools.locator('.mega__panel')).toBeVisible();
+  await expect(tools.locator('.mega__links a')).toHaveCount(await tools.locator('.mega__links li').count());
+  await assess.locator('summary').click();
+  await expect(assess).toHaveAttribute('open', '');
+  await expect(tools).not.toHaveAttribute('open', '');
   await page.keyboard.press('Escape');
-  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
-  await expect(panel).toBeHidden();
+  await expect(assess).not.toHaveAttribute('open', '');
+  await expect(assess.locator('summary')).toBeFocused();
+});
+
+test('the drawer holds every group on small screens and closes with Escape', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'The drawer replaces the mega menu on small screens.');
+  await page.goto('/finance-desk/');
+  const drawer = page.locator('[data-drawer]');
+  const toggle = drawer.locator('summary').first();
+  await expect(toggle).toHaveAccessibleName('Menu');
+  await toggle.click();
+  await expect(drawer).toHaveAttribute('open', '');
+  await expect(drawer.locator('.drawer__group')).toHaveCount(5);
+  // The current group opens with the drawer, its page marked.
+  await expect(drawer.locator('.drawer__group.is-current')).toHaveAttribute('open', '');
+  await expect(drawer.locator('a[aria-current="page"]')).toContainText('Finance Desk');
+  await page.keyboard.press('Escape');
+  await expect(drawer).not.toHaveAttribute('open', '');
   await expect(toggle).toBeFocused();
 });
 

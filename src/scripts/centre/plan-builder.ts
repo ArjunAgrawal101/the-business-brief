@@ -1,4 +1,4 @@
-/** The Paper 3 Boardroom in the browser: actions to add and remove, a live review, print, and storage on this device. */
+/** The Paper 3 plan builder in the browser: actions to add and remove, a live review, print, and storage on this device. */
 import { each, escapeHtml, readConfig, store } from '../ix';
 import { blankAction, reviewPlan, type Action, type Plan } from '../../lib/p3-plan';
 

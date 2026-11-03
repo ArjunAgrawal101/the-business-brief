@@ -4,56 +4,10 @@
  * creator, from the brand's own reversed master) and The Business Brief (the
  * product), as two parts of the Arjun Agrawal Knowledge Series.
  */
-const COLUMNS = [
-  {
-    title: 'Learn',
-    links: [
-      ['Topic library', '/topics/'],
-      ['Mindmaps', '/mindmaps/'],
-      ['Diagrams', '/diagrams/'],
-      ['Glossary', '/glossary/'],
-      ['Course map', '/ib/map/'],
-      ['Coverage tracker', '/ib/coverage/'],
-      ['Key concepts', '/ib/concepts/'],
-      ['Toolkit', '/toolkit/'],
-      ['Revision briefs', '/revision/'],
-    ],
-  },
-  {
-    title: 'Assess',
-    links: [
-      ['Assessment Centre', '/assessment/'],
-      ['Internal assessment', '/assessment/internal-assessment/'],
-      ['Paper 1', '/assessment/paper-1/'],
-      ['Paper 2', '/assessment/paper-2/'],
-      ['Paper 3 Boardroom (HL)', '/assessment/paper-3/'],
-      ['Practice questions', '/exam-desk/practice/'],
-    ],
-  },
-  {
-    title: 'Practise',
-    links: [
-      ['Case studies', '/cases/'],
-      ['Decision Room', '/decision-room/'],
-      ['Finance Desk', '/finance-desk/'],
-      ['Case Room lab', '/case-room/'],
-      ['All rooms', '/rooms/'],
-      ['Pathways', '/pathways/'],
-    ],
-  },
-  {
-    title: 'Platform',
-    links: [
-      ['Resources Library', '/resources/'],
-      ['About Arjun Agrawal', '/about/'],
-      ['Search', '/search/'],
-      ['Your progress', '/progress/'],
-      ['Sources and evidence', '/sources/'],
-      ['Accessibility', '/accessibility/'],
-      ['Privacy', '/privacy/'],
-    ],
-  },
-];
+import { NAV } from '../../lib/navigation';
+
+/** The footer's columns are the five groups of the header, from one list. */
+const COLUMNS = NAV.map((g) => ({ title: g.label, links: g.links.map((l) => [l.label, l.href] as const) }));
 const year = new Date().getFullYear();
 ---
 
@@ -108,6 +62,9 @@ const year = new Date().getFullYear();
       <p class="site-footer__fine">
         <span>&copy; {year} Arjun Agrawal. Educational content and brand: all rights reserved. Code: MIT licence.</span>
         <a href="/privacy/">No account, no tracking: your saved work stays on this device.</a>
+        <a href="/accessibility/">Accessibility</a>
+        <a href="/search/">Search</a>
+        <a href="/rooms/">All rooms</a>
         <a href="/?intro" data-replay-intro>Replay the opening</a>
       </p>
     </div>
@@ -196,7 +153,7 @@ const year = new Date().getFullYear();
 
   .site-footer__nav {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: var(--sp-5);
   }
 
@@ -268,6 +225,12 @@ const year = new Date().getFullYear();
     .site-footer__series {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--sp-5);
+    }
+  }
+
+  @media (max-width: 52rem) {
+    .site-footer__nav {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 

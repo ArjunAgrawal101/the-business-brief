@@ -1,82 +1,49 @@
 ---
+/**
+ * The site header: the brand lockup, the five doors of the information
+ * architecture (Explore, Practise, Tools, Assess, Discover) as a mega menu,
+ * and search. Every group is a native disclosure (details and summary), so
+ * the menus open and close without JavaScript; the script adds the rest of
+ * a menu's manners: one open at a time, Escape returns focus, a click
+ * outside or moving focus away closes it. Below 64rem the groups move into a
+ * full-height drawer.
+ *
+ * The groups and their links come from src/lib/navigation.ts.
+ */
 import BrandLockup from '../brand/BrandLockup.astro';
-import Icon from '../ui/Icon.astro';
-import { modulesInOrder } from '../../lib/content';
-import { isIcon } from '../../lib/icons';
-import { STATUS_LABELS } from '../../lib/labels';
+import Monogram from '../brand/Monogram.astro';
+import { NAV, navPosition } from '../../lib/navigation';
+import { corpus } from '../../lib/content';
+import { subtopicCoverage } from '../../lib/coverage';
 
 interface Props {
   current?: string;
 }
 const { current } = Astro.props;
-const rooms = (await modulesInOrder()).map((m) => ({ id: m.id, ...m.data }));
 
-/** Older section names map onto the 2.0 navigation. */
-const SECTION_OF: Record<string, string> = {
-  'exam-desk': 'assessment',
-  'ia-studio': 'assessment',
-  revision: 'topics',
-  toolkit: 'topics',
+/** Sections whose pages sit outside any listed link. */
+const SECTION_GROUP: Record<string, string> = {
+  'ia-studio': 'assess',
+  'exam-desk': 'assess',
+  assessment: 'assess',
+  rooms: 'tools',
+  toolkit: 'explore',
+  revision: 'explore',
+  topics: 'explore',
 };
-const active = current ? (SECTION_OF[current] ?? current) : undefined;
+const pos = navPosition(Astro.url.pathname);
+const activeGroup = pos.group ?? (current ? SECTION_GROUP[current] : undefined);
+const ariaCurrent = (href: string) => (pos.href === href ? (pos.exact ? 'page' : 'true') : undefined);
 
-const PRIMARY = [
-  { id: 'topics', label: 'Topics', href: '/topics/' },
-  { id: 'mindmaps', label: 'Mindmaps', href: '/mindmaps/' },
-  { id: 'glossary', label: 'Glossary', href: '/glossary/' },
-  { id: 'assessment', label: 'Assessment', href: '/assessment/' },
-  { id: 'resources', label: 'Resources', href: '/resources/' },
-  { id: 'about', label: 'About', href: '/about/' },
-];
+const c = await corpus();
+const coverage = subtopicCoverage(c);
+const complete = coverage.filter((r) => r.state === 'complete').length;
 
-const GROUPS = [
-  {
-    title: 'Learn',
-    links: [
-      { label: 'Topic library', href: '/topics/' },
-      { label: 'Mindmaps', href: '/mindmaps/' },
-      { label: 'Diagrams', href: '/diagrams/' },
-      { label: 'Glossary', href: '/glossary/' },
-      { label: 'Course map', href: '/ib/map/' },
-      { label: 'Coverage tracker', href: '/ib/coverage/' },
-      { label: 'Key concepts', href: '/ib/concepts/' },
-      { label: 'Toolkit', href: '/toolkit/' },
-      { label: 'Revision briefs', href: '/revision/' },
-    ],
-  },
-  {
-    title: 'Assess',
-    links: [
-      { label: 'Assessment Centre', href: '/assessment/' },
-      { label: 'Internal assessment', href: '/assessment/internal-assessment/' },
-      { label: 'Paper 1', href: '/assessment/paper-1/' },
-      { label: 'Paper 2', href: '/assessment/paper-2/' },
-      { label: 'Paper 3 Boardroom (HL)', href: '/assessment/paper-3/' },
-      { label: 'Practice questions', href: '/exam-desk/practice/' },
-    ],
-  },
-  {
-    title: 'Practise',
-    links: [
-      { label: 'Case studies', href: '/cases/' },
-      { label: 'Decision Room', href: '/decision-room/' },
-      { label: 'Finance Desk', href: '/finance-desk/' },
-      { label: 'Case Room lab', href: '/case-room/' },
-      { label: 'All rooms', href: '/rooms/' },
-    ],
-  },
-  {
-    title: 'Platform',
-    links: [
-      { label: 'Resources Library', href: '/resources/' },
-      { label: 'About Arjun Agrawal', href: '/about/' },
-      { label: 'Pathways', href: '/pathways/' },
-      { label: 'Search', href: '/search/' },
-      { label: 'Your progress', href: '/progress/' },
-      { label: 'Sources and evidence', href: '/sources/' },
-      { label: 'Accessibility', href: '/accessibility/' },
-    ],
-  },
+const GUIDES = [
+  { label: 'Internal assessment guide', href: '/downloads/guides/business-brief-ia-research-project-guide.pdf' },
+  { label: 'Paper 1 guide', href: '/downloads/guides/business-brief-paper-1-assessment-guide.pdf' },
+  { label: 'Paper 2 guide', href: '/downloads/guides/business-brief-paper-2-assessment-guide.pdf' },
+  { label: 'Paper 3 guide (HL)', href: '/downloads/guides/business-brief-paper-3-assessment-guide-hl.pdf' },
 ];
 ---
 
@@ -86,14 +53,112 @@ const GROUPS = [
       <BrandLockup />
     </a>
 
-    <nav class="primary-nav" aria-label="Primary">
-      <ul>
+    <nav class="mega-nav" aria-label="Primary" data-mega-nav>
+      <ul class="mega-nav__list">
         {
-          PRIMARY.map((item) => (
-            <li>
-              <a href={item.href} aria-current={active === item.id ? 'page' : undefined}>
-                {item.label}
-              </a>
+          NAV.map((g) => (
+            <li class="mega-nav__item">
+              <details class:list={['mega', `mega--${g.id}`, { 'is-current': activeGroup === g.id }]} name="mega" data-menu>
+                <summary class="mega__trigger">
+                  {g.label}
+                  {activeGroup === g.id && <span class="sr-only"> (current section)</span>}
+                  <svg class="mega__chev" viewBox="0 0 12 12" width="10" height="10" aria-hidden="true" focusable="false">
+                    <path d="M2.5 4.5L6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </summary>
+                <div class="mega__panel">
+                  <div class="wrap mega__grid">
+                    <div class="mega__intro">
+                      <p class="mega__kicker">{g.label}</p>
+                      <p class="mega__lead">{g.intro}</p>
+                    </div>
+                    <ul class="mega__links" role="list">
+                      {g.links.map((l) => (
+                        <li>
+                          <a href={l.href} aria-current={ariaCurrent(l.href)}>
+                            <span class="mega__name">
+                              {l.label}
+                              {l.hl && <span class="tag tag--hl">HL</span>}
+                            </span>
+                            <span class="mega__text">{l.text}</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                    <aside class="mega__feature" aria-label={`${g.label}: featured`}>
+                      {g.id === 'explore' && (
+                        <>
+                          <p class="mega__flabel">Course coverage</p>
+                          <p class="mega__stat">
+                            <span class="num">{complete}</span>
+                            <span class="mega__of">of {coverage.length} subtopics complete</span>
+                          </p>
+                          <p class="mega__ticks" aria-hidden="true">
+                            {coverage.map((r) => (
+                              <span class={`mega__tick mega__tick--${r.state}`} />
+                            ))}
+                          </p>
+                          <a class="mega__cta" href="/ib/coverage/">
+                            The coverage tracker <span aria-hidden="true">&rarr;</span>
+                          </a>
+                        </>
+                      )}
+                      {g.id === 'practise' && (
+                        <>
+                          <p class="mega__flabel">Start here</p>
+                          <p class="mega__ftitle">Halden Distribution: diagnose before you decide</p>
+                          <p class="mega__ftext">A warehouse in trouble after a new system arrived. Five stages from the symptoms to a judgement, checked against the evidence. A fictional business.</p>
+                          <a class="mega__cta" href="/case-room/halden-diagnosis/">
+                            Open the case lab <span aria-hidden="true">&rarr;</span>
+                          </a>
+                        </>
+                      )}
+                      {g.id === 'tools' && (
+                        <>
+                          <p class="mega__flabel">The formula sheet</p>
+                          <p class="mega__ftitle">Every formula in the course, in the guide's notation</p>
+                          <p class="mega__ftext">On one printable page, with a note on when each is used and what it shows.</p>
+                          <a class="mega__cta" href="/resources/formula-sheet/">
+                            Open the formula sheet <span aria-hidden="true">&rarr;</span>
+                          </a>
+                          <a class="mega__cta mega__cta--quiet" href="/rooms/">
+                            All rooms <span aria-hidden="true">&rarr;</span>
+                          </a>
+                        </>
+                      )}
+                      {g.id === 'assess' && (
+                        <>
+                          <p class="mega__flabel">The creator's assessment guides</p>
+                          <ul class="mega__files" role="list">
+                            {GUIDES.map((d) => (
+                              <li>
+                                <a href={d.href} download>
+                                  {d.label} <span class="mega__fmt">PDF</span>
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        </>
+                      )}
+                      {g.id === 'discover' && (
+                        <>
+                          <p class="mega__flabel">The educator</p>
+                          <p class="mega__creator">
+                            <Monogram height={30} reversed />
+                            <span>
+                              <span class="mega__ftitle">Arjun Agrawal</span>
+                              <span class="mega__ftext">IB Diploma Programme educator in Economics, Business Management and Global Politics.</span>
+                            </span>
+                          </p>
+                          <a class="mega__cta" href="https://ib-economics-pi.vercel.app/" rel="noopener">
+                            Arjun Agrawal Economics<span class="sr-only"> (external site)</span> <span aria-hidden="true">&nearr;</span>
+                          </a>
+                        </>
+                      )}
+                    </aside>
+                  </div>
+                </div>
+              </details>
             </li>
           ))
         }
@@ -101,77 +166,52 @@ const GROUPS = [
     </nav>
 
     <div class="site-header__tools">
-      <a class="icon-link" href="/search/" aria-current={current === 'search' ? 'page' : undefined}>
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+      <a class="hdr-btn" href="/search/" aria-current={current === 'search' ? 'page' : undefined}>
+        <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false">
           <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.75"></circle>
           <path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"></path>
         </svg>
-        <span class="icon-link__text">Search</span>
+        <span class="hdr-btn__text">Search</span>
       </a>
-      <a class="menu-toggle" href="/rooms/" data-menu-toggle aria-controls="menu-panel">
-        <span class="menu-toggle__bars" aria-hidden="true"><span></span><span></span></span>
-        <span class="menu-toggle__icon" aria-hidden="true"><Icon id="rooms" size={16} /></span>
-        <span class="menu-toggle__text menu-toggle__text--narrow">Menu</span>
-        <span class="menu-toggle__text menu-toggle__text--wide">Explore</span>
-      </a>
-    </div>
-  </div>
 
-  <div class="menu-panel" id="menu-panel" data-menu-panel hidden>
-    <div class="wrap menu-panel__primary">
-      <ul class="menu-primary">
-        {
-          PRIMARY.map((item) => (
-            <li>
-              <a href={item.href} aria-current={active === item.id ? 'page' : undefined}>
-                {item.label}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-    <div class="wrap menu-panel__inner">
-      {
-        GROUPS.map((g) => (
-          <section class="menu-panel__group" aria-labelledby={`menu-${g.title.toLowerCase()}`}>
-            <h2 class="label" id={`menu-${g.title.toLowerCase()}`}>
-              {g.title}
-            </h2>
-            <ul>
-              {g.links.map((l) => (
-                <li>
-                  <a href={l.href}>{l.label}</a>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))
-      }
-    </div>
-    <div class="wrap menu-panel__rooms">
-      <h2 class="label" id="menu-rooms">Learning environments</h2>
-      <ul class="rooms-menu" aria-labelledby="menu-rooms">
-        {
-          rooms.map((r) => (
-            <li class:list={['rooms-menu__item', `is-${r.status}`]}>
-              {r.href ? (
-                <a href={r.href} class="rooms-menu__link" aria-current={current === r.id ? 'page' : undefined}>
-                  {isIcon(r.id) && <Icon id={r.id} size={20} />}
-                  <span class="rooms-menu__name">{r.name}</span>
-                  <span class="rooms-menu__status">{STATUS_LABELS[r.status].label}</span>
-                </a>
-              ) : (
-                <span class="rooms-menu__link">
-                  {isIcon(r.id) && <Icon id={r.id} size={20} />}
-                  <span class="rooms-menu__name">{r.name}</span>
-                  <span class="rooms-menu__status">{STATUS_LABELS[r.status].label}</span>
-                </span>
-              )}
-            </li>
-          ))
-        }
-      </ul>
+      <details class="drawer" data-drawer>
+        <summary class="hdr-btn hdr-btn--ink drawer__toggle">
+          <span class="drawer__bars" aria-hidden="true"><span></span><span></span></span>
+          <span>Menu</span>
+        </summary>
+        <div class="drawer__panel">
+          <nav class="wrap drawer__nav" aria-label="Primary">
+            {
+              NAV.map((g) => (
+                <details class:list={['drawer__group', { 'is-current': activeGroup === g.id }]} open={activeGroup === g.id}>
+                  <summary>
+                    {g.label}
+                    {activeGroup === g.id && <span class="sr-only"> (current section)</span>}
+                  </summary>
+                  <p class="drawer__intro">{g.intro}</p>
+                  <ul role="list">
+                    {g.links.map((l) => (
+                      <li>
+                        <a href={l.href} aria-current={ariaCurrent(l.href)}>
+                          <span class="drawer__name">
+                            {l.label}
+                            {l.hl && <span class="tag tag--hl">HL</span>}
+                          </span>
+                          <span class="drawer__text">{l.text}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              ))
+            }
+            <p class="drawer__foot">
+              <a href="/search/">Search the platform</a>
+              <a href="/rooms/">All rooms</a>
+            </p>
+          </nav>
+        </div>
+      </details>
     </div>
   </div>
 </header>
@@ -181,8 +221,17 @@ const GROUPS = [
     position: sticky;
     top: 0;
     z-index: 40;
-    background: rgba(246, 241, 231, 0.94);
     border-bottom: 1px solid var(--rule-hair);
+  }
+
+  /* The frosted ground sits on a layer of its own: a backdrop filter on the
+     header itself would trap the drawer, which is fixed to the viewport. */
+  .site-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgba(246, 241, 231, 0.94);
     backdrop-filter: saturate(1.15) blur(8px);
   }
 
@@ -196,43 +245,55 @@ const GROUPS = [
   .brand {
     display: inline-flex;
     align-items: center;
+    flex: none;
     color: var(--text-strong);
     text-decoration: none;
-    flex: none;
   }
 
-  .primary-nav {
+  /* ---------- The mega menu (wide screens) ---------- */
+
+  .mega-nav {
     margin-left: auto;
   }
 
-  .primary-nav ul {
+  .mega-nav__list {
     display: flex;
-    gap: 0.1rem;
-    list-style: none;
+    gap: 0.15rem;
     margin: 0;
     padding: 0;
+    list-style: none;
   }
 
-  .primary-nav li {
+  .mega-nav__item {
     margin: 0;
   }
 
-  .primary-nav a {
+  .mega > summary {
+    list-style: none;
+  }
+
+  .mega > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .mega__trigger {
     position: relative;
     display: inline-flex;
     align-items: center;
+    gap: 0.4rem;
     height: var(--header-h);
     padding: 0 0.8rem;
     color: var(--navy-900);
     font-size: 0.9375rem;
-    font-weight: 540;
+    font-weight: 560;
     letter-spacing: 0.005em;
-    text-decoration: none;
     white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
   }
 
-  .primary-nav a::after {
-    content: '';
+  .mega__trigger::after {
+    content: "";
     position: absolute;
     left: 0.8rem;
     right: 0.8rem;
@@ -240,19 +301,292 @@ const GROUPS = [
     height: 1px;
     background: var(--navy-900);
     transform: scaleX(0);
-    transform-origin: center;
     transition: transform var(--dur-base) var(--ease-out);
   }
 
-  .primary-nav a:hover::after {
+  .mega__trigger:hover::after,
+  .mega[open] > .mega__trigger::after {
     transform: scaleX(1);
   }
 
-  .primary-nav a[aria-current='page']::after {
+  .mega.is-current > .mega__trigger::after {
     height: 2px;
     background: var(--gold-500);
     transform: scaleX(1);
   }
+
+  .mega__trigger:focus-visible {
+    outline-offset: -4px;
+  }
+
+  .mega__chev {
+    color: var(--slate-600);
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+
+  .mega[open] .mega__chev {
+    transform: rotate(180deg);
+  }
+
+  .mega__panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    border-top: 1px solid var(--rule-hair);
+    background:
+      linear-gradient(90deg, rgba(201, 168, 102, 0.07), transparent 30%),
+      var(--ivory-50);
+    box-shadow: 0 28px 48px -30px rgba(11, 26, 51, 0.5);
+    max-height: calc(100vh - var(--header-h));
+    overflow-y: auto;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .mega[open] > .mega__panel {
+      animation: mega-in var(--dur-slow) var(--ease-out);
+    }
+  }
+
+  @keyframes mega-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+
+  .mega__grid {
+    display: grid;
+    grid-template-columns: minmax(12rem, 0.95fr) minmax(0, 2.4fr) minmax(15rem, 1.15fr);
+    gap: var(--sp-6);
+    padding-block: var(--sp-6) var(--sp-6);
+  }
+
+  .mega__kicker {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.875rem;
+    font-weight: 560;
+    line-height: 1.05;
+    color: var(--navy-900);
+  }
+
+  .mega__kicker::after {
+    content: "";
+    display: block;
+    width: 2.5rem;
+    height: 2px;
+    margin-top: var(--sp-3);
+    background: var(--gold-500);
+  }
+
+  .mega__lead {
+    margin: var(--sp-3) 0 0;
+    font-size: var(--fs-small);
+    line-height: 1.55;
+    color: var(--text-muted);
+  }
+
+  .mega__links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 var(--sp-5);
+    align-content: start;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--navy-900);
+  }
+
+  .mega__links li {
+    margin: 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .mega__links a {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.7rem 0.25rem;
+    color: inherit;
+    text-decoration: none;
+    transition: background-color var(--dur-fast) var(--ease);
+  }
+
+  .mega__links a:hover {
+    background: rgba(201, 168, 102, 0.1);
+  }
+
+  .mega__name {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 620;
+    color: var(--navy-900);
+  }
+
+  .mega__links a:hover .mega__name {
+    color: var(--cobalt-text);
+  }
+
+  .mega__links a[aria-current] .mega__name {
+    text-decoration: underline;
+    text-decoration-color: var(--gold-500);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.3em;
+  }
+
+  .mega__text {
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+
+  .mega__feature {
+    align-self: start;
+    display: grid;
+    gap: var(--sp-2);
+    padding: var(--sp-5);
+    color: var(--text-on-ink);
+    background:
+      radial-gradient(ellipse at 100% 0, rgba(201, 168, 102, 0.18), transparent 60%),
+      var(--surface-ink);
+    border-top: 2px solid var(--gold-400);
+  }
+
+  .mega__flabel {
+    margin: 0;
+    font-size: var(--fs-label);
+    font-weight: 650;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-gold-on-ink);
+  }
+
+  .mega__ftitle {
+    display: block;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 560;
+    line-height: 1.25;
+    color: var(--text-on-ink);
+  }
+
+  .mega__ftext {
+    display: block;
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--text-on-ink-muted);
+  }
+
+  .mega__stat {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin: 0;
+  }
+
+  .mega__stat .num {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    line-height: 1;
+    color: var(--gold-400);
+  }
+
+  .mega__of {
+    font-size: 0.875rem;
+    color: var(--text-on-ink);
+  }
+
+  .mega__ticks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    margin: var(--sp-1) 0 var(--sp-2);
+  }
+
+  .mega__tick {
+    width: 9px;
+    height: 9px;
+    border: 1px solid rgba(244, 239, 228, 0.35);
+  }
+
+  .mega__tick--complete {
+    background: var(--gold-400);
+    border-color: var(--gold-400);
+  }
+
+  .mega__tick--partial {
+    border-color: var(--gold-400);
+  }
+
+  .mega__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: 2.25rem;
+    color: var(--cobalt-on-ink);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+
+  .mega__cta:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .mega__cta--quiet {
+    color: var(--text-on-ink);
+  }
+
+  .mega__files {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .mega__files li {
+    border-bottom: 1px solid var(--rule-on-ink);
+  }
+
+  .mega__files a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--sp-3);
+    min-height: 2.5rem;
+    color: var(--text-on-ink);
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+
+  .mega__files a:hover {
+    color: var(--gold-300);
+  }
+
+  .mega__fmt {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--text-gold-on-ink);
+  }
+
+  .mega__creator {
+    display: flex;
+    gap: var(--sp-3);
+    align-items: flex-start;
+    margin: 0;
+  }
+
+  .mega__creator > span {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  /* ---------- Header tools ---------- */
 
   .site-header__tools {
     display: flex;
@@ -260,275 +594,220 @@ const GROUPS = [
     gap: var(--sp-2);
   }
 
-  .icon-link,
-  .menu-toggle {
+  .hdr-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
     min-height: 2.5rem;
     padding: 0 0.85rem;
     border: 1px solid var(--rule);
-    border-radius: 999px;
+    border-radius: var(--radius-1);
     color: var(--navy-900);
     background: transparent;
     font-size: 0.875rem;
     font-weight: 560;
     text-decoration: none;
+    cursor: pointer;
     transition:
       border-color var(--dur-fast) var(--ease),
-      background-color var(--dur-fast) var(--ease),
-      color var(--dur-fast) var(--ease);
+      background-color var(--dur-fast) var(--ease);
   }
 
-  .icon-link svg {
+  .hdr-btn svg {
     flex: none;
     max-width: none;
   }
 
-  .icon-link:hover,
-  .menu-toggle:hover {
+  .hdr-btn:hover {
     border-color: var(--navy-900);
-    color: var(--navy-900);
   }
 
-  .icon-link[aria-current='page'] {
+  .hdr-btn[aria-current='page'] {
     border-color: var(--gold-500);
   }
 
-  .menu-toggle {
-    cursor: pointer;
+  .hdr-btn--ink {
+    color: var(--text-on-ink);
     background: var(--navy-900);
     border-color: var(--navy-900);
-    color: var(--text-on-ink);
   }
 
-  .menu-toggle:hover {
+  .hdr-btn--ink:hover {
     background: var(--navy-800);
-    color: var(--text-on-ink);
   }
 
-  .menu-toggle__icon {
-    display: inline-flex;
-  }
+  /* ---------- The drawer (narrow screens) ---------- */
 
-  .menu-toggle__bars,
-  .menu-toggle__text--narrow {
+  .drawer {
     display: none;
   }
 
-  .menu-toggle__bars {
+  /* With the drawer open, the page behind it holds still. */
+  :global(html.menu-open) {
+    overflow: hidden;
+  }
+
+  .drawer > summary {
+    list-style: none;
+  }
+
+  .drawer > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .drawer__bars {
+    display: grid;
     gap: 4px;
     width: 16px;
   }
 
-  /* Open, the button shows a close mark at every width. */
-  :global(.menu-open) .menu-toggle__icon {
-    display: none;
-  }
-
-  :global(.menu-open) .menu-toggle__bars {
-    display: grid;
-  }
-
-  .menu-toggle__bars span {
+  .drawer__bars span {
     display: block;
     height: 1.5px;
     background: currentColor;
     transition: transform var(--dur-base) var(--ease);
   }
 
-  :global(.menu-open) .menu-toggle__bars span:first-child {
+  .drawer[open] .drawer__bars span:first-child {
     transform: translateY(2.75px) rotate(45deg);
   }
 
-  :global(.menu-open) .menu-toggle__bars span:last-child {
+  .drawer[open] .drawer__bars span:last-child {
     transform: translateY(-2.75px) rotate(-45deg);
   }
 
-  .menu-panel {
-    border-top: 1px solid var(--rule-hair);
-    background: var(--ivory-50);
-    max-height: calc(100vh - var(--header-h));
+  .drawer__panel {
+    position: fixed;
+    top: var(--header-h);
+    left: 0;
+    right: 0;
+    bottom: 0;
     overflow-y: auto;
-    box-shadow: 0 24px 40px -28px rgba(11, 26, 51, 0.45);
+    overscroll-behavior: contain;
+    background: var(--ivory-50);
+    border-top: 1px solid var(--rule-hair);
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .menu-panel {
-      transition:
-        opacity var(--dur-slow) var(--ease-out),
-        transform var(--dur-slow) var(--ease-out),
-        display var(--dur-slow) allow-discrete;
-    }
-
-    .menu-panel[hidden] {
-      display: none;
-      opacity: 0;
-      transform: translateY(-6px);
-    }
-
-    @starting-style {
-      .menu-panel:not([hidden]) {
-        opacity: 0;
-        transform: translateY(-6px);
-      }
+    .drawer[open] > .drawer__panel {
+      animation: mega-in var(--dur-slow) var(--ease-out);
     }
   }
 
-  .menu-panel__primary {
-    display: none;
-    padding-top: var(--sp-5);
+  .drawer__nav {
+    padding-block: var(--sp-4) var(--sp-8);
   }
 
-  .menu-primary {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr));
-    gap: 0;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    border-top: 1px solid var(--navy-900);
-  }
-
-  .menu-primary li {
-    margin: 0;
+  .drawer__group {
     border-bottom: 1px solid var(--rule-hair);
   }
 
-  .menu-primary a {
-    display: block;
-    padding: 0.75rem 0;
-    color: var(--navy-900);
+  .drawer__group > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 3.5rem;
     font-family: var(--font-display);
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: 560;
-    text-decoration: none;
+    color: var(--navy-900);
+    cursor: pointer;
+    list-style: none;
   }
 
-  .menu-primary a[aria-current='page'] {
+  .drawer__group > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .drawer__group > summary::after {
+    content: "";
+    width: 0.55rem;
+    height: 0.55rem;
+    margin-right: 0.3rem;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg) translateY(-0.15rem);
+    transition: transform var(--dur-base) var(--ease-out);
+  }
+
+  .drawer__group[open] > summary::after {
+    transform: rotate(225deg) translateY(-0.1rem);
+  }
+
+  .drawer__group.is-current > summary {
     text-decoration: underline;
     text-decoration-color: var(--gold-500);
     text-decoration-thickness: 2px;
-    text-underline-offset: 0.25em;
+    text-underline-offset: 0.3em;
   }
 
-  .menu-panel__inner {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
-    gap: var(--sp-5) var(--sp-6);
-    padding-block: var(--sp-6) var(--sp-5);
+  .drawer__intro {
+    margin: 0 0 var(--sp-3);
+    font-size: var(--fs-small);
+    color: var(--text-muted);
   }
 
-  .menu-panel__group ul {
-    list-style: none;
-    margin: var(--sp-2) 0 0;
+  .drawer__group ul {
+    margin: 0 0 var(--sp-4);
     padding: 0;
+    list-style: none;
     border-top: 1px solid var(--navy-900);
   }
 
-  .menu-panel__group li {
+  .drawer__group li {
     margin: 0;
     border-bottom: 1px solid var(--rule-hair);
   }
 
-  .menu-panel__group a {
-    display: block;
-    padding: 0.55rem 0;
-    color: var(--navy-900);
-    font-weight: 540;
+  .drawer__group a {
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.7rem 0;
+    color: inherit;
     text-decoration: none;
   }
 
-  .menu-panel__group a:hover {
-    color: var(--cobalt-text);
-  }
-
-  .menu-panel__rooms {
-    padding-bottom: var(--sp-6);
-  }
-
-  .rooms-menu {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr));
-    gap: 0 var(--sp-5);
-    margin: var(--sp-2) 0 0;
-    padding: 0;
-    list-style: none;
-    border-top: 1px solid var(--navy-900);
-  }
-
-  .rooms-menu__item {
-    margin: 0;
-    border-bottom: 1px solid var(--rule-hair);
-  }
-
-  .rooms-menu__link {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
+  .drawer__name {
+    display: inline-flex;
     align-items: center;
-    gap: 0 0.7rem;
-    min-height: 3.25rem;
-    padding: 0.5rem 0.75rem 0.5rem 0;
+    gap: 0.5rem;
+    font-weight: 620;
     color: var(--navy-900);
-    text-decoration: none;
   }
 
-  .rooms-menu__link :global(.icon) {
-    grid-row: span 2;
-    color: var(--brass-text);
-  }
-
-  .rooms-menu__name {
-    font-weight: 580;
-    line-height: 1.2;
-  }
-
-  .rooms-menu__status {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-
-  a.rooms-menu__link:hover .rooms-menu__name,
-  a.rooms-menu__link[aria-current='page'] .rooms-menu__name {
-    color: var(--cobalt-text);
+  .drawer__group a[aria-current] .drawer__name {
     text-decoration: underline;
-    text-underline-offset: 0.2em;
+    text-decoration-color: var(--gold-500);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.3em;
   }
 
-  .is-planned .rooms-menu__link {
+  .drawer__text {
+    font-size: 0.8125rem;
     color: var(--text-muted);
   }
 
-  .is-planned .rooms-menu__link :global(.icon) {
-    color: var(--text-muted);
-    opacity: 0.7;
+  .drawer__foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-5);
+    margin: var(--sp-5) 0 0;
   }
 
-  @media (max-width: 75rem) {
-    .primary-nav {
+  .drawer__foot a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-weight: 600;
+  }
+
+  @media (max-width: 63.99rem) {
+    .mega-nav {
       display: none;
     }
 
-    .menu-panel__primary {
+    .drawer {
       display: block;
-    }
-
-    .menu-toggle__bars,
-    .menu-toggle__text--narrow {
-      display: inline-flex;
-    }
-
-    .menu-toggle__bars {
-      display: grid;
-    }
-
-    .menu-toggle__icon,
-    .menu-toggle__text--wide {
-      display: none;
     }
 
     .site-header__tools {
@@ -537,27 +816,18 @@ const GROUPS = [
   }
 
   @media (max-width: 30rem) {
-    .icon-link__text {
+    .hdr-btn__text,
+    .drawer__toggle > span:last-child {
       position: absolute;
       width: 1px;
       height: 1px;
       overflow: hidden;
-      clip: rect(0, 0, 0, 0);
+      clip: rect(0 0 0 0);
       white-space: nowrap;
     }
 
-    .icon-link,
-    .menu-toggle {
+    .hdr-btn {
       padding: 0 0.7rem;
-    }
-
-    .menu-toggle__text--narrow {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
     }
 
     .site-header__bar {
@@ -585,50 +855,54 @@ const GROUPS = [
   }
 
   @media print {
-    .site-header {
-      position: static;
-      backdrop-filter: none;
-    }
-
-    .primary-nav,
-    .site-header__tools,
-    .menu-panel {
+    .mega-nav,
+    .site-header__tools {
       display: none !important;
     }
   }
 </style>
 
 <script>
-  const toggle = document.querySelector<HTMLAnchorElement>('[data-menu-toggle]');
-  const panel = document.querySelector<HTMLElement>('[data-menu-panel]');
-  if (toggle && panel) {
-    toggle.setAttribute('role', 'button');
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.removeAttribute('href');
-    toggle.tabIndex = 0;
+  /*
+   * Menu manners on top of the native disclosures: one open at a time (the
+   * name attribute does this in current browsers; this covers the rest),
+   * Escape closes and returns focus, a click outside or focus leaving the
+   * menu closes it, and the drawer keeps the page from scrolling behind it.
+   */
+  const menus = [...document.querySelectorAll<HTMLDetailsElement>('[data-menu]')];
+  const drawer = document.querySelector<HTMLDetailsElement>('[data-drawer]');
+  const all = drawer ? [...menus, drawer] : menus;
+  const root = document.documentElement;
 
-    const setOpen = (open: boolean, returnFocus = false) => {
-      panel.hidden = !open;
-      toggle.setAttribute('aria-expanded', String(open));
-      document.documentElement.classList.toggle('menu-open', open);
-      if (open) panel.querySelector<HTMLAnchorElement>('a')?.focus();
-      else if (returnFocus) toggle.focus();
-    };
+  const close = (d: HTMLDetailsElement, returnFocus = false) => {
+    if (!d.open) return;
+    d.open = false;
+    if (returnFocus) d.querySelector('summary')?.focus();
+  };
 
-    toggle.addEventListener('click', () => setOpen(panel.hidden === true));
-    toggle.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        setOpen(panel.hidden === true);
-      }
+  menus.forEach((d) => {
+    d.addEventListener('toggle', () => {
+      if (d.open) menus.forEach((o) => o !== d && close(o));
     });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !panel.hidden) setOpen(false, true);
+    d.addEventListener('focusout', (e) => {
+      const next = e.relatedTarget as Node | null;
+      if (next && !d.contains(next)) close(d);
     });
-    document.addEventListener('click', (e) => {
-      const t = e.target as Node;
-      if (!panel.hidden && !panel.contains(t) && !toggle.contains(t)) setOpen(false);
-    });
-    window.matchMedia('(min-width: 75.0625rem)').addEventListener('change', () => setOpen(false));
+  });
+
+  if (drawer) {
+    drawer.addEventListener('toggle', () => root.classList.toggle('menu-open', drawer.open));
+    window.matchMedia('(min-width: 64rem)').addEventListener('change', () => close(drawer));
   }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const open = all.find((d) => d.open);
+    if (open) close(open, true);
+  });
+
+  document.addEventListener('click', (e) => {
+    const t = e.target as Node;
+    all.forEach((d) => d.open && !d.contains(t) && close(d));
+  });
 </script>
