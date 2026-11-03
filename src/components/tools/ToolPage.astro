@@ -16,7 +16,7 @@ import ToolBar from './ToolBar.astro';
 import { corpus, href } from '../../lib/content';
 import { noteFor, subtopicHref } from '../../lib/learning';
 import { esc, inline, rich } from '../../lib/markup';
-import { ROOM_INFO, STATUS_LABEL, roomTools, toolAnchor, toolHref, type RoomTool } from '../../lib/room-tools';
+import { ROOM_INFO, STATUS_LABEL, isRoomTool, roomTools, toolAnchor, toolHref, type RoomTool } from '../../lib/room-tools';
 import '../../styles/room-tools.css';
 
 interface Props {
@@ -35,7 +35,7 @@ interface Props {
 const { id, ix, json = true, csv = false, open = false, what = '', levelSwitch = false, reset } = Astro.props;
 const c = await corpus();
 const t = c.interactives[id] as RoomTool | undefined;
-if (!t || !('guide' in t)) throw new Error(`ToolPage: ${id} is not a room tool`);
+if (!t || !isRoomTool(t)) throw new Error(`ToolPage: ${id} is not a room tool`);
 const g = t.guide;
 const room = ROOM_INFO[g.room];
 const tools = roomTools(c, g.room);

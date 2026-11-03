@@ -22,8 +22,17 @@ export const STATUS_LABEL: Record<RoomToolGuide['status'], string> = {
   enrichment: 'Enrichment, beyond the syllabus',
 };
 
+/**
+ * Is this interaction one of the People and Culture or Operations Floor tools?
+ * Other rooms' instruments (the Market Studio's) also carry a guide, so the
+ * guide must name one of these rooms.
+ */
 export function isRoomTool(it: Interactive): it is RoomTool {
-  return 'guide' in it && typeof (it as { guide?: unknown }).guide === 'object';
+  if (!('guide' in it)) return false;
+  const guide = (it as { guide?: unknown }).guide;
+  if (typeof guide !== 'object' || guide === null || !('room' in guide)) return false;
+  const room = (guide as { room: unknown }).room;
+  return typeof room === 'string' && room in ROOM_INFO;
 }
 
 /** The tools of one room, in their order. */

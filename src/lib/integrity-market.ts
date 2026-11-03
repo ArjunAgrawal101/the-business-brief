@@ -7,7 +7,7 @@
  */
 import type { Corpus, Problem } from './integrity';
 import type { Interactive } from './schemas';
-import { MARKET_TOOLS, toolHref } from './market-tools';
+import { MARKET_TOOLS, isMarketInstrument, toolHref } from './market-tools';
 import { validateClv, validateMetrics } from './market-metrics';
 import { questionChecks } from './market-research';
 import { validateMap } from './market-map';
@@ -16,7 +16,8 @@ import { campaignChecks, funnel } from './market-campaign';
 import { validateBudget } from './market-budget';
 
 type MarketIx = Extract<Interactive, { guide: { exampleTitle: string } }>;
-const isTool = (it: Interactive): it is MarketIx => 'guide' in it;
+// Other rooms' tools carry a guide too; only the Market Studio's has an exampleTitle.
+const isTool = (it: Interactive): it is MarketIx => isMarketInstrument(it);
 const dupes = (ids: string[]) => ids.filter((x, i) => ids.indexOf(x) !== i);
 
 export function checkMarketTools(c: Corpus): Problem[] {
