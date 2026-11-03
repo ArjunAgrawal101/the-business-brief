@@ -1,0 +1,20 @@
+---
+/**
+ * A calculator of the Financial Laboratory: /finance-desk/lab/<id>/, one page
+ * for each entry in src/lib/lab/catalogue.ts.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import LabCalculator from '../../../components/lab/LabCalculator.astro';
+import { LAB, labEntry } from '../../../lib/lab/catalogue';
+
+export function getStaticPaths() {
+  return LAB.map((e) => ({ params: { id: e.id } }));
+}
+
+const { id } = Astro.params;
+const e = labEntry(id);
+---
+
+<BaseLayout title={`${e.name}: Financial Laboratory`} description={e.description} section="finance-desk" room="finance">
+  <LabCalculator id={e.id} />
+</BaseLayout>
