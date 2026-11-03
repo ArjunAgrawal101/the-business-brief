@@ -1,0 +1,72 @@
+# The capacity utilization and productivity calculator. Wrenhurst Cycles is
+# fictional. September's figures are the notes on production planning (5.6):
+# capacity 250 bikes a week, 800 built in a four-week month, 16 failing
+# inspection and reworked, 25 assembly workers, 400 machine hours, $500 a bike,
+# variable cost $300 and fixed costs $120,000 a month, so total costs are
+# 120,000 + 800 × 300 = $360,000. October, a quieter month, is added here on the
+# same costs: 120,000 + 700 × 300 = $330,000. tests/unit/productivity.test.ts
+# checks every result by hand.
+component: capacity-calculator
+title: Capacity utilization and productivity calculator
+purpose: >
+  The learner enters a business's own figures for one or two periods and calculates capacity utilization, the defect
+  rate, labour and capital productivity, the productivity rate, the fixed cost of each unit and the degree of operating
+  leverage, each worked in eight parts. It diagnoses the belief that a single rate decides anything: the measures mean
+  most compared over time, and a quieter month raises the fixed cost of every unit and the risk in profit.
+provenance: simulated-data
+syllabus: ['5.6']
+page: /operations-floor/capacity-and-productivity/
+guide:
+  room: operations
+  slug: capacity-and-productivity
+  order: 3
+  kind: Calculator
+  question: How hard is the capacity working, and how much does each input produce?
+  summary: Calculate capacity utilization, the defect rate, labour and capital productivity, the productivity rate and operating leverage from your own figures, for two periods side by side, with every working shown.
+  lead: >
+    Enter the figures for one period, or for two to compare, and the calculator works out how much of the capacity is
+    used, how many units fail inspection, how much each worker and each machine hour produces, what the inputs return,
+    and how sharply profit would respond to a change in sales. Every result comes with its working in full.
+  status: HL
+  statusNote: >
+    Subtopic 5.6, Production planning (guide, pp. 34 to 35), is HL only. It names the capacity utilization rate, the
+    defect rate, labour productivity, capital productivity, the productivity rate and operating leverage, at AO2 and
+    AO4. The guide's list of formulas (p. 65) gives the capacity utilization rate and the productivity rate; the other
+    measures use the standard forms in the notes on production planning, and say so in their workings.
+  ao: [AO2, AO4]
+  howTo:
+    - Say what is produced, how labour and capital are measured, and whether units that fail inspection are reworked and sold or scrapped.
+    - Enter each period's figures. Untick the comparison to work with one period only.
+    - Read the measures side by side with the change between the periods, and see on the chart how the fixed cost of each unit falls as more of the capacity is used.
+    - Open the working for any measure, for either period. Your figures are kept on this device; download them as JSON or CSV, or print the page.
+  limitations:
+    - Productive capacity is treated as fixed for the period. In practice it moves with shifts, overtime, maintenance and the mix of products.
+    - The productivity rate values output at its selling price and input at its cost. The guide does not say how to measure them, so state your method in an answer.
+    - Variable costs are taken as total costs minus fixed costs and assumed to rise in proportion to output, which is how operating leverage is worked out here. Real costs are rarely so tidy.
+    - One figure for one period says little. The measures mean most compared over time or with a rival, and pushing one of them, such as utilization, can damage another, such as the defect rate.
+    - The bands used in the reading (below 60%, 60 to 85%, 85 to 97%, and 97% and above) are the platform's rule of thumb, not an IB rule.
+  inAnswer: >
+    Write the formula, substitute, and give the answer with its unit, then interpret it in the case. A capacity
+    utilization rate of 80% is neither good nor bad on its own: say what the spare capacity allows, such as a rush order
+    or maintenance, and what it costs in fixed cost per unit.
+  storageKey: ops:capacity
+  example:
+    name: Wrenhurst Cycles, a fictional bicycle maker
+    note: >
+      Wrenhurst's assembly line, from the notes on [production planning](/topics/production-planning/): September is
+      the notes' own four-week month, 800 bikes built on a line that can build 1,000; October, a quieter month of 700
+      bikes on the same costs, is added here for the comparison. Every figure is simulated.
+  related:
+    subtopics: ['5.3', '5.5']
+    interactives: [ops-capacity-atelier]
+    cases: [atelier-barro]
+    tools: [contribution]
+currency: $
+units: { one: bike, many: bikes, period: month }
+capitalLabel: machine hours
+settings: { defects: reworked, labour: workers }
+periods:
+  - name: September
+    values: { capacity: 1000, made: 800, defects: 16, labour: 25, capital: 400, price: 500, inputCost: 360000, fixedCosts: 120000 }
+  - name: October
+    values: { capacity: 1000, made: 700, defects: 21, labour: 25, capital: 350, price: 500, inputCost: 330000, fixedCosts: 120000 }

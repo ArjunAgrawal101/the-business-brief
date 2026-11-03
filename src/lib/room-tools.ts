@@ -53,4 +53,5 @@ export interface ToolFrame {
 
 export const TOOL_FRAME: Record<RoomTool['component'], ToolFrame> = {
   'org-chart-builder': { ix: 'org-chart', csv: true, open: true, what: 'the chart' },
+  'capacity-calculator': { ix: 'capacity-calculator', csv: true, open: true, what: 'the figures' },
 };

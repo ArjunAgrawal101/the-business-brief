@@ -1,0 +1,27 @@
+---
+/**
+ * One page per Operations Floor tool, from the tools registered in
+ * src/content/interactives (src/lib/room-tools.ts).
+ */
+import ToolPage from '../../components/tools/ToolPage.astro';
+import CapacityCalculator from '../../components/tools/ops/CapacityCalculator.astro';
+import { corpus } from '../../lib/content';
+import { TOOL_FRAME, roomTools, type RoomTool } from '../../lib/room-tools';
+
+export async function getStaticPaths() {
+  const c = await corpus();
+  return roomTools(c, 'operations').map(([id, t]) => ({ params: { tool: t.guide.slug }, props: { id } }));
+}
+
+interface Props {
+  id: string;
+}
+const { id } = Astro.props;
+const c = await corpus();
+const t = c.interactives[id] as RoomTool;
+const f = TOOL_FRAME[t.component];
+---
+
+<ToolPage id={id} ix={f.ix} csv={f.csv} open={f.open} what={f.what} levelSwitch={f.levelSwitch}>
+  {t.component === 'capacity-calculator' && <CapacityCalculator id={id} data={t} />}
+</ToolPage>

@@ -76,6 +76,25 @@ const orgPost = z.object({
   grouping: z.enum(ORG_GROUPINGS).optional(),
 });
 
+/* ---------- Operations Floor ---------- */
+
+const nonNeg = z.number().nonnegative();
+
+/** One period's figures for the capacity utilization and productivity calculator. */
+const periodValues = z.object({
+  capacity: z.number().positive(),
+  made: nonNeg,
+  defects: nonNeg,
+  labour: nonNeg,
+  capital: nonNeg,
+  price: nonNeg,
+  inputCost: z.number().positive(),
+  fixedCosts: nonNeg,
+});
+
+/** Singular and plural names of the unit of output, and the period. */
+const unitNames = z.object({ one: text, many: text, period: text });
+
 /**
  * The schemas, as a tuple to spread into the interaction union. `base` is the
  * interaction base shape (title, purpose, provenance, syllabus, page).
@@ -90,6 +109,18 @@ export function roomToolSchemas<B extends z.ZodRawShape>(base: B) {
       posts: z.array(orgPost).min(2).max(60),
       /** The level removed in the worked example's delayering comparison. */
       delayer: z.number().int().min(2).optional(),
+    }),
+    z.object({
+      component: z.literal('capacity-calculator'),
+      ...base,
+      guide,
+      /** The currency symbol shown before money. */
+      currency: text,
+      units: unitNames,
+      /** What capital input is measured in, such as machine hours. */
+      capitalLabel: text,
+      settings: z.object({ defects: z.enum(['reworked', 'scrapped']), labour: z.enum(['workers', 'hours']) }),
+      periods: z.array(z.object({ name: text, values: periodValues })).length(2),
     }),
   ] as const;
 }

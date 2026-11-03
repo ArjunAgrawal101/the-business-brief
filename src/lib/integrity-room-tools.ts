@@ -7,6 +7,7 @@
  */
 import type { Corpus, Problem } from './integrity';
 import { delayerLevels, orgModel, validateOrg } from './org-chart';
+import { validatePeriod } from './productivity';
 import { ROOM_INFO, isRoomTool, toolHref } from './room-tools';
 
 export function checkRoomTools(c: Corpus): Problem[] {
@@ -50,6 +51,11 @@ export function checkRoomTools(c: Corpus): Problem[] {
         const m = orgModel(posts);
         if (!delayerLevels(m).some((l) => l.level === it.delayer)) add(`level ${it.delayer} has no managers to remove`);
       }
+    }
+
+    if (it.component === 'capacity-calculator') {
+      it.periods.forEach((p) => validatePeriod(p.values).forEach((x) => add(`${p.name}: ${x.field}: ${x.message}`)));
+      if (it.periods[0]?.name === it.periods[1]?.name) add('the two periods need different names');
     }
   }
   return out;
