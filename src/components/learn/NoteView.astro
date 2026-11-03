@@ -230,7 +230,7 @@ const hlQsText = hlQs.length > 1 ? `Questions ${hlQs.slice(0, -1).join(', ')} an
       </ol>
       {hlQs.length > 0 && (
         <p class="hl-notice">
-          <span class="tag tag--hl">HL</span> {hlQsText} HL only and hidden while you are viewing SL content. Switch to HL at the top of the page to see {hlQs.length > 1 ? 'them' : 'it'}.
+          <span class="tag tag--hl">HL</span> <span class="nv-hl-note">{hlQsText} HL only and hidden while you are viewing SL content. Switch to HL at the top of the page to see {hlQs.length > 1 ? 'them' : 'it'}.</span>
         </p>
       )}
     </section>
@@ -542,9 +542,13 @@ const hlQsText = hlQs.length > 1 ? `Questions ${hlQs.slice(0, -1).join(', ')} an
     border-left: 3px solid var(--gold-500);
   }
 
-  /* The notice for hidden HL questions lines up with the questions above it. */
+  /* The notice for hidden HL questions lines up with the questions above it, its text wrapping beside the tag. */
   .nv-exam + .hl-notice {
     max-width: 52rem;
+  }
+
+  .nv-hl-note {
+    flex: 1 1 14rem;
   }
 
   .nv-exam__meta {
