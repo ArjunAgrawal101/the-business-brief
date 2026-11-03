@@ -132,6 +132,26 @@ Fictional cases (`kind: fictional`, `dataStatus: simulated`) must label every ex
 
 The `analysis` block follows DATA, INSIGHT, OPTIONS, RECOMMENDATION, then a CAVEAT: when the recommendation would change.
 
+An exhibit may name its subtotal rows in `totals` (by their first cell); they are set in bold with a rule above, as in a set of accounts.
+
+### The Case Vault fields
+
+Every case in `/case-vault/` carries a classification, checked by `src/lib/integrity-cases.ts`. The fields are optional in the schema, so a case written without them still builds, but a case that carries any of them must carry all of them:
+
+| Field | Values |
+| --- | --- |
+| `industry` | One of `INDUSTRIES` in `src/lib/schemas.ts` (labels in `src/lib/case-vault.ts`; add both for a new industry) |
+| `functions` | `strategy`, `human-resources`, `finance`, `marketing`, `operations` |
+| `difficulty` | `foundation`, `intermediate`, `advanced` |
+| `qualifications` | `ib-dp-sl`, `ib-dp-hl`, `undergraduate`, `mba`. A case for SL is also for HL; a case for undergraduate or MBA readers needs at least three `discussion` prompts |
+| `keyConcepts` | One or two of the four concepts, from the case's `concepts` |
+| `caseType` | `fictional` (an invented organization with simulated data) or `sourced` (a real organization, from cited sources) |
+| `syllabus` | The subtopic codes the case serves; every brief in `topics` must have its code here |
+
+A case can also have the fuller structure, each part shown only when present: `industryContext` (paragraphs about the industry in general terms, with no figures at all, so that nothing reads as a statistic about a real market), `challenge`, `financials` (a summary and the exhibits shown under Financial information), `analysisQuestions` (original questions with a command term at the guide's AO level, marks, subtopics, HL marking, guidance and, for a calculation, the worked `answer`), `exercise` (role, brief, task, deliverable, minutes and criteria; it needs a `debrief`), `debrief` (a summary, every option judged as `strong`, `conditional` or `weak`, trade-offs, the evidence that matters, what would change the recommendation and common errors), `frameworks` (each linked to glossary terms, a toolkit tool and subtopics, and labelled `subject-knowledge`, `source-derived`, `aa-framework` or `enrichment`), `discussion` and `furtherReading` (platform pages by `href`, or supplied sources from the register by `source` with a `location`).
+
+The model case files are `cases/bellbird-home-and-garden.yaml` (quantitative) and `cases/silvertree-clinics.yaml` (people). Every figure in a vault case is rebuilt by its model in `scripts/qa/case-figures.py`, which also fails on any figure in the case's text that the model cannot account for; add a model there for every new case, and recompute its key calculations with the platform's functions in `tests/unit/vault-cases.test.ts`.
+
 ## Decision Rooms
 
 A decision has `metrics` (each `better: higher | lower | context`), a `baseline`, and one to three `rounds`. Each choice has an `outcome`: `headline`, `narrative`, `metrics`, `stakeholders` (with `mood`), `risks` and `theory`.

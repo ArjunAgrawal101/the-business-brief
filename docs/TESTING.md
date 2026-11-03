@@ -19,6 +19,8 @@ runs, in order: `astro check`, ESLint and the content lint, the unit tests, the 
 | Finance | `tests/unit/finance.test.ts` | Every calculation against values worked by hand; rounding of break-even and target output; formatting; every eight-part working builder |
 | Models | `tests/unit/models.test.ts` | The break-even workspace and its scenarios, the special order (including displaced sales), decision trees and the exact crossover point, the scale model, force fields, and the Decision Room's formatting |
 | Cases | `tests/unit/cases.test.ts` | Every exhibit total; every Decision Room board pack for every choice, recomputed from the exhibits; the practice question answers |
+| Vault cases | `tests/unit/vault-cases.test.ts`, `tests/unit/case-vault.test.ts` | The ratios, appraisals, market shares, elasticity, labour turnover and costed options of the six vault cases, recomputed with the platform's functions; ISO weeks and the weekly rotation against dates worked by hand, the filters, sorts and the address |
+| Case figures | `scripts/qa/case-figures.py` (`python3 -I scripts/qa/case-figures.py`, needs PyYAML) | Every exhibit of every vault case rebuilt from its stated model, and every figure written in the case's text accounted for by the model at the precision shown |
 | Cash flow | `tests/unit/cashflow.test.ts` | Atelier Barro's forecast month by month, every way of paying for the kiln and every measure, and the reconciliation of profit to cash, against figures worked by hand |
 | Ratios and investment | `tests/unit/ratios.test.ts`, `investment.test.ts` | Every guide ratio for both years, the statements balancing, every strategy; payback, ARR and NPV with the guide's printed discount factors |
 | Plans | `tests/unit/plan.test.ts` | Critical path analysis worked by hand: earliest and latest times, total and free float, the critical path, and the case lab's plan |
@@ -33,6 +35,7 @@ runs, in order: `astro check`, ESLint and the content lint, the unit tests, the 
 | Navigation | `tests/e2e/navigation.spec.ts` | Skip link, the current section in the primary navigation (Mindmaps, Assessment, Glossary), the Explore menu at both sizes (every room listed, planned rooms not linked) and Escape, the SL and HL switch and its memory, search |
 | Brand opening | `tests/e2e/brand.spec.ts` | The opening plays on a first visit with focus on Skip, skips, leaves the page usable and not inert, does not replay, replays with `?intro`, finishes by itself, and never plays under reduced motion |
 | Motion | `tests/e2e/motion.spec.ts` | Groups below the fold wait for the reader and then arrive; nothing on screen at load is hidden; nothing is held back under reduced motion |
+| Case Vault | `tests/e2e/case-vault.spec.ts` | The archive's filters, counts, disabled choices, empty state, address and order; the Case of the Week under a fixed clock; the page and a case file without JavaScript; the decision exercise from a refused commit to a kept, cleared decision; the progress page |
 | Interactions | `tests/e2e/interactions.spec.ts` | Each interaction driven as a learner would: right and wrong answers, validation messages, scenarios, persistence after reload, the Decision Room from commit to debrief, the case lab from the first stage to the memo, the cash flow lab, the ratio and appraisal desks, the studio tools, the IA planner, the paper 3 criteria self-check, the progress page, the practice filters, clearing stored data |
 | Without JavaScript | `tests/e2e/nojs.spec.ts` | Topic briefs, Decision Rooms, search, the cash flow lab and the case lab work with JavaScript off, and no page shows a button that needs a script |
 | Screenshots | `scripts/qa/screens.mjs` | Sixteen key pages at 1440, 1024, 768 and 390 px, for visual review, with a check for horizontal scrolling; taken with reduced motion so every section shows |
@@ -69,5 +72,5 @@ Problems the checks found during 2.0 and that were fixed before release: interac
 ## Adding tests
 
 - A new calculation needs hand-worked values in `finance.test.ts`.
-- New case figures need a recomputation in `cases.test.ts`.
+- New case figures need a recomputation in `cases.test.ts`, or, for a vault case, a model in `scripts/qa/case-figures.py` and tests in `vault-cases.test.ts`.
 - A new interaction needs a test in `interactions.spec.ts` that makes a wrong choice, a right choice, and checks the feedback in words.

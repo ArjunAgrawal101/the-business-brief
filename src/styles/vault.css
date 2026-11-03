@@ -662,15 +662,34 @@
 
 .case-question {
   display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "no marks"
+    "body body";
   gap: var(--sp-2) var(--sp-5);
+  align-items: baseline;
   margin: 0;
   padding: var(--sp-4) 0;
   border-bottom: 1px solid var(--rule-hair);
 }
 
+.case-question__no {
+  grid-area: no;
+}
+
+.case-question__body {
+  grid-area: body;
+}
+
+.case-question__marks {
+  grid-area: marks;
+  justify-self: end;
+}
+
 @media (min-width: 46rem) {
   .case-question {
     grid-template-columns: 3rem minmax(0, 1fr) 7.5rem;
+    grid-template-areas: "no body marks";
     align-items: start;
   }
 }
@@ -710,6 +729,10 @@
   .case-question__marks {
     text-align: right;
   }
+}
+
+.case-question:has(.case-question__body) .case-question__marks {
+  margin: 0;
 }
 
 .case-question .disclosure {
