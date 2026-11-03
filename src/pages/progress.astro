@@ -8,6 +8,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/layout/PageIntro.astro';
 import SectionHead from '../components/layout/SectionHead.astro';
 import { corpus, decisionsInOrder, href, questionsInOrder, topicsInOrder } from '../lib/content';
+import { boardroomHref, boardroomScenarios } from '../lib/boardroom/content';
 import { jsonForScript } from '../lib/markup';
 
 const c = await corpus();
@@ -41,6 +42,7 @@ const config = {
   interactions: tracked.filter((t) => t.keys.length),
   untracked: tracked.filter((t) => !t.keys.length).length,
   ia: { href: '/ia-studio/', steps: 10 },
+  boardroom: (await boardroomScenarios()).map(([id, sc]) => ({ id, title: sc.title, href: boardroomHref(id), rounds: sc.rounds.length })),
 };
 ---
 

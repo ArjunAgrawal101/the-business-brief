@@ -10,6 +10,7 @@ interface Config {
   topics: Array<{ id: string; title: string; href: string; cards: number }>;
   interactions: Array<{ id: string; uid: string; title: string; href: string; keys: string[]; stages: number }>;
   ia: { href: string; steps: number };
+  boardroom?: Array<{ id: string; title: string; href: string; rounds: number }>;
 }
 
 const has = (key: string): boolean => {
@@ -47,6 +48,13 @@ each('[data-ix="progress"]', (root) => {
     const done = picked === d.rounds.length;
     roomsDone += done ? 1 : 0;
     add('Decision Rooms', d.title, d.href, done ? 'Every decision made' : `${picked} of ${d.rounds.length} decisions`, done);
+  }
+
+  // Boardroom simulations
+  for (const b of cfg.boardroom ?? []) {
+    const v = store.get<{ picks?: string[] } | null>(`boardroom:${b.id}`, null);
+    const n = Array.isArray(v?.picks) ? v.picks.length : 0;
+    if (n) add('Boardroom', b.title, b.href, n >= b.rounds ? 'Every round decided' : `${n} of ${b.rounds} rounds`, n >= b.rounds);
   }
 
   // Interactions and case labs
