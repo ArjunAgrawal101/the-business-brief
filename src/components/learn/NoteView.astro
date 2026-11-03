@@ -25,6 +25,9 @@ const termOf = (id: string) => c.commandTerms[id]?.term ?? id;
 // Notes for an HL-only subtopic are HL throughout: the page's own level says so, so sections are not hidden one by one.
 const mixed = n.level !== 'HL';
 const hl = (level: string) => mixed && level === 'HL';
+// HL exam questions in SL/HL notes: SL readers are told which ones are hidden, as they are for HL sections.
+const hlQs = n.exam.flatMap((q, i) => (hl(q.level) ? [i + 1] : []));
+const hlQsText = hlQs.length > 1 ? `Questions ${hlQs.slice(0, -1).join(', ')} and ${hlQs[hlQs.length - 1]} are` : `Question ${hlQs[0]} is`;
 ---
 
 <section class="nv-intro" aria-labelledby="nv-intro-h">
@@ -225,6 +228,11 @@ const hl = (level: string) => mixed && level === 'HL';
           </li>
         ))}
       </ol>
+      {hlQs.length > 0 && (
+        <p class="hl-notice">
+          <span class="tag tag--hl">HL</span> {hlQsText} HL only and hidden while you are viewing SL content. Switch to HL at the top of the page to see {hlQs.length > 1 ? 'them' : 'it'}.
+        </p>
+      )}
     </section>
   )
 }
@@ -532,6 +540,11 @@ const hl = (level: string) => mixed && level === 'HL';
     background: var(--surface-sheet);
     border: 1px solid var(--rule-hair);
     border-left: 3px solid var(--gold-500);
+  }
+
+  /* The notice for hidden HL questions lines up with the questions above it. */
+  .nv-exam + .hl-notice {
+    max-width: 52rem;
   }
 
   .nv-exam__meta {
