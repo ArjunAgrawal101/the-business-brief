@@ -4,6 +4,7 @@
  * src/content/interactives (src/lib/room-tools.ts).
  */
 import ToolPage from '../../components/tools/ToolPage.astro';
+import ScenarioChooser from '../../components/tools/ScenarioChooser.astro';
 import CapacityCalculator from '../../components/tools/ops/CapacityCalculator.astro';
 import StockSimulator from '../../components/tools/ops/StockSimulator.astro';
 import EoqCalculator from '../../components/tools/ops/EoqCalculator.astro';
@@ -25,9 +26,10 @@ const t = c.interactives[id] as RoomTool;
 const f = TOOL_FRAME[t.component];
 ---
 
-<ToolPage id={id} ix={f.ix} csv={f.csv} open={f.open} what={f.what} levelSwitch={f.levelSwitch}>
+<ToolPage id={id} ix={f.ix} csv={f.csv} open={f.open} what={f.what} levelSwitch={f.levelSwitch} reset={f.reset}>
   {t.component === 'capacity-calculator' && <CapacityCalculator id={id} data={t} />}
   {t.component === 'stock-simulator' && <StockSimulator id={id} data={t} />}
   {t.component === 'eoq-calculator' && <EoqCalculator id={id} data={t} />}
   {t.component === 'location-assessment' && <LocationAssessment id={id} data={t} />}
+  {t.component === 'scenario-chooser' && <ScenarioChooser id={id} data={t} />}
 </ToolPage>

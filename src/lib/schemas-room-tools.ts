@@ -97,6 +97,24 @@ const periodValues = z.object({
 /** Singular and plural names of the unit of output, and the period. */
 const unitNames = z.object({ one: text, many: text, period: text });
 
+/* ---------- Scenario choices (leadership styles, production methods) ---------- */
+
+const scenarioOutcome = z.object({ fit: z.enum(['strong', 'workable', 'weak']), headline: text, consequence: text });
+
+const scenario = z.object({
+  id: z.string().regex(/^[a-z0-9-]+$/),
+  title: text,
+  /** The fictional organization and its situation, in a line. */
+  setting: text,
+  situation: text,
+  /** The features of the context that decide the choice, shown beside it. */
+  factors: z.array(z.object({ label: text, value: text })).min(2).max(5),
+  /** The likely consequence of each option, keyed by option id. */
+  outcomes: z.record(z.string(), scenarioOutcome),
+  /** What the situation calls for, and why. */
+  debrief: text,
+});
+
 /**
  * The schemas, as a tuple to spread into the interaction union. `base` is the
  * interaction base shape (title, purpose, provenance, syllabus, page).
@@ -130,6 +148,18 @@ export function roomToolSchemas<B extends z.ZodRawShape>(base: B) {
       }),
       /** The guide's internal and external factors, and what each means for this plan. */
       factors: z.array(z.object({ name: text, effect: text })).min(3),
+    }),
+    z.object({
+      component: z.literal('scenario-chooser'),
+      ...base,
+      guide,
+      variant: z.enum(['leadership', 'production']),
+      /** The question asked of every scenario, such as "Which style would you use?". */
+      question: text,
+      options: z.array(z.object({ id: z.string().regex(/^[a-z0-9-]+$/), label: text, gist: text })).min(2).max(6),
+      scenarios: z.array(scenario).min(3).max(10),
+      /** A note beside the scenarios, such as how situational leadership is read. */
+      note: text,
     }),
     z.object({
       component: z.literal('capacity-calculator'),

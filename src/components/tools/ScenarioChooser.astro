@@ -1,0 +1,393 @@
+---
+/**
+ * Scenario choices: one option for each situation, its likely consequence,
+ * and the pattern across them (src/lib/scenarios.ts). Used by the leadership
+ * scenarios (2.3) and the production methods exercise (5.2). Without a script
+ * every scenario still shows its choices, and every option's consequence sits
+ * in a disclosure beneath it.
+ */
+import { FIT_LABEL, bestFor, readLeadership, readProduction, scoreChoices } from '../../lib/scenarios';
+import { scoreFiguresHtml, summaryRowsHtml } from '../../lib/scenarios-view';
+import { jsonForScript, rich } from '../../lib/markup';
+import type { RoomTool } from '../../lib/room-tools';
+
+interface Props {
+  id: string;
+  data: Extract<RoomTool, { component: 'scenario-chooser' }>;
+}
+const { id, data } = Astro.props;
+const uid = `sc-${id}`;
+const options = data.options;
+const noun = data.variant === 'leadership' ? { one: 'style', many: 'styles' } : { one: 'method', many: 'methods' };
+const score = scoreChoices(data.scenarios, options, {});
+const titleOf = (sid: string) => data.scenarios.find((s) => s.id === sid)?.title ?? sid;
+const read = data.variant === 'leadership' ? readLeadership(score, options, titleOf) : readProduction(score, options, titleOf);
+const label = (oid: string) => options.find((o) => o.id === oid)?.label ?? oid;
+const config = { uid, key: data.guide.storageKey, variant: data.variant, options, scenarios: data.scenarios, noun };
+---
+
+<script type="application/json" data-config set:html={jsonForScript(config)} />
+
+<div class="sc">
+  <div class="sc__intro">
+    <div class="sc__note prose" set:html={rich(data.note)} />
+    <dl class="sc__options">
+      {
+        options.map((o) => (
+          <div>
+            <dt>{o.label}</dt>
+            <dd>{o.gist}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+
+  <ol class="sc__list" role="list">
+    {
+      data.scenarios.map((s, k) => (
+        <li class="sc-item" data-scenario={s.id} id={`sc-${s.id}`}>
+          <div class="sc-item__head">
+            <span class="sc-item__no" aria-hidden="true">{String(k + 1).padStart(2, '0')}</span>
+            <div>
+              <h3 class="sc-item__title">
+                <span class="sr-only">Scenario {k + 1}: </span>
+                {s.title}
+              </h3>
+              <p class="sc-item__setting">{s.setting}</p>
+            </div>
+          </div>
+          <div class="sc-item__body">
+            <div class="sc-item__situation prose" set:html={rich(s.situation)} />
+            <ul class="sc-item__factors" role="list" aria-label="What matters here">
+              {s.factors.map((f) => (
+                <li>
+                  <span class="sc-item__flabel">{f.label}</span> {f.value}
+                </li>
+              ))}
+            </ul>
+            <fieldset class="choice sc-item__choice">
+              <legend class="choice__legend">{data.question}</legend>
+              <div class="choice__opts">
+                {options.map((o) => (
+                  <label class="opt">
+                    <input type="radio" name={`${uid}-${s.id}`} value={o.id} />
+                    <span class="opt__body">
+                      <span class="opt__text">{o.label}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            <div class="sc-item__result js-only" data-result hidden></div>
+            <details class="disclosure sc-item__all">
+              <summary>The likely consequence of every {noun.one}</summary>
+              <div class="disclosure__body">
+                <dl class="sc-all">
+                  {options.map((o) => {
+                    const out = s.outcomes[o.id];
+                    return out ? (
+                      <div class={`sc-all__row sc-all__row--${out.fit}`}>
+                        <dt>
+                          {o.label} <span class="sc-all__fit">{FIT_LABEL[out.fit]}</span>
+                        </dt>
+                        <dd>
+                          <strong>{out.headline}.</strong> {out.consequence}
+                        </dd>
+                      </div>
+                    ) : null;
+                  })}
+                </dl>
+                <p class="sc-all__debrief">
+                  <strong>What the situation calls for.</strong> {s.debrief} Strong fit here: {bestFor(s, options).map(label).join(' or ')}.
+                </p>
+              </div>
+            </details>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+
+  <section class="tool-panel sc__summary" aria-labelledby={`${uid}-sum-h`}>
+    <h3 id={`${uid}-sum-h`}>Your pattern</h3>
+    <dl class="figs" data-figures set:html={scoreFiguresHtml(score, noun)} />
+    <div class="tool-reading">
+      <p><strong>Reading.</strong> <span data-interp>{read.reading}</span></p>
+      <p class="muted"><strong>Implication.</strong> <span data-impl>{read.implication || 'The pattern appears as you choose.'}</span></p>
+    </div>
+    <div class="table-scroll" role="region" aria-label="Your choices" tabindex="0">
+      <table class="table tool-table sc__table">
+        <thead>
+          <tr>
+            <th scope="col">Situation</th>
+            <th scope="col">Your {noun.one}</th>
+            <th scope="col">Fit</th>
+            <th scope="col">Strong fit</th>
+          </tr>
+        </thead>
+        <tbody data-rows set:html={summaryRowsHtml(data.scenarios, options, {})}></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script>
+  import '../../scripts/scenario-chooser';
+</script>
+
+<style>
+  .sc {
+    display: grid;
+    gap: var(--sp-6);
+  }
+
+  .sc__intro {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  @media (min-width: 60rem) {
+    .sc__intro {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  .sc__options {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .sc__options div {
+    display: grid;
+    grid-template-columns: minmax(8rem, 11rem) minmax(0, 1fr);
+    gap: var(--sp-3);
+    padding: var(--sp-2) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .sc__options dt {
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  .sc__options dd {
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  .sc__list {
+    display: grid;
+    gap: var(--sp-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sc-item {
+    display: grid;
+    gap: var(--sp-4);
+    margin: 0;
+    padding: var(--sp-4) var(--sp-5) var(--sp-5);
+    border: 1px solid var(--rule-hair);
+    border-left: 3px solid var(--room-accent);
+    background: #fff;
+    scroll-margin-top: 6rem;
+  }
+
+  .sc-item__head {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--sp-4);
+    align-items: start;
+  }
+
+  .sc-item__no {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-style: italic;
+    line-height: 1;
+    color: var(--room-accent-text);
+  }
+
+  .sc-item__title {
+    margin: 0;
+    font-size: var(--fs-h4);
+    line-height: var(--lh-snug);
+  }
+
+  .sc-item__setting {
+    margin: var(--sp-1) 0 0;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .sc-item__body {
+    display: grid;
+    gap: var(--sp-4);
+  }
+
+  .sc-item__situation {
+    max-width: var(--text-max);
+  }
+
+  .sc-item__factors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .sc-item__factors li {
+    margin: 0;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--rule);
+    background: var(--surface-page);
+    font-size: 0.8125rem;
+    color: var(--text-strong);
+  }
+
+  .sc-item__flabel {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .sc-item__choice .choice__opts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  }
+
+  .sc-item__choice .opt {
+    width: 100%;
+  }
+
+  .sc-item :global(.sc-result) {
+    display: grid;
+    gap: var(--sp-2);
+    padding: var(--sp-3) var(--sp-4);
+    border: 1px solid var(--rule-hair);
+    border-left: 4px solid var(--bb-slate);
+    background: var(--surface-sheet);
+    max-width: 48rem;
+  }
+
+  .sc-item :global(.sc-result p) {
+    margin: 0;
+  }
+
+  .sc-item :global(.sc-result--strong) {
+    border-left-color: var(--bb-green);
+    background: var(--surface-right);
+  }
+
+  .sc-item :global(.sc-result--workable) {
+    border-left-color: var(--bb-brass);
+    background: var(--surface-partial);
+  }
+
+  .sc-item :global(.sc-result--weak) {
+    border-left-color: var(--bb-signal);
+    background: var(--surface-wrong);
+  }
+
+  .sc-item :global(.sc-result__verdict) {
+    font-size: var(--fs-label);
+    font-weight: 700;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+  }
+
+  .sc-item :global(.sc-result--strong .sc-result__verdict) {
+    color: var(--green-text);
+  }
+
+  .sc-item :global(.sc-result--workable .sc-result__verdict) {
+    color: var(--brass-text);
+  }
+
+  .sc-item :global(.sc-result--weak .sc-result__verdict) {
+    color: var(--signal-text);
+  }
+
+  .sc-item :global(.sc-result__headline) {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .sc-item :global(.sc-result__debrief),
+  .sc-item :global(.sc-result__best) {
+    font-size: 0.9375rem;
+  }
+
+  .sc-all {
+    display: grid;
+    gap: 0;
+    margin: 0;
+  }
+
+  .sc-all__row {
+    display: grid;
+    gap: var(--sp-1);
+    padding: var(--sp-2) 0 var(--sp-2) var(--sp-3);
+    border-bottom: 1px solid var(--rule-hair);
+    border-left: 3px solid var(--rule);
+  }
+
+  .sc-all__row--strong {
+    border-left-color: var(--bb-green);
+  }
+
+  .sc-all__row--workable {
+    border-left-color: var(--bb-brass);
+  }
+
+  .sc-all__row--weak {
+    border-left-color: var(--bb-signal);
+  }
+
+  .sc-all__row dt {
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  .sc-all__fit {
+    margin-left: var(--sp-2);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .sc-all__row dd {
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  .sc-all__debrief {
+    margin: var(--sp-3) 0 0;
+    max-width: var(--text-max);
+  }
+
+  .sc__table :global(tr.is-strong td:nth-child(3)) {
+    color: var(--green-text);
+    font-weight: 700;
+  }
+
+  .sc__table :global(tr.is-weak td:nth-child(3)) {
+    color: var(--signal-text);
+    font-weight: 700;
+  }
+
+  .sc__table :global(a) {
+    display: inline-block;
+    min-height: 24px;
+  }
+</style>

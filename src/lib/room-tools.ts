@@ -49,11 +49,14 @@ export interface ToolFrame {
   what?: string;
   /** Show the SL and HL switch, for tools with HL-only parts. */
   levelSwitch?: boolean;
+  /** The reset button's label, when it is not a return to a worked example. */
+  reset?: string;
 }
 
 export const TOOL_FRAME: Record<RoomTool['component'], ToolFrame> = {
   'org-chart-builder': { ix: 'org-chart', csv: true, open: true, what: 'the chart' },
   'workforce-planner': { ix: 'workforce-planner', csv: true, open: true, what: 'the plan', levelSwitch: true },
+  'scenario-chooser': { ix: 'scenario-chooser', csv: true, open: true, what: 'your choices', reset: 'Clear my choices' },
   'capacity-calculator': { ix: 'capacity-calculator', csv: true, open: true, what: 'the figures' },
   'stock-simulator': { ix: 'stock-simulator', csv: true, open: true, what: 'the plan' },
   'eoq-calculator': { ix: 'eoq-calculator', csv: true, open: true, what: 'the figures' },

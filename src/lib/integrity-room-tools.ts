@@ -80,6 +80,21 @@ export function checkRoomTools(c: Corpus): Problem[] {
       validateMatrix({ factors: it.factors, sites: it.sites, maxScore: it.maxScore, maxWeight: it.maxWeight, lowThreshold: it.lowThreshold }).forEach((x) => add(`${x.site ?? x.factor ?? 'the matrix'}: ${x.message}`));
     }
 
+    if (it.component === 'scenario-chooser') {
+      const want = it.variant === 'leadership' ? 'people' : 'operations';
+      if (it.guide.room !== want) add(`a ${it.variant} exercise belongs in ${ROOM_INFO[want].name}`);
+      const opts = it.options.map((o) => o.id);
+      if (new Set(opts).size !== opts.length) add('two options share an id');
+      if (new Set(it.scenarios.map((x) => x.id)).size !== it.scenarios.length) add('two scenarios share an id');
+      for (const sc of it.scenarios) {
+        opts.forEach((o) => sc.outcomes[o] || add(`scenario "${sc.id}" has no outcome for "${o}"`));
+        Object.keys(sc.outcomes).forEach((k) => opts.includes(k) || add(`scenario "${sc.id}" has an outcome for "${k}", which is not an option`));
+        if (!Object.values(sc.outcomes).some((x) => x.fit === 'strong')) add(`scenario "${sc.id}" has no strong fit`);
+      }
+      // A reader who adapts must be able to match every scenario, so every option fits one strongly.
+      opts.forEach((o) => it.scenarios.some((sc) => sc.outcomes[o]?.fit === 'strong') || add(`option "${o}" is never a strong fit`));
+    }
+
     if (it.component === 'eoq-calculator') {
       if (it.guide.status !== 'enrichment' || it.provenance !== 'enrichment') add('the economic order quantity is beyond the syllabus, so it must be labelled enrichment');
       validateEoq({ ...it.inputs, minQty: it.discount?.minQty ?? null, discountPrice: it.discount?.price ?? null }, Boolean(it.discount)).forEach((x) => add(`${x.field}: ${x.message}`));

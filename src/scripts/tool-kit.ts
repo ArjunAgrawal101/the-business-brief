@@ -115,12 +115,12 @@ export function bindToolbar(o: ToolbarOptions): { changed: (say?: string) => voi
     let armed = 0;
     resetBtn.addEventListener('click', () => {
       if (!armed) {
-        resetBtn.textContent = 'Confirm: replace my work with the worked example';
+        resetBtn.textContent = label.startsWith('Clear') ? 'Confirm: clear everything' : 'Confirm: replace my work with the worked example';
         armed = window.setTimeout(() => {
           resetBtn.textContent = label;
           armed = 0;
         }, 5000);
-        announce(live, 'Press again to replace your work with the worked example.');
+        announce(live, label.startsWith('Clear') ? 'Press again to clear your work.' : 'Press again to replace your work with the worked example.');
         return;
       }
       window.clearTimeout(armed);
@@ -128,8 +128,8 @@ export function bindToolbar(o: ToolbarOptions): { changed: (say?: string) => voi
       resetBtn.textContent = label;
       forget(o.key);
       o.reset();
-      setStatus('Showing the worked example. Your next change will be saved on this device.');
-      announce(live, 'The worked example is back.');
+      setStatus(label.startsWith('Clear') ? 'Cleared. Your next change will be saved on this device.' : 'Showing the worked example. Your next change will be saved on this device.');
+      announce(live, label.startsWith('Clear') ? 'Cleared.' : 'The worked example is back.');
     });
   }
 

@@ -11,14 +11,15 @@ interface Props {
   open?: boolean;
   /** What the JSON and CSV files contain, for the button labels. */
   what?: string;
+  reset?: string;
 }
-const { json = true, csv = false, open = false, what = '' } = Astro.props;
+const { json = true, csv = false, open = false, what = '', reset = 'Reset to the worked example' } = Astro.props;
 ---
 
 <div class="tool-bar js-only no-print" data-toolbar>
   <p class="tool-bar__status" data-save-status>Your changes are kept in this browser, on this device only.</p>
   <div class="tool-bar__actions">
-    <button type="button" class="btn btn--small" data-tool="reset">Reset to the worked example</button>
+    <button type="button" class="btn btn--small" data-tool="reset">{reset}</button>
     {
       json && (
         <button type="button" class="btn btn--small" data-tool="json">

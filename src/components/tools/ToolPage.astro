@@ -30,8 +30,9 @@ interface Props {
   what?: string;
   /** Show the SL and HL switch, for tools with HL-only parts. */
   levelSwitch?: boolean;
+  reset?: string;
 }
-const { id, ix, json = true, csv = false, open = false, what = '', levelSwitch = false } = Astro.props;
+const { id, ix, json = true, csv = false, open = false, what = '', levelSwitch = false, reset } = Astro.props;
 const c = await corpus();
 const t = c.interactives[id] as RoomTool | undefined;
 if (!t || !('guide' in t)) throw new Error(`ToolPage: ${id} is not a room tool`);
@@ -113,7 +114,7 @@ const statusClass = g.status === 'HL' ? 'tag--hl' : g.status === 'enrichment' ? 
           <span class={`tag ${statusClass}`}>{STATUS_LABEL[g.status]}</span>
         </div>
         <div class="ix__intro prose small" set:html={rich(g.example.note)} />
-        <ToolBar json={json} csv={csv} open={open} what={what} />
+        <ToolBar json={json} csv={csv} open={open} what={what} reset={reset} />
       </header>
       <p class="state state--error" data-error hidden>The tool could not start in this browser. Everything below is the worked example as it was prepared, with its results.</p>
       <div class="ix__body tool-frame__body">
