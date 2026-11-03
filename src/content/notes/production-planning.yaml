@@ -8,7 +8,10 @@
 # was read to check coverage; no passage, figure, table or case from it is
 # reproduced, and its operating leverage formula is not followed. Wrenhurst
 # Cycles and Hollowmere Bikes are fictional; the stock figures match the site's
-# stock control chart, and every worked figure was checked by script.
+# stock control chart, and every worked figure was checked by script. The
+# situation and decision continue the Wrenhurst example (a year is 9,600
+# bikes, as in the make-or-buy example); the exam-style questions add Marram
+# Paints and Fairloom, also fictional, and every figure was checked by script.
 code: '5.6'
 title: Production planning
 level: HL
@@ -22,6 +25,17 @@ objectives:
   - '**Construct** and interpret a stock control chart using lead time, buffer stock, reorder level and reorder quantity.'
   - '**Calculate** capacity utilization, the defect rate, labour and capital productivity, the productivity rate and operating leverage, and comment on the results.'
   - '**Recommend** whether to make or buy, using the cost to make and the cost to buy alongside non-financial factors.'
+situation:
+  title: A ship three weeks late
+  fictional: true
+  text: |
+    Wrenhurst Cycles, a fictional bicycle maker, assembles about 200 bikes a week on a line that could build 250. Its aluminium frames come by sea from a single partner factory overseas, eight weeks away, and it keeps about six weeks of them in its warehouse: 1,200 frames, worth $108,000.
+
+    This month a container ship carrying its frames was held up for three weeks. Wrenhurst's line kept running on the frames in its warehouse, while a rival that buys its frames just in time had to stop production for a fortnight.
+
+    Even so, Wrenhurst's new finance manager wants the stock cut, because $108,000 of frames on shelves is cash the business cannot use. The production manager wants more stock, and a second supplier. The owner wonders whether Wrenhurst should simply make its own frames, in spare space in its factory.
+
+    How much stock should Wrenhurst hold, how well is it using its capacity, and when should it make a part rather than buy it?
 sections:
   - id: supply-chain
     title: The local and global supply chain
@@ -255,6 +269,32 @@ sections:
         Wrenhurst fits a rear rack to every bike, 9,600 a year. A supplier quotes $14 a rack, so **CTB** = 9,600 × $14 = **$134,400**. Making them would need a bending and welding machine and a supervisor, fixed costs of $48,000 a year, plus $8 a rack in steel tube, paint and labour, so **CTM** = $48,000 + (9,600 × $8) = **$124,800**. Making saves $9,600 a year.
 
         But the saving depends on volume. The two costs are equal at 48,000 ÷ (14 − 8) = 8,000 racks a year; if sales fell to 7,000 bikes, CTB would be $98,000 and CTM $104,000, and buying would be cheaper. Wrenhurst would also weigh the use of its spare capacity, the risk of a new process and whether racks deserve management time at all. A decision tree, a toolkit method, could set out the two options and their likely outcomes.
+applications:
+  - industry: Car manufacturing
+    text: A car is assembled from thousands of parts supplied by several tiers of suppliers, and car makers were among the first to run their plants just in time. Because one missing component can stop a whole assembly line, many now keep buffer stocks of the parts that are hardest to replace.
+  - industry: Supermarkets and food retail
+    text: Fresh food is perishable, so it is delivered from distribution centres every day or two, close to just in time, with software placing the orders as items are sold. Long-life goods are stocked more generously before holidays, when a stock-out would cost sales on the busiest days.
+  - industry: Hospitals and healthcare
+    text: A stock-out of a critical medicine or of blood can cost lives, so hospitals hold buffers just in case even though some stock expires unused. Bed and theatre capacity matters as much as stock, because a hospital running close to full utilization has no room for a sudden rise in patients.
+  - industry: Hotels and airlines
+    text: An empty room or seat cannot be stored and sold tomorrow, so capacity utilization, measured as occupancy or load factor, decides profit. Their high fixed costs give them high operating leverage, which is why they adjust prices to fill the last places.
+  - industry: Fashion retail
+    text: Styles date within weeks, so stock left unsold loses value quickly. Some retailers buy cheaply from distant factories with long lead times, while others pay more for nearby suppliers that can make and deliver a new design within weeks, trading cost for speed.
+  - industry: Software and online services
+    text: Capacity means servers and bandwidth, which cloud providers let a business rent as demand rises rather than buy in advance. Make or buy becomes build or buy; writing software in-house gives control, while buying or renting an existing product is usually cheaper and quicker.
+stakeholders:
+  - group: Suppliers
+    text: Just-in-time pushes stock and delivery pressure onto suppliers, who must make frequent small deliveries on time, often under long-term contracts with penalties for lateness. A supplier that fails can halt its customer's production, so the two depend on each other more than under just-in-case.
+  - group: Employees
+    text: Productivity drives, overtime at high capacity utilization and the multi-skilling that JIT needs all change how people work. A decision to make rather than buy can create jobs in-house, while buying in can remove them, so employees have a direct stake in every make-or-buy choice.
+  - group: Customers
+    text: Gain from low defect rates and from products that are in stock when they want them, and lose when a lean supply chain breaks and orders are delayed. They rarely see the stock policy, but they feel its failures.
+  - group: Owners and shareholders
+    text: Cash tied up in stock earns nothing, so owners favour lean stock and high capacity utilization, which raise returns. High operating leverage magnifies profit in good years and losses in bad ones, so the cost structure is also a decision about how much risk the owners carry.
+  - group: Local community and environment
+    text: A local supply chain keeps work and income in the area and cuts transport emissions, while a global one may lower prices at the cost of longer journeys. Frequent small JIT deliveries can also add lorries to local roads.
+  - group: Managers across the business
+    text: Finance managers want less stock to free cash; production managers want enough to keep the line running; marketing managers want products always available. A stock policy is a compromise between them, and the stock control chart is where the compromise is made explicit.
 evaluation:
   - JIT and JIC trade efficiency against resilience. JIT cuts costs and waste when suppliers are reliable and demand is steady, but a single disruption, from a storm to a blocked shipping route, shows why many businesses keep buffers of their most critical parts.
   - Supply chain and stock decisions cannot be separated. A global chain may lower costs, but its longer lead times raise the reorder level and the buffer stock needed, and with them the cash tied up in stock.
@@ -262,6 +302,131 @@ evaluation:
   - High operating leverage is not a weakness in itself. It magnifies profit when sales grow as well as losses when they fall, so the right cost structure depends on how stable demand is and how much risk the owners can bear.
   - A cost comparison rarely settles a make-or-buy decision. The result depends on the quantity and on whether spare capacity exists, and quality, reliability, control and ethics, which the numbers leave out, can outweigh a small saving.
   - In an examination, write the formula before substituting, give units or a percentage with every answer, state which measure of operating leverage you use, and interpret each result in the case before recommending.
+decision:
+  title: Where should the frames come from?
+  fictional: true
+  brief: |
+    Wrenhurst Cycles builds 9,600 bikes a year, one frame each. Its overseas partner charges $90 a frame, with a lead time of eight weeks by sea, and Wrenhurst keeps about six weeks of frames, 1,200 worth $108,000. Each bike earns a contribution of $200, so a week without frames, 200 bikes, costs about $40,000 of contribution. After this month's three-week shipping delay, the owner is weighing three ways forward.
+  options:
+    - label: Stay overseas, but hold less
+      text: Keep the $90 frames and cut the stock to about two weeks, 400 frames worth $36,000, freeing $72,000 of cash. This month's three-week delay would then have stopped the line for a week.
+    - label: Switch to a local frame maker
+      text: A maker nearby charges $102 a frame but delivers within a week, so Wrenhurst could hold just one week's stock, 200 frames worth $20,400. The frames would cost $115,200 a year more, and $87,600 of cash would be freed from stock.
+    - label: Make the frames in-house
+      text: Welding equipment, three welders and a supervisor would cost $240,000 a year, plus $66 a frame in tube and materials. At 9,600 frames the cost to make is $873,600 against a cost to buy of $864,000, so making costs $9,600 a year more today. The two costs are equal at 10,000 frames a year.
+  guidance: |
+    Weigh three things: cost, resilience and control.
+
+    **Holding less** frees $72,000 of cash at no extra cost, but it leaves Wrenhurst exposed to exactly the disruption it has just survived. At an interest rate of, say, 8%, the four weeks of stock it would give up cost about $5,760 a year in interest forgone, while one week of lost production costs about $40,000, so a single long delay could wipe out years of savings. It suits a supply route that has proved reliable, and this one has just shown that it is not.
+
+    **The local maker** buys resilience at a price: $115,200 a year is roughly the contribution from three weeks of production, paid every year whether or not a ship is delayed. In return come short lead times, little stock, easier checks on quality and working conditions, and the ability to change designs quickly. It makes most sense if long delays look likely to recur.
+
+    **Making the frames** costs almost the same as buying today, and becomes cheaper as output grows: at the line's full capacity, 250 bikes a week or 12,000 a year, making would cost $1,032,000 against $1,080,000 to buy, a saving of $48,000. It also removes the sea crossing altogether. But it needs welding skills Wrenhurst does not have, management time and a new quality risk, and it commits the business to $240,000 of fixed costs, which raises its operating leverage.
+
+    A strong judgement ties the choice to Wrenhurst's plans. If it expects to grow towards capacity and can recruit skilled welders, making the frames may be the best long-term answer; if not, a mix, some frames bought locally and the rest overseas with a buffer of three or four weeks, may balance cost and risk better than any single option. What would change the decision: how often long delays are expected, the growth forecast, and whether the local maker would offer a lower price for a long contract.
+exam:
+  - q: |
+      Marram Paints, a fictional paint maker, uses 30 drums of pigment a week. The supplier's lead time is 3 weeks, Marram keeps a buffer stock of 40 drums, and it orders 180 drums at a time.
+
+      Calculate the reorder level, the maximum stock level and the number of weeks between deliveries.
+    marks: 4
+    command: calculate
+    level: HL
+    paper: '2'
+    answer: |
+      A strong response states each standard formula, since the guide gives none for stock control, and shows the working.
+
+      - Reorder level = buffer stock + (usage per week × lead time) = 40 + (30 × 3) = **130 drums**.
+      - Maximum stock level = buffer stock + reorder quantity = 40 + 180 = **220 drums**.
+      - Weeks between deliveries = reorder quantity ÷ usage per week = 180 ÷ 30 = **6 weeks**.
+
+      Check: stock falls from 220 to 130 in 3 weeks, the order is placed, and over the 3-week lead time another 90 drums are used, so the delivery arrives just as stock reaches the buffer of 40.
+  - q: |
+      Marram's factory can produce 12,800 tins of paint a month. Last month it produced 9,600 tins, of which 240 failed inspection and were reworked before sale. The tins sell for $20 each, and all the inputs used, materials, labour, energy and the factory's fixed costs, cost $168,000.
+
+      Calculate Marram's capacity utilization rate, its defect rate and its productivity rate for the month.
+    marks: 4
+    command: calculate
+    level: HL
+    paper: '2'
+    answer: |
+      A strong response writes each formula, two of them from the guide's formula list, and gives each result as a percentage.
+
+      - Capacity utilization rate = actual output ÷ productive capacity × 100 = 9,600 ÷ 12,800 × 100 = **75%**.
+      - Defect rate = units that fail the quality standard ÷ units made × 100 = 240 ÷ 9,600 × 100 = **2.5%**.
+      - Productivity rate = total output ÷ total input × 100. Output is worth 9,600 × $20 = $192,000, so 192,000 ÷ 168,000 × 100 = **114.29%**: each $100 of inputs produces about $114 of output.
+
+      A strong answer adds that a quarter of capacity is idle, so the fixed costs are spread over fewer tins than they could be.
+  - q: |
+      Marram buys the empty metal tins it fills, 115,200 a year, at $1.20 each. Making them would need a machine leased for $30,000 a year, plus $0.85 a tin in steel and labour.
+
+      Calculate the cost to buy and the cost to make, and the number of tins a year at which the two are equal.
+    marks: 4
+    command: calculate
+    level: HL
+    paper: '2'
+    answer: |
+      A strong response states both standard formulas, works each cost and finds the volume at which they cross.
+
+      - Cost to buy = 115,200 × $1.20 = **$138,240** a year.
+      - Cost to make = $30,000 + (115,200 × $0.85) = $30,000 + $97,920 = **$127,920** a year, so making is cheaper by $10,320.
+      - The costs are equal where 30,000 = (1.20 − 0.85) × quantity, so at 30,000 ÷ 0.35 = **85,714.3 tins**, about 85,715 a year. Above that, making is cheaper; below it, buying is.
+
+      At 115,200 tins Marram is well above that volume, but a strong answer notes that the saving would shrink if output fell, and that quality, reliability and the use of factory space also matter.
+  - q: Each tin of Marram's paint sells for $20 and has a variable cost of $10. Its fixed costs are $72,000 a month and it sells 9,600 tins a month. Calculate Marram's degree of operating leverage, and use it to estimate the effect on profit of a 10% fall in sales.
+    marks: 4
+    command: calculate
+    level: HL
+    paper: '2'
+    answer: |
+      A strong response states the measure used, since the guide gives no formula, and checks the estimate.
+
+      - Total contribution = 9,600 × ($20 − $10) = $96,000; operating profit = 96,000 − 72,000 = $24,000.
+      - Degree of operating leverage = total contribution ÷ operating profit = 96,000 ÷ 24,000 = **4**.
+      - A 10% fall in sales should therefore cut operating profit by about 4 × 10% = **40%**, to $14,400.
+      - Check: at 8,640 tins, contribution is $86,400 and profit $86,400 − $72,000 = $14,400.
+
+      A strong answer adds what this means: with fixed costs three-quarters of the size of its contribution, Marram's profit is very sensitive to sales.
+  - q: |
+      Fairloom, a fictional social enterprise, trains and employs refugees to make school uniforms. It buys all its cloth from one mill overseas, with a lead time of ten weeks. Last term a late delivery left its sewing team idle for three weeks, and two schools moved to other suppliers.
+
+      Explain **two** ways in which Fairloom could reduce the risks in its supply chain.
+    marks: 6
+    command: explain
+    level: HL
+    paper: '3'
+    answer: |
+      A strong response explains each way, applies it to Fairloom's mission as well as its costs, and notes its drawback.
+
+      - **A second, nearer supplier.** Buying some cloth from a mill with a shorter lead time means one late delivery no longer stops all work, which protects both the schools' orders and the trainees' employment, the heart of Fairloom's mission. The cloth may cost more, and a social enterprise has to check that the new supplier's own labour standards fit its values.
+      - **A larger buffer stock of cloth.** Holding stock just in case covers a late delivery, and the cost of three idle weeks and two lost schools suggests the buffer would pay for itself. But it ties up cash, which a small social enterprise may not have, and needs storage space.
+      - Earlier ordering, sharing school order forecasts with the mill, or tracking each shipment are also valid. A strong answer links every way back to the people Fairloom exists to employ.
+  - q: |
+      Wrenhurst Cycles holds about six weeks of frames, 1,200 worth $108,000, bought from one overseas supplier with an eight-week lead time. This month a three-week shipping delay stopped a rival that uses just-in-time, but not Wrenhurst. A week of lost production costs Wrenhurst about $40,000 of contribution.
+
+      Evaluate whether Wrenhurst should move to just-in-time (JIT) for its frames.
+    marks: 10
+    command: evaluate
+    level: HL
+    paper: '2'
+    answer: |
+      A strong response weighs what JIT would gain against what it requires and risks, uses the figures, and reaches a judgement.
+
+      - **What JIT would gain:** most of the $108,000 now tied up in frames would be freed, along with warehouse space and the risk of damage. At an interest rate of, for example, 8% a year, that stock costs about $8,640 a year in interest forgone, before storage and insurance.
+      - **What JIT requires:** reliable suppliers, usually nearby, frequent small deliveries and good shared information. A single supplier eight weeks away by sea is close to the opposite.
+      - **What JIT risks:** this month's three-week delay would have cost about 3 × $40,000 = $120,000 of contribution, more than the whole value of the stock, as well as late orders and lost customers.
+      - **Other options:** JIT could work for Wrenhurst's local parts, such as tyres and boxes, while frames are held just in case; or a local supplier, or making the frames in-house, would shorten the lead time enough to make lean stock safer.
+      - **Judgement:** for example, that Wrenhurst should not move to JIT for frames while they come from one supplier eight weeks away, because the cost of one disruption outweighs years of holding costs, but it could cut the buffer if it found a nearer source. The decision depends on how often delays occur and on the cost of the alternatives.
+summary:
+  - A supply chain turns raw materials into a product in a customer's hands. Local chains are shorter and easier to control; global chains can be cheaper but are slower and more exposed to disruption.
+  - Just-in-time holds as little stock as possible and needs reliable, nearby suppliers and quality that is right first time; just-in-case holds buffers against delays and surges, at the cost of cash, space and waste.
+  - 'On a stock control chart, reorder level = buffer stock + (usage × lead time) and maximum stock = buffer stock + reorder quantity: the reorder level says when to order, the reorder quantity how much.'
+  - Capacity utilization rate = actual output ÷ productive capacity × 100. High utilization spreads fixed costs, but running at 100% leaves no room for maintenance, breakdowns or rush orders.
+  - Defect rate = units that fail the quality standard ÷ units made × 100. Defects cost twice, in rework and in reputation.
+  - Labour productivity = output ÷ workers or hours; capital productivity = output ÷ capital input; productivity rate = total output ÷ total input × 100.
+  - Degree of operating leverage = total contribution ÷ operating profit. High fixed costs magnify the effect of any change in sales on profit.
+  - Cost to buy = supplier price × quantity; cost to make = fixed costs + (variable cost × quantity). Making tends to win at high volumes, and quality, control, risk and ethics often decide.
+  - The guide gives formulas only for capacity utilization and the productivity rate, so state the standard form for every other measure before substituting.
 connections:
   - code: '5.3'
     text: Just-in-time is a lean production method, and the defect rate is what quality management sets out to cut.
@@ -320,4 +485,4 @@ basis:
     pages: 81 and 83
     note: The glossary's definitions of capacity utilization and the defect rate, checked
 verification: primary
-updated: '2026-11-02'
+updated: '2026-11-03'
