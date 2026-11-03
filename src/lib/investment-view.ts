@@ -56,16 +56,16 @@ export function presentValueRowsHtml(a: Appraisal, b: Appraisal, rate: Rate, cur
 
 const r1 = (n: number) => Math.round(n * 10) / 10;
 
-/** Cumulative net cash flow of both projects, year 0 to the end of the longer one. */
-export function cumulativeSvg(a: Appraisal, b: Appraisal, o: { currency: string; id: string }): string {
+/** Cumulative net cash flow of one project, or of two, year 0 to the end of the longer one. */
+export function cumulativeSvg(a: Appraisal, b: Appraisal | null, o: { currency: string; id: string }): string {
   const W = 560;
   const H = 320;
   const L = 78;
   const R = 112;
   const T = 24;
   const B = 46;
-  const years = Math.max(a.cumulative.length, b.cumulative.length) - 1;
-  const all = [...a.cumulative, ...b.cumulative, 0];
+  const years = Math.max(a.cumulative.length, b?.cumulative.length ?? 0) - 1;
+  const all = [...a.cumulative, ...(b?.cumulative ?? []), 0];
   const lo = Math.min(...all);
   const hi = Math.max(...all);
   const step = niceStep(hi - lo || 1, 5);
@@ -95,7 +95,7 @@ export function cumulativeSvg(a: Appraisal, b: Appraisal, o: { currency: string;
 
   const series = [
     { ap: a, color: COBALT, dash: '', name: a.project.label },
-    { ap: b, color: INK, dash: ' stroke-dasharray="7 4"', name: b.project.label },
+    ...(b ? [{ ap: b, color: INK, dash: ' stroke-dasharray="7 4"', name: b.project.label }] : []),
   ];
   const ends: Array<{ y: number; text: string; color: string }> = [];
   for (const s of series) {
@@ -120,7 +120,7 @@ export function cumulativeSvg(a: Appraisal, b: Appraisal, o: { currency: string;
   const desc = series
     .map((s) => `${s.name}: from ${money(-s.ap.project.capitalCost, o.currency)} in year 0 to ${money(s.ap.cumulative[s.ap.cumulative.length - 1] ?? 0, o.currency)} at the end of year ${s.ap.cumulative.length - 1}; ${s.ap.payback ? `pays back in ${fmtPayback(s.ap.payback)}` : 'does not pay back within its life'}.`)
     .join(' ');
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${o.id}-t ${o.id}-d" class="chart" focusable="false"><title id="${o.id}-t">Cumulative net cash flow of the two projects</title><desc id="${o.id}-d">${esc(desc)}</desc>${parts.join('')}</svg>`;
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${o.id}-t ${o.id}-d" class="chart" focusable="false"><title id="${o.id}-t">${b ? 'Cumulative net cash flow of the two projects' : `Cumulative net cash flow: ${esc(a.project.label)}`}</title><desc id="${o.id}-d">${esc(desc)}</desc>${parts.join('')}</svg>`;
 }
 
 /** The chart's key, in words, so that neither colour nor the dots carry meaning alone. */

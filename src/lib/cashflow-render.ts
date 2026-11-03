@@ -4,7 +4,7 @@
  * profit and its reconciliation to cash, and the eight-part working for one
  * month's closing balance.
  */
-import { bracket, STATUS_WORDS, type Forecast, type Line } from './cashflow';
+import { bracket, STATUS_WORDS, type CashForecast, type Forecast, type Line } from './cashflow';
 import type { Working } from './finance';
 import { fmtMoney } from './format';
 import { esc } from './markup';
@@ -12,7 +12,7 @@ import { esc } from './markup';
 const cells = (values: number[], prev?: number[]) =>
   values.map((v, i) => `<td class="n"${prev && prev[i] !== v ? ' data-changed' : ''}>${esc(bracket(v))}</td>`).join('');
 
-const lineRows = (lines: Line[], prev?: Forecast, group?: 'in' | 'out') =>
+const lineRows = (lines: Line[], prev?: CashForecast, group?: 'in' | 'out') =>
   lines
     .map((l) => {
       const before = prev ? (group === 'in' ? prev.inflows : prev.outflows).find((p) => p.id === l.id) : undefined;
@@ -21,7 +21,7 @@ const lineRows = (lines: Line[], prev?: Forecast, group?: 'in' | 'out') =>
     .join('');
 
 /** The body of the forecast table. `prev` marks the cells that changed since the last render. */
-export function forecastBodyHtml(f: Forecast, prev?: Forecast): string {
+export function forecastBodyHtml(f: CashForecast, prev?: CashForecast): string {
   const span = f.months.length + 1;
   const gap = `<tr class="cff__gap" aria-hidden="true"><td colspan="${span}"></td></tr>`;
   const status = f.status.map((s) => `<td class="cff__st cff__st--${s}">${esc(STATUS_WORDS[s])}</td>`).join('');
@@ -85,8 +85,8 @@ ${rec}
 </div>`;
 }
 
-/** The eight-part working for one month's closing balance. */
-export function closingWorking(f: Forecast, month: number, currency: string): { working: Working; interpretation: string; implication: string } {
+/** The eight-part working for one month's closing balance. `who` names the business in the interpretation. */
+export function closingWorking(f: CashForecast, month: number, currency: string, who = 'the studio'): { working: Working; interpretation: string; implication: string } {
   const m = f.months[month] ?? '';
   const o = f.opening[month] ?? 0;
   const i = f.totalIn[month] ?? 0;
@@ -112,7 +112,7 @@ export function closingWorking(f: Forecast, month: number, currency: string): { 
     },
     interpretation:
       st === 'credit'
-        ? `At the end of ${m} the studio has ${money(close)} in the bank.`
+        ? `At the end of ${m} ${who} has ${money(close)} in the bank.`
         : st === 'overdraft'
           ? `At the end of ${m} the account is overdrawn by ${money(-close)}, within the ${money(f.limit)} limit.`
           : `At the end of ${m} the account is overdrawn by ${money(-close)}, which is ${money(-close - f.limit)} beyond the ${money(f.limit)} limit.`,
@@ -120,7 +120,7 @@ export function closingWorking(f: Forecast, month: number, currency: string): { 
       st === 'beyond'
         ? 'The bank need not honour payments beyond the limit: wages, rent or the supplier could go unpaid even though the business is profitable.'
         : st === 'overdraft'
-          ? 'The studio pays overdraft interest and has little room if sales fall short of the forecast.'
+          ? `${who.charAt(0).toUpperCase()}${who.slice(1)} pays overdraft interest and has little room if sales fall short of the forecast.`
           : 'The balance carries into the next month as its opening balance.',
   };
 }

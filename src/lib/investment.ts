@@ -125,6 +125,56 @@ export function npv(p: Project, rate: Rate): number | null {
   return presentValues(p, rate).reduce((a, b) => a + b, 0) - p.capitalCost;
 }
 
+/* ------------------------------------------------------------------ */
+/* Enrichment: beyond the guide's table                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * A discount factor from its formula, 1 ÷ (1 + r)^t, for any rate. The guide's
+ * table (p. 66) prints these for five rates; the formula is enrichment, and in
+ * an examination the table is used.
+ */
+export const formulaDiscountFactor = (ratePercent: number, year: number): number => 1 / (1 + ratePercent / 100) ** year;
+
+/** NPV with factors from the formula rather than the guide's table (enrichment). */
+export function npvByFormula(p: Project, ratePercent: number): number {
+  return p.returns.reduce((s, r, i) => s + r * formulaDiscountFactor(ratePercent, i + 1), 0) - p.capitalCost;
+}
+
+/**
+ * The internal rate of return: the discount rate, in per cent, at which NPV is
+ * zero. It is beyond the IB syllabus (enrichment). Found by bisection, so it
+ * needs no table. Null when the returns do not even repay the cost undiscounted,
+ * because then no positive rate gives an NPV of zero.
+ */
+export function irr(p: Project): number | null {
+  if (!(p.capitalCost > 0) || p.returns.length === 0) return null;
+  if (npvByFormula(p, 0) <= 0) return null;
+  let lo = 0;
+  let hi = 1000;
+  if (npvByFormula(p, hi) > 0) return null;
+  for (let k = 0; k < 200 && hi - lo > 1e-9; k++) {
+    const mid = (lo + hi) / 2;
+    if (npvByFormula(p, mid) > 0) lo = mid;
+    else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+/**
+ * Between which two of the guide's rates NPV changes sign, read from the table
+ * alone: the IB-safe way to say roughly where the return on a project lies.
+ */
+export function signChange(p: Project): { below: Rate; above: Rate } | null {
+  const values = RATES.map((r) => npv(p, r));
+  for (let k = 0; k < RATES.length - 1; k++) {
+    const a = values[k];
+    const b = values[k + 1];
+    if (a !== null && a !== undefined && b !== null && b !== undefined && a >= 0 && b < 0) return { below: RATES[k] as Rate, above: RATES[k + 1] as Rate };
+  }
+  return null;
+}
+
 export interface Appraisal {
   project: Project;
   payback: Payback | null;

@@ -18,6 +18,9 @@ const SIGNAL = '#B84A4A';
 const RULE = '#DCD6CA';
 const MUTED = '#5A6670';
 
+/** The chart palette, shared by every chart drawn in code: one visual language. */
+export const CHART_COLOURS = { INK, COBALT, SLATE, GREEN, SIGNAL, RULE, MUTED } as const;
+
 /** A step of 1, 2, 2.5 or 5 times a power of ten giving about `target` intervals. */
 export function niceStep(range: number, target = 5): number {
   if (!(range > 0)) return 1;
@@ -41,6 +44,8 @@ interface BreakEvenChartOptions {
   unitsLabel: string;
   periodLabel: string;
   id: string;
+  /** Marks the output needed for a target profit, with the profit it earns. */
+  target?: { output: number; profit: number };
 }
 
 export function breakEvenSvg(m: BreakEvenModel, o: BreakEvenChartOptions): string {
@@ -51,7 +56,7 @@ export function breakEvenSvg(m: BreakEvenModel, o: BreakEvenChartOptions): strin
   const T = 26;
   const B = 50;
   const i = m.inputs;
-  const xmax = niceCeil(Math.max(i.capacity, i.quantity, m.beq ?? 0, 1) * 1.05);
+  const xmax = niceCeil(Math.max(i.capacity, i.quantity, m.beq ?? 0, o.target?.output ?? 0, 1) * 1.05);
   const tr = (q: number) => i.price * q;
   const tc = (q: number) => i.fixedCosts + m.unitVariableCost * q;
   const ymax = niceCeil(Math.max(tr(xmax), tc(xmax), i.fixedCosts, 1) * 1.04);
@@ -130,6 +135,16 @@ export function breakEvenSvg(m: BreakEvenModel, o: BreakEvenChartOptions): strin
     );
   }
 
+  // The output for a target profit: the gap between the lines there is the target.
+  const tq = o.target && o.target.output > 0 && o.target.output <= xmax ? o.target.output : null;
+  if (tq !== null) {
+    const tx = r1(x(tq));
+    parts.push(`<line x1="${tx}" y1="${T + 36}" x2="${tx}" y2="${H - B}" stroke="${COBALT}" stroke-width="1" stroke-dasharray="3 3"/>`);
+    parts.push(`<path d="M${tx - 5} ${r1(y(tc(tq)))}H${tx + 5}M${tx} ${r1(y(tc(tq)))}V${r1(y(tr(tq)))}M${tx - 5} ${r1(y(tr(tq)))}H${tx + 5}" fill="none" stroke="${GREEN}" stroke-width="1.75"/>`);
+    const right = x(tq) + 130 < W - R;
+    parts.push(`<text x="${tx + (right ? 6 : -6)}" y="${T + 46}" text-anchor="${right ? 'start' : 'end'}" class="ch-note">${esc(`Target ${fmtNumber(tq)}`)}</text>`);
+  }
+
   // Break-even point
   if (be !== null && m.beq !== null) {
     parts.push(`<line x1="${r1(x(be))}" y1="${r1(y(tr(be)))}" x2="${r1(x(be))}" y2="${H - B}" stroke="${INK}" stroke-width="1" stroke-dasharray="1 3"/>`);
@@ -141,10 +156,11 @@ export function breakEvenSvg(m: BreakEvenModel, o: BreakEvenChartOptions): strin
     );
   }
 
+  const targetText = tq !== null && o.target ? ` At the target output of ${fmtNumber(tq)}, the gap between total revenue and total cost is a profit of ${fmtMoney(o.target.profit, o.currency, 2)}.` : '';
   const desc =
-    m.beq === null
+    (m.beq === null
       ? `Total cost is above total revenue at every output, so there is no break-even point. Forecast sales are ${fmtNumber(i.quantity)} ${o.unitsLabel} a ${o.periodLabel}.`
-      : `Total revenue and total cost meet at ${fmtNumber(m.beq)} ${o.unitsLabel} a ${o.periodLabel} (the break-even point, rounded up). Forecast sales of ${fmtNumber(i.quantity)} give a margin of safety of ${fmtNumber(m.mos ?? 0)} and a ${m.profitAtForecast >= 0 ? 'profit' : 'loss'} of ${fmtMoney(Math.abs(m.profitAtForecast), o.currency, 2)}. Capacity is ${fmtNumber(i.capacity)}.`;
+      : `Total revenue and total cost meet at ${fmtNumber(m.beq)} ${o.unitsLabel} a ${o.periodLabel} (the break-even point, rounded up). Forecast sales of ${fmtNumber(i.quantity)} give a margin of safety of ${fmtNumber(m.mos ?? 0)} and a ${m.profitAtForecast >= 0 ? 'profit' : 'loss'} of ${fmtMoney(Math.abs(m.profitAtForecast), o.currency, 2)}. Capacity is ${fmtNumber(i.capacity)}.`) + targetText;
 
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${o.id}-t ${o.id}-d" class="chart" focusable="false"><title id="${o.id}-t">Break-even chart</title><desc id="${o.id}-d">${esc(desc)}</desc>${parts.join('')}</svg>`;
 }

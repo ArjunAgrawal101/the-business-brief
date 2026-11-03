@@ -48,7 +48,8 @@ export interface Line {
 
 export type MonthStatus = 'credit' | 'overdraft' | 'beyond';
 
-export interface Forecast {
+/** A cash flow forecast in the guide's layout: what the table, the chart and the reading need. */
+export interface CashForecast {
   months: string[];
   opening: number[];
   inflows: Line[];
@@ -63,6 +64,10 @@ export interface Forecast {
   /** The first month whose closing balance is beyond the overdraft limit, or null. */
   firstBeyond: number | null;
   netCash: number;
+}
+
+/** The cash flow lab's forecast, with the profit for the same months and its reconciliation to cash. */
+export interface Forecast extends CashForecast {
   profit: { revenue: number; expenses: Array<{ label: string; value: number }>; total: number };
   /** Profit, plus these, equals the net cash flow for the period. */
   reconciliation: Array<{ label: string; value: number }>;
@@ -73,6 +78,91 @@ import { fmtMoney } from './format';
 const c = (v: number) => Math.round(v * 100);
 const e = (cents: number) => cents / 100;
 const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
+
+/** Month by month, in whole cents: the totals, the net cash flow and the balances. */
+export interface RolledForward {
+  totalIn: number[];
+  totalOut: number[];
+  net: number[];
+  opening: number[];
+  closing: number[];
+  status: MonthStatus[];
+  /** The month with the lowest closing balance (the first, if several tie). */
+  low: number;
+  /** The first month beyond the overdraft limit, or -1. */
+  beyond: number;
+}
+
+/**
+ * The arithmetic of every forecast: net cash flow = total cash inflows − total
+ * cash outflows, closing balance = opening balance + net cash flow, and each
+ * closing balance is the next month's opening balance. Values are in whole
+ * cents, so the totals add up exactly.
+ */
+export function rollForward(months: number, inflows: number[][], outflows: number[][], openingCents: number, limitCents: number): RolledForward {
+  const totalIn = Array.from({ length: months }, (_, i) => sum(inflows.map((v) => v[i] ?? 0)));
+  const totalOut = Array.from({ length: months }, (_, i) => sum(outflows.map((v) => v[i] ?? 0)));
+  const net = totalIn.map((v, i) => v - (totalOut[i] ?? 0));
+  const opening: number[] = [];
+  const closing: number[] = [];
+  let bal = openingCents;
+  for (let i = 0; i < months; i++) {
+    opening.push(bal);
+    bal += net[i] ?? 0;
+    closing.push(bal);
+  }
+  const status: MonthStatus[] = closing.map((v) => (v >= 0 ? 'credit' : v >= -limitCents ? 'overdraft' : 'beyond'));
+  let low = 0;
+  closing.forEach((v, i) => {
+    if (v < (closing[low] ?? 0)) low = i;
+  });
+  return { totalIn, totalOut, net, opening, closing, status, low, beyond: status.indexOf('beyond') };
+}
+
+export interface ForecastLineInput {
+  id: string;
+  label: string;
+  /** One value a month, in currency units, each zero or more. */
+  values: number[];
+}
+
+/**
+ * A forecast from lines a person has typed: the opening balance, the agreed
+ * overdraft limit and any number of inflow and outflow lines.
+ */
+export function customForecast(input: { months: string[]; opening: number; overdraftLimit: number; inflows: ForecastLineInput[]; outflows: ForecastLineInput[] }): CashForecast {
+  const n = input.months.length;
+  const toLine = (l: ForecastLineInput): Line => {
+    const values = Array.from({ length: n }, (_, i) => c(l.values[i] ?? 0));
+    return { id: l.id, label: l.label, values, total: sum(values) };
+  };
+  const inflows = input.inflows.map(toLine);
+  const outflows = input.outflows.map(toLine);
+  const limit = c(Math.max(0, input.overdraftLimit));
+  const r = rollForward(
+    n,
+    inflows.map((l) => l.values),
+    outflows.map((l) => l.values),
+    c(input.opening),
+    limit,
+  );
+  const toE = (l: Line): Line => ({ ...l, values: l.values.map(e), total: e(l.total) });
+  return {
+    months: input.months,
+    opening: r.opening.map(e),
+    inflows: inflows.map(toE),
+    totalIn: r.totalIn.map(e),
+    outflows: outflows.map(toE),
+    totalOut: r.totalOut.map(e),
+    net: r.net.map(e),
+    closing: r.closing.map(e),
+    limit: e(limit),
+    status: r.status,
+    lowest: { value: e(r.closing[r.low] ?? 0), month: r.low },
+    firstBeyond: r.beyond === -1 ? null : r.beyond,
+    netCash: e(sum(r.net)),
+  };
+}
 
 /** The forecast for a scenario, a way of paying for the investment and any measures. */
 export function forecast(s: CashFlowScenario, finance: FinanceOption = { id: 'buy', kind: 'buy' }, measures: Measure[] = []): Forecast {
@@ -132,24 +222,14 @@ export function forecast(s: CashFlowScenario, finance: FinanceOption = { id: 'bu
   if (finance.kind === 'loan') outflows.push({ id: 'repayments', label: 'Loan repayments', values: repayMonths.map((r) => (r ? c(finance.repayment) : 0)), total: 0 });
 
   [...inflows, ...outflows].forEach((l) => (l.total = sum(l.values)));
-  const totalIn = s.months.map((_, i) => sum(inflows.map((l) => l.values[i] ?? 0)));
-  const totalOut = s.months.map((_, i) => sum(outflows.map((l) => l.values[i] ?? 0)));
-  const net = s.months.map((_, i) => (totalIn[i] ?? 0) - (totalOut[i] ?? 0));
-  const opening: number[] = [];
-  const closing: number[] = [];
-  let bal = c(s.opening);
-  for (let i = 0; i < n; i++) {
-    opening.push(bal);
-    bal += net[i] ?? 0;
-    closing.push(bal);
-  }
   const limit = c(overdraft ? overdraft.limit : s.overdraftLimit);
-  const status: MonthStatus[] = closing.map((v) => (v >= 0 ? 'credit' : v >= -limit ? 'overdraft' : 'beyond'));
-  let low = 0;
-  closing.forEach((v, i) => {
-    if (v < (closing[low] ?? 0)) low = i;
-  });
-  const beyond = status.indexOf('beyond');
+  const { totalIn, totalOut, net, opening, closing, status, low, beyond } = rollForward(
+    n,
+    inflows.map((l) => l.values),
+    outflows.map((l) => l.values),
+    c(s.opening),
+    limit,
+  );
 
   // Profit for the same months, on an accruals basis.
   const owned = buyMonth === null ? 0 : Math.max(0, n - buyMonth);
@@ -216,7 +296,7 @@ export const STATUS_WORDS: Record<MonthStatus, string> = {
 };
 
 /** A plain reading of the forecast. */
-export function readForecast(f: Forecast, currency: string): { headline: string; detail: string } {
+export function readForecast(f: CashForecast, currency: string): { headline: string; detail: string } {
   const money = (v: number) => fmtMoney(v, currency, 2);
   const low = f.lowest;
   const lowMonth = f.months[low.month] ?? '';
