@@ -1,0 +1,770 @@
+---
+/**
+ * The Business Intelligence Briefing: real business developments from 2025
+ * and 2026, curated by hand and read through the ideas of the course. The
+ * front page carries a lead story, every item in date order with filters by
+ * unit, key concept and kind of development, how the briefing is made, and
+ * the documents behind it. Without JavaScript every item is listed; the
+ * filters only hide what the reader asks them to.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import { briefing, briefingHref } from '../../lib/briefing-content';
+import { CATEGORY_LABELS, SOURCE_KIND_LABELS, dateParts, facetsOf, filterSummary, formatDate, itemCount, latest } from '../../lib/briefing';
+import { corpus } from '../../lib/content';
+import { CONCEPT_NAMES } from '../../lib/labels';
+import { INTEL_CATEGORIES, type IntelSource } from '../../lib/schemas';
+
+const items = await briefing();
+const c = await corpus();
+const lead = items.find(([, it]) => it.lead);
+const curated = latest(items.map(([, it]) => it.written)) ?? '';
+const newestCheck = latest(items.map(([, it]) => it.checked)) ?? '';
+const units = c.curricula['ib-dp-bm']?.units ?? [];
+
+// The documents behind the edition: one entry per address, with the items that cite it.
+const documents = new Map<string, { s: IntelSource; items: Array<{ id: string; title: string }> }>();
+for (const [id, it] of items) {
+  for (const s of it.sources) {
+    const d = documents.get(s.url) ?? { s, items: [] };
+    if (!d.items.some((x) => x.id === id)) d.items.push({ id, title: it.title });
+    documents.set(s.url, d);
+  }
+}
+const docs = [...documents.values()].sort((a, b) => a.s.publisher.localeCompare(b.s.publisher) || (b.s.published ?? '').localeCompare(a.s.published ?? ''));
+const citations = items.reduce((n, [, it]) => n + it.sources.length, 0);
+const primaryDocs = docs.filter((d) => d.s.primary).length;
+const usedKinds = INTEL_CATEGORIES.filter((k) => items.some(([, it]) => it.categories.includes(k)));
+const usedUnits = units.filter((u) => items.some(([, it]) => facetsOf(it).units.includes(String(u.number))));
+const anyTools = items.some(([, it]) => it.concepts.tools.length > 0);
+const docDate = (s: IntelSource) => (s.published ? formatDate(s.published) : 'Undated page');
+const kindsLine = (cats: string[]) => cats.map((k) => CATEGORY_LABELS[k as keyof typeof CATEGORY_LABELS]).join(' · ');
+const unitsLine = (us: string[]) => us.map((u) => (u === 'toolkit' ? 'Toolkit' : `Unit ${u}`)).join(', ');
+---
+
+<BaseLayout
+  title="Business Intelligence Briefing"
+  description="Real business developments from 2025 and 2026, curated by hand, dated and sourced to the organizations' own documents, and read through the ideas of IB Business Management."
+  section="intelligence"
+>
+  <div class="wrap">
+    <header class="ib-mast">
+      <Breadcrumbs trail={[{ label: 'Business Intelligence Briefing' }]} />
+      <div class="ib-mast__grid">
+        <div>
+          <p class="label label--ink ib-mast__kicker">The Business Brief · A curated briefing</p>
+          <h1 class="ib-mast__title">The Business Intelligence <em>Briefing</em></h1>
+          <p class="lead ib-mast__lead">
+            Real business developments from 2025 and 2026, read through the ideas of the course. Each item sets out what happened, with every fact dated and traced to the document that states it, and then, labelled as analysis, why it matters, the concepts at work, the choices that were open and what students and managers can learn.
+          </p>
+        </div>
+        <nav class="ib-contents" aria-label="In this edition">
+          <p class="label label--ink">In this edition</p>
+          <ol role="list">
+            {
+              items.map(([id, it]) => (
+                <li>
+                  <a href={briefingHref(id)}>{it.title}</a>
+                </li>
+              ))
+            }
+          </ol>
+        </nav>
+      </div>
+      <dl class="ib-stamp">
+        <div>
+          <dt>Curated</dt>
+          <dd><time datetime={curated}>{formatDate(curated)}</time></dd>
+        </div>
+        <div>
+          <dt>Newest check</dt>
+          <dd><time datetime={newestCheck}>{formatDate(newestCheck)}</time></dd>
+        </div>
+        <div>
+          <dt>Items</dt>
+          <dd>{itemCount(items.length)}</dd>
+        </div>
+        <div>
+          <dt>Sources</dt>
+          <dd>{docs.length} documents, {primaryDocs === docs.length ? 'all' : primaryDocs} primary</dd>
+        </div>
+      </dl>
+      <p class="ib-notice">
+        <strong>A curated briefing, not a news feed.</strong> Every item was written and checked on the dates it shows, and nothing here updates by itself. Businesses move on, so an item can become outdated after its check date; read it as an account of what was true then.
+      </p>
+    </header>
+  </div>
+
+  <div class="wrap page-body">
+    {
+      lead && (
+        <section class="ib-lead" aria-labelledby="lead-title">
+          <article class="ib-lead__card">
+            <div class="ib-lead__text">
+              <p class="label ib-lead__kicker">
+                <span class="ib-lead__flag">Lead story</span> · {kindsLine(lead[1].categories)} · <time datetime={lead[1].date}>{formatDate(lead[1].date)}</time>
+              </p>
+              <h2 class="ib-lead__title" id="lead-title">
+                <a href={briefingHref(lead[0])}>{lead[1].title}</a>
+              </h2>
+              <p class="ib-lead__dek">{lead[1].dek}</p>
+              <p class="ib-lead__meta small">
+                {lead[1].organizations.join(', ')} · {unitsLine(facetsOf(lead[1]).units)} · Written {formatDate(lead[1].written)}, checked {formatDate(lead[1].checked)}
+              </p>
+              <p>
+                <a class="btn btn--gold" href={briefingHref(lead[0])}>
+                  Read the briefing<span class="sr-only">: {lead[1].title}</span>
+                </a>
+              </p>
+            </div>
+            {
+              lead[1].figures.length > 0 && (
+                <dl class="ib-figures ib-figures--lead" aria-label="Headline figures, from the sources">
+                  {lead[1].figures.map((g) => (
+                    <div>
+                      <dt>{g.label}</dt>
+                      <dd>{g.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )
+            }
+          </article>
+        </section>
+      )
+    }
+
+    <section aria-labelledby="list-h" data-ix="briefing">
+      <SectionHead no={1} title="Every item, newest first" id="list-h" dek="Each development is dated by its headline fact. Filter the list by unit, by the IB's key concepts or by the kind of development." />
+
+      <div class="ib-filters js-only" role="group" aria-label="Filter the briefing">
+        <div class="ib-filter">
+          <label class="label" for="ib-unit">Unit</label>
+          <select id="ib-unit" data-filter="unit">
+            <option value="">All units</option>
+            {usedUnits.map((u) => <option value={String(u.number)}>Unit {u.number}: {u.title}</option>)}
+            {anyTools && <option value="toolkit">Toolkit</option>}
+          </select>
+        </div>
+        <div class="ib-filter">
+          <label class="label" for="ib-concept">Key concept</label>
+          <select id="ib-concept" data-filter="concept">
+            <option value="">All key concepts</option>
+            {Object.entries(CONCEPT_NAMES).map(([k, name]) => items.some(([, it]) => it.keyConcepts.includes(k as keyof typeof CONCEPT_NAMES)) && <option value={k}>{name}</option>)}
+          </select>
+        </div>
+        <div class="ib-filter">
+          <label class="label" for="ib-kind">Development</label>
+          <select id="ib-kind" data-filter="kind">
+            <option value="">Every kind</option>
+            {usedKinds.map((k) => <option value={k}>{CATEGORY_LABELS[k]}</option>)}
+          </select>
+        </div>
+        <button class="btn btn--small ib-filters__reset" type="button" data-reset hidden>Clear filters</button>
+        <p class="ib-count" aria-live="polite" data-count>{filterSummary(items.length, items.length)}</p>
+      </div>
+      <p class="state state--error" data-error hidden>The filters could not start. Every item is still listed below.</p>
+
+      <ol class="ib-list" role="list">
+        {
+          items.map(([id, it]) => {
+            const f = facetsOf(it);
+            const d = dateParts(it.date);
+            return (
+              <li class="ib-row" data-item data-units={f.units.join(' ')} data-concepts={f.concepts.join(' ')} data-kinds={f.categories.join(' ')}>
+                <p class="ib-row__date">
+                  <time datetime={it.date}>
+                    {d.day ? <span class="ib-row__day">{d.day}</span> : <span class="ib-row__day">{d.month}</span>}
+                    {d.day && <span class="ib-row__month">{d.month}</span>}
+                    <span class="ib-row__year">{d.year}</span>
+                  </time>
+                </p>
+                <div class="ib-row__body">
+                  <p class="label">
+                    {kindsLine(it.categories)}
+                    {it.lead && <span class="ib-row__lead"> · Lead story</span>}
+                  </p>
+                  <h3 class="ib-row__title">
+                    <a href={briefingHref(id)}>{it.title}</a>
+                  </h3>
+                  <p class="ib-row__dek">{it.dek}</p>
+                </div>
+                <dl class="ib-row__side">
+                  <div>
+                    <dt>Organizations</dt>
+                    <dd>{it.organizations.join(', ')}</dd>
+                  </div>
+                  <div>
+                    <dt>Course</dt>
+                    <dd>{unitsLine(f.units)}</dd>
+                  </div>
+                  <div>
+                    <dt>Key concepts</dt>
+                    <dd>{it.keyConcepts.map((k) => CONCEPT_NAMES[k]).join(', ')}</dd>
+                  </div>
+                  <div>
+                    <dt>Checked</dt>
+                    <dd>
+                      <time datetime={it.checked}>{formatDate(it.checked)}</time>, {it.sources.length} {it.sources.length === 1 ? 'source' : 'sources'}
+                    </dd>
+                  </div>
+                </dl>
+              </li>
+            );
+          })
+        }
+      </ol>
+      <div class="state ib-none" data-none hidden>
+        <p>No item matches all of these filters. Try fewer filters, or clear them to see the whole briefing.</p>
+        <button class="btn btn--small" type="button" data-reset>Clear filters</button>
+      </div>
+    </section>
+
+    <section aria-labelledby="method-h">
+      <SectionHead no={2} title="How this briefing is made" id="method-h" dek="The rules every item follows. The build checks them, and fails if any item breaks one." />
+      <div class="ib-rules">
+        <div>
+          <h3>Curated, not live</h3>
+          <p>Items are chosen by hand for what they teach, not for how recent they are. Each shows when it was written and when its sources were last checked. Nothing changes after that unless the item is checked again and its dates move.</p>
+        </div>
+        <div>
+          <h3>Traced to the document</h3>
+          <p>Every fact names the source that states it, and every source was opened and read in full on its access date. A development is included only when its primary sources could be read: fewer items, rather than weaker ones.</p>
+        </div>
+        <div>
+          <h3>Facts apart from analysis</h3>
+          <p>"What happened" holds only sourced facts. Everything after it, from why it matters to the lessons, is the platform's analysis and is labelled as such. Quotations are avoided; facts are given in the platform's own words.</p>
+        </div>
+        <div>
+          <h3>Primary sources first</h3>
+          <p>The sources are the organizations' own releases, reports and annual reports. They are authoritative on what a business did and said, and partial on why. Each item ends with the limits of its evidence.</p>
+        </div>
+        <div>
+          <h3>Dated as precisely as the source</h3>
+          <p>A fact carries the date its source gives. When a source names only a month, so does the item. Facts read from a live page with no date are marked as at the day the page was read.</p>
+        </div>
+        <div>
+          <h3>A question of our own</h3>
+          <p>Each item ends with a discussion question written for the platform. It is not an IB examination question, and it has no official markscheme.</p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="docs-h">
+      <SectionHead no={3} title="The documents behind this edition" id="docs-h" dek={`${docs.length} documents, cited ${citations} times across ${itemCount(items.length)}. Each was read in full on the date shown.`} />
+      <ul class="ib-docs" role="list">
+        {
+          docs.map(({ s, items: used }) => (
+            <li>
+              <p class="label">
+                {s.publisher} · {SOURCE_KIND_LABELS[s.kind]} · {docDate(s)}
+              </p>
+              <p class="ib-docs__title">
+                <a href={s.url} rel="noopener">
+                  {s.title}
+                  <span class="sr-only"> (external site)</span>
+                </a>
+              </p>
+              <p class="small muted">
+                Read {formatDate(s.accessed)}. Cited in: {used.map((u, i) => <>{i > 0 ? '; ' : ''}<a href={briefingHref(u.id)}>{u.title}</a></>)}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .ib-mast {
+    padding-block: var(--sp-5) var(--sp-6);
+  }
+
+  .ib-mast__grid {
+    display: grid;
+    gap: var(--sp-6);
+  }
+
+  @media (min-width: 64rem) {
+    .ib-mast__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(18rem, 22rem);
+      column-gap: var(--sp-8);
+      align-items: start;
+    }
+  }
+
+  .ib-mast__kicker {
+    margin-top: var(--sp-5);
+  }
+
+  .ib-contents {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .ib-contents {
+      display: block;
+      margin-top: var(--sp-5);
+      padding-top: var(--sp-3);
+      border-top: 2px solid var(--rule-ink);
+    }
+  }
+
+  .ib-contents ol {
+    margin: var(--sp-2) 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: contents;
+  }
+
+  .ib-contents li {
+    margin: 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .ib-contents a {
+    display: block;
+    padding: 0.4rem 0;
+    font-family: var(--font-display);
+    font-size: 0.9375rem;
+    line-height: 1.3;
+    color: var(--text-strong);
+    text-decoration: none;
+  }
+
+  .ib-contents a:hover {
+    color: var(--cobalt-text);
+    text-decoration: underline;
+  }
+
+  .ib-mast__title {
+    margin-top: var(--sp-3);
+    max-width: 18ch;
+    font-size: var(--fs-h1);
+    line-height: var(--lh-tight);
+    letter-spacing: -0.015em;
+  }
+
+  .ib-mast__title em {
+    color: var(--brass-text);
+    font-weight: 400;
+  }
+
+  .ib-mast__lead {
+    margin-top: var(--sp-4);
+    max-width: 46rem;
+  }
+
+  .ib-stamp {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    margin: var(--sp-6) 0 0;
+    border-top: 2px solid var(--rule-ink);
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  @media (min-width: 48rem) {
+    .ib-stamp {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .ib-stamp > div {
+    padding: var(--sp-3) var(--sp-4) var(--sp-3) 0;
+  }
+
+  /* Two columns on a phone, four from tablet width: a rule between columns, and between rows on a phone. */
+  .ib-stamp > div:nth-child(even) {
+    padding-left: var(--sp-4);
+    border-left: 1px solid var(--rule-hair);
+  }
+
+  .ib-stamp > div:nth-child(n + 3) {
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  @media (min-width: 48rem) {
+    .ib-stamp > div:nth-child(n + 2) {
+      padding-left: var(--sp-4);
+      border-left: 1px solid var(--rule-hair);
+    }
+
+    .ib-stamp > div:nth-child(n + 3) {
+      border-top: 0;
+    }
+  }
+
+  .ib-stamp dt {
+    font-family: var(--font-ui);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .ib-stamp dd {
+    margin: var(--sp-1) 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(1rem, 0.9rem + 0.4vw, 1.1875rem);
+    color: var(--text-strong);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .ib-notice {
+    margin-top: var(--sp-4);
+    max-width: 46rem;
+    padding-left: var(--sp-4);
+    border-left: 3px solid var(--gold-500);
+    font-size: var(--fs-small);
+    color: var(--text-body);
+  }
+
+  /* The lead story */
+  .ib-lead__card {
+    display: grid;
+    gap: var(--sp-5);
+    padding: clamp(var(--sp-5), 4vw, var(--sp-7));
+    background: var(--surface-ink);
+    color: var(--text-on-ink);
+    border-top: 3px solid var(--gold-400);
+  }
+
+  @media (min-width: 64rem) {
+    .ib-lead__card {
+      grid-template-columns: minmax(0, 1.6fr) minmax(16rem, 1fr);
+      align-items: end;
+      column-gap: var(--sp-7);
+    }
+  }
+
+  .ib-lead__kicker {
+    color: var(--text-on-ink-muted);
+  }
+
+  .ib-lead__flag {
+    color: var(--text-gold-on-ink);
+  }
+
+  .ib-lead__title {
+    margin-top: var(--sp-3);
+    font-size: var(--fs-h2);
+    line-height: var(--lh-snug);
+    color: var(--text-on-ink);
+  }
+
+  .ib-lead__title a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .ib-lead__title a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--gold-400);
+    text-decoration-thickness: 2px;
+  }
+
+  .ib-lead__title a:focus-visible {
+    outline: var(--focus-ring-on-ink);
+  }
+
+  .ib-lead__dek {
+    margin-top: var(--sp-4);
+    max-width: 40rem;
+    font-size: var(--fs-lead);
+    line-height: 1.5;
+    color: var(--text-on-ink);
+  }
+
+  .ib-lead__meta {
+    margin-top: var(--sp-3);
+    color: var(--text-on-ink-muted);
+  }
+
+  .ib-lead__text > p:last-child {
+    margin-top: var(--sp-5);
+  }
+
+  .ib-lead .btn--gold:focus-visible {
+    outline: var(--focus-ring-on-ink);
+  }
+
+  .ib-figures {
+    display: grid;
+    gap: 0;
+    margin: 0;
+  }
+
+  .ib-figures > div {
+    padding: var(--sp-3) 0;
+    border-top: 1px solid var(--rule-on-ink);
+  }
+
+  .ib-figures dt {
+    font-size: var(--fs-small);
+    color: var(--text-on-ink-muted);
+  }
+
+  .ib-figures dd {
+    margin: 0.15rem 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1.4rem + 1.3vw, 2.5rem);
+    line-height: 1.1;
+    color: var(--text-gold-on-ink);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  /* Filters */
+  .ib-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--sp-3) var(--sp-5);
+    margin-top: var(--sp-5);
+    padding: var(--sp-4) 0;
+    border-top: 1px solid var(--rule-hair);
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .ib-filter {
+    display: grid;
+    flex: 1 1 13rem;
+    gap: 0.3rem;
+  }
+
+  @media (min-width: 60rem) {
+    .ib-filter {
+      flex: 0 1 17rem;
+    }
+  }
+
+  .ib-filter select {
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--rule-control);
+    border-radius: var(--radius-2);
+    background: var(--surface-sheet);
+    color: var(--text-strong);
+    font: 500 0.9375rem/1.2 var(--font-ui);
+  }
+
+  .ib-filters__reset {
+    min-height: 2.75rem;
+  }
+
+  .ib-count {
+    margin-left: auto;
+    font-size: var(--fs-small);
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The dated list */
+  .ib-list {
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .ib-row,
+  .ib-docs li {
+    margin: 0;
+  }
+
+  .ib-row {
+    display: grid;
+    grid-template-columns: 4.25rem minmax(0, 1fr);
+    gap: var(--sp-3) var(--sp-4);
+    padding: var(--sp-5) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  @media (min-width: 60rem) {
+    .ib-row {
+      grid-template-columns: 6rem minmax(0, 1fr) minmax(14rem, 17rem);
+      column-gap: var(--sp-6);
+    }
+  }
+
+  .ib-row__date {
+    margin: 0;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .ib-row__date time {
+    display: grid;
+    justify-items: start;
+    line-height: 1.05;
+  }
+
+  .ib-row__day {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--text-strong);
+  }
+
+  .ib-row__month,
+  .ib-row__year {
+    font-family: var(--font-ui);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .ib-row__month {
+    margin-top: 0.3rem;
+  }
+
+  .ib-row__body > * + * {
+    margin-top: var(--sp-2);
+  }
+
+  .ib-row__lead {
+    color: var(--brass-text);
+  }
+
+  .ib-row__title {
+    margin: 0;
+    font-size: var(--fs-h3);
+    line-height: var(--lh-snug);
+  }
+
+  .ib-row__title a {
+    color: var(--text-strong);
+    text-decoration: none;
+  }
+
+  .ib-row__title a:hover {
+    color: var(--cobalt-text);
+    text-decoration: underline;
+  }
+
+  .ib-row__dek {
+    max-width: 44rem;
+    color: var(--text-body);
+  }
+
+  .ib-row__side {
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-2) var(--sp-4);
+    margin: 0;
+    font-size: var(--fs-small);
+  }
+
+  @media (min-width: 60rem) {
+    .ib-row__side {
+      grid-column: 3;
+      grid-template-columns: minmax(0, 1fr);
+      padding-left: var(--sp-4);
+      border-left: 1px solid var(--rule-hair);
+    }
+  }
+
+  .ib-row__side dt {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .ib-row__side dd {
+    margin: 0.1rem 0 0;
+    color: var(--text-body);
+  }
+
+  .ib-row[hidden] {
+    display: none;
+  }
+
+  .ib-none {
+    margin-top: var(--sp-5);
+  }
+
+  .ib-none .btn {
+    margin-top: var(--sp-3);
+  }
+
+  /* How it is made */
+  .ib-rules {
+    display: grid;
+    gap: var(--sp-5) var(--sp-6);
+    margin-top: var(--sp-5);
+  }
+
+  @media (min-width: 48rem) {
+    .ib-rules {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 72rem) {
+    .ib-rules {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .ib-rules > div {
+    padding-top: var(--sp-3);
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .ib-rules h3 {
+    font-size: 1.0625rem;
+  }
+
+  .ib-rules p {
+    margin-top: var(--sp-2);
+    font-size: var(--fs-small);
+  }
+
+  /* Documents */
+  .ib-docs {
+    display: grid;
+    gap: 0 var(--sp-6);
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  @media (min-width: 60rem) {
+    .ib-docs {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .ib-docs li {
+    display: grid;
+    gap: var(--sp-1);
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .ib-docs__title {
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .ib-docs__title a {
+    color: var(--text-strong);
+  }
+
+  .ib-docs__title a:hover {
+    color: var(--cobalt-text);
+  }
+</style>
+
+<script>
+  import '../../scripts/briefing';
+</script>
