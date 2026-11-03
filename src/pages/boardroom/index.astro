@@ -1,0 +1,268 @@
+---
+import '../../styles/boardroom.css';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import { boardroomHref, boardroomScenarios } from '../../lib/boardroom/content';
+import { describeSeries, sparkline } from '../../lib/boardroom/charts';
+import type { KpiId } from '../../lib/boardroom/engine';
+import { fmtKpi, KPI_DEFS } from '../../lib/boardroom/kpis';
+import { narrateContext } from '../../lib/boardroom/narrate';
+import { allPaths, runHistory } from '../../lib/boardroom/scenario';
+import { CHALLENGE_LABELS, ROLE_IDS, ROLE_IN_TEXT, ROLE_TITLES } from '../../lib/boardroom/schema';
+import { corpus } from '../../lib/content';
+import { allSubtopics } from '../../lib/learning';
+import { jsonForScript } from '../../lib/markup';
+
+const c = await corpus();
+const scenarios = await boardroomScenarios();
+const subs = allSubtopics(c);
+const facts = [
+  { value: String(scenarios.length), label: 'companies, each fictional' },
+  { value: String(scenarios.reduce((n, [, s]) => n + s.rounds.length, 0)), label: 'board decisions' },
+  { value: String(scenarios.reduce((n, [, s]) => n + s.rounds.reduce((m, r) => m + r.options.length, 0), 0)), label: 'options on the table' },
+  { value: String(scenarios.reduce((n, [, s]) => n + allPaths(s).length, 0)), label: 'possible paths, every one tested' },
+  { value: String(ROLE_IDS.length), label: 'seats at the table' },
+];
+const CARD_KPIS: KpiId[] = ['revenue', 'pbit', 'netCash', 'utilization'];
+const cards = scenarios.map(([id, sc]) => {
+  const ctx = narrateContext(sc);
+  const { history } = runHistory(sc);
+  const last = history[history.length - 1];
+  const labels = history.map((h) => h.label);
+  return {
+    id,
+    sc,
+    last,
+    tiles: CARD_KPIS.map((k) => {
+      const values = history.map((h) => h.kpis[k]);
+      const fmt = (v: number) => fmtKpi(k, v, ctx);
+      return {
+        k,
+        value: last ? fmt(last.kpis[k]) : '',
+        svg: sparkline(values, { id: `ix-${id}-${k}`, title: `${KPI_DEFS[k].label}, ${labels[0]} to ${labels[labels.length - 1]}`, desc: describeSeries(KPI_DEFS[k].label, labels, values, fmt), width: 96, height: 28 }),
+      };
+    }),
+    codes: sc.syllabus.map((code) => ({ code, title: subs.find((x) => x.s.code === code)?.s.title ?? code })),
+  };
+});
+const progressConfig = { scenarios: scenarios.map(([id, sc]) => ({ id, rounds: sc.rounds.length })), roles: ROLE_IN_TEXT };
+const SEATS = [
+  { role: 'ceo', watches: 'The whole company: profit, cash, market position, ownership and the board’s balance between them.' },
+  { role: 'finance', watches: 'Profit, cash, liquidity, gearing and the return on capital.' },
+  { role: 'marketing', watches: 'Customers, price, the brand and market share.' },
+  { role: 'operations', watches: 'Capacity, utilization, quality, stock and the footprint of each unit.' },
+  { role: 'hr', watches: 'Jobs, pay, morale, labour turnover and how change is handled.' },
+] as const;
+const MECHANISMS = [
+  ['Price', 'Demand in each open channel', 'Now', 'Price against competitors, through the price elasticity of demand. Contracts fix their own volume.'],
+  ['Marketing spend', 'Brand strength', 'Half now, half next period', 'Spending above the level that holds the brand steady builds it, with diminishing returns as it rises.'],
+  ['Brand strength', 'Demand', 'Now', 'A stronger brand raises demand in the open channels.'],
+  ['Emissions per unit', 'Demand from green-minded customers', 'Now', 'Where a scenario has a sustainability measure, cutting emissions raises demand a little.'],
+  ['Demand against capacity', 'Volume and lost sales', 'Now', 'Productive capacity is the lower of the plant’s and the workforce’s. Contracts are served first; the rest of demand is lost.'],
+  ['Output above normal hours', 'Overtime pay and morale', 'Now', 'Units beyond normal hours are made in overtime at a premium, and overtime strains morale.'],
+  ['Utilization and morale', 'Defect rate', 'Now', 'Rushing above a threshold and low morale both raise defects, which waste inputs and cost brand points.'],
+  ['Pay, redundancies, announcements', 'Morale', 'Now', 'Morale also recovers a share of the way towards its norm each period.'],
+  ['Morale', 'Labour turnover and productivity', 'Now', 'Low morale means more leavers and slower work; leavers are replaced unless hiring is frozen.'],
+  ['Hiring and leavers', 'Capacity and costs', 'Now', 'New starters produce part of a full worker’s output in their first period, and each costs recruitment.'],
+  ['Morale (services)', 'Brand strength', 'Now', 'In a hotel, staff are part of the product, so morale moves reviews.'],
+  ['Investment', 'Capacity, costs, emissions', 'After its lag', 'Paid for now, depreciated straight line from when it comes into use.'],
+  ['Training', 'Productivity', 'Next period', 'Its cost falls now; its effect arrives later.'],
+  ['Sales, stock and purchases', 'Debtors, stock and creditors', 'Now', 'Working capital follows its days, so profit and cash part company.'],
+  ['Loans and overdraft', 'Interest', 'Next period', 'Interest is charged on the balance at the start of each period; an overdraft above its limit pays a penalty rate.'],
+] as const;
+---
+
+<BaseLayout title="Boardroom" description="Multi-round business simulations: take a seat on the board of a fictional company, make a decision each round and follow it through marketing, operations, people and finance." section="boardroom" room="boardroom">
+  <header class="bb-hero">
+    <div class="wrap">
+      <Breadcrumbs trail={[{ label: 'All rooms', href: '/rooms/' }, { label: 'Boardroom' }]} />
+      <div class="bb-hero__grid bb-hero__grid--room">
+      <div class="bb-hero__main bb-hero__main--room">
+        <p class="bb-hero__kicker">The Boardroom · Multi-round simulations</p>
+        <h1 class="bb-hero__title">Run the company, one <em>decision</em> at a time</h1>
+        <p class="bb-hero__dek">
+          Take a seat on the board of a fictional company: chief executive, finance, marketing, operations or HR. Each round the board makes one decision, and you watch it travel through the business, from
+          customers to the workshop floor to the bank balance. Then something happens that nobody chose, and the board decides again.
+        </p>
+      </div>
+      <nav class="bb-agenda" aria-labelledby="bb-agenda-h">
+        <h2 class="bb-agenda__title" id="bb-agenda-h">On the board's agenda</h2>
+        <ol class="bb-agenda__list">
+          {
+            cards.map((card) => (
+              <li>
+                <a href={boardroomHref(card.id)}>
+                  <span class="bb-agenda__name">{card.sc.company.name}</span>
+                  <span class="bb-agenda__what">
+                    {CHALLENGE_LABELS[card.sc.challenge]} · {card.sc.company.industry.toLowerCase()}
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+      </div>
+      <ul class="bb-roomkpis" role="list" aria-label="The Boardroom in figures">
+        {
+          facts.map((f) => (
+            <li>
+              <span class="bb-roomkpis__value">{f.value}</span>
+              <span class="bb-roomkpis__label">{f.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </header>
+
+  <div class="wrap page-body bb-page" data-bb-index>
+    <script type="application/json" data-bb-progress set:html={jsonForScript(progressConfig)} />
+    <section class="bb-section" aria-labelledby="companies-h">
+      <SectionHead no={1} title="The companies" id="companies-h" dek="Three businesses in three industries, each facing a different strategic problem. Every company and person is fictional, and every figure is simulated." />
+      <ol class="bb-papers" role="list">
+        {
+          cards.map((card) => (
+            <li class="bb-paper">
+              <div class="bb-paper__body">
+                <p class="bb-paper__kicker">
+                  {CHALLENGE_LABELS[card.sc.challenge]} · {card.sc.company.industry}
+                </p>
+                <h3 class="bb-paper__title">
+                  <a href={boardroomHref(card.id)}>{card.sc.company.name}</a>
+                </h3>
+                <p class="bb-paper__dek">{card.sc.dek}</p>
+                <p class="bb-paper__question">{card.sc.question}</p>
+                <p class="bb-paper__meta">
+                  {card.sc.company.location} · {card.sc.rounds.length} rounds, one per {card.sc.model.period.unit}
+                </p>
+                <p class="bb-paper__meta">
+                  <span class="bb-chip bb-chip--ink">Fictional company</span>
+                  <ProvenanceTag kind="simulated-data" />
+                </p>
+                <p class="bb-paper__progress js-only" data-progress={card.id} hidden />
+              </div>
+              <div class="bb-paper__figures">
+                <p class="bb-paper__flabel">At the end of {card.last?.label}</p>
+                <ul class="bb-minikpis" role="list">
+                  {card.tiles.map((t) => (
+                    <li>
+                      <span class="bb-minikpis__label">{KPI_DEFS[t.k].short}</span>
+                      <span class="bb-minikpis__value">{t.value}</span>
+                      <Fragment set:html={t.svg} />
+                    </li>
+                  ))}
+                </ul>
+                <p class="bb-paper__codes">
+                  <span class="bb-paper__codes-label">IB subtopics</span>
+                  {card.codes.map((x) => (
+                    <span class="bb-code" title={x.title}>
+                      {x.code}
+                    </span>
+                  ))}
+                </p>
+                <a class="btn btn--primary bb-paper__cta" href={boardroomHref(card.id)}>
+                  Enter the boardroom<span class="sr-only">: {card.sc.company.name}</span>
+                </a>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="bb-section" aria-labelledby="how-h">
+      <SectionHead no={2} title="How a round works" id="how-h" dek="The same rhythm in every company, from the first board pack to the last memo." />
+      <ol class="bb-steps" role="list">
+        <li><span class="bb-steps__no num">1</span><strong>Read the brief and the board pack.</strong> The statements, ratios and trends are calculated by the model from the company’s own history.</li>
+        <li><span class="bb-steps__no num">2</span><strong>Take a seat.</strong> Your seat sets the measures you watch and the goals you are judged on.</li>
+        <li><span class="bb-steps__no num">3</span><strong>Hear the board and decide.</strong> Each director argues from their desk; three options, each with what it involves in figures.</li>
+        <li><span class="bb-steps__no num">4</span><strong>Watch it travel.</strong> The dashboard moves, and each function shows what changed and why.</li>
+        <li><span class="bb-steps__no num">5</span><strong>Meet the event.</strong> Something happens between rounds, and what happens can depend on the state you left the business in.</li>
+        <li><span class="bb-steps__no num">6</span><strong>Write the memo, read the debrief.</strong> A structured recommendation in your own words, then the theory, the other paths and every possible board compared.</li>
+      </ol>
+    </section>
+
+    <section class="bb-section" aria-labelledby="seats-h">
+      <SectionHead no={3} title="The five seats" id="seats-h" dek="The decisions are the whole board’s. Your seat decides what you watch and what you answer for." />
+      <ul class="bb-seatlist" role="list">
+        {
+          SEATS.map((s) => (
+            <li>
+              <span class="bb-seatlist__role">{ROLE_TITLES[s.role]}</span>
+              <span class="bb-seatlist__watch">{s.watches}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="bb-section" id="model" aria-labelledby="model-h">
+      <SectionHead no={4} title="The model behind the figures" id="model-h" dek="One model runs every company. It is deterministic: the same decisions always produce the same figures, so every path can be replayed and tested." />
+      <div class="bb-model-intro prose">
+        <p>
+          Each period the model works through the business in a fixed order: the effects of decisions and events arrive; morale, turnover and productivity are set; the brand and demand follow; capacity and
+          volume are worked out; then costs, profit, working capital and cash. The table lists every link from one part of the business to another, and when it takes effect.
+        </p>
+      </div>
+      <div class="table-scroll" role="region" aria-label="How one part of the business moves another" tabindex="0">
+        <table class="table bb-mech">
+          <thead>
+            <tr>
+              <th scope="col">What changes</th>
+              <th scope="col">What it moves</th>
+              <th scope="col">When</th>
+              <th scope="col">How</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              MECHANISMS.map(([a, b, when, how]) => (
+                <tr>
+                  <th scope="row">{a}</th>
+                  <td>{b}</td>
+                  <td class="bb-mech__when">{when}</td>
+                  <td>{how}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="bb-model-notes">
+        <section>
+          <h3 class="label label--ink">What the tests check</h3>
+          <ul class="prose small">
+            <li>Profit before interest and tax equals revenue less variable, fixed and one-off costs, in every period of every path.</li>
+            <li>Closing cash equals opening cash plus the operating, investing and financing flows, and the operating flow reconciles to profit.</li>
+            <li>Net assets equal equity in every statement of financial position.</li>
+            <li>Every event can happen on at least one path, every option makes a difference, and every claim the debriefs make about their named paths is true of the engine’s figures.</li>
+          </ul>
+        </section>
+        <section>
+          <h3 class="label label--ink">What the model leaves out</h3>
+          <ul class="prose small">
+            <li>Chance: nothing is random, so a path always gives the same result. Real businesses face uncertainty that a single run cannot show.</li>
+            <li>Detail: one price per channel, one wage, one workforce. Tax is a flat simulated rate; interest and tax are paid in the period.</li>
+            <li>Judgement: the coefficients (how strongly price moves demand, or overtime moves morale) are teaching assumptions, stated in each scenario’s file.</li>
+          </ul>
+        </section>
+      </div>
+    </section>
+
+    <aside class="callout callout--framework">
+      <span class="callout__kicker">The shorter format</span>
+      <div class="prose">
+        <p>
+          The <a href="/decision-room/">Decision Rooms</a> are two-round decisions in one function, with a debrief. The Boardroom runs three or four rounds across every function, with events between them.
+        </p>
+      </div>
+    </aside>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../scripts/boardroom-index';
+</script>

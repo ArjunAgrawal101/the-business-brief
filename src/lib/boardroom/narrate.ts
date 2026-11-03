@@ -331,7 +331,7 @@ export function explain(now: PeriodResult, prev: PeriodResult | undefined, ctx: 
   if (ctx.hasSustainability) {
     const change = p ? kpiChange('emissionsPerUnit', p.emissionsPerUnit, n.emissionsPerUnit, ctx) : undefined;
     out.sustainability.push(
-      `Emissions ${fmtNumber(n.emissions, 0)} tonnes of CO₂e: ${fmtNumber(n.emissionsPerUnit, 1)} kg for each ${ctx.unit}${change && change.direction !== 'same' ? ` (${change.text})` : ''}.`,
+      `Emissions ${fmtNumber(n.emissions, 0)} tonnes of CO₂e: ${fmtKpi('emissionsPerUnit', n.emissionsPerUnit, ctx)} for each ${ctx.unit}${change && change.direction !== 'same' ? ` (${change.text})` : ''}.`,
     );
   }
   return out;

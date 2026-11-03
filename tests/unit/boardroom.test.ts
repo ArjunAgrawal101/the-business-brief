@@ -210,7 +210,8 @@ describe('the Boardroom scenarios', () => {
       commandTerms: new Set(Object.keys(c.commandTerms)),
     });
     expect(problems.map((p) => `${p.where}: ${p.message}`)).toEqual([]);
-  });
+    // Loading the whole corpus and running every path takes a few seconds.
+  }, 30_000);
 
   for (const [id, sc] of Object.entries(scenarios)) {
     describe(id, () => {

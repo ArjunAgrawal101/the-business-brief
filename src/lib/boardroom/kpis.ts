@@ -141,7 +141,8 @@ export function fmtKpi(id: KpiId, v: number, ctx: FormatContext): string {
     case 'days':
       return `${fmtNumber(v, 0)} days`;
     case 'perUnit':
-      return `${fmtNumber(v, 1)} kg`;
+      // Grams matter for a loaf; a tenth of a kilogram is enough for a room night.
+      return `${fmtNumber(v, Math.abs(v) < 1 ? 2 : 1)} kg`;
     case 'tonnes':
       return `${fmtNumber(v, 0)} t`;
     case 'perWorker':
@@ -187,7 +188,7 @@ export function kpiChange(id: KpiId, before: number, after: number, ctx: FormatC
   const def = KPI_DEFS[id];
   // The smallest change worth reporting is half of the last digit shown.
   const scale: Record<KpiKind, number> = { money: 1, price: 100, units: 1, percent: 10, points: 10, ratio: 100, index: 1, people: 1, days: 1, perUnit: 10, tonnes: 1, perWorker: 1 };
-  const step = 1 / scale[def.kind];
+  const step = def.kind === 'perUnit' && Math.abs(before) < 1 ? 0.01 : 1 / scale[def.kind];
   const d = after - before;
   if (!Number.isFinite(d) || Math.abs(d) < step / 2 || (def.kind === 'money' && Math.abs(d) < 500)) {
     return { text: 'No change', direction: 'same', verdict: 'same', words: 'No change' };
@@ -215,7 +216,7 @@ export function kpiChange(id: KpiId, before: number, after: number, ctx: FormatC
       text = `${sign}${fmtNumber(abs, 0)} days`;
       break;
     case 'perUnit':
-      text = `${sign}${fmtNumber(abs, 1)} kg`;
+      text = `${sign}${fmtNumber(abs, Math.abs(before) < 1 ? 2 : 1)} kg`;
       break;
     case 'tonnes':
       text = `${sign}${fmtNumber(abs, 0)} t`;
