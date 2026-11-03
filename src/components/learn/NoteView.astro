@@ -395,6 +395,12 @@ const hl = (level: string) => mixed && level === 'HL';
     color: var(--text-on-ink);
   }
 
+  /* Bold text and links default to navy and cobalt, which vanish on the ink panel. */
+  .nv-situation :global(strong),
+  .nv-situation :global(a) {
+    color: var(--text-on-ink);
+  }
+
   .nv-situation .muted {
     color: var(--text-on-ink-muted);
   }
