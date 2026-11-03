@@ -16,7 +16,7 @@ import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
 import { corpus } from '../../lib/content';
 import { rich, plain, inline } from '../../lib/markup';
 import { subtopicHref } from '../../lib/learning';
-import { MARKET_STAGES, MARKET_TOOLS, neighbours, toolHref, type MarketTool } from '../../lib/market-tools';
+import { MARKET_STAGES, MARKET_TOOLS, isMarketInstrument, neighbours, toolHref, type MarketTool } from '../../lib/market-tools';
 import type { Interactive as InteractiveData } from '../../lib/schemas';
 import '../../styles/market.css';
 
@@ -30,7 +30,7 @@ interface Props {
 const { tool } = Astro.props;
 const c = await corpus();
 const raw = c.interactives[tool.ix] as InteractiveData | undefined;
-if (!raw || !('guide' in raw)) throw new Error(`Market Studio: ${tool.ix} is not an instrument`);
+if (!isMarketInstrument(raw)) throw new Error(`Market Studio: ${tool.ix} is not an instrument`);
 const it = raw;
 const index = MARKET_TOOLS.findIndex((t) => t.slug === tool.slug) + 1;
 const stage = MARKET_STAGES.find((s) => s.id === tool.stage);

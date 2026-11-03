@@ -1,0 +1,299 @@
+---
+/**
+ * People and Culture: the room for unit 2, human resource management. Its
+ * working tools are listed from the person to the organization; the Halden
+ * Distribution case sits at its centre; the earlier interactions, the
+ * subtopics of unit 2 and what is planned follow. Tools, figures and the
+ * state of each subtopic are read from the content, so the page follows them.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import RoomIntro from '../../components/tools/RoomIntro.astro';
+import RoomToolIndex from '../../components/tools/RoomToolIndex.astro';
+import SubtopicLedger from '../../components/tools/SubtopicLedger.astro';
+import { corpus, href, modulesInOrder } from '../../lib/content';
+import { fmtNumber } from '../../lib/format';
+import { roomTools } from '../../lib/room-tools';
+import '../../styles/room-tools.css';
+
+const c = await corpus();
+const room = (await modulesInOrder()).find((m) => m.id === 'people-and-culture');
+const tools = roomTools(c, 'people');
+const halden = c.cases['halden-distribution'];
+/** A figure from one of the case's exhibits, so the page and the case file never disagree. */
+const cell = (exhibit: string, label: string, col: number): number | null => {
+  const ex = halden?.exhibits.find((e) => e.id === exhibit);
+  const rows = ex && 'rows' in ex ? (ex.rows as Array<Array<string | number>>) : [];
+  const row = rows.find((r) => r[0] === label);
+  const v = row?.[col];
+  return typeof v === 'number' ? v : null;
+};
+const firstLast = (exhibit: string, col: number): [number | null, number | null, string] => {
+  const ex = halden?.exhibits.find((e) => e.id === exhibit);
+  const rows = ex && 'rows' in ex ? (ex.rows as Array<Array<string | number>>) : [];
+  const a = rows[0]?.[col];
+  const b = rows[rows.length - 1]?.[col];
+  return [typeof a === 'number' ? a : null, typeof b === 'number' ? b : null, String(rows[0]?.[0] ?? '')];
+};
+const staff = cell('ex-2', 'Employees now', 3);
+const nightLT = cell('ex-2', 'Labour turnover (%)', 2);
+const dayLT = cell('ex-2', 'Labour turnover (%)', 1);
+const [dispatchFrom, dispatchTo, dispatchSince] = firstLast('ex-1', 1);
+/** The interactions that came before the tools, on the leadership brief, the toolkit and the Case Room. */
+const PRACTISE: Array<{ id: string; kind: string; text: string }> = [
+  { id: 'lead-style-matcher', kind: 'Interaction', text: 'Choose the leadership style each of eight situations calls for.' },
+  { id: 'lead-functions-sorter', kind: 'Interaction', text: "Sort a manager's week into planning, organizing, commanding, coordinating and controlling." },
+  { id: 'lead-forcefield-halden', kind: 'Interaction, HL', text: "Weigh the forces for and against Halden's change, and choose the one worth weakening." },
+  { id: 'halden-diagnosis', kind: 'Case lab', text: 'Five stages from the symptoms at Halden to a judgement on the results.' },
+];
+const practise = PRACTISE.map((p) => ({ ...p, it: c.interactives[p.id] })).filter((p) => p.it?.page);
+const calc = c.calculations['labour-turnover'];
+---
+
+<BaseLayout
+  title="People and Culture"
+  description={`Working tools for IB Business Management unit 2, human resource management: ${tools.map(([, t]) => t.title.toLowerCase()).join(', ')}, built around fictional organizations and the Halden Distribution case.`}
+  section="tools"
+  room="people"
+>
+  <RoomIntro id="people-and-culture" />
+
+  <div class="wrap page-body">
+    <section aria-labelledby="pc-tools">
+      <SectionHead no={1} title="From the person to the organization" dek="The questions a manager asks about people, from what makes one job worth doing to how a whole workforce takes a change. Each has a working tool, a fictional worked example and its syllabus status." id="pc-tools" />
+      <RoomToolIndex
+        room="people"
+        layout="scale"
+        groups={[
+          { label: 'The person', slugs: ['motivation-analysis'] },
+          { label: 'The team', slugs: ['leadership-scenarios'] },
+          { label: 'The organization', slugs: ['organization-chart'] },
+          { label: 'The workforce', slugs: ['workforce-planning'] },
+          { label: 'The change', slugs: ['change-planner'] },
+        ]}
+      />
+    </section>
+  </div>
+
+  {
+    halden && (
+      <section class="band band--ink pc-case" aria-labelledby="pc-case">
+        <div class="wrap">
+          <SectionHead no={2} title="The case at the centre: Halden Distribution" dek={halden.dek} id="pc-case" />
+          <dl class="pc-case__figs">
+            {staff !== null && (
+              <div>
+                <dt>Employees</dt>
+                <dd>
+                  <span class="pc-case__v">{fmtNumber(staff)}</span> on a day shift and a night shift
+                </dd>
+              </div>
+            )}
+            {nightLT !== null && dayLT !== null && (
+              <div>
+                <dt>Labour turnover in the year</dt>
+                <dd>
+                  <span class="pc-case__v">{fmtNumber(nightLT, 1)}%</span> on the night shift, against {fmtNumber(dayLT, 1)}% on days
+                </dd>
+              </div>
+            )}
+            {dispatchFrom !== null && dispatchTo !== null && (
+              <div>
+                <dt>On-time dispatch</dt>
+                <dd>
+                  <span class="pc-case__v">{fmtNumber(dispatchTo, 1)}%</span> down from {fmtNumber(dispatchFrom, 1)}% in {dispatchSince}
+                </dd>
+              </div>
+            )}
+          </dl>
+          <p class="pc-case__brief">{halden.brief}</p>
+          <ul class="pc-case__links" role="list">
+            <li>
+              <a href={href.case('halden-distribution')}>Read the case file</a> <span>narrative, exhibits, stakeholders and options</span>
+            </li>
+            {c.decisions['halden-leadership'] && (
+              <li>
+                <a href={href.decision('halden-leadership')}>Decide in the Decision Room</a> <span>{c.decisions['halden-leadership']?.title}</span>
+              </li>
+            )}
+            {c.interactives['halden-diagnosis']?.page && (
+              <li>
+                <a href={`${c.interactives['halden-diagnosis']?.page}`}>Diagnose it in the Case Room</a> <span>problem, cause, strategy, implementation, evaluation</span>
+              </li>
+            )}
+          </ul>
+          <p class="pc-case__note">A fictional organization. Every figure is simulated, and the case file says how they were made.</p>
+        </div>
+      </section>
+    )
+  }
+
+  <div class="wrap page-body room-after-band">
+    <section aria-labelledby="pc-practise">
+      <SectionHead no={3} title="Practise the ideas" dek="The interactions that came first, on the leadership brief, the toolkit and the Case Room." id="pc-practise" />
+      <ul class="pc-list" role="list">
+        {
+          practise.map((p) => (
+            <li>
+              <span class="pc-list__kind">{p.kind}</span>
+              <a href={`${p.it?.page}${p.it?.component === 'case-lab' ? '' : `#ix-${p.id}`}`}>{p.it?.title}</a>
+              <span class="pc-list__text">{p.text}</span>
+            </li>
+          ))
+        }
+        {
+          calc && (
+            <li>
+              <span class="pc-list__kind">Calculation, HL</span>
+              <a href={href.calculation('labour-turnover', calc.page)}>{calc.name}</a>
+              <span class="pc-list__text">Leavers as a share of average employees, worked for both of Halden's shifts.</span>
+            </li>
+          )
+        }
+      </ul>
+    </section>
+
+    <section aria-labelledby="pc-syllabus">
+      <SectionHead no={4} title="Unit 2, subtopic by subtopic" dek="Human resource management in the guide's order: what the platform has for each subtopic, and the tools that serve it." id="pc-syllabus" />
+      <SubtopicLedger unit={2} room="people" />
+    </section>
+
+    {
+      room && room.data.planned.length > 0 && (
+        <section aria-labelledby="pc-planned">
+          <SectionHead no={5} title="Planned for this room" dek="Not built yet, so not linked." id="pc-planned" />
+          <ul class="pc-planned">
+            {room.data.planned.map((p) => (
+              <li>{p}</li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .pc-case__figs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    gap: var(--sp-4) var(--sp-6);
+    margin: var(--sp-6) 0 0;
+  }
+
+  .pc-case__figs div {
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--rule-on-ink);
+  }
+
+  .pc-case__figs dt {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-gold-on-ink);
+  }
+
+  .pc-case__figs dd {
+    margin: var(--sp-2) 0 0;
+    color: var(--text-on-ink);
+  }
+
+  .pc-case__v {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 1.6rem + 1.6vw, 3rem);
+    line-height: 1.05;
+    color: var(--text-on-ink);
+  }
+
+  .pc-case__brief {
+    max-width: var(--text-max);
+    margin: var(--sp-6) 0 0;
+    font-size: var(--fs-lead);
+    color: var(--text-on-ink);
+  }
+
+  .pc-case__links {
+    display: grid;
+    gap: 0;
+    max-width: 46rem;
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-on-ink);
+  }
+
+  .pc-case__links li {
+    display: grid;
+    gap: 0.1rem;
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-on-ink);
+  }
+
+  .pc-case__links a {
+    display: inline-block;
+    min-height: 24px;
+    font-weight: 700;
+  }
+
+  .pc-case__links span {
+    font-size: 0.875rem;
+    color: var(--text-on-ink-muted);
+  }
+
+  .pc-case__note {
+    margin: var(--sp-4) 0 0;
+    font-size: 0.8125rem;
+    color: var(--text-on-ink-muted);
+  }
+
+  .pc-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+    gap: 0 var(--sp-6);
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .pc-list li {
+    display: grid;
+    gap: var(--sp-1);
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .pc-list__kind {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--room-accent-text);
+  }
+
+  .pc-list a {
+    display: inline-block;
+    min-height: 24px;
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .pc-list__text {
+    font-size: 0.9375rem;
+    color: var(--text-body);
+  }
+
+  .pc-planned {
+    display: grid;
+    gap: var(--sp-2);
+    max-width: var(--text-max);
+    margin: var(--sp-4) 0 0;
+    color: var(--text-muted);
+  }
+</style>

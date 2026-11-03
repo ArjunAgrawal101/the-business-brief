@@ -15,7 +15,7 @@ import { validatePlc } from './market-plc';
 import { campaignChecks, funnel } from './market-campaign';
 import { validateBudget } from './market-budget';
 
-type MarketIx = Extract<Interactive, { guide: unknown }>;
+type MarketIx = Extract<Interactive, { guide: { exampleTitle: string } }>;
 const isTool = (it: Interactive): it is MarketIx => 'guide' in it;
 const dupes = (ids: string[]) => ids.filter((x, i) => ids.indexOf(x) !== i);
 

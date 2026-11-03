@@ -57,3 +57,14 @@ export function neighbours(slug: string): { prev?: MarketTool; next?: MarketTool
   const i = MARKET_TOOLS.findIndex((t) => t.slug === slug);
   return { prev: i > 0 ? MARKET_TOOLS[i - 1] : undefined, next: i >= 0 && i < MARKET_TOOLS.length - 1 ? MARKET_TOOLS[i + 1] : undefined };
 }
+
+/**
+ * Is this interaction one of the Market Studio's instruments? Their guide
+ * carries an exampleTitle; other rooms' tools have guides of another shape,
+ * so a plain "guide" in it check is not enough.
+ */
+export function isMarketInstrument<T extends object>(it: T | undefined): it is Extract<T, { guide: { exampleTitle: string } }> {
+  if (!it || !('guide' in it)) return false;
+  const guide = (it as { guide?: unknown }).guide;
+  return typeof guide === 'object' && guide !== null && 'exampleTitle' in guide;
+}

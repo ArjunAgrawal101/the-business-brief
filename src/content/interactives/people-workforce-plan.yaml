@@ -1,0 +1,84 @@
+# The workforce planning tool. Wenlow Care is fictional. Its last year is the
+# one in the notes on motivation and demotivation (2.4): 180 staff on 1 January,
+# 220 on 31 December, 46 leavers, labour turnover (46 ÷ 200) × 100 = 23%, and a
+# similar group's 15%. The six retirements, the plan and the factors are added
+# here. tests/unit/workforce.test.ts works the plan by hand: 213 hires over
+# three years, 168 of them replacing leavers and retirements.
+component: workforce-planner
+title: Workforce planning tool
+purpose: >
+  The learner projects a workforce over a planning horizon: staff now, the staff needed each year, people leaving and
+  retiring, and the recruitment that closes the gap, with labour turnover at HL and the options that suit the result.
+  It diagnoses the belief that a growing business recruits mainly for growth: when turnover is high, most hires only
+  replace people who leave.
+provenance: simulated-data
+syllabus: ['2.1', '2.4']
+page: /people-and-culture/workforce-planning/
+guide:
+  room: people
+  slug: workforce-planning
+  order: 4
+  kind: Planner
+  question: Will we have the people we need?
+  summary: Project staff over a planning horizon from demand, leavers and retirements, find the gap and the recruitment needed, calculate labour turnover (HL), and see which options fit.
+  lead: >
+    A workforce plan compares the people a business will have with the people it will need. Enter the staff you have,
+    the staff each year will need and how many are likely to leave or retire, and the tool works out the gap year by
+    year, the recruitment that closes it, and how much of that recruitment only replaces people who left. At HL it
+    starts from last year's labour turnover.
+  status: SL/HL
+  statusNote: >
+    Subtopic 2.1, Introduction to human resource management (guide, p. 25), for SL and HL: the role of human resource
+    management, and the internal and external factors that influence human resource planning, such as demographic
+    change, labour mobility, immigration, flexi-time and the gig economy (AO2). Labour turnover is HL only, in subtopic
+    2.4 (AO2 and AO4, guide, p. 26); the guide's list of formulas does not give it, so the platform's standard form is
+    used. Internal and external recruitment are HL only too (AO3).
+  ao: [AO2, AO4]
+  howTo:
+    - At HL, enter last year's staffing to find the labour turnover and the leaving rate without retirements, then use that rate in the plan. At SL, enter a leaving rate yourself.
+    - Enter the staff you have now and, for each year of the plan, the staff you will need and the retirements you expect. Add or remove years, up to six.
+    - If the labour market is tight, set the most you can recruit in a year and see which posts stay unfilled.
+    - Read the gap year by year, the share of recruitment that only replaces leavers, and the options that fit. Your plan is kept on this device; download it as JSON or CSV, or print it.
+  limitations:
+    - Demand for staff is your forecast. If sales, funding or technology change, the plan changes with them.
+    - The leaving rate is applied to the staff at the start of each year and rounded to whole people. In practice leavers bunch in some months and some posts.
+    - The plan counts heads. It does not show which skills, shifts or sites the gaps are in, which matters more than the total.
+    - "The options are judged by the platform's rules from the numbers. A real recommendation weighs the costs, the labour market, the culture and what staff want."
+    - Labour turnover counts every leaver alike, whether they retired, were dismissed or were the best performer.
+  inAnswer: >
+    Use the numbers to make a case: how big the gap is, how much of it comes from people leaving rather than from growth,
+    and what that implies. Then evaluate two or three options against each other for this organization, rather than
+    listing every strategy: strategies for managing change are AO3 in subtopic 2.1.
+  storageKey: people:workforce-plan
+  example:
+    name: Wenlow Care, a fictional group of care homes
+    note: >
+      Wenlow Care's last year is the one in the notes on
+      [motivation and demotivation](/topics/motivation-and-demotivation/): 180 staff on 1 January, 220 on 31 December
+      and 46 leavers, labour turnover of 23%. Here six of the leavers retired, a new home opens in 2028, and an ageing
+      workforce means more retirements each year. Every figure is simulated.
+  related:
+    subtopics: ['2.2']
+    cases: [halden-distribution]
+    tools: [descriptive-statistics]
+organization: Wenlow Care
+lastYear: { start: 180, end: 220, leavers: 46, retired: 6 }
+benchmark: { rate: 15, label: "A similar care group's labour turnover" }
+plan:
+  staffNow: 220
+  rate: 20
+  years:
+    - { label: '2027', demand: 240, retirements: 7 }
+    - { label: '2028', demand: 260, retirements: 8 }
+    - { label: '2029', demand: 265, retirements: 9 }
+factors:
+  - name: Demographic change
+    effect: An ageing workforce raises retirements each year, from 7 to 9 here, while an ageing population raises the demand for care.
+  - name: Labour mobility
+    effect: Care workers can move easily to hospitals, shops and warehouses that pay similar wages, which keeps the leaving rate high.
+  - name: Immigration
+    effect: Rules on recruiting from abroad widen or narrow the pool of applicants, and so the most the group can recruit in a year.
+  - name: Flexi-time
+    effect: Flexible hours help carers with families and older staff to stay, and widen the pool of people who can apply.
+  - name: The gig economy
+    effect: Agency and app-based shift work offers another way to cover gaps, and a rival for staff who might otherwise take a permanent contract.

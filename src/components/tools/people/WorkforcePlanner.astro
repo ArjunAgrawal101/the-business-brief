@@ -1,0 +1,372 @@
+---
+/**
+ * The workforce planning tool (2.1, with labour turnover from 2.4 at HL). The
+ * worked example is projected on the server by src/lib/workforce.ts;
+ * src/scripts/workforce-planner.ts reruns it as the reader changes the plan.
+ */
+import { planWorkforce, readWorkforce, retentionSaving, turnoverFrom, workforceOptions, MAX_YEARS } from '../../../lib/workforce';
+import { workforceFiguresHtml, workforceOptionsHtml, workforceRowsHtml, workforceSvg, yearRowsHtml } from '../../../lib/workforce-view';
+import { buildWorking } from '../../../lib/finance';
+import { workingHtml } from '../../../lib/render';
+import { esc, jsonForScript } from '../../../lib/markup';
+import { fmtNumber } from '../../../lib/format';
+import type { RoomTool } from '../../../lib/room-tools';
+
+interface Props {
+  id: string;
+  data: Extract<RoomTool, { component: 'workforce-planner' }>;
+}
+const { id, data } = Astro.props;
+const uid = `wf-${id}`;
+const org = data.organization;
+const plan = { staffNow: data.plan.staffNow, rate: data.plan.rate, recruitLimit: data.plan.recruitLimit ?? null, years: data.plan.years };
+const p = planWorkforce(plan);
+const reading = readWorkforce(p, org);
+const t = turnoverFrom(data.lastYear);
+const bench = data.benchmark ?? null;
+const options = workforceOptions(p, bench?.rate ?? null);
+const saving = bench ? retentionSaving(plan, bench.rate) : null;
+const ltWorking = buildWorking('labour-turnover', { leavers: data.lastYear.leavers, averageEmployees: t.average }, '');
+const pct = (v: number | null) => (v === null ? 'n/a' : `${fmtNumber(v, 1)}%`);
+const ltRead = `${fmtNumber(data.lastYear.leavers)} of an average ${fmtNumber(t.average, Number.isInteger(t.average) ? 0 : 1)} employees left: labour turnover of ${pct(t.turnover)}. Without the ${fmtNumber(data.lastYear.retired)} who retired, the leaving rate is ${pct(t.leavingRate)}.`;
+const ltImpl = bench ? `${bench.label} is ${fmtNumber(bench.rate, 1)}%. ${t.turnover !== null && t.turnover > bench.rate ? 'The gap is worth finding the cause of before planning to recruit around it.' : 'The rate is in line with the comparison.'}` : 'Compare the rate with the business’s own past and with similar organizations before judging it.';
+const savingText = saving && bench ? `At a leaving rate of ${fmtNumber(bench.rate, 1)}%, recruitment over the plan would be ${fmtNumber(saving.recruit)}, ${fmtNumber(saving.saved)} fewer hires.` : '';
+const config = { uid, key: data.guide.storageKey, org, lastYear: data.lastYear, plan: { ...plan }, benchmark: bench, maxYears: MAX_YEARS };
+---
+
+<script type="application/json" data-config set:html={jsonForScript(config)} />
+
+<form class="wf" data-form novalidate aria-label="The workforce plan">
+  <section class="tool-panel" data-level="HL" aria-labelledby={`${uid}-lt-h`}>
+    <h3 id={`${uid}-lt-h`}>Last year: labour turnover <span class="tag tag--hl">HL</span></h3>
+    <p class="tool-panel__dek">Labour turnover is HL-only content in subtopic 2.4. It gives the leaving rate the plan below projects forward.</p>
+    <div class="wf__grid">
+      <fieldset class="wf__set">
+        <legend class="label label--ink">Staff last year</legend>
+        <div class="wf__fields">
+          {
+            (
+              [
+                ['start', 'Employees at the start of the year'],
+                ['end', 'Employees at the end of the year'],
+                ['leavers', 'Employees who left during the year'],
+                ['retired', 'Of whom retired'],
+              ] as const
+            ).map(([k, label]) => (
+              <div class="field">
+                <label for={`${uid}-lt-${k}`}>{label}</label>
+                <input class="input input--num" id={`${uid}-lt-${k}`} name={`lt-${k}`} type="number" inputmode="numeric" min="0" step="1" value={String(data.lastYear[k])} aria-describedby={`${uid}-lt-${k}-err`} />
+                <span class="field__error" id={`${uid}-lt-${k}-err`} data-err={`lt-${k}`} />
+              </div>
+            ))
+          }
+        </div>
+      </fieldset>
+      <div class="wf__lt" data-lt-results>
+        <dl class="figs">
+          <div class="fig"><dt>Average employees</dt><dd><span class="fig__v" data-lt-avg>{fmtNumber(t.average, Number.isInteger(t.average) ? 0 : 1)}</span><span class="fig__n">(start + end) ÷ 2</span></dd></div>
+          <div class="fig"><dt>Labour turnover</dt><dd><span class="fig__v" data-lt-rate>{pct(t.turnover)}</span><span class="fig__n">all leavers</span></dd></div>
+          <div class="fig"><dt>Leaving rate without retirements</dt><dd><span class="fig__v" data-lt-leave>{pct(t.leavingRate)}</span><span class="fig__n">used in the plan</span></dd></div>
+        </dl>
+        <p class="js-only"><button type="button" class="btn btn--small" data-use-rate>Use this leaving rate in the plan</button></p>
+      </div>
+    </div>
+    <details class="disclosure">
+      <summary>The working: labour turnover</summary>
+      <div class="disclosure__body" data-lt-working set:html={workingHtml(ltWorking, esc(ltRead), esc(ltImpl))} />
+    </details>
+  </section>
+  <p class="hl-notice"><span class="tag tag--hl">HL</span> Labour turnover is HL-only material, hidden while you are viewing SL content. The plan below takes a leaving rate you can enter yourself.</p>
+
+  <section class="tool-panel" aria-labelledby={`${uid}-plan-h`}>
+    <h3 id={`${uid}-plan-h`}>The plan</h3>
+    <div class="wf__fields wf__fields--plan">
+      <div class="field">
+        <label for={`${uid}-staffNow`}>Staff now</label>
+        <input class="input input--num" id={`${uid}-staffNow`} name="staffNow" type="number" inputmode="numeric" min="0" step="1" value={String(plan.staffNow)} aria-describedby={`${uid}-staffNow-err`} />
+        <span class="field__error" id={`${uid}-staffNow-err`} data-err="staffNow" />
+      </div>
+      <div class="field">
+        <label for={`${uid}-rate`}>Leaving rate a year, without retirements</label>
+        <div class="affix">
+          <input class="input input--num" id={`${uid}-rate`} name="rate" type="number" inputmode="decimal" min="0" max="100" step="0.1" value={String(plan.rate)} aria-describedby={`${uid}-rate-hint ${uid}-rate-err`} />
+          <span class="affix__post" aria-hidden="true">%</span>
+        </div>
+        <span class="field__hint" id={`${uid}-rate-hint`}>Applied to the staff at the start of each year.</span>
+        <span class="field__error" id={`${uid}-rate-err`} data-err="rate" />
+      </div>
+      <div class="field">
+        <label for={`${uid}-limit`}>Most you can recruit in a year</label>
+        <input class="input input--num" id={`${uid}-limit`} name="recruitLimit" type="number" inputmode="numeric" min="0" step="1" value={plan.recruitLimit === null ? '' : String(plan.recruitLimit)} placeholder="No limit" aria-describedby={`${uid}-limit-hint ${uid}-recruitLimit-err`} />
+        <span class="field__hint" id={`${uid}-limit-hint`}>Leave empty for no limit.</span>
+        <span class="field__error" id={`${uid}-recruitLimit-err`} data-err="recruitLimit" />
+      </div>
+    </div>
+    <div class="table-scroll" role="region" aria-label="The years of the plan" tabindex="0">
+      <table class="table tool-table wf__years">
+        <thead>
+          <tr>
+            <th scope="col">Year</th>
+            <th scope="col">Staff needed</th>
+            <th scope="col">Retirements</th>
+            <th scope="col"><span class="sr-only">Problems</span></th>
+          </tr>
+        </thead>
+        <tbody data-years set:html={yearRowsHtml(plan.years, uid)}></tbody>
+      </table>
+    </div>
+    <p class="cluster js-only">
+      <button type="button" class="btn btn--small" data-add-year>Add a year</button>
+      <button type="button" class="btn btn--small" data-remove-year>Remove the last year</button>
+    </p>
+    <span class="field__error" data-err="years" />
+  </section>
+  <p class="nojs-only tool-note">This is the worked example. With JavaScript on, you can change every figure and the plan follows.</p>
+</form>
+
+<div class="tool-problems" data-problems hidden></div>
+
+<section class="tool-panel" aria-labelledby={`${uid}-res-h`} data-results>
+  <h3 id={`${uid}-res-h`}>The gap, year by year</h3>
+  <dl class="figs" data-figures set:html={workforceFiguresHtml(p)} />
+  <div class="wf__pair">
+    <figure class="wf__figure">
+      <div class="chart-scroll" role="region" aria-label="Staff year by year" tabindex="0" data-chart set:html={workforceSvg(p, { id: `${uid}-chart`, org })} />
+      <figcaption class="exhibit__source"><b>Chart</b> Above the line, the staff who stay (dark) and those recruited (blue) in each year, against the staff needed (gold mark). Below it, the people who leave or retire. Simulated teaching data.</figcaption>
+    </figure>
+    <div class="tool-reading">
+      <p><strong>Reading.</strong> <span data-interp>{reading.reading}</span></p>
+      <p class="muted"><strong>Implication.</strong> <span data-impl>{reading.implication}</span></p>
+      {savingText && <p data-saving>{savingText}</p>}
+    </div>
+  </div>
+  <div class="table-scroll" role="region" aria-label="The plan year by year" tabindex="0">
+    <table class="table tool-table wf__table">
+      <thead>
+        <tr>
+          <th scope="col">Year</th>
+          <th scope="col" class="n">Staff at the start</th>
+          <th scope="col" class="n">Expected leavers</th>
+          <th scope="col" class="n">Retirements</th>
+          <th scope="col" class="n">Staff available</th>
+          <th scope="col" class="n">Staff needed</th>
+          <th scope="col" class="n">Recruitment</th>
+          <th scope="col" class="n">Staff at the end</th>
+        </tr>
+      </thead>
+      <tbody data-rows set:html={workforceRowsHtml(p)}></tbody>
+    </table>
+  </div>
+  <p class="tool-note">Expected leavers are the leaving rate applied to the staff at the start of the year, rounded to whole people. Retirements are entered separately, so they are not counted twice.</p>
+</section>
+
+<section class="tool-panel" aria-labelledby={`${uid}-opt-h`} data-results>
+  <h3 id={`${uid}-opt-h`}>The options</h3>
+  <p class="tool-panel__dek">Ways to close the gap, judged from the numbers above by the platform's rules. A recommendation still needs the case: costs, culture and what staff want.</p>
+  <ol class="wf__opts" role="list" data-options set:html={workforceOptionsHtml(options)} />
+</section>
+
+<section class="tool-panel" aria-labelledby={`${uid}-fx-h`}>
+  <h3 id={`${uid}-fx-h`}>Factors to weigh</h3>
+  <p class="tool-panel__dek">The guide names internal and external factors that influence human resource planning (2.1). In this example:</p>
+  <dl class="wf__factors">
+    {
+      data.factors.map((f) => (
+        <div>
+          <dt>{f.name}</dt>
+          <dd>{f.effect}</dd>
+        </div>
+      ))
+    }
+  </dl>
+</section>
+
+<script>
+  import '../../../scripts/workforce-planner';
+</script>
+
+<style>
+  .wf {
+    display: grid;
+    gap: var(--sp-6);
+  }
+
+  .wf__grid {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  @media (min-width: 60rem) {
+    .wf__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  .wf__set {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .wf__set > legend {
+    padding: 0;
+    margin-bottom: var(--sp-3);
+  }
+
+  .wf__fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: var(--sp-3) var(--sp-4);
+    align-items: start;
+  }
+
+  .wf__fields--plan {
+    max-width: 52rem;
+  }
+
+  .wf__lt p {
+    margin: var(--sp-3) 0 0;
+  }
+
+  .wf__years {
+    max-width: 40rem;
+  }
+
+  .wf__years :global(.input) {
+    min-height: 2.5rem;
+    padding-block: 0.35rem;
+  }
+
+  .wf__years :global(.wf-year__label) {
+    min-width: 7rem;
+    font-weight: 650;
+  }
+
+  .wf__pair {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  @media (min-width: 64rem) {
+    .wf__pair {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      align-items: start;
+    }
+  }
+
+  .wf__figure {
+    margin: 0;
+  }
+
+  .wf__table :global(.wf-flag) {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .wf__table :global(.wf-flag--short) {
+    color: var(--signal-text);
+  }
+
+  .wf__table :global(.wf-flag--over) {
+    color: var(--brass-text);
+  }
+
+  .wf__opts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: 0 var(--sp-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .wf__opts :global(.wf-opt) {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-1);
+    margin: 0;
+    padding: var(--sp-3) 0 var(--sp-3) var(--sp-3);
+    border-bottom: 1px solid var(--rule-hair);
+    border-left: 3px solid var(--rule);
+  }
+
+  .wf__opts :global(.wf-opt--strong) {
+    border-left-color: var(--bb-green);
+  }
+
+  .wf__opts :global(.wf-opt--consider) {
+    border-left-color: var(--bb-brass);
+  }
+
+  .wf__opts :global(.wf-opt p) {
+    margin: 0;
+  }
+
+  .wf__opts :global(.wf-opt__head) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.3rem 0.6rem;
+  }
+
+  .wf__opts :global(.wf-opt__name) {
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  .wf__opts :global(.wf-opt__fit) {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .wf__opts :global(.wf-opt--strong .wf-opt__fit) {
+    color: var(--green-text);
+  }
+
+  .wf__opts :global(.wf-opt--consider .wf-opt__fit) {
+    color: var(--brass-text);
+  }
+
+  .wf__opts :global(.wf-opt__why) {
+    font-size: 0.9375rem;
+  }
+
+  .wf__opts :global(.wf-opt__but) {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .wf__factors {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: var(--sp-3) var(--sp-5);
+    margin: 0;
+  }
+
+  .wf__factors div {
+    padding-top: var(--sp-2);
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .wf__factors dt {
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  .wf__factors dd {
+    margin: var(--sp-1) 0 0;
+    font-size: 0.9375rem;
+  }
+
+  :global(.chart text.wf-ch__in) {
+    stroke: none;
+    font-weight: 700;
+  }
+</style>

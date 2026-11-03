@@ -254,6 +254,7 @@ export interface Addition {
  * new notes are added to this list automatically from their `updated` dates.
  */
 export const ADDITIONS: Addition[] = [
+  { date: '2026-11-03', kind: 'Rooms', title: 'People and Culture, and the Operations Floor', text: 'Ten working tools: motivation, leadership, organization charts, workforce and change planning; production methods, location, capacity, stock and order quantities.', href: '/people-and-culture/' },
   { date: '2026-11-03', kind: 'Assessment', title: 'The question bank, calculation practice and IA tools', text: 'Every original question with filters and timed sets, Paper 2 practice with fresh figures and feedback, and tools for the research project.', href: '/assessment/question-bank/' },
   { date: '2026-11-03', kind: 'Platform', title: 'Your dashboard, saved items and a smarter search', text: 'What you have read, practised and saved, kept on this device only; search across every kind of content with filters.', href: '/dashboard/' },
   { date: '2026-11-03', kind: 'Pathways', title: 'Seven distinct learning pathways', text: 'Separate routes, depths and assessment styles for IB, secondary, university, MBA, teachers, founders and independent learners, with nine enrichment maps.', href: '/pathways/' },

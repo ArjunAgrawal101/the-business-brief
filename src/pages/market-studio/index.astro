@@ -36,7 +36,7 @@ const get = <K extends Interactive['component']>(id: string, k: K) => {
   if (!it || it.component !== k) throw new Error(`Market Studio: ${id} is not a ${k}`);
   return it as Extract<Interactive, { component: K }>;
 };
-const tools = MARKET_TOOLS.map((t) => ({ t, it: c.interactives[t.ix] as Extract<Interactive, { guide: unknown }> }));
+const tools = MARKET_TOOLS.map((t) => ({ t, it: c.interactives[t.ix] as Extract<Interactive, { guide: { exampleTitle: string } }> }));
 
 // The front panels, from the worked examples.
 const map = get('market-map-corner-brew', 'competitor-map').state;

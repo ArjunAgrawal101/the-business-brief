@@ -15,6 +15,7 @@ import { checkStudioInteractives } from './integrity-studio';
 import { checkMarketTools } from './integrity-market';
 import { checkLearning } from './integrity-learning';
 import { checkCases } from './integrity-cases';
+import { checkRoomTools } from './integrity-room-tools';
 import { applyAdjustments, balances, derive, type Statement } from './ratios';
 import { checkEnrichmentMaps } from './integrity-pathways';
 
@@ -301,6 +302,7 @@ export function checkIntegrity(c: Corpus): Problem[] {
   problems.push(...checkMarketTools(c));
   problems.push(...checkLearning(c));
   problems.push(...checkCases(c));
+  problems.push(...checkRoomTools(c));
 
   /* Interactions name real subtopics */
   const codes = new Set(Object.values(c.curricula).flatMap((cu) => cu.units.flatMap((u) => u.subtopics.map((st) => st.code))));

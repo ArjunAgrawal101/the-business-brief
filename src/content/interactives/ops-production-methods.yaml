@@ -1,0 +1,240 @@
+# The production methods exercise. Six products from fictional businesses, each
+# with a likely consequence for the four operations methods the guide names in
+# 5.2. The consequences are written for teaching; the integrity check makes sure
+# every method fits at least one product strongly.
+component: scenario-chooser
+title: Production methods exercise
+purpose: >
+  The learner chooses job, batch, or mass or flow production, or mass customization, for six products, sees the
+  consequences for cost, flexibility and the customer, and reads why each method fits or does not. It diagnoses the
+  belief that mass production is always the most efficient choice: efficiency depends on volume and variety.
+provenance: subject-knowledge
+syllabus: ['5.2']
+page: /operations-floor/production-methods/
+guide:
+  room: operations
+  slug: production-methods
+  order: 1
+  kind: Exercise
+  question: How should we produce it?
+  summary: Choose job, batch, or mass or flow production, or mass customization, for six products, see what each choice means for cost, flexibility and the customer, and read why it fits or not.
+  lead: >
+    The right method of production depends on the product: how many are needed, how much they differ and how far the
+    customer wants a say. Choose a method for six products, from wedding cakes to bottled water, and see what each choice
+    would mean for cost, flexibility and the customer.
+  status: SL/HL
+  statusNote: >
+    Subtopic 5.2, Operations methods (guide, p. 33), for SL and HL: job production, batch production, mass or flow
+    production and mass customization, at AO3, so answers are expected to judge which method suits a business, not only
+    to describe the methods.
+  ao: [AO3]
+  howTo:
+    - Read each product and the features beside it, such as the volume, the variety, how far the customer is involved and what buyers pay for.
+    - Choose a method. Its likely consequence appears at once, with what the product calls for.
+    - Open the consequences of every method to compare them, and change your mind as often as you like.
+    - Read your pattern at the end. Your choices are kept on this device; download them or print the page.
+  limitations:
+    - Real businesses often combine methods. A car maker may use flow production for the car, batch production for some parts and mass customization for the options.
+    - The consequences are written for teaching and simplify. Costs, technology and labour vary between industries and countries.
+    - Each product is placed in one market. A different market, such as luxury buyers, could change the best method.
+    - The exercise leaves out lean production and quality management (5.3, HL), which change how any method is run.
+  inAnswer: >
+    State the method, then justify it with the case's own facts: the volume, the variety, the customer's involvement and
+    the price. Weigh at least one alternative and say what would make it better, for example growing demand moving a
+    business from batch towards flow production.
+  storageKey: ops:production-methods
+  example:
+    name: Six products from fictional businesses
+    note: >
+      Every business is fictional: a bakery, a water bottler, a uniform maker, a sportswear brand, an engineering firm and
+      a paint maker. The consequences are written for teaching.
+  related:
+    subtopics: ['5.1', '5.3']
+    cases: [atelier-barro]
+variant: production
+question: Which method would you use?
+note: >
+  The guide names four operations methods in subtopic 5.2, at AO3, so the question is always which method suits this
+  product, and at what cost. The answer turns on four things: how many units are needed, how much they differ from one
+  another, how far the customer is involved, and what the market will pay.
+options:
+  - { id: job, label: Job production, gist: "One-off or bespoke products made to each customer's order, usually by skilled staff." }
+  - { id: batch, label: Batch production, gist: 'A group of identical products made together, then the next group of a different design or size.' }
+  - { id: flow, label: Mass or flow production, gist: Large volumes of a standard product moving continuously along a line. }
+  - { id: mass-customization, label: Mass customization, gist: 'Large volumes built from standard parts and processes, with each order customized by its buyer.' }
+scenarios:
+  - id: wedding-cakes
+    title: Wedding cakes
+    setting: Lark Lane Bakery, a fictional bakery in a market town.
+    situation: >
+      Each wedding cake is designed with the couple: the size, the flavours, the decoration and often a design no one has
+      made before. The bakery makes about four a week, and couples pay a premium for a cake that is theirs alone.
+    factors:
+      - { label: Volume, value: four a week }
+      - { label: Variety, value: every cake different }
+      - { label: Customer, value: shapes the design }
+      - { label: Price, value: premium }
+    outcomes:
+      job:
+        fit: strong
+        headline: Made to the couple's wishes
+        consequence: A skilled baker designs and makes each cake from start to finish. Each one costs a lot to make, but couples pay for it, and the bakery's reputation rests on cakes no one else has.
+      batch:
+        fit: weak
+        headline: Cheaper, but not theirs
+        consequence: Baking sponges in batches of the same size and flavour saves time, but couples who wanted something unique are offered a choice of three, and the premium they paid for disappears.
+      flow:
+        fit: weak
+        headline: A line for a product that does not exist
+        consequence: A production line needs thousands of identical units. At four bespoke cakes a week the equipment would stand idle, and every cake would still need decorating by hand.
+      mass-customization:
+        fit: workable
+        headline: Choice, within limits
+        consequence: A website could let couples choose from set tiers, flavours and decorations built on standard sponges. It would suit couples on a budget, but not those who want a design no one has made before.
+    debrief: Low volume, unique products and a customer involved in the design are the marks of job production. It costs more for each unit, so the price must reflect the skill and time it takes.
+  - id: bottled-water
+    title: Bottled water
+    setting: Clearwell Springs, a fictional spring water company.
+    situation: >
+      The company bottles one product, still water in 500 ml bottles, about two million a month for supermarkets. Demand
+      is steady all year, and the supermarkets choose their suppliers mainly on price and reliability.
+    factors:
+      - { label: Volume, value: two million a month }
+      - { label: Variety, value: one product }
+      - { label: Demand, value: steady }
+      - { label: Buyers want, value: low price }
+    outcomes:
+      job:
+        fit: weak
+        headline: Craft where none is wanted
+        consequence: Filling bottles one at a time by hand would make each one costly with nothing to show for it, because every bottle is the same and the buyers want the lowest price.
+      batch:
+        fit: workable
+        headline: Efficient, with pauses
+        consequence: Bottling in large batches works, but every pause between batches leaves the line idle, and with one product and steady demand there is nothing to switch between.
+      flow:
+        fit: strong
+        headline: The lowest cost per bottle
+        consequence: A continuous, automated line fills, caps and labels bottles around the clock. The machinery is expensive, but spread over two million bottles a month it gives the lowest cost per unit and a reliable supply.
+      mass-customization:
+        fit: weak
+        headline: Choice nobody asked for
+        consequence: Letting buyers design their own labels would add cost and complexity to a product bought on price by supermarkets that want identical bottles.
+    debrief: High, steady volume of one standard product is what flow production is for. Its high fixed costs and its inflexibility are worth bearing when the line runs continuously.
+  - id: school-uniforms
+    title: School blazers
+    setting: Kingsmead Garments, a fictional clothing maker.
+    situation: >
+      The firm makes blazers for forty schools, each with its own colour and badge, in twelve sizes. Orders arrive in the
+      spring, and every school wants its blazers delivered before the new school year in September.
+    factors:
+      - { label: Volume, value: thousands a year }
+      - { label: Variety, value: 'forty designs, twelve sizes' }
+      - { label: Demand, value: seasonal }
+      - { label: Deadline, value: September }
+    outcomes:
+      job:
+        fit: weak
+        headline: Too slow, too costly
+        consequence: Making each blazer individually would be far too slow and costly for thousands of garments in a few dozen identical designs.
+      batch:
+        fit: strong
+        headline: One school at a time
+        consequence: The firm makes a batch of each school's blazers, size by size, then resets the machines for the next school. Each batch is efficient, and switching between them gives the schools the variety they need.
+      flow:
+        fit: workable
+        headline: Fast, until the colour changes
+        consequence: A continuous line would be quick for the biggest school, but forty designs mean frequent changeovers, and a line built for one product loses its advantage.
+      mass-customization:
+        fit: workable
+        headline: Possible, but unnecessary
+        consequence: Customizing each blazer to order would suit a pupil who wanted a name stitched inside, but the schools order identical blazers in standard sizes, which batches make more cheaply.
+    debrief: Batch production suits a range of variations, each made in large enough quantities, with changeovers between them. Its costs are the idle time and the stock that build up between batches.
+  - id: running-shoes
+    title: Running shoes, designed by the buyer
+    setting: Stride Lab, a fictional sportswear brand.
+    situation: >
+      Stride Lab sells a popular running shoe. On its website buyers can choose the colour of each part, the width and the
+      lettering on the heel, and they expect the shoe within ten days at a price close to that of an ordinary pair.
+    factors:
+      - { label: Volume, value: hundreds of thousands a year }
+      - { label: Variety, value: chosen by each buyer }
+      - { label: Price, value: mass market }
+      - { label: Delivery, value: ten days }
+    outcomes:
+      job:
+        fit: weak
+        headline: Unique, and unaffordable
+        consequence: Making each pair by hand to order would give buyers their choice, but at a price and a waiting time the mass market would not accept.
+      batch:
+        fit: workable
+        headline: Variety, but not personal
+        consequence: Batches of the most popular colours keep costs down, but buyers get a choice of set designs, not the shoe they designed.
+      flow:
+        fit: weak
+        headline: Every shoe the same
+        consequence: A flow line making one design is the cheapest way to make shoes, but it cannot give each buyer their own colours and lettering.
+      mass-customization:
+        fit: strong
+        headline: Personal, at scale
+        consequence: Standard soles and uppers are made in volume, and each order's colours and lettering are added on flexible machines at the end of the line. Buyers get their own design at close to the price of an ordinary pair.
+    debrief: Mass customization combines the low cost of large volumes with a choice for every buyer, by standardizing the parts and processes and customizing late, usually with flexible technology and online ordering.
+  - id: footbridge
+    title: A footbridge over the river
+    setting: Harlow and Finch Engineering, a fictional engineering firm.
+    situation: >
+      A city council has commissioned a footbridge for one particular crossing. Its span, foundations and design are set by
+      the riverbanks, the soil and the council's wishes. It will take a year to build, and there will never be another
+      exactly like it.
+    factors:
+      - { label: Volume, value: one }
+      - { label: Variety, value: unique }
+      - { label: Customer, value: sets the specification }
+      - { label: Time, value: a year }
+    outcomes:
+      job:
+        fit: strong
+        headline: One project, one team
+        consequence: A project team designs and builds this bridge to the council's specification, with skilled engineers and specialist subcontractors. It is costly, but it is the only way to make a product that exists once.
+      batch:
+        fit: weak
+        headline: Nothing to batch
+        consequence: Batches need several identical units. Standard parts such as bolts and railings may be bought in batches, but the bridge itself is one of a kind.
+      flow:
+        fit: weak
+        headline: A line for one product
+        consequence: A production line is built for continuous, identical output; for a single structure it makes no sense.
+      mass-customization:
+        fit: weak
+        headline: A bridge from a catalogue
+        consequence: A catalogue bridge with options might suit simple crossings elsewhere, but this site's span and soil call for a design of its own.
+    debrief: One-off projects built to a customer's specification are job production, even on a vast scale. Large construction projects are usually run as projects, with their own teams and plans.
+  - id: house-paint
+    title: Paint in forty colours
+    setting: Copperleaf Paints, a fictional paint manufacturer.
+    situation: >
+      The firm makes forty colours of wall paint for DIY shops, each mixed in tanks of 5,000 litres. Demand for the most
+      popular colours is steady, and the rest sell slowly. Each tank must be cleaned before the next colour is mixed.
+    factors:
+      - { label: Volume, value: millions of litres a year }
+      - { label: Variety, value: forty colours }
+      - { label: Changeover, value: tank cleaning }
+      - { label: Demand, value: steady for a few colours }
+    outcomes:
+      job:
+        fit: weak
+        headline: A tin at a time
+        consequence: Mixing each tin by hand to order would be slow and costly for a product sold by the million litres.
+      batch:
+        fit: strong
+        headline: A tank of each colour
+        consequence: The firm mixes a tank of one colour, fills the tins, cleans the tank and moves on to the next. The batches are large enough to be efficient, and the order of colours can follow demand.
+      flow:
+        fit: workable
+        headline: For the best-sellers only
+        consequence: A continuous line might make sense for white, the biggest seller, but switching it between forty colours would waste its advantage.
+      mass-customization:
+        fit: workable
+        headline: Mixed in the shop
+        consequence: Tinting a standard base to the buyer's chosen shade at the counter is a form of mass customization that many shops use, but it suits rare shades better than the forty standard colours made in the factory.
+    debrief: Batch production fits several varieties of one product, each made in large quantities with a changeover between them. The skill lies in choosing batch sizes that balance the cost of changeovers against the cost of holding stock.

@@ -1,0 +1,151 @@
+---
+/**
+ * A unit of the syllabus, subtopic by subtopic, for a room page: the guide's
+ * title and level, what the platform has for it (a brief, full notes or the
+ * subtopic page), the room's tools that serve it and the other interactions
+ * on the platform. Everything is computed from the content, so a subtopic
+ * whose notes arrive later shows them without an edit here.
+ */
+import LevelTag from '../ui/LevelTag.astro';
+import { corpus } from '../../lib/content';
+import { noteFor, subtopicHref } from '../../lib/learning';
+import { isRoomTool, roomTools, toolHref, type RoomId } from '../../lib/room-tools';
+import { esc } from '../../lib/markup';
+
+interface Props {
+  unit: number;
+  room: RoomId;
+  /** Where a subtopic is worked outside this room. */
+  elsewhere?: Record<string, { label: string; href: string }>;
+}
+const { unit, room, elsewhere = {} } = Astro.props;
+const c = await corpus();
+const u = c.curricula['ib-dp-bm']?.units.find((x) => x.number === unit);
+if (!u) throw new Error(`SubtopicLedger: no unit ${unit}`);
+const tools = roomTools(c, room);
+/** Links joined with commas, as one string so no stray spaces creep in. */
+const links = (xs: Array<{ href: string; title: string }>) => xs.map((x) => `<a href="${esc(x.href)}">${esc(x.title)}</a>`).join(', ');
+const rows = u.subtopics.map((s) => {
+  const brief = Boolean(s.topic && c.topics[s.topic]?.code === s.code);
+  const notes = Boolean(noteFor(c, s.code));
+  const here = tools.filter(([, t]) => t.syllabus.includes(s.code));
+  const other = Object.entries(c.interactives).filter(([, it]) => it.page && !isRoomTool(it) && it.syllabus.includes(s.code));
+  return { s, brief, notes, here, other, away: elsewhere[s.code] };
+});
+---
+
+<ol class="ledger" role="list">
+  {
+    rows.map(({ s, brief, notes, here, other, away }) => (
+      <li class="ledger__row">
+        <span class="ledger__code">{s.code}</span>
+        <div class="ledger__main">
+          <p class="ledger__title">
+            <a href={subtopicHref(c, s.code)}>{s.title}</a> <LevelTag level={s.level} />
+          </p>
+          <p class="ledger__status">{brief ? 'Complete brief' : notes ? 'Full notes, mindmap, terms and diagrams' : 'Subtopic page: mindmap, terms and diagrams'}</p>
+        </div>
+        <div class="ledger__tools">
+          {here.length > 0 && (
+            <p>
+              <span class="ledger__label">Tools here</span> <span set:html={links(here.map(([, t]) => ({ href: toolHref(t), title: t.title })))} />
+            </p>
+          )}
+          {other.length > 0 && (
+            <p>
+              <span class="ledger__label">Interactions</span> <span set:html={links(other.map(([oid, it]) => ({ href: `${it.page}${it.component === 'case-lab' ? '' : `#ix-${oid}`}`, title: it.title })))} />
+            </p>
+          )}
+          {away && (
+            <p>
+              <span class="ledger__label">Elsewhere</span> <a href={away.href}>{away.label}</a>
+            </p>
+          )}
+          {!here.length && !other.length && !away && <p class="ledger__none">No tool yet: start with the subtopic page.</p>}
+        </div>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .ledger {
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .ledger__row {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: var(--sp-1) var(--sp-4);
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  @media (min-width: 60rem) {
+    .ledger__row {
+      grid-template-columns: 3.5rem minmax(0, 1fr) minmax(0, 1.1fr);
+      align-items: baseline;
+    }
+  }
+
+  .ledger__code {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-style: italic;
+    color: var(--room-accent-text, var(--text-strong));
+  }
+
+  .ledger__main p,
+  .ledger__tools p {
+    margin: 0;
+  }
+
+  .ledger__tools {
+    grid-column: 2;
+    display: grid;
+    gap: var(--sp-1);
+    font-size: 0.9375rem;
+  }
+
+  @media (min-width: 60rem) {
+    .ledger__tools {
+      grid-column: 3;
+    }
+  }
+
+  .ledger__title {
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .ledger__title a,
+  .ledger__tools :global(a) {
+    display: inline-block;
+    min-height: 24px;
+  }
+
+  .ledger__title a {
+    color: var(--text-strong);
+  }
+
+  .ledger__status {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  .ledger__label {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .ledger__none {
+    color: var(--text-muted);
+  }
+</style>

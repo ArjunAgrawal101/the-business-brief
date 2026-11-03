@@ -1,0 +1,210 @@
+---
+/**
+ * The economic order quantity calculator: enrichment beyond the IB syllabus.
+ * The worked example is calculated on the server by src/lib/eoq.ts;
+ * src/scripts/eoq-calculator.ts recalculates it as the figures change.
+ */
+import { eoqModel, eoqWorking, readEoq } from '../../../lib/eoq';
+import { eoqFiguresHtml, eoqRowsHtml, eoqSvg } from '../../../lib/eoq-view';
+import { workingHtml } from '../../../lib/render';
+import { esc, jsonForScript, rich } from '../../../lib/markup';
+import type { RoomTool } from '../../../lib/room-tools';
+
+interface Props {
+  id: string;
+  data: Extract<RoomTool, { component: 'eoq-calculator' }>;
+}
+const { id, data } = Astro.props;
+const uid = `eq-${id}`;
+const u = data.units;
+const cur = data.currency;
+const discount = data.discount ?? null;
+const m = eoqModel({ ...data.inputs, discount });
+const reading = readEoq(m, u, cur);
+const working = eoqWorking(m, u, cur);
+const config = { uid, key: data.guide.storageKey, units: u, currency: cur, inputs: data.inputs, discount };
+const FIELDS = [
+  { key: 'demand', label: 'Annual demand (D)', suffix: u.many, step: '1' },
+  { key: 'orderCost', label: 'Cost of placing one order (S)', prefix: cur, step: '0.01', hint: 'Administration, delivery and checking, whatever the order size.' },
+  { key: 'holdingCost', label: `Holding one ${u.one} for a year (H)`, prefix: cur, step: '0.01', hint: 'Storage, insurance, losses and the cash tied up.' },
+  { key: 'current', label: 'Your order quantity, to compare', suffix: u.many, step: '1' },
+  { key: 'weeks', label: 'Working weeks a year', suffix: 'weeks', step: '1' },
+  { key: 'buffer', label: 'Buffer stock held all year', suffix: u.many, step: '1', hint: 'Adds the same holding cost at every order size.' },
+  { key: 'price', label: `Price of one ${u.one}`, prefix: cur, step: '0.01' },
+] as const;
+const vals = data.inputs as Record<string, number>;
+---
+
+<script type="application/json" data-config set:html={jsonForScript(config)} />
+
+<form class="eoq" data-form novalidate aria-label="Figures for the economic order quantity">
+  <fieldset class="eoq__set">
+    <legend class="label label--ink">The figures</legend>
+    <div class="eoq__fields">
+      {
+        FIELDS.map((f) => (
+          <div class="field">
+            <label for={`${uid}-${f.key}`}>{f.label}</label>
+            <div class="affix">
+              {'prefix' in f && <span class="affix__pre" aria-hidden="true">{f.prefix}</span>}
+              <input class="input input--num" id={`${uid}-${f.key}`} name={f.key} type="number" inputmode="decimal" min="0" step={f.step} value={String(vals[f.key] ?? 0)} aria-describedby={`${uid}-${f.key}-err${'hint' in f ? ` ${uid}-${f.key}-hint` : ''}`} />
+              {'suffix' in f && <span class="affix__post" aria-hidden="true">{f.suffix}</span>}
+            </div>
+            {'hint' in f && <span class="field__hint" id={`${uid}-${f.key}-hint`}>{f.hint}</span>}
+            <span class="field__error" id={`${uid}-${f.key}-err`} data-err={f.key} />
+          </div>
+        ))
+      }
+    </div>
+  </fieldset>
+  <fieldset class="eoq__set">
+    <legend class="label label--ink">A quantity discount</legend>
+    <label class="eoq__check js-only"><input type="checkbox" name="discountOn" checked={Boolean(discount)} /> The supplier offers a lower price for larger orders</label>
+    <div class="eoq__fields">
+      <div class="field">
+        <label for={`${uid}-minQty`}>For orders of at least</label>
+        <div class="affix">
+          <input class="input input--num" id={`${uid}-minQty`} name="minQty" type="number" inputmode="decimal" min="0" step="1" value={String(discount?.minQty ?? 2000)} aria-describedby={`${uid}-minQty-err`} />
+          <span class="affix__post" aria-hidden="true">{u.many}</span>
+        </div>
+        <span class="field__error" id={`${uid}-minQty-err`} data-err="minQty" />
+      </div>
+      <div class="field">
+        <label for={`${uid}-discountPrice`}>The price falls to</label>
+        <div class="affix">
+          <span class="affix__pre" aria-hidden="true">{cur}</span>
+          <input class="input input--num" id={`${uid}-discountPrice`} name="discountPrice" type="number" inputmode="decimal" min="0" step="0.01" value={String(discount?.price ?? 0)} aria-describedby={`${uid}-discountPrice-err`} />
+        </div>
+        <span class="field__error" id={`${uid}-discountPrice-err`} data-err="discountPrice" />
+      </div>
+    </div>
+  </fieldset>
+  <p class="nojs-only tool-note">This is the worked example. With JavaScript on, you can enter your own figures.</p>
+</form>
+
+<div class="tool-problems" data-problems hidden></div>
+
+<section class="tool-panel" aria-labelledby={`${uid}-res-h`} data-results>
+  <h3 id={`${uid}-res-h`}>The result</h3>
+  <dl class="figs" data-figures set:html={eoqFiguresHtml(m, u, cur)} />
+  <div class="tool-reading">
+    <p><strong>Reading.</strong> <span data-interp>{reading.reading}</span></p>
+    <p class="muted"><strong>Implication.</strong> <span data-impl>{reading.implication}</span></p>
+  </div>
+  <figure class="eoq__figure">
+    <div class="chart-scroll" role="region" aria-label="Yearly cost against order quantity" tabindex="0" data-chart set:html={eoqSvg(m, { id: `${uid}-chart`, units: u, currency: cur })} />
+    <figcaption class="exhibit__source"><b>Chart</b> Ordering cost falls and the cost of holding the stock each order brings rises with the order size; they cross at the EOQ, where the total is lowest. The total also includes holding the buffer, the same at every order size. The green band is every order size within 5% of the lowest cost. Simulated teaching data.</figcaption>
+  </figure>
+  <div class="table-scroll" role="region" aria-label="Yearly costs at different order quantities" tabindex="0">
+    <table class="table tool-table eoq__table">
+      <thead>
+        <tr>
+          <th scope="col" class="n">Order quantity</th>
+          <th scope="col" class="n">Orders a year</th>
+          <th scope="col" class="n">Weeks between orders</th>
+          <th scope="col" class="n">Ordering</th>
+          <th scope="col" class="n">Holding, with the buffer</th>
+          <th scope="col" class="n">Total</th>
+        </tr>
+      </thead>
+      <tbody data-rows set:html={eoqRowsHtml(m, cur)}></tbody>
+    </table>
+  </div>
+  <div class="bew__working">
+    <h4 class="label label--ink">The working</h4>
+    <div data-working set:html={workingHtml(working, esc(reading.reading), esc(reading.implication))} />
+  </div>
+  <aside class="callout callout--enrichment">
+    <span class="callout__kicker">What the formula assumes</span>
+    <div class="prose">
+      <ul>{data.assumptions.map((a) => <li set:html={rich(a).replace(/^<p>|<\/p>$/g, '')} />)}</ul>
+    </div>
+  </aside>
+</section>
+
+<script>
+  import '../../../scripts/eoq-calculator';
+</script>
+
+<style>
+  .eoq {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .eoq__set {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .eoq__set > legend {
+    padding: 0;
+    margin-bottom: var(--sp-3);
+  }
+
+  .eoq__fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+    gap: var(--sp-3) var(--sp-4);
+    align-items: start;
+    max-width: 60rem;
+  }
+
+  .eoq__check {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    min-height: 44px;
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .eoq__check input {
+    width: 1.15rem;
+    height: 1.15rem;
+    accent-color: var(--bb-cobalt);
+  }
+
+  .eoq__figure {
+    margin: 0;
+  }
+
+  .eoq__figure :global(.chart) {
+    margin-inline: auto;
+  }
+
+  .eoq__table {
+    max-width: 48rem;
+  }
+
+  .eoq__table :global(tr.is-eoq th),
+  .eoq__table :global(tr.is-eoq td) {
+    background: var(--surface-gold-wash);
+    font-weight: 650;
+  }
+
+  .eoq__table :global(tr.is-you th),
+  .eoq__table :global(tr.is-you td) {
+    background: var(--surface-cobalt-wash);
+  }
+
+  .eoq__table :global(.eoq-tag) {
+    display: inline-block;
+    margin-left: 0.35rem;
+    padding: 0 0.3rem;
+    border: 1px solid var(--gold-600);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--brass-text);
+  }
+
+  .eoq__table :global(.eoq-tag--you) {
+    border-color: var(--bb-cobalt);
+    color: var(--cobalt-text);
+  }
+</style>

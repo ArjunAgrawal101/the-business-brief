@@ -1,0 +1,201 @@
+---
+/**
+ * The page of one People and Culture or Operations Floor tool: its purpose,
+ * how to use it, its syllabus status, the tool itself on its fictional worked
+ * example, what it leaves out, and where to read and practise next. The tool
+ * component goes in the slot; the frame around it is the element the tool's
+ * script enhances (data-ix), so the toolbar, the status line and the error
+ * message are shared by every tool.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../layout/PageIntro.astro';
+import SectionHead from '../layout/SectionHead.astro';
+import ProvenanceTag from '../ui/ProvenanceTag.astro';
+import LevelSwitch from '../ui/LevelSwitch.astro';
+import ToolBar from './ToolBar.astro';
+import { corpus, href } from '../../lib/content';
+import { noteFor, subtopicHref } from '../../lib/learning';
+import { esc, inline, rich } from '../../lib/markup';
+import { ROOM_INFO, STATUS_LABEL, roomTools, toolAnchor, toolHref, type RoomTool } from '../../lib/room-tools';
+import '../../styles/room-tools.css';
+
+interface Props {
+  id: string;
+  /** The data-ix name the tool's script looks for. */
+  ix: string;
+  json?: boolean;
+  csv?: boolean;
+  open?: boolean;
+  /** What the downloads contain, for the button labels ("the chart"). */
+  what?: string;
+  /** Show the SL and HL switch, for tools with HL-only parts. */
+  levelSwitch?: boolean;
+  reset?: string;
+}
+const { id, ix, json = true, csv = false, open = false, what = '', levelSwitch = false, reset } = Astro.props;
+const c = await corpus();
+const t = c.interactives[id] as RoomTool | undefined;
+if (!t || !('guide' in t)) throw new Error(`ToolPage: ${id} is not a room tool`);
+const g = t.guide;
+const room = ROOM_INFO[g.room];
+const tools = roomTools(c, g.room);
+const index = tools.findIndex(([tid]) => tid === id);
+const prev = index > 0 ? tools[index - 1] : undefined;
+const next = index < tools.length - 1 ? tools[index + 1] : undefined;
+const anchor = toolAnchor(id);
+const subs = (c.curricula['ib-dp-bm']?.units ?? []).flatMap((u) => u.subtopics);
+const codes = [...new Set([...t.syllabus, ...g.related.subtopics])];
+const subtopics = codes.map((code) => {
+  const s = subs.find((x) => x.code === code);
+  return { code, title: s?.title ?? code, level: s?.level ?? 'SL/HL', href: subtopicHref(c, code), notes: Boolean(noteFor(c, code)), brief: Boolean(s?.topic && c.topics[s.topic]?.code === code) };
+});
+const interactions = g.related.interactives.map((x) => ({ id: x, it: c.interactives[x] })).filter((x) => x.it?.page);
+const cases = g.related.cases.map((x) => ({ id: x, cs: c.cases[x] })).filter((x) => x.cs);
+const decisions = g.related.decisions.map((x) => ({ id: x, d: c.decisions[x] })).filter((x) => x.d);
+const toolkit = g.related.tools.map((x) => ({ id: x, tl: c.tools[x] })).filter((x) => x.tl);
+const statusClass = g.status === 'HL' ? 'tag--hl' : g.status === 'enrichment' ? 'tag--enrichment' : 'tag--sl';
+---
+
+<BaseLayout title={`${t.title}: ${room.name}`} description={g.summary} section="tools" room={g.room}>
+  <PageIntro trail={[{ label: 'All rooms', href: '/rooms/' }, { label: room.name, href: room.href }, { label: t.title }]} kicker={`${room.name}: ${g.kind}`} title={t.title} lead={g.lead}>
+    <dl class="tool-facts">
+      <div class="tool-facts__item">
+        <dt>Syllabus</dt>
+        <dd>
+          {t.syllabus.length ? <span set:html={t.syllabus.map((code) => `<a href="${esc(subtopicHref(c, code))}">${esc(`${code} ${subs.find((x) => x.code === code)?.title ?? ''}`)}</a>`).join(', ')} /> : <span>Beyond the syllabus</span>}
+        </dd>
+      </div>
+      <div class="tool-facts__item">
+        <dt>Status</dt>
+        <dd><span class={`tag ${statusClass}`}>{STATUS_LABEL[g.status]}</span>{g.ao.length > 0 && <span class="tool-facts__ao">{g.ao.join(', ')}</span>}</dd>
+      </div>
+      <div class="tool-facts__item">
+        <dt>Worked example</dt>
+        <dd>{g.example.name}</dd>
+      </div>
+    </dl>
+  </PageIntro>
+
+  <div class="wrap page-body">
+    <section aria-labelledby={`${anchor}-how`}>
+      <SectionHead no={1} title="How to use it" id={`${anchor}-how`} />
+      <ol class="tool-steps" role="list">
+        {g.howTo.map((step, k) => (
+          <li class="tool-step">
+            <span class="tool-step__no" aria-hidden="true">{k + 1}</span>
+            <div class="tool-step__text" set:html={rich(step)} />
+          </li>
+        ))}
+      </ol>
+      <p class="tool-status small"><strong>Where it sits in the course.</strong> <span set:html={inline(g.statusNote)} /></p>
+    </section>
+
+    {levelSwitch && <LevelSwitch id={`lvl-${id}`} />}
+
+    <section class="ix tool-frame" id={anchor} aria-labelledby={`${anchor}-title`} data-ix={ix}>
+      <header class="ix__head tool-frame__head">
+        <p class="ix__kicker">{g.kind}</p>
+        <h2 class="ix__title" id={`${anchor}-title`}>{g.example.name}</h2>
+        <div class="tags">
+          <ProvenanceTag kind={t.provenance} />
+          <span class={`tag ${statusClass}`}>{STATUS_LABEL[g.status]}</span>
+        </div>
+        <div class="ix__intro prose small" set:html={rich(g.example.note)} />
+        <ToolBar json={json} csv={csv} open={open} what={what} reset={reset} />
+      </header>
+      <p class="state state--error" data-error hidden>The tool could not start in this browser. Everything below is the worked example as it was prepared, with its results.</p>
+      <div class="ix__body tool-frame__body">
+        <slot />
+      </div>
+      <p class="sr-only" aria-live="polite" data-status></p>
+    </section>
+
+    <section aria-labelledby={`${anchor}-limits`}>
+      <SectionHead no={2} title="What it leaves out" dek="Every model simplifies. Say so in an answer, and say what else you would want to know." id={`${anchor}-limits`} />
+      <ul class="tool-limits">
+        {g.limitations.map((l) => <li set:html={inline(l)} />)}
+      </ul>
+      {
+        g.inAnswer && (
+          <aside class="callout callout--exam">
+            <span class="callout__kicker">In an answer</span>
+            <div class="prose" set:html={rich(g.inAnswer)} />
+          </aside>
+        )
+      }
+    </section>
+
+    <section aria-labelledby={`${anchor}-next`}>
+      <SectionHead no={3} title="Read and practise next" id={`${anchor}-next`} />
+      <div class="tool-related">
+        <div class="tool-related__col">
+          <h3 class="label label--ink">The subtopics</h3>
+          <ul class="tool-related__list" role="list">
+            {subtopics.map((s) => (
+              <li>
+                <a href={s.href}><span class="num">{s.code}</span> {s.title}</a>
+                <span class="tool-related__meta">{s.brief ? 'Complete brief' : s.notes ? 'Full notes' : 'Subtopic page: mindmap, terms and tools'}{s.level === 'HL' ? ', HL only' : ''}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        {
+          (interactions.length > 0 || cases.length > 0 || decisions.length > 0 || toolkit.length > 0) && (
+            <div class="tool-related__col">
+              <h3 class="label label--ink">Practise on a case</h3>
+              <ul class="tool-related__list" role="list">
+                {interactions.map(({ id: iid, it }) => (
+                  <li>
+                    <a href={`${it?.page}#ix-${iid}`}>{it?.title}</a>
+                    <span class="tool-related__meta">Interaction</span>
+                  </li>
+                ))}
+                {cases.map(({ id: cid, cs }) => (
+                  <li>
+                    <a href={href.case(cid)}>{cs?.title}</a>
+                    <span class="tool-related__meta">Case file, fictional</span>
+                  </li>
+                ))}
+                {decisions.map(({ id: did, d }) => (
+                  <li>
+                    <a href={href.decision(did)}>{d?.title}</a>
+                    <span class="tool-related__meta">Decision Room</span>
+                  </li>
+                ))}
+                {toolkit.map(({ id: tid, tl }) => (
+                  <li>
+                    <a href={href.toolEntry(tid, tl)}>{tl?.name}</a>
+                    <span class="tool-related__meta">Toolkit{tl?.level === 'HL' ? ', HL only' : ''}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+        <div class="tool-related__col">
+          <h3 class="label label--ink">More in {room.name}</h3>
+          <ul class="tool-related__list" role="list">
+            {tools
+              .filter(([tid]) => tid !== id)
+              .map(([, o]) => (
+                <li>
+                  <a href={toolHref(o)}>{o.title}</a>
+                  <span class="tool-related__meta">{o.guide.question}</span>
+                </li>
+              ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <nav class="tool-pager" aria-label={`Tools in ${room.name}`}>
+      {prev ? (
+        <a class="tool-pager__link" href={toolHref(prev[1])} rel="prev"><span class="label">Previous tool</span> {prev[1].title}</a>
+      ) : <span />}
+      <a class="tool-pager__link tool-pager__room" href={room.href}><span class="label">The room</span> {room.name}</a>
+      {next ? (
+        <a class="tool-pager__link tool-pager__next" href={toolHref(next[1])} rel="next"><span class="label">Next tool</span> {next[1].title}</a>
+      ) : <span />}
+    </nav>
+  </div>
+</BaseLayout>

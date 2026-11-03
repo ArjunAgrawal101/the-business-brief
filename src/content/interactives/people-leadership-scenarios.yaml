@@ -1,0 +1,255 @@
+# Leadership scenarios. Six original situations in fictional organizations, each
+# with a likely consequence for the four styles a leader can choose in one
+# situation. Situational leadership, the guide's fifth style, is read from the
+# pattern across the six (src/lib/scenarios.ts). The consequences are written
+# for teaching; the integrity check makes sure every style fits at least one
+# situation strongly, so a reader who adapts can match every one.
+component: scenario-chooser
+title: Leadership scenarios
+purpose: >
+  The learner chooses a leadership style for each of six original workplace situations, sees its likely consequences
+  and reads why the context calls for one style over another. Situational leadership, the guide's fifth style, is read
+  from the pattern across the situations. It diagnoses the belief that one style is best everywhere.
+provenance: subject-knowledge
+syllabus: ['2.3']
+page: /people-and-culture/leadership-scenarios/
+guide:
+  room: people
+  slug: leadership-scenarios
+  order: 2
+  kind: Scenarios
+  question: How should I lead here?
+  summary: Choose a leadership style for six original situations, see the likely consequences of each choice, and read how each style fits the context, with the five styles the guide names.
+  lead: >
+    There is no best leadership style, only a style that fits a situation. Work through six situations, from a crisis on
+    a night shift to a team of expert designers. For each, choose how you would lead, see what would probably happen,
+    and read why the context calls for one style rather than another.
+  status: SL/HL
+  statusNote: >
+    Subtopic 2.3, Leadership and management (guide, p. 26), for SL and HL: the leadership styles autocratic,
+    paternalistic, democratic, laissez-faire and situational, at AO3, so answers are expected to judge which style suits
+    a situation, not only to describe the styles. The HL statement on scientific and intuitive thinking is not covered
+    here.
+  ao: [AO3]
+  howTo:
+    - Read each situation and the features beside it, such as the time available, the team's experience and commitment, the stakes and the culture.
+    - Choose the style you would use. Its likely consequence appears at once, with a verdict and what the situation calls for.
+    - Open the consequences of every style to compare them, and change your mind as often as you like.
+    - Read your pattern at the end, how many styles you used and how well they fitted. Your choices are kept on this device; download them or print the page.
+  limitations:
+    - The consequences are plausible outcomes written for teaching, not predictions. Real outcomes depend on the people, the leader's skill and chance.
+    - Real leaders mix styles within one situation, consulting on some points and deciding others; the tool asks for the main style.
+    - The verdicts are the platform's judgement of each context. Another reading of a situation could justify another style, which is exactly what an evaluation should argue.
+    - What feels autocratic or paternalistic varies between countries and organizations. At HL, Hofstede's cultural dimensions help to explain why.
+  inAnswer: >
+    Name the style, then justify it from the case: the urgency, the team's skill and motivation, the stakes and the
+    culture. Then say what would make another style better, for example once a crisis is over or a new team has learned
+    the job. That conditional judgement is what AO3 rewards.
+  storageKey: people:leadership
+  example:
+    name: Six situations in fictional organizations
+    note: >
+      Each situation is original and every organization is fictional: a food wholesaler, a software company, a hotel, a
+      family furniture maker, a library service and a design studio. The consequences are written for teaching, not
+      predicted.
+  related:
+    subtopics: ['2.4', '2.5']
+    interactives: [lead-style-matcher, lead-functions-sorter]
+    cases: [halden-distribution]
+    decisions: [halden-leadership]
+variant: leadership
+question: Which style would you use?
+note: >
+  **Situational leadership**, the fifth style the guide names, is not one of the choices below, because it is not a
+  single way of behaving: it is choosing the style that each situation calls for. The tool reads it from your pattern
+  across the six situations.
+
+
+  The best-known version, Hersey and Blanchard's model, matches the leader's mix of direction and support to how ready
+  the followers are for the task. It is enrichment beyond the guide.
+options:
+  - { id: autocratic, label: Autocratic, gist: 'The leader decides alone and gives instructions, with little or no consultation.' }
+  - { id: paternalistic, label: Paternalistic, gist: 'The leader decides, but with the staff''s welfare in mind, explaining decisions and looking after people.' }
+  - { id: democratic, label: Democratic, gist: 'The leader involves the team and decides with them, by consultation or agreement.' }
+  - { id: laissez-faire, label: Laissez-faire, gist: The leader sets the goal and leaves the team to decide how to reach it. }
+scenarios:
+  - id: flood
+    title: A burst pipe in the chilled store
+    setting: Ardent Foods, a fictional food wholesaler, on its night shift.
+    situation: >
+      At two in the morning a pipe bursts above the chilled store. Water is rising, the cooling has failed, and the stock
+      must be moved to the backup trailer within about forty minutes or it will have to be thrown away. Eight staff are on
+      shift, three of them in their first month. You are the duty manager.
+    factors:
+      - { label: Time, value: minutes }
+      - { label: Team, value: mixed experience }
+      - { label: Stakes, value: food safety and a day's orders }
+      - { label: Mood, value: anxious }
+    outcomes:
+      autocratic:
+        fit: strong
+        headline: Clear orders save the stock
+        consequence: You give each person a job and an order of work, and the stock is in the trailer with minutes to spare. The new starters are relieved to be told exactly what to do. At the next shift briefing you explain your decisions and ask what would make the routine faster.
+      paternalistic:
+        fit: workable
+        headline: Safe, and a little slower
+        consequence: You check that everyone is safe and calm, then decide the plan yourself and explain it kindly. It works, but the time spent reassuring people costs a few cases of stock that a quicker briefing would have saved.
+      democratic:
+        fit: weak
+        headline: Talking while the stock warms
+        consequence: You gather the team to agree a plan. The discussion takes ten minutes, the most confident voice wins anyway, and a third of the stock is lost before the work starts.
+      laissez-faire:
+        fit: weak
+        headline: Everyone busy, nothing coordinated
+        consequence: You tell the team to sort it out between them. Two people move the same pallets while the dairy shelf is forgotten, and the new starters wait to be told what to do.
+    debrief: In a crisis with minutes to act and an inexperienced team, people need clear direction more than a say. Consultation belongs before and after the crisis, in planning for it and in reviewing it.
+  - id: release
+    title: Rebuilding the release process
+    setting: Calloway Software, a fictional company, and its six senior developers.
+    situation: >
+      Updates to the company's main product keep breaking things for customers. The six senior developers who built the
+      release process, with an average of nine years at the company, have three months to redesign it. Each knows parts
+      of the system no one else does, and all of them will have to work with the result.
+    factors:
+      - { label: Time, value: three months }
+      - { label: Team, value: expert and committed }
+      - { label: Stakes, value: customers' trust }
+      - { label: Knowledge, value: with the team }
+    outcomes:
+      autocratic:
+        fit: weak
+        headline: A design nobody owns
+        consequence: You draw up the new process yourself and announce it. It misses two problems the developers could have warned you about, they follow it to the letter while it fails, and one of the best of them starts looking for another job.
+      paternalistic:
+        fit: weak
+        headline: Protected, and patronized
+        consequence: You decide the new process yourself, explain it carefully and promise that nobody will be blamed for past failures. The developers appreciate the reassurance but feel treated as juniors, and their knowledge of the system goes unused.
+      democratic:
+        fit: strong
+        headline: A better design, owned by the team
+        consequence: You set the goal and the deadline, then work through the design with the team and agree it together. It takes longer than deciding alone, but the new process uses what each developer knows, and they defend it because it is theirs.
+      laissez-faire:
+        fit: workable
+        headline: Strong ideas, loose ends
+        consequence: You hand the redesign to the team and step back. They produce clever ideas, but two of them build rival approaches and the deadline slips until you agree priorities with them.
+    debrief: Expert, committed people with time to decide do their best work when they are involved in the decision. The leader's job is to set the goal and the limits and to make sure a decision is reached. Full delegation can work, but it needs agreed priorities.
+  - id: new-starters
+    title: Fifteen new starters before the busy season
+    setting: Harbourside Hotel, a fictional seaside hotel, two weeks before its peak season.
+    situation: >
+      Fifteen seasonal staff start on Monday as room attendants and kitchen porters. None has worked in a hotel before. In
+      a fortnight the hotel will be full every night, and guests' reviews of cleanliness decide much of next year's
+      bookings.
+    factors:
+      - { label: Time, value: two weeks }
+      - { label: Team, value: no experience }
+      - { label: Stakes, value: guests' reviews }
+      - { label: History, value: high turnover in past seasons }
+    outcomes:
+      autocratic:
+        fit: strong
+        headline: Clear standards, learned fast
+        consequence: You set out exactly how each room is to be cleaned, demonstrate it and check every room for the first week. The new staff reach the standard in time. Telling people clearly is not the same as treating them harshly, and a friendly manner keeps them through the season.
+      paternalistic:
+        fit: workable
+        headline: Welcomed, but unsure
+        consequence: You look after the new starters carefully, with a proper welcome and meals on shift, and you decide everything for them. They settle well, but your instructions are gentler than they are clear, and the standard takes longer to reach.
+      democratic:
+        fit: weak
+        headline: Asked what they cannot yet know
+        consequence: You ask the new team how they would like to organize the rooms. With no experience to draw on, they have little to offer, the discussion unsettles them, and the first week's reviews mention dusty rooms.
+      laissez-faire:
+        fit: weak
+        headline: Left to work it out
+        consequence: You show them the stores and leave them to it. Each attendant invents a method, guests notice the difference between rooms, and four of the fifteen leave in the first fortnight.
+    debrief: People new to a task need direction, with clear instructions, demonstration and close checking. As their skill and confidence grow, the leader can step back and consult them, which is the situational approach at work.
+  - id: family-firm
+    title: An apprenticeship scheme at a family firm
+    setting: Pemberton and Daughters, a fictional furniture maker owned by one family for forty years.
+    situation: >
+      The thirty staff, many with twenty years' service, are used to the owner deciding everything and looking after them
+      in hard times. She wants to start an apprenticeship scheme, with experienced staff training two apprentices a year.
+      Nothing is urgent, but the scheme will only work if the craftsmen are willing to teach.
+    factors:
+      - { label: Time, value: no pressure }
+      - { label: Culture, value: loyal and traditional }
+      - { label: Team, value: highly skilled }
+      - { label: Stakes, value: the firm's future skills }
+    outcomes:
+      autocratic:
+        fit: weak
+        headline: Trust spent
+        consequence: You announce the scheme and assign the trainers. The staff comply, but they feel the firm has changed, because the owner who used to talk to them now issues orders. The apprentices are taught the minimum.
+      paternalistic:
+        fit: strong
+        headline: In keeping with the firm
+        consequence: You decide to go ahead, explain why the firm's future depends on it, and promise that trainers will be paid for their time and no one's job is at risk. The staff accept it as the kind of decision the family has always made with their interests at heart.
+      democratic:
+        fit: workable
+        headline: Involved, and a little uneasy
+        consequence: You ask the staff to design the scheme with you. The best ideas come from the craftsmen, but some find being consulted unsettling after forty years of being told, and the decision takes several months.
+      laissez-faire:
+        fit: weak
+        headline: No one owns it
+        consequence: You tell the senior craftsmen to set up a scheme if they think it worthwhile. Busy with orders, they never quite start, and a year later there are no apprentices.
+    debrief: A paternalistic style fits a culture built on loyalty and care, as long as the leader is trusted and the decision is in the staff's interest. Involving the skilled staff in the details can strengthen it over time, but a sudden switch of style can unsettle people who value the old one.
+  - id: kiosks
+    title: Self-service in four libraries
+    setting: Ridgeway Libraries, a fictional public library service with four branches.
+    situation: >
+      The council has decided to install self-service kiosks for borrowing and returns in all four branches within three
+      months, and to open the libraries for longer hours without extra staff. The twenty-two library assistants fear that
+      their jobs will go, and many regular users are elderly. You manage the service and must introduce the change.
+    factors:
+      - { label: Time, value: three months }
+      - { label: Team, value: anxious }
+      - { label: Stakes, value: jobs and users' trust }
+      - { label: Knowledge, value: staff know the users }
+    outcomes:
+      autocratic:
+        fit: weak
+        headline: Installed, and resented
+        consequence: You announce the timetable and the new duties. The kiosks are in on time, but staff talk of job cuts, two experienced assistants resign, and elderly users who were never shown the kiosks complain to the council.
+      paternalistic:
+        fit: workable
+        headline: Reassured, but not involved
+        consequence: You promise that no one will lose their job, explain why the council wants the change, and arrange training. Anxiety falls, but you design the new routines yourself and miss what the assistants know about the users who will struggle.
+      democratic:
+        fit: strong
+        headline: Change with the people who make it work
+        consequence: You explain the decision and the reasons, give what guarantees the council allows, and ask the assistants to plan how the kiosks are introduced. They suggest a help desk beside the kiosks for the first month. Resistance falls and users adapt faster.
+      laissez-faire:
+        fit: weak
+        headline: Uncertainty fills the gap
+        consequence: You leave each branch to introduce the kiosks its own way. With no plan and no reassurance, rumours spread, one branch delays for months, and another closes its help desk on the first day.
+    debrief: When people fear a change, involving them in how it is introduced reduces resistance and draws on what they know. The decision itself may not be theirs to make, but how it is carried out can be.
+  - id: design-team
+    title: Next year's range
+    setting: Ostara Studio, a fictional maker of glass and ceramics for the home.
+    situation: >
+      Four senior designers, each an expert in a different material, must create next year's range. They have nine
+      months, a budget and a clear brief from the directors. They are highly motivated and have worked together for years.
+      You manage the studio.
+    factors:
+      - { label: Time, value: nine months }
+      - { label: Team, value: expert and motivated }
+      - { label: Stakes, value: next year's sales }
+      - { label: Work, value: creative }
+    outcomes:
+      autocratic:
+        fit: weak
+        headline: Creativity switched off
+        consequence: You decide the themes and approve every sketch. The range is consistent but safe, the designers feel like technicians, and the most original of them leaves for a rival at the end of the year.
+      paternalistic:
+        fit: weak
+        headline: Looked after, and held back
+        consequence: You shield the designers from pressure and make the key choices yourself, for their sake. They appreciate the care but resent the limits on their judgement, and the range lacks ambition.
+      democratic:
+        fit: workable
+        headline: Good, if slow
+        consequence: You hold regular meetings to agree each design together. The range is strong, but weekly debate slows the most productive designer, and decisions that one expert could make take a month.
+      laissez-faire:
+        fit: strong
+        headline: Freedom to do their best work
+        consequence: You agree the brief and the budget, secure the materials and studio time they need, and leave the design to them, checking progress each month. The range is the studio's most original for years.
+    debrief: Expert, motivated people with a long deadline and creative work do their best with freedom. The leader's role becomes securing resources, removing obstacles and checking progress rather than directing the work. Laissez-faire is not the same as absence.

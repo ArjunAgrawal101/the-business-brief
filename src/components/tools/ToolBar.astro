@@ -1,0 +1,47 @@
+---
+/**
+ * The toolbar every room tool shares: where the work is kept, and the
+ * buttons to reset it, download it, open a saved file and print. It needs a
+ * script (src/scripts/tool-kit.ts), so it is hidden without one.
+ */
+interface Props {
+  json?: boolean;
+  csv?: boolean;
+  /** Offer to open a JSON file saved by the tool. */
+  open?: boolean;
+  /** What the JSON and CSV files contain, for the button labels. */
+  what?: string;
+  reset?: string;
+}
+const { json = true, csv = false, open = false, what = '', reset = 'Reset to the worked example' } = Astro.props;
+---
+
+<div class="tool-bar js-only no-print" data-toolbar>
+  <p class="tool-bar__status" data-save-status>Your changes are kept in this browser, on this device only.</p>
+  <div class="tool-bar__actions">
+    <button type="button" class="btn btn--small" data-tool="reset">{reset}</button>
+    {
+      json && (
+        <button type="button" class="btn btn--small" data-tool="json">
+          Download JSON{what && <span class="sr-only"> of {what}</span>}
+        </button>
+      )
+    }
+    {
+      csv && (
+        <button type="button" class="btn btn--small" data-tool="csv">
+          Download CSV{what && <span class="sr-only"> of {what}</span>}
+        </button>
+      )
+    }
+    {
+      open && (
+        <label class="btn btn--small tool-bar__file">
+          Open a saved file
+          <input type="file" accept="application/json,.json" data-tool="import" class="sr-only" />
+        </label>
+      )
+    }
+    <button type="button" class="btn btn--small" data-tool="print">Print</button>
+  </div>
+</div>

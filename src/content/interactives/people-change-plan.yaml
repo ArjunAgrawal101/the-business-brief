@@ -1,0 +1,91 @@
+# The change management planner. Wenlow Care is the fictional group of care
+# homes in the workforce planning tool. Here it plans to move its care staff
+# from three 8-hour shifts a day to two 12-hour shifts. The forces, their
+# strengths, the stakeholders and their stances are judgements invented for
+# teaching. tests/unit/change-plan.test.ts works the plan by hand: driving
+# forces 4 + 4 + 3 + 2 = 13 against restraining forces 4 + 4 + 3 + 3 = 14, and
+# weakening the lack of consultation from 3 to 1 makes it 13 against 12.
+component: change-planner
+title: Change management planner
+purpose: >
+  The learner plans a change at work: the forces for and against it, the stakeholders it affects, the resistance to
+  expect and why, and the steps that answer each reason, with every model named and its status in the course. It
+  diagnoses the belief that announcing a change clearly is enough: different people resist for different reasons,
+  and each reason needs its own answer.
+provenance: simulated-data
+syllabus: ['2.1']
+page: /people-and-culture/change-planner/
+guide:
+  room: people
+  slug: change-planner
+  order: 5
+  kind: Planner
+  question: How do we bring people with us through a change?
+  summary: Weigh the forces for and against a change (HL), map the stakeholders it affects, see the resistance to expect and why, and get the steps to take, with every model named.
+  lead: >
+    Changes at work usually fail on people rather than plans. Describe a change, weigh the forces for and against it,
+    and list the people it affects, with their power, their interest and why they might resist. The tool maps them,
+    ranks the resistance to expect and sets out the steps to take, naming the model behind each one.
+  status: SL/HL
+  statusNote: >
+    Subtopic 2.1, Introduction to human resource management (guide, p. 25), for SL and HL: the reasons for resistance
+    to change in the workplace (AO2), and human resource strategies for reducing the impact of change and resistance
+    to change (AO3). Force field analysis is in the guide's toolkit for HL only. Stakeholder mapping and Kotter and
+    Schlesinger's six approaches to resistance are not named in the guide: they are enrichment, used here to organize
+    the strategies.
+  ao: [AO2, AO3]
+  howTo:
+    - Describe the change in a line.
+    - At HL, list the driving and restraining forces and score each from 1 to 5 on the evidence, then choose a restraining force within the manager's reach to see what weakening it would do.
+    - List the stakeholders the change affects. For each, judge their power over the change, their interest in it, their likely stance and, if they do not support it, their main reason.
+    - Read the map, the resistance to expect and the steps to take, then write your own plan. Your work is kept on this device; download it as JSON or CSV, or print it.
+  limitations:
+    - Every score, stance and reason is a judgement. The plan is only as good as the evidence behind them, and people's views shift as a change unfolds.
+    - "The force totals add up judgements, so a difference of a point or two says little. Forces also interact: weakening one can strengthen another."
+    - Which approach fits which reason, the levels of risk and the order of the steps are the platform's teaching model. Real plans mix approaches and adapt them as they go.
+    - A stakeholder group is rarely of one mind. Splitting a group, such as staff with and without young children, often explains resistance better.
+    - The tool says nothing about cost or timing. A real plan weighs the cost of each step against the deadline for the change.
+  inAnswer: >
+    Explain the resistance before proposing strategies: name the stakeholders, give the reason each resists and the
+    evidence for it. Then recommend two or three strategies that fit those reasons, and judge their drawbacks and
+    timing for this organization. The strategies are AO3 in subtopic 2.1, so the examiner wants a justified choice, not
+    a list. At HL, a force field analysis can structure the argument.
+  storageKey: people:change-plan
+  example:
+    name: Wenlow Care, a fictional group of care homes
+    note: >
+      Wenlow Care, the group in the [workforce planning tool](/people-and-culture/workforce-planning/), plans to move
+      its care staff from three 8-hour shifts a day to two 12-hour shifts. The change, the forces, the stakeholders and
+      every judgement are invented for teaching.
+  related:
+    subtopics: ['1.4', '2.3']
+    interactives: [lead-forcefield-halden]
+    cases: [halden-distribution]
+    decisions: [halden-leadership]
+    tools: [force-field-analysis]
+change: Move care staff from three 8-hour shifts a day to two 12-hour shifts
+driving:
+  - { label: 'Fewer handovers, fewer errors in care notes', strength: 4 }
+  - { label: Agency costs of short evening shifts, strength: 4 }
+  - { label: More full days off for staff, strength: 3 }
+  - { label: Longer shifts attract some applicants, strength: 2 }
+restraining:
+  - { label: Childcare does not fit 12-hour days, strength: 4 }
+  - { label: Fear that tired staff give worse care, strength: 4 }
+  - { label: Loss of the evening shift premium, strength: 3 }
+  - { label: 'Staff told, not consulted', strength: 3 }
+lever: 3
+stakeholders:
+  - { name: Care workers with young children, power: low, interest: high, stance: opposes, reason: routine }
+  - { name: Senior carers who lead each shift, power: high, interest: high, stance: opposes, reason: disagree }
+  - { name: Union branch, power: high, interest: high, stance: opposes, reason: security }
+  - { name: Home managers, power: high, interest: high, stance: supports, reason: none }
+  - { name: Night staff, power: low, interest: high, stance: neutral, reason: unknown }
+  - { name: "Residents' families", power: low, interest: high, stance: neutral, reason: communication }
+  - { name: Care regulator, power: high, interest: low, stance: neutral, reason: none }
+context:
+  - Wenlow Care is the fictional group of care homes in the workforce planning tool, with 220 staff and labour turnover of 23% last year, so it cannot afford to lose more people through a badly handled change.
+  - Care homes need staff day and night, and every handover between shifts is a moment when information about residents can be lost. Two shifts a day mean two handovers instead of three.
+  - Longer shifts suit some staff and tire others, which is why care quality appears on both sides of the force field.
+  - The senior carers lead each shift and are hard to replace, so their view of the plan carries weight. The union branch negotiates contracts, including the evening shift premium.
+  - The scores, the stances and the reasons are judgements made for this example.

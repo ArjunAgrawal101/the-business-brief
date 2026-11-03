@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { checkMarketTools } from '../../src/lib/integrity-market';
-import { MARKET_TOOLS } from '../../src/lib/market-tools';
+import { MARKET_TOOLS, isMarketInstrument } from '../../src/lib/market-tools';
 import { loadCorpus } from './helpers/corpus';
 import type { Interactive } from '../../src/lib/schemas';
 
@@ -35,7 +35,7 @@ describe('Market Studio content', () => {
 
   it('rejects a guide statement that is not quoted exactly from the curriculum', () => {
     const messages = withChange('market-stp-corner-brew', (it) => {
-      if ('guide' in it) it.guide.serves[0] = { code: '4.2', statement: 'Segmentation and targeting' };
+      if (isMarketInstrument(it)) it.guide.serves[0] = { code: '4.2', statement: 'Segmentation and targeting' };
     });
     expect(messages).toContain('quotes "Segmentation and targeting" for 4.2, which is not a statement of that subtopic in the curriculum');
   });

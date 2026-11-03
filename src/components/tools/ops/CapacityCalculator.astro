@@ -1,0 +1,514 @@
+---
+/**
+ * The capacity utilization and productivity calculator (5.6, HL), for two
+ * periods of the reader's own figures. The worked example is calculated on
+ * the server by src/lib/productivity.ts; src/scripts/capacity-calculator.ts
+ * recalculates everything with the same functions as the figures change.
+ */
+import { MEASURES, PERIOD_KEYS, productionModel, productionNotes, productionWorkings, readComparison, readUtilization, type PeriodInputs } from '../../../lib/productivity';
+import { fixedCostRowsHtml, fixedCostSvg, measureRowsHtml, utilizationBarsHtml } from '../../../lib/productivity-view';
+import { workingHtml } from '../../../lib/render';
+import { esc, jsonForScript } from '../../../lib/markup';
+import { inputValue } from '../../../scripts/ix';
+import type { RoomTool } from '../../../lib/room-tools';
+
+interface Props {
+  id: string;
+  data: Extract<RoomTool, { component: 'capacity-calculator' }>;
+}
+const { id, data } = Astro.props;
+const uid = `cc-${id}`;
+const u = data.units;
+const cur = data.currency;
+const s = data.settings;
+const [pa, pb] = data.periods as [{ name: string; values: PeriodInputs }, { name: string; values: PeriodInputs }];
+const a = productionModel(pa.values, s);
+const b = productionModel(pb.values, s);
+const rows = [
+  { name: pa.name, m: a },
+  { name: pb.name, m: b },
+];
+const ua = readUtilization(a, u);
+const ub = readUtilization(b, u);
+const compare = readComparison(a, b, { a: pa.name, b: pb.name }, u, cur);
+const works = productionWorkings(a, u, cur, s, data.capitalLabel);
+const notes = productionNotes(a, u, cur);
+const config = { uid, key: data.guide.storageKey, currency: cur, units: u, capitalLabel: data.capitalLabel, settings: s, periods: data.periods };
+const MONEY = new Set(['price', 'inputCost', 'fixedCosts']);
+const FIELDS: Record<keyof PeriodInputs, { label: string; hint?: string; step: string }> = {
+  capacity: { label: 'Productive capacity', hint: 'The most that can be produced in the period with the present buildings, machines and staff.', step: '1' },
+  made: { label: 'Units produced (actual output)', step: '1' },
+  defects: { label: 'Units failing inspection', step: '1' },
+  labour: { label: 'Labour input', hint: 'In workers or labour hours, as chosen above.', step: '0.5' },
+  capital: { label: 'Capital input', step: '0.5' },
+  price: { label: 'Selling price of one unit', step: '0.01' },
+  inputCost: { label: 'Total costs of the period', hint: 'All the costs, fixed and variable: the total input.', step: '0.01' },
+  fixedCosts: { label: 'Fixed costs of the period', step: '0.01' },
+};
+const unitFor = (k: keyof PeriodInputs) => (MONEY.has(k) ? '' : k === 'labour' ? (s.labour === 'workers' ? 'workers' : 'hours') : k === 'capital' ? data.capitalLabel : u.many);
+---
+
+<script type="application/json" data-config set:html={jsonForScript(config)} />
+
+<form class="cap" data-form novalidate aria-label="Figures for the two periods">
+  <fieldset class="cap__settings">
+    <legend class="label label--ink">What is being produced</legend>
+    <div class="cap__settings-grid">
+      <div class="field">
+        <label for={`${uid}-one`}>Unit of output, one</label>
+        <input class="input" id={`${uid}-one`} name="one" type="text" maxlength="30" value={u.one} />
+      </div>
+      <div class="field">
+        <label for={`${uid}-many`}>Unit of output, several</label>
+        <input class="input" id={`${uid}-many`} name="many" type="text" maxlength="30" value={u.many} />
+      </div>
+      <div class="field">
+        <label for={`${uid}-period`}>Each period is a</label>
+        <input class="input" id={`${uid}-period`} name="period" type="text" maxlength="20" value={u.period} />
+      </div>
+      <div class="field">
+        <label for={`${uid}-currency`}>Currency symbol</label>
+        <input class="input" id={`${uid}-currency`} name="currency" type="text" maxlength="4" value={cur} />
+      </div>
+      <div class="field">
+        <label for={`${uid}-labour`}>Labour is measured in</label>
+        <select class="select" id={`${uid}-labour`} name="labourMeasure">
+          <option value="workers" selected={s.labour === 'workers'}>Workers</option>
+          <option value="hours" selected={s.labour === 'hours'}>Labour hours</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for={`${uid}-capital`}>Capital is measured in</label>
+        <input class="input" id={`${uid}-capital`} name="capitalLabel" type="text" maxlength="30" value={data.capitalLabel} />
+      </div>
+      <div class="field cap__wide">
+        <label for={`${uid}-defects`}>Units that fail inspection are</label>
+        <select class="select" id={`${uid}-defects`} name="defectsMode" aria-describedby={`${uid}-defects-hint`}>
+          <option value="reworked" selected={s.defects === 'reworked'}>Reworked and sold, so they count as good output</option>
+          <option value="scrapped" selected={s.defects === 'scrapped'}>Scrapped, so they are lost</option>
+        </select>
+        <span class="field__hint" id={`${uid}-defects-hint`}>Capacity utilization counts every unit produced, since each used capacity; productivity counts good output only.</span>
+      </div>
+      <div class="cap__wide js-only">
+        <label class="cap__check"><input type="checkbox" name="compare" checked /> Compare two periods</label>
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="cap__grid">
+    <div class="cap__head">
+      <span class="label">Figure</span>
+      {
+        (['a', 'b'] as const).map((p, k) => (
+          <div class="cap__pcol" data-col={p}>
+            <label class="cap__plabel" for={`${uid}-name-${p}`}>Period {k + 1}</label>
+            <input class="input cap__pname" id={`${uid}-name-${p}`} name={`name-${p}`} type="text" maxlength="24" value={data.periods[k]?.name} />
+          </div>
+        ))
+      }
+    </div>
+    {
+      PERIOD_KEYS.map((k) => (
+        <div class="cap__row" role="group" aria-labelledby={`${uid}-${k}-label`}>
+          <p class="cap__flabel">
+            <span id={`${uid}-${k}-label`} data-flabel={k}>{FIELDS[k].label}</span>
+            {unitFor(k) && <span class="cap__unit" data-funit={k}>{unitFor(k)}</span>}
+            {FIELDS[k].hint && <span class="field__hint cap__hint" id={`${uid}-${k}-hint`}>{FIELDS[k].hint}</span>}
+          </p>
+          {(['a', 'b'] as const).map((p, j) => (
+            <div class="cap__cell" data-col={p}>
+              <label class="cap__clabel" for={`${uid}-${p}-${k}`}>
+                <span class="sr-only">{FIELDS[k].label}, </span><span data-pname={p}>{data.periods[j]?.name}</span>
+              </label>
+              <div class="affix">
+                {MONEY.has(k) && <span class="affix__pre" aria-hidden="true" data-cur>{cur}</span>}
+                <input
+                  class="input input--num"
+                  id={`${uid}-${p}-${k}`}
+                  name={`${p}-${k}`}
+                  type="number"
+                  inputmode="decimal"
+                  min="0"
+                  step={FIELDS[k].step}
+                  value={inputValue((data.periods[j]?.values as Record<string, number>)[k] ?? 0, FIELDS[k].step)}
+                  aria-describedby={`${uid}-${p}-${k}-err${FIELDS[k].hint ? ` ${uid}-${k}-hint` : ''}`}
+                />
+              </div>
+              <span class="field__error" id={`${uid}-${p}-${k}-err`} data-err={`${p}-${k}`} />
+            </div>
+          ))}
+        </div>
+      ))
+    }
+  </div>
+  <p class="nojs-only tool-note">These are the worked example's figures. With JavaScript on, you can enter your own and everything below is recalculated.</p>
+</form>
+
+<div class="tool-problems" data-problems hidden></div>
+
+<section class="tool-panel" aria-labelledby={`${uid}-res-h`} data-results>
+  <h3 id={`${uid}-res-h`}>The measures</h3>
+  <div class="table-scroll" role="region" aria-label="The measures for each period" tabindex="0">
+    <table class="table cap__results" data-results-table>
+      <thead>
+        <tr>
+          <th scope="col">Measure</th>
+          <th scope="col" class="n" data-col="a" data-rname="a">{pa.name}</th>
+          <th scope="col" class="n" data-col="b" data-rname="b">{pb.name}</th>
+          <th scope="col" class="n" data-col="change">Change</th>
+        </tr>
+      </thead>
+      <tbody data-measures set:html={measureRowsHtml(a, b, u, cur, s, data.capitalLabel)}></tbody>
+    </table>
+  </div>
+  <p class="tool-note">"Guide formula" marks the two formulas the guide gives (p. 65); the others are standard forms, as in the notes on production planning. Changes in rates are in percentage points.</p>
+  <div class="cap__pair">
+    <div>
+      <h4 class="label label--ink cap__h">Capacity used</h4>
+      <div data-bars set:html={utilizationBarsHtml(rows, u)} />
+    </div>
+    <div class="tool-reading">
+      <p><strong>Reading.</strong> <span data-read-a>{pa.name}: {ua.reading}</span> <span data-read-b>{pb.name}: {ub.reading}</span></p>
+      <p><span data-compare>{compare}</span></p>
+      <p class="muted"><strong>Implication.</strong> <span data-impl>{ua.implication}</span></p>
+    </div>
+  </div>
+  <figure class="cap__figure">
+    <div class="chart-scroll" role="region" aria-label="Fixed cost per unit at each level of output" tabindex="0" data-chart set:html={fixedCostSvg(rows, u, cur, `${uid}-chart`)} />
+    <figcaption class="exhibit__source"><b>Chart</b> The same fixed costs shared by more output: each period is marked on its curve. Simulated teaching data.</figcaption>
+    <details class="disclosure">
+      <summary>The chart's figures as a table</summary>
+      <div class="disclosure__body table-scroll" role="region" aria-label="Fixed cost per unit at each level of output, as a table" tabindex="0">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col" class="n">Output</th>
+              <th scope="col" class="n">Share of capacity</th>
+              <th scope="col" class="n">Fixed cost per unit</th>
+            </tr>
+          </thead>
+          <tbody data-curve set:html={fixedCostRowsHtml(pa.values.fixedCosts, pa.values.capacity, cur)}></tbody>
+        </table>
+      </div>
+    </details>
+  </figure>
+</section>
+
+<section class="tool-panel" aria-labelledby={`${uid}-wk-h`} data-results>
+  <h3 id={`${uid}-wk-h`}>The workings</h3>
+  <div class="field cap__which js-only">
+    <label for={`${uid}-which`}>Show the workings for</label>
+    <select class="select" id={`${uid}-which`} data-which>
+      <option value="a" data-pname-opt="a">{pa.name}</option>
+      <option value="b" data-pname-opt="b">{pb.name}</option>
+    </select>
+  </div>
+  <p class="tool-note nojs-only">The workings for {pa.name}.</p>
+  {
+    MEASURES.map((m, k) =>
+      k === 0 ? (
+        <div class="bew__working">
+          <h4 class="label label--ink">{m.name}</h4>
+          <div data-working={m.key} set:html={workingHtml(works[m.key], esc(notes[m.key].interpretation), esc(notes[m.key].implication))} />
+        </div>
+      ) : (
+        <details class="disclosure">
+          <summary>{m.name}</summary>
+          <div class="disclosure__body" data-working={m.key} set:html={workingHtml(works[m.key], esc(notes[m.key].interpretation), esc(notes[m.key].implication))} />
+        </details>
+      ),
+    )
+  }
+</section>
+
+<script>
+  import '../../../scripts/capacity-calculator';
+</script>
+
+<style>
+  .cap {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .cap__settings {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .cap__settings > legend {
+    padding: 0;
+    margin-bottom: var(--sp-3);
+  }
+
+  .cap__settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+    gap: var(--sp-3) var(--sp-4);
+    align-items: start;
+  }
+
+  .cap__wide {
+    grid-column: 1 / -1;
+    max-width: 36rem;
+  }
+
+  .cap__check {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    min-height: 44px;
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .cap__check input {
+    width: 1.15rem;
+    height: 1.15rem;
+    accent-color: var(--bb-cobalt);
+  }
+
+  .cap__grid {
+    display: grid;
+    max-width: 52rem;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .cap__head,
+  .cap__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--sp-2) var(--sp-3);
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .cap__head > .label {
+    display: none;
+  }
+
+  .cap__flabel {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 0.1rem;
+    margin: 0;
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .cap__cell {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+  }
+
+  .cap__clabel,
+  .cap__plabel {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  @media (min-width: 44rem) {
+    .cap__head,
+    .cap__row {
+      grid-template-columns: minmax(12rem, 1.4fr) minmax(8rem, 1fr) minmax(8rem, 1fr);
+      align-items: start;
+    }
+
+    .cap__head > .label {
+      display: block;
+      align-self: end;
+      padding-bottom: 0.6rem;
+    }
+
+    .cap__flabel {
+      grid-column: auto;
+    }
+
+    /* The column heads name the periods, so the cell captions are for screen readers only. */
+    .cap__clabel {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+  }
+
+  .cap__unit {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+
+  .cap__hint {
+    font-weight: 400;
+  }
+
+  :global(.is-single) .cap__head,
+  :global(.is-single) .cap__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (min-width: 44rem) {
+    :global(.is-single) .cap__head,
+    :global(.is-single) .cap__row {
+      grid-template-columns: minmax(12rem, 1.4fr) minmax(8rem, 1fr) minmax(8rem, 1fr);
+    }
+  }
+
+  .cap__pname {
+    font-weight: 650;
+  }
+
+  .cap__results th[scope="row"] {
+    min-width: 10rem;
+  }
+
+  :global(.cap-guide) {
+    display: inline-block;
+    margin-left: 0.35rem;
+    padding: 0 0.35rem;
+    border: 1px solid var(--rule);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--brass-text);
+    vertical-align: 0.1em;
+  }
+
+  .cap__results {
+    min-width: 30rem;
+    max-width: 56rem;
+  }
+
+  /* One period only: the second column and the change are hidden. */
+  :global(.is-single [data-col="b"]),
+  :global(.is-single [data-col="change"]),
+  :global(.is-single [data-read-b]),
+  :global(.is-single [data-compare]),
+  :global(.is-single .cap__which) {
+    display: none;
+  }
+
+  .cap__pair {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  @media (min-width: 60rem) {
+    .cap__pair {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  .cap__figure {
+    margin: 0;
+  }
+
+  .cap__which {
+    max-width: 20rem;
+  }
+
+  .cap__h {
+    margin: 0 0 var(--sp-3);
+  }
+
+  :global(.cap-bars) {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  :global(.cap-bars__row) {
+    display: grid;
+    grid-template-columns: minmax(5rem, 8rem) minmax(0, 1fr) 4rem;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  :global(.cap-bars__name) {
+    font-weight: 650;
+    color: var(--text-strong);
+    overflow-wrap: anywhere;
+  }
+
+  :global(.cap-bars__track) {
+    position: relative;
+    height: 1.4rem;
+    border: 1px solid var(--rule);
+    background: repeating-linear-gradient(135deg, var(--surface-sunk) 0 6px, #fff 6px 12px);
+  }
+
+  :global(.cap-bars__used) {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--bb-ink);
+    transition: width var(--dur-slow) var(--ease);
+  }
+
+  :global(.cap-bars__mark) {
+    position: absolute;
+    top: -0.3rem;
+    bottom: -0.3rem;
+    left: 85%;
+    border-left: 2px dashed var(--gold-600);
+  }
+
+  :global(.cap-bars__v) {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 650;
+    text-align: right;
+  }
+
+  :global(.cap-bars__key) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-1) var(--sp-2);
+    margin: var(--sp-2) 0 0;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  :global(.cap-bars__sw) {
+    display: inline-block;
+    width: 0.85rem;
+    height: 0.85rem;
+    margin-left: var(--sp-2);
+    border: 1px solid var(--rule);
+  }
+
+  :global(.cap-bars__sw:first-child) {
+    margin-left: 0;
+  }
+
+  :global(.cap-bars__sw--used) {
+    background: var(--bb-ink);
+  }
+
+  :global(.cap-bars__sw--spare) {
+    background: repeating-linear-gradient(135deg, var(--surface-sunk) 0 3px, #fff 3px 6px);
+  }
+
+  :global(.cap-bars__sw--mark) {
+    width: 0;
+    border: 0;
+    border-left: 2px dashed var(--gold-600);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.cap-bars__used) {
+      transition: none;
+    }
+  }
+</style>

@@ -1,0 +1,108 @@
+# The motivation analysis. The worked example rates the night shift at Halden
+# Distribution, the fictional warehouse of the leadership case, from the case's
+# own exhibits: the staff survey (Exhibit 3), the exit interviews with
+# night-shift leavers (Exhibit 5) and the figures by shift (Exhibit 2). The
+# ratings are judgements made for this example. tests/unit/motivation.test.ts
+# works the analysis by hand: hygiene factors 2.8 and motivators 1.5 (both low),
+# esteem the lowest unmet need at 1.3, autonomy the weakest basic need, and an
+# illustrative expectancy index of 0.25 x 0.5 x 0.5 = 0.0625.
+component: motivation-analysis
+title: Motivation analysis
+purpose: >
+  The learner rates a job on the factors the motivation theories look at, sees what each theory the guide names makes
+  of the ratings, and gets the financial and non-financial rewards and the training that fit, each with its drawback.
+  It diagnoses the belief that more pay is the answer to every motivation problem: in the worked example, pay is not
+  the weakest factor, and a pay rise would leave the real causes untouched.
+provenance: simulated-data
+syllabus: ['2.4']
+page: /people-and-culture/motivation-analysis/
+guide:
+  room: people
+  slug: motivation-analysis
+  order: 1
+  kind: Analysis
+  question: What would motivate these people?
+  summary: Rate a job on the factors the motivation theories look at, read it through each theory the guide names, and see the financial and non-financial rewards and the training that fit.
+  lead: >
+    Each motivation theory is a lens that picks out different things about the same job. Rate what a job offers now,
+    from pay and security to responsibility and purpose, and the tool reads the ratings through Taylor, Maslow and
+    Herzberg and, at HL, McClelland, Deci and Ryan, equity theory and expectancy theory. It then suggests the rewards
+    and the training that fit, each with its catch.
+  status: SL/HL
+  statusNote: >
+    Subtopic 2.4, Motivation and demotivation (guide, p. 26). The theories of Taylor, Maslow and Herzberg are for SL
+    and HL; McClelland's acquired needs theory, Deci and Ryan's self-determination theory, and equity and expectancy
+    theory are HL only. All the theories are AO3, so answers are expected to judge how well a theory explains a
+    situation. Financial rewards, non-financial rewards and the types of training are for SL and HL at AO2. The
+    ratings, the factors each theory reads and the threshold for a need that is met are the platform's teaching model,
+    not part of the guide.
+  ao: [AO2, AO3]
+  howTo:
+    - Rate what the job offers now on each factor, from 1 (poorly) to 5 (very well). Base each rating on evidence, such as a staff survey, exit interviews, pay rates elsewhere or what staff say.
+    - Tick the facts about the job that decide which methods of payment are possible, such as whether each person's output can be counted.
+    - At HL, rate the staff's beliefs about fairness and rewards, and choose their dominant need if the evidence shows one.
+    - Read what each theory sees, then the rewards and training that fit, each with its drawback. Your analysis is kept on this device; download it as JSON or CSV, or print it.
+  limitations:
+    - The ratings are judgements. Two people reading the same evidence can rate a job differently, and the analysis is only as good as the evidence behind the ratings.
+    - "Which factors each theory reads, the threshold of 3 for a need that is met and the expectancy index are the platform's teaching model. The theories set no numbers, and Vroom's three beliefs cannot be measured."
+    - One set of ratings treats a workforce as one person. People differ, and the same job can meet one person's needs and not another's.
+    - The rewards are chosen by the platform's rules from the ratings. A real decision weighs their cost, the culture, the labour market and what staff say they want.
+    - Every theory has its critics, set out in the notes on motivation and demotivation. The tool shows what each theory would say, not which one is right.
+  inAnswer: >
+    Choose the one or two theories that explain the evidence best, rather than all seven, and apply them to the case:
+    name the factor, give the evidence and say what the theory predicts. Then weigh two or three of the rewards that
+    fit against each other for this organization, including their cost and their drawbacks. The theories are AO3, so
+    judge how far each one explains what is happening, not only what it says.
+  storageKey: people:motivation
+  example:
+    name: The night shift at Halden Distribution, a fictional warehouse
+    note: >
+      The ratings are one reading of the evidence in the [Halden Distribution case](/cases/halden-distribution/): its
+      staff survey (Exhibit 3), the exit interviews with night-shift leavers (Exhibit 5) and the figures by shift
+      (Exhibit 2). The ratings are judgements made for this example, and every figure in the case is simulated.
+  related:
+    subtopics: ['2.3', '2.1']
+    interactives: [lead-forcefield-halden, halden-diagnosis]
+    cases: [halden-distribution]
+    decisions: [halden-leadership]
+subject: Pickers on the night shift at Halden Distribution, since the new scanning system arrived
+ratings:
+  pay: 3
+  security: 3
+  conditions: 3
+  relationships: 3
+  supervision: 2
+  recognition: 2
+  responsibility: 1
+  work: 2
+  growth: 1
+  purpose: 2
+  fairness: 2
+  expectancy: 2
+  instrumentality: 3
+  valence: 3
+job: { countable: true, sales: false, teams: true, shares: true }
+need: unknown
+evidence:
+  - factor: 'Responsibility and a say in how the work is done: 1'
+    note: Only 21% of the night shift agree that they are consulted about changes that affect their work, against 38% on days (Exhibit 3).
+  - factor: 'Training and the chance of promotion: 1'
+    note: Night-shift pickers had two hours of training on the new system, against six on days, and only 33% say they have had the training they need (Exhibits 2 and 3).
+  - factor: 'Fair and supportive supervision: 2'
+    note: 48% of the night shift say their team leader helps them solve problems, against 74% on days, and their team leaders have 0.6 years' experience in the role (Exhibits 2 and 3).
+  - factor: 'Recognition and feedback for good work: 2'
+    note: Seven of the 24 leavers interviewed left mainly because targets changed without warning (Exhibit 5), so what staff heard about their work was new targets rather than feedback. This is a judgement, as the case has no direct measure.
+  - factor: 'Interesting, varied work and a sense that it makes a difference: 2 each'
+    note: The scanners now tell pickers what to pick and in what order, and only 29% of the night shift would recommend Halden as a place to work (Exhibit 3). Both ratings are judgements.
+  - factor: 'Pay compared with similar jobs elsewhere: 3'
+    note: Only 4 of the 24 leavers left mainly for better pay elsewhere (Exhibit 5), so pay is rated middling rather than the main grievance. It can change only at the annual review in April.
+  - factor: 'Working conditions: 3'
+    note: Two of the 24 leavers named the shift pattern as their main reason for leaving (Exhibit 5).
+  - factor: 'Job security and relationships with colleagues: 3 each'
+    note: The exhibits say little about either, so both are rated midway, as judgements.
+  - factor: 'Targets that effort can actually reach: 2 (HL)'
+    note: Eleven of the 24 leavers said nobody explained the new scanners properly (Exhibit 5), so effort does not reliably produce the performance asked for.
+  - factor: 'Pay and treatment seen as fair beside colleagues: 2 (HL)'
+    note: The night shift had a third of the day shift's training on the same system (Exhibit 2), an obvious comparison for staff in the same warehouse.
+  - factor: 'Good performance reliably rewarded, and rewards that staff value: 3 each (HL)'
+    note: The case says little about either belief, so both are rated midway, as judgements.

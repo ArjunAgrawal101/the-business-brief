@@ -9,7 +9,8 @@ import { corpus, href } from '../../lib/content';
 import { esc, rich, inline } from '../../lib/markup';
 import type { Interactive } from '../../lib/schemas';
 
-type MarketIx = Extract<Interactive, { guide: unknown }>;
+// Only the Market Studio instruments: their guide carries an exampleTitle, which the room tools' guides do not.
+type MarketIx = Extract<Interactive, { guide: { exampleTitle: string } }>;
 interface Props {
   it: MarketIx;
   idBase: string;

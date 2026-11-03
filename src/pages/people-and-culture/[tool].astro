@@ -1,0 +1,35 @@
+---
+/**
+ * One page per People and Culture tool, from the tools registered in
+ * src/content/interactives (src/lib/room-tools.ts).
+ */
+import ToolPage from '../../components/tools/ToolPage.astro';
+import ScenarioChooser from '../../components/tools/ScenarioChooser.astro';
+import OrgChartBuilder from '../../components/tools/people/OrgChartBuilder.astro';
+import WorkforcePlanner from '../../components/tools/people/WorkforcePlanner.astro';
+import MotivationAnalysis from '../../components/tools/people/MotivationAnalysis.astro';
+import ChangePlanner from '../../components/tools/people/ChangePlanner.astro';
+import { corpus } from '../../lib/content';
+import { TOOL_FRAME, roomTools, type RoomTool } from '../../lib/room-tools';
+
+export async function getStaticPaths() {
+  const c = await corpus();
+  return roomTools(c, 'people').map(([id, t]) => ({ params: { tool: t.guide.slug }, props: { id } }));
+}
+
+interface Props {
+  id: string;
+}
+const { id } = Astro.props;
+const c = await corpus();
+const t = c.interactives[id] as RoomTool;
+const f = TOOL_FRAME[t.component];
+---
+
+<ToolPage id={id} ix={f.ix} csv={f.csv} open={f.open} what={f.what} levelSwitch={f.levelSwitch} reset={f.reset}>
+  {t.component === 'org-chart-builder' && <OrgChartBuilder id={id} data={t} />}
+  {t.component === 'workforce-planner' && <WorkforcePlanner id={id} data={t} />}
+  {t.component === 'motivation-analysis' && <MotivationAnalysis id={id} data={t} />}
+  {t.component === 'change-planner' && <ChangePlanner id={id} data={t} />}
+  {t.component === 'scenario-chooser' && <ScenarioChooser id={id} data={t} />}
+</ToolPage>

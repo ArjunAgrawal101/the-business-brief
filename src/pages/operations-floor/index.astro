@@ -1,0 +1,295 @@
+---
+/**
+ * The Operations Floor: the room for unit 5, operations management, laid out
+ * as a production system. Its working tools follow the stages of the system:
+ * design the process, run it, feed it. One fictional business, Wrenhurst
+ * Cycles, runs through most of them. The room's first three interactions
+ * keep their places and anchors (#of-location, #of-capacity, #of-stock),
+ * which the notes on production planning link to.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import Interactive from '../../components/interactive/Interactive.astro';
+import LevelSwitch from '../../components/ui/LevelSwitch.astro';
+import RoomIntro from '../../components/tools/RoomIntro.astro';
+import RoomToolIndex from '../../components/tools/RoomToolIndex.astro';
+import SubtopicLedger from '../../components/tools/SubtopicLedger.astro';
+import { corpus, href, modulesInOrder } from '../../lib/content';
+import { subtopicHref } from '../../lib/learning';
+import { roomTools, toolHref } from '../../lib/room-tools';
+import '../../styles/room-tools.css';
+
+const c = await corpus();
+const room = (await modulesInOrder()).find((m) => m.id === 'operations-floor');
+const tools = roomTools(c, 'operations');
+const wrenhurst = tools.filter(([, t]) => t.guide.example.name.startsWith('Wrenhurst'));
+const CASES = ['atelier-barro', 'marigold-kitchens'].filter((x) => c.cases[x]);
+const DECISIONS = ['atelier-pricing', 'marigold-growth'].filter((x) => c.decisions[x]);
+---
+
+<BaseLayout
+  title="Operations Floor"
+  description={`Working tools for IB Business Management unit 5, operations management, set out as a production system: ${tools.map(([, t]) => t.title.toLowerCase()).join(', ')}, with the room's case-based interactions.`}
+  section="tools"
+  room="operations"
+>
+  <RoomIntro id="operations-floor" />
+
+  <div class="wrap page-body">
+    <section aria-labelledby="of-system">
+      <SectionHead no={1} title="The production system, stage by stage" dek="Design the process, run it, and keep it supplied. Each question has a working tool with your own figures, a fictional worked example and its syllabus status." id="of-system" />
+      <RoomToolIndex
+        room="operations"
+        layout="flow"
+        groups={[
+          { label: 'Design the process', note: 'How and where to produce, before anything is made.', slugs: ['production-methods', 'location-assessment'] },
+          { label: 'Run the process', note: 'Using the capacity well, and getting the output right first time.', slugs: ['capacity-and-productivity', 'quality-management'] },
+          { label: 'Feed the process', note: 'Keeping materials arriving: when to reorder, how much, and where supply can fail.', slugs: ['stock-control', 'economic-order-quantity', 'supply-chain-mapper'] },
+        ]}
+      />
+    </section>
+  </div>
+
+  {
+    wrenhurst.length > 0 && (
+      <section class="band band--sunk of-firm" aria-labelledby="of-firm">
+        <div class="wrap">
+          <SectionHead no={2} title="One business through the floor" dek="Wrenhurst Cycles, the fictional bicycle maker of the notes on production planning, runs through most of the tools, so their figures connect." id="of-firm" />
+          <div class="of-firm__grid">
+            <ul class="of-firm__facts" role="list">
+              <li>
+                <span class="of-firm__v">250</span> bikes a week: the capacity of the assembly line, which builds about 200
+              </li>
+              <li>
+                <span class="of-firm__v">200</span> gear sets used a week, reordered 800 at a time when stock falls to 600
+              </li>
+              <li>
+                <span class="of-firm__v">8</span> weeks by sea for every frame, from a single partner factory overseas
+              </li>
+            </ul>
+            <div class="of-firm__tools">
+              <p class="label label--ink">Wrenhurst in the tools</p>
+              <ul role="list">
+                {wrenhurst.map(([, t]) => (
+                  <li>
+                    <a href={toolHref(t)}>{t.title}</a>
+                  </li>
+                ))}
+              </ul>
+              <p class="tool-note">
+                From the notes on <a href={subtopicHref(c, '5.6')}>production planning (5.6)</a>. The business is fictional and every figure simulated.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <div class="wrap page-body room-after-band">
+    <section aria-labelledby="of-cases">
+      <SectionHead no={3} title="Case work" dek="The room's first three interactions, each built on a fictional case: a location in Mumbai for Marigold Kitchens, and the kiln and the clay at Atelier Barro." id="of-cases" />
+      <div class="of-cases__links">
+        {CASES.map((x) => <a href={href.case(x)}>{c.cases[x]?.title}: the case file</a>)}
+      </div>
+    </section>
+
+    <section aria-labelledby="of-location">
+      <SectionHead no={4} title="Choosing a location" dek="Subtopic 5.4, AO2. Weigh the factors yourself, and see how much the answer depends on the weights." id="of-location" level={2} />
+      <div style="margin-top:var(--sp-5)">
+        <Interactive
+          component="location-scoring"
+          refId="ops-location-marigold"
+          title="Where should the first Mumbai restaurant go?"
+          intro="Weighted scoring turns a location decision into numbers you can argue about. The scores are given; the weights are yours."
+          provenance="simulated-data"
+          headingLevel={3}
+        />
+      </div>
+    </section>
+
+    <LevelSwitch id="lvl-operations" />
+
+    <section aria-labelledby="of-capacity" data-level="HL">
+      <SectionHead no={5} title="Capacity utilization and productivity" dek="Subtopic 5.6, HL only, AO2 and AO4." id="of-capacity" />
+      <div style="margin-top:var(--sp-5)">
+        <Interactive
+          component="capacity-productivity"
+          refId="ops-capacity-atelier"
+          title="How hard is the kiln working?"
+          intro="Atelier Barro's kiln can fire 1,200 mugs a month. Compare a quiet October with a November that includes the hotel's order, and see what happens to each measure."
+          level="HL"
+          provenance="simulated-data"
+          headingLevel={3}
+        />
+      </div>
+    </section>
+
+    <section aria-labelledby="of-stock" data-level="HL">
+      <SectionHead no={6} title="Stock control" dek="Subtopic 5.6, HL only, AO2 and AO4." id="of-stock" />
+      <div style="margin-top:var(--sp-5)">
+        <Interactive
+          component="stock-control"
+          refId="ops-stock-control-atelier"
+          title="When should the studio order more clay?"
+          intro="A stock control chart shows when to reorder, how much to keep in reserve and what happens when usage or a delivery does not go to plan."
+          level="HL"
+          provenance="simulated-data"
+          headingLevel={3}
+        />
+      </div>
+    </section>
+    <p class="hl-notice"><span class="tag tag--hl">HL</span> Capacity utilization, productivity and stock control are HL-only material, hidden while you are viewing SL content. Switch to HL above to see them.</p>
+
+    <section aria-labelledby="of-serves">
+      <SectionHead no={7} title="Unit 5, subtopic by subtopic" dek="Operations management in the guide's order: what the platform has for each subtopic, and the tools that serve it." id="of-serves" />
+      <SubtopicLedger unit={5} room="operations" elsewhere={{ '5.5': { label: 'Break-even on the Finance Desk', href: '/finance-desk/break-even/' } }} />
+    </section>
+
+    <section aria-labelledby="of-related">
+      <SectionHead no={8} title="Decide on a case" dek="Decision Rooms where operations choices meet costs, prices and growth." id="of-related" />
+      <ul class="of-related" role="list">
+        {
+          DECISIONS.map((d) => (
+            <li>
+              <span class="label">Decision Room</span>
+              <a href={href.decision(d)}>{c.decisions[d]?.title}</a>
+            </li>
+          ))
+        }
+        {
+          CASES.map((x) => (
+            <li>
+              <span class="label">Case file</span>
+              <a href={href.case(x)}>{c.cases[x]?.title}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    {
+      room && room.data.planned.length > 0 && (
+        <section aria-labelledby="of-planned">
+          <SectionHead no={9} title="Planned for this room" dek="Not built yet, so not linked." id="of-planned" />
+          <ul class="of-planned">
+            {room.data.planned.map((p) => (
+              <li>{p}</li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .of-firm__grid {
+    display: grid;
+    gap: var(--sp-6);
+    margin-top: var(--sp-5);
+  }
+
+  @media (min-width: 60rem) {
+    .of-firm__grid {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      align-items: start;
+    }
+  }
+
+  .of-firm__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: var(--sp-4) var(--sp-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .of-firm__facts li {
+    margin: 0;
+    padding-top: var(--sp-3);
+    border-top: 2px solid var(--room-accent);
+    font-size: 0.9375rem;
+  }
+
+  .of-firm__v {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 1.8rem + 1.8vw, 3.25rem);
+    line-height: 1;
+    color: var(--text-strong);
+  }
+
+  .of-firm__tools ul {
+    display: grid;
+    gap: 0;
+    margin: var(--sp-2) 0 var(--sp-3);
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule);
+  }
+
+  .of-firm__tools li {
+    margin: 0;
+    padding: var(--sp-2) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .of-firm__tools a {
+    display: inline-block;
+    min-height: 24px;
+    font-weight: 650;
+  }
+
+  .of-cases__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-5);
+    margin-top: var(--sp-3);
+  }
+
+  .of-cases__links a {
+    display: inline-block;
+    min-height: 24px;
+  }
+
+  .of-related {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: 0 var(--sp-6);
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .of-related li {
+    display: grid;
+    gap: var(--sp-1);
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .of-related .label {
+    color: var(--room-accent-text);
+  }
+
+  .of-related a {
+    display: inline-block;
+    min-height: 24px;
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .of-planned {
+    display: grid;
+    gap: var(--sp-2);
+    max-width: var(--text-max);
+    margin: var(--sp-4) 0 0;
+    color: var(--text-muted);
+  }
+</style>

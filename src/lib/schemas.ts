@@ -16,6 +16,7 @@ import { PRICE_METHODS } from './market-mix';
 import { QUESTION_TYPES } from './market-research';
 import { EXTENSIONS } from './market-plc';
 import { ROLES } from './market-campaign';
+import { roomToolSchemas } from './schemas-room-tools';
 
 /* ------------------------------------------------------------------ */
 /* Shared vocabularies                                                 */
@@ -1460,6 +1461,8 @@ export const budgetStateSchema = z.object({
   budget: z.number().positive(),
   channels: z.array(z.object({ id: z.string(), name: z.string(), spend: nonneg, audience: z.number().positive(), k: z.number().positive(), conversion: pct })).min(2).max(10),
 });
+/** The working tools of People and Culture and the Operations Floor (src/lib/schemas-room-tools.ts). */
+const ROOM_TOOLS = roomToolSchemas(interactiveBase);
 
 export const interactiveSchema = z.discriminatedUnion('component', [
   z.object({
@@ -1910,6 +1913,7 @@ export const interactiveSchema = z.discriminatedUnion('component', [
     limits: z.array(md).min(2),
     questions: z.array(z.string()).min(2),
   }),
+  ...ROOM_TOOLS,
 ]);
 export type Interactive = z.infer<typeof interactiveSchema>;
 export type Assessment = AssessmentComponent;
