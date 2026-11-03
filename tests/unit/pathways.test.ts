@@ -234,8 +234,9 @@ describe('the lesson library', () => {
     expect(lib.map((e) => e.code)).toEqual(expected);
   });
 
-  it('gives every notes subtopic its own discussion prompts', () => {
-    for (const e of lib) expect(e.source.prompts.length, e.code).toBeGreaterThanOrEqual(3);
+  it('carries the discussion prompts written for each subtopic, and a brief its own', () => {
+    for (const l of pathway('teachers').lessons) expect(lib.find((e) => e.code === l.code)?.source.prompts, l.code).toEqual(l.prompts);
+    for (const e of lib.filter((x) => x.source.kind === 'brief')) expect(e.source.prompts.length, e.code).toBeGreaterThanOrEqual(3);
   });
 
   it('fills every lesson exactly, at every length, for SL and HL classes', () => {

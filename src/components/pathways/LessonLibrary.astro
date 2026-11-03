@@ -83,14 +83,16 @@ const briefsCount = lib.length - notesCount;
               <div class="ll-entry__body">
                 <div data-plan set:html={lessonsHtml(e.source, DEFAULT_LENGTH, 'HL')} />
                 <div class="ll-cols">
-                  <div>
-                    <h4 class="ll-h">Discussion prompts</h4>
-                    <ul class="ll-list">
-                      {e.source.prompts.map((q) => (
-                        <li>{q}</li>
-                      ))}
-                    </ul>
-                  </div>
+                  {e.source.prompts.length > 0 && (
+                    <div>
+                      <h4 class="ll-h">Discussion prompts</h4>
+                      <ul class="ll-list">
+                        {e.source.prompts.map((q) => (
+                          <li>{q}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   <div>
                     <h4 class="ll-h">Assessment resources</h4>
                     <ul class="ll-list">
