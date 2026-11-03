@@ -539,6 +539,24 @@ test.describe('Market Studio instruments', () => {
     expect((await download).suggestedFilename()).toBe('market-metrics.csv');
   });
 
+  test('an instrument imports a saved file, and refuses a file from another instrument', async ({ page }) => {
+    await page.goto('/market-studio/marketing-mix/');
+    await ready(page, '[data-ix="mix"]');
+    const ix = page.locator('[data-ix="mix"]');
+    const input = ix.locator('[data-kit-import]');
+    await input.setInputFiles({ name: 'other.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify({ tool: 'stp-planner', version: 1, state: {} })) });
+    await expect(ix.locator('[data-status]')).toContainText('not a saved marketing mix from this instrument');
+    const download = page.waitForEvent('download');
+    await ix.locator('[data-kit-json]').click();
+    const file = JSON.parse(await (await (await download).createReadStream())!.toArray().then((c) => Buffer.concat(c).toString('utf8')));
+    expect(file.tool).toBe('marketing-mix');
+    file.state.position = 'premium';
+    await input.setInputFiles({ name: 'mix.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(file)) });
+    await expect(ix.locator('[data-f="position"]')).toHaveValue('premium');
+    await expect(ix.locator('[data-checks]')).toContainText('A premium position needs a price at or above rivals');
+    await expect(ix.locator('[data-kit-status]')).toContainText('Saved on this device');
+  });
+
   test('the studio lists the work this browser has kept, and removes it on request', async ({ page }) => {
     await page.goto('/market-studio/budget-allocation/');
     await ready(page, '[data-ix="budget"]');

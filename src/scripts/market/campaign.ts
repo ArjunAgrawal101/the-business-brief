@@ -1,7 +1,7 @@
 /** The campaign planner in the browser: channels, tasks and KPIs to add and remove, the timeline and funnel redrawn, saving and export. */
 import { nextId } from '../../lib/market-kit';
 import { ROLES, campaignChecks, campaignCsvRows, campaignSummary, normalizeCampaign, type CampaignState, type Frequency, type Role } from '../../lib/market-campaign';
-import { campaignFiguresHtml, channelRowHtml, funnelFiguresHtml, funnelFor, ganttFor, kpiRowHtml, taskRowHtml } from '../../lib/market-campaign-view';
+import { campaignFiguresHtml, channelRowHtml, funnelFiguresHtml, funnelFor, funnelRowsHtml, ganttFor, kpiRowHtml, taskRowHtml } from '../../lib/market-campaign-view';
 import { checksHtml, checksTally } from '../../lib/market-view';
 import { announce, each, readConfig } from '../ix';
 import { fieldChecked, fieldNumber, fieldValue, fill, mountKit } from './kit';
@@ -59,6 +59,7 @@ each('[data-ix="campaign"]', (root) => {
     fill(root, '[data-gantt]', ganttFor(s, `${uid}-gantt`));
     fill(root, '[data-funnel]', funnelFor(s, `${uid}-funnel`));
     fill(root, '[data-funnel-figures]', funnelFiguresHtml(s));
+    fill(root, '[data-funnel-rows]', funnelRowsHtml(s));
     fill(root, '[data-checks]', checksHtml(campaignChecks(s)));
   };
 

@@ -9,7 +9,7 @@ import ToolBar from './ToolBar.astro';
 import { jsonForScript } from '../../lib/markup';
 import { checksHtml, numberField } from '../../lib/market-view';
 import { budgetChecks, budgetSummary, budgetView } from '../../lib/market-budget';
-import { budgetFiguresHtml, budgetResultRowsHtml, budgetRowHtml, diminishingHtml, responseChart } from '../../lib/market-budget-view';
+import { budgetFiguresHtml, budgetResultRowsHtml, budgetRowHtml, curveTableHtml, diminishingHtml, responseChart } from '../../lib/market-budget-view';
 import type { Interactive } from '../../lib/schemas';
 
 interface Props {
@@ -19,6 +19,7 @@ interface Props {
 const { data, uid } = Astro.props;
 const s = data.state;
 const v = budgetView(s);
+const curves = curveTableHtml(s);
 const config = { uid, slug: 'budget-allocation', defaults: s };
 ---
 
@@ -76,6 +77,16 @@ const config = { uid, slug: 'budget-allocation', defaults: s };
     <figure class="mk-figure">
       <div class="chart-scroll" role="region" aria-label="Response curves" tabindex="0" data-chart set:html={responseChart(s, `${uid}-chart`)} />
       <figcaption class="exhibit__source"><b>Chart</b> New customers for any spend in each channel; the circle marks your spend. Where a curve flattens, more money buys little. Each line has its own pattern as well as its colour.</figcaption>
+      <details class="disclosure">
+        <summary>The curves as a table</summary>
+        <div class="disclosure__body table-scroll" role="region" aria-label="New customers by spend" tabindex="0">
+          <table class="table">
+            <caption class="sr-only">New customers each channel would win at each level of spend</caption>
+            <thead data-curve-head set:html={curves.head} />
+            <tbody data-curve-body set:html={curves.body} />
+          </table>
+        </div>
+      </details>
     </figure>
   </section>
 

@@ -9,7 +9,7 @@ import ToolBar from './ToolBar.astro';
 import { jsonForScript } from '../../lib/markup';
 import { areaField, checksHtml, numberField, textField } from '../../lib/market-view';
 import { campaignChecks, campaignSummary } from '../../lib/market-campaign';
-import { campaignFiguresHtml, channelRowHtml, funnelFiguresHtml, funnelFor, ganttFor, kpiRowHtml, taskRowHtml } from '../../lib/market-campaign-view';
+import { campaignFiguresHtml, channelRowHtml, funnelFiguresHtml, funnelFor, funnelRowsHtml, ganttFor, kpiRowHtml, taskRowHtml } from '../../lib/market-campaign-view';
 import type { Interactive } from '../../lib/schemas';
 
 interface Props {
@@ -109,6 +109,15 @@ const cur = s.currency;
           <figure class="mk-figure mk-figure--funnel">
             <div class="chart-scroll" role="region" aria-label="Funnel estimate" tabindex="0" data-funnel set:html={funnelFor(s, `${uid}-funnel`)} />
             <figcaption class="exhibit__source"><b>Funnel</b> Bar widths are to scale; each number is printed beside its bar.</figcaption>
+            <details class="disclosure">
+              <summary>The funnel's figures as a table</summary>
+              <div class="disclosure__body table-scroll" role="region" aria-label="Funnel figures" tabindex="0">
+                <table class="table">
+                  <thead><tr><th scope="col">Stage</th><th scope="col" class="n">People</th><th scope="col">How it is worked out</th></tr></thead>
+                  <tbody data-funnel-rows set:html={funnelRowsHtml(s)} />
+                </table>
+              </div>
+            </details>
           </figure>
           <dl class="figs mk-figs--compact" data-funnel-figures set:html={funnelFiguresHtml(s)} />
         </div>

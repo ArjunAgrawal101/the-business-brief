@@ -2,7 +2,7 @@
 import { fmtNumber } from '../../lib/format';
 import { nextId } from '../../lib/market-kit';
 import { budgetChecks, budgetCsvRows, budgetSummary, budgetView, normalizeBudget, roundSplit, validateBudget, type BudgetState } from '../../lib/market-budget';
-import { budgetFiguresHtml, budgetResultRowsHtml, budgetRowHtml, diminishingHtml, responseChart } from '../../lib/market-budget-view';
+import { budgetFiguresHtml, budgetResultRowsHtml, budgetRowHtml, curveTableHtml, diminishingHtml, responseChart } from '../../lib/market-budget-view';
 import { checksHtml } from '../../lib/market-view';
 import { announce, each, readConfig } from '../ix';
 import { fieldNumber, fieldValue, fill, mountKit, showProblems } from './kit';
@@ -50,6 +50,9 @@ each('[data-ix="budget"]', (root) => {
     fill(root, '[data-dim]', diminishingHtml(v, s));
     fill(root, '[data-results]', budgetResultRowsHtml(v, s));
     fill(root, '[data-chart]', responseChart(s, `${uid}-chart`));
+    const curves = curveTableHtml(s);
+    fill(root, '[data-curve-head]', curves.head);
+    fill(root, '[data-curve-body]', curves.body);
     fill(root, '[data-checks]', checksHtml(budgetChecks(s, v)));
     if (say) announce(status, `About ${fmtNumber(v.yours.customers, 0)} new customers for ${fmtNumber(v.yours.spend)}; the suggested split would win about ${fmtNumber(v.suggested.customers, 0)}.`);
   };

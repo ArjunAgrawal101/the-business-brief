@@ -5,7 +5,7 @@ import { BASIS_LABELS, USE_LABELS, initials, type PersonaChannel, type PersonaSt
 
 export function channelRowHtml(c: PersonaChannel, i: number, uid: string): string {
   const id = (k: string) => `${uid}-ch-${i}-${k}`;
-  return `<div class="mk-chrow" data-row="${i}">${textField({ id: id('name'), f: 'name', label: `Channel ${i + 1}`, value: c.name, max: 60, srLabel: true })}${selectField({ id: id('use'), f: 'use', label: `Channel ${i + 1}: how much they use it`, value: c.use, options: (['high', 'medium', 'low'] as const).map((u) => ({ value: u, label: USE_LABELS[u] })), srLabel: true })}${removeButton('Remove', `channel ${i + 1}`)}${textField({ id: id('note'), f: 'note', label: `Note on channel ${i + 1} (optional)`, value: c.note, max: 160, cls: 'mk-chrow__note' })}</div>`;
+  return `<div class="mk-chrow" data-row="${i}">${textField({ id: id('name'), f: 'name', label: `Channel ${i + 1}`, value: c.name, max: 60, cls: 'mk-chrow__name' })}${selectField({ id: id('use'), f: 'use', label: 'How much they use it', value: c.use, options: (['high', 'medium', 'low'] as const).map((u) => ({ value: u, label: USE_LABELS[u] })) })}${removeButton('Remove', `channel ${i + 1}`)}${textField({ id: id('note'), f: 'note', label: `Note on channel ${i + 1} (optional)`, value: c.note, max: 160, cls: 'mk-chrow__note' })}</div>`;
 }
 
 const list = (items: string[], cls: string) => (items.length ? `<ul class="${cls}">${items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : '<p class="small muted">None yet.</p>');

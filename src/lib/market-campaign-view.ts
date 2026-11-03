@@ -90,3 +90,16 @@ export function funnelFiguresHtml(s: CampaignState): string {
     fig('Share of the target gap', esc(f.coverage === null ? 'n/a' : `${fmtNumber(f.coverage, 0)}%`), `the gap is ${fmtNumber(s.objective.target - s.objective.baseline)} ${s.objective.unit} a week`),
   ].join('');
 }
+
+/** The funnel's figures as table rows, beside the chart. */
+export function funnelRowsHtml(s: CampaignState): string {
+  const f = funnel(s);
+  const row = (label: string, value: string, how: string) => `<tr><th scope="row">${esc(label)}</th><td class="n">${esc(value)}</td><td>${esc(how)}</td></tr>`;
+  return [
+    row('Reached', fmtNumber(f.reach), 'people the campaign can reach'),
+    row('Aware', fmtNumber(f.aware, 1), `${fmtNumber(s.funnel.aware, 1)}% of those reached`),
+    row('Try it', fmtNumber(f.tried, 1), `${fmtNumber(s.funnel.trial, 1)}% of those aware`),
+    row('Come back as regulars', fmtNumber(f.regulars, 2), `${fmtNumber(s.funnel.repeat, 1)}% of those who try it`),
+    row('Added a week', fmtMoney(f.weekly, s.currency, 2), `regulars × ${fmtNumber(s.funnel.visits, 1)} visits × ${fmtMoney(s.funnel.spend, s.currency, 2)}`),
+  ].join('');
+}

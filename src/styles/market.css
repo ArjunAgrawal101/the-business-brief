@@ -981,14 +981,14 @@
   grid-column: 1 / -1;
 }
 
-.mk-chrow--head {
-  padding-bottom: 0;
-  border-bottom: 0;
-  font-size: var(--fs-label);
-  font-weight: 600;
-  letter-spacing: var(--track-label);
-  text-transform: uppercase;
-  color: var(--text-muted);
+@media (max-width: 40rem) {
+  .mk-chrow {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .mk-chrow__name {
+    grid-column: 1 / -1;
+  }
 }
 
 .mk-pc {

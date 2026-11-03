@@ -15,7 +15,7 @@ import { clusters, describeSpot, gapVerdict, nearestRival, openSpaces, readMap, 
 import { marginOfError, parseRange, questionChecks, quotaCounts, rangeProblems, samplingNotes, surveyChecks, type Question, type QuestionnaireState } from '../../src/lib/market-research';
 import { baseUnits, lossYear, plcView, simulate, stageOf, validatePlc, type PlcState } from '../../src/lib/market-plc';
 import { campaignChecks, campaignLine, funnel, objectiveChange, plannedSpend, reviewWeeks, type CampaignState } from '../../src/lib/market-campaign';
-import { budgetView, channelResult, customers, marginalCustomers, reach, roundSplit, suggestSplit, validateBudget, type BudgetState } from '../../src/lib/market-budget';
+import { budgetView, channelResult, curvePoints, customers, marginalCustomers, reach, roundSplit, suggestSplit, validateBudget, type BudgetState } from '../../src/lib/market-budget';
 
 const example = <T>(file: string): T => structuredClone(parse(readFileSync(new URL(`../../src/content/interactives/${file}.yaml`, import.meta.url), 'utf8')).state) as T;
 const levels = (cs: Array<{ level: string }>) => cs.map((c) => c.level);
@@ -408,6 +408,10 @@ describe('marketing budget allocation', () => {
     // The first $100 wins 144 × (1 − e^(−0.4)) = 47.47; at $1,000 the next $100 wins 144 × (e^(−4) − e^(−4.4)) = 0.87
     expect(r.first100).toBeCloseTo(47.4740, 3);
     expect(r.next100).toBeCloseTo(0.8695, 3);
+    // The curves as a table: six spends from 0 to the $1,800 budget; posts at $1,800 win 144 × (1 − e^(−7.2)) = 143.89
+    const pts = curvePoints(s, 6);
+    expect(pts.spends).toEqual([0, 360, 720, 1080, 1440, 1800]);
+    expect(pts.series[0]?.values[5]).toBeCloseTo(143.8925, 3);
   });
 
   it('compares the first draft with the suggested split', () => {

@@ -52,7 +52,6 @@ const lines = (k: 'needs' | 'pains' | 'behaviour' | 'objections' | 'winners', la
       </fieldset>
       <fieldset class="mk-fieldset">
         <legend class="label label--ink">Where to reach them</legend>
-        <div class="mk-chrow mk-chrow--head" aria-hidden="true"><span>Channel</span><span>How much they use it</span></div>
         <div data-rows set:html={p.channels.map((c, i) => channelRowHtml(c, i, uid)).join('')} />
         <p class="cluster mk-add js-only"><button type="button" class="btn btn--small" data-add>Add a channel</button></p>
       </fieldset>

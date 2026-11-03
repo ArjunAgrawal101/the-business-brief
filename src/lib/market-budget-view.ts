@@ -3,7 +3,7 @@ import { esc } from './markup';
 import { fmtMoney, fmtNumber } from './format';
 import { C, responseSvg } from './market-charts';
 import { fig, numberField, removeButton, textField } from './market-view';
-import { customers, type BudgetChannel, type BudgetState, type BudgetView } from './market-budget';
+import { curvePoints, customers, type BudgetChannel, type BudgetState, type BudgetView } from './market-budget';
 
 const COLOURS = [C.ink, C.cobalt, C.green, C.gold, C.signal, '#6A4C93', '#2E6B8F', '#A4552A', '#5B6678', '#1E355F'];
 const DASHES = ['', '7 4', '2 3', '10 3 2 3', '4 2', '', '7 4', '2 3', '10 3 2 3', '4 2'];
@@ -57,4 +57,12 @@ export function diminishingHtml(v: BudgetView, s: BudgetState): string {
   if (!used.length) return '';
   const r = used.reduce((a, b) => (b.first100 - b.next100 > a.first100 - a.next100 ? b : a));
   return esc(`Diminishing returns: the first ${fmtMoney(100, s.currency, 0)} on ${r.name} wins about ${fmtNumber(r.first100, 1)} customers; at your spend of ${fmtMoney(r.spend, s.currency, 0)}, the next ${fmtMoney(100, s.currency, 0)} wins about ${fmtNumber(r.next100, 1)}.`);
+}
+
+/** The response curves as a table: new customers in each channel at spends from nothing to the budget. */
+export function curveTableHtml(s: BudgetState): { head: string; body: string } {
+  const pts = curvePoints(s, 6);
+  const head = `<tr><th scope="col">Channel</th>${pts.spends.map((x) => `<th scope="col" class="n">${esc(fmtMoney(x, s.currency, 0))}</th>`).join('')}</tr>`;
+  const body = pts.series.map((ser) => `<tr><th scope="row">${esc(ser.name || 'Unnamed')}</th>${ser.values.map((v) => `<td class="n">${esc(fmtNumber(v, 1))}</td>`).join('')}</tr>`).join('');
+  return { head, body };
 }
