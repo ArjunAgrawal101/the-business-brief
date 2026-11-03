@@ -1,0 +1,33 @@
+---
+/**
+ * The bar every Market Studio instrument shares: where the work is kept, and
+ * the buttons to export, copy, print, import and reset. Every control needs a
+ * script, so the bar is js-only; without scripts a note says what it would do.
+ * The behaviour is in src/scripts/market/kit.ts.
+ */
+interface Props {
+  csv?: boolean;
+  /** Label for an extra text download, such as "Download as text (.md)". */
+  text?: string;
+}
+const { csv = false, text } = Astro.props;
+---
+
+<div class="mk-kit">
+  <p class="mk-kit__status js-only" data-kit-status>Showing the worked example. Your changes are saved on this device as you work.</p>
+  <div class="mk-kit__actions js-only" role="group" aria-label="Save, export and reset">
+    <button type="button" class="btn btn--small" data-kit-json>Download JSON</button>
+    {csv && <button type="button" class="btn btn--small" data-kit-csv>Download CSV</button>}
+    {text && <button type="button" class="btn btn--small" data-kit-text>{text}</button>}
+    <button type="button" class="btn btn--small" data-kit-copy>Copy summary</button>
+    <button type="button" class="btn btn--small" data-kit-print>Print</button>
+    <label class="btn btn--small mk-kit__import">
+      Import a saved file
+      <input type="file" accept=".json,application/json" class="sr-only" data-kit-import />
+    </label>
+    <button type="button" class="btn btn--small btn--ink" data-kit-reset>Reset to the worked example</button>
+  </div>
+  <p class="nojs-only small muted mk-kit__note">
+    With JavaScript on, your work is saved in this browser only, and you can download it, copy a summary, print it or go back to the worked example. Without it, the worked example below is complete, and the summary as text is at the end.
+  </p>
+</div>

@@ -1,0 +1,102 @@
+# Market Studio: the market research questionnaire builder. Corner Brew is the
+# fictional café of the 4.2 notes, researching the students its plan targets.
+# Questions q3 and q4 are written badly on purpose; the integrity check
+# confirms the rules flag those two as problems and no other question.
+component: questionnaire-builder
+title: Market research questionnaire builder
+purpose: >
+  The learner writes a survey question by question, choosing each question's type, and sees rule-based checks for
+  leading, double-barrelled and loaded wording, overlapping answer ranges, unbalanced scales and sensitive
+  questions, with notes on the sampling method and, for a random sample, the margin of error. It diagnoses
+  questions that push respondents towards an answer or ask two things at once, and the belief that any sample of
+  convenient respondents represents the market.
+provenance: simulated-data
+syllabus: ['4.4']
+page: /market-studio/research-questionnaire/
+flawed: [q3, q4]
+guide:
+  lead: >
+    A survey is only as good as its questions and the people who answer them. Build a questionnaire one question at
+    a time, choose how the sample will be drawn, and let the checks flag wording that leads respondents, asks two
+    things at once or leaves some of them with no answer to give.
+  use:
+    - Start with the objective, the decision the research will inform, and the population, the whole group you want to learn about.
+    - Choose a sampling method and a sample size. For quota sampling, set the groups and their share of the population.
+    - Add questions, choosing a type for each. Closed types give quantitative data; open questions give qualitative data.
+    - Read the flags beneath each question, rewrite, and check the preview as a respondent would see it. Export the questionnaire to print it or run it in a survey tool.
+  limits:
+    - The checks are rules about wording, not an understanding of meaning. A flag is a prompt to look again, and a question can be poor without tripping any rule.
+    - The tool builds the questionnaire; it does not collect or analyse answers. Pilot it with a few people first, to find the questions they misread.
+    - A good questionnaire cannot rescue a poor sample. Who answers matters as much as what they are asked.
+  status: syllabus
+  serves:
+    - { code: '4.4', statement: 'Primary research: surveys, interviews, focus groups and observations' }
+    - { code: '4.4', statement: Qualitative versus quantitative research }
+    - { code: '4.4', statement: 'Sampling methods: quota, random and convenience' }
+    - { code: '4.4', statement: Why and how organizations carry out market research }
+  beyond:
+    - The wording checks apply the common rules of questionnaire design; the guide names surveys but sets no rules for writing them.
+    - '**The margin of error** for a random sample is standard statistics beyond the guide (enrichment). It does not apply to quota or convenience samples.'
+  related:
+    - { label: '4.4 Market research', href: /topics/market-research/ }
+    - { label: Research bias, href: /glossary/research-bias/ }
+    - { label: 'Descriptive statistics, for summarizing the answers', href: /glossary/descriptive-statistics/ }
+  terms: [survey, primary-research, quantitative-research, qualitative-research, sampling, quota-sampling, random-sampling, convenience-sampling, research-bias, sampling-error]
+  example: >
+    Corner Brew, the fictional café of the 4.2 notes, wants students from the college nearby to study there in the
+    quiet afternoons. Before spending its campaign budget it surveys them. The population and quotas are simulated.
+    Questions 3 and 4 are written badly on purpose, so you can see what the checks catch: rewrite them, and the flags
+    clear.
+  exampleTitle: "Corner Brew's afternoon study survey"
+state:
+  business: Corner Brew
+  title: Afternoon study survey
+  objective: >-
+    Find out what would bring students from the college to Corner Brew between 2 and 5 p.m. on weekdays, and what
+    they would pay for refills, before Corner Brew spends its $3,000 campaign budget.
+  population: Students at the college a ten-minute walk from Corner Brew
+  populationSize: 2400
+  method: quota
+  sampleSize: 120
+  quotas:
+    - { id: y1, group: Year 1 students, share: 40 }
+    - { id: y2, group: Year 2 students, share: 35 }
+    - { id: y3, group: Year 3 students, share: 25 }
+  intro: >-
+    Corner Brew is a café near the college. We would like to know how students study in the afternoons. The survey
+    takes about three minutes, your answers are anonymous, and you can skip any question.
+  questions:
+    - id: q1
+      type: single
+      text: Where do you usually study between classes?
+      options: [The college library, A student common room, A café, At home, Other]
+    - id: q2
+      type: single
+      text: How often do you buy a drink at a café in the afternoon?
+      options: [Never, Less than once a week, 1 to 2 times a week, 3 or more times a week]
+    - id: q3
+      type: scale
+      text: Don't you agree that Corner Brew's freshly roasted coffee is better than the chains'?
+      low: Strongly disagree
+      high: Strongly agree
+    - id: q4
+      type: scale
+      text: How important are cheap refills and fast wi-fi to you?
+      low: Not important at all
+      high: Very important
+    - id: q5
+      type: multi
+      text: Which of these would make you stay longer in a café?
+      options: [A power socket at every table, Quiet hours with no music, A fixed price for refills, Food deals in the afternoon, Tables you can book]
+    - id: q6
+      type: single
+      text: What is the most you would pay for unlimited filter coffee refills from 2 to 5 p.m.?
+      options: [Under $2, $2 to $2.99, $3 to $3.99, $4 or more]
+    - id: q7
+      type: open
+      text: What, if anything, puts you off studying in cafés?
+      required: false
+    - id: q8
+      type: single
+      text: Which year of your course are you in?
+      options: [Year 1, Year 2, Year 3, Other year or course]

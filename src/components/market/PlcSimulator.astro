@@ -1,0 +1,125 @@
+---
+/**
+ * Market Studio: the product life cycle simulator (4.5). The worked example's
+ * figures, charts and table are rendered on the server from
+ * src/lib/market-plc.ts; src/scripts/market/plc.ts re-runs the same model as
+ * the reader changes any assumption.
+ */
+import ToolBar from './ToolBar.astro';
+import { jsonForScript } from '../../lib/markup';
+import { numberField, textField } from '../../lib/market-view';
+import { cashChart, extensionRowHtml, plcFiguresHtml, plcRowsHtml, plcSummary, plcView, readPlc, salesChart } from '../../lib/market-plc-view';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'plc-simulator' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const s = data.state;
+const v = plcView(s);
+const reading = readPlc(v, s);
+const config = { uid, slug: 'product-life-cycle', defaults: s };
+const cur = s.currency;
+const summary = plcSummary(s);
+---
+
+<div class="mk mk--plc" data-ix="plc" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The simulator could not start. The worked example below is complete.</p>
+  <ToolBar csv />
+  <p class="mk-model-note"><span class="tag tag--simulated">Illustrative model</span> <span>Every figure comes from the assumptions below, which are simulated. Change them and the whole life cycle is recalculated.</span></p>
+
+  <form class="mk-form mk-form--stack" data-form novalidate aria-label="Product life cycle assumptions">
+    <div class="mk-grid">
+      <fieldset class="mk-fieldset">
+        <legend class="label label--ink">The product and its costs</legend>
+        <div class="mk-fields">
+          <Fragment set:html={textField({ id: `${uid}-product`, f: 'product', label: 'Product', value: s.product, max: 120, cls: 'mk-span-2' })} />
+          <Fragment set:html={numberField({ id: `${uid}-price`, f: 'price', label: 'Price per unit', value: s.price, min: 0, step: '0.01', prefix: cur })} />
+          <Fragment set:html={numberField({ id: `${uid}-vc`, f: 'variableCost', label: 'Variable cost per unit', value: s.variableCost, min: 0, step: '0.01', prefix: cur })} />
+          <Fragment set:html={numberField({ id: `${uid}-dev`, f: 'development', label: 'Development, year 0', value: s.development, min: 0, step: '100', prefix: cur })} />
+          <Fragment set:html={numberField({ id: `${uid}-launch-promo`, f: 'launchPromotion', label: 'Launch promotion, year 1', value: s.launchPromotion, min: 0, step: '100', prefix: cur })} />
+          <Fragment set:html={numberField({ id: `${uid}-fixed`, f: 'fixedCosts', label: 'Fixed costs a year', value: s.fixedCosts, min: 0, step: '100', prefix: cur })} />
+          <Fragment set:html={numberField({ id: `${uid}-wc`, f: 'workingCapital', label: 'Stock and credit held', value: s.workingCapital, min: 0, max: 100, step: '1', suffix: '% of revenue' })} />
+          <Fragment set:html={numberField({ id: `${uid}-capex`, f: 'capexAmount', label: 'Equipment bought', value: s.capex.amount, min: 0, step: '100', prefix: cur })} />
+          <Fragment set:html={numberField({ id: `${uid}-capex-year`, f: 'capexYear', label: 'Bought in year', value: s.capex.year, min: 1, max: s.horizon, step: '1' })} />
+          <Fragment set:html={numberField({ id: `${uid}-capex-life`, f: 'capexLife', label: 'Equipment life, years', value: s.capex.life, min: 1, step: '1', hint: 'Depreciated by the straight-line method.' })} />
+        </div>
+      </fieldset>
+      <fieldset class="mk-fieldset">
+        <legend class="label label--ink">The shape of the life cycle</legend>
+        <div class="mk-fields">
+          <Fragment set:html={numberField({ id: `${uid}-launch`, f: 'launch', label: `Sales in year 1, the launch`, value: s.launch, min: 0, step: '100', suffix: s.unit })} />
+          <Fragment set:html={numberField({ id: `${uid}-peak`, f: 'peak', label: 'Peak sales a year', value: s.peak, min: 0, step: '100', suffix: s.unit })} />
+          <Fragment set:html={numberField({ id: `${uid}-growth`, f: 'growthYears', label: 'Years of growth', value: s.growthYears, min: 1, max: s.horizon, step: '1' })} />
+          <Fragment set:html={numberField({ id: `${uid}-maturity`, f: 'maturityYears', label: 'Years of maturity', value: s.maturityYears, min: 0, max: s.horizon, step: '1' })} />
+          <Fragment set:html={numberField({ id: `${uid}-decline`, f: 'decline', label: 'Fall in sales each year of decline', value: s.decline, min: 0, max: 90, step: '1', suffix: '%' })} />
+          <Fragment set:html={numberField({ id: `${uid}-pg`, f: 'promo-growth', label: 'Promotion in growth', value: s.promotion.growth, min: 0, max: 100, step: '1', suffix: '% of revenue' })} />
+          <Fragment set:html={numberField({ id: `${uid}-pm`, f: 'promo-maturity', label: 'Promotion in maturity', value: s.promotion.maturity, min: 0, max: 100, step: '1', suffix: '% of revenue' })} />
+          <Fragment set:html={numberField({ id: `${uid}-pd`, f: 'promo-decline', label: 'Promotion in decline', value: s.promotion.decline, min: 0, max: 100, step: '1', suffix: '% of revenue' })} />
+        </div>
+      </fieldset>
+    </div>
+  </form>
+
+  <section class="mk-part" aria-labelledby={`${uid}-res-h`}>
+    <h4 class="mk-part__h" id={`${uid}-res-h`}><span class="mk-part__no">A</span> Investment, profit and cash flow</h4>
+    <dl class="figs" data-figures set:html={plcFiguresHtml(v, s)} />
+    <div class="bew__reading">
+      <p><strong>Reading.</strong> <span data-interp>{reading.reading}</span></p>
+      <p class="muted"><strong>Implication.</strong> <span data-impl>{reading.implication}</span></p>
+    </div>
+    <div class="mk-charts">
+      <figure class="mk-figure">
+        <div class="chart-scroll" role="region" aria-label="Sales chart" tabindex="0" data-chart-sales set:html={salesChart(v, s, `${uid}-sales`)} />
+        <figcaption class="exhibit__source"><b>Chart 1</b> Units sold each year, with the stages shaded. The dashed gold line shows sales with the extension strategies chosen.</figcaption>
+      </figure>
+      <figure class="mk-figure">
+        <div class="chart-scroll" role="region" aria-label="Profit and cash flow chart" tabindex="0" data-chart-cash set:html={cashChart(v, s, `${uid}-cash`)} />
+        <figcaption class="exhibit__source"><b>Chart 2</b> Profit (solid), net cash flow (dashed) and cumulative cash flow (dotted, with squares) each year, including any extension.</figcaption>
+      </figure>
+    </div>
+    <details class="disclosure">
+      <summary>Year by year: the figures behind the charts</summary>
+      <div class="disclosure__body table-scroll" role="region" aria-label="Year by year figures" tabindex="0">
+        <table class="table mk-plc-table">
+          <thead>
+            <tr>
+              <th scope="col">Year</th>
+              <th scope="col">Stage</th>
+              <th scope="col" class="n">Units</th>
+              <th scope="col" class="n">Revenue</th>
+              <th scope="col" class="n">Profit</th>
+              <th scope="col" class="n">Equipment</th>
+              <th scope="col" class="n">Stock and credit</th>
+              <th scope="col" class="n">Net cash flow</th>
+              <th scope="col" class="n">Cumulative</th>
+            </tr>
+          </thead>
+          <tbody data-table set:html={plcRowsHtml(v, s)} />
+        </table>
+        <p class="small muted">Profit = contribution − fixed costs − promotion − depreciation (and, in year 0, development). Net cash flow = profit + depreciation − equipment bought − cash newly tied up in stock and credit. The highlighted year is the one in which everything spent has been paid back.</p>
+      </div>
+    </details>
+  </section>
+
+  <section class="mk-part" aria-labelledby={`${uid}-ext-h`}>
+    <h4 class="mk-part__h" id={`${uid}-ext-h`}><span class="mk-part__no">B</span> Extension strategies</h4>
+    <p class="small muted mk-part__dek">Each effect is an assumption you can change. Strategies chosen together add their uplifts; a price cut changes the price and the number sold instead.</p>
+    <form class="mk-form" data-ext novalidate aria-label="Extension strategies">
+      <Fragment set:html={numberField({ id: `${uid}-ext-year`, f: 'extensionYear', label: 'Start the extensions in year', value: s.extensionYear, min: 2, max: s.horizon, step: '1', hint: 'Usually in maturity, before decline sets in.' })} />
+      <div class="mk-exts" data-rows set:html={s.extensions.map((e) => extensionRowHtml(e, uid, s)).join('')} />
+    </form>
+  </section>
+
+  <details class="disclosure mk-summary" data-no-print>
+    <summary>The summary as text</summary>
+    <pre class="mk-pre" data-kit-summary>{summary}</pre>
+  </details>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/market/plc';
+</script>

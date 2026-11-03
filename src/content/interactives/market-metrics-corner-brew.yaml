@@ -1,0 +1,68 @@
+# Market Studio: market metrics calculators. Corner Brew is the fictional café
+# of the 4.2 notes; the coffee brands are those of the position-map diagram.
+# Every figure is simulated. The acquisition cost is what the campaign planner
+# spends on winning customers ($1,800: every channel but the loyalty card)
+# divided by the regulars its funnel expects (47.52), and
+# src/lib/integrity-market.ts checks the two agree.
+component: market-metrics
+title: Market metrics calculators
+purpose: >
+  The learner enters sales for the sellers in a market they define, by value or by volume, and sees market size,
+  market growth, each seller's share, the change in share, relative market share and the leader recalculated, with
+  a chart, a table and the working. A second calculator works out customer lifetime value from spend, visits,
+  margin, retention and a discount rate. It diagnoses reading rising sales as a rising share, treating a group of
+  small sellers as a leader, and judging the cost of winning a customer without knowing what the customer is worth.
+provenance: simulated-data
+syllabus: ['4.1']
+page: /market-studio/market-metrics/
+guide:
+  lead: >
+    How big is the market, how fast is it growing, and is the business winning ground or losing it? Enter the sales
+    of each seller and the calculators work out market share and market growth, the change in share, and relative
+    market share for the BCG matrix. A second calculator asks what one customer is worth over the time they keep
+    buying.
+  use:
+    - Describe the market and say whether sales are measured by value (money) or by volume (units).
+    - Enter each seller's sales in the two periods. Tick **Group** for a line that adds up many small sellers, so it is counted in the market but never ranked as the leader.
+    - Choose the business to focus on, and read its share, its change in share and its relative market share against the reading.
+    - In the second calculator, enter what a customer spends, how often, the margin, how many customers stay each year, and a discount rate, to see their lifetime value against the cost of winning them.
+  limits:
+    - The answer depends on how the market is defined. Draw the boundary wider (all hot drinks) or narrower (speciality coffee only) and every share changes.
+    - Share by value and share by volume can tell different stories. A premium seller's share by value is larger than its share by volume.
+    - Two periods show a change, not a trend. One unusual year can make a market look as if it is growing or shrinking.
+    - Customer lifetime value rests on a retention rate that is an estimate, and a small change in it moves the answer a lot.
+  status: partly
+  serves:
+    - { code: '4.1', statement: Market share }
+    - { code: '4.1', statement: Market growth }
+    - { code: '4.1', statement: The importance of market share and market leadership }
+  beyond:
+    - '**Customer lifetime value** is not in the IB guide: it is enrichment, useful for judging how much a business can afford to spend to win a customer.'
+    - '**Relative market share** is the measure the BCG matrix uses, a toolkit tool for units 3 and 4 (guide, p. 14). The guide''s formula list (pp. 64 to 65) does not include it, nor market share or market growth.'
+  related:
+    - { label: '4.1 Introduction to marketing', href: /topics/introduction-to-marketing/ }
+    - { label: 'The BCG matrix in the 4.5 notes', href: /topics/the-seven-ps-of-the-marketing-mix/#product-portfolio }
+    - { label: 'Net present value and discounting (3.8)', href: /topics/investment-appraisal/ }
+  terms: [market-share, market-growth, market-size, market-leader, bcg-matrix]
+  example: >
+    Corner Brew is a fictional café that roasts its own coffee, the business in the 4.2 notes. Its local market is
+    coffee bought from cafés and kiosks within a ten-minute walk, measured by value in dollars a year. The rival
+    brands are fictional and every figure is simulated. The lifetime value is for a regular student customer won by
+    the study-hours campaign in the campaign planner.
+  exampleTitle: "Corner Brew's local coffee market"
+state:
+  market: Coffee bought from cafés and kiosks within a ten-minute walk of Corner Brew
+  basis: value
+  unit: dollars
+  symbol: $
+  periods: { last: '2025', now: '2026' }
+  focus: cornerbrew
+  firms:
+    - { id: quickcup, name: Quickcup, last: 410000, now: 430000 }
+    - { id: daybreak, name: Daybreak, last: 380000, now: 372000 }
+    - { id: harbour, name: Harbour Roast, last: 300000, now: 330000 }
+    - { id: cornerbrew, name: Corner Brew, last: 210000, now: 240000 }
+    - { id: kettle, name: Kettle Lane, last: 150000, now: 168000 }
+    - { id: saltmarsh, name: Saltmarsh, last: 90000, now: 84000 }
+    - { id: others, name: Other cafés and kiosks, last: 160000, now: 176000, group: true }
+  clv: { spend: 3.5, visits: 40, margin: 65, retention: 55, discount: 8, cac: 37.88 }

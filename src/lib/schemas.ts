@@ -11,6 +11,11 @@
  */
 import { z } from 'astro/zod';
 import { RATIO_IDS, STATEMENT_FIELDS } from './ratios';
+import { BASES } from './market-stp';
+import { PRICE_METHODS } from './market-mix';
+import { QUESTION_TYPES } from './market-research';
+import { EXTENSIONS } from './market-plc';
+import { ROLES } from './market-campaign';
 
 /* ------------------------------------------------------------------ */
 /* Shared vocabularies                                                 */
@@ -1011,6 +1016,165 @@ const statementFigures = z.object({
   retainedEarnings: z.number(),
 });
 
+/* ---------- Market Studio instruments (src/lib/market-*.ts) ---------- */
+
+/** What every Market Studio instrument says about itself, at the top of its page. */
+const marketToolGuide = z.object({
+  /** One paragraph for the page's lead. */
+  lead: md,
+  /** How to use it, step by step. */
+  use: z.array(md).min(2),
+  limits: z.array(md).min(2),
+  /** In the IB syllabus, partly beyond it, or wholly beyond it (enrichment). */
+  status: z.enum(['syllabus', 'partly', 'enrichment']),
+  /** The guide's statements the instrument serves, exactly as in the curriculum file (the integrity check compares them). */
+  serves: z.array(z.object({ code: z.string(), statement: z.string() })).default([]),
+  /** Parts of the instrument beyond the syllabus, each labelled on the page. */
+  beyond: z.array(md).default([]),
+  /** Where to read more on the platform. */
+  related: z.array(z.object({ label: z.string(), href: z.string().startsWith('/') })).default([]),
+  terms: ids,
+  /** The fictional business of the worked example, and how its figures were made. */
+  example: md,
+  /** A short title for the worked example, shown on the instrument's frame. */
+  exampleTitle: z.string().min(3),
+});
+const marketToolBase = { ...interactiveBase, page: z.string().regex(/^\/market-studio\/[a-z-]+\/$/), guide: marketToolGuide };
+const rating = z.number().int().min(1).max(5);
+const pct = z.number().min(0).max(100);
+const nonneg = z.number().nonnegative();
+const week = z.number().int().min(1).max(104);
+const axis = z.object({ label: z.string(), low: z.string(), high: z.string() });
+const answer = z.enum(['yes', 'no', 'unsure']);
+
+export const metricsStateSchema = z.object({
+  market: z.string(),
+  basis: z.enum(['value', 'volume']),
+  unit: z.string(),
+  symbol: z.string(),
+  periods: z.object({ last: z.string(), now: z.string() }),
+  focus: z.string(),
+  firms: z.array(z.object({ id: z.string(), name: z.string(), last: nonneg, now: nonneg, group: z.boolean().default(false) })).min(2).max(12),
+  clv: z.object({ spend: nonneg, visits: nonneg, margin: pct, retention: z.number().min(0).max(99), discount: z.number().min(0).max(50), cac: nonneg }),
+});
+
+export const questionnaireStateSchema = z.object({
+  business: z.string(),
+  title: z.string(),
+  objective: z.string(),
+  population: z.string(),
+  populationSize: z.number().int().nonnegative().default(0),
+  method: z.enum(['random', 'quota', 'convenience']),
+  sampleSize: z.number().int().nonnegative(),
+  quotas: z.array(z.object({ id: z.string(), group: z.string(), share: pct })).default([]),
+  intro: z.string(),
+  questions: z
+    .array(z.object({ id: z.string(), type: z.enum(QUESTION_TYPES), text: z.string(), options: z.array(z.string()).default([]), low: z.string().default(''), high: z.string().default(''), required: z.boolean().default(true) }))
+    .min(1)
+    .max(25),
+});
+
+export const personaStateSchema = z.object({
+  business: z.string(),
+  name: z.string(),
+  age: z.string(),
+  occupation: z.string(),
+  location: z.string(),
+  segment: z.string(),
+  quote: z.string(),
+  background: z.string(),
+  needs: z.array(z.string()),
+  pains: z.array(z.string()),
+  behaviour: z.array(z.string()),
+  channels: z.array(z.object({ name: z.string(), use: z.enum(['high', 'medium', 'low']), note: z.string().default('') })),
+  objections: z.array(z.string()).default([]),
+  winners: z.array(z.string()).default([]),
+  basis: z.enum(['research', 'mixed', 'assumption']),
+  evidence: z.string(),
+});
+
+export const stpStateSchema = z.object({
+  business: z.string(),
+  market: z.string(),
+  bases: z.array(z.enum(BASES)),
+  weights: z.object({ size: z.number().int().min(0).max(5), growth: z.number().int().min(0).max(5), fit: z.number().int().min(0).max(5), competition: z.number().int().min(0).max(5) }),
+  segments: z
+    .array(z.object({ id: z.string(), name: z.string(), profile: z.string(), bases: z.array(z.enum(BASES)), size: rating, growth: rating, fit: rating, competition: rating, reachable: z.boolean(), target: z.boolean(), evidence: z.string() }))
+    .min(2)
+    .max(8),
+  positioning: z.object({ customers: z.string(), need: z.string(), brand: z.string(), frame: z.string(), difference: z.string(), proof: z.string() }),
+});
+
+export const mapStateSchema = z.object({
+  market: z.string(),
+  scale: z.enum(['0-10', '1-10', '1-5']),
+  x: axis,
+  y: axis,
+  focus: z.string(),
+  brands: z.array(z.object({ id: z.string(), name: z.string(), x: z.number(), y: z.number(), note: z.string().default('') })).min(3).max(12),
+  test: z.object({ demand: answer, deliver: answer, fit: answer, rivals: answer, note: z.string().default('') }),
+});
+
+export const mixStateSchema = z.object({
+  business: z.string(),
+  offer: z.string(),
+  kind: z.enum(['good', 'service']),
+  target: z.object({ name: z.string(), sensitivity: z.enum(['high', 'medium', 'low']), size: z.enum(['niche', 'mass']) }),
+  position: z.enum(['premium', 'mid', 'value']),
+  product: z.object({ quality: z.enum(['basic', 'standard', 'distinctive']), range: z.enum(['single', 'wide']), text: z.string() }),
+  price: z.object({ method: z.enum(PRICE_METHODS), level: z.enum(['below', 'in-line', 'above']), text: z.string() }),
+  promotion: z.object({ line: z.enum(['above', 'below', 'through']), text: z.string() }),
+  place: z.object({ channel: z.enum(['direct', 'one', 'two', 'agent', 'several']), coverage: z.enum(['intensive', 'selective', 'exclusive']), text: z.string() }),
+  people: z.object({ service: z.enum(['self', 'standard', 'personal']), text: z.string() }),
+  processes: z.object({ style: z.enum(['self', 'assisted', 'personal']), text: z.string() }),
+  physical: z.object({ standard: z.enum(['basic', 'functional', 'designed']), text: z.string() }),
+});
+
+export const plcStateSchema = z.object({
+  product: z.string(),
+  currency: z.string(),
+  unit: z.string(),
+  price: z.number().positive(),
+  variableCost: nonneg,
+  development: nonneg,
+  launchPromotion: nonneg,
+  fixedCosts: nonneg,
+  promotion: z.object({ growth: pct, maturity: pct, decline: pct }),
+  capex: z.object({ year: z.number().int().min(1), amount: nonneg, life: z.number().int().min(1) }),
+  workingCapital: pct,
+  launch: nonneg,
+  peak: z.number().positive(),
+  growthYears: z.number().int().min(1),
+  maturityYears: z.number().int().min(0),
+  decline: z.number().min(0).max(90),
+  horizon: z.number().int().min(5).max(20),
+  extensionYear: z.number().int().min(2),
+  priceCut: z.object({ price: z.number().min(0).max(90), units: z.number().min(0).max(500) }),
+  extensions: z.array(z.object({ id: z.enum(EXTENSIONS), on: z.boolean(), detail: z.string(), uplift: z.number().min(0).max(200), fade: z.number().min(0).max(100), cost: nonneg })).length(EXTENSIONS.length),
+});
+
+export const campaignStateSchema = z.object({
+  name: z.string(),
+  business: z.string(),
+  currency: z.string(),
+  objective: z.object({ metric: z.string(), baseline: nonneg, target: nonneg, unit: z.string(), weeks: week }),
+  audience: z.string(),
+  insight: z.string().default(''),
+  message: z.object({ proposition: z.string(), proof: z.string(), action: z.string() }),
+  budget: nonneg,
+  channels: z.array(z.object({ id: z.string(), name: z.string(), line: z.enum(['above', 'below']), role: z.enum(ROLES), cost: nonneg, start: week, end: week })).max(12),
+  tasks: z.array(z.object({ id: z.string(), name: z.string(), cost: nonneg, start: week, end: week })).max(12).default([]),
+  kpis: z.array(z.object({ id: z.string(), name: z.string(), role: z.enum(ROLES), primary: z.boolean().default(false), baseline: nonneg, target: nonneg, unit: z.string(), frequency: z.enum(['weekly', 'monthly', 'end']) })).max(10),
+  funnel: z.object({ reach: nonneg, aware: pct, trial: pct, repeat: pct, visits: nonneg, spend: nonneg }),
+});
+
+export const budgetStateSchema = z.object({
+  business: z.string(),
+  currency: z.string(),
+  budget: z.number().positive(),
+  channels: z.array(z.object({ id: z.string(), name: z.string(), spend: nonneg, audience: z.number().positive(), k: z.number().positive(), conversion: pct })).min(2).max(10),
+});
+
 export const interactiveSchema = z.discriminatedUnion('component', [
   z.object({
     component: z.literal('cost-classifier'),
@@ -1324,6 +1488,22 @@ export const interactiveSchema = z.discriminatedUnion('component', [
     gaps: z.array(z.object({ poles: z.record(z.string(), z.enum(['high', 'low'])), note: md })).default([]),
     caution: md,
   }),
+  /* The Market Studio instruments: each holds its guide and its worked example as `state`. */
+  z.object({ component: z.literal('market-metrics'), ...marketToolBase, state: metricsStateSchema }),
+  z.object({
+    component: z.literal('questionnaire-builder'),
+    ...marketToolBase,
+    state: questionnaireStateSchema,
+    /** Questions written badly on purpose, to show the checks; the integrity check confirms the rules flag these and no others. */
+    flawed: ids,
+  }),
+  z.object({ component: z.literal('persona-creator'), ...marketToolBase, state: personaStateSchema }),
+  z.object({ component: z.literal('stp-planner'), ...marketToolBase, state: stpStateSchema }),
+  z.object({ component: z.literal('competitor-map'), ...marketToolBase, state: mapStateSchema }),
+  z.object({ component: z.literal('mix-builder'), ...marketToolBase, state: mixStateSchema }),
+  z.object({ component: z.literal('plc-simulator'), ...marketToolBase, state: plcStateSchema }),
+  z.object({ component: z.literal('campaign-planner'), ...marketToolBase, state: campaignStateSchema }),
+  z.object({ component: z.literal('budget-allocator'), ...marketToolBase, state: budgetStateSchema }),
   z.object({
     component: z.literal('capacity-productivity'),
     ...interactiveBase,

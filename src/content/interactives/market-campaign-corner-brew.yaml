@@ -1,0 +1,80 @@
+# Market Studio: the marketing campaign planner. Corner Brew's plan for the
+# quiet hours from the 4.2 notes: raise afternoon sales by 25% within six
+# months, with a study-hours offer, more power sockets and posts on the
+# college's student pages, for $3,000. The weekly figures and channel costs are
+# simulated; the four promotion channels follow the budget allocation tool's
+# suggested split, rounded, and the funnel's 264 first visits match the
+# customers that split is expected to win.
+component: campaign-planner
+title: Marketing campaign planner
+purpose: >
+  The learner plans a campaign: an objective with a starting figure, a target and a deadline, the audience and the
+  insight behind the message, the channels with their line, role, cost and weeks, other tasks, and the KPIs that
+  will show whether it worked, with a funnel estimate of what the campaign might add. The timeline is drawn as a
+  Gantt chart. Checks flag an objective that cannot be measured, a missing call to action, channels that never turn
+  interest into a purchase, spending over budget, items outside the campaign and KPIs that do not measure the
+  objective. It diagnoses campaigns planned as a list of activities with no way of telling whether they worked.
+provenance: simulated-data
+syllabus: ['4.2', '4.5']
+page: /market-studio/campaign-planner/
+guide:
+  lead: >
+    A campaign is a plan with a number at the end of it. Set an objective you can measure, decide who it is for and
+    what to tell them, choose channels that take them from noticing to buying, put it all on a timeline and choose
+    the KPIs that will show, week by week, whether it is working.
+  use:
+    - Write the objective as a measure with a starting figure, a target and a deadline in weeks.
+    - Describe the audience and what you know about them, then the message, a reason to believe it and a call to action.
+    - Add the channels with their line (above or below), their role, their cost and the weeks they run, and any other tasks.
+    - Choose KPIs, mark the one that measures the objective, and check the Gantt chart, the funnel estimate and the checks.
+  limits:
+    - The funnel estimate multiplies your own assumptions. Real response rates are uncertain, and the estimate is only a way to see which assumption matters most.
+    - A plan on paper does not show the campaign's quality, the creativity of the message or the timing of rivals' moves.
+    - Each item has one block of weeks. A channel that runs in bursts needs a row for each burst.
+  status: syllabus
+  serves:
+    - { code: '4.2', statement: The role of marketing planning }
+    - { code: '4.5', statement: 'Promotion: above, below and through the line' }
+    - { code: '4.5', statement: 'Promotion: social media marketing as a promotional strategy' }
+  beyond:
+    - '**The Gantt chart** is an HL toolkit tool (guide, p. 14); at SL, read it as a timeline.'
+    - KPIs and the funnel estimate are common planning practice, not terms of the guide.
+  related:
+    - { label: 'The role of marketing planning (4.2 notes)', href: /topics/marketing-planning/#role-of-marketing-planning }
+    - { label: 'Above, below and through the line', href: /topics/the-seven-ps-of-the-marketing-mix/#promotion-lines }
+    - { label: Social media marketing, href: /topics/the-seven-ps-of-the-marketing-mix/#social-media-marketing }
+    - { label: SMART objectives, href: /glossary/smart-objectives/ }
+  terms: [marketing-plan, marketing-objectives, smart-objectives, promotional-mix, below-the-line-promotion, through-the-line-promotion, sales-promotion, gantt-chart]
+  example: >
+    Corner Brew's plan for the quiet hours from the 4.2 notes: raise afternoon sales by 25% within six months with
+    a study-hours offer, more power sockets and posts on the college's student pages, for $3,000, with afternoon
+    sales checked every month. The weekly figures and costs are simulated.
+  exampleTitle: "Study hours at Corner Brew"
+state:
+  name: Study hours at Corner Brew
+  business: Corner Brew
+  currency: $
+  objective: { metric: 'Afternoon sales a week, 2 to 5 p.m. on weekdays', baseline: 720, target: 900, unit: dollars, weeks: 26 }
+  audience: Students from the college nearby who study after classes; see Lena in the persona creator.
+  insight: The college library is full by 2 p.m., and students want somewhere they can stay without buying a drink every hour.
+  message:
+    proposition: 'Study hours at Corner Brew: one fixed price for refills from 2 to 5 p.m. on weekdays, and a socket at every table.'
+    proof: the coffee is roasted on the premises every morning, with the date on every cup
+    action: Show your student card at the gate stall for a free first refill.
+  budget: 3000
+  channels:
+    - { id: posts, name: Posts on the college's student pages, line: below, role: awareness, cost: 650, start: 3, end: 26 }
+    - { id: posters, name: Posters on campus noticeboards, line: below, role: awareness, cost: 300, start: 3, end: 8 }
+    - { id: stall, name: Sampling stall at the college gate, line: below, role: conversion, cost: 600, start: 3, end: 4 }
+    - { id: leaflets, name: Leaflets to flats near the college, line: below, role: awareness, cost: 250, start: 3, end: 3 }
+    - { id: stamps, name: 'Loyalty stamp card: every sixth refill free', line: below, role: loyalty, cost: 150, start: 3, end: 26 }
+  tasks:
+    - { id: sockets, name: Fit a power socket at every study table, cost: 1050, start: 1, end: 2 }
+    - { id: brief, name: Brief staff on the study-hours welcome, cost: 0, start: 2, end: 2 }
+    - { id: price, name: Review the refill price, cost: 0, start: 13, end: 13 }
+  kpis:
+    - { id: sales, name: Afternoon sales a week, role: conversion, primary: true, baseline: 720, target: 900, unit: dollars, frequency: monthly }
+    - { id: reach, name: Students reached by the posts, role: awareness, baseline: 0, target: 2000, unit: students, frequency: monthly }
+    - { id: vouchers, name: First-refill vouchers redeemed, role: conversion, baseline: 0, target: 264, unit: vouchers, frequency: monthly }
+    - { id: cards, name: Stamp cards completed, role: loyalty, baseline: 0, target: 40, unit: cards, frequency: monthly }
+  funnel: { reach: 2400, aware: 55, trial: 20, repeat: 18, visits: 1.1, spend: 3.5 }

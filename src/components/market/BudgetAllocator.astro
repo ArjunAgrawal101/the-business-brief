@@ -1,0 +1,96 @@
+---
+/**
+ * Market Studio: the marketing budget allocation tool (enrichment). The
+ * worked example's results, curves and suggested split are rendered on the
+ * server from src/lib/market-budget.ts; src/scripts/market/budget.ts re-runs
+ * the same illustrative model as the reader edits.
+ */
+import ToolBar from './ToolBar.astro';
+import { jsonForScript } from '../../lib/markup';
+import { checksHtml, numberField } from '../../lib/market-view';
+import { budgetChecks, budgetSummary, budgetView } from '../../lib/market-budget';
+import { budgetFiguresHtml, budgetResultRowsHtml, budgetRowHtml, diminishingHtml, responseChart } from '../../lib/market-budget-view';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'budget-allocator' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const s = data.state;
+const v = budgetView(s);
+const config = { uid, slug: 'budget-allocation', defaults: s };
+---
+
+<div class="mk mk--budget" data-ix="budget" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The tool could not start. The worked example below is complete.</p>
+  <ToolBar csv />
+  <p class="mk-model-note"><span class="tag tag--simulated">Illustrative model</span> <span>Reach = audience × (1 − e<sup>−spend ÷ k</sup>), where k is the spend that reaches about two thirds of the audience; customers = reach × the share who buy. The curves are assumptions for teaching, not measurements.</span></p>
+
+  <form class="mk-form mk-form--stack" data-form novalidate aria-label="Budget and channels">
+    <Fragment set:html={numberField({ id: `${uid}-budget`, f: 'budget', label: 'Promotion budget', value: s.budget, min: 0, step: '10', prefix: s.currency, cls: 'mk-field--narrow' })} />
+    <div class="table-scroll" role="region" aria-label="Channels and their assumptions" tabindex="0">
+      <table class="table mk-edit-table">
+        <thead>
+          <tr>
+            <th scope="col">Channel</th>
+            <th scope="col" class="n">Your spend</th>
+            <th scope="col" class="n">Audience it could reach</th>
+            <th scope="col" class="n">Spend for two thirds of it</th>
+            <th scope="col" class="n">Share who buy</th>
+            <th scope="col"><span class="sr-only">Remove</span></th>
+          </tr>
+        </thead>
+        <tbody data-rows set:html={s.channels.map((c, i) => budgetRowHtml(c, i, uid, s)).join('')} />
+      </table>
+    </div>
+    <p class="cluster mk-add js-only">
+      <button type="button" class="btn btn--small" data-add>Add a channel</button>
+      <button type="button" class="btn btn--small btn--ink" data-apply-suggested>Use the suggested split</button>
+    </p>
+  </form>
+
+  <section class="mk-part" aria-labelledby={`${uid}-res-h`}>
+    <h4 class="mk-part__h" id={`${uid}-res-h`}><span class="mk-part__no">A</span> What each channel buys</h4>
+    <dl class="figs" data-figures set:html={budgetFiguresHtml(v, s)} />
+    <p class="mk-dim" data-dim set:html={diminishingHtml(v, s)} />
+    <div class="table-scroll" role="region" aria-label="Results by channel" tabindex="0">
+      <table class="table">
+        <caption class="sr-only">Reach, customers and costs per customer for each channel at your spend, with the suggested spend</caption>
+        <thead>
+          <tr>
+            <th scope="col">Channel</th>
+            <th scope="col" class="n">Your spend</th>
+            <th scope="col" class="n">Reach</th>
+            <th scope="col" class="n">New customers</th>
+            <th scope="col" class="n">Average cost each</th>
+            <th scope="col" class="n">Cost of the next one</th>
+            <th scope="col" class="n">First 100 then next 100 spent</th>
+            <th scope="col" class="n">Suggested spend</th>
+          </tr>
+        </thead>
+        <tbody data-results set:html={budgetResultRowsHtml(v, s)} />
+      </table>
+    </div>
+    <figure class="mk-figure">
+      <div class="chart-scroll" role="region" aria-label="Response curves" tabindex="0" data-chart set:html={responseChart(s, `${uid}-chart`)} />
+      <figcaption class="exhibit__source"><b>Chart</b> New customers for any spend in each channel; the circle marks your spend. Where a curve flattens, more money buys little. Each line has its own pattern as well as its colour.</figcaption>
+    </figure>
+  </section>
+
+  <section class="mk-part" aria-labelledby={`${uid}-chk-h`}>
+    <h4 class="mk-part__h" id={`${uid}-chk-h`}>Checks</h4>
+    <div data-checks set:html={checksHtml(budgetChecks(s, v))} />
+  </section>
+
+  <details class="disclosure mk-summary" data-no-print>
+    <summary>The summary as text</summary>
+    <pre class="mk-pre" data-kit-summary>{budgetSummary(s)}</pre>
+  </details>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/market/budget';
+</script>

@@ -1,0 +1,54 @@
+# Market Studio: the marketing budget allocation tool. Corner Brew's first
+# draft of its $1,800 promotion budget, with simulated response curves. The
+# model is illustrative and labelled so on the page.
+component: budget-allocator
+title: Marketing budget allocation
+purpose: >
+  The learner splits a promotion budget across channels, each with an audience it can reach, the spend that
+  reaches about two thirds of it and the share of people reached who buy, and sees the reach, new customers,
+  average cost per customer and cost of the next customer in each channel, with response curves that flatten as
+  spending rises and a suggested split for comparison. It diagnoses putting more and more money into the channel
+  that worked best, past the point where each extra dollar buys much.
+provenance: enrichment
+syllabus: ['4.2', '4.5']
+page: /market-studio/budget-allocation/
+guide:
+  lead: >
+    The first hundred dollars in a channel buys more than the tenth. Split a promotion budget across channels and see
+    diminishing returns made explicit: what each channel's next customer costs, and how a split that evens out those
+    costs compares with yours. The model is illustrative, and every curve is an assumption you can change.
+  use:
+    - Enter the budget, then for each channel the spend, the audience it could reach, the spend that would reach about two thirds of that audience, and the share of people reached who become customers.
+    - Read each channel's customers, its average cost per customer and, most important, the cost of the next customer.
+    - Compare the response curves. Where a curve has flattened, more money buys little.
+    - Compare your split with the suggested one, then decide, remembering what the model leaves out.
+  limits:
+    - An illustrative model. The curves are assumptions, not measurements, and real channels are rarely this smooth.
+    - It ignores people reached by more than one channel, minimum spends, timing, and the effect of one channel on another.
+    - It counts customers, not their value. A channel that wins fewer but more loyal customers may be worth more.
+  status: enrichment
+  serves:
+    - { code: '4.2', statement: The role of marketing planning }
+    - { code: '4.5', statement: 'Promotion: above, below and through the line' }
+  beyond:
+    - The response curves, cost per acquisition and the suggested split are enrichment. The guide asks for a marketing plan's budget (4.2) and, at HL, for budgets and variances (3.9), but not for response models.
+  related:
+    - { label: The campaign planner, href: /market-studio/campaign-planner/ }
+    - { label: 'Budgets (3.9, HL)', href: /topics/budgets/ }
+    - { label: 'Above, below and through the line', href: /topics/the-seven-ps-of-the-marketing-mix/#promotion-lines }
+  terms: [budget, promotional-mix, above-the-line-promotion, below-the-line-promotion, marketing-plan]
+  example: >
+    Corner Brew's first draft of the $1,800 promotion budget for its study-hours campaign put most of it into the
+    student page posts that had worked before. The audiences, curves and conversion rates are simulated. The
+    campaign planner's channels follow the suggested split, rounded.
+  exampleTitle: "Corner Brew's first draft of its promotion budget"
+state:
+  business: Corner Brew
+  currency: $
+  budget: 1800
+  channels:
+    - { id: posts, name: Posts on the college's student pages, spend: 1000, audience: 2400, k: 250, conversion: 6 }
+    - { id: posters, name: Posters on campus noticeboards, spend: 200, audience: 1500, k: 150, conversion: 3 }
+    - { id: stall, name: Sampling stall at the college gate, spend: 300, audience: 600, k: 300, conversion: 15 }
+    - { id: leaflets, name: Leaflets to flats near the college, spend: 300, audience: 3000, k: 400, conversion: 1 }
+    - { id: radio, name: Local radio adverts, spend: 0, audience: 40000, k: 2000, conversion: 0.2 }

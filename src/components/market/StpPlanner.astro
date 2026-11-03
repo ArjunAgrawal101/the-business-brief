@@ -1,0 +1,135 @@
+---
+/**
+ * Market Studio: the STP planner (4.2). The ranking, chart, reading and
+ * checks for the worked example are rendered on the server from
+ * src/lib/market-stp.ts; src/scripts/market/stp.ts recalculates them from the
+ * same functions as the reader edits.
+ */
+import ToolBar from './ToolBar.astro';
+import { jsonForScript } from '../../lib/markup';
+import { checksHtml, textField } from '../../lib/market-view';
+import { BASES, BASE_LABELS, CRITERIA, CRITERION_LABELS, MAX_WEIGHT, readStp, stpChecks, stpSummary } from '../../lib/market-stp';
+import { segmentRowHtml, statementHtml, stpChartSvg, stpTableHtml } from '../../lib/market-stp-view';
+import type { Interactive } from '../../lib/schemas';
+
+interface Props {
+  data: Extract<Interactive, { component: 'stp-planner' }>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const s = data.state;
+const reading = readStp(s);
+const config = { uid, slug: 'stp-planner', defaults: s };
+const P = s.positioning;
+---
+
+<div class="mk mk--stp" data-ix="stp" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The planner could not start. The worked example below is complete, with its ranking and checks.</p>
+  <ToolBar csv />
+
+  <form class="mk-form mk-form--stack" data-form novalidate aria-label="STP plan">
+    <section class="mk-part" aria-labelledby={`${uid}-seg-h`}>
+      <h4 class="mk-part__h" id={`${uid}-seg-h`}><span class="mk-part__no">A</span> Segmentation: the market and its segments</h4>
+      <div class="mk-fields mk-fields--wide">
+        <Fragment set:html={textField({ id: `${uid}-business`, f: 'business', label: 'Business', value: s.business, max: 80 })} />
+        <Fragment set:html={textField({ id: `${uid}-market`, f: 'market', label: 'The market you are segmenting', value: s.market, max: 200 })} />
+      </div>
+      <fieldset class="mk-subset mk-bases">
+        <legend class="field__label">Bases you will use</legend>
+        <div class="mk-bases__grid">
+          {
+            BASES.map((b) => (
+              <label class="mk-base" for={`${uid}-base-${b}`}>
+                <input type="checkbox" id={`${uid}-base-${b}`} data-f="bases" value={b} checked={s.bases.includes(b)} />
+                <span>
+                  <b>{BASE_LABELS[b].label}</b>
+                  <span class="small muted">{BASE_LABELS[b].examples}</span>
+                </span>
+              </label>
+            ))
+          }
+        </div>
+      </fieldset>
+      <div class="mk-seglist" data-rows set:html={s.segments.map((g, i) => segmentRowHtml(g, i, uid)).join('')} />
+      <p class="cluster mk-add js-only"><button type="button" class="btn btn--small" data-add>Add a segment</button></p>
+    </section>
+
+    <section class="mk-part" aria-labelledby={`${uid}-tgt-h`}>
+      <h4 class="mk-part__h" id={`${uid}-tgt-h`}><span class="mk-part__no">B</span> Targeting: weigh the segments</h4>
+      <div class="mk-grid">
+        <fieldset class="mk-fieldset mk-weights">
+          <legend class="label label--ink">How much each criterion matters, 0 to {MAX_WEIGHT}</legend>
+          <ol class="mk-weights__list" role="list">
+            {
+              CRITERIA.map((c) => (
+                <li class="mk-weight">
+                  <label for={`${uid}-w-${c}`}>{CRITERION_LABELS[c].label}</label>
+                  <span class="mk-weight__ctl">
+                    <input type="range" id={`${uid}-w-${c}`} min="0" max={MAX_WEIGHT} step="1" value={String(s.weights[c])} data-weight={c} aria-valuetext={`Weight ${s.weights[c]} of ${MAX_WEIGHT}`} aria-describedby={`${uid}-w-${c}-hint`} />
+                    <output class="num" for={`${uid}-w-${c}`} data-out={c}>{s.weights[c]}</output>
+                  </span>
+                  <span class="field__hint" id={`${uid}-w-${c}-hint`}>1 means {CRITERION_LABELS[c].low}; 5 means {CRITERION_LABELS[c].high}.</span>
+                </li>
+              ))
+            }
+          </ol>
+        </fieldset>
+        <div class="mk-results">
+          <div class="table-scroll" role="region" aria-label="Segment ranking" tabindex="0">
+            <table class="table mk-rank">
+              <caption class="sr-only">Each segment's ratings, weighted total, share of the maximum and rank</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Segment</th>
+                  {CRITERIA.map((c) => <th scope="col">{CRITERION_LABELS[c].label}</th>)}
+                  <th scope="col" class="n">Total</th>
+                  <th scope="col" class="n">Share</th>
+                  <th scope="col" class="n">Rank</th>
+                </tr>
+              </thead>
+              <tbody data-table set:html={stpTableHtml(s)} />
+            </table>
+          </div>
+          <div class="bew__reading">
+            <p><strong>Reading.</strong> <span data-interp>{reading.reading}</span></p>
+            <p class="muted"><strong>Targeting.</strong> <span data-impl>{reading.implication}</span></p>
+          </div>
+        </div>
+      </div>
+      <figure class="mk-figure">
+        <div class="chart-scroll" role="region" aria-label="Segment attractiveness chart" tabindex="0" data-chart set:html={stpChartSvg(s, `${uid}-chart`)} />
+        <figcaption class="exhibit__source"><b>Chart</b> Weighted attractiveness as a share of the maximum score. Targets are solid and labelled; other segments are outlined.</figcaption>
+      </figure>
+    </section>
+
+    <section class="mk-part" aria-labelledby={`${uid}-pos-h`}>
+      <h4 class="mk-part__h" id={`${uid}-pos-h`}><span class="mk-part__no">C</span> Positioning: the statement</h4>
+      <p class="small muted mk-part__dek">A common format beyond the guide (enrichment): for whom, what need, which kind of business, what difference, and why customers should believe it.</p>
+      <div class="mk-fields mk-fields--wide">
+        <Fragment set:html={textField({ id: `${uid}-p-customers`, f: 'p-customers', label: 'For (the target customers)', value: P.customers, max: 200 })} />
+        <Fragment set:html={textField({ id: `${uid}-p-need`, f: 'p-need', label: 'Who (their need)', value: P.need, max: 200 })} />
+        <Fragment set:html={textField({ id: `${uid}-p-brand`, f: 'p-brand', label: 'The brand', value: P.brand, max: 80 })} />
+        <Fragment set:html={textField({ id: `${uid}-p-frame`, f: 'p-frame', label: 'Is the (kind of product or business)', value: P.frame, max: 120 })} />
+        <Fragment set:html={textField({ id: `${uid}-p-difference`, f: 'p-difference', label: 'That (the point of difference)', value: P.difference, max: 240 })} />
+        <Fragment set:html={textField({ id: `${uid}-p-proof`, f: 'p-proof', label: 'Because (the reason to believe)', value: P.proof, max: 240 })} />
+      </div>
+      <blockquote class="mk-statement"><p data-statement set:html={statementHtml(s)} /></blockquote>
+    </section>
+  </form>
+
+  <section class="mk-part" aria-labelledby={`${uid}-chk-h`}>
+    <h4 class="mk-part__h" id={`${uid}-chk-h`}>Checks on the plan</h4>
+    <div data-checks set:html={checksHtml(stpChecks(s))} />
+  </section>
+
+  <details class="disclosure mk-summary" data-no-print>
+    <summary>The summary as text</summary>
+    <pre class="mk-pre" data-kit-summary>{stpSummary(s)}</pre>
+  </details>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/market/stp';
+</script>

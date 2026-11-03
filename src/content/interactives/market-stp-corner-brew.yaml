@@ -1,0 +1,106 @@
+# Market Studio: the STP planner. The four segments are those of the 4.2
+# notes (Corner Brew, "Four segments, one café"); the ratings and the weights
+# are simulated, and the positioning follows the notes: good quality at a
+# modest price, built on beans roasted on the premises every morning.
+component: stp-planner
+title: STP planner
+purpose: >
+  The learner segments a market by the bases they choose, rates each segment from 1 to 5 for size, growth, fit with
+  the business and competitive space, weights the criteria, chooses targets and writes a positioning statement.
+  The planner ranks the segments, names the targeting strategy, tests whether one change of weight would change the
+  ranking, and checks the plan for unreachable or poorly fitting targets and a statement that does not name them.
+  It diagnoses treating segmentation as a list of bases rather than a choice, and a position that has no point of
+  difference.
+provenance: simulated-data
+syllabus: ['4.2']
+page: /market-studio/stp-planner/
+guide:
+  lead: >
+    Segment the market, decide which segments are worth serving, and say how you want them to see you. The planner
+    weighs each segment on four criteria, shows how much the ranking depends on your weights, and checks that the
+    position you write is aimed at the customers you chose.
+  use:
+    - Describe the market and tick the bases you will use to segment it. Combining bases usually describes customers better than one.
+    - For each segment, write who they are and what they need, tick the bases that define it, and rate it from 1 to 5 on each criterion. Record the evidence for the ratings.
+    - Set the weights to show which criteria matter most to this business, then tick the segments to target.
+    - Complete the positioning statement for the targets, and read the checks.
+  limits:
+    - The ratings and weights are judgements. The weighted score organizes them; it cannot make them objective.
+    - A segment that scores well may still be wrong for the business for reasons outside the four criteria, such as its image or its capacity.
+    - Real segments overlap, and real customers do not fit neatly into one.
+  status: syllabus
+  serves:
+    - { code: '4.2', statement: 'Segmentation, targeting and positioning, including position maps' }
+    - { code: '4.2', statement: Niche markets versus mass markets }
+    - { code: '4.2', statement: How organizations differentiate themselves and their products from competitors }
+  beyond:
+    - Weighted scoring of segments is a decision method, not a requirement of the guide.
+    - '**The positioning statement** (for whom, what need, which category, what difference, why believe it) is a common practitioners'' format, not named in the guide: enrichment.'
+  related:
+    - { label: 'Segmentation in the 4.2 notes', href: /topics/marketing-planning/#segmentation }
+    - { label: 'Targeting: niche and mass markets', href: /topics/marketing-planning/#targeting-niche-and-mass }
+    - { label: 'Positioning and position maps', href: /topics/marketing-planning/#positioning-and-position-maps }
+    - { label: The unique selling point, href: /topics/marketing-planning/#unique-selling-point }
+  terms: [market-segmentation, demographic-segmentation, geographic-segmentation, psychographic-segmentation, behavioural-segmentation, target-market, niche-market, mass-market, positioning, unique-selling-point, differentiation]
+  example: >
+    Corner Brew, the fictional café of the 4.2 notes, segments the coffee drinkers within a ten-minute walk into
+    the four groups the notes describe. It is full before 9 a.m. and nearly empty after 2 p.m., so fit with its
+    spare afternoon seats carries the most weight. The ratings are simulated.
+  exampleTitle: "Segmenting the coffee drinkers around Corner Brew"
+state:
+  business: Corner Brew
+  market: Coffee drinkers within a ten-minute walk of the café
+  bases: [demographic, psychographic, behavioural]
+  weights: { size: 3, growth: 2, fit: 4, competition: 3 }
+  segments:
+    - id: commuters
+      name: Commuters
+      profile: Buy a takeaway every weekday on the way to work and want it fast.
+      bases: [behavioural]
+      size: 5
+      growth: 2
+      fit: 2
+      competition: 1
+      reachable: true
+      target: false
+      evidence: Morning queue counts; the chain on the same street is cheaper and faster.
+    - id: students
+      name: College students
+      profile: Students from the college nearby, with little money to spend, who stay for hours and want somewhere to study after classes.
+      bases: [demographic, behavioural]
+      size: 4
+      growth: 3
+      fit: 4
+      competition: 4
+      reachable: true
+      target: true
+      evidence: Research among customers; the college's student numbers; few places nearby welcome long stays.
+    - id: homeworkers
+      name: Home workers
+      profile: People who work from home and want a calm place with reliable wi-fi that feels like a workplace.
+      bases: [psychographic]
+      size: 3
+      growth: 4
+      fit: 4
+      competition: 3
+      reachable: true
+      target: true
+      evidence: Weekday afternoon counts and conversations with regulars.
+    - id: brewers
+      name: Home brewers
+      profile: Want freshly roasted beans to take away and brew at home.
+      bases: [behavioural]
+      size: 1
+      growth: 3
+      fit: 5
+      competition: 4
+      reachable: true
+      target: false
+      evidence: Bean sales at the counter; no other roaster within walking distance.
+  positioning:
+    customers: college students and people working from home nearby
+    need: want a calm place to work through the quiet afternoon hours
+    brand: Corner Brew
+    frame: neighbourhood café
+    difference: serves good coffee, roasted on the premises that morning, at a modest price
+    proof: it roasts its own beans every day and prints the roasting date on every cup

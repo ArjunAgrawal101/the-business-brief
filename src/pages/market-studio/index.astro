@@ -1,0 +1,767 @@
+---
+/**
+ * The Market Studio: the marketing room's home. Its front panels are drawn
+ * from the instruments' own worked examples with the same functions the
+ * instruments use, so every figure on the page is one a reader can open and
+ * change. Below them: the nine instruments in the order a marketing plan uses
+ * them, unit 4 subtopic by subtopic, the case exercises, how the numbers are
+ * made, and what this browser has kept.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import LevelTag from '../../components/ui/LevelTag.astro';
+import StatusTag from '../../components/ui/StatusTag.astro';
+import { corpus, href, modulesInOrder } from '../../lib/content';
+import { mindmapFor, noteFor, subtopicHref } from '../../lib/learning';
+import { jsonForScript, rich } from '../../lib/markup';
+import { fmtMoney, fmtNumber } from '../../lib/format';
+import { MARKET_STAGES, MARKET_TOOLS, toolHref, toolKey } from '../../lib/market-tools';
+import { metricsView } from '../../lib/market-metrics';
+import { funnel } from '../../lib/market-campaign';
+import { funnelFor } from '../../lib/market-campaign-view';
+import { miniMapSvg } from '../../lib/market-map-view';
+import { openSpaces, describeSpot, attributes, scaleOf } from '../../lib/market-map';
+import type { Interactive } from '../../lib/schemas';
+import '../../styles/market.css';
+
+const c = await corpus();
+const rooms = await modulesInOrder();
+const roomIndex = rooms.findIndex((m) => m.id === 'market-studio') + 1;
+const room = rooms.find((m) => m.id === 'market-studio')?.data;
+if (!room) throw new Error('The Market Studio is missing from modules.yaml');
+const unit = c.curricula['ib-dp-bm']?.units.find((u) => u.number === 4);
+const get = <K extends Interactive['component']>(id: string, k: K) => {
+  const it = c.interactives[id];
+  if (!it || it.component !== k) throw new Error(`Market Studio: ${id} is not a ${k}`);
+  return it as Extract<Interactive, { component: K }>;
+};
+const tools = MARKET_TOOLS.map((t) => ({ t, it: c.interactives[t.ix] as Extract<Interactive, { guide: unknown }> }));
+
+// The front panels, from the worked examples.
+const map = get('market-map-corner-brew', 'competitor-map').state;
+const sc = scaleOf(map.scale);
+const { xa, ya } = attributes(map);
+const spaces = openSpaces(map.brands, { min: sc.min, max: sc.max }, 2).map((sp) => describeSpot(sp.x, sp.y, xa, ya, { min: sc.min, max: sc.max }));
+const camp = get('market-campaign-corner-brew', 'campaign-planner').state;
+const fun = funnel(camp);
+const metrics = get('market-metrics-corner-brew', 'market-metrics').state;
+const mv = metricsView(metrics);
+const cb = mv.model.firms.find((f) => f.id === metrics.focus);
+
+// Unit 4, subtopic by subtopic.
+const CASES = [
+  { id: 'market-share-porto', slug: 'market-metrics', code: '4.1' },
+  { id: 'market-position-map-porto', slug: 'positioning-map', code: '4.2' },
+];
+const subtopics = (unit?.subtopics ?? []).map((s) => {
+  const note = noteFor(c, s.code)?.[1];
+  const mm = mindmapFor(c, s.code);
+  return {
+    s,
+    href: subtopicHref(c, s.code),
+    note,
+    sections: note ? note.sections.slice(0, 6).map((x) => ({ id: x.id, title: x.title.replace(/^(Product|Price|Promotion|Place): /, '') })) : [],
+    mindmap: mm ? href.mindmap(mm[0]) : null,
+    tools: tools.filter(({ it }) => it.syllabus.includes(s.code)).map(({ t }) => t),
+    cases: CASES.filter((x) => x.code === s.code).map((x) => ({ ...x, title: c.interactives[x.id]?.title ?? x.id })),
+  };
+});
+const STATUS_WORD = { syllabus: 'IB syllabus', partly: 'Syllabus and enrichment', enrichment: 'Enrichment' } as const;
+const config = { tools: MARKET_TOOLS.map((t) => ({ slug: t.slug, name: t.name, key: `bb:${toolKey(t.slug)}`, href: toolHref(t.slug) })) };
+---
+
+<BaseLayout title="Market Studio" description="A marketing laboratory for IB Business Management unit 4: nine working instruments, from market metrics and research to STP, positioning, the marketing mix, the product life cycle, campaigns and budgets." section="market-studio" room="market">
+  <div class="wrap">
+    <header class="ms-hero">
+      <Breadcrumbs trail={[{ label: 'All rooms', href: '/rooms/' }, { label: 'Market Studio' }]} />
+      <div class="ms-hero__grid">
+        <div class="ms-hero__text">
+          <p class="ms-hero__kicker">
+            <span class="label label--ink">Room {String(roomIndex).padStart(2, '0')} of {rooms.length}</span>
+            <span class="label">Unit 4: Marketing</span>
+            <StatusTag status={room.status} />
+          </p>
+          <h1 class="ms-hero__title">Market Studio</h1>
+          <p class="ms-hero__line">A laboratory for reading a market and choosing <em>where to compete.</em></p>
+          <div class="lead ms-hero__lead" set:html={rich(room.lead ?? room.purpose)} />
+          <dl class="ms-facts">
+            <div><dt>Instruments</dt><dd class="num">{MARKET_TOOLS.length}</dd></div>
+            <div><dt>Unit 4 subtopics</dt><dd class="num">{unit?.subtopics.length ?? 6}</dd></div>
+            <div><dt>Case exercises</dt><dd class="num">{CASES.length}</dd></div>
+            <div><dt>Where your work is kept</dt><dd>This browser only</dd></div>
+          </dl>
+          <p class="cluster ms-hero__actions">
+            <a class="btn btn--primary" href={toolHref('stp-planner')}>Open the STP planner <span aria-hidden="true">→</span></a>
+            <a class="btn" href="#ms-instruments">All nine instruments</a>
+          </p>
+        </div>
+
+        <div class="ms-console" aria-label="Three readings from the worked examples">
+          <figure class="ms-panel ms-panel--map">
+            <figcaption class="ms-panel__head"><span class="ms-panel__no">Fig. 1</span> Position <a href={toolHref('positioning-map')}>Open the map</a></figcaption>
+            <div class="ms-panel__body" set:html={miniMapSvg(map, 'ms-mini-map')} />
+            <p class="ms-panel__note">
+              Six fictional coffee brands as customers see them. {spaces.length ? `Open spaces around ${spaces.join(', and around ')}: each a question for research, not an answer.` : 'No open space stands out on these two attributes.'}
+            </p>
+          </figure>
+          <figure class="ms-panel ms-panel--funnel">
+            <figcaption class="ms-panel__head"><span class="ms-panel__no">Fig. 2</span> Campaign funnel <a href={toolHref('campaign-planner')}>Open the plan</a></figcaption>
+            <div class="ms-panel__body" set:html={funnelFor(camp, 'ms-mini-funnel', true)} />
+            <p class="ms-panel__note">Corner Brew’s study-hours campaign: {fmtNumber(fun.regulars, 1)} regulars would add about {fmtMoney(fun.weekly, camp.currency, 0)} a week against a target of {fmtMoney(camp.objective.target - camp.objective.baseline, camp.currency, 0)}.</p>
+          </figure>
+          <figure class="ms-panel ms-panel--kpi">
+            <figcaption class="ms-panel__head"><span class="ms-panel__no">Fig. 3</span> Market metrics <a href={toolHref('market-metrics')}>Open the calculators</a></figcaption>
+            <dl class="ms-kpis">
+              <div><dt>Market growth</dt><dd class="num">{mv.model.growth === null ? 'n/a' : `${fmtNumber(mv.model.growth, 1)}%`}</dd><dd class="ms-kpis__n">{metrics.periods.last} to {metrics.periods.now}</dd></div>
+              <div><dt>Corner Brew’s share</dt><dd class="num">{cb?.shareNow == null ? 'n/a' : `${fmtNumber(cb.shareNow, 1)}%`}</dd><dd class="ms-kpis__n">{cb?.shareChange == null ? '' : `${cb.shareChange >= 0 ? '+' : ''}${fmtNumber(cb.shareChange, 1)} points`}</dd></div>
+              <div><dt>Relative share</dt><dd class="num">{mv.relative === null ? 'n/a' : fmtNumber(mv.relative, 2)}</dd><dd class="ms-kpis__n">against {mv.rival?.name ?? 'the leader'}</dd></div>
+              <div><dt>Lifetime value <span class="tag tag--enrichment">Enrichment</span></dt><dd class="num">{fmtMoney(mv.clv.clv, metrics.symbol, 0)}</dd><dd class="ms-kpis__n">a regular student customer</dd></div>
+            </dl>
+            <p class="ms-panel__note">The local coffee market by value. Fictional businesses; every figure simulated.</p>
+          </figure>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <div class="wrap page-body">
+    <section aria-labelledby="ms-instruments">
+      <SectionHead no={1} title="Nine instruments, in the order a plan uses them" dek="Each one works on a fictional worked example you can change, keeps your work in this browser, and exports it. Each says what it is for, how to use it, what it cannot do and where it stands in the IB syllabus." id="ms-instruments" />
+      <ol class="ms-stages" role="list">
+        {
+          MARKET_STAGES.map((st, k) => (
+            <li class="ms-stage">
+              <div class="ms-stage__head">
+                <span class="ms-stage__no" aria-hidden="true">{String.fromCharCode(65 + k)}</span>
+                <h3 class="ms-stage__title">{st.title}</h3>
+                <p class="ms-stage__text">{st.text}</p>
+              </div>
+              <ul class="ms-tools" role="list">
+                {tools
+                  .filter(({ t }) => t.stage === st.id)
+                  .map(({ t, it }) => (
+                    <li class="ms-tool" data-tool={t.slug}>
+                      <span class="ms-tool__no num" aria-hidden="true">{String(MARKET_TOOLS.indexOf(t) + 1).padStart(2, '0')}</span>
+                      <div class="ms-tool__body">
+                        <h4 class="ms-tool__name">
+                          <a href={toolHref(t.slug)}>{t.name}</a>
+                        </h4>
+                        <p class="ms-tool__text">{t.short}</p>
+                      </div>
+                      <p class="ms-tool__meta">
+                        <span class:list={['tag', it.guide.status === 'enrichment' ? 'tag--enrichment' : 'tag--ib']}>{STATUS_WORD[it.guide.status]}</span>
+                        <span class="ms-tool__codes num">{it.syllabus.join(' · ')}</span>
+                        <span class="ms-tool__saved js-only" data-saved hidden>Saved work here</span>
+                      </p>
+                    </li>
+                  ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section aria-labelledby="ms-unit">
+      <SectionHead no={2} title="Unit 4, subtopic by subtopic" dek="The notes, the mindmap and the instruments for each subtopic. HL-only content is marked." id="ms-unit" />
+      <ul class="ms-unit" role="list">
+        {
+          subtopics.map((x) => (
+            <li class="ms-sub">
+              <div class="ms-sub__id">
+                <span class="ms-sub__code num">{x.s.code}</span>
+                <a class="ms-sub__title" href={x.href}>{x.s.title}</a>
+                <span class="tags">
+                  <LevelTag level={x.s.level} />
+                  <span class:list={['tag', x.note ? 'tag--live' : 'tag--planned']}>{x.note ? 'Full notes' : 'Notes planned'}</span>
+                </span>
+              </div>
+              <div class="ms-sub__links">
+                {x.sections.length > 0 && (
+                  <p class="ms-sub__row">
+                    <span class="label">In the notes</span>
+                    {x.sections.map((sec, i) => (
+                      <>
+                        {i > 0 && <span aria-hidden="true"> · </span>}
+                        <a href={`${x.href}#${sec.id}`}>{sec.title}</a>
+                      </>
+                    ))}
+                  </p>
+                )}
+                <p class="ms-sub__row">
+                  <span class="label">Study</span>
+                  <a href={x.href}>The subtopic page</a>
+                  {x.mindmap && (
+                    <>
+                      <span aria-hidden="true"> · </span>
+                      <a href={x.mindmap}>Mindmap</a>
+                    </>
+                  )}
+                </p>
+                {(x.tools.length > 0 || x.cases.length > 0) && (
+                  <p class="ms-sub__row">
+                    <span class="label">Instruments</span>
+                    {x.tools.map((t, i) => (
+                      <>
+                        {i > 0 && <span aria-hidden="true"> · </span>}
+                        <a href={toolHref(t.slug)}>{t.name}</a>
+                      </>
+                    ))}
+                    {x.cases.map((cs) => (
+                      <>
+                        <span aria-hidden="true"> · </span>
+                        <a href={`${toolHref(cs.slug)}#ix-${cs.id}`}>Case exercise: {cs.title}</a>
+                      </>
+                    ))}
+                  </p>
+                )}
+                {x.tools.length === 0 && x.cases.length === 0 && <p class="ms-sub__row small muted">No instrument yet. {x.s.code === '4.3' ? 'Sales forecasting (HL) is worked through its notes and mindmap.' : 'International marketing (HL) is worked through its notes and mindmap.'}</p>}
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section aria-labelledby="ms-cases">
+      <SectionHead no={3} title="Case exercises" dek="Two interactions on a fixed, simulated market from the Case Room: Atelier Barro’s hand-made mugs in Porto. They check your answer and explain it." id="ms-cases" />
+      <ul class="ms-cases" role="list">
+        {
+          CASES.map((x) => {
+            const it = c.interactives[x.id];
+            return (
+              <li class="ms-case">
+                <span class="ms-case__code num">{x.code}</span>
+                <div>
+                  <h3 class="ms-case__title">
+                    <a href={`${toolHref(x.slug)}#ix-${x.id}`}>{it?.title}</a>
+                  </h3>
+                  <p class="ms-case__text">{x.id === 'market-share-porto' ? 'Edit two years of sales and see whether rising sales mean a rising share; the closing question, on market share and leadership, is HL.' : 'Choose the axes, find the empty part of the map, and judge whether the gap is worth filling.'}</p>
+                </div>
+              </li>
+            );
+          })
+        }
+      </ul>
+      <p class="small muted">Read the case first: <a href={href.case('atelier-barro')}>Atelier Barro</a>.</p>
+    </section>
+
+    <section aria-labelledby="ms-method">
+      <SectionHead no={4} title="How the numbers are made" id="ms-method" />
+      <div class="ms-method">
+        <div>
+          <h3 class="ms-method__h">Fictional, and labelled</h3>
+          <p>Corner Brew, the café that roasts its own coffee, is the fictional business of the 4.2 notes. The worked examples follow it from research to campaign, and its rivals are the coffee brands of the notes’ position map. Every figure is simulated.</p>
+        </div>
+        <div>
+          <h3 class="ms-method__h">One set of functions</h3>
+          <p>Every figure, chart and check on these pages comes from tested functions that run in the build and in your browser alike, so the worked example you read and the one you change can never disagree.</p>
+        </div>
+        <div>
+          <h3 class="ms-method__h">Models are illustrative</h3>
+          <p>The product life cycle and the budget response curves are teaching models: their assumptions are on the page and yours to change. The checks are rules, prompts to think again rather than verdicts.</p>
+        </div>
+        <div>
+          <h3 class="ms-method__h">What the guide says</h3>
+          <p>Each instrument names the guide’s statements it serves, with their AO levels. The guide’s formula list (pp. 64 to 65) has no marketing formulas, so each formula is given as a standard form, and anything beyond the syllabus is labelled enrichment.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="ms-notebook js-only" aria-labelledby="ms-notebook-h" data-notebook>
+      <script type="application/json" data-config set:html={jsonForScript(config)} />
+      <SectionHead no={5} title="Your work on this device" dek="What the instruments have kept in this browser. Nothing is sent anywhere." id="ms-notebook-h" />
+      <p class="small muted" data-notebook-empty tabindex="-1">Nothing saved yet. Change any worked example and the instrument keeps your version here.</p>
+      <ul class="ms-saved" role="list" data-notebook-list></ul>
+      <p class="cluster"><button type="button" class="btn btn--small btn--ink" data-notebook-clear hidden>Remove all Market Studio work from this browser</button></p>
+      <p class="sr-only" aria-live="polite" data-status></p>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../scripts/market/home';
+</script>
+
+<style>
+  .ms-hero {
+    padding-block: clamp(var(--sp-6), 4vw, var(--sp-7)) clamp(var(--sp-5), 3vw, var(--sp-6));
+  }
+
+  .ms-hero__grid {
+    display: grid;
+    gap: var(--sp-6);
+    margin-top: var(--sp-5);
+  }
+
+  @media (min-width: 70rem) {
+    .ms-hero__grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: start;
+    }
+  }
+
+  .ms-hero__kicker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+    margin: 0;
+  }
+
+  .ms-hero__title {
+    margin-top: var(--sp-3);
+  }
+
+  .ms-hero__line {
+    margin: var(--sp-3) 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.625rem);
+    line-height: 1.3;
+    color: var(--text-strong);
+    max-width: 30ch;
+  }
+
+  .ms-hero__line em {
+    color: var(--brass-text);
+  }
+
+  .ms-hero__lead {
+    margin-top: var(--sp-4);
+    max-width: 40rem;
+  }
+
+  .ms-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: var(--sp-5) 0 0;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .ms-facts > div {
+    padding: var(--sp-3) var(--sp-3) var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .ms-facts dt {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .ms-facts dd {
+    margin: var(--sp-1) 0 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .ms-facts dd:not(.num) {
+    font-size: 1rem;
+    padding-top: 0.35rem;
+  }
+
+  .ms-hero__actions {
+    margin-top: var(--sp-5);
+  }
+
+  /* The console: three panels drawn from the worked examples, on a faint plotting grid. */
+  .ms-console {
+    display: grid;
+    gap: var(--sp-3);
+    padding: var(--sp-3);
+    border: 1px solid var(--rule);
+    background-color: var(--surface-sunk);
+    background-image: linear-gradient(rgba(11, 26, 51, 0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(11, 26, 51, 0.045) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  @media (min-width: 46rem) {
+    .ms-console {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      grid-template-areas: "map funnel" "map kpi";
+    }
+
+    .ms-panel--map {
+      grid-area: map;
+    }
+
+    .ms-panel--funnel {
+      grid-area: funnel;
+    }
+
+    .ms-panel--kpi {
+      grid-area: kpi;
+    }
+  }
+
+  .ms-panel {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: var(--sp-3) var(--sp-4) var(--sp-4);
+    background: var(--surface-sheet);
+    border-top: 3px solid var(--bb-ink);
+    box-shadow: var(--shadow-sheet);
+    min-width: 0;
+  }
+
+  .ms-panel__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--sp-2);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-strong);
+  }
+
+  .ms-panel__head a {
+    margin-left: auto;
+    font-size: 0.8125rem;
+    letter-spacing: 0;
+    text-transform: none;
+    min-height: 24px;
+  }
+
+  .ms-panel__no {
+    color: var(--brass-text);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 0.95rem;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ms-panel__body :global(.chart) {
+    min-width: 0;
+  }
+
+  .ms-panel__note {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+  }
+
+  .ms-kpis {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0;
+    border-top: 1px solid var(--rule-ink);
+  }
+
+  .ms-kpis > div {
+    padding: var(--sp-2) var(--sp-2) var(--sp-2) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .ms-kpis dt {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .ms-kpis dd {
+    margin: 0;
+  }
+
+  .ms-kpis dd.num {
+    font-size: 1.375rem;
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .ms-kpis__n {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  /* The instruments, by stage of the plan. */
+  .ms-stages {
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .ms-stage {
+    display: grid;
+    gap: var(--sp-3) var(--sp-6);
+    padding: var(--sp-5) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  @media (min-width: 60rem) {
+    .ms-stage {
+      grid-template-columns: minmax(14rem, 1fr) minmax(0, 2.6fr);
+    }
+  }
+
+  .ms-stage__head {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0 var(--sp-3);
+    align-content: start;
+  }
+
+  .ms-stage__no {
+    grid-row: span 2;
+    color: var(--brass-text);
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .ms-stage__title {
+    margin: 0;
+    font-size: var(--fs-h4);
+  }
+
+  .ms-stage__text {
+    margin: var(--sp-1) 0 0;
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+  }
+
+  .ms-tools {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ms-tool {
+    position: relative;
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: var(--sp-1) var(--sp-3);
+    padding: var(--sp-3) 0;
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .ms-tool:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  @media (min-width: 46rem) {
+    .ms-tool {
+      grid-template-columns: 2.5rem minmax(0, 1fr) 13rem;
+      align-items: baseline;
+    }
+  }
+
+  .ms-tool__no {
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .ms-tool__name {
+    margin: 0;
+    font-size: 1.125rem;
+  }
+
+  .ms-tool__name a {
+    color: var(--text-strong);
+    text-decoration: none;
+  }
+
+  .ms-tool__name a:hover {
+    color: var(--cobalt-text);
+    text-decoration: underline;
+  }
+
+  .ms-tool__text {
+    margin: var(--sp-1) 0 0;
+    font-size: 0.9375rem;
+  }
+
+  .ms-tool__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    margin: 0;
+    grid-column: 2;
+  }
+
+  @media (min-width: 46rem) {
+    .ms-tool__meta {
+      grid-column: 3;
+      justify-content: flex-end;
+    }
+  }
+
+  .ms-tool__codes {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  .ms-tool__saved {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--green-text);
+  }
+
+  /* Unit 4 subtopics */
+  .ms-unit {
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .ms-sub {
+    display: grid;
+    gap: var(--sp-2) var(--sp-6);
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  @media (min-width: 60rem) {
+    .ms-sub {
+      grid-template-columns: minmax(16rem, 1fr) minmax(0, 2.2fr);
+    }
+  }
+
+  .ms-sub__id {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: var(--sp-1) var(--sp-2);
+    align-content: start;
+  }
+
+  .ms-sub__code {
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .ms-sub__title {
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .ms-sub__id .tags {
+    grid-column: 2;
+  }
+
+  .ms-sub__links {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .ms-sub__row {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+  }
+
+  .ms-sub__row .label {
+    display: inline-block;
+    min-width: 7.5rem;
+    margin-right: var(--sp-2);
+  }
+
+  .ms-sub__row a {
+    display: inline-block;
+    min-height: 24px;
+  }
+
+  /* Case exercises */
+  .ms-cases {
+    display: grid;
+    gap: var(--sp-4);
+    margin: var(--sp-5) 0 var(--sp-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 52rem) {
+    .ms-cases {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .ms-case {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: var(--sp-3);
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--rule-ink);
+  }
+
+  .ms-case__code {
+    font-weight: 650;
+    color: var(--brass-text);
+  }
+
+  .ms-case__title {
+    margin: 0;
+    font-size: var(--fs-h4);
+  }
+
+  .ms-case__text {
+    margin: var(--sp-1) 0 0;
+    font-size: 0.9375rem;
+  }
+
+  /* Method */
+  .ms-method {
+    display: grid;
+    gap: var(--sp-5);
+    margin-top: var(--sp-5);
+  }
+
+  @media (min-width: 52rem) {
+    .ms-method {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .ms-method > div {
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .ms-method__h {
+    margin: 0 0 var(--sp-2);
+    font-size: var(--fs-h4);
+  }
+
+  .ms-method p {
+    margin: 0;
+    max-width: var(--text-max);
+  }
+
+  /* Notebook */
+  .ms-saved {
+    margin: var(--sp-4) 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-ink);
+  }
+
+  .ms-saved :global(li) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-1) var(--sp-4);
+    padding: var(--sp-2) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .ms-saved :global(a) {
+    min-height: 24px;
+    font-weight: 600;
+  }
+</style>
