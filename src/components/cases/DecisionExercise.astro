@@ -1,0 +1,105 @@
+---
+/**
+ * A case's decision exercise: a role, a task, a time limit and the criteria the
+ * decision is judged against. With JavaScript the learner chooses one of the
+ * case's strategic alternatives, writes the reasons, commits, and sees how the
+ * debrief judges that alternative; the decision is kept on this device and can
+ * be copied. Without JavaScript the brief and criteria are complete, and the
+ * debrief below is open to read.
+ */
+import { inline, jsonForScript, plain, rich } from '../../lib/markup';
+import type { CaseEntry } from '../../lib/schemas';
+
+interface Props {
+  id: string;
+  cs: CaseEntry;
+}
+const { id, cs } = Astro.props;
+const ex = cs.exercise;
+if (!ex) throw new Error(`DecisionExercise: case ${id} has no exercise`);
+const uid = `ex-${id}`;
+const config = { id, title: cs.title, options: cs.options.map((o) => ({ id: o.id, label: o.label })) };
+---
+
+<div class="exercise" data-ix="case-exercise" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error exercise__work" data-error hidden>The exercise could not start. You can still make your decision on paper and read the debrief below.</p>
+
+  <div class="exercise__brief">
+    <p class="label">Your role</p>
+    <p class="exercise__role">{ex.role}</p>
+    <div class="prose" style="margin-top:var(--sp-3)" set:html={rich(ex.brief)} />
+    <dl class="exercise__facts">
+      <div>
+        <dt>The task</dt>
+        <dd set:html={inline(ex.task)} />
+      </div>
+      <div>
+        <dt>What to produce</dt>
+        <dd set:html={inline(ex.deliverable)} />
+      </div>
+      <div>
+        <dt>Time</dt>
+        <dd>{ex.minutes} minutes</dd>
+      </div>
+    </dl>
+  </div>
+
+  <aside class="exercise__criteria" aria-labelledby={`${uid}-crit`}>
+    <h3 class="label label--ink" id={`${uid}-crit`}>What a good decision does</h3>
+    <ol>
+      {ex.criteria.map((k) => <li set:html={inline(k)} />)}
+    </ol>
+  </aside>
+
+  <div class="exercise__work">
+    <p class="nojs-only small">
+      Choose one of the strategic alternatives and write down your reasons before you open the debrief below. With JavaScript on, this page keeps your
+      decision on this device and shows how the evidence judges the alternative you chose.
+    </p>
+    <form class="exercise-form js-only stack" data-form novalidate aria-labelledby={`${uid}-form-h`}>
+      <h3 class="label label--ink" id={`${uid}-form-h`}>Make your decision</h3>
+      <fieldset aria-describedby={`${uid}-err`}>
+        <legend>Which alternative do you choose?</legend>
+        <div class="exercise-options">
+          {
+            cs.options.map((o) => (
+              <label class="exercise-option">
+                <input type="radio" name={`${uid}-choice`} value={o.id} />
+                <span>
+                  <span class="exercise-option__name">{o.group ? `${o.group}: ${o.label}` : o.label}</span>
+                  <span class="exercise-option__text">{plain(o.summary)}</span>
+                </span>
+              </label>
+            ))
+          }
+        </div>
+        <p class="field__error" id={`${uid}-err`} data-err hidden>Choose one alternative before you commit.</p>
+      </fieldset>
+      <div class="field">
+        <label for={`${uid}-reasons`}>Your recommendation and reasons</label>
+        <span class="field__hint" id={`${uid}-hint`}>About 150 to 250 words: the alternative you choose, the evidence for it, its main risk, and what would change your mind.</span>
+        <textarea class="textarea" id={`${uid}-reasons`} name="reasons" rows="8" aria-describedby={`${uid}-hint ${uid}-words`}></textarea>
+        <span class="exercise-words" id={`${uid}-words`} data-words>0 words</span>
+      </div>
+      <div class="exercise-form__actions">
+        <button class="btn btn--primary" type="submit">Commit to this decision</button>
+        <button class="btn" type="button" data-copy hidden>Copy my decision</button>
+        <button class="btn btn--small" type="button" data-reset>Clear and start again</button>
+      </div>
+      <p class="small muted" data-status aria-live="polite"></p>
+    </form>
+
+    <div class="exercise-result arrive" data-result hidden tabindex="-1" aria-labelledby={`${uid}-res-h`}>
+      <p class="label" id={`${uid}-res-h`}>Your decision</p>
+      <p class="exercise-result__choice" data-result-choice></p>
+      <p data-result-fit></p>
+      <div class="prose small" data-result-body></div>
+      <p class="small"><a href="#debrief">Read the full debrief</a>, which judges every alternative.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  import '../../scripts/case-exercise';
+</script>

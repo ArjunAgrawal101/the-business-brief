@@ -12,6 +12,7 @@ import { topoOrder } from './plan';
 import { buildWorking, workings } from './finance';
 import { checkStudioInteractives } from './integrity-studio';
 import { checkLearning } from './integrity-learning';
+import { checkCases } from './integrity-cases';
 import { applyAdjustments, balances, derive, type Statement } from './ratios';
 
 type Dict<T> = Record<string, T>;
@@ -293,6 +294,7 @@ export function checkIntegrity(c: Corpus): Problem[] {
   }
   problems.push(...checkStudioInteractives(c.interactives));
   problems.push(...checkLearning(c));
+  problems.push(...checkCases(c));
 
   /* Interactions name real subtopics */
   const codes = new Set(Object.values(c.curricula).flatMap((cu) => cu.units.flatMap((u) => u.subtopics.map((st) => st.code))));
