@@ -57,7 +57,7 @@ export const NAV: NavGroup[] = [
     intro: 'Business laboratories: enter your own figures and ideas, change the assumptions, and see the outcome with the working shown.',
     links: [
       { label: 'Finance Desk', href: '/finance-desk/', text: 'Costs, break-even, cash flow, ratios and investment appraisal' },
-      { label: 'Strategy Studio', href: '/strategy-studio/', text: 'Strategic analysis, growth choices and decision tools' },
+      { label: 'Strategy Studio', href: '/strategy-studio/', text: 'SWOT, STEEPLE, five forces, Ansoff, BCG, decision trees and a recommendation memo' },
       { label: 'Market Studio', href: '/market-studio/', text: 'Market share, positioning and the marketing mix' },
       { label: 'People and Culture', href: '/people-and-culture/', text: 'Leadership, motivation, structure and culture' },
       { label: 'Operations Floor', href: '/operations-floor/', text: 'Location, capacity, productivity and stock control' },
