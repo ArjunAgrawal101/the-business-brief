@@ -77,7 +77,8 @@ const num = () => {
       <p class="label label--ink sh__kicker">Unit {unit.number}: {unit.title}</p>
       <h1 class="sh__title">
         <span class="sh__code">{s.code}</span>
-        {s.title}
+        {/* A line may break after a slash ("Industrial/employee relations"), which a narrow screen needs at this size. */}
+        <span>{s.title.split('/').map((part, i, all) => (i < all.length - 1 ? <>{part}/<wbr /></> : part))}</span>
       </h1>
       <div class="sh__meta">
         <span class="tag tag--plain">{levelText}</span>

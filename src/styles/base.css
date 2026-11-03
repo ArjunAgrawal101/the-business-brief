@@ -21,6 +21,8 @@ body {
   font-size: var(--fs-body);
   line-height: var(--lh-body);
   font-feature-settings: "cv05" 1;
+  /* A word too long for a narrow screen (a URL, "Industrial/employee" in a large heading) breaks rather than pushing the page sideways. */
+  overflow-wrap: break-word;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
