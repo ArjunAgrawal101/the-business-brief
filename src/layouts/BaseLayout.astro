@@ -13,7 +13,8 @@ import '../styles/motion.css';
 import '../styles/print.css';
 import SiteHeader from '../components/layout/SiteHeader.astro';
 import SiteFooter from '../components/layout/SiteFooter.astro';
-import BrandIntro from '../components/brand/BrandIntro.astro';
+import CinematicIntro from '../components/brand/CinematicIntro.astro';
+import { INTRO_GATE } from '../lib/intro';
 import { corpus } from '../lib/content';
 
 interface Props {
@@ -25,8 +26,6 @@ interface Props {
   /** Structured data for search engines. */
   jsonLd?: Record<string, unknown>;
   noindex?: boolean;
-  /** The home page offers the opening brand reveal on a first visit. */
-  intro?: boolean;
   /** An image to share instead of the default social card (a path under public/). */
   image?: string;
   /**
@@ -38,7 +37,7 @@ interface Props {
   room?: string;
 }
 
-const { title, description, section, jsonLd, noindex = false, intro = false, image, room } = Astro.props;
+const { title, description, section, jsonLd, noindex = false, image, room } = Astro.props;
 
 // The integrity gate: building any page loads and checks every relationship.
 await corpus();
@@ -47,12 +46,6 @@ const SITE_NAME = 'The Business Brief';
 const fullTitle = title === 'home' ? 'Arjun Agrawal | The Business Brief: Strategy. Leadership. Decisions.' : `${title} | ${SITE_NAME}`;
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : undefined;
 const ogImage = Astro.site ? new URL(image ?? '/brand/social-card.png', Astro.site).href : undefined;
-/** Decides, before the first paint, whether the opening plays: a first visit (or ?intro), never under reduced motion. */
-const INTRO_GATE = `try {
-  var forced = /[?&]intro\\b/.test(location.search);
-  var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!calm && (forced || !localStorage.getItem('bb:intro-seen'))) document.documentElement.classList.add('intro-on', 'intro-hold');
-} catch (e) {}`;
 ---
 
 <!doctype html>
@@ -96,10 +89,11 @@ const INTRO_GATE = `try {
         if (l === 'SL' || l === 'HL') document.documentElement.setAttribute('data-level', l);
       } catch (e) {}
     </script>
-    {intro && <script is:inline set:html={INTRO_GATE} />}
+    <!-- The opening plays on every fresh entry to the site, never between its own pages (src/lib/intro.ts). -->
+    <script is:inline set:html={INTRO_GATE} />
   </head>
   <body data-room={room}>
-    {intro && <BrandIntro />}
+    <CinematicIntro />
     <a class="skip-link" href="#main">Skip to content</a>
     <SiteHeader current={section} />
     <main id="main" tabindex="-1">

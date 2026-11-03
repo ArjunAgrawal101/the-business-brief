@@ -1,0 +1,1018 @@
+---
+/**
+ * The opening: a five-second cinematic sequence, on every fresh entry to the
+ * site (src/lib/intro.ts decides when, before the first paint).
+ *
+ *   0.0 to 1.0 s  the room: deep navy, ambient light, gold dust, the lines of
+ *                 an architecture drawing themselves from a horizon
+ *   1.0 to 2.1 s  the business world: an organization chart, a market
+ *                 moving, a globe of trade routes, a decision tree choosing
+ *   2.0 to 3.5 s  the identity: the AA monogram rises from the creator's own
+ *                 vector master, the name and rule open, then The Business
+ *                 Brief and Strategy. Leadership. Decisions.
+ *   3.5 to 5.0 s  the convergence: the world is drawn in, the monogram flies
+ *                 to its place in the site's header, the curtain dissolves
+ *
+ * Built from inline SVG and CSS, about 25 KB before compression, no video or
+ * images. The markup sits in a <template> and is cloned only when the opening
+ * plays. It is decoration: aria-hidden, the page beneath stays readable and
+ * keyboard-usable throughout, and any key, click, tap or scroll ends it. The
+ * Skip intro button is outside the hidden layer. Under reduced motion it is a
+ * still title card that fades. If its script fails, CSS ends it on time.
+ */
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { MONOGRAM } from '../../lib/brand';
+
+const master = readFileSync(join(process.cwd(), 'public/brand/creator/arjun-agrawal-logo.svg'), 'utf8');
+// The master's six parts, in order: monogram (navy), monogram (gold), name,
+// rule with its diamond, tagline letters, tagline full stops. The opening uses
+// the monogram, the name and the rule, at the master's own proportions; the
+// platform's tagline takes the place of the logo's.
+const parts = [...master.matchAll(/<(path|g)\b[^>]*?(?:\/>|>[\s\S]*?<\/g>)/g)].map((m) => m[0]);
+if (parts.length !== 6) throw new Error(`CinematicIntro: expected 6 parts in the logo master, found ${parts.length}`);
+const strip = (s: string) => s.replace(/\sfill="[^"]*"/g, '');
+const NAME = strip(parts[2]!);
+const RULE = strip(parts[3]!);
+
+/** A small seeded generator, so the gold dust is the same on every build. */
+function seeded(seed: number) {
+  return () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const r = seeded(20261103);
+const dust = Array.from({ length: 36 }, () => ({
+  x: (r() * 100).toFixed(1),
+  y: (r() * 100).toFixed(1),
+  s: (1 + r() * 2.2).toFixed(1),
+  d: (r() * 1.4).toFixed(2),
+  t: (2.4 + r() * 2.4).toFixed(2),
+  o: (0.3 + r() * 0.6).toFixed(2),
+  dx: (r() * 40 - 20).toFixed(0),
+}));
+
+// The architecture: a floor in one-point perspective, a horizon and columns.
+const VP = { x: 800, y: 470 };
+const floorEnds = [-500, -150, 200, 500, 800, 1100, 1400, 1750, 2100];
+const floorRows = [505, 548, 604, 680, 780, 900];
+const columns = [70, 150, 230, 1370, 1450, 1530];
+
+// The market: a rising, uneven line and candles (abstract, no figures).
+const line = [
+  [20, 200], [62, 188], [104, 196], [146, 162], [188, 172], [230, 134], [272, 146], [314, 104], [356, 118], [398, 80], [440, 92], [482, 50], [500, 56],
+];
+const linePts = line.map((p) => p.join(',')).join(' ');
+const area = `M${line.map((p) => p.join(',')).join(' L')} L500,230 L20,230 Z`;
+const candles = [
+  { x: 44, o: 196, c: 182, h: 176, l: 204 },
+  { x: 90, o: 184, c: 194, h: 178, l: 202 },
+  { x: 136, o: 190, c: 160, h: 154, l: 196 },
+  { x: 182, o: 162, c: 170, h: 156, l: 178 },
+  { x: 228, o: 168, c: 136, h: 128, l: 172 },
+  { x: 274, o: 136, c: 146, h: 130, l: 152 },
+  { x: 320, o: 144, c: 108, h: 100, l: 150 },
+  { x: 366, o: 108, c: 116, h: 102, l: 124 },
+  { x: 412, o: 114, c: 84, h: 76, l: 120 },
+  { x: 458, o: 86, c: 56, h: 48, l: 92 },
+];
+
+// The globe: meridians, parallels, cities and the routes between them.
+const R = 200;
+const parallels = [-140, -70, 0, 70, 140].map((dy) => {
+  const rx = Math.sqrt(R * R - dy * dy);
+  return { cy: 220 + dy, rx: rx.toFixed(1), ry: (rx * 0.16).toFixed(1) };
+});
+const cities = [
+  [150, 150], [262, 118], [304, 212], [190, 262], [118, 232], [252, 304], [334, 150],
+];
+const routes = ['M150,150 Q204,92 262,118', 'M262,118 Q330,120 334,150', 'M150,150 Q118,196 118,232', 'M190,262 Q246,238 304,212', 'M118,232 Q170,300 252,304', 'M262,118 Q300,160 304,212'];
+
+/** The script that clones and runs the opening, right after the template. */
+const MOUNT = `(function () {
+  var root = document.documentElement;
+  if (!root.classList.contains('cx-on')) return;
+  var tpl = document.getElementById('cx-template');
+  if (!tpl || !tpl.content) { root.classList.remove('cx-on', 'cx-full', 'cx-still', 'intro-hold'); return; }
+  var frag = tpl.content.cloneNode(true);
+  var el = frag.querySelector('.cx');
+  var skip = frag.querySelector('.cx-skip');
+  tpl.parentNode.insertBefore(frag, tpl);
+  var still = root.classList.contains('cx-still');
+  var timers = [], done = false, started = false;
+  function clear() { while (timers.length) clearTimeout(timers.pop()); }
+  function release() { root.classList.remove('intro-hold'); }
+  function toSkipLink() { var l = document.querySelector('.skip-link'); if (l) l.focus({ preventScroll: true }); }
+  function finish() {
+    if (done) return;
+    done = true;
+    clear();
+    release();
+    var focused = document.activeElement === skip;
+    root.classList.remove('cx-on', 'cx-full', 'cx-still', 'cx-wait', 'cx-ending');
+    if (el.parentNode) el.parentNode.removeChild(el);
+    if (skip.parentNode) skip.parentNode.removeChild(skip);
+    document.removeEventListener('keydown', onKey, true);
+    if (focused) toSkipLink();
+    if (/[?&]intro\\b/.test(location.search)) { try { history.replaceState(history.state, '', location.pathname + location.hash); } catch (x) {} }
+  }
+  function end() {
+    if (done || root.classList.contains('cx-ending')) return;
+    clear();
+    release();
+    root.classList.add('cx-ending');
+    timers.push(setTimeout(finish, 400));
+  }
+  function fly() {
+    var mono = el.querySelector('.cx-mono');
+    var target = document.querySelector('#site-header .brand .monogram');
+    if (!mono || !target) return;
+    var a = mono.getBoundingClientRect(), b = target.getBoundingClientRect();
+    if (!a.height || !b.height || b.bottom < 0) return;
+    var s = b.height / a.height;
+    var dx = b.left + b.width / 2 - (a.left + a.width / 2);
+    var dy = b.top + b.height / 2 - (a.top + a.height / 2);
+    mono.style.setProperty('--cx-fly', 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px) scale(' + s.toFixed(4) + ')');
+    el.classList.add('cx-fly');
+  }
+  function start() {
+    if (started) return;
+    started = true;
+    root.classList.remove('cx-wait');
+    if (still) {
+      timers.push(setTimeout(release, 900));
+      timers.push(setTimeout(finish, 1650));
+    } else {
+      timers.push(setTimeout(fly, 3950));
+      timers.push(setTimeout(release, 4100));
+      timers.push(setTimeout(finish, 5000));
+    }
+  }
+  function onKey(e) {
+    if (done) return;
+    if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta') return;
+    if (e.key === 'Tab') { e.preventDefault(); end(); toSkipLink(); return; }
+    if ((e.key === ' ' || e.key === 'Enter' || e.key === 'Escape') && document.activeElement !== skip) e.preventDefault();
+    end();
+  }
+  skip.addEventListener('click', end);
+  el.addEventListener('pointerdown', end);
+  el.addEventListener('wheel', end, { passive: true });
+  el.addEventListener('touchstart', end, { passive: true });
+  document.addEventListener('keydown', onKey, true);
+  if (document.visibilityState === 'hidden') {
+    root.classList.add('cx-wait');
+    document.addEventListener('visibilitychange', function wake() {
+      if (document.visibilityState !== 'visible') return;
+      document.removeEventListener('visibilitychange', wake);
+      start();
+    });
+  } else {
+    start();
+  }
+})();`;
+---
+
+<template id="cx-template">
+  <div class="cx" aria-hidden="true">
+    <div class="cx__ground"></div>
+
+    <svg class="cx__arch" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" focusable="false">
+      <g class="cx-arch-floor">
+        {floorEnds.map((x, i) => <line class="cx-d" pathLength="1" x1={VP.x} y1={VP.y} x2={x} y2="900" style={`--d:${(0.15 + Math.abs(i - 4) * 0.05).toFixed(2)}s;--t:.85s`} />)}
+        {floorRows.map((y, i) => <line class="cx-row" x1="0" y1={y} x2="1600" y2={y} style={`--d:${(0.3 + i * 0.08).toFixed(2)}s`} />)}
+      </g>
+      <g class="cx-arch-cols">
+        {columns.map((x, i) => <line class="cx-d" pathLength="1" x1={x} y1="0" x2={x} y2={VP.y} style={`--d:${(0.4 + (i % 3) * 0.08).toFixed(2)}s;--t:.9s`} />)}
+      </g>
+      <line class="cx-horizon cx-d" pathLength="1" x1="0" y1={VP.y} x2="1600" y2={VP.y} style="--d:.1s;--t:.85s" />
+    </svg>
+
+    <div class="cx__dust">
+      {dust.map((p) => <span style={`left:${p.x}%;top:${p.y}%;width:${p.s}px;height:${p.s}px;--d:${p.d}s;--t:${p.t}s;--o:${p.o};--dx:${p.dx}px`}></span>)}
+    </div>
+
+    <div class="cx__world">
+      <svg class="cx-v cx-v--org" viewBox="0 0 360 170" focusable="false">
+        <rect class="cx-box" x="150" y="8" width="60" height="28" style="--d:1s" />
+        <path class="cx-d" pathLength="1" d="M180,36 V58 M50,58 H310 M50,58 V78 M180,58 V78 M310,58 V78" style="--d:1.1s;--t:.45s" />
+        <rect class="cx-box" x="22" y="78" width="56" height="24" style="--d:1.32s" />
+        <rect class="cx-box" x="152" y="78" width="56" height="24" style="--d:1.36s" />
+        <rect class="cx-box" x="282" y="78" width="56" height="24" style="--d:1.4s" />
+        <path class="cx-d" pathLength="1" d="M50,102 V120 M25,120 H75 M25,120 V134 M75,120 V134 M180,102 V120 M155,120 H205 M155,120 V134 M205,120 V134 M310,102 V120 M285,120 H335 M285,120 V134 M335,120 V134" style="--d:1.45s;--t:.4s" />
+        {[9, 59, 139, 189, 269, 319].map((x, i) => <rect class="cx-box cx-box--small" x={x} y="134" width="32" height="18" style={`--d:${(1.62 + i * 0.03).toFixed(2)}s`} />)}
+      </svg>
+
+      <svg class="cx-v cx-v--market" viewBox="0 0 520 260" focusable="false">
+        <defs>
+          <linearGradient id="cx-area" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stop-color="#c9a866" stop-opacity=".28"></stop>
+            <stop offset="1" stop-color="#c9a866" stop-opacity="0"></stop>
+          </linearGradient>
+        </defs>
+        {[60, 110, 160, 210].map((y) => <line class="cx-grid" x1="20" y1={y} x2="500" y2={y} />)}
+        <line class="cx-d" pathLength="1" x1="20" y1="230" x2="500" y2="230" style="--d:1s;--t:.4s" />
+        <path class="cx-area" d={area} style="--d:1.5s" />
+        {candles.map((k, i) => (
+          <g class:list={['cx-candle', { 'is-down': k.c > k.o }]} style={`--d:${(1.22 + i * 0.07).toFixed(2)}s`}>
+            <line x1={k.x} y1={k.h} x2={k.x} y2={k.l} />
+            <rect x={k.x - 6} y={Math.min(k.o, k.c)} width="12" height={Math.abs(k.o - k.c)} />
+          </g>
+        ))}
+        <polyline class="cx-d cx-line" pathLength="1" points={linePts} style="--d:1.1s;--t:.85s" />
+        <circle class="cx-pulse" cx="500" cy="56" r="4" style="--d:1.9s" />
+      </svg>
+
+      <svg class="cx-v cx-v--tree" viewBox="0 0 420 210" focusable="false">
+        <rect class="cx-box cx-node" x="12" y="93" width="22" height="22" style="--d:1.2s" />
+        <path class="cx-d" pathLength="1" d="M34,104 L120,52 M34,104 L120,156" style="--d:1.3s;--t:.4s" />
+        <circle class="cx-box cx-node" cx="130" cy="52" r="10" style="--d:1.5s" />
+        <circle class="cx-box cx-node" cx="130" cy="156" r="10" style="--d:1.55s" />
+        <path class="cx-d" pathLength="1" d="M140,52 L268,20 M140,52 L268,84 M140,156 L268,124 M140,156 L268,188" style="--d:1.62s;--t:.4s" />
+        {[20, 84, 124, 188].map((y, i) => <path class="cx-box cx-leaf" d={`M268,${y} l12,-7 v14 z`} style={`--d:${(1.85 + i * 0.04).toFixed(2)}s`} />)}
+        <path class="cx-d cx-chosen" pathLength="1" d="M34,104 L120,52 M140,52 L268,20 M282,20 H392" style="--d:2.02s;--t:.5s" />
+      </svg>
+
+      <svg class="cx-v cx-v--globe" viewBox="0 0 440 440" focusable="false">
+        <g transform="rotate(-18 220 220)">
+          <circle class="cx-d" pathLength="1" cx="220" cy="220" r={R} style="--d:1.05s;--t:.6s" />
+          {[173.2, 100, 40].map((rx, i) => <ellipse class="cx-d cx-faint" pathLength="1" cx="220" cy="220" rx={rx} ry={R} style={`--d:${(1.15 + i * 0.06).toFixed(2)}s;--t:.55s`} />)}
+          <line class="cx-d cx-faint" pathLength="1" x1="220" y1="20" x2="220" y2="420" style="--d:1.2s;--t:.5s" />
+          {parallels.map((p, i) => <ellipse class="cx-d cx-faint" pathLength="1" cx="220" cy={p.cy} rx={p.rx} ry={p.ry} style={`--d:${(1.2 + i * 0.05).toFixed(2)}s;--t:.55s`} />)}
+        </g>
+        {routes.map((d, i) => <path class="cx-d cx-route" pathLength="1" d={d} style={`--d:${(1.55 + i * 0.07).toFixed(2)}s;--t:.5s`} />)}
+        <path class="cx-run" pathLength="1" d={routes[3]} />
+        {cities.map(([x, y], i) => <circle class="cx-city" cx={x} cy={y} r="3.5" style={`--d:${(1.45 + i * 0.05).toFixed(2)}s`} />)}
+      </svg>
+    </div>
+
+    <div class="cx__id">
+      <svg class="cx-mono" viewBox={`${MONOGRAM.viewBox.x} ${MONOGRAM.viewBox.y} ${MONOGRAM.viewBox.w} ${MONOGRAM.viewBox.h}`} focusable="false">
+        <defs>
+          <clipPath id="cx-mono-clip">
+            <path d={MONOGRAM.a}></path>
+            <path d={MONOGRAM.b}></path>
+          </clipPath>
+          <linearGradient id="cx-sheen-g" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" stop-color="#fff6df" stop-opacity="0"></stop>
+            <stop offset=".5" stop-color="#fff6df" stop-opacity=".75"></stop>
+            <stop offset="1" stop-color="#fff6df" stop-opacity="0"></stop>
+          </linearGradient>
+        </defs>
+        <path class="cx-mono__a" fill-rule="evenodd" d={MONOGRAM.a}></path>
+        <path class="cx-mono__b" fill-rule="evenodd" d={MONOGRAM.b}></path>
+        <g clip-path="url(#cx-mono-clip)">
+          <rect class="cx-sheen" x="120" y="-10" width="90" height="290" fill="url(#cx-sheen-g)" transform="skewX(-18)"></rect>
+        </g>
+      </svg>
+      <svg class="cx-name" viewBox="0 298 760 114" focusable="false">
+        <g class="cx-name__name" set:html={NAME} />
+        <g class="cx-name__rule" set:html={RULE} />
+      </svg>
+      <p class="cx-product">The Business Brief</p>
+      <p class="cx-tagline"><span>Strategy.</span> <span>Leadership.</span> <span>Decisions.</span></p>
+    </div>
+
+    <div class="cx__progress"><span></span></div>
+  </div>
+  <button class="cx-skip" type="button">Skip intro</button>
+</template>
+<script is:inline set:html={MOUNT} />
+
+<style is:global>
+  .cx,
+  .cx-skip {
+    display: none;
+  }
+
+  html.cx-on .cx {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: block;
+    overflow: hidden;
+    color: #f4efe4;
+    cursor: pointer;
+    contain: strict;
+    /* A failsafe: whatever the script does, the layer is gone at 5 s. */
+    animation: cx-gone 0s linear 5.05s forwards;
+  }
+
+  html.cx-still .cx {
+    animation: cx-out 0.4s ease 1.2s forwards;
+  }
+
+  html.cx-on .cx-skip {
+    position: fixed;
+    right: max(var(--gutter), env(safe-area-inset-right));
+    bottom: max(1.5rem, calc(env(safe-area-inset-bottom) + 0.75rem));
+    z-index: 101;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 2.75rem;
+    padding: 0 1.1rem;
+    border: 1px solid rgba(244, 239, 228, 0.34);
+    border-radius: var(--radius-1);
+    background: rgba(7, 18, 38, 0.55);
+    color: #f4efe4;
+    font: 600 0.75rem/1 var(--font-ui);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    animation: cx-out 0.3s ease 4.55s forwards;
+  }
+
+  html.cx-on .cx-skip::after {
+    content: "";
+    width: 0.45rem;
+    height: 0.45rem;
+    border-top: 1.5px solid currentColor;
+    border-right: 1.5px solid currentColor;
+    transform: rotate(45deg);
+  }
+
+  html.cx-still .cx-skip {
+    animation-delay: 1.25s;
+  }
+
+  html.cx-on .cx-skip:hover {
+    border-color: #c9a866;
+    color: #fff;
+  }
+
+  html.cx-on .cx-skip:focus-visible {
+    outline: 3px solid #c9a866;
+    outline-offset: 3px;
+  }
+
+  html.cx-ending .cx {
+    animation: cx-out 0.36s ease forwards !important;
+  }
+
+  html.cx-ending .cx-skip {
+    animation: cx-out 0.2s ease forwards !important;
+  }
+
+  html.cx-wait .cx,
+  html.cx-wait .cx *,
+  html.cx-wait .cx-skip {
+    animation-play-state: paused !important;
+  }
+
+  /* Until the curtain begins to lift, the page holds its own arrivals. */
+  html.intro-hold main *,
+  html.intro-hold main *::before,
+  html.intro-hold main *::after {
+    animation-play-state: paused !important;
+  }
+
+  /* ---------- The room ---------- */
+
+  .cx__ground {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 55% at 50% 48%, #15305a 0%, #0b1a33 52%, #050d1d 100%);
+  }
+
+  .cx__ground::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 34% 30% at 50% 46%, rgba(201, 168, 102, 0.2), transparent 70%),
+      var(--grain);
+    opacity: 0.85;
+  }
+
+  .cx__arch {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform-origin: 50% 50%;
+    fill: none;
+    stroke: #c9a866;
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .cx__arch line {
+    vector-effect: non-scaling-stroke;
+    stroke-opacity: 0.22;
+  }
+
+  .cx__arch .cx-horizon {
+    stroke-opacity: 0.55;
+  }
+
+  .cx__arch .cx-row {
+    transform-box: fill-box;
+    transform-origin: center;
+    stroke-opacity: 0.16;
+  }
+
+  .cx__dust {
+    position: absolute;
+    inset: 0;
+    transform-origin: 50% 50%;
+  }
+
+  .cx__dust span {
+    position: absolute;
+    border-radius: 50%;
+    background: #e6cf9c;
+    box-shadow: 0 0 6px rgba(230, 207, 156, 0.7);
+    opacity: var(--o);
+  }
+
+  /* ---------- The business world ---------- */
+
+  .cx__world {
+    position: absolute;
+    inset: 0;
+    transform-origin: 50% 50%;
+  }
+
+  .cx-v {
+    position: absolute;
+    height: auto;
+    overflow: visible;
+    fill: none;
+    stroke: #c9a866;
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .cx-v--org {
+    top: 10vh;
+    left: 6vw;
+    width: clamp(10rem, 21vw, 22rem);
+  }
+
+  .cx-v--market {
+    left: 5vw;
+    bottom: 9vh;
+    width: clamp(14rem, 30vw, 32rem);
+  }
+
+  .cx-v--tree {
+    top: 11vh;
+    right: 6vw;
+    width: clamp(11rem, 22vw, 24rem);
+  }
+
+  .cx-v--globe {
+    right: -5vw;
+    bottom: -16vh;
+    width: clamp(16rem, 34vw, 36rem);
+  }
+
+  .cx-box {
+    fill: rgba(201, 168, 102, 0.08);
+    stroke-opacity: 0.9;
+  }
+
+  .cx-box--small {
+    stroke-opacity: 0.7;
+  }
+
+  .cx-node {
+    fill: rgba(244, 239, 228, 0.12);
+    stroke: #f4efe4;
+  }
+
+  .cx-leaf {
+    fill: rgba(201, 168, 102, 0.5);
+    stroke: none;
+  }
+
+  .cx-chosen {
+    stroke: #f4efe4;
+    stroke-width: 2.2;
+  }
+
+  .cx-grid {
+    stroke-opacity: 0.14;
+    stroke-dasharray: 3 6;
+  }
+
+  .cx-area {
+    fill: url(#cx-area);
+    stroke: none;
+  }
+
+  .cx-line {
+    stroke: #ecdcb3;
+    stroke-width: 2;
+  }
+
+  .cx-candle line {
+    stroke-opacity: 0.7;
+  }
+
+  .cx-candle rect {
+    fill: #c9a866;
+    stroke: #c9a866;
+  }
+
+  .cx-candle.is-down rect {
+    fill: #0b1a33;
+  }
+
+  .cx-pulse {
+    fill: #f4efe4;
+    stroke: none;
+  }
+
+  .cx-faint {
+    stroke-opacity: 0.38;
+  }
+
+  .cx-route {
+    stroke: #ecdcb3;
+    stroke-width: 1.6;
+  }
+
+  .cx-run {
+    stroke: #fff6df;
+    stroke-width: 3;
+    stroke-dasharray: 0.08 1;
+    stroke-dashoffset: 1.08;
+    opacity: 0;
+  }
+
+  .cx-city {
+    fill: #f4efe4;
+    stroke: rgba(201, 168, 102, 0.6);
+    stroke-width: 4;
+  }
+
+  /* ---------- The identity ---------- */
+
+  .cx__id {
+    --w: min(78vw, 33rem);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 var(--gutter) 4vh;
+    text-align: center;
+  }
+
+  /* The monogram and the name keep the master's proportions: the monogram is
+     350.8 of the master's 760 units wide, and sits 31.5 units above the name. */
+  .cx-mono {
+    display: block;
+    width: calc(var(--w) * 350.8 / 760);
+    height: auto;
+    overflow: visible;
+    transform-origin: center;
+  }
+
+  .cx-mono__a {
+    fill: #f4efe4;
+  }
+
+  .cx-mono__b {
+    fill: #c9a866;
+  }
+
+  .cx-name {
+    display: block;
+    width: var(--w);
+    height: auto;
+    margin-top: calc(var(--w) * 31.5 / 760);
+    overflow: visible;
+  }
+
+  .cx-name__name path {
+    fill: #f4efe4;
+  }
+
+  .cx-name__rule,
+  .cx-name__rule * {
+    fill: #c9a866;
+  }
+
+  .cx-name__rule {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .cx-product {
+    margin: clamp(1.1rem, 3.6vh, 2rem) 0 0;
+    font-family: var(--font-brand);
+    font-size: clamp(1.15rem, 0.85rem + 1.5vw, 1.9rem);
+    font-weight: 600;
+    letter-spacing: 0.26em;
+    color: #f4efe4;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .cx-tagline {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.2em 0.9em;
+    margin: 0.85rem 0 0;
+    font-family: var(--font-ui);
+    font-size: clamp(0.6875rem, 0.6rem + 0.35vw, 0.875rem);
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #c9a866;
+  }
+
+  .cx__progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: rgba(244, 239, 228, 0.1);
+  }
+
+  .cx__progress span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, #8a6b2a, #c9a866 60%, #ecdcb3);
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+
+  /* ---------- The full sequence: timings ---------- */
+
+  html.cx-full .cx__ground {
+    animation: cx-out 0.7s cubic-bezier(0.4, 0, 0.2, 1) 4.2s forwards;
+  }
+
+  html.cx-full .cx__ground::after {
+    opacity: 0;
+    animation: cx-glow 1.4s ease-out forwards;
+  }
+
+  html.cx-full .cx-d {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: cx-draw var(--t, 0.6s) cubic-bezier(0.65, 0, 0.35, 1) var(--d, 1s) forwards;
+  }
+
+  html.cx-full .cx__arch .cx-row {
+    transform: scaleX(0);
+    animation: cx-extend 1s cubic-bezier(0.22, 1, 0.36, 1) var(--d) forwards;
+  }
+
+  html.cx-full .cx__arch {
+    animation:
+      cx-dim 0.6s ease 2.1s forwards,
+      cx-converge 0.8s cubic-bezier(0.55, 0, 0.45, 1) 3.55s forwards;
+  }
+
+  html.cx-full .cx__dust span {
+    opacity: 0;
+    animation: cx-float var(--t) ease-in-out var(--d) 2 both;
+  }
+
+  html.cx-full .cx__dust {
+    animation: cx-converge 0.8s cubic-bezier(0.55, 0, 0.45, 1) 3.55s forwards;
+  }
+
+  html.cx-full .cx__world {
+    animation:
+      cx-dim 0.5s ease 2.1s forwards,
+      cx-converge 0.8s cubic-bezier(0.55, 0, 0.45, 1) 3.55s forwards;
+  }
+
+  html.cx-full .cx-box,
+  html.cx-full .cx-city,
+  html.cx-full .cx-candle,
+  html.cx-full .cx-area,
+  html.cx-full .cx-pulse {
+    opacity: 0;
+    animation: cx-in 0.45s ease var(--d, 1s) forwards;
+  }
+
+  html.cx-full .cx-box,
+  html.cx-full .cx-city,
+  html.cx-full .cx-candle {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  html.cx-full .cx-pulse {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation:
+      cx-in 0.3s ease 1.9s forwards,
+      cx-beat 1.1s ease-in-out 2.2s 2;
+  }
+
+  html.cx-full .cx-run {
+    animation: cx-run 1.3s cubic-bezier(0.45, 0, 0.55, 1) 2s 2;
+  }
+
+  html.cx-full .cx-mono__a,
+  html.cx-full .cx-mono__b {
+    clip-path: inset(100% 0 0 0);
+    animation: cx-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) 2s forwards;
+  }
+
+  html.cx-full .cx-mono__b {
+    animation-delay: 2.14s;
+  }
+
+  html.cx-full .cx-sheen {
+    animation: cx-sheen 0.9s cubic-bezier(0.45, 0, 0.2, 1) 2.62s forwards;
+    transform: skewX(-18deg) translateX(-260px);
+  }
+
+  html.cx-full .cx-name__name {
+    clip-path: inset(0 50% 0 50%);
+    opacity: 0;
+    animation: cx-open 0.7s cubic-bezier(0.16, 1, 0.3, 1) 2.55s forwards;
+  }
+
+  html.cx-full .cx-name__rule {
+    transform: scaleX(0);
+    animation: cx-extend 0.55s cubic-bezier(0.16, 1, 0.3, 1) 2.8s forwards;
+  }
+
+  html.cx-full .cx-product {
+    opacity: 0;
+    animation:
+      cx-track 0.75s cubic-bezier(0.16, 1, 0.3, 1) 2.95s forwards,
+      cx-leave 0.35s ease 3.95s forwards;
+  }
+
+  html.cx-full .cx-tagline span {
+    display: inline-block;
+    opacity: 0;
+    animation:
+      cx-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) calc(3.15s + var(--i) * 0.15s) forwards,
+      cx-leave 0.3s ease 4s forwards;
+  }
+
+  html.cx-full .cx-tagline span:nth-child(1) { --i: 0; }
+  html.cx-full .cx-tagline span:nth-child(2) { --i: 1; }
+  html.cx-full .cx-tagline span:nth-child(3) { --i: 2; }
+
+  html.cx-full .cx-name {
+    animation: cx-leave 0.35s ease 3.95s forwards;
+  }
+
+  /* Without the script's flight, the monogram simply settles and fades. */
+  html.cx-full .cx-mono {
+    animation: cx-settle 0.6s cubic-bezier(0.55, 0, 0.45, 1) 4.05s forwards;
+  }
+
+  /* With it, the monogram flies to its place in the header and takes the
+     header's colours, then hands over to the real one. */
+  html.cx-full .cx.cx-fly .cx-mono {
+    animation: none;
+    transform: var(--cx-fly);
+    opacity: 0;
+    transition:
+      transform 0.75s cubic-bezier(0.65, 0, 0.25, 1),
+      opacity 0.18s linear 0.78s;
+  }
+
+  html.cx-full .cx.cx-fly .cx-mono__a {
+    fill: #0b1a33;
+    transition: fill 0.45s ease 0.3s;
+  }
+
+  html.cx-full .cx.cx-fly .cx-mono__b {
+    fill: #b39350;
+    transition: fill 0.45s ease 0.3s;
+  }
+
+  html.cx-full .cx__progress span {
+    animation: cx-progress 5s linear forwards;
+  }
+
+  html.cx-full .cx__progress {
+    animation: cx-out 0.3s ease 4.7s forwards;
+  }
+
+  /* ---------- The still card (reduced motion) ---------- */
+
+  html.cx-still .cx__world,
+  html.cx-still .cx__dust,
+  html.cx-still .cx__progress {
+    display: none;
+  }
+
+  html.cx-still .cx__arch {
+    opacity: 0.45;
+  }
+
+  /* ---------- Small screens ---------- */
+
+  @media (max-aspect-ratio: 4/5) {
+    .cx__id {
+      --w: min(84vw, 26rem);
+      padding-bottom: 8vh;
+    }
+
+    .cx-v--org {
+      top: 7vh;
+      left: 5vw;
+      width: 40vw;
+    }
+
+    .cx-v--tree {
+      top: 8vh;
+      right: 5vw;
+      width: 40vw;
+    }
+
+    .cx-v--market {
+      left: 4vw;
+      bottom: 13vh;
+      width: 58vw;
+    }
+
+    .cx-v--globe {
+      right: -22vw;
+      bottom: -9vh;
+      width: 74vw;
+    }
+  }
+
+  @media print {
+    .cx,
+    .cx-skip {
+      display: none !important;
+    }
+  }
+
+  /* ---------- Keyframes ---------- */
+
+  @keyframes cx-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes cx-extend {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes cx-in {
+    from {
+      opacity: 0;
+      transform: scale(0.85);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes cx-glow {
+    to {
+      opacity: 0.85;
+    }
+  }
+
+  @keyframes cx-float {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 0, 0);
+    }
+    25% {
+      opacity: var(--o);
+    }
+    100% {
+      opacity: 0;
+      transform: translate3d(var(--dx), -70px, 0);
+    }
+  }
+
+  @keyframes cx-dim {
+    to {
+      opacity: 0.32;
+    }
+  }
+
+  @keyframes cx-converge {
+    from {
+      opacity: 0.32;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+  }
+
+  @keyframes cx-beat {
+    50% {
+      transform: scale(1.9);
+      opacity: 0.4;
+    }
+  }
+
+  @keyframes cx-run {
+    0% {
+      opacity: 0;
+      stroke-dashoffset: 1.08;
+    }
+    15%,
+    85% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes cx-rise {
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes cx-sheen {
+    to {
+      transform: skewX(-18deg) translateX(330px);
+    }
+  }
+
+  @keyframes cx-open {
+    to {
+      clip-path: inset(0 0 0 0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes cx-track {
+    from {
+      opacity: 0;
+      letter-spacing: 0.62em;
+    }
+    to {
+      opacity: 1;
+      letter-spacing: 0.26em;
+    }
+  }
+
+  @keyframes cx-up {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes cx-leave {
+    to {
+      opacity: 0;
+      transform: translateY(-0.35rem);
+    }
+  }
+
+  @keyframes cx-settle {
+    to {
+      opacity: 0;
+      transform: scale(0.82);
+    }
+  }
+
+  @keyframes cx-progress {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @keyframes cx-out {
+    to {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+
+  @keyframes cx-gone {
+    to {
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+</style>
