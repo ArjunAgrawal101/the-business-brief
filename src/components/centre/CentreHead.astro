@@ -14,13 +14,16 @@ interface Props {
   stats: Stat[];
   hl?: boolean;
   crumb: string;
+  /** The page above this one inside the Centre, for pages such as Paper 2's calculation practice. */
+  parent?: { label: string; href: string };
 }
-const { title, kicker, lead, stats, hl = false, crumb } = Astro.props;
+const { title, kicker, lead, stats, hl = false, crumb, parent } = Astro.props;
+const trail = [{ label: 'Assessment Centre', href: '/assessment/' }, ...(parent ? [parent] : []), { label: crumb }];
 ---
 
 <header class="ch">
   <div class="wrap">
-    <Breadcrumbs trail={[{ label: 'Assessment Centre', href: '/assessment/' }, { label: crumb }]} />
+    <Breadcrumbs trail={trail} />
     <p class="ch__kicker">
       {kicker}
       {hl && <span class="ch__hl">Higher Level only</span>}
@@ -52,9 +55,17 @@ const { title, kicker, lead, stats, hl = false, crumb } = Astro.props;
     color: var(--text-on-ink);
   }
 
-  .ch :global(.breadcrumbs a),
-  .ch :global(.breadcrumbs) {
+  .ch :global(.crumbs a),
+  .ch :global(.crumbs) {
     color: var(--text-on-ink-muted);
+  }
+
+  .ch :global(.crumbs [aria-current='page']) {
+    color: var(--text-on-ink);
+  }
+
+  .ch :global(.crumbs a:focus-visible) {
+    outline: var(--focus-ring-on-ink);
   }
 
   .ch__kicker {

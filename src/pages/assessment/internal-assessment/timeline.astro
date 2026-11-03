@@ -1,0 +1,300 @@
+---
+/**
+ * IA tool 4: the research planning timeline. Milestones are counted back
+ * from the reader's internal deadline in the order of the TSM's ten steps
+ * (pp. 69 to 72), with the guide's requirements labelled; spacing is the
+ * platform's recommendation. Exports to a calendar file (.ics), CSV and print.
+ * Without JavaScript an illustrative plan is shown. Saved in bb:ia-timeline.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import CentreHead from '../../../components/centre/CentreHead.astro';
+import GuideLabel from '../../../components/centre/GuideLabel.astro';
+import IaToolNav from '../../../components/centre/IaToolNav.astro';
+import IaIntegrity from '../../../components/centre/IaIntegrity.astro';
+import { longDay, planTimeline, type Timeline } from '../../../lib/ia-tools';
+import '../../../styles/centre.css';
+import '../../../styles/ia-tools.css';
+
+/** An illustrative plan, the same for every reader, until the reader enters their own dates. */
+const EXAMPLE = { start: '2026-09-07', deadline: '2027-03-01' };
+const example = planTimeline(EXAMPLE.start, EXAMPLE.deadline) as Timeline;
+const RULES = [
+  ['Your teacher approves the question before work starts.', 'Guide, p. 53'],
+  ['Your teacher comments on your work plans and reads and advises on one draft; the next version is the final one.', 'Guide, pp. 51 and 54'],
+  ['About 20 hours of teaching time is recommended for the project, including time to work on it in class.', 'Guide, p. 52'],
+  ['Supporting documents must be published within three years before submission.', 'Guide, p. 54'],
+  ['Submission to the IB is in April or October of the final year, depending on the examination session.', 'Guide, p. 54'],
+  ['On a two-year course, steps 1 to 5 of the TSM’s guidance, up to the initial proposal, are best finished towards the end of the first year.', 'TSM, p. 69'],
+  ['A penultimate draft is reviewed against the criteria at least two weeks before the project is due.', 'TSM, p. 72'],
+];
+const STAND: Record<string, string> = { ib: 'IB requirement', strategy: 'Recommended', examiner: 'Examiner emphasis' };
+---
+
+<BaseLayout
+  room="assessment"
+  title="Research timeline"
+  description="An IB Business Management IA tool: enter your start date and your school's internal deadline, and get milestones counted back from the deadline in the order the IB's teacher support material suggests, to print or add to your calendar."
+  section="assessment"
+>
+  <CentreHead
+    crumb="Research timeline"
+    parent={{ label: 'Internal assessment', href: '/assessment/internal-assessment/' }}
+    kicker="Internal assessment · Tool 4 of 5"
+    title="Your research timeline"
+    lead="Enter the date you start and your school's internal deadline. The timeline counts back from the deadline in the order the IB's teacher support material suggests, and goes into your calendar as a file."
+    stats={[
+      { value: '11', label: 'Milestones', note: 'from requirements to final version' },
+      { value: '2 weeks', label: 'Kept', note: 'for the final check' },
+      { value: '.ics', label: 'Calendar file', note: 'plus CSV and print' },
+    ]}
+  />
+
+  <div class="wrap page-body it-page">
+    <IaToolNav current="timeline" />
+
+    <section class="it-sec" aria-labelledby="tl-tool-h">
+      <SectionHead no="01" title="Your dates" id="tl-tool-h" dek="Your school's internal deadline comes before the IB's submission. Ask your teacher for it." />
+      <div class="it-tool" data-ix="ia-timeline">
+        <p class="state state--error" data-error hidden>The timeline could not start. The illustrative plan below can still be read and printed.</p>
+        <p class="sr-only" aria-live="polite" data-live></p>
+        <form class="tl-form js-only" data-form novalidate aria-label="Your dates">
+          <div class="field">
+            <label for="tl-start">The date you start</label>
+            <input class="input" id="tl-start" name="start" type="date" aria-describedby="tl-start-hint tl-err" />
+            <span class="field__hint" id="tl-start-hint">Today, unless you started earlier.</span>
+          </div>
+          <div class="field">
+            <label for="tl-deadline">Your school's internal deadline</label>
+            <input class="input" id="tl-deadline" name="deadline" type="date" aria-describedby="tl-deadline-hint tl-err" />
+            <span class="field__hint" id="tl-deadline-hint">The date your final version is due to your teacher.</span>
+          </div>
+          <div class="field">
+            <label for="tl-session">Your examination session</label>
+            <select class="select" id="tl-session" name="session">
+              <option value="">Not sure yet</option>
+              <option value="may">May</option>
+              <option value="november">November</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="tl-year">Year of the session</label>
+            <input class="input input--num" id="tl-year" name="year" type="number" min="2025" max="2035" inputmode="numeric" />
+          </div>
+        </form>
+        <p class="field__error js-only" id="tl-err" data-err aria-live="polite"></p>
+
+        <div class="tl-out">
+          <div class="tl-head">
+            <p class="it-out__k" data-title>Illustrative example: a plan from {longDay(EXAMPLE.start)} to {longDay(EXAMPLE.deadline)}</p>
+            <p class="small" data-span>{example.days} days, with the last two weeks kept for the final check.</p>
+          </div>
+          <ul class="it-list" data-warnings hidden></ul>
+          <ol class="tl-list" data-list>
+            {
+              example.milestones.map((m) => (
+                <li class={`tl-item tl-item--${m.standing}`}>
+                  <p class="tl-date">{longDay(m.date)}</p>
+                  <div>
+                    <p class="tl-title">{m.title}</p>
+                    <p class="tl-detail">{m.detail}</p>
+                  </div>
+                  <p class="tl-stand">
+                    {STAND[m.standing]}
+                    {m.source && <span>{m.source}</span>}
+                  </p>
+                </li>
+              ))
+            }
+          </ol>
+          <p class="small" data-submission>Submission to the IB is in April or October of the final year, depending on your examination session (guide, p. 54). Your school’s deadline comes first.</p>
+          <p class="small muted">The order follows the TSM's ten steps; the spacing between milestones is the platform's recommendation. Your teacher's dates come first.</p>
+        </div>
+
+        <div class="it-export js-only">
+          <button type="button" class="btn btn--small" data-ics>Add to my calendar (.ics)</button>
+          <button type="button" class="btn btn--small" data-csv>Download (CSV)</button>
+          <button type="button" class="btn btn--small" data-print>Print</button>
+          <button type="button" class="btn btn--small" data-reset>Clear my dates</button>
+          <span class="it-export__confirm" data-reset-confirm hidden>
+            <span>This clears your dates on this page.</span>
+            <button type="button" class="btn btn--small btn--primary" data-reset-yes>Clear them</button>
+            <button type="button" class="btn btn--small" data-reset-no>Keep them</button>
+          </span>
+        </div>
+        <p class="nojs-only small muted">With JavaScript on, enter your own dates to make your own plan and export it.</p>
+      </div>
+    </section>
+
+    <section class="it-sec" aria-labelledby="tl-rules-h">
+      <SectionHead no="02" title="What sets the dates" id="tl-rules-h" />
+      <p class="ce-labels"><GuideLabel kind="ib" /></p>
+      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s}</span></li>)}</ul>
+    </section>
+
+    <section class="it-sec" aria-labelledby="tl-ex-h">
+      <SectionHead no="03" title="A last-minute plan, and a steady one" id="tl-ex-h" dek="Two students with the same deadline, 1 March, writing about a fictional business." />
+      <div class="it-examples">
+        <article class="it-ex it-ex--weak" aria-labelledby="tl-weak-h">
+          <p class="it-ex__k">Weaker <GuideLabel kind="example" /></p>
+          <h3 id="tl-weak-h">Started in mid-January</h3>
+          <dl>
+            <div><dt>Weeks 1 to 2</dt><dd>Question changed twice; approved in week 3.</dd></div>
+            <div><dt>Weeks 3 to 4</dt><dd>Documents found as the writing goes, one of them four years old.</dd></div>
+            <div><dt>Week 5</dt><dd>Draft to the teacher three days before the deadline.</dd></div>
+            <div><dt>Week 6</dt><dd>No time to act on the comments or to check the criteria.</dd></div>
+          </dl>
+          <p class="it-why">The one draft the teacher reads comes too late to use, and the documents were chosen to fit the writing rather than the question.</p>
+        </article>
+        <article class="it-ex it-ex--strong" aria-labelledby="tl-strong-h">
+          <p class="it-ex__k">Stronger <GuideLabel kind="example" /></p>
+          <h3 id="tl-strong-h">Started in September</h3>
+          <dl>
+            <div><dt>Autumn</dt><dd>Question approved in October; proposal and candidate documents by November.</dd></div>
+            <div><dt>Winter</dt><dd>Five documents selected in December; tools applied over the holiday.</dd></div>
+            <div><dt>January</dt><dd>Draft with the teacher by the end of the month; revised in February.</dd></div>
+            <div><dt>Mid-February</dt><dd>Penultimate draft marked strictly against each criterion; final version on time.</dd></div>
+          </dl>
+          <p class="it-why">Each stage has room to go wrong and be put right, and the teacher's comments arrive while there is time to use them.</p>
+        </article>
+      </div>
+    </section>
+
+    <IaIntegrity no="04" />
+  </div>
+</BaseLayout>
+
+<style>
+  .tl-form {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--sp-3) var(--sp-4);
+    align-items: start;
+  }
+
+  .tl-out {
+    display: grid;
+    gap: var(--sp-3);
+  }
+
+  .tl-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-2) var(--sp-4);
+  }
+
+  .tl-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 3px solid var(--navy-900);
+  }
+
+  .tl-list :global(.tl-item) {
+    position: relative;
+    display: grid;
+    grid-template-columns: 14rem minmax(0, 1fr) 11rem;
+    gap: var(--sp-2) var(--sp-5);
+    margin: 0;
+    padding: var(--sp-3) 0 var(--sp-3) var(--sp-5);
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .tl-list :global(.tl-item::before) {
+    content: '';
+    position: absolute;
+    left: 0.25rem;
+    top: 1.15rem;
+    width: 0.6rem;
+    height: 0.6rem;
+    border: 2px solid var(--navy-900);
+    border-radius: 50%;
+    background: var(--surface-sheet);
+  }
+
+  .tl-list :global(.tl-item--ib::before) {
+    background: var(--navy-900);
+  }
+
+  .tl-list :global(.tl-item::after) {
+    content: '';
+    position: absolute;
+    left: 0.6rem;
+    top: 1.95rem;
+    bottom: -1.15rem;
+    width: 1px;
+    background: var(--rule);
+  }
+
+  .tl-list :global(.tl-item:last-child::after) {
+    display: none;
+  }
+
+  .tl-list :global(.tl-date) {
+    font-weight: 600;
+    color: var(--navy-900);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tl-list :global(.tl-title) {
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .tl-list :global(.tl-detail) {
+    font-size: 0.9375rem;
+    color: var(--text-body);
+  }
+
+  .tl-list :global(.tl-stand) {
+    display: grid;
+    gap: 0.1rem;
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .tl-list :global(.tl-item--ib .tl-stand) {
+    color: var(--navy-900);
+  }
+
+  .tl-list :global(.tl-stand span) {
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--text-muted);
+  }
+
+  .tl-list :global(.tl-item.is-past .tl-date) {
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 64rem) {
+    .tl-form {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 52rem) {
+    .tl-list :global(.tl-item) {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.15rem;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .tl-form {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
+
+<script>
+  import '../../../scripts/centre/ia-timeline';
+</script>

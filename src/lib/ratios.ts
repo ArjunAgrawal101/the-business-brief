@@ -693,7 +693,7 @@ export interface Diagnosis {
 export const TOLERANCE = 0.051;
 
 /** Wrong answers that come from a known slip, with what went wrong. */
-function slips(id: RatioId, i: Inputs): Array<{ value: number | null; message: string }> {
+export function slips(id: RatioId, i: Inputs): Array<{ value: number | null; message: string }> {
   const v = (k: string) => i[k] ?? 0;
   switch (id) {
     case 'gross-profit-margin':

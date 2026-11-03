@@ -1,0 +1,88 @@
+---
+/** The five IA tools, numbered, with the current one marked. Each is a page of its own. */
+import { IA_TOOL_PAGES, type IaToolId } from '../../lib/ia-tools';
+
+interface Props {
+  current: IaToolId;
+}
+const { current } = Astro.props;
+---
+
+<nav class="itn" aria-label="The internal assessment tools">
+  <ol class="itn__list">
+    {
+      IA_TOOL_PAGES.map((t, i) => (
+        <li>
+          <a href={t.href} aria-current={t.id === current ? 'page' : undefined}>
+            <span class="itn__n" aria-hidden="true">
+              {i + 1}
+            </span>
+            <span class="itn__name">{t.name}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+  <p class="itn__more">
+    <a href="/assessment/internal-assessment/">The internal assessment</a> · <a href="/ia-studio/">The ten-step planner</a>
+  </p>
+</nav>
+
+<style>
+  .itn {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3) var(--sp-5);
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .itn__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .itn__list li {
+    margin: 0;
+  }
+
+  .itn__list a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.9rem 0.6rem 0;
+    margin-right: var(--sp-3);
+    border-bottom: 3px solid transparent;
+    color: var(--text-body);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .itn__list a:hover {
+    color: var(--cobalt-text);
+  }
+
+  .itn__list a[aria-current='page'] {
+    border-bottom-color: var(--navy-900);
+    color: var(--navy-900);
+  }
+
+  .itn__n {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--brass-text);
+  }
+
+  .itn__more {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+</style>

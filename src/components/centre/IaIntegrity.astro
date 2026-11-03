@@ -1,0 +1,116 @@
+---
+/**
+ * Academic integrity, attribution and AI, on every IA tool page. The IB's
+ * requirements are stated apart from the platform's recommendation, each
+ * with the guide's page.
+ */
+import GuideLabel from './GuideLabel.astro';
+
+interface Props {
+  no: string;
+}
+const { no } = Astro.props;
+---
+
+<section class="ii" aria-labelledby={`ii-h-${no}`}>
+  <header class="ii__head">
+    <span class="ii__no" aria-hidden="true">{no}</span>
+    <div>
+      <h2 id={`ii-h-${no}`}><span class="sr-only">Section {no}: </span>Your own work</h2>
+      <p class="ii__dek">What the IB requires of authentic work, and how the platform recommends using any outside help, including AI.</p>
+    </div>
+  </header>
+  <div class="ii__grid">
+    <div class="ii__col">
+      <p class="ce-labels"><GuideLabel kind="ib" /></p>
+      <ul class="ii__list">
+        <li>Work you submit must be authentic: your own ideas, with everything you took from anyone else's ideas or work acknowledged. <span class="ii__src">Guide, p. 4</span></li>
+        <li>
+          Acknowledge every source you use, in a standard referencing style used consistently: at least the author, the date of publication, the title and
+          page numbers where they apply, and the date you accessed an electronic source. Mark quoted words as quotations. <span class="ii__src">Guide, pp. 4 to 5</span>
+        </li>
+        <li>Your teacher reads and advises on one draft, but does not edit it; the next version you hand in is the final one, and once submitted it cannot be retracted. <span class="ii__src">Guide, p. 51</span></li>
+        <li>You confirm that the project is your authentic work, and the same work cannot be submitted for both the IA and the extended essay. <span class="ii__src">Guide, pp. 51 to 52</span></li>
+      </ul>
+    </div>
+    <div class="ii__col ii__col--rec">
+      <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+      <ul class="ii__list">
+        <li><b>Rules first.</b> Your school and the IB set the rules on AI tools. Ask your teacher what applies to you before you use one.</li>
+        <li>
+          <b>Help, not authorship.</b> If you use an AI tool at all, use it as you might a well-read friend: to explain an idea you have met, or to test your
+          understanding. Do not let it choose your question, find or summarize your documents, analyse them, or write any part of the project.
+        </li>
+        <li><b>Say what you used.</b> If anything an AI tool produced appears in your work, acknowledge it as you would any other source, and keep a note of how you used it.</li>
+        <li><b>Check everything.</b> An AI tool can be fluent and wrong. Every fact in your project should trace to a document or source you can cite.</li>
+        <li><b>These tools.</b> Nothing on this platform writes your project. The tools check what you have planned and ask questions about it; your teacher guides you, and marks the work.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .ii {
+    padding: var(--sp-5);
+    background: var(--surface-sheet);
+    border-top: 3px solid var(--navy-900);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .ii__head {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: var(--sp-3);
+    align-items: baseline;
+  }
+
+  .ii__no {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.75rem;
+    color: var(--cobalt-text);
+  }
+
+  .ii__head h2 {
+    font-size: var(--fs-h3);
+  }
+
+  .ii__dek {
+    margin-top: var(--sp-1);
+    color: var(--text-muted);
+  }
+
+  .ii__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-6);
+    margin-top: var(--sp-4);
+  }
+
+  .ii__list {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding-left: 1.1rem;
+    font-size: 0.9375rem;
+  }
+
+  .ii__src {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 52rem) {
+    .ii__grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sp-4);
+    }
+
+    .ii__head {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+  }
+</style>

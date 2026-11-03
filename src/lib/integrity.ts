@@ -9,6 +9,7 @@
  */
 import type { AssessmentComponent, Block, Calculation, CaseEntry, Claim, CommandTerm, Concept, Curriculum, Decision, EnrichmentMap, GlossaryEntry, Interactive, Mindmap, Note, Question, Source, Topic, Tool } from './schemas';
 import { topoOrder } from './plan';
+import { checkAssessment } from './integrity-assessment';
 import { buildWorking, workings } from './finance';
 import { checkStudioInteractives } from './integrity-studio';
 import { checkMarketTools } from './integrity-market';
@@ -353,6 +354,7 @@ export function checkIntegrity(c: Corpus): Problem[] {
     a.questions.forEach((x) => need(c.questions, x, `assessment/${id}`, 'question'));
     a.facts.forEach((f) => f.sources.forEach((x) => need(c.sources, x, `assessment/${id}`, 'source')));
   }
+  problems.push(...checkAssessment(c));
   for (const [id, cl] of Object.entries(c.claims)) cl.sources.forEach((x) => need(c.sources, x, `claims/${id}`, 'source'));
   for (const [id, g] of Object.entries(c.glossary)) {
     g.topics.forEach((x) => need(c.topics, x, `glossary/${id}`, 'topic'));

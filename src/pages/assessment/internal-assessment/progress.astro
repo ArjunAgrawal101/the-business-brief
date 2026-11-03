@@ -1,0 +1,353 @@
+---
+/**
+ * IA tool 5: the progress tracker. Each stage's status and notes, the words
+ * that count (checked by wordStatus in src/lib/ia.ts), and the guide's
+ * requirements before submission, with a summary that reads the reader's
+ * timeline, documents and concept from the other tools. It never predicts a
+ * mark. Saved in bb:ia-progress.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import CentreHead from '../../../components/centre/CentreHead.astro';
+import GuideLabel from '../../../components/centre/GuideLabel.astro';
+import IaToolNav from '../../../components/centre/IaToolNav.astro';
+import IaIntegrity from '../../../components/centre/IaIntegrity.astro';
+import { STAGES, STAGE_STATUS } from '../../../lib/ia-tools';
+import '../../../styles/centre.css';
+import '../../../styles/ia-tools.css';
+
+const FINAL = [
+  { id: 'one-org', text: 'The project refers directly to a single organization.', source: 'Guide, p. 53' },
+  { id: 'concept', text: 'The key concept is stated on the title page.', source: 'Guide, p. 53' },
+  { id: 'count', text: 'The word count is on the cover page, and the words that count are 1,800 or fewer.', source: 'Guide, p. 56' },
+  { id: 'docs', text: 'Three to five supporting documents are attached at the end, labelled, with the parts you use highlighted.', source: 'Guide, p. 55' },
+  { id: 'translate', text: 'Highlighted parts not in your registered language are translated.', source: 'Guide, p. 55' },
+  { id: 'refs', text: 'Every supporting document and other source is cited in the text and listed in a bibliography.', source: 'Guide, pp. 53 and 55' },
+  { id: 'present', text: 'A title page, an accurate table of contents, headings and subheadings, and numbered pages.', source: 'Guide, p. 55' },
+  { id: 'answer', text: 'The conclusion answers the research question and introduces no new facts or arguments.', source: 'Guide, p. 55' },
+];
+const NOT_COUNTED = ['Acknowledgments', 'The contents page', 'Tables of statistical data', 'Diagrams or figures', 'Equations, formulae and calculations', 'The supporting documents', 'Citations, in the body', 'References, in footnotes or endnotes', 'The bibliography'];
+---
+
+<BaseLayout
+  room="assessment"
+  title="IA progress tracker"
+  description="An IB Business Management IA tool: track each stage of your business research project, the words that count and the guide's requirements before you submit. It reads your timeline and documents from the other tools, and never predicts a mark."
+  section="assessment"
+>
+  <CentreHead
+    crumb="Progress tracker"
+    parent={{ label: 'Internal assessment', href: '/assessment/internal-assessment/' }}
+    kicker="Internal assessment · Tool 5 of 5"
+    title="Your progress"
+    lead="Track each stage of your project, the words that count and the guide's requirements before you submit. If you have used the other tools, it reads your deadline, documents and lens from them. It never predicts a mark: only your teacher's marking and the IB's moderation decide that."
+    stats={[
+      { value: String(STAGES.length), label: 'Stages', note: 'in the TSM’s order' },
+      { value: '1,800', label: 'Words', note: 'at most, that count' },
+      { value: String(FINAL.length), label: 'Final checks', note: 'from the guide' },
+    ]}
+  />
+
+  <div class="wrap page-body it-page">
+    <IaToolNav current="progress" />
+
+    <div class="pg-root" data-ix="ia-progress">
+      <p class="state state--error" data-error hidden>The tracker could not start. You can still read and print the stages and checks.</p>
+      <p class="sr-only" aria-live="polite" data-live></p>
+
+      <section class="it-sec" aria-labelledby="pg-sum-h">
+        <SectionHead no="01" title="Where you are" id="pg-sum-h" />
+        <div class="pg-sum js-only" data-summary>
+          <div class="pg-stat"><p class="label">Stages done</p><p class="pg-stat__v" data-done>0 of {STAGES.length}</p></div>
+          <div class="pg-stat pg-stat--wide"><p class="label">Next</p><p class="pg-stat__t" data-next>{STAGES[0]?.title}</p></div>
+          <div class="pg-stat"><p class="label">Deadline</p><p class="pg-stat__t" data-left><a href="/assessment/internal-assessment/timeline/">Set it in the timeline</a></p></div>
+          <div class="pg-stat"><p class="label">Documents selected</p><p class="pg-stat__t" data-docs><a href="/assessment/internal-assessment/documents/">List them</a></p></div>
+          <div class="pg-stat"><p class="label">Lens</p><p class="pg-stat__t" data-lens><a href="/assessment/internal-assessment/key-concept/">Choose it</a></p></div>
+        </div>
+        <ul class="it-list js-only" data-overdue hidden></ul>
+        <p class="nojs-only small muted">With JavaScript off you can mark the stages and print the page, but nothing is saved or summarized.</p>
+      </section>
+
+      <section class="it-sec" aria-labelledby="pg-stages-h">
+        <SectionHead no="02" title="The stages" id="pg-stages-h" dek="In the order of the TSM's ten steps, with the guide's requirements labelled. Mark each as you go; add a note for your next meeting with your teacher." />
+        <ol class="pg-stages">
+          {
+            STAGES.map((s, i) => (
+              <li class="pg-stage" data-stage={s.id}>
+                <span class="pg-stage__n" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <div class="pg-stage__main">
+                  <h3 class="pg-stage__title" id={`pg-${s.id}-h`}>
+                    {s.title}
+                  </h3>
+                  <p class="pg-stage__detail">
+                    {s.detail}
+                    {s.source && <span class="it-src"> {s.source}</span>}
+                  </p>
+                  <div class="field pg-note">
+                    <label for={`pg-${s.id}-note`}>Note</label>
+                    <input class="input" id={`pg-${s.id}-note`} data-note autocomplete="off" />
+                  </div>
+                </div>
+                <div class="pg-stage__side">
+                  <p class="pg-stand">{s.standing === 'ib' ? 'IB requirement' : 'Recommended'}</p>
+                  <div class="field">
+                    <label for={`pg-${s.id}-status`}>Status</label>
+                    <select class="select" id={`pg-${s.id}-status`} data-status aria-describedby={`pg-${s.id}-done`}>
+                      {Object.entries(STAGE_STATUS).map(([v, l]) => <option value={v}>{l}</option>)}
+                    </select>
+                  </div>
+                  <p class="small muted" id={`pg-${s.id}-done`} data-done-on></p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      <section class="it-sec" aria-labelledby="pg-words-h">
+        <SectionHead no="03" title="The words that count" id="pg-words-h" dek="Moderators do not read beyond 1,800 words, and your teacher marks only the first 1,800 (guide, p. 56)." />
+        <div class="pg-words">
+          <div class="field">
+            <label for="pg-words">Words that count in your latest draft</label>
+            <input class="input input--num" id="pg-words" data-words type="number" min="0" max="20000" inputmode="numeric" aria-describedby="pg-words-out" />
+            <p class="pg-words__out" id="pg-words-out" data-words-out aria-live="polite">Enter the count of the words that count.</p>
+          </div>
+          <div>
+            <p class="ce-labels"><GuideLabel kind="ib" /></p>
+            <p class="small"><b>Not counted</b> (guide, p. 56):</p>
+            <ul class="pg-not">{NOT_COUNTED.map((x) => <li>{x}</li>)}</ul>
+            <p class="small">Everything else counts, including headings, definitions of business terms and quotations. Footnotes and endnotes may hold references only.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="it-sec" aria-labelledby="pg-final-h">
+        <SectionHead no="04" title="Before you submit" id="pg-final-h" dek="The guide's requirements for the submitted project. Ticking them tells you what is in place; it does not predict a mark." />
+        <fieldset class="it-fs">
+          <legend class="ce-labels"><GuideLabel kind="ib" /></legend>
+          <div class="it-checks-in">
+            {
+              FINAL.map((f) => (
+                <label class="it-check">
+                  <input type="checkbox" value={f.id} data-final />
+                  <span>
+                    {f.text} <span class="it-src">{f.source}</span>
+                  </span>
+                </label>
+              ))
+            }
+          </div>
+          <p class="small muted js-only" data-final-count aria-live="polite">0 of {FINAL.length} in place.</p>
+        </fieldset>
+      </section>
+
+      <div class="it-export js-only">
+        <button type="button" class="btn btn--small" data-json>Download a backup (JSON)</button>
+        <button type="button" class="btn btn--small" data-print>Print</button>
+        <button type="button" class="btn btn--small" data-reset>Clear my progress</button>
+        <span class="it-export__confirm" data-reset-confirm hidden>
+          <span>This clears your stages, notes, word count and checks on this page.</span>
+          <button type="button" class="btn btn--small btn--primary" data-reset-yes>Clear it</button>
+          <button type="button" class="btn btn--small" data-reset-no>Keep it</button>
+        </span>
+      </div>
+    </div>
+
+    <section class="it-sec" aria-labelledby="pg-ex-h">
+      <SectionHead no="05" title="A week before the deadline" id="pg-ex-h" dek="Two snapshots of the same tracker, for projects on fictional businesses." />
+      <div class="it-examples">
+        <article class="it-ex it-ex--weak" aria-labelledby="pg-weak-h">
+          <p class="it-ex__k">Weaker <GuideLabel kind="example" /></p>
+          <h3 id="pg-weak-h">Five stages done, the draft never shown</h3>
+          <dl>
+            <div><dt>Stages</dt><dd>5 of 11 done; "first draft to your teacher" not started.</dd></div>
+            <div><dt>Words</dt><dd>2,140 counted: the last 340 would not be read.</dd></div>
+            <div><dt>Documents</dt><dd>Four, one published four years before submission.</dd></div>
+            <div><dt>Title page</dt><dd>No key concept stated.</dd></div>
+          </dl>
+          <p class="it-why">Each gap is a requirement the guide states, and the week left is not enough to close them with the teacher's help.</p>
+        </article>
+        <article class="it-ex it-ex--strong" aria-labelledby="pg-strong-h">
+          <p class="it-ex__k">Stronger <GuideLabel kind="example" /></p>
+          <h3 id="pg-strong-h">Ten stages done, one week for the final version</h3>
+          <dl>
+            <div><dt>Stages</dt><dd>10 of 11 done; the draft was commented on in January and revised.</dd></div>
+            <div><dt>Words</dt><dd>1,760 that count, with the count on the cover page.</dd></div>
+            <div><dt>Documents</dt><dd>Five, all within three years, labelled SD1 to SD5 and highlighted.</dd></div>
+            <div><dt>Final checks</dt><dd>All eight in place; the penultimate draft was marked strictly against each criterion.</dd></div>
+          </dl>
+          <p class="it-why">What is left is the final read, not missing requirements. That is a sign of a well-run project, not a prediction of its mark.</p>
+        </article>
+      </div>
+    </section>
+
+    <IaIntegrity no="06" />
+  </div>
+</BaseLayout>
+
+<style>
+  .pg-root > * + * {
+    margin-top: var(--sp-7);
+  }
+
+  .pg-sum {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0;
+    margin-top: var(--sp-4);
+    border-top: 1px solid var(--navy-900);
+  }
+
+  .pg-stat {
+    display: grid;
+    align-content: start;
+    gap: 0.3rem;
+    padding: var(--sp-3) var(--sp-4) var(--sp-3) 0;
+  }
+
+  .pg-stat + .pg-stat {
+    padding-left: var(--sp-4);
+    border-left: 1px solid var(--rule-hair);
+  }
+
+  .pg-stat__v {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    line-height: 1.1;
+    color: var(--navy-900);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pg-stat__t {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .pg-stages {
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 3px solid var(--navy-900);
+  }
+
+  .pg-stage {
+    display: grid;
+    grid-template-columns: 2.75rem minmax(0, 1fr) 13rem;
+    gap: var(--sp-3) var(--sp-5);
+    margin: 0;
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .pg-stage.is-done .pg-stage__title {
+    color: var(--green-text);
+  }
+
+  .pg-stage__n {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.25rem;
+    color: var(--brass-text);
+  }
+
+  .pg-stage__main {
+    display: grid;
+    gap: var(--sp-2);
+    min-width: 0;
+  }
+
+  .pg-stage__title {
+    font-size: 1.125rem;
+  }
+
+  .pg-stage__detail {
+    font-size: 0.9375rem;
+  }
+
+  .pg-note {
+    max-width: 34rem;
+  }
+
+  .pg-stage__side {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+  }
+
+  .pg-stand {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .pg-words {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: var(--sp-6);
+    margin-top: var(--sp-4);
+    align-items: start;
+  }
+
+  .pg-words__out {
+    margin-top: var(--sp-2);
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .pg-words__out.is-over {
+    color: var(--signal-text);
+  }
+
+  .pg-not {
+    columns: 2;
+    margin: var(--sp-2) 0;
+    padding-left: 1.1rem;
+    font-size: 0.875rem;
+  }
+
+  @media (max-width: 64rem) {
+    .pg-sum {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pg-stat,
+    .pg-stat + .pg-stat {
+      padding-left: 0;
+      border-left: 0;
+      border-bottom: 1px solid var(--rule-hair);
+    }
+
+    .pg-stat--wide {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 52rem) {
+    .pg-stage {
+      grid-template-columns: 2rem minmax(0, 1fr);
+    }
+
+    .pg-stage__side {
+      grid-column: 2;
+    }
+
+    .pg-words {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .pg-not {
+      columns: 1;
+    }
+  }
+</style>
+
+<script>
+  import '../../../scripts/centre/ia-progress';
+</script>

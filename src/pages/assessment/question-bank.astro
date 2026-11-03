@@ -1,0 +1,510 @@
+---
+/**
+ * The question bank: every original practice question on the platform, from
+ * the questions collection, the notes' exam-style practice and the case
+ * files, in one server-rendered list that works without JavaScript. The
+ * script adds filters, search, self-rating, timed sets at each paper's pace
+ * and progress kept on this device (bb:bank), all through src/lib/bank.ts.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import CentreHead from '../../components/centre/CentreHead.astro';
+import GuideLabel from '../../components/centre/GuideLabel.astro';
+import BankCard from '../../components/centre/BankCard.astro';
+import Exhibit from '../../components/blocks/Exhibit.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import { corpus, href } from '../../lib/content';
+import { buildBank, facetsOf } from '../../lib/bank-build';
+import { AO_LABELS, BAND_LABELS, PAPER_LABELS, TYPE_LABELS, fmtPace, pacesFrom, type Ao, type Band, type PaperStyle, type QType } from '../../lib/bank';
+import { jsonForScript } from '../../lib/markup';
+import '../../styles/centre.css';
+import '../../styles/bank.css';
+
+const c = await corpus();
+const bank = buildBank(c);
+const items = bank.items;
+const units = (c.curricula['ib-dp-bm']?.units ?? []).map((u) => ({ n: u.number, title: u.title }));
+const present = new Set(items.flatMap((i) => i.codes));
+const subtopics = bank.subtopics.filter((s) => present.has(s.code));
+const terms = Object.entries(c.commandTerms)
+  .filter(([id]) => items.some((i) => i.command === id))
+  .sort((a, b) => a[1].order - b[1].order);
+const AOS: Ao[] = ['AO1', 'AO2', 'AO3', 'AO4'];
+const papers = (Object.keys(PAPER_LABELS) as PaperStyle[]).filter((p) => items.some((i) => i.paper === p));
+const bands = (Object.keys(BAND_LABELS) as Band[]).filter((b) => items.some((i) => i.band === b));
+const types = (Object.keys(TYPE_LABELS) as QType[]).filter((t) => items.some((i) => i.type === t));
+const marks = items.reduce((s, i) => s + i.marks, 0);
+const count = (p: PaperStyle) => items.filter((i) => i.paper === p).length;
+const bySource = (s: string) => items.filter((i) => i.source === s).length;
+const unitItems = (n: number) => items.filter((i) => i.units[0] === n);
+/** Every exhibit a question uses, once, keyed "case:exhibit", for the cards to copy when opened. */
+const evidence = new Map<string, { caseId: string; caseTitle: string; exhibit: NonNullable<(typeof c.cases)[string]>['exhibits'][number] }>();
+for (const it of items) {
+  const cs = it.caseId ? c.cases[it.caseId] : undefined;
+  if (!cs || !it.caseId) continue;
+  for (const id of it.exhibits) {
+    const exhibit = cs.exhibits.find((x) => x.id === id);
+    if (exhibit) evidence.set(`${it.caseId}:${id}`, { caseId: it.caseId, caseTitle: cs.title, exhibit });
+  }
+}
+/** With JavaScript, the list shows this many matching questions at a time. */
+const PAGE = 30;
+
+/* Each paper's time, marks and scope, from the guide's assessment outlines (pp. 39 to 40). */
+const paces = pacesFrom(c.assessment);
+const config = {
+  page: PAGE,
+  items: items.map(facetsOf),
+  paces,
+  terms: Object.fromEntries(terms.map(([id, t]) => [id, t.term])),
+  units: Object.fromEntries(units.map((u) => [u.n, u.title])),
+};
+---
+
+<BaseLayout
+  room="assessment"
+  title="Question bank"
+  description="Every original IB Business Management practice question on the platform in one bank: filter by unit, subtopic, paper, level, command term and marks, reveal the guidance, rate yourself and sit timed sets at each paper's pace."
+  section="assessment"
+>
+  <CentreHead
+    crumb="Question bank"
+    kicker="Assessment Centre · Practice"
+    title="The question bank"
+    lead="Every original practice question on the platform, in one place: from the practice sets, the notes and the case files. Write your answer, then reveal the guidance and rate yourself, or sit a timed set at a paper's pace."
+    stats={[
+      { value: String(items.length), label: 'Questions', note: 'all original practice' },
+      { value: `${count('paper-1')} · ${count('paper-2')} · ${count('paper-3')}`, label: 'By paper style', note: 'Paper 1 · Paper 2 · Paper 3' },
+      { value: String(marks), label: 'Marks', note: 'across the bank' },
+      { value: `${terms.length} of ${Object.keys(c.commandTerms).length}`, label: 'Command terms', note: 'used in the questions' },
+    ]}
+  />
+
+  <div class="wrap page-body bank" data-ix="bank">
+    <script type="application/json" data-config set:html={jsonForScript(config)} />
+    <p class="state state--error" data-error hidden>The bank's tools could not start. Every question and its guidance is still here to read.</p>
+    <p class="sr-only" aria-live="polite" data-live></p>
+
+    <div class="bank-standing">
+      <ProvenanceTag kind="original-practice" />
+      <p>
+        Every question here was written for the platform in the style of the papers; none is an IB question. The guidance under each is the platform's
+        own, for its own question, and is not an IB markscheme. Nothing here predicts a mark or a grade.
+      </p>
+    </div>
+
+    <section class="bank-sec" aria-labelledby="bank-h">
+      <SectionHead no="01" title="The bank" id="bank-h" dek="Answer on paper or in your head first. Then open the guidance, compare, and rate your answer honestly: the rating is for you." />
+
+      <div class="bank-layout">
+        <aside class="bank-side" aria-label="Filters and your progress" data-side>
+          <button type="button" class="btn btn--small bank-side__toggle js-only" aria-expanded="false" aria-controls="bank-filters" data-side-toggle>Show filters and search</button>
+          <form class="bank-filters js-only" id="bank-filters" data-filters role="search" aria-label="Filter and search the questions">
+            <div class="field">
+              <label for="bf-q">Search the questions</label>
+              <input class="input" id="bf-q" name="query" type="search" autocomplete="off" aria-describedby="bf-q-hint" />
+              <span class="field__hint" id="bf-q-hint">Words in the question, its case or its subtopic</span>
+            </div>
+            <div class="field">
+              <label for="bf-unit">Unit</label>
+              <select class="select" id="bf-unit" name="unit">
+                <option value="">All units</option>
+                {units.filter((u) => items.some((i) => i.units.includes(u.n))).map((u) => <option value={String(u.n)}>Unit {u.n}: {u.title}</option>)}
+              </select>
+            </div>
+            <div class="field">
+              <label for="bf-code">Subtopic</label>
+              <select class="select" id="bf-code" name="code">
+                <option value="">All subtopics</option>
+                {
+                  units.map((u) => {
+                    const subs = subtopics.filter((s) => s.unit === u.n);
+                    return subs.length > 0 ? (
+                      <optgroup label={`Unit ${u.n}`}>
+                        {subs.map((s) => (
+                          <option value={s.code}>
+                            {s.code} {s.title}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ) : null;
+                  })
+                }
+              </select>
+            </div>
+            <div class="field">
+              <label for="bf-paper">Paper style</label>
+              <select class="select" id="bf-paper" name="paper">
+                <option value="">All paper styles</option>
+                {papers.map((p) => <option value={p}>{PAPER_LABELS[p]}</option>)}
+              </select>
+            </div>
+            <div class="field">
+              <label for="bf-level">Level</label>
+              <select class="select" id="bf-level" name="level">
+                <option value="">SL and HL</option>
+                <option value="SL">SL: hide HL-only questions</option>
+                <option value="HL">HL-only questions</option>
+              </select>
+            </div>
+            <div class="bank-filters__pair">
+              <div class="field">
+                <label for="bf-ao">Objective</label>
+                <select class="select" id="bf-ao" name="ao">
+                  <option value="">All</option>
+                  {AOS.filter((a) => items.some((i) => i.ao === a)).map((a) => <option value={a}>{a}</option>)}
+                </select>
+              </div>
+              <div class="field">
+                <label for="bf-band">Marks</label>
+                <select class="select" id="bf-band" name="band">
+                  <option value="">All</option>
+                  {bands.map((b) => <option value={b}>{BAND_LABELS[b].replace(' marks', '').replace(' or more', '+')}</option>)}
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="bf-command">Command term</label>
+              <select class="select" id="bf-command" name="command">
+                <option value="">All command terms</option>
+                {
+                  AOS.map((a) => {
+                    const list = terms.filter(([, t]) => t.ao === a);
+                    return list.length > 0 ? (
+                      <optgroup label={AO_LABELS[a]}>
+                        {list.map(([id, t]) => (
+                          <option value={id}>
+                            {t.term} ({a})
+                          </option>
+                        ))}
+                      </optgroup>
+                    ) : null;
+                  })
+                }
+              </select>
+            </div>
+            <div class="field">
+              <label for="bf-type">Question type</label>
+              <select class="select" id="bf-type" name="type">
+                <option value="">All types</option>
+                {types.map((t) => <option value={t}>{TYPE_LABELS[t]}</option>)}
+              </select>
+            </div>
+            <div class="field">
+              <label for="bf-status">Your progress</label>
+              <select class="select" id="bf-status" name="status">
+                <option value="">Any</option>
+                <option value="new">Not attempted</option>
+                <option value="attempted">Attempted</option>
+                <option value="not-secure">Not yet secure</option>
+                <option value="secure">Secure</option>
+              </select>
+            </div>
+            <button type="button" class="btn btn--small bank-filters__clear" data-clear hidden>Clear filters</button>
+          </form>
+
+          <nav class="bank-contents" aria-label="Units in the bank">
+            <p class="label">By unit</p>
+            <ol>
+              {
+                units.map((u) =>
+                  unitItems(u.n).length > 0 ? (
+                    <li>
+                      <a href={`#bank-unit-${u.n}`}>
+                        <span>Unit {u.n}</span> {u.title}
+                      </a>
+                      <span class="bank-contents__n" data-unit-count={u.n}>
+                        {unitItems(u.n).length}
+                      </span>
+                    </li>
+                  ) : null,
+                )
+              }
+            </ol>
+          </nav>
+
+          <div class="bank-mine js-only">
+            <p class="label" id="bank-mine-h">Your progress</p>
+            <p class="bank-mine__line"><b data-mine-attempted>0</b> of {items.length} attempted</p>
+            <p class="bank-mine__line"><b data-mine-secure>0</b> rated secure</p>
+            <a class="small" href="#progress-h">By unit and command term</a>
+          </div>
+        </aside>
+
+        <div class="bank-main">
+          <div class="bank-set js-only" data-set-form>
+            <div class="bank-set__head">
+              <p class="bank-set__k">Timed set</p>
+              <p class="small muted">Drawn from the questions your filters show, at the chosen paper's pace. <GuideLabel kind="strategy" /></p>
+            </div>
+            <div class="bank-set__row">
+              <div class="field">
+                <label for="set-pace">Pace</label>
+                <select class="select" id="set-pace" data-set-pace>
+                  {paces.map((p) => <option value={p.id}>{p.label}: {fmtPace(p)}</option>)}
+                </select>
+              </div>
+              <div class="field bank-set__n">
+                <label for="set-n">Questions</label>
+                <select class="select" id="set-n" data-set-n>
+                  {[1, 2, 3, 4, 5, 6, 8, 10].map((n) => <option value={String(n)} selected={n === 3}>{n}</option>)}
+                </select>
+              </div>
+              <button type="button" class="btn btn--primary" data-set-start>Start the set</button>
+            </div>
+            <div class="bank-set__row bank-set__row--foot">
+              <label class="bank-check">
+                <input type="checkbox" data-set-general />
+                <span>Include questions not tied to a paper</span>
+              </label>
+              <p class="bank-set__info" data-set-info>Choose a pace to see how many questions it can draw on.</p>
+            </div>
+          </div>
+
+          <div class="bank-run" data-run hidden>
+            <div class="bank-run__clock">
+              <p class="label" data-run-state>Time left</p>
+              <p class="bank-run__time num" data-clock>00:00</p>
+            </div>
+            <p class="bank-run__info" data-run-info></p>
+            <div class="bank-run__actions">
+              <button type="button" class="btn btn--small" data-run-pause>Pause</button>
+              <button type="button" class="btn btn--small btn--primary" data-run-finish>Finish and review</button>
+              <button type="button" class="btn btn--small" data-run-quit>Abandon the set</button>
+            </div>
+          </div>
+
+          <div class="bank-review" data-review hidden tabindex="-1">
+            <p class="label">Set finished</p>
+            <p class="bank-review__line" data-review-line></p>
+            <p class="small">Open the guidance under each question, rate your answer, then save the set to your progress.</p>
+            <div class="bank-run__actions">
+              <button type="button" class="btn btn--small btn--primary" data-review-save>Save the set</button>
+              <button type="button" class="btn btn--small" data-review-back>Back to the bank</button>
+            </div>
+          </div>
+
+          <div class="bank-bar">
+            <p class="bank-bar__count" data-count aria-live="polite">{items.length} questions, {marks} marks</p>
+            <a class="small" href="#how-h">How the bank works</a>
+          </div>
+
+          <div class="bank-list">
+            {
+              units.map((u) => {
+                const list = unitItems(u.n);
+                if (!list.length) return null;
+                const start = items.indexOf(list[0]!);
+                return (
+                  <section class="bank-unit" id={`bank-unit-${u.n}`} data-unit-group={u.n} aria-labelledby={`bank-unit-${u.n}-h`}>
+                    <h3 class="bank-unit__h" id={`bank-unit-${u.n}-h`}>
+                      <span class="bank-unit__n">Unit {u.n}</span> {u.title}
+                      <span class="bank-unit__count" data-group-count>
+                        {list.length} {list.length === 1 ? 'question' : 'questions'}
+                      </span>
+                    </h3>
+                    {list.map((it, k) => (
+                      <BankCard item={it} n={start + k + 1} subtopics={bank.subtopics} />
+                    ))}
+                  </section>
+                );
+              })
+            }
+            <div class="state bank-empty" data-empty hidden>
+              <p class="state__title">No questions match.</p>
+              <p>Clear a filter or change the search.</p>
+            </div>
+            <div class="bank-more js-only" data-more hidden>
+              <p data-more-text></p>
+              <button type="button" class="btn" data-more-btn>Show more questions</button>
+            </div>
+            {
+              [...evidence].map(([key, x]) => (
+                <template data-exhibit={key}>
+                  <Exhibit exhibit={x.exhibit} caseTitle={x.caseTitle} caseHref={href.case(x.caseId)} headingLevel={4} idPrefix={`bt-${key.replace(':', '-')}`} />
+                </template>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bank-sec" aria-labelledby="progress-h">
+      <SectionHead no="02" title="Your progress" id="progress-h" dek="What the bank holds, unit by unit and command term by command term, and how much of it you have attempted and rated secure. Kept on this device only." />
+      <p class="nojs-only small muted bank-nojs">Your progress needs JavaScript; the tables show what the bank holds.</p>
+      <div class="bank-progress">
+        <div class="table-scroll" role="region" aria-label="Progress by unit" tabindex="0">
+          <table class="table bank-ptable" data-progress="unit">
+            <caption>By unit</caption>
+            <thead>
+              <tr>
+                <th scope="col">Unit</th>
+                <th scope="col" class="n">Questions</th>
+                <th scope="col" class="n js-only">Attempted</th>
+                <th scope="col" class="n js-only">Secure</th>
+                <th scope="col" class="js-only"><span class="sr-only">Share attempted</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                units.map((u) => {
+                  const total = items.filter((i) => i.units.includes(u.n)).length;
+                  return total > 0 ? (
+                    <tr data-key={String(u.n)}>
+                      <th scope="row">
+                        <span class="bank-ptable__k">{u.n}</span> {u.title}
+                      </th>
+                      <td class="n">{total}</td>
+                      <td class="n js-only" data-attempted>
+                        0
+                      </td>
+                      <td class="n js-only" data-secure>
+                        0
+                      </td>
+                      <td class="js-only bank-ptable__bar" aria-hidden="true">
+                        <span class="bank-bar2">
+                          <span data-bar-attempted style="width:0%" />
+                          <span data-bar-secure style="width:0%" />
+                        </span>
+                      </td>
+                    </tr>
+                  ) : null;
+                })
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="table-scroll" role="region" aria-label="Progress by command term" tabindex="0">
+          <table class="table bank-ptable" data-progress="command">
+            <caption>By command term</caption>
+            <thead>
+              <tr>
+                <th scope="col">Command term</th>
+                <th scope="col" class="n">Questions</th>
+                <th scope="col" class="n js-only">Attempted</th>
+                <th scope="col" class="n js-only">Secure</th>
+                <th scope="col" class="js-only"><span class="sr-only">Share attempted</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                terms.map(([id, t]) => (
+                  <tr data-key={id}>
+                    <th scope="row">
+                      {t.term} <span class="bank-ptable__ao">{t.ao}</span>
+                    </th>
+                    <td class="n">{items.filter((i) => i.command === id).length}</td>
+                    <td class="n js-only" data-attempted>
+                      0
+                    </td>
+                    <td class="n js-only" data-secure>
+                      0
+                    </td>
+                    <td class="js-only bank-ptable__bar" aria-hidden="true">
+                      <span class="bank-bar2">
+                        <span data-bar-attempted style="width:0%" />
+                        <span data-bar-secure style="width:0%" />
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="small muted bank-key js-only"><span class="bank-key__a" aria-hidden="true"></span> Attempted <span class="bank-key__s" aria-hidden="true"></span> Rated secure. A question that spans two units counts in each.</p>
+
+      <div class="bank-sets js-only">
+        <h3 class="ce-h3">Timed sets</h3>
+        <p class="small muted" data-sets-empty>No timed sets yet. Start one above the list of questions.</p>
+        <div class="table-scroll" role="region" aria-label="Your timed sets" tabindex="0" data-sets-wrap hidden>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Finished</th>
+                <th scope="col">Pace</th>
+                <th scope="col" class="n">Questions</th>
+                <th scope="col" class="n">Marks</th>
+                <th scope="col" class="n">Time used</th>
+                <th scope="col" class="n">Time allowed</th>
+                <th scope="col" class="n">Rated secure</th>
+              </tr>
+            </thead>
+            <tbody data-sets></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="bank-data js-only">
+        <button type="button" class="btn btn--small" data-export="csv">Download my progress (CSV)</button>
+        <button type="button" class="btn btn--small" data-export="json">Download a backup (JSON)</button>
+        <button type="button" class="btn btn--small" data-reset>Reset my progress</button>
+        <span class="bank-data__confirm" data-reset-confirm hidden>
+          <span>This deletes every rating and timed set on this device.</span>
+          <button type="button" class="btn btn--small btn--primary" data-reset-yes>Delete my progress</button>
+          <button type="button" class="btn btn--small" data-reset-no>Keep it</button>
+        </span>
+      </div>
+    </section>
+
+    <section class="bank-sec" aria-labelledby="how-h">
+      <SectionHead no="03" title="How the bank works" id="how-h" />
+      <div class="bank-how">
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="ib" /></p>
+          <h3>Each paper's time and marks</h3>
+          <dl class="bank-dl">
+            {
+              paces.map((p) => (
+                <div>
+                  <dt>{p.label}</dt>
+                  <dd>
+                    {p.minutes} minutes, {p.marks} marks
+                  </dd>
+                </div>
+              ))
+            }
+          </dl>
+          <p class="small muted">
+            Paper 1, at both levels, and Paper 2 at SL do not assess the HL extension topics, so sets at their pace leave out HL-only questions. Guide, pp. 39
+            to 40. Every paper also starts with five minutes' reading time (guide, p. 41).
+          </p>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+          <h3>The pace of a timed set</h3>
+          <p>
+            A set allows its marks multiplied by the paper's time per mark: the paper's minutes divided by its marks. The guide sets each paper's time and
+            marks; it does not set a time per mark, so treat the pace as a target to practise against, not a rule.
+          </p>
+          <ul class="bank-paces">{paces.map((p) => <li><b>{p.label}</b> {fmtPace(p)}</li>)}</ul>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><ProvenanceTag kind="original-practice" /></p>
+          <h3>Where the questions come from</h3>
+          <ul>
+            <li>{bySource('question')} from the practice sets on the platform's fictional cases, with mark allocations and the errors that cost marks</li>
+            <li>{bySource('note')} from the exam-style practice at the end of the subtopic notes</li>
+            <li>{bySource('case')} from analysis questions in the case files</li>
+          </ul>
+          <p class="small muted">New questions join the bank as soon as they are published anywhere on the platform.</p>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+          <h3>Your ratings</h3>
+          <p>
+            <b>Not yet</b>: most of the guidance was missing from your answer. <b>Partly</b>: some of it was there. <b>Secure</b>: your answer did what the
+            guidance describes. The first rating on a day counts as an attempt; changing it that day corrects it.
+          </p>
+          <p class="small muted">Saved in this browser under <code>bb:bank</code>. Download a backup before clearing your browser's data.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../scripts/centre/bank';
+</script>

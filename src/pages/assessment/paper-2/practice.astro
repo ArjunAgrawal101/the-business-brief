@@ -1,0 +1,362 @@
+---
+/**
+ * Paper 2 calculation practice: questions generated from the platform's
+ * tested finance functions with new fictional figures each time, checked
+ * within a stated tolerance, with the full working and the error behind each
+ * typical wrong answer. A timed mode works at Paper 2's pace; scores stay on
+ * this device (bb:p2-practice). Without JavaScript the page is a worked set.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import CentreHead from '../../../components/centre/CentreHead.astro';
+import GuideLabel from '../../../components/centre/GuideLabel.astro';
+import ProvenanceTag from '../../../components/ui/ProvenanceTag.astro';
+import { corpus } from '../../../lib/content';
+import { GROUPS, GROUP_IDS, KINDS, KIND_IDS, generate, type GroupId } from '../../../lib/p2-practice';
+import { questionHtml, workingHtml } from '../../../lib/p2-render';
+import { fmtPace, pacesFrom } from '../../../lib/bank';
+import { jsonForScript } from '../../../lib/markup';
+import '../../../styles/centre.css';
+import '../../../styles/p2-practice.css';
+
+const c = await corpus();
+/* Paper 2's time and marks at SL and HL, from the guide's assessment outlines (pp. 39 to 40). */
+const paces = pacesFrom(c.assessment).filter((p) => p.paper === 'paper-2');
+const first = generate('break-even-quantity', 24680);
+/** A worked set for every reader, with or without JavaScript: one question from each topic. */
+const WORKED: Array<[string, number]> = [
+  ['margin-of-safety', 31415],
+  ['profit-margin', 27182],
+  ['acid-test-ratio', 16180],
+  ['average-rate-of-return', 14142],
+  ['closing-balance', 17320],
+  ['gearing-ratio', 22360],
+  ['net-present-value', 26457],
+];
+const worked = WORKED.map(([k, s]) => generate(k, s));
+const kindsBy = (g: GroupId) => KIND_IDS.filter((id) => KINDS[id]?.group === g);
+const slCount = KIND_IDS.filter((id) => KINDS[id]?.level !== 'HL').length;
+const config = {
+  paces,
+  first: first.code,
+  kinds: Object.fromEntries(KIND_IDS.map((id) => [id, { name: KINDS[id]?.name ?? id, group: KINDS[id]?.group, level: KINDS[id]?.level, marks: KINDS[id]?.marks }])),
+};
+const LEVEL_NOTE: Record<GroupId, string> = {
+  'break-even': '5.5',
+  profitability: '3.5',
+  liquidity: '3.5',
+  efficiency: '3.6, HL only',
+  investment: '3.8; NPV is HL only',
+  'cash-flow': '3.7',
+};
+---
+
+<BaseLayout
+  room="assessment"
+  title="Paper 2 calculation practice"
+  description="IB Business Management Paper 2 calculation practice: break-even, contribution, ratios, investment appraisal and cash flow, generated with new fictional figures each time, checked with the full working and the error behind each wrong answer."
+  section="assessment"
+>
+  <CentreHead
+    crumb="Calculation practice"
+    parent={{ label: 'Paper 2', href: '/assessment/paper-2/' }}
+    kicker="Paper 2 · Practice"
+    title="Calculation practice"
+    lead="Every question is generated from the platform's finance functions, with new fictional figures each time. Answer, check, and see the full working and the error that leads to each typical wrong answer."
+    stats={[
+      { value: String(KIND_IDS.length), label: 'Calculations', note: `${slCount} at SL, all ${KIND_IDS.length} at HL` },
+      { value: '6', label: 'Topics', note: 'syllabus 3.5 to 3.8 and 5.5' },
+      { value: '90,000', label: 'Question codes', note: 'for each calculation' },
+      { value: paces.map((p) => String(Math.round((p.minutes / p.marks) * 100) / 100)).join(' | '), label: 'Timed pace', note: 'minutes a mark, SL | HL' },
+    ]}
+  />
+
+  <div class="wrap page-body pp-page">
+    <div class="pp-standing">
+      <p class="pp-standing__tags"><ProvenanceTag kind="original-practice" /> <GuideLabel kind="example" /></p>
+      <p>
+        The businesses are invented and every figure is simulated. The questions are the platform's own practice, not IB questions; mark allocations
+        are the platform's, for practice. Answers are checked against the platform's tested finance functions, the same ones the Finance Desk uses.
+      </p>
+    </div>
+
+    <section class="pp-sec" aria-labelledby="pp-h">
+      <SectionHead no="01" title="Practise a calculation" id="pp-h" dek="Choose your level and topics, answer, then check. Each question has a code: enter it later to see the same question again." />
+
+      <div class="pp" data-ix="p2-practice">
+        <script type="application/json" data-config set:html={jsonForScript(config)} />
+        <p class="state state--error" data-error hidden>The practice could not start. The question below and the worked set further down can still be read, with their working.</p>
+        <p class="sr-only" aria-live="polite" data-live></p>
+
+        <form class="pp-controls js-only" data-controls aria-label="Practice settings">
+          <fieldset class="pp-fs">
+            <legend>Level</legend>
+            <div class="pp-seg">
+              <label class="pp-opt"><input type="radio" name="level" value="SL" /> <span>SL</span></label>
+              <label class="pp-opt"><input type="radio" name="level" value="HL" checked /> <span>HL</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="pp-fs pp-fs--topics">
+            <legend>Topics</legend>
+            <div class="pp-topics">
+              {
+                GROUP_IDS.map((g) => (
+                  <label class="pp-topic" data-topic={g} data-hl={GROUPS[g].level === 'HL' ? 'true' : undefined}>
+                    <input type="checkbox" name="topic" value={g} checked />
+                    <span>
+                      {GROUPS[g].label} <span class="pp-topic__n">{LEVEL_NOTE[g]}</span>
+                    </span>
+                  </label>
+                ))
+              }
+            </div>
+          </fieldset>
+          <fieldset class="pp-fs">
+            <legend>Mode</legend>
+            <div class="pp-seg">
+              <label class="pp-opt"><input type="radio" name="mode" value="practice" checked /> <span>One at a time</span></label>
+              <label class="pp-opt"><input type="radio" name="mode" value="timed" /> <span>Timed set</span></label>
+            </div>
+          </fieldset>
+        </form>
+
+        <div class="pp-bar js-only" data-practice-bar>
+          <button type="button" class="btn btn--primary" data-new>New question</button>
+          <form class="pp-code" data-code-form aria-label="Load a question by its code">
+            <label for="pp-code">Question code</label>
+            <input class="input" id="pp-code" name="code" autocomplete="off" spellcheck="false" aria-describedby="pp-code-hint" />
+            <button type="submit" class="btn btn--small">Load</button>
+            <span class="field__hint" id="pp-code-hint" data-code-hint>Three letters and five digits, for example {first.code}</span>
+          </form>
+          <p class="pp-bar__session" data-session aria-live="polite">This session: none checked yet.</p>
+        </div>
+
+        <div class="pp-bar js-only" data-timed-bar hidden>
+          <div class="field pp-bar__n">
+            <label for="pp-n">Questions</label>
+            <select class="select" id="pp-n" data-n>
+              {[3, 5, 8, 10].map((n) => <option value={String(n)} selected={n === 5}>{n}</option>)}
+            </select>
+          </div>
+          <button type="button" class="btn btn--primary" data-start>Start the timed set</button>
+          <p class="pp-bar__session" data-timed-info>
+            Answers are marked at the end. The time allowed is the set's marks at Paper 2's pace: {paces.map((p) => `${p.label}, ${fmtPace(p)}`).join('; ')}.
+          </p>
+        </div>
+
+        <article class="pp-q" data-question aria-labelledby="pp-q-h">
+          <header class="pp-q__head">
+            <p class="pp-q__meta">
+              <span data-q-group>{GROUPS[first.group].label}</span>
+              <span class="pp-q__code" data-q-code>Question code {first.code}</span>
+              <span class="tag tag--hl" data-q-hl hidden={first.level !== 'HL'}>HL</span>
+            </p>
+            <h3 class="pp-q__title" id="pp-q-h" data-q-name>{first.name}</h3>
+            <p class="pp-q__biz"><span data-q-biz>{first.business}</span>: fictional, figures simulated</p>
+          </header>
+          <div class="pp-q__body" data-q-body set:html={questionHtml(first, 'pp-q')} />
+          <form class="pp-answer js-only" data-answer-form novalidate>
+            <label for="pp-answer" class="pp-answer__label">Your answer</label>
+            <div class="pp-answer__row">
+              <span class="pp-answer__fix" data-prefix aria-hidden="true">{first.prefix}</span>
+              <input class="input input--num pp-answer__in" id="pp-answer" name="answer" inputmode="decimal" autocomplete="off" aria-describedby="pp-answer-hint pp-feedback" />
+              <span class="pp-answer__fix" data-suffix aria-hidden="true">{first.suffix}</span>
+              <button type="submit" class="btn btn--primary">Check answer</button>
+              <button type="button" class="btn" data-reveal>Show the working</button>
+            </div>
+            <span class="field__hint" id="pp-answer-hint" data-hint>For example {first.example}. {first.toleranceText}</span>
+          </form>
+          <div class="pp-feedback" id="pp-feedback" data-feedback></div>
+          <details class="pp-work" data-work>
+            <summary>Answer, working and typical errors</summary>
+            <div class="pp-work__body" data-work-body set:html={workingHtml(first)} />
+          </details>
+        </article>
+
+        <div class="pp-set" data-set hidden>
+          <div class="pp-run" data-run>
+            <div>
+              <p class="label" data-run-state>Time left</p>
+              <p class="pp-run__time num" data-clock>00:00</p>
+            </div>
+            <p class="pp-run__info" data-run-info></p>
+            <div class="pp-run__actions">
+              <button type="button" class="btn btn--small" data-pause>Pause</button>
+              <button type="button" class="btn btn--small btn--primary" data-finish>Finish and mark</button>
+              <button type="button" class="btn btn--small" data-quit>Abandon the set</button>
+            </div>
+          </div>
+          <div class="pp-result" data-result hidden tabindex="-1">
+            <p class="label">Set marked</p>
+            <p class="pp-result__line" data-result-line></p>
+            <div class="table-scroll" role="region" aria-label="Results of the timed set" tabindex="0">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Question</th>
+                    <th scope="col">Your answer</th>
+                    <th scope="col">The answer</th>
+                    <th scope="col">Result</th>
+                    <th scope="col" class="n">Marks</th>
+                  </tr>
+                </thead>
+                <tbody data-result-rows></tbody>
+              </table>
+            </div>
+            <p class="small muted">Saved to your record below. Each question's working and the typical errors are under it.</p>
+            <button type="button" class="btn btn--small" data-back>Back to practice</button>
+          </div>
+          <ol class="pp-set__list" data-set-list></ol>
+        </div>
+      </div>
+    </section>
+
+    <section class="pp-sec" aria-labelledby="pp-worked-h">
+      <SectionHead no="02" title="A worked set" id="pp-worked-h" dek="One question from each topic, the same for every reader. Try each before you open its working; the codes load the same questions above." />
+      <ol class="pp-worked">
+        {
+          worked.map((q, i) => (
+            <li class="pp-q pp-q--worked">
+              <header class="pp-q__head">
+                <p class="pp-q__meta">
+                  <span>{GROUPS[q.group].label}</span>
+                  <span class="pp-q__code">Question code {q.code}</span>
+                  {q.level === 'HL' && <span class="tag tag--hl">HL</span>}
+                </p>
+                <h3 class="pp-q__title" id={`pp-w${i}-h`}>
+                  {i + 1}. {q.name}
+                </h3>
+                <p class="pp-q__biz">{q.business}: fictional, figures simulated</p>
+              </header>
+              <div class="pp-q__body" set:html={questionHtml(q, `pp-w${i}`)} />
+              <details class="pp-work">
+                <summary>Answer, working and typical errors</summary>
+                <div class="pp-work__body" set:html={workingHtml(q)} />
+              </details>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="pp-sec" aria-labelledby="pp-rec-h">
+      <SectionHead no="03" title="Your record" id="pp-rec-h" dek="Every calculation you have checked, and every timed set, kept on this device only." />
+      <p class="nojs-only small muted">Your record needs JavaScript. The worked set above needs nothing.</p>
+      <div class="pp-rec js-only" data-record>
+        <div class="table-scroll" role="region" aria-label="Your record by calculation" tabindex="0">
+          <table class="table pp-rec__table">
+            <caption>By calculation</caption>
+            <thead>
+              <tr>
+                <th scope="col">Calculation</th>
+                <th scope="col" class="n">Checked</th>
+                <th scope="col" class="n">Right first time</th>
+                <th scope="col"><span class="sr-only">Share right</span></th>
+              </tr>
+            </thead>
+            {
+              GROUP_IDS.map((g) => (
+                <tbody>
+                  <tr class="pp-rec__group">
+                    <td colspan="4">{GROUPS[g].label}</td>
+                  </tr>
+                  {kindsBy(g).map((id) => (
+                    <tr data-kind={id}>
+                      <th scope="row">
+                        {KINDS[id]?.name}
+                        {KINDS[id]?.level === 'HL' && <span class="pp-rec__hl">HL</span>}
+                      </th>
+                      <td class="n" data-tried>
+                        0
+                      </td>
+                      <td class="n" data-right>
+                        0
+                      </td>
+                      <td class="pp-rec__bar" aria-hidden="true">
+                        <span>
+                          <span data-bar style="width:0%" />
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              ))
+            }
+          </table>
+        </div>
+        <div>
+          <h3 class="ce-h3 pp-rec__h">Timed sets</h3>
+          <p class="small muted" data-timed-empty>No timed sets yet.</p>
+          <div class="table-scroll" role="region" aria-label="Your timed sets" tabindex="0" data-timed-wrap hidden>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Finished</th>
+                  <th scope="col">Level</th>
+                  <th scope="col" class="n">Right</th>
+                  <th scope="col" class="n">Marks</th>
+                  <th scope="col" class="n">Time used</th>
+                  <th scope="col" class="n">Allowed</th>
+                </tr>
+              </thead>
+              <tbody data-timed-rows></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="pp-data js-only">
+        <button type="button" class="btn btn--small" data-export="csv">Download my record (CSV)</button>
+        <button type="button" class="btn btn--small" data-export="json">Download a backup (JSON)</button>
+        <button type="button" class="btn btn--small" data-reset>Reset my record</button>
+        <span class="pp-data__confirm" data-reset-confirm hidden>
+          <span>This deletes your record of calculations and timed sets on this device.</span>
+          <button type="button" class="btn btn--small btn--primary" data-reset-yes>Delete my record</button>
+          <button type="button" class="btn btn--small" data-reset-no>Keep it</button>
+        </span>
+      </div>
+    </section>
+
+    <section class="pp-sec" aria-labelledby="pp-how-h">
+      <SectionHead no="04" title="How answers are marked" id="pp-how-h" />
+      <div class="pp-how">
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+          <h3>Right, nearly, or not yet</h3>
+          <p>
+            An answer is right when it is within the tolerance stated under the box: to the nearest cent or dollar for money, within 0.05 for ratios
+            and percentages, a whole number rounded up for break-even and target outputs, and within a month for payback. <b>Nearly</b> means the
+            method was right but the last step was not, such as the unrounded break-even.
+          </p>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+          <h3>Working earns the marks</h3>
+          <p>
+            Here only the final figure is checked, but in the examination the working is marked too: formula, substitution, working and the answer
+            with its unit. Write all four on paper for every question, then compare them with the working shown.
+          </p>
+          <p class="small muted"><a href="/assessment/paper-2/#p2-calc-h">Mastering quantitative questions</a>, on the Paper 2 page.</p>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="ib" /></p>
+          <h3>Paper 2's time and marks</h3>
+          <ul class="pp-paces">{paces.map((p) => <li><b>{p.label}</b> {p.minutes} minutes, {p.marks} marks</li>)}</ul>
+          <p class="small muted">Guide, pp. 39 to 40. A timed set allows its marks at the paper's time per mark, a recommended pace rather than an IB rule.</p>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+          <h3>The formulas used</h3>
+          <p>
+            Ratios, ARR and NPV use the formulas on the guide's formula sheet (pp. 64 to 65) and NPV its printed discount factors. Break-even, margin of
+            safety, payback and working capital use the standard methods the Finance Desk uses.
+          </p>
+          <p class="small muted"><a href="/finance-desk/">The Finance Desk</a> works each one with figures you choose.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../../scripts/centre/p2-practice';
+</script>

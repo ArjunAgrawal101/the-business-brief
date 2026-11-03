@@ -1,0 +1,291 @@
+---
+/**
+ * IA tool 3: the business tool selection assistant. The reader says what the
+ * research question asks and what data the documents hold; the page suggests
+ * toolkit tools and syllabus techniques that fit, and why (src/lib/ia-tools.ts).
+ * Criterion C rewards tools selected and applied with clear relevance, not
+ * many tools (guide, p. 57; TSM, p. 70). Saved in bb:ia-tools.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import CentreHead from '../../../components/centre/CentreHead.astro';
+import GuideLabel from '../../../components/centre/GuideLabel.astro';
+import IaToolNav from '../../../components/centre/IaToolNav.astro';
+import IaIntegrity from '../../../components/centre/IaIntegrity.astro';
+import { corpus, href } from '../../../lib/content';
+import { DATA_KINDS, QUESTION_KINDS, TOOL_RULES } from '../../../lib/ia-tools';
+import { jsonForScript } from '../../../lib/markup';
+import '../../../styles/centre.css';
+import '../../../styles/ia-tools.css';
+
+const c = await corpus();
+const subs = (c.curricula['ib-dp-bm']?.units ?? []).flatMap((u) => u.subtopics);
+const slugOf = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+/** Where each tool is explained on the platform: its toolkit guide, or its subtopic's page. */
+const links: Record<string, { href: string; label: string }> = Object.fromEntries(
+  TOOL_RULES.map((r) => {
+    if (r.kind === 'toolkit') {
+      const tool = c.tools[r.id];
+      return [r.id, { href: href.toolEntry(r.id, tool), label: tool?.status === 'complete' ? 'The toolkit guide' : 'In the toolkit' }];
+    }
+    const s = subs.find((x) => x.code === r.code);
+    return [r.id, { href: s ? `/topics/${slugOf(s.title)}/` : '/topics/', label: s ? `${r.code} ${s.title}` : 'The topic' }];
+  }),
+);
+const RULES = [
+  ['The project puts business management tools and theories that suit the issue to work on one real organization’s problem.', 'Guide, p. 53'],
+  ['Criterion C, 4 marks: its top level asks for tools chosen well, applied properly and plainly relevant to the research question.', 'Guide, p. 57'],
+  ['Tools chosen with a purpose and applied in depth make better projects; many tools used superficially weaken them.', 'TSM, p. 70'],
+  ['Force field analysis, Gantt charts, Hofstede’s cultural dimensions, Porter’s generic strategies, contribution, critical path analysis and simple linear regression are HL tools in the toolkit.', 'Guide, p. 14'],
+];
+---
+
+<BaseLayout
+  room="assessment"
+  title="Choosing business management tools"
+  description="An IB Business Management IA tool: say what your research question asks and what data your documents hold, and see which toolkit tools and syllabus techniques fit, and why."
+  section="assessment"
+>
+  <CentreHead
+    crumb="Tool selection"
+    parent={{ label: 'Internal assessment', href: '/assessment/internal-assessment/' }}
+    kicker="Internal assessment · Tool 3 of 5"
+    title="Choosing business management tools"
+    lead="Say what your question asks and what data your documents hold. The assistant suggests the tools that fit, and why, from the toolkit and the syllabus. Criterion C rewards tools that are relevant and applied to your organization's figures, not many tools."
+    stats={[
+      { value: String(TOOL_RULES.length), label: 'Tools weighed', note: 'toolkit and syllabus' },
+      { value: '4', label: 'Marks', note: 'criterion C' },
+      { value: '2 or 3', label: 'Tools', note: 'applied in depth, recommended' },
+    ]}
+  />
+
+  <div class="wrap page-body it-page">
+    <IaToolNav current="tool-selection" />
+
+    <section class="it-sec" aria-labelledby="ts-rules-h">
+      <SectionHead no="01" title="What the guide asks of your tools" id="ts-rules-h" />
+      <p class="ce-labels"><GuideLabel kind="ib" /></p>
+      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s}</span></li>)}</ul>
+    </section>
+
+    <section class="it-sec" aria-labelledby="ts-tool-h">
+      <SectionHead no="02" title="Your question and your data" id="ts-tool-h" dek="Suggestions, not instructions: any relevant tool can be used, and your teacher can advise on yours." />
+      <div class="it-tool" data-ix="ia-tools">
+        <script type="application/json" data-config set:html={jsonForScript({ links })} />
+        <p class="state state--error" data-error hidden>The assistant could not start. The table of tools below can still be read.</p>
+        <p class="sr-only" aria-live="polite" data-live></p>
+        <div class="it-tool__head">
+          <h3 class="it-tool__title">Your project</h3>
+          <p class="it-tool__saved js-only">Saved on this device.</p>
+        </div>
+        <div class="it-grid">
+          <div class="it-stack">
+            <fieldset class="it-fs it-step">
+              <legend class="it-step__k"><span>1</span> What does your research question ask?</legend>
+              <div class="it-checks-in">
+                {
+                  Object.entries(QUESTION_KINDS).map(([v, l]) => (
+                    <label class="it-check">
+                      <input type="radio" name="kind" value={v} />
+                      <span>{l}</span>
+                    </label>
+                  ))
+                }
+              </div>
+            </fieldset>
+            <fieldset class="it-fs it-step">
+              <legend class="it-step__k"><span>2</span> Your level</legend>
+              <div class="it-seg">
+                <label class="it-check"><input type="radio" name="level" value="SL" /> <span>SL</span></label>
+                <label class="it-check"><input type="radio" name="level" value="HL" checked /> <span>HL</span></label>
+              </div>
+            </fieldset>
+          </div>
+          <fieldset class="it-fs it-step">
+            <legend class="it-step__k"><span>3</span> What data do your documents hold? Tick all that apply</legend>
+            <div class="it-checks-in">
+              {
+                Object.entries(DATA_KINDS).map(([v, l]) => (
+                  <label class="it-check">
+                    <input type="checkbox" name="data" value={v} />
+                    <span>{l}</span>
+                  </label>
+                ))
+              }
+            </div>
+          </fieldset>
+        </div>
+
+        <div class="it-out js-only">
+          <p class="it-out__k">Tools that fit</p>
+          <p class="small" data-summary>Choose what your question asks and tick the data your documents hold.</p>
+          <ol class="ts-list" data-list></ol>
+          <div data-hl hidden>
+            <p class="it-out__k">At HL you could also use</p>
+            <ul class="ts-hl" data-hl-list></ul>
+          </div>
+          <p class="small" data-shortlist aria-live="polite"></p>
+        </div>
+
+        <div class="it-export js-only">
+          <button type="button" class="btn btn--small" data-download>Download my shortlist (text)</button>
+          <button type="button" class="btn btn--small" data-print>Print</button>
+          <button type="button" class="btn btn--small" data-reset>Clear this page</button>
+          <span class="it-export__confirm" data-reset-confirm hidden>
+            <span>This clears your answers and shortlist on this page.</span>
+            <button type="button" class="btn btn--small btn--primary" data-reset-yes>Clear it</button>
+            <button type="button" class="btn btn--small" data-reset-no>Keep it</button>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <section class="it-sec" aria-labelledby="ts-ref-h">
+      <SectionHead no="03" title="Every tool, and what it decides" id="ts-ref-h" dek="The full list the assistant weighs, with the data each needs. Which tool suits which question is the platform's recommendation." />
+      <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+      <div class="table-scroll" role="region" aria-label="Business management tools, what they decide and the data they need" tabindex="0">
+        <table class="table ts-ref">
+          <thead>
+            <tr>
+              <th scope="col">Tool</th>
+              <th scope="col">Level</th>
+              <th scope="col">It decides</th>
+              <th scope="col">Data it works on</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              TOOL_RULES.map((r) => (
+                <tr>
+                  <th scope="row">
+                    <a href={links[r.id]?.href}>{r.name}</a>
+                    <span class="ts-ref__kind">{r.kind === 'toolkit' ? 'Toolkit' : `Syllabus ${r.code}`}</span>
+                  </th>
+                  <td>{r.level === 'HL' ? 'HL only' : 'SL and HL'}</td>
+                  <td>{r.decides}</td>
+                  <td>{r.needs.map((n) => DATA_KINDS[n]).join('; ')}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="it-sec" aria-labelledby="ts-ex-h">
+      <SectionHead no="04" title="Many tools, and the right ones" id="ts-ex-h" dek="Two selections for one question: can Harbour Cycles, a fictional repair shop, afford to open a second workshop this year?" />
+      <div class="it-examples">
+        <article class="it-ex it-ex--weak" aria-labelledby="ts-weak-h">
+          <p class="it-ex__k">Weaker <GuideLabel kind="example" /></p>
+          <h3 id="ts-weak-h">Five tools, none applied to the figures</h3>
+          <ul>
+            <li>SWOT analysis of the business in general</li>
+            <li>STEEPLE analysis of the cycling industry</li>
+            <li>Ansoff matrix placing the workshop as market development</li>
+            <li>BCG matrix, with no market share data</li>
+            <li>Maslow's hierarchy, mentioned once</li>
+          </ul>
+          <p class="it-why">A cash question answered with tools that cannot measure cash. Each is described rather than applied, and none uses the documents' figures.</p>
+        </article>
+        <article class="it-ex it-ex--strong" aria-labelledby="ts-strong-h">
+          <p class="it-ex__k">Stronger <GuideLabel kind="example" /></p>
+          <h3 id="ts-strong-h">Three tools, each deciding something</h3>
+          <ul>
+            <li><b>Cash flow forecast</b> from the accounts and the workshop's costs: the months the balance goes negative</li>
+            <li><b>Break-even analysis</b> of the second workshop: the repairs a week it needs</li>
+            <li><b>Liquidity ratios</b> from the accounts: how much strain the business can absorb</li>
+          </ul>
+          <p class="it-why">Each tool works on figures from the documents and answers part of the question; together they lead to a conditional answer. At HL, a decision tree could compare opening now with opening after a winter trial.</p>
+        </article>
+      </div>
+    </section>
+
+    <IaIntegrity no="05" />
+  </div>
+</BaseLayout>
+
+<style>
+  .ts-list {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ts-list :global(li) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--sp-2) var(--sp-4);
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .ts-list :global(.ts-name) {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .ts-list :global(.ts-meta) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin-top: 0.15rem;
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .ts-list :global(.ts-why),
+  .ts-list :global(.ts-decides),
+  .ts-list :global(.ts-caution) {
+    margin-top: 0.35rem;
+    font-size: 0.9375rem;
+  }
+
+  .ts-list :global(.ts-caution) {
+    color: var(--brass-text);
+  }
+
+  .ts-list :global(.ts-pick) {
+    align-self: start;
+    white-space: nowrap;
+  }
+
+  .ts-hl {
+    margin: 0;
+    padding-left: 1.1rem;
+    font-size: 0.9375rem;
+  }
+
+  .ts-ref th a {
+    font-weight: 600;
+  }
+
+  .ts-ref__kind {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 40rem) {
+    .ts-list :global(li) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
+
+<script>
+  import '../../../scripts/centre/ia-tool-select';
+</script>

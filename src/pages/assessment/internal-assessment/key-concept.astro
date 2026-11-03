@@ -1,0 +1,239 @@
+---
+/**
+ * IA tool 1: choosing the key concept. The reader describes the issue and the
+ * question; the page shows which concepts the issue points to, checks the
+ * question's form against the guide (p. 53), and gives the questions the
+ * chosen lens asks in each part of the project. It never chooses for the
+ * reader and never approves a question (the teacher does, guide p. 53).
+ * Saved in bb:ia-concept.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import CentreHead from '../../../components/centre/CentreHead.astro';
+import GuideLabel from '../../../components/centre/GuideLabel.astro';
+import IaToolNav from '../../../components/centre/IaToolNav.astro';
+import IaIntegrity from '../../../components/centre/IaIntegrity.astro';
+import { CONCEPTS, CONCEPT_NAMES, ISSUE_SIGNS, LENS, QUESTION_TESTS } from '../../../lib/ia-tools';
+import '../../../styles/centre.css';
+import '../../../styles/ia-tools.css';
+
+const RULES = [
+  ['The project uses only one of the four key concepts, change, creativity, ethics or sustainability, as its lens.', 'Guide, p. 53'],
+  ['The concept may or may not appear in the research question, but the title page must state which one was used.', 'Guide, p. 53'],
+  ['Five marks, criterion A, are for identifying and using a relevant key concept; the lens must be made explicit.', 'Guide, p. 53'],
+  ['A concept other than the four scores 0 for criterion A.', 'Guide, p. 56'],
+  ['The question may look forward or backward, and is about a real issue facing a single organization.', 'Guide, p. 53'],
+  ['Your teacher approves the question before work starts.', 'Guide, p. 53'],
+];
+---
+
+<BaseLayout
+  room="assessment"
+  title="Choosing your key concept"
+  description="An IB Business Management IA tool: describe your issue and research question, see which of the four key concepts fits as a lens, check the question's form against the guide, and get the questions the lens asks."
+  section="assessment"
+>
+  <CentreHead
+    crumb="Key concept guide"
+    parent={{ label: 'Internal assessment', href: '/assessment/internal-assessment/' }}
+    kicker="Internal assessment · Tool 1 of 5"
+    title="Choosing your key concept"
+    lead="Describe your issue and your question. The guide shows which of the four concepts your issue points to, checks the question's form against the IB guide, and gives you the questions your lens asks. It does not choose for you: your teacher approves the question."
+    stats={[
+      { value: '1 of 4', label: 'Key concept', note: 'stated on the title page' },
+      { value: '5', label: 'Marks', note: 'criterion A' },
+      { value: '6', label: 'Tests', note: 'before your teacher approves it' },
+    ]}
+  />
+
+  <div class="wrap page-body it-page">
+    <IaToolNav current="key-concept" />
+
+    <section class="it-sec" aria-labelledby="kc-rules-h">
+      <SectionHead no="01" title="What the guide requires" id="kc-rules-h" />
+      <p class="ce-labels"><GuideLabel kind="ib" /></p>
+      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s}</span></li>)}</ul>
+    </section>
+
+    <section class="it-sec" aria-labelledby="kc-tool-h">
+      <SectionHead no="02" title="Your issue, your question, your lens" id="kc-tool-h" dek="Everything you type stays on this device. Nothing here is sent anywhere or approves anything." />
+      <div class="it-tool" data-ix="ia-concept">
+        <p class="state state--error" data-error hidden>The checks could not start. You can still read the lenses below.</p>
+        <p class="sr-only" aria-live="polite" data-live></p>
+        <div class="it-tool__head">
+          <h3 class="it-tool__title">Your project</h3>
+          <p class="it-tool__saved js-only" data-saved>Saved on this device as you type.</p>
+        </div>
+        <div class="it-grid">
+          <div class="it-stack">
+            <div class="it-step">
+              <p class="it-step__k"><span>1</span> The organization and the issue</p>
+              <div class="field">
+                <label for="kc-org">The organization</label>
+                <input class="input" id="kc-org" name="org" autocomplete="off" aria-describedby="kc-org-hint" />
+                <span class="field__hint" id="kc-org-hint">One real organization. Industry-wide issues may come in where they affect it (guide, p. 53).</span>
+              </div>
+              <div class="field">
+                <label for="kc-issue">The issue or problem it faces</label>
+                <textarea class="textarea" id="kc-issue" name="issue" rows="3"></textarea>
+              </div>
+            </div>
+            <div class="it-step">
+              <p class="it-step__k"><span>2</span> Your research question</p>
+              <div class="field">
+                <label for="kc-rq">Research question</label>
+                <textarea class="textarea" id="kc-rq" name="rq" rows="2" aria-describedby="kc-rq-hint"></textarea>
+                <span class="field__hint" id="kc-rq-hint">For example: Should Harbour Cycles open a second workshop? (an illustrative, fictional business)</span>
+              </div>
+            </div>
+            <fieldset class="it-fs it-step" data-signs>
+              <legend class="it-step__k"><span>3</span> What is the issue about? Tick all that apply</legend>
+              <div class="it-checks-in">
+                {
+                  ISSUE_SIGNS.map((s) => (
+                    <label class="it-check">
+                      <input type="checkbox" name="sign" value={s.id} />
+                      <span>{s.text}</span>
+                    </label>
+                  ))
+                }
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="it-stack">
+            <div class="it-out js-only">
+              <p class="it-out__k" id="kc-q-h">Checks of your question's form</p>
+              <ul class="it-list" data-checks>
+                <li><span class="it-word it-word--advice">Advice</span><span>Write your research question to see checks of its form.</span></li>
+              </ul>
+            </div>
+            <div class="it-out js-only">
+              <p class="it-out__k" id="kc-fit-h">Where your issue points</p>
+              <ul class="it-fit" data-fit>
+                {
+                  CONCEPTS.map((k) => (
+                    <li data-concept={k}>
+                      <span>{CONCEPT_NAMES[k]}</span>
+                      <span class="it-fit__bar" aria-hidden="true">
+                        <span style="width:0%" />
+                      </span>
+                      <span class="it-fit__n" data-n>
+                        0 signs
+                      </span>
+                    </li>
+                  ))
+                }
+              </ul>
+              <p class="small" data-fit-text>Tick what the issue is about to see which concepts it points to.</p>
+              <p class="small muted">The signs are the platform's reading of the guide's descriptions of the concepts (pp. 12 to 13). Any of the four can work if it is used as a lens throughout.</p>
+            </div>
+            <fieldset class="it-fs it-step">
+              <legend class="it-step__k"><span>4</span> Your lens</legend>
+              <div class="it-seg">
+                {
+                  CONCEPTS.map((k) => (
+                    <label class="it-check">
+                      <input type="radio" name="concept" value={k} />
+                      <span>{CONCEPT_NAMES[k]}</span>
+                    </label>
+                  ))
+                }
+              </div>
+            </fieldset>
+            <div class="it-out js-only" data-lens-out hidden>
+              <p class="it-out__k" id="kc-lens-h">The questions your lens asks</p>
+              <div class="it-lens">
+                <p class="it-lens__asks" data-lens-asks></p>
+                <ol data-lens-prompts></ol>
+              </div>
+            </div>
+            <fieldset class="it-fs it-step">
+              <legend class="it-step__k"><span>5</span> Before your teacher approves it</legend>
+              <div class="it-checks-in">
+                {
+                  QUESTION_TESTS.map((t) => (
+                    <label class="it-check">
+                      <input type="checkbox" name="test" value={t.id} />
+                      <span>
+                        <b>{t.name}.</b> {t.text}
+                      </span>
+                    </label>
+                  ))
+                }
+              </div>
+              <p class="small muted js-only" data-tests aria-live="polite">0 of {QUESTION_TESTS.length} ticked.</p>
+              <p class="small muted">The six tests are from the creator's IA guide: a recommended strategy, not IB requirements.</p>
+            </fieldset>
+          </div>
+        </div>
+        <div class="it-export js-only">
+          <button type="button" class="btn btn--small" data-copy>Copy a summary</button>
+          <button type="button" class="btn btn--small" data-download>Download a summary (text)</button>
+          <button type="button" class="btn btn--small" data-print>Print</button>
+          <button type="button" class="btn btn--small" data-reset>Clear this page</button>
+          <span class="it-export__confirm" data-reset-confirm hidden>
+            <span>This clears what you entered on this page.</span>
+            <button type="button" class="btn btn--small btn--primary" data-reset-yes>Clear it</button>
+            <button type="button" class="btn btn--small" data-reset-no>Keep it</button>
+          </span>
+        </div>
+        <p class="nojs-only small muted">With JavaScript off you can fill in and print this page, but nothing is checked or saved.</p>
+      </div>
+    </section>
+
+    <section class="it-sec" aria-labelledby="kc-lens-ref-h">
+      <SectionHead no="03" title="The four lenses" id="kc-lens-ref-h" dek="What each concept asks of one organization, and where to carry it in your project. The prompts are the platform's, to help you think; they are not words to copy." />
+      <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+      <div class="it-ref">
+        {
+          CONCEPTS.map((k) => (
+            <div>
+              <h3>{CONCEPT_NAMES[k]}</h3>
+              <p class="it-lens__asks">{LENS[k].asks}</p>
+              <ol>
+                {LENS[k].prompts.map((p) => (
+                  <li>{p}</li>
+                ))}
+              </ol>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="it-sec" aria-labelledby="kc-ex-h">
+      <SectionHead no="04" title="A lens added, and a lens used" id="kc-ex-h" dek="One question, two ways of using a concept. Harbour Cycles is a fictional repair shop deciding whether to open a second workshop." />
+      <div class="it-examples">
+        <article class="it-ex it-ex--weak" aria-labelledby="kc-weak-h">
+          <p class="it-ex__k">Weaker <GuideLabel kind="example" /></p>
+          <h3 id="kc-weak-h">Sustainability, named and then dropped</h3>
+          <p class="it-ex__q">Should Harbour Cycles open a second workshop?</p>
+          <dl>
+            <div><dt>Introduction</dt><dd>A general definition of sustainability, with no mention of Harbour Cycles.</dd></div>
+            <div><dt>Analysis</dt><dd>A break-even calculation for the workshop; the concept is not mentioned.</dd></div>
+            <div><dt>Conclusion</dt><dd>Open the workshop, because break-even is low.</dd></div>
+          </dl>
+          <p class="it-why">The concept describes nothing about this organization and never shapes the analysis or the answer. Criterion A rewards the connection between the concept and the organization, integrated throughout (guide, pp. 56 to 57).</p>
+        </article>
+        <article class="it-ex it-ex--strong" aria-labelledby="kc-strong-h">
+          <p class="it-ex__k">Stronger <GuideLabel kind="example" /></p>
+          <h3 id="kc-strong-h">Change, carried through every section</h3>
+          <p class="it-ex__q">Should Harbour Cycles open a second workshop?</p>
+          <dl>
+            <div><dt>Introduction</dt><dd>What moving from one workshop to two would change: fixed costs, staffing and the owner's time.</dd></div>
+            <div><dt>Analysis</dt><dd>Break-even shows how far the change raises the sales needed; staff survey results show who resists it and why.</dd></div>
+            <div><dt>Conclusion</dt><dd>Make the change only after a winter trial shows demand covers the new break-even.</dd></div>
+          </dl>
+          <p class="it-why">The lens frames the question, decides what is analysed and gives the answer its condition. The figures are invented for illustration.</p>
+        </article>
+      </div>
+    </section>
+
+    <IaIntegrity no="05" />
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../../scripts/centre/ia-concept';
+</script>
