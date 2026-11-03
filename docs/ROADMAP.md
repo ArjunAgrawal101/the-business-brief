@@ -1,53 +1,43 @@
 # Roadmap
 
-In order of priority. Each step is done completely before the next begins.
+In order of priority. Each step is done completely before the next begins. What 2.1 delivered is in [RELEASE_REPORT.md](RELEASE_REPORT.md).
 
 ## Before a public launch
 
-1. **Upgrade Astro to 7.4** on Node 24 (SECURITY.md), and set a Content Security Policy.
-2. **Deploy** as a separate Vercel project (DEPLOYMENT.md) and check the live site.
-3. **Accessibility testing with people** who use screen readers, magnification and switch access; test in Firefox and Safari and on real phones.
+1. **Check the deployed site.** Vercel deploys from `main`, but this environment cannot reach `the-business-brief-dun.vercel.app`. Open it after each deployment, or allow the host in the environment's network settings so it can be checked from here (DEPLOYMENT.md).
+2. **Upgrade Astro to 7.4** on Node 24 (SECURITY.md), and set a Content Security Policy.
+3. **Test with people.** Accessibility testing with people who use screen readers, magnification and switch access; Firefox, Safari and real phones; and sessions with each kind of learner the pathways serve: IB students and teachers, undergraduates, MBA students and founders.
 4. **Licensing.** The guide's notice says commercial use by curriculum mapping or teacher resource platforms needs a licence from the IB. The platform paraphrases and cites; if it becomes commercial, ask the IB (SOURCE_GOVERNANCE.md).
 
-## Next notes
+## Content
 
-2.0 gives every subtopic a page with its statements, mindmap, terms, diagrams and tools, and full notes for the subtopics listed as complete on the site's coverage tracker (`/ib/coverage/`). The rest follow one at a time, each complete, in this order:
-
-1. **The SL core still without notes:** 1.6 MNCs, 2.1 Introduction to HRM, 2.6 Communication, 3.1 Introduction to finance, 3.2 Sources of finance, 4.1 Introduction to marketing, 4.4 Market research, 5.1 Introduction to operations management, 5.2 Operations methods, 5.4 Location.
-2. **The HL-only subtopics:** 2.5 Organizational culture, 2.7 Industrial relations, 3.6 Efficiency ratios, 3.9 Budgets, 4.3 Sales forecasting, 4.6 International marketing, 5.3 Lean production and quality, 5.7 Crisis management, 5.8 Research and development, 5.9 Management information systems.
-3. Notes for the three subtopics taught in briefs (1.5, 2.3, 3.3), so every subtopic reads the same way.
-
-Full notes exist for 1.1 to 1.4, 2.2, 2.4, 3.4, 3.5, 3.7, 3.8, 4.2, 4.5, 5.5 and 5.6. The coursebook extracts supplied so far cover the toolkit, 1.1 to 1.5 and 5.5 to 5.9; the rest are written from the guide.
-
-## Learning tools
-
-- A reading guide for each diagram: what changes, why, what the diagram does not show and the common mistake.
-- Generated calculation practice that hides the answer until the reader has tried.
-- Timed revision sessions built from the retrieval questions.
+1. **Hofstede's cultural dimensions**, the fifteenth toolkit guide, applied to a case.
+2. **Full notes for 1.5, 2.3 and 3.3**, the three subtopics taught in complete briefs, so every subtopic reads the same way.
+3. **Revision briefs** for the 34 subtopics with full notes; the Revision Brief room has them only for the three briefs.
+4. **Examiner observations**, each cited, once subject reports are supplied. Until then guidance is labelled as the platform's recommendation.
+5. **A wider Business Intelligence briefing.** More developments as more publishers' own sites can be read, refreshed each term, every fact dated and cited. It stays a curated briefing, never a feed presented as live news.
+6. **Real-organization cases** in the Case Vault, built only from cited, dated evidence.
 
 ## Rooms
 
 | Room | Next step |
 | --- | --- |
-| Case Room | A second case lab following the analysis chain (data, insight, option, recommendation) for Atelier Barro's pricing |
-| Strategy Studio | Guides for the remaining nine toolkit tools, each applied to a case |
-| Finance Desk | Budgets and variances (3.9, HL), final accounts and depreciation (3.4) |
-| Market Studio | Market research, the seven Ps, sales forecasting (HL) |
-| Operations Floor | Operations methods, lean production and quality (HL), crisis management (HL) |
-| People and Culture | An organization chart explorer (2.2), motivation (2.4), culture (2.5, HL) |
-| Boardroom | Multi-function decisions across several rounds, ending in a defended strategy |
-| Examiner Lens | Examiner observations, each cited, once subject reports are supplied |
-| Assessment Centre | A timer and word count for the Paper 1 and Paper 3 workspaces; worked examples for each IA key concept |
-| IA Studio | Worked planning examples for each concept lens |
-| Case Vault | Real-organization cases built only from cited, dated evidence |
+| Operations Floor | A supply chain mapper, a quality management simulation (5.3, HL) and a crisis management scenario (5.7, HL) |
+| Market Studio | Instruments for sales forecasting (4.3, HL) and international marketing (4.6) |
+| People and Culture | Tools for organizational culture (2.5, HL) and industrial relations (2.7, HL) |
+| Financial Laboratory | Depreciation schedules (3.4) beside the profit and loss calculator |
+| Case Room | A second staged case lab, following the analysis chain (data, insight, option, recommendation) |
+| Boardroom | Further scenarios, for example a multinational entering a market and a social enterprise |
+| Assessment Centre | A timer for the Paper 1 workspace and the Paper 3 plan; a worked planning example for each IA key concept |
+| Question bank | A lighter page: the static list of 269 questions is 1.3 MB (197 KB compressed), so it should load in parts |
 
 ## Pathways
 
-- A mapping for Cambridge IGCSE Business Studies from its current syllabus, in its own curriculum file.
-- Undergraduate and MBA lenses on every brief, with sources from the literature.
+- A mapping for Cambridge IGCSE Business Studies from its current syllabus, in its own curriculum file and never mixed with the IB route.
+- Undergraduate and MBA readings for the enrichment maps and frameworks, cited from the literature.
 
 ## Platform
 
-- Optional, consent-based progress across devices, only after a privacy and security review.
+- Optional, consent-based progress across devices, only after a privacy and security review and the owner's approval. Today everything stays in the reader's browser.
 - Visual regression testing with stored baselines.
-- Printable PDF packs of each brief.
+- Printable PDF packs of each subtopic's notes.

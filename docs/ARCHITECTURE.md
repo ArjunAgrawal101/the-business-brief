@@ -135,7 +135,11 @@ The quiz engine (`src/scripts/quiz.ts`) dispatches a bubbling `quiz:progress` ev
 | `/diagrams/` | The diagram library |
 | `/glossary/`, `/glossary/[id]/` | The glossary, and a page for every term |
 | `/frameworks/`, `/frameworks/[id]/` | The frameworks library: an index by purpose and standing, and a page for every framework |
-| `/assessment/`, `/assessment/internal-assessment/`, `/assessment/paper-1/`, `/assessment/paper-2/`, `/assessment/paper-3/` | The Assessment Centre |
+| `/assessment/`, `/assessment/internal-assessment/`, `/assessment/paper-1/`, `/assessment/paper-2/`, `/assessment/paper-3/` | The Assessment Centre (Paper 3 is the HL Strategic Planning Centre) |
+| `/assessment/internal-assessment/[tool]/` | The IA tools: `documents`, `key-concept`, `tool-selection`, `timeline`, `progress` |
+| `/assessment/question-bank/`, `/assessment/paper-2/practice/`, `/assessment/paper-1/workspace/` | The question bank, Paper 2 calculation practice (a question opens from its code after `#`) and the Paper 1 workspace |
+| `/mindmaps/enrichment/[id]/` | The nine enrichment maps beyond the course |
+| `/intelligence/`, `/intelligence/[id]/` | The Business Intelligence briefing and its items, each fact tied to a dated source |
 | `/resources/`, `/resources/[id]/`, `/resources/formula-sheet/` | The Resources Library, details pages, the formula sheet |
 | `/downloads/glossary.csv`, `/downloads/mindmaps/[id].svg`, `/downloads/diagrams/[id].svg`, `/downloads/guides/*.pdf` | Downloads (the PDFs are files in `public/`; the rest are written by the build) |
 | `/case-vault/`, `/cases/[id]/` | The Case Vault (the archive, its filters and the Case of the Week) and the case files; `/cases/` sends readers on to the vault |
@@ -146,6 +150,7 @@ The quiz engine (`src/scripts/quiz.ts`) dispatches a bubbling `quiz:progress` ev
 | `/rooms/`, `/case-room/`, `/case-room/halden-diagnosis/`, `/strategy-studio/`, `/market-studio/`, `/people-and-culture/`, `/operations-floor/` | All rooms; the rooms with pages of their own; the case lab |
 | `/strategy-studio/[tool]/` | The Strategy Studio's tools: `swot`, `steeple`, `five-forces`, `ansoff`, `bcg-matrix`, `generic-strategies`, `stakeholder-map`, `decision-tree`, `force-field`, `option-appraisal` |
 | `/market-studio/[instrument]/` | The nine Market Studio instruments, from one template (`src/pages/market-studio/[tool].astro`) |
+| `/people-and-culture/[tool]/`, `/operations-floor/[tool]/` | The five People and Culture and five Operations Floor tools, from one frame (`src/components/tools/ToolPage.astro`, `src/lib/room-tools.ts`) |
 | `/dashboard/`, `/progress/` | The learner dashboard: what this browser has kept (the old address renders the same page) |
 | `/toolkit/`, `/toolkit/[id]/` | Toolkit (guides for complete tools only) |
 | `/exam-desk/practice/` | All practice questions, filterable (the other Exam Desk addresses redirect to the Assessment Centre) |
@@ -164,7 +169,7 @@ Moved addresses (the Exam Desk paper pages) are listed under `redirects` in `ast
 
 ## Brand opening
 
-`BaseLayout.astro` adds the class `js` to `<html>` in an inline script before the first paint (controls marked `js-only` stay hidden without scripts), and on the home page a second inline script decides, before the first paint, whether the opening plays: not under reduced motion, and only when `bb:intro-seen` is not stored or `?intro` is in the address. `BrandIntro.astro` holds the markup, styles and script; see [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md#the-opening).
+`BaseLayout.astro` adds the class `js` to `<html>` in an inline script before the first paint (controls marked `js-only` stay hidden without scripts). A second inline script, `INTRO_GATE` from `src/lib/intro.ts`, then decides before the first paint whether the opening plays, from the navigation alone and with nothing stored. It plays on every fresh entry (a new tab, a typed address, a link from another site, a reload). It does not play when the reader moves between the site's own pages, on Back or Forward, or in a browser under automation, unless `?intro` is in the address. Under reduced motion it is a still card. When it plays, `CinematicIntro.astro` clones its markup from a `<template>`, runs its own small script, and removes itself; a timed backstop and a CSS failsafe end it if anything goes wrong. See [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md#the-opening).
 
 ## The SL and HL switch
 

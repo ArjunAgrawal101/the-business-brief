@@ -64,7 +64,7 @@ All of these now come from one calculation (`coverageSummary` in `src/lib/covera
 | --- | --- | --- |
 | The deployed site | `*.vercel.app` is blocked | Checked from the source and local builds; the owner checks the live site, or allows the host in the environment's network settings |
 | Real-world cases with dated sources | The open web is blocked, so no source can be read and cited | Cases are fictional and labelled; real organizations appear only where supplied material supports every fact |
-| Live business news | As above, and a static site has no feed | No live briefing is built or simulated. A curated section needs sources the owner can supply or that can be read; until then it is not shown rather than invented |
+| Live business news | As above, and a static site has no feed | No live briefing is built or simulated. A curated section needs sources the owner can supply or that can be read; until then it is not shown rather than invented. **Update, 3 November:** web search worked, and four publishers' own sites (Oracle, Microsoft, Google Cloud and Docker) could be read, so the Business Intelligence briefing was built from 8 developments whose every fact was read on the publisher's page that states it, dated and cited, with the date of reading. It is a curated briefing, not a feed, and says so |
 | IGCSE, A level or university syllabuses | No official specification was supplied | Those pathways use general business content clearly labelled as not mapped to any qualification; nothing is presented as a qualification's requirement |
 | Examiner observations | No subject reports were supplied | The "examiner observation" label stays reserved; guidance is labelled as the platform's recommendation |
 

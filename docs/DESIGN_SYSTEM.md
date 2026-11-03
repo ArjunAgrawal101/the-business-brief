@@ -17,7 +17,7 @@ The brand mark is the creator's AA monogram: a navy A and a gold A, with the gol
 | --- | --- |
 | `Monogram.astro` | The mark alone, at a given height, in either colour pair; decorative unless given a label |
 | `BrandLockup.astro` | The monogram, a gold hairline and "Arjun Agrawal / The Business Brief" in Cinzel: the header, the footer, covers |
-| `BrandIntro.astro` | The opening (below) |
+| `CinematicIntro.astro` | The opening (below) |
 
 Rules: keep the monogram's proportions (viewBox 350.8 by 268.4); give it clear space of at least a third of its height; never recolour it outside the two pairs, outline it, rotate it, add effects or set it on a busy image; never place another mark inside it.
 
