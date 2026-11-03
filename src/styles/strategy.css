@@ -189,6 +189,17 @@
   font-family: var(--font-display);
   font-size: 1.0625rem;
   font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 30rem) {
+  .sx-pager {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sx-pager__link--next {
+    grid-column: 1;
+  }
 }
 
 /* ---------- The studio's home ---------- */
@@ -761,9 +772,13 @@
     align-items: start;
   }
 
+  /* The analysis stays beside the inputs; when it is taller than the window it scrolls on its own, so nothing in it is out of reach. */
   .sx-tool--split .sx-panel--out {
     position: sticky;
     top: calc(var(--header-h) + var(--sp-3));
+    max-height: calc(100vh - var(--header-h) - var(--sp-5));
+    overflow-y: auto;
+    padding-right: var(--sp-2);
   }
 }
 
