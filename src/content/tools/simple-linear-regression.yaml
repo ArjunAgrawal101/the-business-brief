@@ -1,5 +1,5 @@
 name: "Simple linear regression"
-status: planned
+status: complete
 classes: [planning, situational]
 classSource: platform
 units: [1, 4, 5]
@@ -10,6 +10,59 @@ includes:
 ibStatus: ib-toolkit
 level: HL
 verification: primary
-
 order: 15
 summary: "A method of fitting a straight line to data on two variables, used to describe a relationship and to forecast."
+purpose: >
+  To measure how closely two variables move together, describe the relationship with a straight line, and make
+  cautious forecasts, such as how sales respond to price or to advertising.
+whenToUse:
+  - "When there is reason to think that one variable affects another, and paired data are available."
+  - "When a forecast is needed and a straight line fits the data reasonably well."
+  - "When testing a claim, such as that advertising raises sales."
+construct:
+  - "Choose the independent variable (x) and the dependent variable (y), and collect pairs of values."
+  - "Plot a scatter diagram, and look for a pattern and for outliers."
+  - "Fit the line of best fit, y = a + bx, by least squares or with software, and read the gradient b in business terms."
+  - "Judge the strength and direction of the relationship from the correlation coefficient r, which runs from −1 to +1."
+  - "Forecast within the range of the data where possible; if you extrapolate, say so and state the assumption that the relationship continues."
+evidence:
+  - "Paired observations of the two variables, ideally from what people actually did."
+  - "Enough observations, gathered under similar conditions."
+reveals:
+  - "The direction and strength of a straight-line relationship."
+  - "How much y changes, on average, for each unit change in x."
+doesNotReveal:
+  - "Whether x causes y: a third factor may drive both."
+  - "Whether the relationship holds beyond the range of the data."
+limitations:
+  - "Few or unreliable observations give an unreliable line."
+  - "It fits straight lines only, so a curved relationship is misdescribed."
+  - "Outliers can pull the line, and inflate or hide the correlation."
+application:
+  case: atelier-barro
+  title: Atelier Barro's prices and sales
+  body: >
+    Exhibit 3 estimates how many mugs a month Atelier Barro would sell at five prices: 700 at €20, 640 at €22, 590
+    at €24, 560 at €25 and 480 at €27. The least-squares line of best fit is mugs a month = 1,315 − 30.5 × price,
+    with a correlation coefficient of −0.995, a very strong negative relationship: each €1 on the price is
+    associated with about 30 fewer mugs a month. At €23, between two observed prices, the line predicts about 612
+    mugs.
+  result: >
+    The relationship looks almost perfect, but the evidence is weaker than the correlation suggests: three of the
+    five points come only from a survey of what customers say they would do, one from a survey and a two-week price
+    test, and only one from actual sales. Extrapolating to €30 would predict about 398 mugs, beyond any price the
+    studio has tried. The line is a reasonable guide between €20 and €27, and Inês would be wise to test any new
+    price before relying on it.
+examRelevance: >
+  At HL, simple linear regression is a toolkit tool for units 1, 4 and 5, covering scatter diagrams, the line of
+  best fit, and correlation and extrapolation. Questions may ask for a scatter diagram or a line to be
+  interpreted, for a forecast, or for the reliability of a forecast to be evaluated. Comment on the strength of the
+  correlation, the risk of extrapolation and the difference between correlation and causation.
+commonErrors:
+  - "Claiming that a strong correlation proves cause and effect."
+  - "Extrapolating far beyond the data without warning that the relationship may not hold."
+  - "Reading the gradient without its units, such as mugs a month for each euro."
+topics: [costs-and-revenues]
+cases: [atelier-barro]
+sources: [ib-bm-guide-2024]
+updated: 2026-11-03

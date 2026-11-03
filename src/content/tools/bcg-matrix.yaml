@@ -1,11 +1,70 @@
 name: "Boston Consulting Group matrix"
-status: planned
+status: complete
 classes: [decision-making]
 classSource: tsm
 units: [3, 4]
 ibStatus: ib-toolkit
 level: SL/HL
 verification: primary
-
 order: 4
 summary: "A matrix that classifies a business's products by market growth and market share, to guide how resources are allocated across them."
+purpose: >
+  To see a portfolio of products as a whole: which products generate cash, which need it, and where the next
+  investment should go, so that today's cash generators fund tomorrow's growth.
+whenToUse:
+  - "When a business with several products or units must decide where to invest a limited budget."
+  - "To check whether a portfolio is balanced: enough cash cows to fund the stars and question marks, and no dogs dragging it down."
+  - "Alongside the product life cycle, to judge which stage each product has reached."
+construct:
+  - "Define each product's market precisely, because growth and share depend on where the boundary is drawn."
+  - "Find each market's growth rate: the change in its sales over a year, as a percentage."
+  - "Find each product's relative market share: its sales divided by those of its largest competitor. A value above 1 means it leads its market."
+  - "Draw the grid with market growth on the vertical axis and relative market share on the horizontal, high share on the left by convention, and choose the dividing lines, such as 10% growth and a relative share of 1."
+  - "Plot each product, ideally as a circle sized by its revenue, and name its quadrant: star, cash cow, question mark or dog."
+  - "Read the portfolio as a whole, then test each implication against contribution, capacity and strategy."
+evidence:
+  - "Market data: the sales of each market or segment in two periods, and the sales of the largest competitor."
+  - "The business's own sales and contribution by product."
+  - "Information on capacity, costs and the links between products, to test the implications."
+reveals:
+  - "Where cash is generated and where it is absorbed across the portfolio."
+  - "Products whose position calls for a decision, especially question marks that need investment or withdrawal."
+  - "Whether the portfolio is balanced for the future, or depends on one ageing cash cow."
+doesNotReveal:
+  - "Whether a product is profitable: a high share of a growing market does not guarantee contribution."
+  - "The links between products, such as a dog that supports the sales of others."
+  - "What competitors will do, or how long a market will keep growing."
+limitations:
+  - "It rests on two measures only, and the dividing lines are arbitrary."
+  - "Defining the market differently can move a product into another quadrant."
+  - "Its labels invite simple conclusions, such as dropping every dog."
+  - "Small businesses often lack the market data the matrix needs."
+application:
+  case: tausi-beverages
+  title: Tausi Beverages' four products
+  body: >
+    From the retail audit (Exhibit 3), sales in the four segments changed from 2024 to 2025 by 3.0% (juices and
+    nectars), 30.0% (ginger and functional drinks) and 20.0% (fortified porridge flours), while colas fell by 2.0%.
+    Relative market shares in 2025, each brand's sales divided by those of its largest rival, were Mango Nectar
+    1.43, Ginger Zing 0.20, Uji Power 1.70 and Tausi Cola 0.06. With dividing lines at 10% growth and a relative
+    share of 1, Uji Power is a star, Mango Nectar a cash cow, Ginger Zing a question mark and Tausi Cola a dog.
+    Exhibit 1 agrees: Mango Nectar earns KSh 462m of the KSh 678m of contribution after marketing, and Ginger Zing
+    loses KSh 15m.
+  result: >
+    The matrix shows a portfolio living off one cash cow in a segment that is barely growing, a star held back by
+    capacity (its packing line is full) and a question mark that needs a decision. It points the KSh 120m reserve
+    towards Uji Power and Ginger Zing rather than towards protecting Mango Nectar. Tausi Cola's small share of a
+    shrinking segment makes it the candidate to drop, provided the distributors do not need it in the range.
+examRelevance: >
+  Questions may give market data for a product range and ask for the matrix to be applied, or for its usefulness
+  to be discussed. Show how each relative market share was calculated, place each product, and draw the
+  implications for investment and the balance of the portfolio. Credit comes from the implications and their
+  limits, not from naming the quadrants.
+commonErrors:
+  - "Using a product's share of the whole market instead of its share relative to the largest rival."
+  - "Treating the labels as decisions, such as automatically dropping a dog that still makes a positive contribution."
+  - "Ignoring cash flow, which is the point of the matrix: how cash moves around the portfolio."
+topics: []
+cases: [tausi-beverages]
+sources: [ib-bm-guide-2024, ib-bm-tsm-2022]
+updated: 2026-11-03

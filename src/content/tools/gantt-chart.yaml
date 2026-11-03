@@ -1,11 +1,64 @@
 name: "Gantt chart"
-status: planned
+status: complete
 classes: [planning]
 classSource: tsm
 units: [4, 5]
 ibStatus: ib-toolkit
 level: HL
 verification: primary
-
 order: 10
 summary: "A bar chart that shows the tasks of a project against time, used to plan and monitor progress."
+purpose: >
+  To show a project's schedule so that everyone can see when each task happens, which tasks overlap, which must
+  wait for others, and whether the project is on time.
+whenToUse:
+  - "When planning a project with several tasks and a deadline, such as a launch, a refit or a change programme."
+  - "When allocating people and equipment, to spot clashes where tasks overlap."
+  - "When reporting progress to a team, a client or a board."
+construct:
+  - "List the tasks and estimate how long each will take."
+  - "Identify the dependencies: which tasks cannot start until another has finished."
+  - "Draw a time scale along the top and list the tasks down the side."
+  - "Draw each task as a bar from its start to its finish, starting each as soon as its dependencies allow."
+  - "Mark the milestones, such as a deadline, and shade the bars as work is completed."
+evidence:
+  - "The list of tasks and estimates of their durations, from the people who will do the work."
+  - "The dependencies between tasks, and the dates of any fixed milestones."
+  - "When the people and equipment needed are available."
+reveals:
+  - "The overall schedule and the project's end date, at a glance."
+  - "Overlaps, where tasks run at the same time and may compete for the same people."
+  - "Progress against the plan, once the bars are shaded or compared with actual dates."
+doesNotReveal:
+  - "Which tasks are critical: a critical path network shows that, with each task's float."
+  - "The cost of the project or the quality of the work."
+limitations:
+  - "Dependencies are harder to read than on a network diagram, especially in large projects."
+  - "It depends on estimates of duration that may prove wrong."
+  - "It must be updated as the project changes, or it becomes misleading."
+application:
+  case: halden-distribution
+  title: Halden Distribution's thirteen weeks
+  body: >
+    Drawn as a Gantt chart, the plan in the [Halden case lab](/case-room/halden-diagnosis/) runs from week 1 to
+    week 13, against the client's deadline in week 14. Listening to the night shift takes week 1; coaching the
+    night team leaders runs from weeks 1 to 6; redesigning the pick routes, weeks 2 to 4; retraining, weeks 5 to 7;
+    the pilot, weeks 8 and 9; the day-shift buddies, weeks 8 to 11; the roll-out, weeks 10 to 12; and the readiness
+    check, week 13.
+  result: >
+    The chart makes the plan easy to share with both shifts: each can see when a change reaches it, and that the
+    pilot and the buddies run side by side in weeks 8 and 9. What it does not show clearly is which tasks have no
+    room to slip. A critical path analysis of the same plan shows that retraining and the pilot have none, while
+    the coaching has three weeks of float.
+examRelevance: >
+  At HL, the Gantt chart is a toolkit tool for units 4 and 5. Questions may ask for a chart to be constructed from
+  task data or interpreted, or for its usefulness to be compared with critical path analysis. Label the time
+  scale, show the dependencies and the milestones, and comment on what the chart shows about the project's risks.
+commonErrors:
+  - "Starting a dependent task before the task it depends on has finished."
+  - "Assuming the project is safe because the last bar ends before the deadline, without checking which tasks have no slack."
+  - "Leaving out the time scale, its units or the milestone."
+topics: [leadership-and-management]
+cases: [halden-distribution]
+sources: [ib-bm-guide-2024, ib-bm-tsm-2022]
+updated: 2026-11-03
