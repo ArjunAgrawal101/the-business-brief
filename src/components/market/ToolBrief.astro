@@ -52,7 +52,7 @@ const terms = it.guide.terms.map((t) => ({ id: t, term: c.glossary[t]?.term ?? t
               <span class="mk-brief__stmt">
                 {s.statement}
                 <span class="mk-brief__meta">
-                  <span>{`${s.ao.join(', ')}${s.page ? `, guide p. ${s.page}` : ''}`}</span>
+                  <span>{`${s.ao.join(', ')}${s.page ? `; ${s.code} starts on guide p. ${s.page}` : ''}`}</span>
                   {s.hl && <span class="tag tag--hl">HL only</span>}
                 </span>
               </span>

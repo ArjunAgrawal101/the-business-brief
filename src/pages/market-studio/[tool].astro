@@ -36,7 +36,7 @@ const index = MARKET_TOOLS.findIndex((t) => t.slug === tool.slug) + 1;
 const stage = MARKET_STAGES.find((s) => s.id === tool.stage);
 const { prev, next } = neighbours(tool.slug);
 const cases = (tool.cases ?? []).map((id) => [id, c.interactives[id]] as const).filter((x): x is readonly [string, InteractiveData] => Boolean(x[1]));
-const hasHL = tool.hl === true;
+const hasHL = Boolean(tool.hlNotice);
 const subtopics = it.syllabus.map((code) => ({ code, title: c.curricula['ib-dp-bm']?.units.flatMap((u) => u.subtopics).find((x) => x.code === code)?.title ?? code, href: subtopicHref(c, code) }));
 const CASE_INTRO: Record<string, { title: string; intro: string }> = {
   'market-share-porto': {
@@ -93,6 +93,14 @@ const no = () => ++n;
           </div>
         </section>
       ))
+    }
+
+    {
+      hasHL && (
+        <p class="hl-notice">
+          <span class="tag tag--hl">HL</span> {tool.hlNotice}
+        </p>
+      )
     }
 
     <section aria-labelledby="mk-next-h">

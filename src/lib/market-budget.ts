@@ -1,7 +1,7 @@
 /**
- * The marketing budget allocation tool (enrichment: the guide asks for a
- * marketing plan's budget in 4.2 and budgets at HL in 3.9, but not for
- * response models).
+ * The marketing budget allocation tool (enrichment: the guide covers the role
+ * of marketing planning in 4.2 and, at HL, budgets in 3.9, but not response
+ * models).
  *
  * An illustrative model of diminishing returns. A channel can reach an
  * audience of A people; spending s on it reaches A × (1 − e^(−s ÷ k)) of

@@ -27,12 +27,12 @@ export interface MarketTool {
   short: string;
   /** Case interactions that also live on the instrument's page. */
   cases?: string[];
-  /** The page holds HL-only material (marked data-level="HL"), so it offers the SL and HL switch. */
-  hl?: boolean;
+  /** The page holds HL-only material (marked data-level="HL"): the notice shown when the SL view hides it. The page then offers the SL and HL switch. */
+  hlNotice?: string;
 }
 
 export const MARKET_TOOLS: MarketTool[] = [
-  { slug: 'market-metrics', ix: 'market-metrics-corner-brew', component: 'market-metrics', stage: 'understand', name: 'Market metrics calculators', short: 'Market share, market growth and relative share for a market you define; customer lifetime value as enrichment.', cases: ['market-share-porto'], hl: true },
+  { slug: 'market-metrics', ix: 'market-metrics-corner-brew', component: 'market-metrics', stage: 'understand', name: 'Market metrics calculators', short: 'Market share, market growth and relative share for a market you define; customer lifetime value as enrichment.', cases: ['market-share-porto'], hlNotice: 'The case exercise’s closing question, on the importance of market share and market leadership, is HL-only material, hidden while you are viewing SL content. Switch to HL above to see it.' },
   { slug: 'research-questionnaire', ix: 'market-questionnaire-corner-brew', component: 'questionnaire-builder', stage: 'understand', name: 'Market research questionnaire builder', short: 'Write a survey question by question, with checks for leading and double-barrelled wording and notes on the sample.' },
   { slug: 'customer-persona', ix: 'market-persona-corner-brew', component: 'persona-creator', stage: 'understand', name: 'Customer persona creator', short: 'A portrait of one typical customer in a target segment: needs, pains, channels and the evidence behind it.' },
   { slug: 'stp-planner', ix: 'market-stp-corner-brew', component: 'stp-planner', stage: 'choose', name: 'STP planner', short: 'Segment by the bases you choose, weigh the segments, choose targets and write the positioning statement.' },
