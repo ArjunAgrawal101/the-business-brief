@@ -8,6 +8,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import Diagram from '../../components/diagrams/Diagram.astro';
+import SaveButton from '../../components/ui/SaveButton.astro';
 import { DIAGRAMS, DIAGRAM_GROUPS } from '../../lib/diagrams';
 import { corpus } from '../../lib/content';
 import { allSubtopics, codeKey, subtopicHref } from '../../lib/learning';
@@ -65,6 +66,7 @@ const hl = all.filter(([, d]) => d.level === 'HL').length;
                     </>
                   ))}
                 </p>
+                <SaveButton compact title={d.title} kind="diagram" url={`/diagrams/#diagram-${id}`} />
               </li>
             ))}
           </ul>
@@ -132,5 +134,9 @@ const hl = all.filter(([, d]) => d.level === 'HL').length;
 
   .dgl-uses .label {
     margin-right: 0.5rem;
+  }
+
+  .dgl-grid :global(.save) {
+    margin-top: var(--sp-3);
   }
 </style>

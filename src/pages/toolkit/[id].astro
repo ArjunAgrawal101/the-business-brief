@@ -8,6 +8,7 @@ import CalcCard from '../../components/finance/CalcCard.astro';
 import LevelTag from '../../components/ui/LevelTag.astro';
 import VerifyTag from '../../components/ui/VerifyTag.astro';
 import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import SaveButton from '../../components/ui/SaveButton.astro';
 import { corpus, href, longDate, toolsInOrder } from '../../lib/content';
 import { inline, rich } from '../../lib/markup';
 import type { Tool } from '../../lib/schemas';
@@ -42,6 +43,7 @@ const lists = [
       <VerifyTag status={t.verification} />
       <span class="tag tag--plain">{t.ibStatus === 'ib-toolkit' ? 'In the IB toolkit' : t.ibStatus === 'enrichment' ? 'Enrichment' : 'Teaching framework'}</span>
       <span class="tag tag--plain">Updated {longDate(t.updated)}</span>
+      <SaveButton title={t.name} kind="framework" />
     </div>
   </PageIntro>
   <div class="wrap page-body">

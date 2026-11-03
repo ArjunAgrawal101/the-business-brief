@@ -11,6 +11,7 @@ import Block from '../../components/blocks/Block.astro';
 import QuestionCard from '../../components/assess/QuestionCard.astro';
 import RetrievalCards from '../../components/assess/RetrievalCards.astro';
 import LevelSwitch from '../../components/ui/LevelSwitch.astro';
+import SaveButton from '../../components/ui/SaveButton.astro';
 import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
 import VerifyTag from '../../components/ui/VerifyTag.astro';
 import LevelTag from '../../components/ui/LevelTag.astro';
@@ -74,6 +75,7 @@ const nav = [
         <LevelTag level={t.level} always />
         {sub && <VerifyTag status={sub.verification} />}
         <span class="tag tag--plain">Updated {longDate(t.updated)}</span>
+        <SaveButton title={`${t.code} ${t.title}`} kind="topic" />
       </div>
       <LevelSwitch id={`lvl-${id}`} />
     </div>

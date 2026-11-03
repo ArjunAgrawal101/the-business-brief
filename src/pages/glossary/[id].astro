@@ -6,6 +6,7 @@
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import SaveButton from '../../components/ui/SaveButton.astro';
 import { corpus, href } from '../../lib/content';
 import { inline, rich } from '../../lib/markup';
 import { subtopicHref } from '../../lib/learning';
@@ -52,6 +53,7 @@ const jsonLd = {
       </p>
       <h1 class="gt__term">{g.term}</h1>
       {g.aliases.length > 0 && <p class="gt__aliases">Also called {g.aliases.join(', ')}</p>}
+      <div class="gt__save"><SaveButton title={g.term} kind="term" /></div>
     </header>
 
     <div class="gt__grid">
@@ -211,6 +213,10 @@ const jsonLd = {
   .gt__aliases {
     margin-top: var(--sp-2);
     color: var(--text-muted);
+  }
+
+  .gt__save {
+    margin-top: var(--sp-4);
   }
 
   .gt__grid {

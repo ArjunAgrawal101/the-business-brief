@@ -1,0 +1,122 @@
+---
+/**
+ * Save this page (or one item on it) to the reader's saved items, kept in
+ * this browser only (bb:saved) and listed on the dashboard. A toggle button
+ * with a constant name, "Save", and aria-pressed for its state; when saved, a
+ * link to the dashboard appears beside it, so the state is said in words.
+ * The button needs JavaScript and storage, so without either it is not shown.
+ *
+ * It also loads the learner recorder, so a page with a save button notes the
+ * visit even before the recorder is loaded on every page.
+ */
+import { iconSvg } from '../../lib/icons';
+import type { SavedKind } from '../../lib/learner';
+
+interface Props {
+  /** What is saved, as the dashboard will list it. */
+  title: string;
+  kind: SavedKind;
+  /** The address to save; the current page by default. A fragment saves one item on a page. */
+  url?: string;
+  /** A smaller button, for items inside a list or a card. */
+  compact?: boolean;
+}
+const { title, kind, url = Astro.url.pathname, compact = false } = Astro.props;
+---
+
+<div class:list={['save', { 'save--compact': compact }]} data-ix="save" data-url={url} data-title={title} data-kind={kind}>
+  <button type="button" class="save__btn js-only" aria-pressed="false" data-save>
+    <Fragment set:html={iconSvg('bookmark', compact ? 16 : 18)} />
+    <span>Save</span><span class="sr-only">: {title}</span>
+  </button>
+  <a class="save__link js-only" href="/dashboard/#saved" data-save-link hidden>{compact ? 'Saved' : 'Saved to your dashboard'}</a>
+  <span class="sr-only" aria-live="polite" data-save-status></span>
+</div>
+
+<script>
+  import '../../scripts/save-button';
+  import '../../scripts/learner';
+</script>
+
+<style>
+  .save {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+  }
+
+  .save[hidden] {
+    display: none;
+  }
+
+  .save__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.45rem 1rem 0.45rem 0.8rem;
+    border: 1px solid var(--bb-ink);
+    border-radius: var(--radius-1);
+    background: var(--surface-sheet);
+    color: var(--navy-900);
+    font: 600 0.875rem/1 var(--font-ui);
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition:
+      background var(--dur-fast) var(--ease),
+      color var(--dur-fast) var(--ease);
+  }
+
+  .save__btn :global(svg) {
+    flex: none;
+    transition: fill var(--dur-base) var(--ease);
+  }
+
+  .save__btn:hover {
+    background: var(--surface-sunk);
+  }
+
+  .save__btn:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .save__btn[aria-pressed='true'] {
+    background: var(--bb-ink);
+    color: var(--text-on-ink);
+  }
+
+  .save__btn[aria-pressed='true'] :global(svg) {
+    color: var(--gold-400);
+    fill: var(--gold-400);
+  }
+
+  .save__link {
+    min-height: 24px;
+    display: inline-flex;
+    align-items: center;
+    font-size: var(--fs-small);
+    font-weight: 560;
+  }
+
+  .save__link[hidden] {
+    display: none;
+  }
+
+  .save--compact .save__btn {
+    min-height: 2.25rem;
+    padding: 0.3rem 0.75rem 0.3rem 0.6rem;
+    font-size: 0.8125rem;
+  }
+
+  .save--compact .save__link {
+    font-size: 0.8125rem;
+  }
+
+  @media print {
+    .save {
+      display: none;
+    }
+  }
+</style>

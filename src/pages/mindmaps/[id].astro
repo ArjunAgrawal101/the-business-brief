@@ -7,6 +7,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import MindmapView from '../../components/mindmap/MindmapView.astro';
+import SaveButton from '../../components/ui/SaveButton.astro';
 import { corpus, href } from '../../lib/content';
 import { nodeCount, termsIn } from '../../lib/mindmap';
 import { mindmapsInOrder, subtopicHref } from '../../lib/learning';
@@ -45,6 +46,7 @@ const basis = map.basis.map((b) => ({ ...b, title: c.sources[b.source]?.title ??
     <span class="tag tag--plain">{map.level === 'HL' ? 'HL only' : map.level === 'SL/HL' ? 'SL and HL' : 'SL and HL, with HL-only parts'}</span>
     <span class="tag tag--plain">{nodeCount(map)} ideas in {map.branches.length} branches</span>
     <a class="tag tag--plain" href={topicLink}>{map.scope === 'unit' ? 'Topic library' : 'Read the topic'}</a>
+    <SaveButton title={map.scope === 'unit' ? `Unit ${map.unit}: ${map.title}` : `${map.code} ${map.title}`} kind="mindmap" />
   </PageIntro>
 
   <div class="wrap page-body">

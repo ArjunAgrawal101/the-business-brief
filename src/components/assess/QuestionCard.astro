@@ -7,6 +7,7 @@
 import Exhibit from '../blocks/Exhibit.astro';
 import ProvenanceTag from '../ui/ProvenanceTag.astro';
 import LevelTag from '../ui/LevelTag.astro';
+import SaveButton from '../ui/SaveButton.astro';
 import { corpus, href } from '../../lib/content';
 import { inline, jsonForScript, rich } from '../../lib/markup';
 import type { Question } from '../../lib/schemas';
@@ -50,6 +51,7 @@ const config = { id, marks: q.marks, kind: ms.kind, points: ms.points.map((p) =>
         )
       }
       <span class="tag tag--plain">{q.ao}</span>
+      <SaveButton compact title={q.title} kind="question" url={href.question(id)} />
     </div>
   </header>
 
