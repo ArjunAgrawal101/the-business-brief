@@ -1,0 +1,55 @@
+# Force field builder. Checked against the Business management guide: force
+# field analysis is an HL-only toolkit tool, suggested for units 2 and 5
+# (p. 14), taught at AO2 and AO4 (p. 13). Totals and the effect of weakening a
+# force come from src/lib/force-field.ts. The worked example is fictional.
+type: tool
+kind: force-field
+slug: force-field
+title: Force field builder
+short: Force field
+order: 9
+stage: plan
+summary: Set out the forces driving a change and the forces holding it back, score each with evidence and an action, and test what weakening a restraining force would do.
+purpose: To judge whether a change is likely to succeed and to plan how to make it succeed, usually by finding the restraining forces that can be weakened.
+howTo:
+  - State the change in a sentence.
+  - Add the driving forces and the restraining forces, each with its evidence.
+  - Score each force from 1 (weak) to 5 (very strong). The tool totals each side and says which way the balance falls.
+  - "For each force, write the action: how a driving force could be strengthened, or a restraining force weakened, and at what cost."
+  - Choose a restraining force to test. The tool shows what weakening it would do to the balance.
+  - Carry the actions into the implementation steps of the recommendation memo.
+limitations:
+  - The scores are judgements, not measurements. Adding them up gives a prompt for discussion, not a forecast.
+  - Two forces with the same score may need very different effort and money to change.
+  - Forces interact. Weakening one can strengthen another, as when a shift premium wins over staff but adds to the cash needed.
+  - It shows the forces at one moment. The balance shifts as the change goes ahead.
+status:
+  kind: ib-toolkit
+  level: HL
+  toolkit: force-field-analysis
+  subtopics: ['2.1']
+  text: Force field analysis is an HL-only toolkit tool, suggested for units 2 and 5 (Business management guide, p. 14), and taught at AO2 and AO4 alongside the syllabus content (p. 13). It fits subtopic 2.1, on resistance to change in the workplace and strategies for reducing it. SL students can skip this tool or use it as enrichment.
+read:
+  - { label: 'Toolkit guide: force field analysis', href: /toolkit/force-field-analysis/ }
+  - { label: '2.1 Introduction to human resource management', href: /topics/introduction-to-human-resource-management/, note: 'Resistance to change and how to reduce it.' }
+  - { label: '2.5 Organizational (corporate) culture (HL)', href: /topics/organizational-corporate-culture/, note: 'Cultural clashes when organizations change.' }
+  - { label: 'Decision Room: Halden Distribution, how to lead in the first ninety days', href: /decision-room/halden-leadership/ }
+example:
+  title: Can the fleet plan be made to work?
+  situation: To serve delivery firms, Northvale must add a second assembly shift and a fleet sales team. Some forces push for the change; others hold it back. Fictional business; every figure is simulated.
+  data:
+    business: Northvale Cycles
+    change: Add a second assembly shift and a fleet sales team for business cargo bikes
+    forces:
+      - { id: d1, side: driving, label: Fleet orders waiting from three delivery firms, strength: 4, evidence: 'Three firms have asked for quotes for fleets of 30 to 60 bikes.', action: 'Turn the strongest inquiry into a paid trial with a firm order.' }
+      - { id: d2, side: driving, label: Fleet bikes earn a higher margin, evidence: 'A fleet bike with a service contract earns about €400 more contribution than a cargo bike sold through a dealer.', strength: 4, action: 'Show the margin in the board paper, net of the dealer commission.' }
+      - { id: d3, side: driving, label: The owners want profit restored, strength: 3, evidence: 'The family board has asked for a plan to return to €3m of operating profit.', action: 'Agree review dates so the board sees progress.' }
+      - { id: d4, side: driving, label: Van charges pushing firms towards bikes, strength: 4, evidence: 'Three nearby cities will charge vans to enter their low-emission zones from 2027.', action: 'Time the launch for the year before the charges start.' }
+      - { id: r1, side: restraining, label: Dealers fear being bypassed, strength: 4, evidence: 'Dealers sell four in five Northvale bikes, and several have said they will stock rivals if sales go direct.', action: 'Pay dealers a commission on fleet sales in their area and use them for servicing.' }
+      - { id: r2, side: restraining, label: Staff reluctant to work a late shift, strength: 3, evidence: 'In an informal poll, half the assembly staff said they would not work evenings.', action: 'Consult the staff council, ask for volunteers first and pay a shift premium.' }
+      - { id: r3, side: restraining, label: Cash needed for tooling and stock, strength: 4, evidence: 'The plan needs €2m, and cash is tight after two years of falling profit.', action: 'Phase the investment behind the trial, and use the bank loan only once orders are firm.' }
+      - { id: r4, side: restraining, label: Motor lead times of up to 20 weeks, strength: 3, evidence: 'Lead times for cargo-rated motors reached 20 weeks in 2024.', action: 'Qualify a second motor supplier before the second shift starts.' }
+    test: r1
+    by: 2
+inUse: The recommended use is to plan, not to total. The driving forces lead by one point, 15 to 14, which says the change is possible, not that it will happen. Name the restraining force worth weakening first, here the dealers' fear, and say how and at what cost.
+updated: '2026-11-03'

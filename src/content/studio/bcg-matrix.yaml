@@ -1,0 +1,55 @@
+# BCG portfolio matrix. Checked against the Business management guide: the
+# Boston Consulting Group (BCG) matrix is a toolkit tool for SL and HL,
+# suggested for units 3 and 4 (p. 14), taught at AO2 and AO4 (p. 13). The
+# guide does not fix the axes; this tool uses relative market share. Market
+# share and market growth are 4.1 (p. 31); the product portfolio is 4.5
+# (p. 31). The worked example is fictional, with simulated figures that sum to
+# the engagement's revenue of €38.0m.
+type: tool
+kind: bcg
+slug: bcg-matrix
+title: BCG portfolio matrix
+short: BCG matrix
+order: 5
+stage: options
+summary: Plot a product portfolio by relative market share and market growth, with each product's revenue as the size of its circle, and get guidance on the balance of the portfolio.
+purpose: To see a business's products side by side by the strength of their market position and the growth of their markets, so that cash can be moved from the products that generate it to the products that need it, and weak products can be questioned.
+howTo:
+  - Add each product with its market share, the share of the largest rival in its market (the next largest, if the product leads), the growth of its market and its revenue.
+  - Set the growth line, the market growth that counts as high. There is no fixed rule; one approach is to use the average growth of the markets the business is in.
+  - Read the chart. Relative share above 1 means the product leads its market; the circles' areas show revenue.
+  - "Read the portfolio guidance: what the cash cows can fund, which question marks to back, and which dogs to question."
+  - "Use the result in the option appraisal: which products should the strategy invest in, hold or drop?"
+limitations:
+  - Market share and market growth are only two measures. Profit, cash flow and how products support each other are not on the chart.
+  - The labels depend on where the lines are drawn and on how the market is defined. A product can look like a dog in a broad market and a star in a niche.
+  - A dog is not always worth dropping. It may cover its costs, complete a range or keep a key customer.
+  - It assumes high share brings low costs and high growth needs cash. That holds in many markets, but not in all.
+  - It is a snapshot. Positions change as markets grow and mature.
+status:
+  kind: ib-toolkit
+  level: SL/HL
+  toolkit: bcg-matrix
+  subtopics: ['4.1', '4.5']
+  text: The Boston Consulting Group (BCG) matrix is one of the guide's toolkit tools for SL and HL, suggested for units 3 and 4 (Business management guide, p. 14), and taught at AO2 and AO4 alongside the syllabus content (p. 13). It draws on market share and market growth (4.1) and the product portfolio (4.5). The guide names the matrix without fixing its axes; this tool uses relative market share, and some textbooks use market share instead.
+read:
+  - { label: '4.1 Introduction to marketing: market share and growth', href: /topics/introduction-to-marketing/ }
+  - { label: '4.5 The seven Ps: the product life cycle and portfolio', href: /topics/the-seven-ps-of-the-marketing-mix/ }
+  - { label: 'The BCG matrix in the toolkit (guide in preparation)', href: '/toolkit/#tool-bcg-matrix' }
+  - { label: 'Market Studio: market share and growth workspace', href: /market-studio/ }
+example:
+  title: Northvale's five product lines
+  situation: Northvale earned €38.0m last year from five product lines. The matrix asks which of them should fund the rest, which deserve investment and which should be questioned. Fictional business; every figure is simulated.
+  data:
+    business: Northvale Cycles
+    currency: €
+    unit: m
+    growthLine: 5
+    products:
+      - { id: city, name: City and trekking bikes, share: 18, rival: 12, growth: -1, revenue: 15 }
+      - { id: commuter, name: Commuter e-bikes, share: 6, rival: 18, growth: 12, revenue: 10.5 }
+      - { id: cargo, name: Cargo e-bikes, share: 24, rival: 16, growth: 22, revenue: 6 }
+      - { id: kids, name: Children's bikes, share: 5, rival: 20, growth: 2, revenue: 4 }
+      - { id: road, name: Road bikes, share: 3, rival: 14, growth: 0, revenue: 2.5 }
+inUse: The recommended use is to turn the picture into decisions about money. Say which products fund which, and what happens when the cash cow's market keeps shrinking. For Northvale, city bikes pay for the cargo bike's growth today, but at −1% a year that cash will not last, which is why the cargo bike, the star, sits at the centre of the strategy.
+updated: '2026-11-03'

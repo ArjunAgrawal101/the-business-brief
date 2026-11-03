@@ -1,0 +1,64 @@
+# Decision tree builder. Checked against the Business management guide:
+# decision trees are a toolkit tool for SL and HL, suggested for units 1 and 5
+# (p. 14), taught at AO2 and AO4 (p. 13). Expected values are worked by
+# evaluateOption in src/lib/decision-tree.ts. The worked example is fictional:
+# figures in € millions, simulated, and checked by hand in
+# tests/unit/strategy-models.test.ts (the fleet option: 0.6 x 6 + 0.4 x 1.7 = 4.28,
+# less its cost of 2 = 2.28).
+type: tool
+kind: decision-tree
+slug: decision-tree
+title: Decision tree builder
+short: Decision tree
+order: 8
+stage: decide
+summary: Build a decision tree of any shape, with options, costs, chances, probabilities and payoffs, and see expected values rolled back to the first decision, with the best branch marked.
+purpose: To compare options whose results are uncertain, by weighting each possible outcome by its probability, and to see how a later decision changes the value of an earlier one.
+howTo:
+  - Name the decision at the root. Add a branch for each option, with what choosing it costs.
+  - Make each option a chance node and give it its outcomes, each with a probability. The probabilities at each chance node must add up to 1, and the tool checks that they do.
+  - End each branch with an outcome and its payoff, before the costs on the way to it. Where a later decision follows an outcome, change that outcome's type to a decision and grow the tree from there.
+  - Read the rolled-back values. A chance node's value is the sum of probability times value; a decision takes the branch with the highest value net of its cost. The chosen branch is drawn heavier and the rejected ones are crossed.
+  - Read the spread of results behind each option, not only its expected value, then test the probabilities you are least sure of.
+limitations:
+  - The probabilities and payoffs are estimates, and the answer is only as good as they are. Small changes to an uncertain probability can change the choice.
+  - An expected value is an average over many imagined repeats. A decision taken once will produce one outcome, which may be the worst.
+  - It ignores attitudes to risk. A business that cannot survive the worst outcome may rightly reject the option with the highest expected value.
+  - It leaves out what the numbers do not capture, such as control, quality, ethics and the effect on people.
+  - Payoffs at different times are treated as equal, unless they have been discounted first.
+status:
+  kind: ib-toolkit
+  level: SL/HL
+  toolkit: decision-trees
+  subtopics: ['1.5']
+  text: Decision trees are one of the guide's toolkit tools for SL and HL, suggested for units 1 and 5 (Business management guide, p. 14), and taught at AO2 and AO4 alongside the syllabus content (p. 13). An option's expected value is the sum of probability times payoff, less its cost; the growth brief (1.5) works one in full.
+read:
+  - { label: 'Toolkit guide: decision trees', href: /toolkit/decision-trees/ }
+  - { label: '1.5 Growth and evolution: the decision tree lab', href: /topics/growth-and-evolution/ }
+  - { label: 'Decision Room: Marigold Kitchens, which way to grow?', href: /decision-room/marigold-growth/ }
+example:
+  title: Which growth investment pays best?
+  situation: Northvale weighs three investments against doing nothing new. The fleet cargo bike could meet weak demand, in which case Northvale would face a second decision, so the tree has a decision inside it. Figures are cash over three years in € millions, before each option's cost. Fictional business; every figure is simulated.
+  data:
+    business: Northvale Cycles
+    question: Which growth investment should Northvale make over the next three years?
+    currency: €
+    unit: m
+    nodes:
+      - { id: root, parent: '', kind: decision, label: Choose a growth investment }
+      - { id: fleet, parent: root, kind: chance, label: Launch a fleet cargo bike, cost: 2 }
+      - { id: strong, parent: fleet, kind: end, label: Strong fleet demand, prob: 0.6, payoff: 6 }
+      - { id: weak, parent: fleet, kind: decision, label: Weak fleet demand, prob: 0.4 }
+      - { id: cut, parent: weak, kind: chance, label: Cut the fleet price, cost: 0.3 }
+      - { id: respond, parent: cut, kind: end, label: Fleets respond, prob: 0.5, payoff: 3 }
+      - { id: ignore, parent: cut, kind: end, label: Fleets do not respond, prob: 0.5, payoff: 1 }
+      - { id: families, parent: weak, kind: end, label: Sell the bikes to families instead, cost: 0, payoff: 1.5 }
+      - { id: online, parent: root, kind: chance, label: Relaunch commuter e-bikes online, cost: 1.2 }
+      - { id: onstrong, parent: online, kind: end, label: Strong online sales, prob: 0.5, payoff: 3.5 }
+      - { id: onweak, parent: online, kind: end, label: Weak online sales, prob: 0.5, payoff: 1 }
+      - { id: export, parent: root, kind: chance, label: Export city bikes, cost: 0.8 }
+      - { id: signup, parent: export, kind: end, label: Dealers sign up, prob: 0.4, payoff: 2.6 }
+      - { id: few, parent: export, kind: end, label: Few dealers sign up, prob: 0.6, payoff: 0.5 }
+      - { id: nothing, parent: root, kind: end, label: Do nothing new, cost: 0, payoff: 0 }
+inUse: The recommended use is to give the expected values and then go beyond them. The fleet cargo bike has the highest expected value, €2.28m, but a 0.2 chance of losing €1.3m; say whether Northvale can bear that, which probability you trust least, and what a paid trial would do to it.
+updated: '2026-11-03'

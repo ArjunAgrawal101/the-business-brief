@@ -1,0 +1,91 @@
+# Option appraisal and recommendation memo. Weighted scoring is a general
+# decision method, not one of the guide's toolkit tools; the memo's structure
+# is the platform's own. Paper 3 (HL) asks for a recommended plan of action
+# (guide, pp. 42 and 47 to 50; claims register: paper3-structure). The worked
+# example is fictional and agrees with the other tools' examples: the decision
+# tree's expected values, the BCG figures and the stakeholder map.
+type: tool
+kind: appraisal
+slug: option-appraisal
+title: Option appraisal and recommendation memo
+short: Option appraisal
+order: 10
+stage: decide
+summary: Score strategic options against weighted criteria, see how far the ranking depends on the weights, and write the recommendation as a structured memo to copy or print.
+purpose: To compare options on everything that matters to the decision, not only the figures, to test whether the ranking survives a change of priorities, and to turn the analysis into a recommendation that the people who must act on it can follow.
+howTo:
+  - State the question, then list the criteria that matter and weight each from 0 to 5. Agree the weights before you look at the totals, and say what a score of 5 means, so that risk and cost are scored the right way round.
+  - List two to five distinct options, and score each from 1 to 5 on every criterion.
+  - Read the weighted ranking and the sensitivity test, which shows any weight at which a different option would lead, and who would lead if every criterion counted the same.
+  - Write the memo. The options and the weighted evaluation are filled in for you; add the situation, the evidence from your other tools (the button gathers the headlines of the tools you have saved), the recommendation, the risks, the implementation steps and what would change your mind.
+  - Copy the memo or print it. A recommendation that differs from the ranking is allowed, but the memo must say why.
+limitations:
+  - The scores and weights are judgements. A weighted total can make a judgement look more exact than it is.
+  - Criteria can overlap and count the same thing twice, such as profit and return on investment.
+  - A total can hide a fatal weakness. An option that scores 1 on legality or safety may need to be ruled out, whatever its total.
+  - It compares the options listed, and cannot show a better one that nobody thought of.
+status:
+  kind: enrichment
+  subtopics: []
+  text: "Weighted option appraisal is not in the guide's toolkit. It is a general decision-making method, offered as enrichment, like the weighted scoring of locations on the Operations Floor, and the memo's six parts are the platform's own structure. Reaching a reasoned recommendation is central to the course: Paper 3 (HL) asks for a recommended plan of action (Business management guide, pp. 42 and 47 to 50)."
+read:
+  - { label: 'Paper 3 Boardroom (HL)', href: /assessment/paper-3/ }
+  - { label: '5.7 Crisis management and contingency planning (HL)', href: /topics/crisis-management-and-contingency-planning/, note: 'For the risks in the memo.' }
+  - { label: 'Operations Floor: weighted scoring of locations', href: /operations-floor/ }
+example:
+  title: The recommendation to the family board
+  situation: Three options survive the analysis. The appraisal weighs them against what matters to Northvale and its owners, and the memo turns the result into a recommendation the board can act on. Fictional business; every figure is simulated.
+  data:
+    business: Northvale Cycles
+    question: How should Northvale Cycles restore its profit over the next three years?
+    criteria:
+      - { id: profit, label: Expected profit over three years, weight: 5, high: 'Adds the most profit, on the decision tree and the forecasts' }
+      - { id: fit, label: "Fit with Northvale's strengths", weight: 4, high: 'Builds on the cargo lead, the works and the dealers' }
+      - { id: risk, label: Risk, weight: 3, high: 'The lowest risk' }
+      - { id: cash, label: Cash needed, weight: 3, high: 'Needs the least cash' }
+      - { id: people, label: Effect on staff and dealers, weight: 2, high: 'Welcomed by staff and dealers' }
+    options:
+      - id: fleet
+        name: Fleet cargo bikes for delivery firms
+        summary: A fleet version of the cargo bike with service contracts, sold direct to delivery firms in low-emission cities, with a second assembly shift.
+        scores: { profit: 5, fit: 5, risk: 3, cash: 2, people: 2 }
+      - id: online
+        name: Relaunch commuter e-bikes online
+        summary: A cheaper commuter e-bike sold online with home delivery, to win back share from the direct-online brands.
+        scores: { profit: 3, fit: 2, risk: 3, cash: 3, people: 3 }
+      - id: export
+        name: City bikes for dealers abroad
+        summary: Sell city bikes through twelve dealers in a neighbouring country, with a local distributor.
+        scores: { profit: 2, fit: 3, risk: 4, cash: 4, people: 4 }
+    memo:
+      to: The family board
+      from: Ingrid Marsh, managing director
+      date: 3 November 2026
+      situation: |
+        Northvale's operating profit fell from €3.4m to €1.5m in two years. Direct-online brands undercut its commuter e-bikes, motor and battery prices rose 9%, and road and children's bikes lost €0.4m between them.
+        Its cargo e-bikes lead a segment that grew 22% last year, and three delivery firms have asked about fleets.
+      evidence: |
+        SWOT: the heaviest factors are the lead in cargo bikes, costs above the online rivals, van restrictions in city centres and discounting by the online brands.
+        STEEPLE: the low-emission zones restricting vans score 20 of 25, the factor to act on first.
+        Five Forces (enrichment): the market for business cargo bikes is moderately attractive; buyer and supplier power are the strongest forces.
+        BCG matrix: city bikes are a cash cow in a shrinking market, and the cargo bike is the star that must replace them.
+        Decision tree: the fleet cargo bike has the highest expected value, €2.28m net of its cost, with a 0.2 chance of a loss.
+      recommend: fleet
+      why: |
+        It has the highest weighted score and the highest expected value, and it builds on what Northvale does best: its lead in cargo bikes, its own works and its dealers' servicing.
+        The ranking holds unless expected profit is given almost no weight. City bikes abroad is safer and cheaper, and is worth keeping as a second step once the fleet business is running.
+      risks: |
+        Weak fleet demand, a 0.4 chance in the decision tree: start with a paid trial, and cut the fleet price if orders lag.
+        Dealers opposing direct sales: pay them a commission on fleet sales in their area and use them for servicing.
+        Motor supply: qualify a second supplier before the second shift starts, as a contingency plan.
+        Staff resistance to a late shift: consult the staff council, ask for volunteers first and pay a shift premium.
+      steps:
+        - { id: s1, action: 'Agree the plan, the budget and the review dates with the board', owner: Ingrid Marsh, when: December }
+        - { id: s2, action: Run a paid three-month trial with one delivery firm, owner: Head of sales, when: January to March }
+        - { id: s3, action: Agree a dealer commission on fleet sales, owner: Head of sales, when: February }
+        - { id: s4, action: Qualify a second motor supplier, owner: Operations manager, when: By April }
+        - { id: s5, action: 'Consult the staff council on a second shift, and recruit volunteers', owner: Works manager, when: March to May }
+        - { id: s6, action: Launch to fleets in the three low-emission cities, owner: Ingrid Marsh, when: June }
+      review: Think again if the trial wins fewer than 40 fleet orders, if the van charges are delayed beyond 2027, or if no second motor supplier can be found by April.
+inUse: The recommended use is to recommend, not to report the totals. Say which option, why, on what conditions, and what would change your mind, and let the sensitivity test tell you how hard to argue for the weights. Paper 3 (HL) ends with exactly this task, a recommended plan of action supported by the resource materials and by business management tools and theories (Business management guide, pp. 42 and 47 to 50).
+updated: '2026-11-03'

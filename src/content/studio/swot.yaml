@@ -1,0 +1,69 @@
+# SWOT builder. Checked against the Business management guide: SWOT analysis
+# is a toolkit tool for SL and HL, suggested for units 1 to 5 (p. 14), taught
+# at AO2 and AO4 (p. 13). The TOWS matrix is not in the guide: enrichment.
+# The worked example is fictional, with simulated figures.
+type: tool
+kind: swot
+slug: swot
+title: SWOT builder
+short: SWOT
+order: 1
+stage: diagnose
+summary: List and weight the internal strengths and weaknesses and the external opportunities and threats behind a decision, then pair them into strategic options in a TOWS matrix.
+purpose: To summarize the position a decision starts from, rank the factors that matter most, and turn the summary into options instead of leaving it as four lists.
+howTo:
+  - Name the organization and the decision. A SWOT without a decision has no way of judging what matters.
+  - Add factors to each box. Strengths and weaknesses are internal, within the organization's control; opportunities and threats are external. The prompt under a factor asks a question when its words suggest the other side of that line.
+  - Give each factor its evidence from the case and a weight from 1 (slight) to 5 (decisive) for this decision.
+  - Read the ranked SWOT and the checks, which point out empty boxes, factors without evidence and heavy weaknesses or threats that nothing deals with.
+  - Pair factors into options in the TOWS matrix, ticking the factors each option uses. Options are ranked by the weight of evidence behind them.
+  - Export the analysis, or carry the leading options into the Ansoff planner and the option appraisal.
+limitations:
+  - A SWOT describes a position; it does not choose an option. The TOWS matrix generates options but cannot judge their cost, risk or feasibility.
+  - Weights are judgements. Adding them up gives a prompt for discussion, not a measurement, and a box's total rises with the number of factors listed in it.
+  - The same factor can be a strength and a weakness at once, such as a founder's close control, and the four boxes hide that.
+  - The checks look for words such as market, government or our. They cannot read the case, so they will sometimes question a factor that is in the right box and miss one that is not.
+  - It is a snapshot. The position changes, and the analysis has to change with it.
+status:
+  kind: ib-toolkit
+  level: SL/HL
+  toolkit: swot-analysis
+  subtopics: ['1.3', '1.5']
+  text: SWOT analysis is one of the guide's toolkit tools for SL and HL, suggested for all five units (Business management guide, p. 14). Like every toolkit tool, it is taught at AO2 and AO4 alongside the syllabus content (p. 13). The notes for 1.3 use it before setting strategic objectives.
+  extensions:
+    - name: TOWS matrix
+      text: The TOWS matrix is not in the guide. It is enrichment, a widely used way of pairing factors into options, and the IB course does not require it.
+read:
+  - { label: 'Toolkit guide: SWOT analysis', href: /toolkit/swot-analysis/ }
+  - { label: '1.3 Business objectives: SWOT analysis', href: /topics/business-objectives/#swot-analysis }
+  - { label: '1.5 Growth and evolution', href: /topics/growth-and-evolution/ }
+example:
+  title: Northvale Cycles before its board meeting
+  situation: Northvale's profit has more than halved in two years. Before choosing a response, the analysis sorts what the business controls from what it does not, and weights each factor by how much it matters to the decision. Fictional business; every figure is simulated.
+  data:
+    business: Northvale Cycles
+    decision: How to restore profit over the next three years
+    factors:
+      - { id: s1, quadrant: S, text: Leads the cargo e-bike segment, evidence: '24% of cargo e-bike sales in its home market, against 16% for the nearest rival.', weight: 5 }
+      - { id: s2, quadrant: S, text: Durable frames and strong dealer servicing, evidence: 'Warranty claims on 1.2% of bikes sold; dealers rate its after-sales support the best of six brands.', weight: 4 }
+      - { id: s3, quadrant: S, text: Own works that can build short runs, evidence: 'Custom fleet versions can be built within four weeks of an order.', weight: 3 }
+      - { id: w1, quadrant: W, text: Costs above direct-online rivals, evidence: 'A commuter e-bike costs about €1,450 to make and deliver, against an estimated €1,200 for the two largest online brands.', weight: 5 }
+      - { id: w2, quadrant: W, text: Depends on one motor supplier, evidence: "All its e-bikes use one supplier's motor; a three-month delay in 2024 cut e-bike output by a fifth.", weight: 4 }
+      - { id: w3, quadrant: W, text: Two product lines lose money, evidence: "Road and children's bikes made a combined loss of €0.4m last year.", weight: 3 }
+      - { id: w4, quadrant: W, text: Weak online sales, evidence: 'Its website turns 0.8% of visits into sales, against about 2% thought to be usual for online bike sellers.', weight: 2 }
+      - { id: o1, quadrant: O, text: Vans restricted in city centres, evidence: 'Three nearby cities will charge vans to enter their low-emission zones from 2027; delivery firms are trialling cargo bikes.', weight: 5 }
+      - { id: o2, quadrant: O, text: Employers offering bike leasing as a benefit, evidence: 'Two large local employers joined a leasing scheme this year, letting their people pay for a bike from their salary.', weight: 3 }
+      - { id: o3, quadrant: O, text: A possible grant for business cargo bikes, evidence: 'The national government is consulting on grants towards cargo bikes bought by businesses.', weight: 3 }
+      - { id: o4, quadrant: O, text: Dealers abroad asking to stock its bikes, evidence: 'Twelve dealers in a neighbouring country have asked to stock its city bikes.', weight: 2 }
+      - { id: t1, quadrant: T, text: Discounting by direct-online brands, evidence: 'The two largest online brands cut their e-bike prices by 15% this year.', weight: 5 }
+      - { id: t2, quadrant: T, text: Rising prices for motors and batteries, evidence: 'Motor and battery prices rose 9% in a year.', weight: 4 }
+      - { id: t3, quadrant: T, text: Higher interest rates, evidence: 'Credit for large purchases costs more, and e-bike sales across the market fell 6% last year.', weight: 3 }
+      - { id: t4, quadrant: T, text: Stricter battery rules from 2027, evidence: 'New battery safety and recycling rules will add testing costs to every e-bike model.', weight: 2 }
+    tows:
+      - { id: so1, cell: SO, text: Launch a fleet version of the cargo bike for delivery firms in low-emission cities, links: [s1, s3, o1, o3] }
+      - { id: wo1, cell: WO, text: Sell e-bikes through employer leasing schemes to lift online sales, links: [w4, o2] }
+      - { id: st1, cell: ST, text: 'Compete on durability and service, not price, with a five-year frame warranty sold through dealers', links: [s2, t1] }
+      - { id: wt1, cell: WT, text: Drop road bikes and redesign the commuter e-bike to cut its cost, links: [w1, w3, t1] }
+      - { id: wt2, cell: WT, text: Qualify a second motor supplier, links: [w2, t2] }
+inUse: The recommended use is to let the ranking do the work. Name the two or three factors that decide the question, show how they combine (Northvale's lead in cargo bikes meets the van restrictions; its costs meet the discounting), and draw the implication for the decision. Four unranked lists describe a business; they do not analyse it.
+updated: '2026-11-03'
