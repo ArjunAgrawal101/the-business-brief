@@ -22,14 +22,26 @@ export function qualificationsOf(g: GlossaryEntry): QualificationTag[] {
 /** Has the entry been written as a full dictionary entry (plain and technical explanations, misconceptions)? */
 export const isDeep = (g: GlossaryEntry): boolean => Boolean(g.simple && g.technical && g.misconceptions.length);
 
-/** The lower-case text the index searches: names, the definition and the plain explanation. */
-export function searchText(g: GlossaryEntry): string {
-  return [g.term, ...g.aliases, g.definition, g.simple ?? '']
+const flat = (parts: string[]) =>
+  parts
     .join(' ')
     .replace(/[*`[\]()]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
     .toLowerCase();
+
+/** The lower-case text the index searches: names, the definition and the plain explanation. */
+export function searchText(g: GlossaryEntry): string {
+  return flat([g.term, ...g.aliases, g.definition, g.simple ?? '']);
+}
+
+/**
+ * The part of the search text the index page does not already show: the
+ * names and the plain explanation. The page's script adds each entry's
+ * visible definition, so the definition is not repeated in the markup.
+ */
+export function searchKeys(g: GlossaryEntry): string {
+  return flat([g.term, ...g.aliases, g.simple ?? '']);
 }
 
 const STOP = new Set(['analysis', 'business', 'theory', 'model', 'method', 'management', 'production', 'market', 'marketing', 'the', 'and', 'of', 'for', 'in', 'to', 'a']);

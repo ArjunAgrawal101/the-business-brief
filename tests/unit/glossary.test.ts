@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { glossarySchema, type GlossaryEntry } from '../../src/lib/schemas';
-import { backlinks, isDeep, isEnrichment, qualificationsOf, searchText, suggestTerms } from '../../src/lib/glossary';
+import { backlinks, isDeep, isEnrichment, qualificationsOf, searchKeys, searchText, suggestTerms } from '../../src/lib/glossary';
 import { checkGlossaryDepth } from '../../src/lib/integrity-frameworks';
 import { asCorpus, loadCorpus } from './helpers/corpus';
 
@@ -38,6 +38,9 @@ describe('qualifications and scope', () => {
     expect(t).toContain('capital employed');
     expect(t).toContain('how much is borrowed');
     expect(t).not.toContain('*');
+    // The index page carries only the names and the plain explanation; its script adds the visible definition.
+    const k = searchKeys(entry({ term: 'Gearing ratio', aliases: ['Gearing'], definition: 'The share of **capital employed** from loans.', simple: 'How much is borrowed.' }));
+    expect(k).toBe('gearing ratio gearing how much is borrowed.');
   });
 });
 

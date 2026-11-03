@@ -10,7 +10,7 @@ import PageIntro from '../../components/layout/PageIntro.astro';
 import { corpus, href } from '../../lib/content';
 import { inline } from '../../lib/markup';
 import { GLOSSARY_CATEGORIES, GLOSSARY_CATEGORY_LABELS, QUALIFICATION_TAGS, QUALIFICATION_TAG_LABELS } from '../../lib/schemas';
-import { isDeep, isEnrichment, qualificationsOf, searchText } from '../../lib/glossary';
+import { isDeep, isEnrichment, qualificationsOf, searchKeys } from '../../lib/glossary';
 
 const c = await corpus();
 const entries = Object.entries(c.glossary).sort((a, b) => a[1].term.localeCompare(b[1].term, 'en', { sensitivity: 'base' }));
@@ -122,20 +122,18 @@ const unitsOf = (g: (typeof entries)[number][1]) => (isEnrichment(g) ? 'beyond' 
                   class={`gl-entry${isEnrichment(g) ? ' gl-entry--beyond' : ''}`}
                   id={`term-${id}`}
                   data-entry
-                  data-text={searchText(g)}
+                  data-text={searchKeys(g)}
                   data-units={unitsOf(g)}
                   data-level={g.level === 'HL' && !isEnrichment(g) ? 'hl' : 'sl'}
                   data-category={g.category ?? ''}
                   data-qualification={qualificationsOf(g).join(' ')}
                 >
-                  <div class="gl-entry__head">
-                    <h3 class="gl-entry__term">
-                      <a href={href.glossary(id)}>{g.term}</a>
-                    </h3>
-                    {g.level === 'HL' && !isEnrichment(g) && <span class="tag tag--hl">HL</span>}
-                    {isEnrichment(g) && <span class="tag tag--enrichment">Beyond IB</span>}
-                    {g.subtopics.length > 0 && <span class="gl-entry__codes">{g.subtopics.map((s) => (s === 'toolkit' ? 'Toolkit' : s)).join(' · ')}</span>}
-                  </div>
+                  <h3 class="gl-entry__term">
+                    <a href={href.glossary(id)}>{g.term}</a>
+                  </h3>
+                  {g.level === 'HL' && !isEnrichment(g) && <span class="tag tag--hl">HL</span>}
+                  {isEnrichment(g) && <span class="tag tag--enrichment">Beyond IB</span>}
+                  {g.subtopics.length > 0 && <span class="gl-entry__codes">{g.subtopics.map((s) => (s === 'toolkit' ? 'Toolkit' : s)).join(' · ')}</span>}
                   <p class="gl-entry__def" set:html={inline(g.definition)} />
                   {g.formula && <p class="gl-entry__formula">{g.formula}</p>}
                 </li>
@@ -335,6 +333,10 @@ const unitsOf = (g: (typeof entries)[number][1]) => (isEnrichment(g) ? 'beyond' 
   }
 
   .gl-entry {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.3rem 0.6rem;
     margin: 0;
     padding: var(--sp-4) 0;
     border-bottom: 1px solid var(--rule-hair);
@@ -344,11 +346,9 @@ const unitsOf = (g: (typeof entries)[number][1]) => (isEnrichment(g) ? 'beyond' 
     display: none;
   }
 
-  .gl-entry__head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.3rem 0.6rem;
+  .gl-entry__def,
+  .gl-entry__formula {
+    flex-basis: 100%;
   }
 
   .gl-entry__term {
@@ -375,13 +375,13 @@ const unitsOf = (g: (typeof entries)[number][1]) => (isEnrichment(g) ? 'beyond' 
   }
 
   .gl-entry__def {
-    margin-top: 0.35rem;
+    margin-top: 0.05rem;
     font-size: 0.9375rem;
     color: var(--text-body);
   }
 
   .gl-entry__formula {
-    margin-top: 0.4rem;
+    margin-top: 0.1rem;
     padding: 0.35rem 0.6rem;
     border-left: 2px solid var(--gold-500);
     background: var(--surface-gold-wash);

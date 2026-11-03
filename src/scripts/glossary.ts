@@ -17,6 +17,9 @@ each('[data-ix="glossary"]', (root) => {
   const none = root.querySelector<HTMLElement>('[data-none]');
   if (!input) return;
 
+  // Each entry is searched by its names and plain explanation (data-text) and by its visible definition.
+  const texts = new Map(entries.map((e) => [e, `${e.dataset.text ?? ''} ${e.querySelector('.gl-entry__def')?.textContent ?? ''}`.toLowerCase()]));
+
   const params = new URLSearchParams(location.search);
   input.value = params.get('q') ?? '';
   const get = (k: string) => selects.find((s) => s.dataset.filter === k)?.value ?? '';
@@ -30,7 +33,7 @@ each('[data-ix="glossary"]', (root) => {
     let shown = 0;
     for (const e of entries) {
       const ok =
-        words.every((w) => (e.dataset.text ?? '').includes(w)) &&
+        words.every((w) => (texts.get(e) ?? '').includes(w)) &&
         (!unit || (e.dataset.units ?? '').split(' ').includes(unit)) &&
         (!level || (level === 'hl' ? e.dataset.level === 'hl' : e.dataset.level !== 'hl')) &&
         (!cat || e.dataset.category === cat) &&
