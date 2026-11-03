@@ -32,7 +32,7 @@ export type ConceptId = (typeof CONCEPTS)[number];
 
 export const CONCEPT_NAMES: Record<ConceptId, string> = { change: 'Change', creativity: 'Creativity', ethics: 'Ethics', sustainability: 'Sustainability' };
 
-/** Signs in the issue itself that point to a concept. The mapping is the platform's reading of the guide's descriptions (p. 13). */
+/** Signs in the issue itself that point to a concept. The mapping is the platform's reading of the guide's descriptions (pp. 12 to 13). */
 export const ISSUE_SIGNS: Array<{ id: string; text: string; concepts: ConceptId[] }> = [
   { id: 'move', text: 'The organization is deciding whether to move from one way of working to another: to expand, restructure, relocate, merge or automate', concepts: ['change'] },
   { id: 'respond', text: 'It is responding to a shift outside it: a new competitor, a new law, changing customer tastes, new technology', concepts: ['change'] },
