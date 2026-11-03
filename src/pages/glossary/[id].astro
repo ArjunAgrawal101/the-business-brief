@@ -36,6 +36,8 @@ const next = i < all.length - 1 ? all[i + 1] : undefined;
 const subs = c.curricula['ib-dp-bm']?.units.flatMap((u) => u.subtopics) ?? [];
 const places = g.subtopics.map((code) => (code === 'toolkit' ? { code, title: 'The toolkit', url: '/toolkit/' } : { code, title: subs.find((s) => s.code === code)?.title ?? code, url: subtopicHref(c, code) }));
 const maps = Object.entries(c.mindmaps).filter(([, m]) => termsIn(m).includes(id) || (m.scope === 'subtopic' && g.subtopics.includes(m.code)));
+// The maps beyond the IB course that use the term, listed apart from the IB maps.
+const enrichmentMaps = Object.entries(c.enrichmentMaps).filter(([, m]) => termsIn(m).includes(id)).sort((a, b) => a[1].order - b[1].order);
 const briefs = g.topics.map((t) => ({ id: t, title: c.topics[t]?.title ?? t }));
 const related = g.related.map((r) => ({ id: r, e: c.glossary[r] })).filter((x) => x.e);
 const usedBy = all.filter(([x, e]) => x !== id && e.related.includes(id) && !g.related.includes(x)).slice(0, 8);
@@ -252,6 +254,20 @@ const jsonLd = {
                 {maps.map(([mid, m]) => (
                   <li>
                     <a href={href.mindmap(mid)}>{m.scope === 'unit' ? `Unit ${m.unit} map` : `${m.code} ${m.title}`}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+        {
+          enrichmentMaps.length > 0 && (
+            <div>
+              <p class="label">On the enrichment maps, beyond the IB course</p>
+              <ul>
+                {enrichmentMaps.map(([mid, m]) => (
+                  <li>
+                    <a href={href.enrichmentMap(mid)}>{m.title}</a>
                   </li>
                 ))}
               </ul>
