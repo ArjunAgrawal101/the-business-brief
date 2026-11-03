@@ -9,10 +9,10 @@
  */
 import type { AssessmentComponent, Block, Calculation, CaseEntry, Claim, CommandTerm, Concept, Curriculum, Decision, GlossaryEntry, Interactive, Mindmap, Note, Question, Source, Topic, Tool } from './schemas';
 import { topoOrder } from './plan';
+import { checkAssessment } from './integrity-assessment';
 import { buildWorking, workings } from './finance';
 import { checkStudioInteractives } from './integrity-studio';
 import { checkLearning } from './integrity-learning';
-import { checkAssessment } from './integrity-assessment';
 import { applyAdjustments, balances, derive, type Statement } from './ratios';
 
 type Dict<T> = Record<string, T>;
@@ -294,7 +294,6 @@ export function checkIntegrity(c: Corpus): Problem[] {
   }
   problems.push(...checkStudioInteractives(c.interactives));
   problems.push(...checkLearning(c));
-  problems.push(...checkAssessment(c));
 
   /* Interactions name real subtopics */
   const codes = new Set(Object.values(c.curricula).flatMap((cu) => cu.units.flatMap((u) => u.subtopics.map((st) => st.code))));
@@ -348,6 +347,7 @@ export function checkIntegrity(c: Corpus): Problem[] {
     a.questions.forEach((x) => need(c.questions, x, `assessment/${id}`, 'question'));
     a.facts.forEach((f) => f.sources.forEach((x) => need(c.sources, x, `assessment/${id}`, 'source')));
   }
+  problems.push(...checkAssessment(c));
   for (const [id, cl] of Object.entries(c.claims)) cl.sources.forEach((x) => need(c.sources, x, `claims/${id}`, 'source'));
   for (const [id, g] of Object.entries(c.glossary)) {
     g.topics.forEach((x) => need(c.topics, x, `glossary/${id}`, 'topic'));
