@@ -293,8 +293,9 @@ describe('the lesson library', () => {
     const frames = outlineFrames(e.outline);
     expect(frames[0]?.title).toBe('3.8 Investment appraisal');
     expect(frames.some((f) => f.title === 'Net present value (NPV) (HL)')).toBe(true);
-    // Title, objectives, six sections, weigh it up, check: ten frames (no decision in these notes).
-    expect(frames.length).toBe(1 + 1 + 6 + 1 + 1);
+    // Title, objectives, six sections, the decision (the 3.8 notes now have one), weigh it up, check.
+    expect(frames.length).toBe(1 + 1 + 6 + 1 + 1 + 1);
+    expect(frames.some((f) => /decision/i.test(f.title))).toBe(true);
     const text = outlineText(frames, 'The Business Brief');
     expect(text.startsWith('1. 3.8 Investment appraisal')).toBe(true);
     expect(text).not.toMatch(/\*\*|<[a-z]/);
