@@ -27,6 +27,7 @@ import {
 } from './lib/schemas';
 import { studioSchema } from './lib/schemas-strategy';
 import { scenarioSchema } from './lib/boardroom/schema';
+import { briefingSchema, labToolSchema } from './lib/lab/schemas';
 
 /**
  * Loads every `.yaml` file in a folder, each holding a list of entries with an
@@ -94,4 +95,7 @@ export const collections = {
   resources: defineCollection({ loader: file('./src/content/data/resources.yaml'), schema: resourceSchema }),
   studio: defineCollection({ loader: yamlFiles('./src/content/studio'), schema: studioSchema }),
   boardroom: defineCollection({ loader: yamlFiles('./src/content/boardroom'), schema: scenarioSchema }),
+  // The Entrepreneurship and Innovation Lab: its briefings and the data behind its tools.
+  briefings: defineCollection({ loader: yamlFiles('./src/content/briefings'), schema: briefingSchema }),
+  labTools: defineCollection({ loader: yamlFiles('./src/content/lab'), schema: labToolSchema }),
 };

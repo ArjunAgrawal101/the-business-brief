@@ -1,0 +1,70 @@
+---
+/**
+ * The frame of every briefing and tool page in the Entrepreneurship and
+ * Innovation Lab: the room's identity on the layout, the breadcrumb, a
+ * blueprint header with its title block, the page's own content, and the
+ * Lab's navigation at the foot.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../layout/Breadcrumbs.astro';
+import LabNav from './LabNav.astro';
+import { rich } from '../../lib/markup';
+import '../../styles/lab.css';
+
+interface Props {
+  /** The page's id within the Lab, for the navigation. */
+  id: string;
+  /** The h1. */
+  title: string;
+  /** The document title, without the site name. */
+  metaTitle: string;
+  description: string;
+  /** Words above the h1, such as "Briefing 03 of 06". */
+  kicker: string;
+  /** The breadcrumb's last item. */
+  crumb: string;
+  lead: string;
+  /** The title block: label and HTML value pairs. */
+  block: Array<{ label: string; html: string }>;
+}
+const { id, title, metaTitle, description, kicker, crumb, lead, block } = Astro.props;
+---
+
+<BaseLayout title={metaTitle} description={description} section="entrepreneurship-lab" room="enterprise">
+  <div class="lab">
+    <div class="wrap lab-crumbs">
+      <Breadcrumbs trail={[{ label: 'All rooms', href: '/rooms/' }, { label: 'Entrepreneurship and Innovation Lab', href: '/entrepreneurship-lab/' }, { label: crumb }]} />
+      <header class="lab-blueprint lab-hero">
+        <div>
+          <p class="lab-hero__kicker"><span>Entrepreneurship and Innovation Lab</span><span>{kicker}</span></p>
+          <h1>{title}</h1>
+          <div class="lab-hero__lead" set:html={rich(lead)} />
+        </div>
+        <dl class="lab-titleblock">
+          {
+            block.map((b) => (
+              <div>
+                <dt>{b.label}</dt>
+                <dd set:html={b.html} />
+              </div>
+            ))
+          }
+        </dl>
+      </header>
+    </div>
+    <div class="wrap page-body lab-body">
+      <slot />
+      <LabNav current={id} />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .lab-crumbs {
+    padding-top: var(--sp-5);
+  }
+
+  .lab-body {
+    padding-top: clamp(var(--sp-6), 5vw, var(--sp-8));
+  }
+</style>

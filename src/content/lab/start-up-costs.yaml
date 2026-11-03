@@ -1,0 +1,83 @@
+# The start-up cost calculator. Start-up costs and funding draw on IB content
+# (1.1 starting up, 3.2 sources of finance, 3.3 types of cost, 3.7 cash flow);
+# runway and burn rate are enrichment. Refill Round is fictional and every
+# figure is simulated. Worked by hand: one-off costs $27,200; monthly
+# outgoings $5,050; funding $45,000; cash at launch $17,800; with no sales the
+# cash lasts 17,800 ÷ 5,050 = 3.52 months. Checked in tests/unit.
+title: Start-up cost calculator
+kind: costs
+order: 5
+question: How long will the money last?
+summary: One-off costs, monthly outgoings and funding, with the runway in months, the month sales cover outgoings, the funding gap and a chart of the cash.
+lead: >
+  Most start-ups that fail do not run out of ideas; they run out of cash. List what it costs to open the doors,
+  what goes out every month, and where the money is coming from. The calculator shows how long the cash lasts with
+  the sales you expect and with none at all, when sales start to cover the bills, and how much more you would need
+  to raise.
+briefing: start-up-finance
+ib:
+  status: mixed
+  statement: >
+    Start-up costs, the sources of finance and cash flow are IB content: the challenges of starting up (1.1),
+    sources of finance (3.2), fixed and variable costs (3.3) and cash flow (3.7). Runway and burn rate are
+    enrichment: start-up terms the guide does not use. A full cash flow forecast in the guide's layout is on the
+    [Finance Desk](/finance-desk/cash-flow/).
+  links:
+    - { code: '1.1', note: 'Challenges for starting up a business, of which running short of cash is one of the most common' }
+    - { code: '3.2', note: 'Personal funds, loan capital, share capital, business angels and crowdfunding (AO2), and which suits the situation (AO3)' }
+    - { code: '3.3', note: 'One-off and monthly costs; contribution is revenue minus variable costs' }
+    - { code: '3.7', note: 'Cash flow: the difference between profit and cash, and the liquidity position' }
+steps:
+  - 'List the one-off costs of starting: equipment, stock, premises, the website, legal fees and the launch.'
+  - List the outgoings that recur every month whatever the sales, including loan repayments. Leave out costs that rise with each sale; they are netted off in the contribution.
+  - List the funding by source and say what kind each one is, because a loan, shares and pre-sales cost the founders different things.
+  - Enter the contribution expected in the first month of sales (revenue minus variable costs), how fast it will grow, and the month sales start. Then read the runway and the chart.
+cautions:
+  - The calculator projects cash, not profit. Loan repayments go out as cash although only their interest is a cost, and equipment is paid for at the start rather than spread over its life.
+  - Steady growth is an assumption. Change the growth rate and the start month to see how the runway shrinks if customers arrive later or more slowly than planned.
+  - Pre-sales and rewards crowdfunding bring cash forward. The customers who paid in advance will not pay again for what they have already bought, so early contribution is lower than it looks.
+  - The model leaves out tax, interest on any overdraft and customers who pay late. A cash flow forecast in the guide's layout shows those month by month.
+example:
+  name: Refill Round
+  summary: >
+    Refill Round, the fictional subscription refill service, needs electric cargo bikes, reusable bottles and a
+    washing unit before its first delivery. The founders have raised $45,000 from their savings, a family loan, a
+    bank loan, a business angel and rewards crowdfunding. The expected contribution of $1,400 in the first month
+    comes from the revenue planner's first month; the founders assume it grows by 15% a month, more slowly than
+    their revenue forecast, to leave room for error. Every figure is simulated.
+definitions:
+  - { term: One-off costs, text: 'Spending needed once, before or at the start of trading: equipment, fitting out premises, the first stock, launch marketing.' }
+  - { term: Monthly outgoings, text: 'Cash that goes out every month whatever the sales: rent, pay, insurance, software, loan repayments.' }
+  - { term: Contribution, text: 'Revenue minus variable costs: what sales add towards the monthly outgoings.' }
+  - { term: Burn rate, text: 'How fast a start-up spends its cash. Gross burn is the monthly outgoings; net burn is outgoings minus contribution.' }
+  - { term: Runway, text: 'How many months the cash lasts at the expected burn rate before it runs out.' }
+  - { term: Funding gap, text: 'How much more money is needed for the cash never to fall below zero over the months projected.' }
+currency: $
+oneOff:
+  - { id: bikes, label: Two electric cargo bikes, amount: 8400 }
+  - { id: bottles, label: '1,500 reusable bottles', amount: 3600 }
+  - { id: washer, label: Bottle washer and drying racks, amount: 4800 }
+  - { id: stock, label: First stock of concentrate and labels, amount: 2200 }
+  - { id: website, label: Website and ordering system, amount: 3000 }
+  - { id: unit, label: Deposit and fit-out of the washing unit, amount: 2600 }
+  - { id: legal, label: 'Licences, insurance set-up and legal fees', amount: 1100 }
+  - { id: launch, label: Launch marketing, amount: 1500 }
+monthly:
+  - { id: rent, label: Rent of the washing unit, amount: 1150 }
+  - { id: pay, label: "Founders' pay (two, part-time)", amount: 1000 }
+  - { id: marketing, label: Marketing and referral credits, amount: 1800 }
+  - { id: insurance, label: Insurance, amount: 140 }
+  - { id: software, label: 'Software, website and payments', amount: 160 }
+  - { id: utilities, label: Water and electricity, amount: 250 }
+  - { id: servicing, label: Bike servicing, amount: 90 }
+  - { id: repayment, label: Bank loan repayment, amount: 460 }
+funding:
+  - { id: savings, label: "Founders' savings", amount: 10000, kind: own }
+  - { id: family, label: 'Family loan, repaid after two years', amount: 6000, kind: loan }
+  - { id: bank, label: Bank start-up loan, amount: 15000, kind: loan }
+  - { id: angel, label: 'Business angel, for a 15% stake', amount: 10000, kind: equity }
+  - { id: crowd, label: Rewards crowdfunding (pre-paid boxes), amount: 4000, kind: presales }
+contribution: 1400
+growth: 15
+salesStart: 1
+updated: '2026-11-03'

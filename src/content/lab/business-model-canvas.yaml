@@ -1,0 +1,80 @@
+# The Business Model Canvas builder. The canvas (Alexander Osterwalder with
+# Yves Pigneur) is not in the IB guide, so the tool is enrichment; the block
+# prompts and hints are the platform's own. The example canvas belongs to
+# Refill Round, a fictional start-up; its figures and research results are
+# simulated and agree with the Lab's other tools (unit economics: $24 a month,
+# $9.10 variable cost, 8% churn; start-up costs: $1,150 rent, quotes received).
+title: Business Model Canvas builder
+kind: canvas
+order: 2
+question: Which of your assumptions could sink the business?
+summary: Build a Business Model Canvas in nine blocks, mark each entry as an assumption or as evidence, rate its risk, and get the riskiest assumptions to test first.
+lead: >
+  A business model is a chain of beliefs: these customers have this problem, they will pay this much, we can reach
+  them this way, and serve them at this cost. The canvas sets the chain out on one page. Mark which links you have
+  evidence for and which you are assuming, rate how badly each would hurt if it were wrong, and the canvas tells you
+  what to test first.
+briefing: business-models
+ib:
+  status: enrichment
+  statement: >
+    The Business Model Canvas is not in the guide and is not one of its toolkit tools, so this tool is enrichment.
+    Several blocks rest on IB content, and the canvas is a useful way to connect it: segmentation, targeting and the
+    USP (4.2), market research as evidence (4.4), revenue streams and costs (3.3), and the circular business models
+    of the toolkit, which change the key resources and the cost structure.
+  links:
+    - { code: '1.1', note: 'Entrepreneurship and starting up: the canvas sets out what a start-up must get right' }
+    - { code: '3.3', note: 'Revenue streams and the types of cost fill two of the nine blocks' }
+    - { code: '4.2', note: 'Customer segments and value propositions build on segmentation, targeting and the USP' }
+    - { code: '4.4', note: 'Primary research turns an assumption into evidence' }
+steps:
+  - Fill the blocks in the numbered order, starting with the customer. One idea per entry, in a short sentence you could test.
+  - Mark each entry as an assumption (you believe it) or as evidence (you have seen, measured or signed something that shows it), and say what the evidence is or how you would test the assumption.
+  - Rate each entry for the damage it would do if it were wrong, from 1 (minor) to 5 (the business fails).
+  - Work down the list of riskiest assumptions. Design the cheapest test that could prove the first one wrong, run it, and update the canvas with what you learn.
+cautions:
+  - The canvas shows the model at one moment. It is a working sheet to revise after every test, not a finished document.
+  - Evidence varies in strength. What people say in a survey is weaker than what they do, and what they do is weaker than what they pay for. Mark a belief as evidence only when you could show the evidence to a sceptic.
+  - Nine blocks leave things out, including the competition, the founders and the money needed to start. The feasibility assessment, the start-up cost calculator and the business plan cover those.
+example:
+  name: Refill Round
+  summary: >
+    Refill Round, a fictional start-up, delivers refills of household cleaning products in reusable bottles by
+    electric cargo bike, as a monthly subscription. The bottles stay the business's property and come back to be
+    washed and refilled: the product service system model of the guide's circular business models. Its research
+    results and quotes are simulated.
+definitions:
+  - { term: Assumption, text: 'Something the model needs to be true that you have not yet shown to be true.' }
+  - { term: Evidence, text: 'Something you have observed, measured or signed that supports an entry: a signed quote, customers who paid, the results of a test. Opinions are weak evidence.' }
+  - { term: Risk rating, text: 'How badly the business would be hurt if the entry turned out to be wrong: 1 is a minor setback, 5 means the model fails.' }
+  - { term: Riskiest assumptions, text: "Assumptions in order of risk. Ties are broken in the order a lean start-up tests them: whether customers want it, then whether it can pay, then whether it can be done." }
+blocks:
+  - { id: customer-segments, label: Customer segments, prompt: 'Who has the problem, and which of them will you serve first?', hint: 'Specific enough to find them: where they live or work, what they do now, what they would gain.' }
+  - { id: value-propositions, label: Value propositions, prompt: 'What do you do for those customers that they value and cannot easily get elsewhere?', hint: 'The job you do or the pain you remove, rather than the features.' }
+  - { id: channels, label: Channels, prompt: 'How will customers hear of you, buy from you and receive what they bought?', hint: 'One cheap channel that works beats five you cannot afford.' }
+  - { id: customer-relationships, label: Customer relationships, prompt: 'How will you win customers, keep them and grow what they buy?', hint: 'Self-service, personal service, a community, a subscription, and what stops them leaving.' }
+  - { id: revenue-streams, label: Revenue streams, prompt: 'What will customers pay for, how often and how much?', hint: 'The price, how they pay, and whether anyone has paid it yet.' }
+  - { id: key-resources, label: Key resources, prompt: 'What must you own or control for the model to work?', hint: 'Equipment, premises, people, data, a brand, money.' }
+  - { id: key-activities, label: Key activities, prompt: 'What must you do well, every week, to deliver the value?', hint: 'The few activities that decide your quality and your costs.' }
+  - { id: key-partners, label: Key partners, prompt: 'Who will you rely on that you do not control?', hint: 'Suppliers, platforms, delivery partners: anyone whose decisions could stop you.' }
+  - { id: cost-structure, label: Cost structure, prompt: 'What will it cost to run, and which costs are fixed and which vary with sales?', hint: 'The biggest costs, and what drives each one.' }
+entries:
+  - { id: cs-flats, block: customer-segments, kind: evidence, risk: 3, text: 'Households in flats within 5 km of the centre who want to cut plastic waste', note: '62 of 120 people surveyed at two weekend markets said they would consider a refill delivery' }
+  - { id: cs-cafes, block: customer-segments, kind: assumption, risk: 2, text: 'Independent cafés that buy cleaning products every week', note: 'Visit ten cafés and ask what they buy, how often and from whom' }
+  - { id: vp-no-trip, block: value-propositions, kind: evidence, risk: 4, text: 'Plastic-free cleaning products without a trip to a refill shop', note: '18 of 25 interviewees named the trip as the main reason they had stopped refilling' }
+  - { id: vp-cheaper, block: value-propositions, kind: assumption, risk: 4, text: 'Cheaper per wash than supermarket brands over a year', note: 'Compare the cost per wash with three supermarket brands, then show the comparison to ten customers' }
+  - { id: ch-social, block: channels, kind: assumption, risk: 4, text: 'Local social media groups and community noticeboards bring most first orders', note: 'Post in three groups for two weeks and count the sign-ups each one brings' }
+  - { id: ch-referral, block: channels, kind: assumption, risk: 2, text: 'A $5 credit for each friend who subscribes brings one new customer in four', note: 'Track referral codes for the first 100 subscribers' }
+  - { id: cr-subscription, block: customer-relationships, kind: assumption, risk: 3, text: 'A monthly subscription that customers can pause or cancel online at any time', note: 'Ask the first 50 subscribers whether flexibility made them sign up' }
+  - { id: cr-churn, block: customer-relationships, kind: assumption, risk: 5, text: 'Subscribers stay about a year on average: 8% leave each month', note: 'Run a three-month pilot with 40 paying households and measure who cancels' }
+  - { id: rs-box, block: revenue-streams, kind: assumption, risk: 5, text: 'A subscription box at $24 a month', note: 'Take pre-orders at $24 through a landing page before buying stock' }
+  - { id: rs-oneoff, block: revenue-streams, kind: assumption, risk: 2, text: 'One-off refill orders at about $9 each, through the website and a delivery app', note: 'Offer one-off orders during the pilot and record their average value' }
+  - { id: kr-bottles, block: key-resources, kind: evidence, risk: 2, text: '1,500 reusable bottles, which stay the business’s property', note: 'Supplier quote received: $2.40 a bottle' }
+  - { id: kr-bikes, block: key-resources, kind: evidence, risk: 2, text: 'Two electric cargo bikes and a rented washing unit', note: 'Quotes received; unit available at $1,150 a month' }
+  - { id: ka-wash, block: key-activities, kind: assumption, risk: 4, text: 'Washing and refilling bottles to a reliable hygiene standard at volume', note: 'Wash 200 bottles in a trial week and have a sample tested' }
+  - { id: ka-rounds, block: key-activities, kind: assumption, risk: 3, text: 'Delivery rounds planned by postcode, twice a week', note: 'Time three trial rounds of 20 deliveries' }
+  - { id: kp-supplier, block: key-partners, kind: evidence, risk: 3, text: 'A local manufacturer supplies refill concentrate in bulk', note: 'Supply quote signed at $1.60 a litre' }
+  - { id: kp-council, block: key-partners, kind: assumption, risk: 1, text: "The council's recycling scheme takes bottles too damaged to reuse", note: 'Email the council recycling team' }
+  - { id: cost-fixed, block: cost-structure, kind: evidence, risk: 3, text: "Fixed costs of about $4,600 a month, led by marketing, rent and the founders' pay", note: 'Lease, quotes and the marketing plan' }
+  - { id: cost-variable, block: cost-structure, kind: assumption, risk: 4, text: 'Variable cost of about $9.10 a box: concentrate, bottle washing and delivery', note: 'Cost the pilot boxes line by line' }
+updated: '2026-11-03'

@@ -254,6 +254,7 @@ export interface Addition {
  * new notes are added to this list automatically from their `updated` dates.
  */
 export const ADDITIONS: Addition[] = [
+  { date: '2026-11-03', kind: 'Room', title: 'The Entrepreneurship and Innovation Lab', text: 'Six briefings and six tools for founders, from validating an idea to a business plan, worked on one fictional start-up.', href: '/entrepreneurship-lab/' },
   { date: '2026-11-03', kind: 'Simulation', title: 'The Boardroom', text: 'Three multi-round simulations: take a seat on the board of a fictional company and follow each decision through every function.', href: '/boardroom/' },
   { date: '2026-11-03', kind: 'Room', title: 'The Strategy Studio', text: 'Ten analysis tools on one consulting engagement, from SWOT to a recommendation memo.', href: '/strategy-studio/' },
   { date: '2026-11-03', kind: 'Platform', title: 'A new way round the platform', text: 'Five doors, Explore, Practise, Tools, Assess and Discover, each with a panel of its own.', href: '/rooms/' },

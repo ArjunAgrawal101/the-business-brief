@@ -1,0 +1,333 @@
+---
+/**
+ * The business plan outline builder. Twelve sections with the platform's
+ * prompts, the IB subtopics each draws on and the Lab tools that help. Without
+ * JavaScript every section can be written in and the page printed; with it,
+ * the plan is kept on this device, progress is counted as the learner writes,
+ * figures saved by the other Lab tools appear under the sections they belong
+ * to, and the outline exports as Markdown.
+ */
+import IbChips from './IbChips.astro';
+import type { LabToolOf } from '../../lib/lab/schemas';
+import { labHref } from '../../lib/integrity-lab';
+import { esc, jsonForScript } from '../../lib/markup';
+
+interface Props {
+  data: LabToolOf<'plan'>;
+  uid: string;
+  /** Tool titles by id, for the links under each section. */
+  toolTitles: Record<string, string>;
+}
+const { data, uid, toolTitles } = Astro.props;
+const total = data.sections.length;
+const config = { uid, sections: data.sections };
+---
+
+<div class="lab-tool lab-plan" data-ix="lab-plan" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The outline builder could not start. You can still write in each section and print the page.</p>
+  <p class="lab-note-nojs nojs-only">Without JavaScript you can write in each section and print the page, but nothing is saved, counted or exported.</p>
+
+  <div class="lab-tool__bar js-only" role="group" aria-label="Plan actions">
+    <button type="button" class="btn btn--small" data-md>Download as Markdown</button>
+    <button type="button" class="btn btn--small" data-copy>Copy as Markdown</button>
+    <button type="button" class="btn btn--small" data-print>Print the plan</button>
+    <button type="button" class="btn btn--small" data-clear>Clear the plan</button>
+  </div>
+
+  <div class="lab-plan__top">
+    <div class="field lab-plan__title">
+      <label for={`${uid}-title`}>Title of the plan</label>
+      <input class="input" id={`${uid}-title`} type="text" maxlength="120" autocomplete="off" placeholder="For example: Refill Round, business plan" data-title />
+    </div>
+    <div class="lab-plan__progress js-only" aria-live="off">
+      <p class="lab-plan__progress-text" data-progress>0 of {total} sections drafted, 0 words</p>
+      <span class="lab-bar" aria-hidden="true"><span data-progress-bar style="width:0%"></span></span>
+    </div>
+  </div>
+
+  <div class="lab-plan__layout">
+    <nav class="lab-plan__outline" aria-labelledby={`${uid}-outline-h`}>
+      <h3 class="lab-label" id={`${uid}-outline-h`}>Outline</h3>
+      <ol class="lab-plan__toc" role="list">
+        {
+          data.sections.map((s, i) => (
+            <li data-toc={s.id} class="is-empty">
+              <a href={`#${uid}-${s.id}`}>
+                <span class="num">{String(i + 1).padStart(2, '0')}</span> {s.title}
+              </a>
+              <span class="lab-plan__state js-only" data-state={s.id}>
+                Empty
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+      <label class="lab-plan__include js-only">
+        <input type="checkbox" checked data-include /> Include figures from my Lab tools in the export
+      </label>
+    </nav>
+
+    <form class="lab-plan__sections" data-form novalidate aria-label="The plan, section by section">
+      {
+        data.sections.map((s, i) => (
+          <section class="lab-plan__section" id={`${uid}-${s.id}`} aria-labelledby={`${uid}-${s.id}-h`}>
+            <h3 class="lab-plan__h" id={`${uid}-${s.id}-h`}>
+              <span class="lab-plan__no" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              {s.title}
+            </h3>
+            <div class="lab-plan__meta">
+              <IbChips codes={s.ib} label="Draws on" />
+              {s.tools.length > 0 && <p class="small lab-plan__tools" set:html={`Use: ${s.tools.map((t) => `<a href="${labHref(t)}">${esc(toolTitles[t] ?? t)}</a>`).join(', ')}`} />}
+            </div>
+            <ul class="lab-plan__prompts">
+              {s.prompts.map((p) => (
+                <li>{p}</li>
+              ))}
+            </ul>
+            <div class="field">
+              <label for={`${uid}-${s.id}-text`}>Your draft: {s.title.toLowerCase()}</label>
+              <textarea class="textarea" id={`${uid}-${s.id}-text`} rows="6" data-section={s.id} aria-describedby={`${uid}-${s.id}-count`} />
+              <span class="field__hint" id={`${uid}-${s.id}-count`} data-count={s.id}>
+                Suggested length: about {s.words} words.
+              </span>
+            </div>
+            <div class="lab-plan__figs" data-figs={s.id} hidden>
+              <p class="lab-label">From your Lab tools</p>
+              <ul data-figs-list={s.id} />
+            </div>
+          </section>
+        ))
+      }
+    </form>
+  </div>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/lab/plan';
+</script>
+
+<style>
+  .lab-plan__top {
+    display: grid;
+    gap: var(--sp-4);
+    align-items: end;
+  }
+
+  @media (min-width: 52rem) {
+    .lab-plan__top {
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    }
+  }
+
+  .lab-plan__progress {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .lab-plan__progress-text {
+    margin: 0;
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .lab-plan__progress .lab-bar {
+    height: 0.75rem;
+  }
+
+  .lab-plan__layout {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  @media (min-width: 64rem) {
+    .lab-plan__layout {
+      grid-template-columns: minmax(14rem, 17rem) minmax(0, 1fr);
+      align-items: start;
+    }
+
+    .lab-plan__outline {
+      position: sticky;
+      top: calc(var(--header-h) + var(--sp-4));
+    }
+  }
+
+  .lab-plan__toc {
+    display: grid;
+    gap: 0;
+    margin: 0 0 var(--sp-4);
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .lab-plan__toc li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--sp-2);
+    align-items: baseline;
+    margin: 0;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--rule-hair);
+    font-size: 0.875rem;
+  }
+
+  .lab-plan__toc a {
+    display: block;
+    min-height: 24px;
+    color: var(--text-strong);
+    text-decoration: none;
+  }
+
+  .lab-plan__toc a:hover {
+    color: var(--cobalt-text);
+    text-decoration: underline;
+  }
+
+  .lab-plan__toc .num {
+    font-family: var(--font-mono);
+    font-weight: 650;
+    color: var(--text-muted);
+  }
+
+  .lab-plan__state {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .lab-plan__state::before {
+    content: "";
+    width: 0.55rem;
+    height: 0.55rem;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+  }
+
+  .is-started .lab-plan__state {
+    color: var(--brass-text);
+  }
+
+  .is-started .lab-plan__state::before {
+    background: linear-gradient(90deg, currentColor 50%, transparent 50%);
+  }
+
+  .is-drafted .lab-plan__state {
+    color: var(--green-text);
+  }
+
+  .is-drafted .lab-plan__state::before {
+    background: currentColor;
+  }
+
+  .lab-plan__include {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: flex-start;
+    font-size: 0.875rem;
+    min-height: 24px;
+  }
+
+  .lab-plan__include input {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-top: 0.15rem;
+    accent-color: var(--bb-cobalt);
+  }
+
+  .lab-plan__sections {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .lab-plan__section {
+    padding: var(--sp-4) var(--sp-5) var(--sp-5);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--bb-ink);
+    background: var(--ivory-50);
+    scroll-margin-top: calc(var(--header-h) + var(--sp-4));
+  }
+
+  .lab-plan__h {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-3);
+    margin: 0;
+    font-size: var(--fs-h4);
+  }
+
+  .lab-plan__no {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--lab-accent-text);
+  }
+
+  .lab-plan__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-4);
+    margin-top: var(--sp-3);
+  }
+
+  .lab-plan__tools {
+    margin: 0;
+  }
+
+  .lab-plan__tools a {
+    display: inline-block;
+    min-height: 24px;
+  }
+
+  .lab-plan__prompts {
+    display: grid;
+    gap: 0.3rem;
+    margin: var(--sp-3) 0 var(--sp-4);
+    padding-left: 1.2em;
+    font-family: var(--font-serif);
+    color: var(--text-strong);
+  }
+
+  .lab-plan__section .textarea {
+    min-height: 9rem;
+    background: var(--surface-sheet);
+  }
+
+  .lab-plan__figs {
+    margin-top: var(--sp-4);
+    padding: var(--sp-3) var(--sp-4);
+    border: 1px solid var(--rule-hair);
+    border-left: 3px solid var(--lab-accent);
+    background: var(--surface-sheet);
+  }
+
+  .lab-plan__figs ul {
+    display: grid;
+    gap: var(--sp-1);
+    margin: 0;
+    padding-left: 1.1em;
+    font-size: 0.875rem;
+  }
+
+  @media print {
+    .lab-plan__outline,
+    .lab-plan__progress {
+      display: none !important;
+    }
+
+    .lab-plan__layout {
+      display: block;
+    }
+
+    .lab-plan__section {
+      break-inside: avoid;
+      background: #fff;
+    }
+  }
+</style>

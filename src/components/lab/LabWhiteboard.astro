@@ -1,0 +1,223 @@
+---
+/**
+ * The studio whiteboard: Refill Round, the Lab's fictional venture, worked
+ * through every tool. Each figure is computed at build time from the tool's
+ * own example data by the same functions the tools run in the browser, so
+ * the board cannot disagree with the tools.
+ */
+import { assess, DEFAULT_SETTINGS } from '../../lib/lab/feasibility';
+import { riskiest, summarize } from '../../lib/lab/canvas';
+import { unitEconomics } from '../../lib/lab/unit-economics';
+import { revenuePlan } from '../../lib/lab/revenue';
+import { costModel } from '../../lib/lab/costs';
+import { labHref, toolOf } from '../../lib/lab/content';
+import { fmtMoney, fmtNumber } from '../../lib/format';
+
+const [feasId, feas] = await toolOf('feasibility');
+const [canvasId, canvas] = await toolOf('canvas');
+const [unitId, unit] = await toolOf('unit-economics');
+const [revId, rev] = await toolOf('revenue');
+const [costId, cost] = await toolOf('costs');
+const [planId, plan] = await toolOf('plan');
+
+const weights = Object.fromEntries(feas.criteria.map((c) => [c.id, c.weight]));
+const a = assess(feas.ideas, feas.criteria, weights, { ...DEFAULT_SETTINGS, threshold: feas.threshold, floor: feas.floor });
+const lead = a.results[0]!;
+const cv = summarize({ name: canvas.example.name, entries: canvas.entries });
+const top = riskiest({ name: canvas.example.name, entries: canvas.entries }, 1)[0];
+const u = unitEconomics(unit.defaults);
+const r = revenuePlan(rev.streams);
+const k = costModel(cost);
+const name = (id: string) => feas.ideas.find((i) => i.id === id)?.name ?? id;
+
+const notes = [
+  {
+    tool: feasId,
+    title: feas.title,
+    figure: `${fmtNumber(lead.share, 0)}%`,
+    label: 'of the maximum score',
+    detail: `Ranked first of ${['no', 'one', 'two', 'three'][a.results.length] ?? a.results.length} ideas, but ${a.optimism?.passes ? 'it survives' : 'it fails'} the optimism test${a.optimism && !a.optimism.leads ? `: ${name(a.optimism.overtakenBy ?? '')} would overtake it` : ''}.`,
+  },
+  {
+    tool: canvasId,
+    title: canvas.title,
+    figure: `${cv.assumptions} of ${cv.entries}`,
+    label: 'entries are still assumptions',
+    detail: top ? `Test first: ${top.text.charAt(0).toLowerCase()}${top.text.slice(1)}.` : 'Every entry is backed by evidence.',
+  },
+  {
+    tool: unitId,
+    title: unit.title,
+    figure: `${fmtNumber(u.ratio ?? 0, 1)} to 1`,
+    label: 'lifetime value to acquisition cost',
+    detail: `Each subscriber costs ${fmtMoney(u.cac ?? 0, unit.currency, 0)} to win and pays it back in ${fmtNumber(u.payback ?? 0, 1)} months, if churn really is ${fmtNumber(unit.defaults.churn, 0)}% a month.`,
+  },
+  {
+    tool: revId,
+    title: rev.title,
+    figure: fmtMoney(r.revenue, rev.currency, 0),
+    label: 'revenue in the first year',
+    detail: `From ${fmtMoney(r.first, rev.currency, 0)} in month 1 to ${fmtMoney(r.last, rev.currency, 0)} in month ${r.months.length}, with ${fmtNumber(r.endSubscribers)} subscribers by then.`,
+  },
+  {
+    tool: costId,
+    title: cost.title,
+    figure: k.runOut === null ? `${k.runway}+ months` : `${k.runway} months`,
+    label: 'of runway on the expected sales',
+    detail: k.gap > 0 ? `Sales cover the outgoings only from month ${k.breakEvenMonth ?? 'beyond the projection'}, so about ${fmtMoney(k.gap, cost.currency, 0)} more is needed.` : 'The cash lasts the whole projection.',
+  },
+  {
+    tool: planId,
+    title: plan.title,
+    figure: `${plan.sections.length} sections`,
+    label: 'for your own plan',
+    detail: 'The figures you save in the other tools appear under the sections they belong to, ready to export.',
+  },
+];
+---
+
+<div class="lab-whiteboard lab-board-wall">
+  <div class="lab-board-wall__head">
+    <p class="lab-board-wall__name">Refill Round</p>
+    <p class="small muted">A fictional subscription refill service. Every figure is simulated, and comes from each tool's example.</p>
+  </div>
+  <ul class="lab-board-wall__notes" role="list">
+    {
+      notes.map((n) => (
+        <li class="lab-pin">
+          <span class="lab-pin__tool">{n.title}</span>
+          <span class="lab-pin__figure">{n.figure}</span>
+          <span class="lab-pin__label">{n.label}</span>
+          <span class="lab-pin__detail">{n.detail}</span>
+          <a class="lab-pin__link" href={labHref(n.tool)}>
+            Open the tool<span class="sr-only">: {n.title}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .lab-board-wall {
+    padding: clamp(var(--sp-4), 3.5vw, var(--sp-6));
+  }
+
+  .lab-board-wall__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--sp-1) var(--sp-4);
+    padding-bottom: var(--sp-3);
+    border-bottom: 2px solid var(--bb-ink);
+  }
+
+  .lab-board-wall__head p {
+    margin: 0;
+  }
+
+  .lab-board-wall__name {
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  .lab-board-wall__notes {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-4);
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 40rem) {
+    .lab-board-wall__notes {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .lab-board-wall__notes {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .lab-pin {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto auto 1fr auto;
+    gap: var(--sp-1);
+    margin: 0;
+    padding: var(--sp-4) var(--sp-4) var(--sp-3);
+    background: var(--surface-sheet);
+    border: 1px solid var(--bb-ink);
+    box-shadow: 4px 4px 0 var(--surface-sunk);
+  }
+
+  .lab-pin::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: var(--sp-4);
+    width: 2.5rem;
+    height: 3px;
+    background: var(--lab-accent);
+  }
+
+  .lab-pin:hover {
+    box-shadow: 4px 4px 0 var(--ivory-300);
+  }
+
+  .lab-pin:focus-within {
+    outline: var(--focus-ring);
+    outline-offset: 3px;
+  }
+
+  .lab-pin__tool {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .lab-pin__figure {
+    margin-top: var(--sp-2);
+    font-family: var(--font-display);
+    font-size: clamp(1.875rem, 1.5rem + 1.2vw, 2.5rem);
+    font-weight: 650;
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-strong);
+  }
+
+  .lab-pin__label {
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .lab-pin__detail {
+    font-size: 0.9375rem;
+    color: var(--text-body);
+  }
+
+  .lab-pin__link {
+    justify-self: start;
+    margin-top: var(--sp-2);
+    min-height: 24px;
+    font-weight: 600;
+  }
+
+  .lab-pin__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .lab-pin__link:focus-visible {
+    outline: none;
+  }
+</style>

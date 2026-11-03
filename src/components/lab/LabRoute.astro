@@ -1,0 +1,166 @@
+---
+/**
+ * The founder's route through the Lab, drawn as a blueprint: six stations,
+ * each with the question a founder is answering, the briefing to read and the
+ * tool to use. Built from the briefings and tools, paired by order.
+ */
+import { labHref, route } from '../../lib/lab/content';
+
+const stations = await route();
+---
+
+<div class="lab-blueprint lab-route">
+  <p class="lab-route__sheet" aria-hidden="true"><span>Sheet 01</span><span>The founder's route</span><span>Six stations</span></p>
+  <ol class="lab-route__stations" role="list">
+    {
+      stations.map((s) => (
+        <li class="lab-route__station">
+          <span class="lab-route__node" aria-hidden="true" />
+          <span class="lab-route__no" aria-hidden="true">
+            {String(s.step).padStart(2, '0')}
+          </span>
+          <h3 class="lab-route__step">
+            <span class="sr-only">Step {s.step}: </span>
+            {s.briefing[1].step}
+          </h3>
+          <p class="lab-route__q">{s.briefing[1].question}</p>
+          <dl class="lab-route__links">
+            <div>
+              <dt>Read</dt>
+              <dd>
+                <a href={labHref(s.briefing[0])}>{s.briefing[1].title}</a>
+              </dd>
+            </div>
+            <div>
+              <dt>Use</dt>
+              <dd>
+                <a href={labHref(s.tool[0])}>{s.tool[1].title}</a>
+              </dd>
+            </div>
+          </dl>
+        </li>
+      ))
+    }
+  </ol>
+</div>
+
+<style>
+  .lab-route {
+    padding: clamp(var(--sp-5), 4vw, var(--sp-7)) clamp(var(--sp-4), 4vw, var(--sp-7));
+  }
+
+  .lab-route__sheet {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-4);
+    margin: 0 0 var(--sp-6);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-on-ink-muted);
+  }
+
+  .lab-route__sheet span:first-child {
+    color: var(--gold-400);
+  }
+
+  .lab-route__stations {
+    display: grid;
+    gap: var(--sp-6) var(--sp-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 48rem) {
+    .lab-route__stations {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 72rem) {
+    .lab-route__stations {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .lab-route__station {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+    margin: 0;
+    padding-top: var(--sp-5);
+    border-top: 1px solid rgba(244, 239, 228, 0.5);
+  }
+
+  /* A dimension line's end mark, where each station meets the route. */
+  .lab-route__node {
+    position: absolute;
+    top: -0.4rem;
+    left: 0;
+    width: 0.8rem;
+    height: 0.8rem;
+    border: 1.5px solid var(--gold-400);
+    border-radius: 50%;
+    background: var(--lab-ink);
+  }
+
+  .lab-route__no {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--gold-400);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .lab-route__step {
+    margin: 0;
+    color: var(--text-on-ink);
+    font-size: 1.3125rem;
+    line-height: var(--lh-snug);
+  }
+
+  .lab-route__q {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--text-on-ink-muted);
+  }
+
+  .lab-route__links {
+    display: grid;
+    gap: var(--sp-2);
+    margin: var(--sp-2) 0 0;
+  }
+
+  .lab-route__links > div {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: var(--sp-2);
+    align-items: first baseline;
+  }
+
+  .lab-route__links dt {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold-400);
+  }
+
+  .lab-route__links dd {
+    margin: 0;
+  }
+
+  .lab-route__links a {
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: rgba(201, 168, 102, 0.6);
+    text-underline-offset: 0.2em;
+  }
+</style>

@@ -1,0 +1,185 @@
+---
+/**
+ * The revenue model planner. The default state is Refill Round's three
+ * streams, forecast on the server by src/lib/lab/revenue.ts; the script lets
+ * the learner add, change and remove streams, recalculates the forecast, the
+ * chart and the setbacks, keeps the plan on this device and exports CSV.
+ */
+import { readRevenue, revenuePlan, revenueSensitivity, MAX_STREAMS, type StreamDraft } from '../../lib/lab/revenue';
+import { revenueSvg } from '../../lib/lab/charts';
+import { legendHtml, revenueFiguresHtml, revenueTableHtml, sensitivityHtml } from '../../lib/lab/render';
+import { streamHtml } from '../../lib/lab/forms';
+import type { LabToolOf } from '../../lib/lab/schemas';
+import { jsonForScript } from '../../lib/markup';
+
+interface Props {
+  data: LabToolOf<'revenue'>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const cur = data.currency;
+const m = revenuePlan(data.streams);
+const sens = revenueSensitivity(data.streams);
+const reading = readRevenue(m, sens, cur);
+const drafts = data.streams as StreamDraft[];
+const config = { uid, currency: cur, example: drafts };
+const chartId = `${uid}-chart`;
+---
+
+<div class="lab-tool lab-rev" data-ix="lab-revenue" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The planner could not start. The forecast below is Refill Round's example.</p>
+  <p class="lab-note-nojs nojs-only">Without JavaScript the forecast below is for Refill Round's example, and changing an input does not recalculate it.</p>
+
+  <div class="lab-tool__bar js-only" role="group" aria-label="Planner actions">
+    <button type="button" class="btn btn--small" data-clear>Start from blank</button>
+    <button type="button" class="btn btn--small" data-example>Load the example</button>
+    <button type="button" class="btn btn--small" data-csv>Download the forecast (CSV)</button>
+    <button type="button" class="btn btn--small" data-print>Print</button>
+  </div>
+
+  <form class="lab-rev__form" data-form novalidate aria-label="Revenue streams">
+    <div class="lab-rev__head">
+      <h3 class="lab-label">Revenue streams, up to {MAX_STREAMS}</h3>
+      <div class="field lab-rev__currency">
+        <label for={`${uid}-currency`}>Currency symbol</label>
+        <input class="input" id={`${uid}-currency`} type="text" maxlength="4" autocomplete="off" value={cur} data-currency />
+      </div>
+    </div>
+    <ol class="lab-rev__streams" role="list" data-streams set:html={drafts.map((s, i) => streamHtml(s, i + 1, uid, cur)).join('')} />
+    <p class="field__error" data-err="list" />
+    <button type="button" class="btn btn--small lab-add js-only" data-add>Add a stream</button>
+  </form>
+
+  <div class="lab-results">
+    <h3 class="lab-label">The forecast</h3>
+    <dl class="figs" data-figures set:html={revenueFiguresHtml(m, cur)} />
+    <div class="lab-reading">
+      <p><strong>Reading.</strong> <span data-interp>{reading.reading}</span></p>
+      <p class="muted"><strong>Implication.</strong> <span data-impl>{reading.implication}</span></p>
+    </div>
+    <p class="lab-saved js-only">Your streams are kept on this device only.</p>
+  </div>
+
+  <figure class="lab-figure">
+    <div class="chart-scroll" role="region" aria-label="Revenue chart" tabindex="0" data-chart set:html={revenueSvg(m, { currency: cur, id: chartId })} />
+    <div data-legend set:html={legendHtml(m, `${uid}-key`)} />
+    <figcaption>Revenue each month, stacked by stream; each stream has its own colour and pattern. The figures are in the table below.</figcaption>
+  </figure>
+
+  <section aria-labelledby={`${uid}-table-h`}>
+    <h3 class="lab-label" id={`${uid}-table-h`}>Month by month</h3>
+    <div class="table-scroll" role="region" aria-label="Revenue forecast by month" tabindex="0">
+      <table class="table lab-rev__table" data-table set:html={revenueTableHtml(m, cur)} />
+    </div>
+  </section>
+
+  <section aria-labelledby={`${uid}-what-h`}>
+    <h3 class="lab-label" id={`${uid}-what-h`}>What if? Plausible setbacks, one at a time</h3>
+    <div class="table-scroll" role="region" aria-label="Setbacks to the forecast" tabindex="0">
+      <table class="table">
+        <caption class="sr-only">The year's revenue if one assumption turns out worse, the others unchanged</caption>
+        <thead>
+          <tr><th scope="col">Setback</th><th scope="col" class="n">Year's revenue</th><th scope="col" class="n">Change</th><th scope="col" class="n">Change, %</th></tr>
+        </thead>
+        <tbody data-sens set:html={sensitivityHtml(sens, m.revenue, cur)} />
+      </table>
+    </div>
+    <p class="small muted">The setbacks are different sizes on purpose: each is a plausible bad case for that assumption, not a common percentage.</p>
+  </section>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/lab/revenue';
+</script>
+
+<style>
+  .lab-rev__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--sp-3) var(--sp-5);
+    padding-bottom: var(--sp-3);
+    border-bottom: 2px solid var(--rule-ink);
+  }
+
+  .lab-rev__head .lab-label {
+    margin: 0;
+  }
+
+  .lab-rev__currency .input {
+    max-width: 6rem;
+  }
+
+  .lab-rev__streams {
+    display: grid;
+    gap: var(--sp-4);
+    margin: var(--sp-4) 0 var(--sp-3);
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 64rem) {
+    .lab-rev__streams {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+  }
+
+  .lab-rev :global(.lab-stream) {
+    margin: 0;
+    padding: var(--sp-4);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--bb-ink);
+    background: var(--ivory-50);
+  }
+
+  .lab-rev :global(.lab-stream__legend) {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-3);
+    font-family: var(--font-display);
+    font-size: var(--fs-h4);
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .lab-rev :global(.lab-stream__no) {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--lab-accent-text);
+  }
+
+  .lab-rev :global(.lab-stream__top),
+  .lab-rev :global(.lab-stream__fields) {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: var(--sp-3);
+  }
+
+  .lab-rev :global(.lab-stream__fields) {
+    margin-top: var(--sp-3);
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .lab-rev :global(.lab-stream__fields[hidden]) {
+    display: none;
+  }
+
+  .lab-rev :global(.lab-stream__remove) {
+    margin-top: var(--sp-3);
+  }
+
+  .lab-rev :global(.field__error:empty) {
+    display: none;
+  }
+
+  .lab-rev__table :global(td.n strong) {
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+</style>

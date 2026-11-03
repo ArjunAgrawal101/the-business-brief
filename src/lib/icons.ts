@@ -21,6 +21,7 @@ export const ICONS = {
   'examiner-lens': '<circle cx="10" cy="10" r="6.5"/><path d="M15 15l6 6"/><path d="M7 8.5h6M7 11.5h4"/>',
   'ia-studio': '<path d="M5 3h13v18H5z"/><path d="M8.5 3v18"/><path d="M12 3v7l2-1.5 2 1.5V3"/>',
   'revision-brief': '<rect x="3" y="8" width="14" height="12"/><path d="M7 8V4h14v12h-4"/><path d="M6 12h8M6 15h5"/>',
+  'entrepreneurship-lab': '<path d="M9 3h6"/><path d="M10 3v6.5L4.5 19.5V21h15v-1.5L14 9.5V3"/><path d="M7 15h10"/><rect x="11" y="17" width="2" height="2" fill="currentColor"/>',
   /* Interface */
   search: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/>',
   rooms: '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>',

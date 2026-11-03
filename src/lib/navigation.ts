@@ -62,6 +62,7 @@ export const NAV: NavGroup[] = [
       { label: 'Market Studio', href: '/market-studio/', text: 'Market share, positioning and the marketing mix' },
       { label: 'People and Culture', href: '/people-and-culture/', text: 'Leadership, motivation, structure and culture' },
       { label: 'Operations Floor', href: '/operations-floor/', text: 'Location, capacity, productivity and stock control' },
+      { label: 'Entrepreneurship Lab', href: '/entrepreneurship-lab/', text: 'From an idea to a tested business model: canvas, unit economics, runway and a plan' },
     ],
   },
   {

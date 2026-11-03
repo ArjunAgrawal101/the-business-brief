@@ -1,0 +1,53 @@
+# The revenue model planner. Total revenue and revenue streams are IB content
+# (3.3, AO2) and sales forecasting is HL content (4.3, AO3); subscriptions,
+# churn and channel fees are enrichment. Refill Round is fictional and its
+# figures are simulated; the subscription stream uses the unit economics
+# calculator's figures ($24 a month, 45 new subscribers, 8% churn).
+title: Revenue model planner
+kind: revenue
+order: 4
+question: Where will the money come from, month by month?
+summary: Forecast twelve months of revenue from up to four streams, sold by the unit through a channel or by subscription, with channel fees, churn and plausible setbacks.
+lead: >
+  A revenue model says what customers pay for, how and how often. Turn it into a twelve-month forecast stream by
+  stream: products sold by the unit through your own shop or someone else's platform, and subscriptions that build
+  up as customers join and wear away as they leave. Then see which assumption the year depends on most.
+briefing: financial-projections
+ib:
+  status: mixed
+  statement: >
+    Total revenue and revenue streams are IB content (3.3, AO2), and at HL so are the benefits and limitations of
+    sales forecasting (4.3, AO3). Subscriptions, churn and channel fees are enrichment: standard start-up terms the
+    guide does not use. The guide's own forecasting methods are on the HL sales forecasting page.
+  links:
+    - { code: '3.3', note: 'Total revenue and revenue streams, with examples (AO2)' }
+    - { code: '4.3', note: 'HL: the benefits and limitations of sales forecasting (AO3)' }
+    - { code: '4.5', note: 'Place: the choice of distribution channel changes the revenue kept from each sale' }
+steps:
+  - Add up to four revenue streams. Choose units for products or orders sold one at a time, and subscription for customers who pay every month.
+  - For a unit stream, enter the price, the units sold in month 1, the monthly growth in units and any share of the price a channel keeps.
+  - For a subscription, enter the monthly price, any subscribers you already have, the new subscribers in month 1, the monthly growth in new subscribers and the share of subscribers who leave each month.
+  - Read the forecast, then the table of setbacks, which makes each assumption worse on its own and shows what the year loses.
+cautions:
+  - A forecast is a set of assumptions written as numbers. Growth rates in particular are guesses until customers have behaved that way for several months.
+  - Steady percentage growth compounds. At 10% a month, month 12 is 2.85 times month 1 (1.1 to the power 11), and real growth is rarely so smooth.
+  - Revenue is not cash and it is not profit. Customers may pay late, and every sale has costs. The start-up cost calculator turns sales into cash.
+  - Channel fees are a cost of the sale. A marketplace or delivery app can bring customers you could not reach alone, at the price of a share of every order.
+example:
+  name: Refill Round
+  summary: >
+    Refill Round, the fictional subscription refill service, has three revenue streams: the subscription box at $24 a
+    month; one-off refill orders through its own website at about $9; and one-off orders through a local delivery
+    app at $11, of which the app keeps 20%. All figures are simulated.
+definitions:
+  - { term: Revenue stream, text: 'A distinct source of revenue, such as one product, one service or one channel. Total revenue is the sum of the streams (3.3).' }
+  - { term: Subscription, text: 'An agreement under which a customer pays regularly, usually monthly, until they cancel.' }
+  - { term: Churn, text: 'The share of subscribers who cancel in a month. Each month, churn removes subscribers and new ones join.' }
+  - { term: Channel fee, text: 'The share of each sale kept by an intermediary that sells for you, such as a marketplace or a delivery app.' }
+  - { term: Monthly growth rate, text: 'The percentage by which units, or new subscribers, rise each month. 5% a month compounds to about 71% more after 11 months.' }
+currency: $
+streams:
+  - { id: subscription, kind: subscription, label: Subscription boxes, price: 24, start: 0, joining: 45, growth: 6, churn: 8, fee: 0 }
+  - { id: website, kind: units, label: Website orders, price: 9, units: 110, growth: 5, fee: 0 }
+  - { id: delivery-app, kind: units, label: Delivery app orders, price: 11, units: 40, growth: 8, fee: 20 }
+updated: '2026-11-03'

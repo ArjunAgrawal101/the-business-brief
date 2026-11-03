@@ -33,6 +33,7 @@ The platform has no accounts and stores nothing on a server. A static site is th
 | questions, glossary | several YAML files, each a list of entries with ids | custom `yamlList` loader (checks for duplicate ids) |
 | calculations, assessment, commandTerms, concepts, pathways, modules, sources, claims, resources | one YAML file of entries in `src/content/data/` | Astro `file` |
 | studio | one YAML file per Strategy Studio tool, and one for its engagement, in `src/content/studio/` (schema in `src/lib/schemas-strategy.ts`) | Astro `glob` |
+| briefings, labTools | one YAML file per entry in `src/content/briefings/` and `src/content/lab/`, with their schemas in `src/lib/lab/schemas.ts` | Astro `glob` |
 
 Two kinds of material are code rather than content, because they are drawn or computed: the diagram library (`src/lib/diagrams.ts`, with the drawings in `src/lib/figures/`) and the Resources Library catalogue (`src/lib/resources.ts`), which joins the curated `resources.yaml` with entries generated from the content (mindmaps, notes, briefs, revision briefs, cases, Decision Rooms, tools, practice and the diagram groups).
 
@@ -55,7 +56,8 @@ Schemas live in `src/lib/schemas.ts`. Every content block, exhibit and interacti
 - the ratio desk's statements balance and link across the two years, and every strategy keeps them balanced; the Market Studio and Operations Floor data pass their own checks (`src/lib/integrity-studio.ts`);
 - in the Strategy Studio (`src/lib/integrity-strategy.ts`, run by the studio's pages and its unit test), a tool called an IB toolkit tool names its entry in `src/content/tools` and has the same level, a tool outside the toolkit is labelled enrichment and says so, every subtopic, Decision Room and toolkit guide named exists, and every worked example reads back unchanged through the tool's own reader of saved work and passes the tool's checks;
 - for the 2.0 learning collections (`src/lib/integrity-learning.ts`): every mindmap names a real subtopic in the right unit (one map each), is marked HL exactly when its subtopic is HL only, has enough nodes to revise from (16 or more), gives every branch at least two children and a core node for the revision view, gives every formula node its formula, links only to glossary terms that exist and gives the sources it was checked against; every set of notes carries the guide's exact subtopic title, is marked HL when its subtopic is, and names only glossary terms, questions, subtopics, sources and diagrams that exist; every glossary entry names a real subtopic, has a name no other entry uses, is not related to itself, and is marked HL when all its subtopics are HL only;
-- a resource is offered as a download only when its file exists in `public/` or is one the build writes (`/downloads/glossary.csv`, `/downloads/mindmaps/*.svg`, `/downloads/diagrams/*.svg`).
+- a resource is offered as a download only when its file exists in `public/` or is one the build writes (`/downloads/glossary.csv`, `/downloads/mindmaps/*.svg`, `/downloads/diagrams/*.svg`);
+- for the Entrepreneurship and Innovation Lab (`src/lib/integrity-lab.ts`, run by `src/lib/lab/content.ts` before any Lab page is built): every briefing section is mapped to an IB subtopic, marked as enrichment, or both; every idea in a briefing's register says whether it is IB content, a toolkit tool or enrichment, with the guide's page for the first two; every code, glossary term, tool and source resolves; each tool's example is a valid input to its own model; briefings and tools pair one to one by order; and the room's entry in `modules.yaml` lists exactly the Lab's pages and only the subtopics its material maps to.
 
 The same checks run in the unit tests (`tests/unit/integrity.test.ts`), which load the YAML directly without Astro.
 
@@ -76,6 +78,7 @@ The same checks run in the unit tests (`tests/unit/integrity.test.ts`), which lo
 | `src/lib/plan.ts` | Critical path analysis: earliest and latest times, total and free float, the critical path |
 | `src/lib/strategy/*.ts` | The Strategy Studio's ten tools: each tool's model, checks, reader of saved work, editor and analysis HTML, chart and exports; the decision tree reuses `decision-tree.ts`, the force field `force-field.ts` and the option appraisal the weighted scoring in `operations.ts` |
 | `src/lib/market.ts`, `src/lib/operations.ts` | Market share and growth, position maps; capacity utilization, productivity, stock control, weighted location scores |
+| `src/lib/lab/` | The Entrepreneurship and Innovation Lab: start-up costs and runway (`costs.ts`), the revenue model (`revenue.ts`), unit economics (`unit-economics.ts`), the feasibility assessment (`feasibility.ts`, on the weighted scoring of `operations.ts`), the Business Model Canvas (`canvas.ts`), the business plan outline and its digest of the other tools (`plan.ts`), with their charts, renderers and form markup |
 | `src/lib/ia.ts` | The IA planner's checks on supporting documents, dates, word count and self-marks, each citing its page |
 | `src/lib/format.ts` | en-GB number and money formatting with the typographic minus |
 | `src/lib/charts.ts`, `cashflow-chart.ts`, `plan-chart.ts`, `charts-studio.ts` | SVG charts (break-even, decision tree, scale, cash flow, plans, the studio tools), each with a title and a text description |
@@ -131,6 +134,7 @@ The quiz engine (`src/scripts/quiz.ts`) dispatches a bubbling `quiz:progress` ev
 | `/ib/`, `/ib/map/`, `/ib/coverage/`, `/ib/concepts/` | The IB course, the course map, the coverage matrix, concepts |
 | `/search/`, `/sources/` | Search across everything; the sources and claims register |
 | `/pathways/`, `/pathways/[id]/` | Audience pathways |
+| `/entrepreneurship-lab/`, `/entrepreneurship-lab/[slug]/` | The Entrepreneurship and Innovation Lab: its home, six briefings and six tools, from the `briefings` and `labTools` collections |
 | `/about/`, `/platform/`, `/accessibility/`, `/privacy/` | About the creator and the platform |
 | `/sitemap.xml`, `/robots.txt`, `/404.html` | Generated |
 

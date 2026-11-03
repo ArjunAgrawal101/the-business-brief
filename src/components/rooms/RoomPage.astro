@@ -24,8 +24,12 @@ interface Props {
   section?: string;
   /** Number of the first section after the slot's own sections. */
   firstSection?: number;
+  /** The learning environment, passed to the layout as its room (see BaseLayout). */
+  room?: string;
+  /** False when the room's own material in the slot already lists every item, so the generic list is not repeated. */
+  listItems?: boolean;
 }
-const { id, room: identity, description, section, firstSection = 1 } = Astro.props;
+const { id, description, section, firstSection = 1, room: roomId, listItems = true } = Astro.props;
 const all = await modulesInOrder();
 const room = all.find((m) => m.id === id);
 if (!room) throw new Error(`RoomPage: no module "${id}" in src/content/data/modules.yaml`);
@@ -40,12 +44,12 @@ const served = r.syllabus.map((code) => {
 });
 const index = all.findIndex((m) => m.id === id) + 1;
 let n = firstSection;
-const itemsNo = r.items.length ? n++ : 0;
+const itemsNo = r.items.length && listItems ? n++ : 0;
 const syllabusNo = served.length ? n++ : 0;
 const plannedNo = r.planned.length ? n++ : 0;
 ---
 
-<BaseLayout title={r.name} description={description ?? r.purpose} section={section ?? id} room={identity}>
+<BaseLayout title={r.name} description={description ?? r.purpose} section={section ?? id} room={roomId}>
   <div class="wrap">
     <header class="room-intro">
       <Breadcrumbs trail={[{ label: 'All rooms', href: '/rooms/' }, { label: r.name }]} />
@@ -65,7 +69,7 @@ const plannedNo = r.planned.length ? n++ : 0;
   <div class="wrap page-body">
     <slot />
     {
-      r.items.length > 0 && (
+      r.items.length > 0 && listItems && (
         <section aria-labelledby={`${id}-items-h`}>
           <SectionHead no={itemsNo} title="In this room" id={`${id}-items-h`} />
           <ul class="room-items" role="list" data-reveal="group">

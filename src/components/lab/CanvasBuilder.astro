@@ -1,0 +1,519 @@
+---
+/**
+ * The Business Model Canvas builder. The default state is Refill Round's
+ * canvas, rendered on the server from src/lib/lab/canvas.ts: the editor, the
+ * riskiest assumptions and the nine-block sheet. Without JavaScript every
+ * entry can still be edited and the page printed. The script adds and removes
+ * entries, re-ranks the assumptions as the learner types, keeps the canvas on
+ * this device, and saves and loads it as a JSON file.
+ */
+import { FILL_ORDER, readCanvas, riskiest, type BlockId, type Canvas } from '../../lib/lab/canvas';
+import { boardHtml, riskiestHtml } from '../../lib/lab/render';
+import { blockOrderMap, entryHtml } from '../../lib/lab/forms';
+import type { LabToolOf } from '../../lib/lab/schemas';
+import { jsonForScript } from '../../lib/markup';
+
+interface Props {
+  data: LabToolOf<'canvas'>;
+  uid: string;
+}
+const { data, uid } = Astro.props;
+const canvas: Canvas = { name: data.example.name, entries: data.entries };
+const labels = Object.fromEntries(data.blocks.map((b) => [b.id, b.label])) as Record<BlockId, string>;
+const order = blockOrderMap(FILL_ORDER);
+const blocks = FILL_ORDER.map((id) => data.blocks.find((b) => b.id === id)!);
+const top = riskiest(canvas);
+const reading = readCanvas(canvas, labels);
+const config = { uid, labels, example: canvas };
+---
+
+<div class="lab-tool lab-canvas" data-ix="lab-canvas" id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The canvas builder could not start. You can still edit the entries below and print the page.</p>
+  <p class="lab-note-nojs nojs-only">Without JavaScript you can edit the entries and print the page, but entries cannot be added or removed, the ranking does not update and nothing is saved.</p>
+
+  <div class="lab-tool__bar js-only" role="group" aria-label="Canvas actions">
+    <button type="button" class="btn btn--small" data-blank>Start a blank canvas</button>
+    <button type="button" class="btn btn--small" data-example>Load the example</button>
+    <button type="button" class="btn btn--small" data-json>Download as JSON</button>
+    <button type="button" class="btn btn--small" data-import>Open a JSON file</button>
+    <input type="file" accept="application/json,.json" hidden data-file aria-label="Canvas file to open" />
+    <button type="button" class="btn btn--small" data-print>Print the canvas</button>
+  </div>
+
+  <div class="field lab-canvas__name">
+    <label for={`${uid}-name`}>Name of the business or idea</label>
+    <input class="input" id={`${uid}-name`} type="text" maxlength="120" autocomplete="off" value={canvas.name} data-name />
+  </div>
+
+  <div class="lab-canvas__work">
+    <form class="lab-canvas__editor" data-form novalidate aria-label="Canvas entries, block by block">
+      {
+        blocks.map((b) => (
+          <fieldset class="lab-block" data-block={b.id}>
+            <legend class="lab-block__legend">
+              <span class="lab-block__no" aria-hidden="true">{order[b.id]}</span>
+              {b.label}
+            </legend>
+            <p class="lab-block__prompt">{b.prompt}</p>
+            <p class="field__hint">{b.hint}</p>
+            <ol class="lab-entries" role="list" data-entries={b.id} set:html={canvas.entries.filter((e) => e.block === b.id).map((e, i) => entryHtml(e, i + 1, uid, b.label)).join('')} />
+            <button type="button" class="btn btn--small lab-add js-only" data-add={b.id}>
+              Add an entry<span class="sr-only"> to {b.label}</span>
+            </button>
+          </fieldset>
+        ))
+      }
+    </form>
+
+    <aside class="lab-canvas__aside lab-whiteboard lab-canvas__panel" aria-labelledby={`${uid}-test-h`} tabindex="0">
+      <h3 class="lab-label" id={`${uid}-test-h`}>Test these first</h3>
+      <div data-riskiest set:html={riskiestHtml(top, labels)} />
+      <div class="lab-canvas__reading">
+        <p data-interp>{reading.reading}</p>
+        <p class="muted" data-impl>{reading.implication}</p>
+      </div>
+      <p class="lab-saved js-only">Your canvas is kept on this device only.</p>
+    </aside>
+  </div>
+
+  <section class="lab-canvas__sheet" aria-labelledby={`${uid}-sheet-h`}>
+    <div class="lab-canvas__sheet-head">
+      <h3 class="lab-label" id={`${uid}-sheet-h`}>The canvas</h3>
+      <p class="lab-canvas__sheet-name" data-sheet-name>{canvas.name}</p>
+    </div>
+    <div class="lab-board lab-whiteboard" data-board set:html={boardHtml(canvas, labels, order)} />
+    <p class="small muted lab-canvas__key">
+      <span class="lab-note-key lab-note-key--evidence">Evidence: solid edge</span>
+      <span class="lab-note-key lab-note-key--assumption">Assumption: dashed edge</span>
+      Numbers give the order to fill the blocks, starting from the customer.
+    </p>
+  </section>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
+
+<script>
+  import '../../scripts/lab/canvas';
+</script>
+
+<style>
+  .lab-canvas__name {
+    max-width: 32rem;
+  }
+
+  .lab-canvas__work {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  @media (min-width: 64rem) {
+    .lab-canvas__work {
+      grid-template-columns: minmax(0, 1.55fr) minmax(18rem, 1fr);
+      align-items: start;
+    }
+
+    .lab-canvas__panel {
+      position: sticky;
+      top: calc(var(--header-h) + var(--sp-4));
+      max-height: calc(100vh - var(--header-h) - var(--sp-6));
+      overflow-y: auto;
+    }
+  }
+
+  .lab-canvas__editor {
+    display: grid;
+    gap: var(--sp-4);
+  }
+
+  .lab-block {
+    padding: var(--sp-4) !important;
+    border: 1px solid var(--rule) !important;
+    border-left: 3px solid var(--bb-ink) !important;
+    background: var(--ivory-50);
+  }
+
+  .lab-block__legend {
+    float: left;
+    width: 100%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-family: var(--font-display);
+    font-size: var(--fs-h4);
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .lab-block__no {
+    display: inline-grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    background: var(--bb-ink);
+    color: var(--text-on-ink);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 650;
+  }
+
+  .lab-block__prompt {
+    clear: both;
+    margin: 0;
+    padding-top: var(--sp-2);
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    color: var(--text-strong);
+  }
+
+  .lab-entries {
+    display: grid;
+    gap: var(--sp-3);
+    margin: var(--sp-3) 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .lab-canvas :global(.lab-entry) {
+    display: grid;
+    gap: var(--sp-2) var(--sp-3);
+    margin: 0;
+    padding: var(--sp-3);
+    background: var(--surface-sheet);
+    border: 1px solid var(--rule-control);
+  }
+
+  .lab-canvas :global(.lab-entry--assumption) {
+    border-style: dashed;
+  }
+
+  .lab-canvas :global(.lab-entry--evidence) {
+    border-left: 3px solid var(--green-text);
+  }
+
+  .lab-canvas :global(.lab-entry .textarea) {
+    min-height: 4.25rem;
+  }
+
+  @media (max-width: 40rem) {
+    .lab-canvas :global(.lab-entry .textarea) {
+      min-height: 6rem;
+    }
+  }
+
+  .lab-canvas :global(.lab-entry__meta) {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    gap: var(--sp-2) var(--sp-3);
+  }
+
+  .lab-canvas :global(.lab-entry__remove) {
+    justify-self: start;
+  }
+
+  .lab-canvas__reading {
+    display: grid;
+    gap: var(--sp-2);
+    margin-top: var(--sp-4);
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--rule-hair);
+    font-size: 0.9375rem;
+  }
+
+  .lab-canvas__reading p {
+    margin: 0;
+  }
+
+  .lab-canvas__panel {
+    padding: var(--sp-4) var(--sp-5);
+  }
+
+  .lab-canvas__panel:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .lab-canvas :global(.lab-risk-list) {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .lab-canvas :global(.lab-risk-list li) {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: var(--sp-3);
+    margin: 0;
+    padding: var(--sp-3);
+    background: var(--surface-sheet);
+    border: 1px solid var(--rule);
+    box-shadow: 3px 3px 0 var(--surface-sunk);
+  }
+
+  .lab-canvas :global(.lab-risk-list__no) {
+    display: inline-grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid var(--bb-ink);
+    font-family: var(--font-display);
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  .lab-canvas :global(.lab-risk-list__body) {
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .lab-canvas :global(.lab-risk-list__text) {
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .lab-canvas :global(.lab-risk-list__meta) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.6rem;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  .lab-canvas :global(.lab-risk) {
+    font-weight: 650;
+  }
+
+  .lab-canvas :global(.lab-risk--5),
+  .lab-canvas :global(.lab-risk--4) {
+    color: var(--signal-text);
+  }
+
+  .lab-canvas :global(.lab-risk-list__test) {
+    font-size: 0.875rem;
+  }
+
+  .lab-canvas :global(.lab-risk-list__test--none) {
+    color: var(--brass-text);
+    font-style: italic;
+  }
+
+  .lab-canvas__sheet-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-2) var(--sp-4);
+  }
+
+  .lab-canvas__sheet-head .lab-label {
+    margin: 0;
+  }
+
+  .lab-canvas__sheet-name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-h4);
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .lab-board {
+    display: grid;
+    gap: 0;
+    margin-top: var(--sp-3);
+    border: 2px solid var(--bb-ink);
+  }
+
+  @media (min-width: 60rem), print {
+    .lab-board {
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      grid-template-rows: auto auto auto;
+    }
+
+    .lab-board :global(.lab-board__block--key-partners) {
+      grid-column: 1 / 3;
+      grid-row: 1 / 3;
+    }
+
+    .lab-board :global(.lab-board__block--key-activities) {
+      grid-column: 3 / 5;
+      grid-row: 1;
+    }
+
+    .lab-board :global(.lab-board__block--key-resources) {
+      grid-column: 3 / 5;
+      grid-row: 2;
+    }
+
+    .lab-board :global(.lab-board__block--value-propositions) {
+      grid-column: 5 / 7;
+      grid-row: 1 / 3;
+    }
+
+    .lab-board :global(.lab-board__block--customer-relationships) {
+      grid-column: 7 / 9;
+      grid-row: 1;
+    }
+
+    .lab-board :global(.lab-board__block--channels) {
+      grid-column: 7 / 9;
+      grid-row: 2;
+    }
+
+    .lab-board :global(.lab-board__block--customer-segments) {
+      grid-column: 9 / 11;
+      grid-row: 1 / 3;
+    }
+
+    .lab-board :global(.lab-board__block--cost-structure) {
+      grid-column: 1 / 6;
+      grid-row: 3;
+    }
+
+    .lab-board :global(.lab-board__block--revenue-streams) {
+      grid-column: 6 / 11;
+      grid-row: 3;
+    }
+  }
+
+  @media screen and (max-width: 59.99rem) {
+    .lab-board :global(.lab-board__block--customer-segments) { order: 1; }
+    .lab-board :global(.lab-board__block--value-propositions) { order: 2; }
+    .lab-board :global(.lab-board__block--channels) { order: 3; }
+    .lab-board :global(.lab-board__block--customer-relationships) { order: 4; }
+    .lab-board :global(.lab-board__block--revenue-streams) { order: 5; }
+    .lab-board :global(.lab-board__block--key-resources) { order: 6; }
+    .lab-board :global(.lab-board__block--key-activities) { order: 7; }
+    .lab-board :global(.lab-board__block--key-partners) { order: 8; }
+    .lab-board :global(.lab-board__block--cost-structure) { order: 9; }
+  }
+
+  .lab-board :global(.lab-board__block) {
+    min-height: 9rem;
+    padding: var(--sp-3);
+    border: 1px solid var(--rule-control);
+    background: rgba(255, 255, 255, 0.82);
+  }
+
+  .lab-board :global(.lab-board__name) {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin: 0 0 var(--sp-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-strong);
+  }
+
+  .lab-board :global(.lab-board__no) {
+    display: inline-grid;
+    place-items: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    background: var(--bb-ink);
+    color: var(--text-on-ink);
+    font-size: 0.6875rem;
+    letter-spacing: 0;
+  }
+
+  .lab-board :global(.lab-board__notes) {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .lab-board :global(.lab-note) {
+    display: grid;
+    gap: 0.15rem;
+    margin: 0;
+    padding: 0.45rem 0.55rem;
+    background: var(--surface-sheet);
+    border: 1.5px solid var(--bb-ink);
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    color: var(--text-strong);
+  }
+
+  .lab-board :global(.lab-note--assumption) {
+    border-style: dashed;
+    background: var(--surface-gold-wash);
+  }
+
+  .lab-board :global(.lab-note__meta) {
+    font-size: 0.6875rem;
+    color: var(--text-muted);
+  }
+
+  .lab-board :global(.lab-board__empty) {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-style: italic;
+    color: var(--text-muted);
+  }
+
+  .lab-canvas__key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2) var(--sp-4);
+    align-items: center;
+    margin-top: var(--sp-3);
+  }
+
+  .lab-note-key {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .lab-note-key::before {
+    content: "";
+    width: 1.1rem;
+    height: 0.8rem;
+    border: 1.5px solid var(--bb-ink);
+    background: var(--surface-sheet);
+  }
+
+  .lab-note-key--assumption::before {
+    border-style: dashed;
+    background: var(--surface-gold-wash);
+  }
+
+  @media print {
+    .lab-canvas__editor,
+    .lab-canvas__name,
+    .lab-canvas__panel .lab-saved {
+      display: none !important;
+    }
+
+    .lab-canvas__work {
+      display: block;
+    }
+
+    .lab-canvas__panel {
+      position: static;
+      max-height: none;
+      overflow: visible;
+    }
+
+    .lab-board {
+      break-inside: avoid;
+    }
+
+    .lab-board :global(.lab-board__block) {
+      min-height: 0;
+    }
+  }
+
+  /* The canvas is a landscape sheet. This stylesheet loads only on the canvas page. */
+  @page {
+    size: A4 landscape;
+    margin: 12mm;
+  }
+</style>

@@ -8,6 +8,9 @@ import ProvenanceTag from '../components/ui/ProvenanceTag.astro';
 import { corpus, modulesInOrder } from '../lib/content';
 
 const modules = await modulesInOrder();
+/** The number of modules in words, so the count follows the register in modules.yaml. */
+const NUMBER_WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
+const howMany = NUMBER_WORDS[modules.length] ?? String(modules.length);
 const c = await corpus();
 const interactions = Object.entries(c.interactives).sort((a, b) => a[1].title.localeCompare(b[1].title, 'en'));
 const CHAINS = [
@@ -22,7 +25,7 @@ const CHAINS = [
     trail={[{ label: 'Platform' }]}
     kicker="The platform"
     title="How The Business Brief works"
-    lead="One platform of many rooms, three chains of reasoning that run through all of them, and rules for evidence that every page follows. This page says what is live in this release and what is not."
+    lead={`One platform with ${howMany} modules, three chains of reasoning that run through all of them, and rules for evidence that every page follows. This page says what is live in this release and what is not.`}
   />
   <div class="wrap page-body">
     <section aria-labelledby="arch-h">

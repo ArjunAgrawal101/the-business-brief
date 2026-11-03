@@ -1,0 +1,69 @@
+---
+/**
+ * Moving through the Lab: the previous and next pages on the founder's route
+ * (each briefing, then the tool that goes with it), and every briefing and
+ * tool, with the current page marked.
+ */
+import { labHref, route, sequence } from '../../lib/lab/content';
+
+interface Props {
+  current: string;
+}
+const { current } = Astro.props;
+const seq = await sequence();
+const stations = await route();
+const i = seq.findIndex((p) => p.id === current);
+const prev = i > 0 ? seq[i - 1] : undefined;
+const next = i >= 0 && i < seq.length - 1 ? seq[i + 1] : undefined;
+const kindWord = (k: 'briefing' | 'tool') => (k === 'briefing' ? 'Briefing' : 'Tool');
+---
+
+<nav class="lab-nav" aria-labelledby="lab-nav-h">
+  <h2 id="lab-nav-h" class="lab-label">In the Lab</h2>
+  <div class="lab-nav__pager">
+    {
+      prev ? (
+        <a class="lab-nav__step" href={labHref(prev.id)} rel="prev">
+          <span class="lab-nav__dir">Back: {kindWord(prev.kind)}</span>
+          <span class="lab-nav__title">{prev.title}</span>
+        </a>
+      ) : (
+        <a class="lab-nav__step" href="/entrepreneurship-lab/">
+          <span class="lab-nav__dir">Back</span>
+          <span class="lab-nav__title">The Lab's home</span>
+        </a>
+      )
+    }
+    {
+      next ? (
+        <a class="lab-nav__step lab-nav__step--next" href={labHref(next.id)} rel="next">
+          <span class="lab-nav__dir">Next: {kindWord(next.kind)}</span>
+          <span class="lab-nav__title">{next.title}</span>
+        </a>
+      ) : (
+        <a class="lab-nav__step lab-nav__step--next" href="/entrepreneurship-lab/">
+          <span class="lab-nav__dir">Next</span>
+          <span class="lab-nav__title">Back to the Lab's home</span>
+        </a>
+      )
+    }
+  </div>
+  <div class="lab-nav__all">
+    <div>
+      <h3 class="lab-label">Briefings</h3>
+      <ol class="lab-nav__list" role="list">
+        {
+          stations.map((s) => (
+            <li>{s.briefing[0] === current ? <span aria-current="page">{s.briefing[1].title}</span> : <a href={labHref(s.briefing[0])}>{s.briefing[1].title}</a>}</li>
+          ))
+        }
+      </ol>
+    </div>
+    <div>
+      <h3 class="lab-label">Tools</h3>
+      <ol class="lab-nav__list" role="list">
+        {stations.map((s) => <li>{s.tool[0] === current ? <span aria-current="page">{s.tool[1].title}</span> : <a href={labHref(s.tool[0])}>{s.tool[1].title}</a>}</li>)}
+      </ol>
+    </div>
+  </div>
+</nav>
