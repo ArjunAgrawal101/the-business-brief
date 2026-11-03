@@ -10,6 +10,8 @@ const PORT = Number(process.env.PW_PORT ?? 4321);
 export default defineConfig({
   testDir: 'tests/e2e',
   fullyParallel: true,
+  // The axe scan of the largest pages (the glossary, search) takes most of the default 30 s on a busy machine.
+  timeout: 60_000,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   reporter: [['list'], ['html', { open: 'never', outputFolder: 'playwright-report' }]],
