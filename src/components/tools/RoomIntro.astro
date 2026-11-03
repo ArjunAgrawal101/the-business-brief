@@ -1,0 +1,103 @@
+---
+/**
+ * The opening of the People and Culture and Operations Floor pages: the
+ * room's mark, its number among the rooms, its status, its name and its lead,
+ * from src/content/data/modules.yaml. It follows the header of RoomPage.astro,
+ * so every room opens the same way, and takes the room's drawing from
+ * src/styles/rooms.css through the room-intro class.
+ */
+import Breadcrumbs from '../layout/Breadcrumbs.astro';
+import Icon from '../ui/Icon.astro';
+import StatusTag from '../ui/StatusTag.astro';
+import { modulesInOrder } from '../../lib/content';
+import { isIcon } from '../../lib/icons';
+import { rich } from '../../lib/markup';
+
+interface Props {
+  /** The module id in modules.yaml. */
+  id: string;
+}
+const { id } = Astro.props;
+const all = await modulesInOrder();
+const room = all.find((m) => m.id === id);
+if (!room) throw new Error(`RoomIntro: no module "${id}" in src/content/data/modules.yaml`);
+const r = room.data;
+const index = all.findIndex((m) => m.id === id) + 1;
+---
+
+<div class="wrap">
+  <header class="room-intro">
+    <Breadcrumbs trail={[{ label: 'All rooms', href: '/rooms/' }, { label: r.name }]} />
+    <div class="room-intro__grid">
+      <span class:list={['room-intro__icon', `room-intro__icon--${r.status}`]} aria-hidden="true">{isIcon(id) && <Icon id={id} size={40} />}</span>
+      <div class="room-intro__text">
+        <p class="room-intro__kicker">
+          <span class="label label--ink">Room {String(index).padStart(2, '0')} of {all.length}</span>
+          <StatusTag status={r.status} />
+        </p>
+        <h1>{r.name}</h1>
+        <div class="lead room-intro__lead" set:html={rich(r.lead ?? r.purpose)} />
+        <slot />
+      </div>
+    </div>
+  </header>
+</div>
+
+<style>
+  .room-intro {
+    padding-block: clamp(var(--sp-6), 5vw, var(--sp-8)) clamp(var(--sp-5), 4vw, var(--sp-7));
+  }
+
+  .room-intro__grid {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: var(--sp-4) var(--sp-5);
+    margin-top: var(--sp-5);
+  }
+
+  .room-intro__icon {
+    display: inline-grid;
+    place-items: center;
+    width: clamp(3.5rem, 8vw, 5.5rem);
+    height: clamp(3.5rem, 8vw, 5.5rem);
+    border: 1px solid var(--bb-ink);
+    background: var(--bb-ink);
+    color: var(--text-on-ink);
+    box-shadow: 6px 6px 0 var(--room-accent, var(--bb-brass));
+  }
+
+  .room-intro__icon--partial {
+    background: #fff;
+    color: var(--bb-ink);
+  }
+
+  .room-intro__icon :global(.icon) {
+    width: 55%;
+    height: 55%;
+  }
+
+  .room-intro__kicker {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+    margin: 0;
+  }
+
+  .room-intro h1 {
+    margin-top: var(--sp-3);
+    max-width: 22ch;
+  }
+
+  .room-intro__lead {
+    margin-top: var(--sp-4);
+    max-width: 44rem;
+  }
+
+  @media (max-width: 36rem) {
+    .room-intro__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

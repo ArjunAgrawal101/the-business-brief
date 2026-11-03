@@ -1,0 +1,297 @@
+---
+/**
+ * The working tools of a room, grouped and in order, for its page. People and
+ * Culture lists them from the person to the organization ('scale'); the
+ * Operations Floor sets them out as the stages of a production system
+ * ('flow'). Only tools that exist are listed: a group with none is left out.
+ */
+import { corpus } from '../../lib/content';
+import { subtopicHref } from '../../lib/learning';
+import { STATUS_LABEL, roomTools, toolHref, type RoomId } from '../../lib/room-tools';
+import { rich } from '../../lib/markup';
+
+interface Group {
+  label: string;
+  note?: string;
+  slugs: string[];
+}
+interface Props {
+  room: RoomId;
+  layout: 'scale' | 'flow';
+  groups: Group[];
+}
+const { room, layout, groups } = Astro.props;
+const c = await corpus();
+const tools = roomTools(c, room);
+const subs = (c.curricula['ib-dp-bm']?.units ?? []).flatMap((u) => u.subtopics);
+const filled = groups.map((g) => ({ ...g, tools: g.slugs.map((sl) => tools.find(([, t]) => t.guide.slug === sl)).filter((x): x is NonNullable<typeof x> => Boolean(x)) })).filter((g) => g.tools.length);
+let n = 0;
+const statusClass = (s: string) => (s === 'HL' ? 'tag--hl' : s === 'enrichment' ? 'tag--enrichment' : 'tag--sl');
+---
+
+{
+  layout === 'scale' ? (
+    <ol class="rti rti--scale" role="list">
+      {filled.flatMap((g) =>
+        g.tools.map(([, t]) => {
+          n += 1;
+          return (
+            <li class="rti-row">
+              <span class="rti-row__no" aria-hidden="true">{String(n).padStart(2, '0')}</span>
+              <p class="rti-row__scale">{g.label}</p>
+              <div class="rti-row__body">
+                <h3 class="rti-row__q">{t.guide.question}</h3>
+                <p class="rti-row__tool">
+                  <a href={toolHref(t)}>{t.title}</a> <span class="rti-row__kind">{t.guide.kind}</span>
+                </p>
+                <p class="rti-row__sum">{t.guide.summary}</p>
+                <p class="rti-row__meta">
+                  {t.syllabus.map((code) => (
+                    <a class="rti-code" href={subtopicHref(c, code)}>{`${code} ${subs.find((s) => s.code === code)?.title ?? ''}`}</a>
+                  ))}
+                  <span class={`tag ${statusClass(t.guide.status)}`}>{STATUS_LABEL[t.guide.status]}</span>
+                </p>
+              </div>
+            </li>
+          );
+        }),
+      )}
+    </ol>
+  ) : (
+    <ol class="rti rti--flow" role="list">
+      {filled.map((g, k) => (
+        <li class="rti-stage">
+          <p class="rti-stage__step">Stage {k + 1}</p>
+          <h3 class="rti-stage__label">{g.label}</h3>
+          {g.note && <div class="rti-stage__note" set:html={rich(g.note)} />}
+          <ul class="rti-stage__tools" role="list">
+            {g.tools.map(([, t]) => (
+              <li>
+                <p class="rti-stage__q">{t.guide.question}</p>
+                <p class="rti-row__tool">
+                  <a href={toolHref(t)}>{t.title}</a>
+                </p>
+                <p class="rti-row__meta">
+                  <span class="rti-code rti-code--plain">{t.syllabus.join(', ')}</span>
+                  <span class={`tag ${statusClass(t.guide.status)}`}>{STATUS_LABEL[t.guide.status]}</span>
+                </p>
+              </li>
+            ))}
+          </ul>
+        </li>
+      ))}
+    </ol>
+  )
+}
+
+<style>
+  .rti {
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* ---------- From the person to the organization ---------- */
+
+  .rti--scale {
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .rti-row {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: var(--sp-1) var(--sp-4);
+    margin: 0;
+    padding: var(--sp-5) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  @media (min-width: 56rem) {
+    .rti-row {
+      grid-template-columns: 4rem 11rem minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  .rti-row__no {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.5rem);
+    font-style: italic;
+    line-height: 1;
+    color: var(--room-accent-text);
+  }
+
+  .rti-row__scale {
+    margin: 0;
+    padding-top: 0.45rem;
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .rti-row__body {
+    grid-column: 2;
+    display: grid;
+    gap: var(--sp-2);
+    max-width: 46rem;
+  }
+
+  @media (min-width: 56rem) {
+    .rti-row__body {
+      grid-column: 3;
+    }
+  }
+
+  .rti-row__q {
+    margin: 0;
+    font-size: var(--fs-h3);
+    line-height: var(--lh-snug);
+  }
+
+  .rti-row__tool,
+  .rti-row__sum,
+  .rti-row__meta {
+    margin: 0;
+  }
+
+  .rti-row__tool a {
+    display: inline-block;
+    min-height: 24px;
+    font-weight: 700;
+  }
+
+  .rti-row__tool a::after {
+    content: " \2192";
+  }
+
+  .rti-row__kind {
+    margin-left: var(--sp-2);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .rti-row__sum {
+    font-size: 0.9375rem;
+    color: var(--text-body);
+  }
+
+  .rti-row__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+    font-size: 0.8125rem;
+  }
+
+  .rti-code {
+    display: inline-block;
+    min-height: 24px;
+    line-height: 24px;
+    color: var(--text-muted);
+  }
+
+  .rti-code--plain {
+    font-family: var(--font-mono);
+    font-weight: 600;
+  }
+
+  /* ---------- The stages of a production system ---------- */
+
+  .rti--flow {
+    display: grid;
+    gap: var(--sp-6);
+    counter-reset: stage;
+  }
+
+  @media (min-width: 64rem) {
+    .rti--flow {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--sp-7);
+    }
+  }
+
+  .rti-stage {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+    margin: 0;
+    padding-top: var(--sp-4);
+    border-top: 3px solid var(--room-accent);
+  }
+
+  /* The arrow from one stage to the next: below on a phone, to the right on a wide screen. */
+  .rti-stage:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: 1.5rem;
+    bottom: calc(-1 * var(--sp-6) + 0.35rem);
+    width: 0.8rem;
+    height: 0.8rem;
+    border-right: 2px solid var(--room-accent);
+    border-bottom: 2px solid var(--room-accent);
+    transform: rotate(45deg);
+  }
+
+  @media (min-width: 64rem) {
+    .rti-stage:not(:last-child)::after {
+      left: auto;
+      right: calc(-1 * var(--sp-7) / 2 - 0.4rem);
+      top: -0.55rem;
+      bottom: auto;
+      transform: rotate(-45deg);
+    }
+  }
+
+  .rti-stage__step {
+    margin: 0;
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--room-accent-text);
+  }
+
+  .rti-stage__label {
+    margin: 0;
+    font-size: var(--fs-h3);
+  }
+
+  .rti-stage__note {
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+  }
+
+  .rti-stage__note :global(p) {
+    margin: 0;
+  }
+
+  .rti-stage__tools {
+    display: grid;
+    gap: 0;
+    margin: var(--sp-2) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .rti-stage__tools li {
+    display: grid;
+    gap: var(--sp-1);
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .rti-stage__q {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    line-height: var(--lh-snug);
+    color: var(--text-strong);
+  }
+</style>

@@ -15,7 +15,7 @@ import LevelSwitch from '../ui/LevelSwitch.astro';
 import ToolBar from './ToolBar.astro';
 import { corpus, href } from '../../lib/content';
 import { noteFor, subtopicHref } from '../../lib/learning';
-import { inline, rich } from '../../lib/markup';
+import { esc, inline, rich } from '../../lib/markup';
 import { ROOM_INFO, STATUS_LABEL, roomTools, toolAnchor, toolHref, type RoomTool } from '../../lib/room-tools';
 import '../../styles/room-tools.css';
 
@@ -62,20 +62,7 @@ const statusClass = g.status === 'HL' ? 'tag--hl' : g.status === 'enrichment' ? 
       <div class="tool-facts__item">
         <dt>Syllabus</dt>
         <dd>
-          {
-            t.syllabus.length ? (
-              t.syllabus.map((code, k) => (
-                <>
-                  {k > 0 && ', '}
-                  <a href={subtopicHref(c, code)}>
-                    {code} {subs.find((x) => x.code === code)?.title}
-                  </a>
-                </>
-              ))
-            ) : (
-              <span>Beyond the syllabus</span>
-            )
-          }
+          {t.syllabus.length ? <span set:html={t.syllabus.map((code) => `<a href="${esc(subtopicHref(c, code))}">${esc(`${code} ${subs.find((x) => x.code === code)?.title ?? ''}`)}</a>`).join(', ')} /> : <span>Beyond the syllabus</span>}
         </dd>
       </div>
       <div class="tool-facts__item">
