@@ -90,7 +90,7 @@ export const NAV: NavGroup[] = [
       { label: 'Learning pathways', href: '/pathways/', text: 'Routes for IB students, teachers, universities and founders' },
       { label: 'Lesson library', href: '/pathways/teachers/#lessons', text: 'Timed lesson sequences for teachers, subtopic by subtopic' },
       { label: 'About Arjun Agrawal', href: '/about/', text: 'The educator, his teaching and the story of the platform' },
-      { label: 'Your progress', href: '/progress/', text: 'What you have done here, kept on this device' },
+      { label: 'Your dashboard', href: '/dashboard/', text: 'What you have read, practised and saved, kept on this device' },
       { label: 'Sources and evidence', href: '/sources/', text: 'Where every claim comes from, and how sure we are' },
     ],
   },
