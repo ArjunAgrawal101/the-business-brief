@@ -224,7 +224,7 @@ export const OBJECTIVES: Objective[] = [
     text: 'Know what each component asks, practise in its style, and check your answers against guidance.',
     links: [
       { label: 'Assessment Centre', href: '/assessment/' },
-      { label: 'Practice questions', href: '/exam-desk/practice/' },
+      { label: 'Question bank', href: '/assessment/question-bank/' },
       { label: 'Command terms', href: '/examiner-lens/' },
     ],
   },
@@ -254,6 +254,7 @@ export interface Addition {
  * new notes are added to this list automatically from their `updated` dates.
  */
 export const ADDITIONS: Addition[] = [
+  { date: '2026-11-03', kind: 'Assessment', title: 'The question bank, calculation practice and IA tools', text: 'Every original question with filters and timed sets, Paper 2 practice with fresh figures and feedback, and tools for the research project.', href: '/assessment/question-bank/' },
   { date: '2026-11-03', kind: 'Platform', title: 'Your dashboard, saved items and a smarter search', text: 'What you have read, practised and saved, kept on this device only; search across every kind of content with filters.', href: '/dashboard/' },
   { date: '2026-11-03', kind: 'Pathways', title: 'Seven distinct learning pathways', text: 'Separate routes, depths and assessment styles for IB, secondary, university, MBA, teachers, founders and independent learners, with nine enrichment maps.', href: '/pathways/' },
   { date: '2026-11-03', kind: 'Laboratory', title: 'The Financial Laboratory', text: 'Twenty calculators for your own figures, from break-even to NPV, each with the formula, the working and what it means.', href: '/finance-desk/lab/' },

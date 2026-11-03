@@ -50,7 +50,7 @@ export const NAV: NavGroup[] = [
       { label: 'Case Vault', href: '/case-vault/', text: 'An archive of cases by industry and topic, with a Case of the Week' },
       { label: 'Decision Room', href: '/decision-room/', text: 'Commit to a decision, then live with its consequences' },
       { label: 'Boardroom', href: '/boardroom/', text: 'Multi-round simulations: take a seat on the board and follow each decision through' },
-      { label: 'Practice questions', href: '/exam-desk/practice/', text: 'Original questions in the style of the papers, with guidance' },
+      { label: 'Question bank', href: '/assessment/question-bank/', text: 'Every original question, filtered by topic, paper, level and command term, with timed sets' },
     ],
   },
   {
@@ -76,6 +76,7 @@ export const NAV: NavGroup[] = [
       { label: 'IA Studio', href: '/assessment/internal-assessment/', text: 'The business research project, from question to submission' },
       { label: 'Paper 1', href: '/assessment/paper-1/', text: 'The pre-released case: analysis and answer building' },
       { label: 'Paper 2', href: '/assessment/paper-2/', text: 'Quantitative questions: calculations and constructions' },
+      { label: 'Calculation practice', href: '/assessment/paper-2/practice/', text: 'Fresh fictional figures each time, checked, with the working and the slip behind each wrong answer' },
       { label: 'Paper 3', href: '/assessment/paper-3/', text: 'The social enterprise strategic plan', hl: true },
       { label: 'Examiner Lens', href: '/examiner-lens/', text: 'The command terms and what each one asks of you' },
     ],
