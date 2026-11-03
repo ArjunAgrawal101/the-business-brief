@@ -48,6 +48,7 @@ export const NAV: NavGroup[] = [
       { label: 'Case Room', href: '/case-room/', text: 'Diagnose a business stage by stage, against the evidence' },
       { label: 'Case studies', href: '/cases/', text: 'Fictional businesses with complete, consistent exhibits' },
       { label: 'Decision Room', href: '/decision-room/', text: 'Commit to a decision, then live with its consequences' },
+      { label: 'Boardroom', href: '/boardroom/', text: 'Multi-round simulations: take a seat on the board and follow each decision through' },
       { label: 'Practice questions', href: '/exam-desk/practice/', text: 'Original questions in the style of the papers, with guidance' },
     ],
   },
