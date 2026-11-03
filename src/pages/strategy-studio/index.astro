@@ -1,0 +1,325 @@
+---
+/**
+ * The Strategy Studio's home: a consulting engagement in four stages
+ * (diagnose, generate options, decide, plan), the fictional client whose
+ * question runs through every tool, each tool's standing in the IB course,
+ * and the notes, briefs, guides and Decision Rooms to read alongside.
+ * Everything is computed from the studio collection, the room's entry in
+ * modules.yaml and the corpus, so nothing is listed that does not exist.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import Icon from '../../components/ui/Icon.astro';
+import StatusTag from '../../components/ui/StatusTag.astro';
+import { corpus, href, modulesInOrder, toolsInOrder } from '../../lib/content';
+import { noteFor, subtopicHref } from '../../lib/learning';
+import { inline, rich } from '../../lib/markup';
+import { STAGES, STAGE_IDS } from '../../lib/strategy/common';
+import { statusLabel, studio, studioHref, toolsIn } from '../../lib/strategy/content';
+import '../../styles/strategy.css';
+
+const s = await studio();
+const c = await corpus();
+const rooms = await modulesInOrder();
+const at = rooms.findIndex((m) => m.id === 'strategy-studio');
+const room = rooms[at];
+if (!room) throw new Error('Strategy Studio: no entry in modules.yaml');
+const e = s.engagement;
+const subtopics = (c.curricula['ib-dp-bm']?.units ?? []).flatMap((u) => u.subtopics);
+const title = (code: string) => subtopics.find((x) => x.code === code)?.title ?? code;
+const level = (code: string) => subtopics.find((x) => x.code === code)?.level ?? 'SL/HL';
+const reading = e.reading.map((r) => {
+  const brief = Object.entries(c.topics).find(([, t]) => t.code === r.code);
+  const note = noteFor(c, r.code);
+  return {
+    ...r,
+    title: title(r.code),
+    href: brief ? href.topic(brief[0]) : subtopicHref(c, r.code),
+    state: brief ? 'Topic brief' : note ? 'Full notes' : 'Mindmap and key terms; notes in preparation',
+    hl: level(r.code) === 'HL',
+  };
+});
+const guides = (await toolsInOrder()).filter(([id, t]) => t.status === 'complete' && s.tools.some((x) => x.status.toolkit === id));
+const studioFor = (toolkitId: string) => s.tools.find((x) => x.status.toolkit === toolkitId);
+const decisionRooms = e.decisionRooms.map((d) => ({ ...d, room: c.decisions[d.id] })).filter((d) => d.room);
+const served = room.data.syllabus.map((code) => ({ code, title: title(code), href: subtopicHref(c, code), hl: level(code) === 'HL' }));
+const ibTools = s.tools.filter((t) => t.status.kind === 'ib-toolkit');
+const WORDS = ['None', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
+---
+
+<BaseLayout
+  title="Strategy Studio"
+  description="A consulting-style strategy environment for IB Business Management and beyond: diagnose, generate options, decide and plan, with ten tools that produce structured analysis you can export."
+  section="strategy-studio"
+  room="strategy"
+>
+  <div class="wrap">
+    <header class="sx-home-intro">
+      <Breadcrumbs trail={[{ label: 'All rooms', href: '/rooms/' }, { label: 'Strategy Studio' }]} />
+      <div class="sx-home-intro__grid">
+        <span class="sx-home-intro__icon" aria-hidden="true"><Icon id="strategy-studio" size={40} /></span>
+        <div>
+          <p class="sx-home-intro__kicker">
+            <span class="label label--ink">Room {String(at + 1).padStart(2, '0')} of {rooms.length}</span>
+            <StatusTag status={room.data.status} />
+          </p>
+          <h1>Strategy <em>Studio</em></h1>
+          <div class="lead sx-home-intro__lead" set:html={rich(room.data.lead ?? room.data.purpose)} />
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <div class="wrap page-body">
+    <section aria-labelledby="sx-eng-h">
+      <SectionHead no={1} title="The engagement" id="sx-eng-h" dek="Four stages, ten tools, one question. Work through them in order, or open the tool the question in front of you needs." />
+      <ol class="sx-rail" role="list">
+        {
+          STAGE_IDS.map((id) => {
+            const st = STAGES[id];
+            const info = e.stages.find((x) => x.id === id);
+            return (
+              <li class="sx-rail__stage">
+                <p class="sx-rail__no" aria-hidden="true">
+                  {String(st.no).padStart(2, '0')}
+                </p>
+                <h3 class="sx-rail__name">{st.title}</h3>
+                <p class="sx-rail__q">{st.question}</p>
+                {info && <p class="sx-rail__body">{info.body}</p>}
+                <ul class="sx-rail__tools" role="list">
+                  {toolsIn(s, id).map((t) => {
+                    const l = statusLabel(t);
+                    return (
+                      <li>
+                        <a href={studioHref(t.slug)} class="sx-rail__tool">
+                          {t.title}
+                        </a>
+                        <span class="sx-rail__tags">
+                          <span class={`tag ${t.status.kind === 'ib-toolkit' ? (t.status.level === 'HL' ? 'tag--hl' : 'tag--ib') : 'tag--enrichment'}`}>
+                            {t.status.kind === 'ib-toolkit' ? (t.status.level === 'HL' ? 'Toolkit, HL only' : 'Toolkit') : l.text}
+                          </span>
+                          <span class="sx-saved js-only" data-saved-for={t.slug} />
+                        </span>
+                      </li>
+                    );
+                  })}
+                  {id === 'plan' && (
+                    <li>
+                      <a href={`${studioHref('option-appraisal')}#tool`} class="sx-rail__tool">
+                        Recommendation memo
+                      </a>
+                      <span class="sx-rail__tags small muted">In the option appraisal</span>
+                    </li>
+                  )}
+                </ul>
+                {info && (
+                  <p class="sx-rail__deliverable">
+                    <span class="sx-rail__label">Deliverable</span> {info.deliverable}
+                  </p>
+                )}
+              </li>
+            );
+          })
+        }
+      </ol>
+      <p class="sx-saved-summary js-only small muted" data-saved-summary></p>
+    </section>
+
+    <section aria-labelledby="sx-client-h">
+      <SectionHead no={2} title={`The client: ${e.client}`} id="sx-client-h" dek="Every tool opens on part of this engagement, so the worked examples add up to one analysis." />
+      <div class="sx-client">
+        <div class="sx-client__story">
+          <p class="tags"><span class="tag tag--simulated">Fictional business</span><span class="tag tag--simulated">Simulated data</span></p>
+          <p class="small muted">{e.setting}</p>
+          <div class="prose narrative" set:html={rich(e.situation)} />
+          <blockquote class="sx-client__q">
+            <p class="sx-client__q-label">The question on the table</p>
+            <p class="sx-client__q-text">{e.question}</p>
+          </blockquote>
+        </div>
+        <dl class="sx-client__facts">
+          {
+            e.facts.map((f) => (
+              <div>
+                <dt>{f.label}</dt>
+                <dd>{f.value}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </section>
+
+    <section aria-labelledby="sx-reg-h">
+      <SectionHead
+        no={3}
+        title="The tools and the IB course"
+        id="sx-reg-h"
+        dek={`${WORDS[ibTools.length] ?? ibTools.length} of the ten are tools from the guide's toolkit, checked against the Business management guide (p. 14); the rest are enrichment, labelled as such on every page.`}
+      />
+      <div class="table-scroll sx-scroll" role="region" aria-label="The Strategy Studio's tools and their standing in the IB course" tabindex="0">
+        <table class="table sx-register">
+          <caption class="sr-only">Each tool, its stage in the engagement, its standing in the IB course and the subtopics it serves</caption>
+          <thead>
+            <tr>
+              <th scope="col">Tool</th>
+              <th scope="col">Stage</th>
+              <th scope="col">In the IB course</th>
+              <th scope="col">Serves</th>
+              <th scope="col" class="js-only">On this device</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              s.sequence.map((t) => {
+                const l = statusLabel(t);
+                return (
+                  <tr>
+                    <th scope="row">
+                      <a href={studioHref(t.slug)}>{t.title}</a>
+                      <span class="sx-register__sum">{t.summary}</span>
+                    </th>
+                    <td>{STAGES[t.stage].title}</td>
+                    <td>
+                      <span class="tags">
+                        <span class={`tag ${t.status.kind === 'ib-toolkit' ? 'tag--ib' : 'tag--enrichment'}`}>{l.text}</span>
+                        <span class={`tag ${t.status.kind === 'ib-toolkit' ? l.css : 'tag--plain'}`}>{l.level}</span>
+                      </span>
+                      {t.status.extensions.map((x) => (
+                        <span class="sx-register__ext">{x.name}: enrichment</span>
+                      ))}
+                    </td>
+                    <td class="small">{t.status.subtopics.length ? t.status.subtopics.map((code) => `${code} ${title(code)}`).join('; ') : 'Not tied to a subtopic'}</td>
+                    <td class="js-only small">
+                      <span class="sx-saved" data-saved-for={t.slug} data-count="yes">Not started</span>
+                    </td>
+                  </tr>
+                );
+              })
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted sx-note">
+        The guide lists fifteen toolkit tools, all taught at AO2 and AO4 alongside the syllabus content (Business management guide, pp. 13 to 14). Porter's five forces, the TOWS matrix, stakeholder mapping and weighted option appraisal are not among them; they are offered here as enrichment.
+      </p>
+    </section>
+
+    <section aria-labelledby="sx-read-h">
+      <SectionHead no={4} title="Read alongside" id="sx-read-h" dek="The notes and briefs behind the engagement, the toolkit guides and the Decision Rooms where the same reasoning is put under pressure." />
+      <div class="sx-read">
+        <div>
+          <h3 class="label label--ink">Notes and briefs</h3>
+          <ul class="sx-read__list" role="list">
+            {
+              reading.map((r) => (
+                <li>
+                  <a href={r.href}>
+                    <span class="num">{r.code}</span> {r.title}
+                  </a>
+                  {r.hl && <span class="tag tag--hl">HL only</span>}
+                  <span class="sx-read__state">{r.state}</span>
+                  <span class="sx-read__why">{r.why}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <h3 class="label label--ink sx-read__h">Decision Rooms</h3>
+          <ul class="sx-read__list" role="list">
+            {
+              decisionRooms.map((d) => (
+                <li>
+                  <a href={href.decision(d.id)}>{d.room?.title}</a>
+                  <span class="sx-read__why">{d.why}</span>
+                </li>
+              ))
+            }
+            <li>
+              <a href="/decision-room/">All Decision Rooms</a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="label label--ink">Toolkit guides</h3>
+          <ul class="sx-read__list" role="list">
+            {
+              guides.map(([id, g]) => {
+                const st = studioFor(id);
+                return (
+                  <li>
+                    <a href={href.toolEntry(id, g)}>{g.name}</a>
+                    {g.level === 'HL' && <span class="tag tag--hl">HL only</span>}
+                    <span class="sx-read__why">{g.summary}</span>
+                    {st && (
+                      <span class="sx-read__state">
+                        Build one: <a href={studioHref(st.slug)}>{st.title}</a>
+                      </span>
+                    )}
+                  </li>
+                );
+              })
+            }
+            <li>
+              <a href="/toolkit/">The whole toolkit</a>
+              <span class="sx-read__why">All fifteen tools in the guide, with the guides written so far.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="band band--ink sx-principles" aria-labelledby="sx-prin-h">
+    <div class="wrap">
+      <h2 id="sx-prin-h" class="sx-principles__h">How to work in the studio</h2>
+      <ol class="sx-principles__list" role="list">
+        {
+          e.principles.map((p, i) => (
+            <li>
+              <span class="sx-principles__no" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <h3 class="sx-principles__title">{p.title}</h3>
+              <p set:html={inline(p.body)} />
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <div class="wrap page-body sx-after-band">
+    <section aria-labelledby="sx-syl-h">
+      <SectionHead no={5} title="The syllabus it serves" id="sx-syl-h" dek="IB DP Business Management subtopics with material in this room, checked against the guide." />
+      <ul class="sx-syl" role="list">
+        {
+          served.map((x) => (
+            <li>
+              <a href={x.href}>
+                <span class="num">{x.code}</span> {x.title}
+              </a>
+              {x.hl && <span class="tag tag--hl">HL only</span>}
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+    {
+      room.data.planned.length > 0 && (
+        <section aria-labelledby="sx-plan-h">
+          <SectionHead no={6} title="Planned for this room" id="sx-plan-h" dek="Not built yet, so not linked." />
+          <ul class="sx-planned">
+            {room.data.planned.map((p) => (
+              <li>{p}</li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../scripts/strategy/home';
+</script>

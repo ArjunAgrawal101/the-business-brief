@@ -25,6 +25,7 @@ import {
   toolSchema,
   topicSchema,
 } from './lib/schemas';
+import { studioSchema } from './lib/schemas-strategy';
 
 /**
  * Loads every `.yaml` file in a folder, each holding a list of entries with an
@@ -90,4 +91,5 @@ export const collections = {
   sources: defineCollection({ loader: file('./src/content/data/sources.yaml'), schema: sourceSchema }),
   claims: defineCollection({ loader: file('./src/content/data/claims.yaml'), schema: claimSchema }),
   resources: defineCollection({ loader: file('./src/content/data/resources.yaml'), schema: resourceSchema }),
+  studio: defineCollection({ loader: yamlFiles('./src/content/studio'), schema: studioSchema }),
 };

@@ -6,6 +6,7 @@ import LevelTag from '../../components/ui/LevelTag.astro';
 import VerifyTag from '../../components/ui/VerifyTag.astro';
 import StatusTag from '../../components/ui/StatusTag.astro';
 import { corpus, href, toolsInOrder } from '../../lib/content';
+import { studio, studioHref } from '../../lib/strategy/content';
 
 const c = await corpus();
 const tools = await toolsInOrder();
@@ -13,6 +14,7 @@ const claim = c.claims['course-toolkit'];
 const both = tools.filter(([, t]) => t.level === 'SL/HL');
 const hl = tools.filter(([, t]) => t.level === 'HL');
 const CLASSES = { situational: 'Situational', planning: 'Planning', 'decision-making': 'Decision-making' } as const;
+const studioTools = (await studio()).tools;
 ---
 
 <BaseLayout title="Toolkit" description="The business management toolkit: what each tool is for, how to build it, what it reveals and what it hides, applied to a case." section="toolkit">
@@ -46,6 +48,7 @@ const CLASSES = { situational: 'Situational', planning: 'Planning', 'decision-ma
           <ol class="index-list" style="margin-top:var(--sp-4)">
             {g.list.map(([id, t]) => {
               const link = href.tool(id, t);
+              const build = studioTools.find((x) => x.status.toolkit === id);
               return (
                 <li class="index-item" id={`tool-${id}`}>
                   <span class="index-item__code" style="font-size:1rem">{t.classes.map((k) => CLASSES[k]).join(' and ')}</span>
@@ -64,6 +67,11 @@ const CLASSES = { situational: 'Situational', planning: 'Planning', 'decision-ma
                       <VerifyTag status={t.verification} />
                     </div>
                     {!link && <span class="muted">Guide in preparation</span>}
+                    {build && (
+                      <a href={studioHref(build.slug)} class="small">
+                        Build one: {build.title}
+                      </a>
+                    )}
                   </div>
                 </li>
               );

@@ -1,0 +1,192 @@
+---
+/**
+ * A Strategy Studio tool: what it is for, how to use it, its limitations and
+ * its standing in the IB course; the tool itself, opening on its worked
+ * example; how to use what it shows; and the way on through the engagement.
+ * Each page loads only its own tool's script.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import StudioTool from '../../components/strategy/StudioTool.astro';
+import SwotScript from '../../components/strategy/scripts/Swot.astro';
+import SteepleScript from '../../components/strategy/scripts/Steeple.astro';
+import ForcesScript from '../../components/strategy/scripts/Forces.astro';
+import AnsoffScript from '../../components/strategy/scripts/Ansoff.astro';
+import BcgScript from '../../components/strategy/scripts/Bcg.astro';
+import PorterScript from '../../components/strategy/scripts/Porter.astro';
+import StakeholdersScript from '../../components/strategy/scripts/Stakeholders.astro';
+import TreeScript from '../../components/strategy/scripts/Tree.astro';
+import ForceFieldScript from '../../components/strategy/scripts/ForceField.astro';
+import AppraisalScript from '../../components/strategy/scripts/Appraisal.astro';
+import { corpus } from '../../lib/content';
+import { subtopicHref } from '../../lib/learning';
+import { inline, rich } from '../../lib/markup';
+import { STAGES } from '../../lib/strategy/common';
+import { statusLabel, studio, studioHref } from '../../lib/strategy/content';
+import '../../styles/strategy.css';
+
+export async function getStaticPaths() {
+  const s = await studio();
+  return s.tools.map((t) => ({ params: { tool: t.slug }, props: { slug: t.slug } }));
+}
+
+interface Props {
+  slug: string;
+}
+const { slug } = Astro.props;
+const s = await studio();
+const c = await corpus();
+const t = s.tools.find((x) => x.slug === slug);
+if (!t) throw new Error(`Strategy Studio: no tool "${slug}"`);
+const at = s.sequence.findIndex((x) => x.slug === slug);
+const prev = s.sequence[at - 1];
+const next = s.sequence[at + 1];
+const stage = STAGES[t.stage];
+const label = statusLabel(t);
+const subtopics = (c.curricula['ib-dp-bm']?.units ?? []).flatMap((u) => u.subtopics);
+const serves = t.status.subtopics.map((code) => ({ code, title: subtopics.find((x) => x.code === code)?.title ?? code, href: subtopicHref(c, code) }));
+const SPLIT = new Set(['bcg', 'porter', 'stakeholders', 'five-forces']);
+// The memo can gather headlines from the other tools' saved work.
+const extra = t.kind === 'appraisal' ? { tools: s.sequence.filter((x) => x.slug !== t.slug).map((x) => ({ slug: x.slug, title: x.short })) } : {};
+---
+
+<BaseLayout title={`${t.title}: Strategy Studio`} description={t.summary} section="strategy-studio" room="strategy">
+  <PageIntro
+    trail={[
+      { label: 'All rooms', href: '/rooms/' },
+      { label: 'Strategy Studio', href: '/strategy-studio/' },
+      { label: t.title },
+    ]}
+    kicker={`Strategy Studio · Stage ${stage.no} of 4: ${stage.title}`}
+    title={t.title}
+    lead={t.summary}
+  >
+    <div class="tags sx-intro-tags">
+      <span class={`tag ${t.status.kind === 'ib-toolkit' ? 'tag--ib' : 'tag--enrichment'}`}>{label.text}</span>
+      <span class={`tag ${t.status.kind === 'ib-toolkit' ? label.css : 'tag--plain'}`}>{label.level}</span>
+      {t.status.extensions.map((x) => <span class="tag tag--enrichment">{x.name}: enrichment</span>)}
+      <span class="tag tag--simulated">Worked example: fictional</span>
+    </div>
+    <p class="sx-jump no-print"><a href="#tool">Go to the tool</a></p>
+  </PageIntro>
+
+  <div class="wrap page-body">
+    <section aria-labelledby="sx-about-h" class="no-print">
+      <SectionHead no={1} title="About this tool" id="sx-about-h" dek="What it is for, how to use it, what it cannot do, and where it stands in the IB course." />
+      <div class="sx-method">
+        <div class="sx-method__part sx-method__part--purpose">
+          <h3 class="sx-method__h">Purpose</h3>
+          <p class="sx-method__purpose" set:html={inline(t.purpose)} />
+        </div>
+        <div class="sx-method__part sx-method__part--status">
+          <h3 class="sx-method__h">IB syllabus status</h3>
+          <p class="tags">
+            <span class={`tag ${t.status.kind === 'ib-toolkit' ? 'tag--ib' : 'tag--enrichment'}`}>{label.text}</span>
+            <span class={`tag ${t.status.kind === 'ib-toolkit' ? label.css : 'tag--plain'}`}>{label.level}</span>
+          </p>
+          <div class="prose small" set:html={rich(t.status.text)} />
+          {
+            t.status.extensions.map((x) => (
+              <p class="small sx-ext">
+                <strong>{x.name}.</strong> {x.text}
+              </p>
+            ))
+          }
+          {
+            serves.length > 0 && (
+              <p class="small sx-serves">
+                <span class="sx-serves__label">Serves</span>
+                {serves.map((x, i) => (
+                  <>
+                    {i > 0 && ', '}
+                    <a href={x.href}>{`${x.code} ${x.title}`}</a>
+                  </>
+                ))}
+              </p>
+            )
+          }
+        </div>
+        <div class="sx-method__part sx-method__part--how">
+          <h3 class="sx-method__h">How to use it</h3>
+          <ol class="sx-steps">{t.howTo.map((x) => <li set:html={inline(x)} />)}</ol>
+        </div>
+        <div class="sx-method__part sx-method__part--limits">
+          <h3 class="sx-method__h">Limitations</h3>
+          <ul class="sx-limits">{t.limitations.map((x) => <li set:html={inline(x)} />)}</ul>
+          <p class="sx-judgement">A model is an aid to judgement, not a universal answer. Use what it shows, then decide, and say why.</p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="sx-build-h" id="tool" class="sx-build">
+      <SectionHead no={2} title="Build your analysis" id="sx-build-h" dek="The tool opens on a worked example. Change anything: the analysis follows, and your work is kept on this device." />
+      <aside class="sx-example no-print" aria-label="The worked example">
+        <p class="sx-example__kicker"><span class="tag tag--simulated">Simulated data</span> Worked example: {s.engagement.client} (fictional)</p>
+        <p class="sx-example__title">{t.example.title}</p>
+        <p class="sx-example__text" set:html={inline(t.example.situation)} />
+      </aside>
+      <StudioTool kind={t.kind} slug={t.slug} title={t.title} state={t.example.data} split={SPLIT.has(t.kind)} client={s.engagement.client} extra={extra} />
+    </section>
+
+    <section aria-labelledby="sx-use-h" class="no-print">
+      <SectionHead no={3} title="Using what it shows" id="sx-use-h" />
+      <div class="sx-use">
+        <div class="prose">
+          <p class="tags"><span class="tag tag--framework">Recommended use</span></p>
+          <div set:html={rich(t.inUse)} />
+        </div>
+        <div>
+          <h3 class="label label--ink">Read alongside</h3>
+          <ul class="link-list">
+            {
+              t.read.map((r) => (
+                <li>
+                  <a href={r.href}>{r.label}</a>
+                  {r.note && <span class="small muted"> {r.note}</span>}
+                </li>
+              ))
+            }
+            <li><a href="/strategy-studio/">The Strategy Studio: all ten tools and the engagement</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <nav class="sx-pager no-print" aria-label="The engagement, tool by tool">
+      {
+        prev ? (
+          <a class="sx-pager__link sx-pager__link--prev" href={studioHref(prev.slug)}>
+            <span class="sx-pager__dir">Previous</span>
+            <span class="sx-pager__title">{prev.title}</span>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      {
+        next ? (
+          <a class="sx-pager__link sx-pager__link--next" href={studioHref(next.slug)}>
+            <span class="sx-pager__dir">Next</span>
+            <span class="sx-pager__title">{next.title}</span>
+          </a>
+        ) : (
+          <a class="sx-pager__link sx-pager__link--next" href="/strategy-studio/">
+            <span class="sx-pager__dir">Back to</span>
+            <span class="sx-pager__title">The Strategy Studio</span>
+          </a>
+        )
+      }
+    </nav>
+  </div>
+  {t.kind === 'swot' && <SwotScript />}
+  {t.kind === 'steeple' && <SteepleScript />}
+  {t.kind === 'five-forces' && <ForcesScript />}
+  {t.kind === 'ansoff' && <AnsoffScript />}
+  {t.kind === 'bcg' && <BcgScript />}
+  {t.kind === 'porter' && <PorterScript />}
+  {t.kind === 'stakeholders' && <StakeholdersScript />}
+  {t.kind === 'decision-tree' && <TreeScript />}
+  {t.kind === 'force-field' && <ForceFieldScript />}
+  {t.kind === 'appraisal' && <AppraisalScript />}
+</BaseLayout>

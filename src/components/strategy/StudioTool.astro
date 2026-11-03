@@ -1,0 +1,70 @@
+---
+/**
+ * The frame every Strategy Studio tool shares: its configuration for the
+ * script, the save and export bar, the inputs and the analysis. The inputs
+ * and the analysis are drawn by the tool's library from the worked example,
+ * so the page is complete before any script runs; the browser script
+ * (included by the page for this tool only) redraws them as the reader works.
+ * On paper only the analysis prints.
+ */
+import { jsonForScript } from '../../lib/markup';
+import { lib } from '../../lib/strategy/registry';
+import type { StudioKind } from '../../lib/schemas-strategy';
+import '../../styles/strategy.css';
+
+interface Props {
+  kind: StudioKind;
+  slug: string;
+  title: string;
+  state: unknown;
+  /** Lay the inputs and the analysis side by side on wide screens. */
+  split?: boolean;
+  /** The fictional client of the worked example. */
+  client: string;
+  /** Anything else the tool's script needs, added to its configuration. */
+  extra?: Record<string, unknown>;
+}
+const { kind, slug, title, state, split = false, client, extra = {} } = Astro.props;
+const uid = `sx-${slug}`;
+const view = lib(kind).view(state, uid);
+const config = { ...extra, tool: slug, uid, example: state };
+---
+
+<div class:list={['sx-tool', split && 'sx-tool--split']} data-ix="studio" data-tool={slug} id={uid}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="state state--error" data-error hidden>The tool could not start in this browser. The worked example below is complete, but changes will not be calculated or kept.</p>
+  <p class="nojs-only sx-nojs">Scripts are off, so this is the worked example as a finished analysis. Every part of it can be read; to build your own, turn scripts on.</p>
+
+  <div class="sx-bar js-only no-print" role="group" aria-label={`Save and export: ${title}`}>
+    <p class="sx-bar__save" data-save-status>Your work is kept on this device as you type.</p>
+    <div class="sx-bar__row">
+      <button type="button" class="btn btn--small" data-tool-act="example">Restore the worked example</button>
+      <button type="button" class="btn btn--small" data-tool-act="blank">Start a blank analysis</button>
+    </div>
+    <div class="sx-bar__row sx-bar__row--export">
+      <span class="sx-bar__label" aria-hidden="true">Export</span>
+      <button type="button" class="btn btn--small" data-tool-act="copy">Copy as text</button>
+      <button type="button" class="btn btn--small" data-tool-act="csv">Download CSV</button>
+      <button type="button" class="btn btn--small" data-tool-act="json">Download JSON</button>
+      <button type="button" class="btn btn--small" data-tool-act="print">Print or save as PDF</button>
+      <label class="btn btn--small sx-import">Load a JSON file<input type="file" accept=".json,application/json" data-import class="sr-only" /></label>
+    </div>
+    <div class="sx-copy" data-copy-fallback hidden>
+      <label for={`${uid}-copy`}>The analysis as plain text</label>
+      <textarea id={`${uid}-copy`} class="textarea" readonly rows="8"></textarea>
+    </div>
+  </div>
+
+  <div class="sx-panels">
+    <section class="sx-panel sx-panel--in no-print" aria-labelledby={`${uid}-in-h`}>
+      <h3 class="sx-panel__h" id={`${uid}-in-h`}><span class="sx-panel__no" aria-hidden="true">A</span> Your inputs</h3>
+      <div class="sx-editor" data-editor set:html={view.editor} />
+    </section>
+    <section class="sx-panel sx-panel--out" aria-labelledby={`${uid}-out-h`}>
+      <h3 class="sx-panel__h" id={`${uid}-out-h`}><span class="sx-panel__no" aria-hidden="true">B</span> The analysis</h3>
+      <p class="sx-example-flag"><span class="tag tag--simulated">Worked example</span> {client} is fictional and its figures are simulated. Change anything and this becomes your own analysis.</p>
+      <div class="sx-outputs" data-outputs set:html={view.outputs} />
+    </section>
+  </div>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</div>
