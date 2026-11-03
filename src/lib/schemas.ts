@@ -1651,3 +1651,113 @@ export const resourceSchema = z.object({
   order: z.number(),
 });
 export type ResourceEntry = z.infer<typeof resourceSchema>;
+
+/* ------------------------------------------------------------------ */
+/* The Business Intelligence Briefing: curated, dated and sourced      */
+/* ------------------------------------------------------------------ */
+
+/** A day, written 2025-09-22. */
+const isoDay = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/, 'a date written as YYYY-MM-DD');
+/** A day, or only a month when the source gives no day: 2025-09-22 or 2025-10. */
+const isoDayOrMonth = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?$/, 'a date written as YYYY-MM-DD, or YYYY-MM when the source gives no day');
+
+/** The kinds of development the briefing covers; an item can be more than one. */
+export const INTEL_CATEGORIES = [
+  'corporate-strategy',
+  'mergers-and-acquisitions',
+  'leadership',
+  'marketing',
+  'restructuring',
+  'financial-results',
+  'innovation',
+  'entrepreneurship',
+  'sustainability',
+  'global-trend',
+] as const;
+export type IntelCategory = (typeof INTEL_CATEGORIES)[number];
+
+/** What kind of document a source is. Primary sources are published by the organization itself. */
+export const INTEL_SOURCE_KINDS = ['press-release', 'annual-report', 'company-report', 'company-blog', 'company-page', 'regulatory-filing', 'press'] as const;
+
+/**
+ * A source the briefing relies on, kept with its item. Every source was opened
+ * and read in full on the date in `accessed`; `supports` says exactly which
+ * facts on the page it stands behind. A live page that carries no publication
+ * date says so in `undated` instead of `published`.
+ */
+export const intelSourceSchema = z.object({
+  id: z.string().regex(/^[a-z0-9-]+$/),
+  title: z.string(),
+  publisher: z.string(),
+  author: z.string().optional(),
+  kind: z.enum(INTEL_SOURCE_KINDS),
+  primary: z.boolean(),
+  published: isoDayOrMonth.optional(),
+  undated: z.string().optional(),
+  accessed: isoDay,
+  url: z.url(),
+  supports: z.array(z.string()).min(1),
+  /** Anything a reader needs to know about the document itself, such as which date it carries. */
+  note: z.string().optional(),
+});
+
+/**
+ * One sourced fact, with the date it refers to and the sources that state it.
+ * A fact read from a live page that carries no date is marked `asAt`: its date
+ * is then the day the page was read, and the page says so.
+ */
+export const intelFactSchema = z.object({
+  date: isoDayOrMonth,
+  asAt: z.boolean().default(false),
+  text: md,
+  sources: z.array(z.string()).min(1),
+});
+
+/**
+ * One item of the briefing: a real development, what happened (sourced facts
+ * only), and the platform's analysis, kept visibly apart: why it matters, the
+ * course concepts at work, the choices that were open, the lessons, a
+ * discussion question of the platform's own and the limits of the evidence.
+ */
+export const intelligenceSchema = z.object({
+  title: z.string(),
+  /** The standfirst: one or two sentences under the headline. */
+  dek: z.string(),
+  organizations: z.array(z.string()).min(1),
+  categories: z.array(z.enum(INTEL_CATEGORIES)).min(1),
+  /** The IB key concepts the item speaks to, for the concept filter. */
+  keyConcepts: z.array(conceptId).min(1),
+  /** When the development happened: the date of the headline fact. */
+  date: isoDayOrMonth,
+  /** When the item was written, and when its sources were last checked. */
+  written: isoDay,
+  checked: isoDay,
+  /** The lead story on the briefing's front page. Exactly one item is the lead. */
+  lead: z.boolean().default(false),
+  /** Up to three headline figures, each taken from a source. */
+  figures: z
+    .array(z.object({ value: z.string(), label: z.string(), source: z.string() }))
+    .max(3)
+    .default([]),
+  happened: z.array(intelFactSchema).min(3),
+  /** Later developments, read on the check date. */
+  since: z.array(intelFactSchema).default([]),
+  matters: md,
+  concepts: z.object({
+    /** `level: HL` when the connection rests on HL-only content; required when the whole subtopic is HL only. */
+    subtopics: z.array(z.object({ code: z.string(), note: z.string(), level: level.default('SL/HL') })).min(1),
+    terms: z.array(z.string()).default([]),
+    tools: z.array(z.object({ id: z.string(), note: z.string() })).default([]),
+  }),
+  /** The options that were open. `taken` marks the one the organization chose, which the facts must show. */
+  choices: z.array(z.object({ option: z.string(), analysis: md, taken: z.boolean().default(false) })).min(2),
+  lessons: z.array(md).min(2),
+  /** One discussion question, the platform's own. `command` is an id in the command term register. */
+  question: z.object({ command: z.string(), prompt: z.string(), level: level.default('SL/HL') }),
+  /** What the sources do not show, so that no reader takes the analysis for more than it is. */
+  limits: z.array(md).min(1),
+  sources: z.array(intelSourceSchema).min(1),
+});
+export type Intelligence = z.infer<typeof intelligenceSchema>;
+export type IntelSource = z.infer<typeof intelSourceSchema>;
+export type IntelFact = z.infer<typeof intelFactSchema>;

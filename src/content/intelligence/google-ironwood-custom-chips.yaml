@@ -1,0 +1,145 @@
+title: Google's own AI chips reach a seventh generation, then an eighth
+dek: >-
+  Google Cloud announced general availability for Ironwood, its seventh-generation TPU, in November 2025 and an
+  eighth generation in April 2026, making the case for designing its own chips while still offering customers
+  Nvidia's.
+organizations: [Google]
+categories: [innovation]
+keyConcepts: [creativity, change]
+date: '2025-11-06'
+written: '2026-11-03'
+checked: '2026-11-03'
+figures:
+  - value: 9,216
+    label: Ironwood chips linked in one superpod
+    source: ironwood
+  - value: 10x
+    label: Peak performance of Ironwood against TPU v5p, as Google claims
+    source: ironwood
+  - value: 80%
+    label: Better inference performance per dollar for TPU 8i than the previous generation, as Google claims
+    source: next26
+
+happened:
+  - date: '2025-11-06'
+    text: >-
+      Google Cloud announced that Ironwood, its seventh-generation Tensor Processing Unit (TPU), would be generally
+      available in the coming weeks. Google said Ironwood offers ten times the peak performance of TPU v5p and more than
+      four times the performance per chip of TPU v6e for both training and inference.
+    sources: [ironwood]
+  - date: '2025-11-06'
+    text: >-
+      Ironwood chips can be linked in a superpod of 9,216 chips sharing 1.77 petabytes of high-bandwidth memory, and
+      superpods can be joined into clusters of hundreds of thousands of TPUs.
+    sources: [ironwood]
+  - date: '2025-11-06'
+    text: >-
+      Google said it built its first TPU ten years earlier, and that it designs its processors with model research,
+      software and hardware development under one roof. It also announced virtual machines on its own Arm-based Axion
+      processors, which it said offer up to twice the price-performance of comparable x86 machines.
+    sources: [ironwood]
+  - date: '2025-11-06'
+    text: >-
+      The announcement described a shift in demand from training AI models to running them for users, which Google
+      called the age of inference, and said this creates new opportunities for custom chips.
+    sources: [ironwood]
+
+since:
+  - date: '2026-04-22'
+    text: >-
+      At Next '26, Google Cloud said Ironwood and Axion were generally available and introduced eighth-generation TPUs:
+      TPU 8t for training, which it said has three times the processing power of Ironwood, and TPU 8i for inference,
+      which it said delivers 80% better performance per dollar than the previous generation.
+    sources: [next26]
+  - date: '2026-04-22'
+    text: >-
+      Google described its range of computing hardware as running from its own TPUs and Axion processors to the latest
+      Nvidia GPUs, so that customers can choose the right architecture for each job.
+    sources: [next26]
+
+matters: |-
+  Most businesses that need computing power buy their chips from specialist suppliers. Google has spent a decade designing its own: a long-term commitment to research and development, and a form of backward vertical integration, making an input it could buy. The case Google makes is that designing the chip together with the software and the models gives performance and cost that a part bought off the shelf cannot match. In the language of [production planning](/topics/production-planning/), Google is judging that, at its scale and counting performance, the cost to make these chips is below the cost to buy them.
+
+  Each generation improves on the last, which is incremental innovation. The cumulative effect could be more disruptive if the cost of running AI models becomes the main basis of competition, as the shift to inference that Google describes suggests. Yet Google still offers Nvidia's chips beside its own. The decision is not all or nothing: it makes some of its chips, buys others, and lets customers choose.
+
+concepts:
+  subtopics:
+    - code: '5.8'
+      note: Long-term research and development, and incremental innovation that may add up to something more disruptive.
+      level: HL
+    - code: '5.6'
+      note: Cost to make against cost to buy, for an input as critical as the chips that run AI.
+      level: HL
+    - code: '1.5'
+      note: Backward vertical integration into the supply of an input.
+    - code: '5.9'
+      note: Artificial intelligence, data centres and cloud computing as critical infrastructure.
+      level: HL
+    - code: '4.2'
+      note: Differentiation; a cloud provider competing on hardware its rivals cannot buy.
+  terms: [research-and-development, incremental-innovation, disruptive-innovation, vertical-integration, cost-to-make, cost-to-buy, data-centre, artificial-intelligence, cloud-computing, economies-of-scale, differentiation]
+  tools:
+    - id: contribution
+      note: Make or buy analysis compares the cost of making an input with the price of buying it in.
+
+choices:
+  - option: Buy all its chips from specialist suppliers
+    analysis: >-
+      No design costs and access to the market leader's products, but dependence on suppliers' prices, plans and
+      capacity, and no hardware advantage over rivals who buy the same chips.
+  - option: Design its own chips and offer nothing else
+    analysis: >-
+      The most control and the largest potential cost advantage, but every gap in its own range becomes a gap in its
+      offer, and customers who want other chips go elsewhere.
+  - option: Design its own chips and keep offering others
+    taken: true
+    analysis: >-
+      Gains the benefit of its own designs where they are strongest while keeping customer choice and a fallback, at the
+      cost of running two hardware strategies at once.
+  - option: Partner with a chip designer instead of designing in-house
+    analysis: >-
+      Shares the cost and the risk, but shares the advantage too, and the partner may sell the same design to rivals.
+
+lessons:
+  - Research and development is a long game. Google's first TPU came a decade before the generation described here.
+  - Make or buy turns on cost and on control. At enough scale, making an input can be both cheaper and a source of differentiation.
+  - Treat a company's performance figures as claims. Independent tests are needed before products can be compared.
+  - For managers, vertical integration is not all or nothing; a business can make some of an input and buy the rest.
+
+question:
+  command: discuss
+  level: HL
+  prompt: Using the concepts of cost to make and cost to buy, discuss why a cloud computing provider might design its own chips while continuing to offer chips made by other suppliers.
+
+limits:
+  - Every performance figure here is Google's own claim; no independent test was read for this item.
+  - The pages give no figures for what Google spends on designing chips, or for how much of its computing runs on its own chips.
+  - The November 2025 post said Ironwood would be generally available within weeks; the pages read do not give the exact date it became available.
+
+sources:
+  - id: ironwood
+    title: Announcing Ironwood TPUs General Availability and new Axion VMs to power the age of inference
+    author: Amin Vahdat and Mark Lohmeyer, Google Cloud
+    publisher: Google Cloud
+    kind: company-blog
+    primary: true
+    published: '2025-11-06'
+    accessed: '2026-11-03'
+    url: https://cloud.google.com/blog/products/compute/ironwood-tpus-and-new-axion-based-vms-for-your-ai-workloads
+    supports:
+      - Ironwood's announced availability, and Google's performance claims against TPU v5p and TPU v6e.
+      - The size of an Ironwood superpod, its shared memory, and clusters of many superpods.
+      - The first TPU ten years earlier, Google's in-house co-design, and the Axion virtual machines and their claimed price-performance.
+      - Google's description of the shift from training to inference and the opportunity it sees for custom chips.
+  - id: next26
+    title: Welcome to Google Cloud Next '26
+    author: Thomas Kurian, CEO, Google Cloud
+    publisher: Google Cloud
+    kind: company-blog
+    primary: true
+    published: '2026-04-22'
+    accessed: '2026-11-03'
+    url: https://cloud.google.com/blog/topics/google-cloud-next/welcome-to-google-cloud-next26
+    supports:
+      - The general availability of Ironwood and Axion, the eighth-generation TPU 8t and TPU 8i, and Google's claims for them.
+      - Google's range of hardware from its own TPUs and Axion processors to Nvidia GPUs.

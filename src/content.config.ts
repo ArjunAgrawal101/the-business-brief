@@ -15,6 +15,7 @@ import {
   decisionSchema,
   glossarySchema,
   interactiveSchema,
+  intelligenceSchema,
   mindmapSchema,
   moduleSchema,
   noteSchema,
@@ -98,4 +99,5 @@ export const collections = {
   // The Entrepreneurship and Innovation Lab: its briefings and the data behind its tools.
   briefings: defineCollection({ loader: yamlFiles('./src/content/briefings'), schema: briefingSchema }),
   labTools: defineCollection({ loader: yamlFiles('./src/content/lab'), schema: labToolSchema }),
+  intelligence: defineCollection({ loader: yamlFiles('./src/content/intelligence'), schema: intelligenceSchema }),
 };

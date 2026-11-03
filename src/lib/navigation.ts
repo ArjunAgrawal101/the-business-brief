@@ -83,6 +83,7 @@ export const NAV: NavGroup[] = [
     label: 'Discover',
     intro: 'Resources to learn and teach with, routes through the platform for every learner, and the educator behind it.',
     links: [
+      { label: 'Business Intelligence', href: '/intelligence/', text: 'Real developments from 2025 and 2026, dated, sourced and read through the course' },
       { label: 'Resources Library', href: '/resources/', text: 'Guides, notes, maps, cases and sheets, with real downloads' },
       { label: 'Learning pathways', href: '/pathways/', text: 'Routes for IB students, teachers, universities and founders' },
       { label: 'About Arjun Agrawal', href: '/about/', text: 'The educator, his teaching and the story of the platform' },
