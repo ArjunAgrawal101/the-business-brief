@@ -52,6 +52,10 @@ const connections = note?.[1].connections ?? map?.[1].connections.map((x) => ({ 
 // Diagrams for the subtopic that its notes do not already show.
 const inNotes = new Set(note ? note[1].sections.map((x) => x.diagram).filter(Boolean) : []);
 const diagrams = Object.entries(DIAGRAMS).filter(([did, d]) => d.syllabus.includes(code) && !inNotes.has(did));
+// A subtopic that is SL and HL can still carry HL material (an HL section or point in its notes, an HL exam
+// question, an HL diagram or term); the page then needs the switch too, or its "switch to HL" notices point nowhere.
+const notesHL = note ? note[1].sections.some((x) => x.level === 'HL' || x.points.some((p) => p.level === 'HL')) || note[1].exam.some((q) => q.level === 'HL') : false;
+const showSwitch = hasHL || notesHL || diagrams.some(([, d]) => d.level === 'HL') || terms.some(([, g]) => g.level === 'HL');
 const titleOf = (cd: string) => list.find((x) => x.s.code === cd)?.s.title ?? cd;
 // One numbering for the whole page: "What the IB course asks" is 01, the notes take the numbers after it
 // (introduction, each section, evaluation), and the page's later sections carry on from there.
@@ -78,7 +82,7 @@ const num = () => {
         <span class:list={['tag', note ? 'tag--live' : brief ? 'tag--live' : 'tag--planned']}>{status}</span>
         {map && <a class="tag tag--plain" href="#map">Mindmap</a>}
         {terms.length > 0 && <a class="tag tag--plain" href="#terms">{terms.length} key terms</a>}
-        {hasHL && <LevelSwitch />}
+        {showSwitch && <LevelSwitch />}
       </div>
       {
         s.level === 'HL' && (

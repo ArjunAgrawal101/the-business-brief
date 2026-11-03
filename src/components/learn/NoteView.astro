@@ -478,6 +478,12 @@ const hl = (level: string) => mixed && level === 'HL';
     border: 1px solid var(--rule-hair);
   }
 
+  /* Grid items: the grid gap spaces them, so the base list margin would only push the later ones out of line. */
+  .nv-options li + li,
+  .nv-exam > li + li {
+    margin-top: 0;
+  }
+
   .nv-options__label {
     font-family: var(--font-display);
     font-weight: 600;
