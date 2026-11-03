@@ -48,6 +48,8 @@ const next = at < LAB.length - 1 ? LAB[at + 1] : undefined;
 const siblings = LAB.filter((x) => x.group === e.group && x.id !== id);
 const wide = e.family === 'cash' || e.family === 'budget';
 const linkable = e.family !== 'cash' && e.family !== 'budget';
+// Figures travel between calculators only where they share all their inputs: the break-even group and the investment group.
+const carries = (s: (typeof LAB)[number]) => linkable && s.family === e.family && (e.family === 'breakeven' || e.family === 'investment');
 const hlParts = e.level !== 'HL' && (formulas.some((f) => f.scope === 'hl') || report.figures.some((f) => f.scope === 'hl'));
 const SOURCE: Record<typeof e.source, string> = {
   sheet: 'Formula as on the guide’s formula sheet',
@@ -236,14 +238,14 @@ const EXTRA_TITLE: Record<string, string> = { statement: 'The statement', cash: 
             <ul role="list">
               {siblings.map((s) => (
                 <li>
-                  <a href={labHref(s.id)} data-carry={s.family === e.family && linkable ? labHref(s.id) : undefined}>
+                  <a href={labHref(s.id)} data-carry={carries(s) ? labHref(s.id) : undefined}>
                     {s.name}
                   </a>
                   {s.level === 'HL' && <span class="tag tag--hl">HL</span>}
                 </li>
               ))}
             </ul>
-            {siblings.some((s) => s.family === e.family) && linkable && <p class="small muted js-only">Links to calculators that use the same inputs carry your figures with them.</p>}
+            {siblings.some(carries) && <p class="small muted js-only">These calculators use the same inputs, so the links carry your figures with them.</p>}
           </nav>
         )
       }

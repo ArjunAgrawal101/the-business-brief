@@ -260,7 +260,7 @@ export function buildStatement(st: StatementState, s: Settings): LabReport {
   ].sort((a, b) => b.v - a.v)[0];
   const actions: string[] = [];
   if (gpm !== null && gpm < 30) actions.push('The gross margin is thin: look at prices and the cost of sales first, such as supplier terms, waste and the product mix.');
-  if (L.salesRevenue > 0 && L.expenses / L.salesRevenue > 0.3) actions.push(`Expenses take ${pct((L.expenses / L.salesRevenue) * 100)} of sales: review overheads such as rent, energy and administration, without cutting what wins sales.`);
+  if (L.salesRevenue > 0 && L.expenses > 0) actions.push(`Expenses take ${pct((L.expenses / L.salesRevenue) * 100)} of sales: compare that share with earlier years and similar businesses before cutting, and protect the spending that wins sales.`);
   if (p.pbit > 0 && L.interest / p.pbit > 0.15) actions.push('Interest takes a large share of operating profit: refinancing at a lower rate or repaying debt would leave more for the owners.');
   if (p.retainedProfit < 0) actions.push('Dividends exceed the profit for period: paying them reduces the business’s reserves, which cannot continue for long.');
   actions.push('Weigh dividends against retained profit: owners want a return now, but retained profit is the cheapest finance for growth.');

@@ -179,6 +179,8 @@ interface Content {
   actions: string[];
   /** One line on what the sensitivity table shows. */
   insight: string;
+  /** For a ratio where higher is neither better nor worse: what to check when it rises or falls. */
+  judgement?: { rose: string; fell: string };
 }
 
 const per = (cur: string, v: number) => `${cur}${fmtNumber(v, 2)}`;
@@ -255,6 +257,10 @@ const CONTENT: Record<RatioLabId, Content> = {
       'Match the decision to the risk: high gearing magnifies returns to owners in good years and losses in bad ones.',
     ],
     insight: 'Gearing rises when borrowing grows faster than equity; retained profit lowers it slowly, a share issue at once.',
+    judgement: {
+      rose: 'Gearing has risen: check that profit covers the interest comfortably, and that the borrowing pays for assets that will earn more than it costs.',
+      fell: 'Gearing has fallen: the business carries less financial risk, but check whether cheaper borrowed money could have funded profitable growth.',
+    },
   },
   'stock-turnover': {
     meaning: (v) => `Stock is used and replaced **${fmtNumber(v, 2)} times** a year on average.`,
@@ -291,6 +297,10 @@ const CONTENT: Record<RatioLabId, Content> = {
       'Treat a sharp rise as a warning sign: it can mean the business is struggling to pay.',
     ],
     insight: 'A higher figure is neither good nor bad in itself: it is cash kept, at the cost of goodwill and possibly of discounts.',
+    judgement: {
+      rose: 'Creditor days have risen: check whether that is longer credit the suppliers agreed to, or late payment, which costs goodwill and can be a sign of strain.',
+      fell: 'Creditor days have fallen: suppliers are paid sooner, which builds goodwill and may earn discounts, but uses cash the business could have kept for longer.',
+    },
   },
 };
 
@@ -375,7 +385,14 @@ export function buildRatio(id: RatioLabId, st: RatioState, s: Settings): LabRepo
     figures.push({ label: 'Capital employed, latest year', value: money(ce, s.currency), note: 'non-current liabilities + equity' });
   }
   const dir = v === 'worse' || (b !== null && weak(id, b));
-  const actions = dir ? content.actions : [`The ratio ${v === 'better' ? 'has improved' : v === 'unchanged' ? 'is unchanged' : 'needs judgement'}; the question is whether it can be sustained, and at what cost.`, ...content.actions.slice(0, 2)];
+  const rose = a !== null && b !== null && b > a;
+  const first =
+    v === 'judgement' && content.judgement
+      ? content.judgement[rose ? 'rose' : 'fell']
+      : v === 'better'
+        ? 'The ratio has improved: check that the cause will last, and what it cost to achieve.'
+        : 'The ratio is unchanged: compare it with similar businesses to judge whether its level is right.';
+  const actions = dir && v !== 'judgement' ? content.actions : [first, ...content.actions.slice(0, 2)];
   const changeText = describeChange(def, a, b, 'the previous year', 'the latest year');
   const headlineNote = a === null || b === null ? undefined : `${fmtChange(a, b, def.kind)} on the previous year; ${VERDICT_TEXT[v].toLowerCase()}`;
   const secondary = id === 'stock-turnover' ? valueFromInputs('stock-turnover-days', inputsFor('stock-turnover-days', st.latest)) : null;

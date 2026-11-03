@@ -86,8 +86,8 @@ const ESTIMATES = [
   { label: 'Capital cost 10% lower', r: 0, c: -0.1 },
 ];
 
-const METHOD_LIMITS =
-  'All three methods rest on estimates of future cash flows, which grow less reliable the further ahead they look, and none of them measures what the figures leave out: the fit with the business’s objectives, the risk, and the effect on staff, customers and the environment.';
+const WEIGH_THE_REST = 'Weigh what the figures leave out before deciding: the fit with the business’s objectives, how risky the estimates are, and the effect on staff, customers and the environment.';
+const ESTIMATES_NOTE = ' Every method rests on estimates of future cash flows, which grow less reliable the further ahead they look.';
 
 /* ------------------------------------------------------------------ */
 /* Payback                                                             */
@@ -206,12 +206,12 @@ export function buildArr(st: InvestmentState, s: Settings): LabReport {
     interpretation: {
       meaning: v === null ? 'The ARR cannot be calculated from these figures.' : `On average the project earns a profit of **${fmtNumber(v, 2)}%** of its cost each year: ${money2(avg, c)} a year on ${money(st.capitalCost, c)}. The ARR counts every year’s return equally, so ${c}1 in year ${n} weighs as much as ${c}1 in year 1.`,
       compare: 'Compare the ARR with the business’s target rate of return, with the interest rate on any loan that would pay for the project, with other projects competing for the money, and with the business’s return on capital employed: a project below the current ROCE would dilute the return on the business as a whole.',
-      benchmarks: 'The return a business should require depends on risk and on the cost of money. A project in an unfamiliar market, or with uncertain sales, should promise more than a safe replacement of existing equipment, and when interest rates rise the bar rises with them. Because ARR ignores when the returns arrive, two projects with the same ARR can carry very different risks.',
+      benchmarks: 'The return a business should require depends on risk and on the cost of money. A project in an unfamiliar market, or with uncertain sales, should promise more than a safe replacement of existing equipment, and when interest rates rise the bar rises with them. Because ARR ignores when the returns arrive, two projects with the same ARR can carry very different risks.' + ESTIMATES_NOTE,
       actions: [
         'Compare the ARR with a target the business sets in advance, not with a figure chosen after seeing the result.',
         'Look at timing as well: a project whose returns come late is riskier than its ARR suggests; payback and, at HL, NPV show it.',
-        'Test the estimates: a small fall in yearly returns can halve a modest ARR.',
-        METHOD_LIMITS,
+        `Test the estimates: a 10% fall in every year’s return would take the ARR from ${v === null ? 'n/a' : `${fmtNumber(v, 2)}%`} to ${tenDown === null ? 'n/a' : `${fmtNumber(tenDown, 2)}%`}.`,
+        WEIGH_THE_REST,
       ],
     },
     given: given(st, s, false),
@@ -280,12 +280,12 @@ export function buildNpv(st: InvestmentState, s: Settings): LabReport {
     interpretation: {
       meaning: v === null ? 'NPV cannot be calculated from these figures.' : `At a discount rate of ${st.rate}%, the project’s returns are worth ${money2(sumPv, c)} in today’s money. Taking away the ${money(st.capitalCost, c)} cost leaves an NPV of **${money2(v, c)}**: ${v >= 0 ? 'on these estimates the project earns more than the rate the money could earn elsewhere' : 'on these estimates the money would earn more elsewhere at this rate'}.`,
       compare: `Compare the NPV with other projects’ NPVs at the same rate, and look at the rate itself: ${change ? `the NPV turns negative between ${change.below}% and ${change.above}%, so a business that requires ${change.above}% would reject a project that one requiring ${change.below}% would accept` : 'the table shows how much the answer depends on it'}. Compare the size of the NPV with the size of the investment: a small positive NPV on a large cost leaves little room for error.`,
-      benchmarks: 'The right rate reflects what the money could earn elsewhere and the risk of the project, so it differs between businesses and over time: when interest rates rise, or when a project is riskier, a higher rate is used and NPV falls. The guide’s table gives five rates, and an examination uses the table; in practice a business chooses its own rate.',
+      benchmarks: 'The right rate reflects what the money could earn elsewhere and the risk of the project, so it differs between businesses and over time: when interest rates rise, or when a project is riskier, a higher rate is used and NPV falls. The guide’s table gives five rates, and an examination uses the table; in practice a business chooses its own rate.' + ESTIMATES_NOTE,
       actions: [
         'Agree the discount rate before appraising, so that it is not chosen to fit the answer.',
         `Test the estimates as well as the rate: ${pct(10, 0)} lower returns would change the NPV by about ${money(Math.round(sumPv * 0.1), c)}.`,
         'Compare projects of different sizes with care: a larger NPV may simply come from a larger investment.',
-        METHOD_LIMITS,
+        WEIGH_THE_REST,
       ],
     },
     given: given(st, s, true),
