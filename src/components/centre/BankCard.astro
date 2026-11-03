@@ -1,0 +1,206 @@
+---
+/**
+ * One question in the question bank: what it is (paper style, marks, command
+ * term and AO, subtopic), the question with any case evidence, the
+ * strong-response guidance behind a disclosure, where it lives, and, with
+ * JavaScript, a self-rating kept on this device. The guidance is the
+ * platform's for its own question; it is never an IB markscheme.
+ */
+import Exhibit from '../blocks/Exhibit.astro';
+import { corpus, href } from '../../lib/content';
+import { excerpt, inline, rich } from '../../lib/markup';
+import { PAPER_LABELS, RATING_HINTS, RATING_LABELS, type Rating } from '../../lib/bank';
+import type { BankItem, Subtopic } from '../../lib/bank-build';
+
+interface Props {
+  item: BankItem;
+  n: number;
+  subtopics: Subtopic[];
+}
+const { item: it, n, subtopics } = Astro.props;
+const c = await corpus();
+const q = it.questionId ? c.questions[it.questionId] : undefined;
+const ms = q?.markscheme;
+const theCase = it.caseId ? c.cases[it.caseId] : undefined;
+const exhibits = theCase ? it.exhibits.map((e) => theCase.exhibits.find((x) => x.id === e)).filter((x) => x !== undefined) : [];
+const uid = `bq-${it.id}`;
+const sub = (code: string) => subtopics.find((s) => s.code === code);
+const RATINGS: Rating[] = [1, 2, 3];
+/** Longer stimuli fold away so the list stays scannable; the reader opens them to answer. */
+const LONG = 480;
+---
+
+<article class="bq" id={uid} data-bq={it.id} aria-labelledby={`${uid}-t`}>
+  <p class="bq__no" aria-hidden="true">{String(n).padStart(3, '0')}</p>
+  <div class="bq__main">
+    <p class="bq__meta">
+      <span class="bq__paper">{PAPER_LABELS[it.paper]}</span>
+      <span class="bq__marks">[{it.marks} {it.marks === 1 ? 'mark' : 'marks'}]</span>
+      <a class="bq__term" href={href.commandTerm(it.commandName)}>{it.commandName}<span class="sr-only">, command term at</span> <span class="bq__ao">{it.ao}</span></a>
+      {it.level === 'HL' && <span class="tag tag--hl">HL</span>}
+    </p>
+    <h4 class="bq__title" id={`${uid}-t`}>{it.title}</h4>
+    <p class="bq__codes">
+      {
+        it.codes.map((code) => (
+          <span>
+            {code} {sub(code)?.title}
+          </span>
+        ))
+      }
+    </p>
+    {
+      it.stimulus &&
+        (it.stimulus.length > LONG ? (
+          <details class="bq__more bq__stim-more">
+            <summary>
+              The stimulus <span class="bq__sum-note">{excerpt(it.stimulus, 90)}</span>
+            </summary>
+            <div class="bq__more-body bq__stimulus prose narrative" set:html={rich(it.stimulus)} />
+          </details>
+        ) : (
+          <div class="bq__stimulus prose narrative" set:html={rich(it.stimulus)} />
+        ))
+    }
+    <div class="bq__prompt prose" set:html={rich(it.prompt)} />
+
+    {
+      exhibits.length > 0 && theCase && (
+        <details class="bq__more bq__evidence">
+          <summary>
+            The case evidence: {exhibits.map((e) => `Exhibit ${e.id.replace(/^ex-/, '')}`).join(' and ')}
+            <span class="bq__sum-note">{theCase.title}{theCase.kind === 'fictional' ? ', fictional, simulated data' : ''}</span>
+          </summary>
+          <div class="bq__more-body stack">
+            {exhibits.map((e) => (
+              <Exhibit exhibit={e} caseTitle={theCase.title} caseHref={href.case(it.caseId ?? '')} headingLevel={4} idPrefix={uid} />
+            ))}
+          </div>
+        </details>
+      )
+    }
+
+    <div class="field bq__draft js-only">
+      <label for={`${uid}-draft`}>Your answer</label>
+      <textarea class="textarea" id={`${uid}-draft`} rows={it.marks >= 6 ? 8 : 4} aria-describedby={`${uid}-draft-hint`} data-draft></textarea>
+      <span class="field__hint" id={`${uid}-draft-hint`}>For this timed set only: it is cleared when you leave the set.</span>
+    </div>
+
+    <details class="bq__more bq__guide" data-guide>
+      <summary>Strong-response guidance</summary>
+      <div class="bq__more-body">
+        <p class="bq__guide-note">
+          The platform's guidance for its own question{ms && ms.points.length > 0 ? ', with the marks it allocates' : ''}. It is not an IB markscheme.
+        </p>
+        {ms?.guidance && <div class="prose" set:html={rich(ms.guidance)} />}
+        {
+          ms?.answer && (
+            <div class="bq__answer">
+              <p class="label">Answer</p>
+              <div class="prose" set:html={rich(ms.answer)} />
+            </div>
+          )
+        }
+        {
+          ms && ms.points.length > 0 && (
+            <ul class="bq__points">
+              {ms.points.map((p) => (
+                <li>
+                  <span class="bq__pm">[{p.marks}]</span>
+                  <span set:html={inline(p.text)} />
+                </li>
+              ))}
+            </ul>
+          )
+        }
+        {
+          ms && ms.levels.length > 0 && (
+            <div class="table-scroll" role="region" aria-label={`Levels for: ${it.title}`} tabindex="0">
+              <table class="table bq__levels">
+                <thead>
+                  <tr>
+                    <th scope="col">Marks</th>
+                    <th scope="col">What a response at this level does</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ms.levels.map((l) => (
+                    <tr>
+                      <th scope="row" class="n">
+                        {l.marks.replace('-', ' to ')}
+                      </th>
+                      <td set:html={inline(l.descriptor)} />
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
+        }
+        {
+          ms && ms.criteria.length > 0 && (
+            <ol class="bq__criteria" role="list">
+              {ms.criteria.map((k) => (
+                <li>
+                  <p class="bq__crit">
+                    <span>{k.id}</span> {k.name} <span class="muted">out of {k.marks}</span>
+                  </p>
+                  <div class="small" set:html={rich(k.prompt)} />
+                </li>
+              ))}
+            </ol>
+          )
+        }
+        {
+          ms?.exemplar && (
+            <div class="bq__answer">
+              <p class="label">A strong answer might read</p>
+              <div class="prose narrative" set:html={rich(ms.exemplar)} />
+            </div>
+          )
+        }
+        {it.guidance && <div class="prose" set:html={rich(it.guidance)} />}
+        {
+          it.answer && (
+            <div class="bq__answer">
+              <p class="label">Worked answer</p>
+              <div class="prose" set:html={rich(it.answer)} />
+            </div>
+          )
+        }
+        {
+          q && q.errors.length > 0 && (
+            <div class="bq__errors">
+              <p class="label">Where marks are lost</p>
+              <ul>
+                {q.errors.map((e) => (
+                  <li set:html={inline(e)} />
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      </div>
+    </details>
+
+    <div class="bq__foot">
+      <p class="bq__origin">
+        {it.origin}. <a href={it.href}>Open it in context<span class="sr-only">: {it.title}</span></a>
+      </p>
+      <fieldset class="bq__rate js-only" data-rate>
+        <legend>Rate your answer against the guidance</legend>
+        <div class="bq__opts">
+          {
+            RATINGS.map((r) => (
+              <label class="bq__opt" title={RATING_HINTS[r]}>
+                <input type="radio" name={`${uid}-rate`} value={String(r)} />
+                <span>{RATING_LABELS[r]}</span>
+              </label>
+            ))
+          }
+        </div>
+        <p class="bq__status" data-status>Not attempted yet.</p>
+      </fieldset>
+    </div>
+  </div>
+</article>

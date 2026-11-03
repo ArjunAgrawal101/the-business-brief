@@ -15,11 +15,13 @@ interface Props {
   caseTitle?: string;
   caseHref?: string;
   headingLevel?: 3 | 4;
+  /** Makes the exhibit's ids unique when it appears more than once on a page (the question bank). */
+  idPrefix?: string;
 }
-const { exhibit: e, caseTitle, caseHref, headingLevel = 3 } = Astro.props;
+const { exhibit: e, caseTitle, caseHref, headingLevel = 3, idPrefix } = Astro.props;
 const no = e.id.replace(/^ex-/, '');
 const H = headingLevel === 3 ? 'h3' : 'h4';
-const titleId = `${caseTitle ? caseTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' : ''}${e.id}-title`;
+const titleId = `${idPrefix ? `${idPrefix}-` : ''}${caseTitle ? caseTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' : ''}${e.id}-title`;
 ---
 
 <figure class="exhibit" id={caseTitle ? undefined : e.id} aria-labelledby={titleId}>
