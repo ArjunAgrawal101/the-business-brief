@@ -89,6 +89,20 @@ async function changeSomething(root: Locator): Promise<string> {
   return picked.kind;
 }
 
+/**
+ * Everything a tool keeps in this browser must be declared on the privacy
+ * page: an item there either names the key exactly or, ending in "…", the
+ * prefix of a family of keys.
+ */
+async function expectDeclared(page: Page) {
+  const html = await (await page.request.get('/privacy/')).text();
+  const declared = [...html.matchAll(/<code[^>]*>\s*(bb:[^<]+?)\s*<\/code>/g)].map((m) => (m[1] ?? '').trim());
+  expect(declared.length, 'the privacy page lists what is kept').toBeGreaterThan(10);
+  const kept = await page.evaluate(() => Object.keys(localStorage).filter((k) => k.startsWith('bb:')));
+  const undeclared = kept.filter((k) => !declared.some((d) => (d.endsWith('…') ? k.startsWith(d.slice(0, -1)) : k === d)));
+  expect(undeclared, 'kept in this browser but not declared on the privacy page').toEqual([]);
+}
+
 /** A change a reader would make, for the tools where the first control is not a fair test. */
 type Act = (root: Locator) => Promise<void>;
 
@@ -107,6 +121,7 @@ async function useAndKeep(page: Page, url: string, ix: string, act?: Act) {
   await page.reload();
   const again = await ready(page, ix);
   await expect.poll(() => snapshot(again), { message: 'the work is still there after a reload' }).toEqual(after);
+  await expectDeclared(page);
   expect(errors, 'no script errors').toEqual([]);
 }
 
@@ -214,6 +229,7 @@ test('Paper 2 practice explains a slip, shows the working and accepts the right 
   await answer.fill(right);
   await check.click();
   await expect(root.locator('[data-feedback]')).toContainText('Right.');
+  await expectDeclared(page);
 });
 
 test('the question bank searches, and keeps a self-rating after a reload', async ({ page }) => {
@@ -233,6 +249,7 @@ test('the question bank searches, and keeps a self-rating after a reload', async
   await page.reload();
   await ready(page, 'bank');
   await expect(page.locator(`[data-bq="${id}"] [data-rate] input[value="1"]`)).toBeChecked();
+  await expectDeclared(page);
 });
 
 test('the Paper 1 workspace tags a sentence as evidence and keeps it', async ({ page }) => {
@@ -251,4 +268,5 @@ test('the Paper 1 workspace tags a sentence as evidence and keeps it', async ({ 
   await page.reload();
   const again = await ready(page, 'p1-workspace');
   await expect.poll(() => again.locator('[data-board]').textContent()).toBe(after);
+  await expectDeclared(page);
 });
