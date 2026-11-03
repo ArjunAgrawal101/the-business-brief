@@ -1,0 +1,150 @@
+# Enrichment map: corporate finance, for the undergraduate and MBA pathways.
+# Beyond the IB course. The platform's own summary, organized around the three
+# decisions a finance function makes. Formulas are standard forms; the IB's own
+# forms of NPV and gearing (guide pp. 64 to 66) are noted where they differ.
+title: Corporate finance
+scope: enrichment
+audience: [undergraduate, mba]
+field: Finance
+order: 2
+summary: How a business decides which investments to make, how to pay for them and what to return to its owners, with the time value of money and risk at the centre of each decision.
+centre: Corporate finance
+branches:
+  - label: Three decisions
+    kind: concept
+    children:
+      - label: 'Investment: which projects and assets'
+        term: investment-appraisal
+        core: true
+      - label: 'Financing: debt, equity or retained profit'
+        core: true
+      - label: 'Payout: dividends or reinvestment'
+        term: dividend
+        core: true
+      - label: The aim is long-run value, not this year's profit
+        kind: definition
+        term: shareholder-value
+        note: Value depends on the size, timing and risk of future cash flows.
+  - label: Time value of money
+    kind: calculation
+    children:
+      - label: Present value
+        kind: formula
+        term: present-value
+        core: true
+        formula: 'PV = cash flow in year n ÷ (1 + r)^n'
+        note: r is the discount rate. In the IB course the discount factors come from a table.
+      - label: Net present value
+        kind: formula
+        term: net-present-value
+        core: true
+        formula: 'NPV = sum of the present values of future cash flows − initial investment'
+        note: The same idea as the IB's NPV (HL), with the rate set by the cost of capital.
+      - label: Internal rate of return
+        note: The discount rate at which NPV is zero; a project passes if it beats the cost of capital.
+      - label: Payback and ARR as quick screens
+        term: payback-period
+        note: Payback ignores cash after the payback point; ARR ignores timing.
+      - label: Discounting does not make a forecast reliable
+        kind: limitation
+        note: Precise arithmetic on uncertain cash flows still gives an uncertain answer.
+  - label: Risk and the cost of capital
+    kind: theory
+    children:
+      - label: The return investors require
+        kind: definition
+        core: true
+        note: The cost of capital is the hurdle a project must clear; riskier projects face a higher one.
+      - label: Weighted average cost of capital
+        kind: formula
+        core: true
+        formula: 'WACC = (E ÷ V) × cost of equity + (D ÷ V) × cost of debt × (1 − tax rate)'
+        note: E is equity, D is debt and V is E + D, each at market value.
+      - label: The cost of equity from the CAPM
+        kind: formula
+        formula: 'Required return = risk-free rate + beta × (market return − risk-free rate)'
+        note: Beta measures how far a share tends to move with the market as a whole.
+      - label: Only market-wide risk is rewarded
+        note: Investors can diversify away risks specific to one firm, so they are not paid to bear them.
+  - label: Financing choices
+    kind: types
+    children:
+      - label: Retained profit
+        kind: type
+        term: retained-profit
+        note: No new owners or lenders, but it competes with dividends.
+      - label: Debt
+        kind: type
+        term: loan-capital
+        note: Interest is usually tax-deductible; repayments fall due whatever happens.
+      - label: Equity
+        kind: type
+        term: share-capital
+        note: No fixed payments, but new owners share control and future profit.
+      - label: Gearing magnifies returns and risk
+        term: gearing-ratio
+        core: true
+        note: The IB measures it against capital employed; many university texts use debt to equity.
+      - label: Capital structure is a trade-off
+        core: true
+        note: Tax savings on debt against the costs of financial distress.
+        children:
+          - label: Without taxes or distress costs the mix would not matter
+            note: The starting point set out by Modigliani and Miller.
+  - label: Working capital and liquidity
+    kind: application
+    children:
+      - label: Cash conversion cycle
+        kind: formula
+        term: working-capital-cycle
+        core: true
+        formula: 'Cash conversion cycle = stock days + debtor days − creditor days'
+        note: The days cash is tied up between paying suppliers and being paid by customers.
+      - label: Growth uses up cash
+        term: overtrading
+        note: More sales mean more stock and more debtors before more cash arrives.
+      - label: Liquidity ratios as warning lights
+        term: current-ratio
+  - label: Judging the numbers
+    kind: evaluation
+    children:
+      - label: What does the answer assume?
+        kind: question
+        core: true
+        note: Test growth, margins and the discount rate with sensitivity analysis.
+      - label: Profit is not cash
+        kind: limitation
+        note: Depreciation and credit sales separate the two.
+      - label: Flexibility has value
+        note: Options to expand, delay or abandon later are worth something that NPV can miss.
+      - label: Strategy and ethics can outweigh a positive NPV
+        kind: limitation
+        core: true
+builds:
+  - code: '3.2'
+    label: Internal and external sources of finance
+  - code: '3.5'
+    label: Profitability and liquidity ratios
+  - code: '3.6'
+    label: 'HL: the gearing ratio and efficiency ratios'
+  - code: '3.7'
+    label: Cash flow and working capital
+  - code: '3.8'
+    label: Payback, ARR and, at HL, NPV
+related:
+  - map: strategy-formulation
+    label: The options a valuation compares
+  - map: corporate-governance
+    label: Who decides how profit is used
+  - map: entrepreneurship
+    label: Financing before there are profits
+basis:
+  note: >
+    The platform's own summary of established finance ideas, written for the undergraduate and MBA pathways.
+    It goes beyond the IB course and is aligned to no university course or textbook, because none was
+    supplied. Formulas are given in standard forms. Ideas are named with the people usually credited with
+    them; their works were not opened for this map.
+  sources:
+    - source: ib-bm-guide-2024
+      pages: 64 to 66
+      for: The IB's own forms of gearing and NPV, and its discount table, for comparison

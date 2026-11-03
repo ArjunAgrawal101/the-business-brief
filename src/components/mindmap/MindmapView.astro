@@ -7,17 +7,16 @@
  * and print.
  */
 import MindOutline from './MindOutline.astro';
-import { BRANCH_COLOURS, BRANCH_LABELS, layout, renderSvg } from '../../lib/mindmap';
+import { BRANCH_COLOURS, BRANCH_LABELS, layout, mapCode, renderSvg, type AnyMap } from '../../lib/mindmap';
 import { href } from '../../lib/content';
 import { jsonForScript } from '../../lib/markup';
-import type { Mindmap } from '../../lib/schemas';
 
 interface Props {
   id: string;
-  map: Mindmap;
+  map: AnyMap;
 }
 const { id, map } = Astro.props;
-const codeLabel = map.scope === 'unit' ? `Unit ${map.unit}` : map.code;
+const codeLabel = mapCode(map);
 const svg = renderSvg(layout(map), {
   code: codeLabel,
   glossaryHref: href.glossary,
@@ -68,7 +67,7 @@ const config = { id, map, code: codeLabel, glossary: '/glossary/' };
     }
     <li><span class="mm-legend__mark" aria-hidden="true">+</span> Advantage</li>
     <li><span class="mm-legend__mark mm-legend__mark--minus" aria-hidden="true">&minus;</span> Limitation</li>
-    <li><span class="tag tag--hl">HL</span> HL only</li>
+    {map.scope !== 'enrichment' && <li><span class="tag tag--hl">HL</span> HL only</li>}
   </ul>
   <details class="mm-outline" open>
     <summary>The map as an outline</summary>

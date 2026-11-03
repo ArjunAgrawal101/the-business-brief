@@ -5,8 +5,7 @@
  * download buttons, which also embed the fonts.
  */
 import { MONOGRAM } from './brand';
-import { esc, layout, renderSvg, type LayoutOptions } from './mindmap';
-import type { Mindmap } from './schemas';
+import { esc, layout, mapCode, renderSvg, type AnyMap, type LayoutOptions } from './mindmap';
 
 export interface ExportOptions extends LayoutOptions {
   /** The map's page, printed in the footer. */
@@ -15,8 +14,8 @@ export interface ExportOptions extends LayoutOptions {
   fontCss?: string;
 }
 
-export function brandedSvg(id: string, map: Mindmap, o: ExportOptions): string {
-  const code = map.scope === 'unit' ? `Unit ${map.unit}` : map.code;
+export function brandedSvg(id: string, map: AnyMap, o: ExportOptions): string {
+  const code = mapCode(map);
   const full = layout(map, { collapsed: o.collapsed, revision: o.revision });
   const inner = renderSvg(full, { code, title: `Mindmap: ${map.title}`, description: map.summary, idPrefix: `mx-${id}` });
   const b = full.bounds;

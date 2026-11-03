@@ -26,6 +26,7 @@ const NAMES = [
   'interactives',
   'mindmaps',
   'notes',
+  'enrichmentMaps',
 ] as const;
 
 let loaded: Promise<Corpus> | null = null;
@@ -61,6 +62,7 @@ export const href = {
   question: (id: string) => `/exam-desk/practice/#q-${id}`,
   glossary: (id: string) => `/glossary/${id}/`,
   mindmap: (id: string) => `/mindmaps/${id}/`,
+  enrichmentMap: (id: string) => `/mindmaps/enrichment/${id}/`,
   commandTerm: (term: string) => `/examiner-lens/#ct-${slug(term)}`,
   pathway: (id: string) => `/pathways/${id}/`,
   concept: (id: string) => `/ib/concepts/#${id}`,

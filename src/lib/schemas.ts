@@ -754,6 +754,37 @@ export const mindmapSchema = z.object({
 });
 export type Mindmap = z.infer<typeof mindmapSchema>;
 
+/** Who an enrichment map is written for: the pathways that go beyond the IB course. */
+export const ENRICHMENT_AUDIENCES = ['undergraduate', 'mba'] as const;
+/** The area of management an enrichment map belongs to, for grouping on the index. */
+export const ENRICHMENT_FIELDS = ['Strategy', 'Finance', 'People', 'Leadership', 'Marketing', 'Operations', 'Enterprise', 'Governance', 'Sustainability'] as const;
+
+/**
+ * A mindmap of management ideas beyond the IB course, for the undergraduate
+ * and MBA pathways. It keeps the mindmap schema's centre, branches and nodes
+ * as they are, and replaces the IB code, unit and level with scope
+ * 'enrichment' and the audiences it is written for. Enrichment maps are a
+ * collection of their own (src/content/enrichment-maps/), so nothing that
+ * counts IB maps, IB coverage or IB resources can count one by mistake.
+ */
+export const enrichmentMapSchema = mindmapSchema
+  .omit({ code: true, scope: true, unit: true, level: true, connections: true, basis: true })
+  .extend({
+    scope: z.literal('enrichment'),
+    audience: z.array(z.enum(ENRICHMENT_AUDIENCES)).min(1),
+    field: z.enum(ENRICHMENT_FIELDS),
+    /** Where a reader who knows the IB course starts from: subtopics by code, with what the map builds on. */
+    builds: z.array(z.object({ code: z.string(), label: z.string() })).default([]),
+    /** Other enrichment maps, by id, with the link between them. */
+    related: z.array(z.object({ map: z.string(), label: z.string() })).default([]),
+    /** How the map was written. Any source it names must be in the register, with what it is cited for. */
+    basis: z.object({
+      note: md,
+      sources: z.array(z.object({ source: z.string(), pages: z.string().optional(), for: z.string() })).default([]),
+    }),
+  });
+export type EnrichmentMap = z.infer<typeof enrichmentMapSchema>;
+
 /* ------------------------------------------------------------------ */
 /* Topic notes: the full notes for a subtopic without a brief          */
 /* ------------------------------------------------------------------ */

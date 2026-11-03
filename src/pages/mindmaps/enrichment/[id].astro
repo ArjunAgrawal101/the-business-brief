@@ -1,0 +1,297 @@
+---
+/**
+ * One enrichment map: management ideas beyond the IB course, for the
+ * undergraduate and MBA pathways. The same engine and controls as an IB map,
+ * labelled enrichment in the address, the heading, a notice and the map
+ * itself, with the IB subtopics it builds on and the basis it was written from.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageIntro from '../../../components/layout/PageIntro.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import MindmapView from '../../../components/mindmap/MindmapView.astro';
+import ProvenanceTag from '../../../components/ui/ProvenanceTag.astro';
+import { corpus, href } from '../../../lib/content';
+import { enrichmentMapsInOrder, subtopicHref } from '../../../lib/learning';
+import { nodeCount, termsIn } from '../../../lib/mindmap';
+import { rich } from '../../../lib/markup';
+import type { EnrichmentMap } from '../../../lib/schemas';
+
+export async function getStaticPaths() {
+  const maps = await enrichmentMapsInOrder();
+  return maps.map(([id, map]) => ({ params: { id }, props: { id, map } }));
+}
+
+interface Props {
+  id: string;
+  map: EnrichmentMap;
+}
+const { id, map } = Astro.props;
+const c = await corpus();
+const maps = await enrichmentMapsInOrder();
+const index = maps.findIndex(([x]) => x === id);
+const prev = index > 0 ? maps[index - 1] : undefined;
+const next = index < maps.length - 1 ? maps[index + 1] : undefined;
+const AUDIENCE: Record<EnrichmentMap['audience'][number], { label: string; href: string }> = {
+  undergraduate: { label: 'Undergraduate', href: href.pathway('undergraduate') },
+  mba: { label: 'MBA and advanced', href: href.pathway('mba') },
+};
+const subs = (c.curricula['ib-dp-bm']?.units ?? []).flatMap((u) => u.subtopics);
+const builds = map.builds.map((b) => ({ ...b, title: subs.find((s) => s.code === b.code)?.title ?? b.code, href: subtopicHref(c, b.code) }));
+const related = map.related.map((r) => ({ ...r, map: c.enrichmentMaps[r.map], id: r.map })).filter((r) => r.map);
+const terms = termsIn(map)
+  .map((t) => ({ id: t, entry: c.glossary[t] }))
+  .filter((t) => t.entry)
+  .sort((a, b) => a.entry!.term.localeCompare(b.entry!.term));
+const AVAILABILITY: Record<string, string> = {
+  supplied: 'Supplied to the platform and read.',
+  referenced: 'Cited as a bibliographic reference; not opened for this map.',
+  repository: 'In the platform repository.',
+  'web-search': 'Found by web search.',
+  'not-available': 'Not available to the platform.',
+};
+const sources = map.basis.sources.map((s) => {
+  const e = c.sources[s.source];
+  const cite = [e?.author, e?.year ? `(${e.year})` : '', s.pages ? `p. ${s.pages}` : ''].filter(Boolean).join(' ');
+  return { ...s, title: e?.title ?? s.source, cite, checked: AVAILABILITY[e?.availability ?? ''] ?? '' };
+});
+let n = 0;
+---
+
+<BaseLayout title={`${map.title}: enrichment map`} description={`Enrichment beyond the IB course, for undergraduate and MBA learners: ${map.summary}`} section="mindmaps">
+  <PageIntro
+    trail={[{ label: 'Mindmaps', href: '/mindmaps/' }, { label: 'Enrichment', href: '/mindmaps/#enrichment' }, { label: map.title }]}
+    kicker={`Enrichment map · ${map.field} · Beyond the IB course`}
+    title={map.title}
+    lead={map.summary}
+  >
+    <div class="tags">
+      <ProvenanceTag kind="enrichment" />
+      {
+        map.audience.map((a) => (
+          <a class="tag tag--plain" href={AUDIENCE[a].href}>
+            For {AUDIENCE[a].label.toLowerCase()} learners
+          </a>
+        ))
+      }
+      <span class="tag tag--plain">{nodeCount(map)} ideas in {map.branches.length} branches</span>
+    </div>
+  </PageIntro>
+
+  <div class="wrap page-body">
+    <aside class="callout callout--enrichment em-notice" aria-label="About this map">
+      <span class="callout__kicker">Enrichment, not IB content</span>
+      <p>
+        This map goes beyond the IB Business Management course. It is not part of the syllabus, the IB does not assess it, and it does not count towards
+        the platform's coverage of the course. No university syllabus was supplied, so it is not aligned to any university course either: it is the
+        platform's own summary of established ideas, to read beside your own course's reading.
+      </p>
+    </aside>
+
+    <MindmapView id={`enrichment-${id}`} map={map} />
+
+    <p class="em-download">
+      <a href={`/downloads/mindmaps/enrichment/${id}.svg`} download>Download the full map as an SVG file</a>
+      <span class="small muted">Works without JavaScript; the buttons above also save the view you have open.</span>
+    </p>
+
+    <div class="em-grid">
+      {
+        builds.length > 0 && (
+          <section aria-labelledby="em-builds-h">
+            <SectionHead no={++n} title="Where it starts from the IB course" id="em-builds-h" dek="For readers who know the IB course: the subtopics this map builds on. The map goes further than any of them." level={2} />
+            <ul class="em-list">
+              {builds.map((b) => (
+                <li>
+                  <span class="em-list__head">
+                    <span class="em-list__code">{b.code}</span>
+                    <a href={b.href}>{b.title}</a>
+                  </span>
+                  <span class="small muted">{b.label}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+      {
+        related.length > 0 && (
+          <section aria-labelledby="em-related-h">
+            <SectionHead no={++n} title="Related enrichment maps" id="em-related-h" level={2} />
+            <ul class="em-list">
+              {related.map((r) => (
+                <li>
+                  <a href={href.enrichmentMap(r.id)}>{r.map!.title}</a>
+                  <span class="small muted">{r.label}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+    </div>
+
+    {
+      terms.length > 0 && (
+        <section class="em-terms" aria-labelledby="em-terms-h">
+          <SectionHead
+            no={++n}
+            title="Terms on the map"
+            id="em-terms-h"
+            dek="Where an idea on the map is the same as a term in the platform's glossary, the node links to it. The glossary defines each term as the IB course uses it."
+            level={2}
+          />
+          <ul class="em-chips">
+            {terms.map((t) => (
+              <li>
+                <a href={href.glossary(t.id)}>{t.entry!.term}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <section class="em-basis" aria-labelledby="em-basis-h">
+      <h2 class="label label--ink" id="em-basis-h">How this map was written</h2>
+      <div class="prose small" set:html={rich(map.basis.note)} />
+      {
+        sources.length > 0 && (
+          <ul class="small em-sources">
+            {sources.map((s) => (
+              <li>
+                <a href={href.source(s.source)}>{s.title}</a>{`${s.cite ? `, ${s.cite}` : ''}: ${s.for}. `}<span class="muted">{s.checked}</span>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </section>
+
+    <nav class="em-pager" aria-label="More enrichment maps">
+      {prev ? <a href={href.enrichmentMap(prev[0])}>&larr; {prev[1].title}</a> : <span />}
+      <a href="/mindmaps/#enrichment">All enrichment maps</a>
+      {next ? <a href={href.enrichmentMap(next[0])}>{next[1].title} &rarr;</a> : <span />}
+    </nav>
+  </div>
+</BaseLayout>
+
+<style>
+  .em-notice {
+    margin-bottom: var(--sp-6);
+  }
+
+  .em-notice p {
+    max-width: var(--text-max);
+  }
+
+  .em-download {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--sp-2) var(--sp-4);
+    margin-top: var(--sp-5);
+  }
+
+  .em-download a {
+    font-weight: 600;
+  }
+
+  .em-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+    gap: var(--sp-7);
+    margin-top: var(--sp-8);
+  }
+
+  .em-list {
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .em-list li {
+    display: grid;
+    gap: 0.15rem;
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .em-list a {
+    font-weight: 560;
+  }
+
+  .em-list__head {
+    display: flex;
+    gap: var(--sp-2);
+    align-items: baseline;
+  }
+
+  .em-list__code {
+    min-width: 2rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--brass-text);
+  }
+
+  .em-terms {
+    margin-top: var(--sp-8);
+  }
+
+  .em-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .em-chips li {
+    margin: 0;
+  }
+
+  .em-chips a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2rem;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: var(--surface-sheet);
+    color: var(--navy-900);
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+
+  .em-chips a:hover {
+    border-color: var(--gold-500);
+  }
+
+  .em-basis {
+    margin-top: var(--sp-8);
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--rule-hair);
+    max-width: var(--text-max);
+  }
+
+  .em-basis .prose {
+    margin-top: var(--sp-2);
+  }
+
+  .em-sources {
+    margin: var(--sp-3) 0 0;
+    padding-left: 1.1rem;
+  }
+
+  .em-pager {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    margin-top: var(--sp-6);
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--rule-hair);
+  }
+</style>

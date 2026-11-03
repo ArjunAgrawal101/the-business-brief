@@ -4,7 +4,7 @@
  */
 import { corpus, slug } from './content';
 import type { Corpus } from './integrity';
-import type { Mindmap, Note } from './schemas';
+import type { EnrichmentMap, Mindmap, Note } from './schemas';
 
 /** "3.10" sorts after "3.9". */
 export function codeKey(code: string): number {
@@ -62,4 +62,10 @@ export function noteParts(n: Note): string[] {
 export async function mindmapsInOrder(): Promise<Array<[string, Mindmap]>> {
   const c = await corpus();
   return Object.entries(c.mindmaps).sort(([, a], [, b]) => a.unit - b.unit || (a.scope === b.scope ? codeKey(a.code) - codeKey(b.code) : a.scope === 'unit' ? -1 : 1));
+}
+
+/** The enrichment maps beyond the IB course, in their own order. They are never mixed into the IB maps above. */
+export async function enrichmentMapsInOrder(): Promise<Array<[string, EnrichmentMap]>> {
+  const c = await corpus();
+  return Object.entries(c.enrichmentMaps).sort(([, a], [, b]) => a.order - b.order);
 }
