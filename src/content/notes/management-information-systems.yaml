@@ -1,0 +1,508 @@
+# Notes: 5.9 Management information systems (HL only). Written in the
+# platform's own words from the guide's content statements (pp. 35 to 36), so
+# every section and question is HL. The guide uses "management information
+# systems" for the advanced computer technologies of 5.9 taken together, and
+# the notes follow that use. The guide sets no formula for this subtopic; the
+# labour turnover figures use the standard form from the notes for 2.4. The
+# supplied coursebook chapter (Hodder, pp. 549 to 559) and the teacher support
+# material's glossary (pp. 80 to 90) were read only to check coverage and
+# definitions; nothing from either is reproduced. Every business named is
+# fictional and every figure simulated; each figure was checked by script.
+code: '5.9'
+title: Management information systems
+level: HL
+introduction: |
+  Every sale, delivery, click and shift now leaves a trail of data. Businesses that can collect it, keep it safe and turn it into good decisions gain an advantage that is hard to copy; businesses that collect it carelessly, or use it in ways their customers and employees find intrusive, take on risks they may not see until it is too late.
+
+  This HL subtopic covers the technologies the guide groups as **management information systems**, from databases and data analytics to artificial intelligence and big data. You need to describe some (AO1), explain how businesses use others (AO2), and evaluate loyalty programmes, data mining, the monitoring of employees and the benefits, risks and ethics of the whole field (AO3).
+objectives:
+  - '**Describe** databases, data analytics, cybersecurity and cybercrime.'
+  - '**Explain** how businesses use critical infrastructures (artificial neural networks, data centres and cloud computing), virtual reality, the internet of things, artificial intelligence and big data.'
+  - '**Evaluate** customer loyalty programmes and the use of data mining to inform decisions.'
+  - '**Evaluate** the use of data to manage and monitor employees, including digital Taylorism.'
+  - '**Discuss** the benefits, risks and ethical implications of management information systems for decision-making and for stakeholders.'
+situation:
+  title: Marrowby's data plan
+  fictional: true
+  text: |
+    Marrowby, a fictional chain of 60 grocery stores, is losing customers to a discount rival. Its new chief digital officer proposes a three-part plan: an app-based loyalty programme that rewards repeat shopping and records every purchase; an artificial intelligence system that mines those records, together with weather forecasts and local events, to predict demand in each store; and wrist-worn scanners for warehouse pickers that set a target time for every order and rank the pickers by speed.
+
+    The finance director likes the forecasts, because Marrowby throws away about 4% of its fresh food. The warehouse manager warns that pickers already feel watched. And last month a fake email tricked a store manager into giving away a password, and criminals copied the email addresses of thousands of customers.
+
+    Should Marrowby build its future on data, and if so, how far should it go?
+sections:
+  - id: data-and-analytics
+    title: Management information systems, databases and data analytics
+    kind: concept
+    level: HL
+    body: |
+      A **management information system (MIS)** gathers data about a business's operations, customers and environment and turns it into information that managers can use to plan, monitor and decide. In everyday use an MIS is often one reporting system, such as a sales or stock system. The guide uses the term more widely, for all the advanced computer technologies in this subtopic taken together, and these notes follow the guide.
+
+      **Data** are raw facts: a till record, a temperature reading, a delivery time. **Information** is data organized so that it means something to a decision-maker, such as sales by store this week compared with last year. Information is useful only if it is accurate, timely, relevant, complete enough to act on and presented clearly; a report that arrives too late or buries the key figure on page forty helps nobody.
+
+      Two foundations come first. A **database** stores data in an organized way, usually in tables of records, such as customers, products and orders, each with fields such as name, postcode and date. Linking the tables lets managers search, sort and combine the data in seconds. **Data analytics** is the examination of data to find patterns and answer questions, using statistics, charts and, increasingly, software that learns. It ranges from describing what happened to recommending what to do next, and it includes data mining, which searches very large data sets for patterns that predict behaviour.
+    diagram: mis-data-flow
+    points:
+      - term: Database
+        text: An organized, searchable store of related records, held electronically. Its value depends on the data being accurate, up to date, secure and collected lawfully.
+      - term: Descriptive analytics
+        text: What happened? For example, sales of each product by store and by week, shown in tables and charts.
+      - term: Diagnostic analytics
+        text: Why did it happen? For example, linking a fall in sales to a rival's promotion or to bad weather.
+      - term: Predictive analytics
+        text: What is likely to happen? For example, forecasting next week's demand from past sales, the weather and local events.
+      - term: Prescriptive analytics
+        text: What should we do? For example, software that recommends how much of each product to order for each store.
+    example:
+      title: Where Marrowby's data comes from
+      fictional: true
+      text: Marrowby already holds a great deal of data without a loyalty programme. Its tills record every item sold, its stock system records every delivery and every item thrown away, and its staff rota records who worked when. Until now, store managers have received a weekly sales report and little else. The data exists; what is missing is a way to link it, analyse it and put the results in front of the people who order stock, which is what an MIS is for.
+  - id: cybersecurity
+    title: Cybersecurity and cybercrime
+    kind: concept
+    level: HL
+    body: |
+      **Cybercrime** is illegal activity carried out with computers or networks: breaking into systems, stealing data or money, spreading malicious software or knocking a website offline. Businesses are attractive targets because they hold customers' personal and payment details, depend on their systems to trade and may pay to get them back. Attacks range from mass emails sent to millions in the hope that someone clicks, to patient, targeted campaigns against a single company.
+
+      **Cybersecurity** is the defence: the technology, procedures and training a business uses to protect its systems and data. Technical measures include firewalls, encryption, two-step logins, prompt software updates and backups kept separately from the main systems. Just as important are people and procedures, because many attacks succeed by tricking an employee rather than by breaking the technology: training staff to spot fake emails, limiting who can reach sensitive data, and having a tested plan for responding to an attack, which is contingency planning (subtopic 5.7) applied to cybercrime.
+
+      The costs of a successful attack are rarely only financial. A business may lose sales while systems are down, pay to investigate and repair the damage, face fines for failing to protect personal data and compensate customers, and lose the trust of customers who wonder what else it has failed to protect. Every new device, app and data set an MIS adds is also a new way in, so cybersecurity has to grow with the system.
+    points:
+      - term: Hacking
+        text: Gaining access to a computer system without permission, to steal, change or destroy data, or to take control of the system.
+      - term: Phishing
+        text: Fake emails, messages or websites that pretend to come from a trusted source and trick people into revealing passwords or payment details, or into opening harmful files.
+      - term: Malware and ransomware
+        text: Malicious software, such as viruses and spyware, installed without the owner's knowledge. Ransomware locks or encrypts a business's files and demands payment to release them.
+      - term: Denial-of-service attack
+        text: Flooding a website or network with so much traffic from many computers that genuine customers cannot reach it, stopping online sales until it is resolved.
+      - term: Insider threats
+        text: Employees or contractors who steal or leak data, deliberately or through carelessness, which is why access to sensitive data is limited to those who need it.
+    example:
+      title: The email that cost Marrowby its customers' trust
+      fictional: true
+      text: The fake email that tricked Marrowby's store manager looked like a message from its IT supplier, asking staff to confirm their password. With that password, criminals reached a customer mailing list and copied thousands of email addresses. No payment details were taken, but customers began receiving convincing fake offers in Marrowby's name. The attack cost little to carry out and a great deal to put right. It also exposes the weakness in the chief digital officer's plan, which would collect far more data on far more customers through a business that has just shown it cannot yet protect what it holds.
+  - id: critical-infrastructure
+    title: 'Critical infrastructures: data centres, cloud computing and artificial neural networks'
+    kind: concept
+    level: HL
+    body: |
+      Every MIS rests on **critical infrastructure**: the underlying systems that store data, run software and connect everything together, so that their failure would stop much of the business. The guide names three. They decide where a business's data is held, how securely, how much can be stored and how quickly it can be reached and analysed.
+
+      A **data centre** is a building, or a secure room, full of servers, storage and network equipment. A business can run its own, rent space in a shared one, or rely on those of a cloud provider. Data centres need reliable power, cooling and physical security, and they use a great deal of electricity, which raises questions of cost and sustainability. **Cloud computing** means using storage, software and computing power that another business provides over the internet, and paying for what is used. It lets staff reach files and applications from anywhere, lets capacity rise and fall with demand, and turns a large capital cost into a running cost, at the price of dependence on the provider and on the connection to it.
+
+      An **artificial neural network (ANN)** is a computing system loosely modelled on the brain: layers of connected processing units that learn to recognize patterns by being trained on large numbers of examples, adjusting the strength of their connections each time they get an answer wrong. Neural networks are the engine behind most modern artificial intelligence, from recognizing speech and images to spotting fraud, and they can find patterns too complex for people or simple statistics. They need large amounts of good data and computing power, and it can be hard to explain why a network reached a particular answer.
+    points:
+      - term: Own data centre
+        text: Gives full control over where data is held and how it is protected, but costs a great deal to build, staff and power, and capacity must be bought in advance of need.
+      - term: Cloud computing
+        text: Flexible, scalable and paid for as it is used, with security and maintenance handled by a specialist. But the business depends on the provider, pays fees for as long as it uses the service, and must check where its data is stored and who can see it.
+      - term: Artificial neural network
+        text: Learns from examples rather than following rules written by a programmer. Powerful for recognizing patterns in images, sound, text and transactions, but only as good as its training data, and its reasoning is hard to inspect.
+      - term: Single points of failure
+        text: If a business's data and software sit in one place, an outage, a fire or a cyberattack there stops everything. Copies in a second data centre or region are the usual contingency measure.
+    example:
+      title: Moving Marrowby to the cloud
+      fictional: true
+      text: |
+        Marrowby's data sits on servers in a small room at its head office, bought eight years ago and now nearly full. Rather than spend on new servers, it moves its systems to a cloud provider, paying a monthly fee that rises and falls with use, and keeping copies in a second region. The same provider rents out the computing power needed to train a neural network on three years of till data, weather records and local events, something Marrowby could never have afforded to buy outright. The trade-off is dependence: if the provider or Marrowby's internet connection fails, so do the tills' price checks and the ordering system, so the contingency plan must cover that too.
+  - id: ai-and-big-data
+    title: Artificial intelligence and big data
+    kind: concept
+    level: HL
+    body: |
+      **Artificial intelligence (AI)** describes computer systems that do tasks normally needing human intelligence: understanding language, recognizing images, making predictions and recommending choices. Much of it learns from data rather than following fixed rules. Businesses use it to answer customers through chatbots, recommend products, detect fraud, forecast demand, set prices, screen job applications and automate routine office work.
+
+      **Big data** describes data sets so large, fast-moving and varied that ordinary databases and software cannot easily store or analyse them. It is often summed up by three Vs: **volume**, the sheer quantity; **velocity**, the speed at which it arrives, often in real time; and **variety**, the many forms it takes, from transactions and sensor readings to text, images and video. Big data comes from loyalty cards, websites, apps, social media and connected devices, and its value lies in the patterns it can reveal about customers and operations.
+
+      The two depend on each other. Big data gives AI the examples it learns from, and AI, usually built on neural networks, is what makes it possible to analyse big data at all. Together they let a business decide faster and more consistently, and spread expert judgement cheaply, such as an insurer settling simple claims in minutes. But AI can also make confident mistakes, repeat the biases in its training data, and make decisions that nobody can fully explain, so someone must remain accountable for what it decides. And a pattern found in big data shows that two things move together, not that one causes the other.
+    points:
+      - term: What AI does well
+        text: Fast, consistent decisions on large numbers of routine cases; spotting patterns in images, sound and text; personalizing offers; working around the clock without tiring.
+      - term: Where AI goes wrong
+        text: Bias learned from past data; errors stated with confidence; poor judgement in unusual cases it was not trained on; and decisions that are hard to explain to the people they affect.
+      - term: The three Vs of big data
+        text: Volume (how much), velocity (how fast it arrives) and variety (how many forms it takes). Some writers add veracity, how trustworthy it is, which is often the real problem.
+      - term: Correlation, not cause
+        text: Big data can show that two things happen together, such as rainy weekends and soup sales, but not on its own why. Acting on a pattern without asking why risks acting on chance.
+    example:
+      title: Forecasting fresh food at Marrowby
+      fictional: true
+      text: Marrowby's AI system combines three years of sales for each product in each store with weather forecasts, school holidays and local events, and learns which combinations move demand. It predicts, for example, that strawberries sell far more in the store near the park on sunny Saturdays, and that soup sells more everywhere after a cold, wet week. Store managers still approve every order, because the system does not know that a road outside one store will close for repairs next week. The forecasts are a tool for their judgement, not a replacement for it.
+  - id: iot-and-vr
+    title: The internet of things and virtual reality
+    kind: types
+    level: HL
+    body: |
+      The **internet of things (IoT)** is the network of physical objects, such as machines, vehicles, meters, shelves and appliances, fitted with sensors and connections so that they collect data and share it over the internet, often without anyone having to do anything. A refrigerated lorry reports its temperature every minute; a machine warns that a part is wearing out; a smart meter reports energy use by the hour. Because so many devices now produce data continuously, the IoT is one of the main sources of big data.
+
+      For a business, the IoT means knowing what is happening as it happens rather than after the event. It allows **predictive maintenance**, repairing machines before they break; real-time tracking of stock and deliveries; automatic reordering; and new information about how customers really use a product. Each connected device is also another way into the business's systems for a cyberattack, and the data it collects about people's homes, cars and habits raises questions of privacy.
+
+      **Virtual reality (VR)** creates a computer-generated, three-dimensional environment that a user can look around and interact with, usually through a headset. Businesses use it to train staff in situations that would be dangerous, rare or expensive to practise for real, to let customers explore a product or a property before buying, and to test designs and layouts before anything is built. It can cut the costs of travel, training and prototypes and make marketing memorable, but headsets and good content are expensive, some users find it uncomfortable, and many customers still want to see and touch the real thing.
+    points:
+      - term: IoT in operations
+        text: Sensors on machines, vehicles and stock give real-time data that cuts breakdowns, waste and delays, and supports just-in-time stock control by showing exactly what is where.
+      - term: IoT and customers
+        text: Connected products report how and when they are used, which helps a business improve them and offer services such as automatic repairs, but customers may object to how much the products reveal.
+      - term: VR for training
+        text: Staff rehearse emergencies, complex repairs or difficult conversations safely and repeatedly, and their performance can be measured.
+      - term: VR for marketing and design
+        text: Virtual tours, showrooms and product trials reach customers who cannot visit in person, and virtual prototypes let a business test a design before paying to build it.
+    example:
+      title: Sensors in the cold chain, headsets in training
+      fictional: true
+      text: Marrowby fits sensors to every chiller cabinet and delivery lorry. When a cabinet's temperature starts to rise at 3 a.m., an alert reaches the duty engineer before any food has to be thrown away, and over a year the data shows which cabinets fail most and should be replaced first. For training, new store staff practise handling a fire alarm, a fall in an aisle and an aggressive customer in a short VR course, which costs less than closing a store for drills and can be repeated until they are confident.
+  - id: loyalty-programmes
+    title: Customer loyalty programmes
+    kind: evaluation
+    level: HL
+    body: |
+      A **customer loyalty programme** rewards customers for repeat purchases, with points, discounts, free products or special treatment, while recording what each member buys, when and where. The guide sets it at AO3, so you need to judge whether a programme is worth what it costs, for the business in the case.
+
+      Businesses run them for two reasons. The first is **behaviour**: rewards give customers a reason to come back, buy more each visit and choose the brand over a rival, which builds brand loyalty and can make demand less sensitive to price, that is, less price elastic. The second, often more valuable, is **data**. A loyalty programme links purchases to a person, so the business learns who buys what, how often and in response to which offers, and can personalize promotions, plan stock and spot customers who are drifting away.
+
+      The costs are easy to underestimate. Rewards are paid on purchases customers would have made anyway, as well as on the extra ones the programme brings in. The app, the systems and the staff to run them cost money every year. Many customers belong to several rival schemes, so the loyalty may be bought rather than earned, and rivals can copy a scheme quickly. Using personal data carries legal duties and the risk of a breach, and personalized offers can feel intrusive, or unfair if some customers are charged more than others for the same goods.
+    points:
+      - term: Benefits
+        text: More repeat visits and higher spending per visit; customers less tempted by small price cuts elsewhere; detailed data for targeted marketing, stock planning and new products; and a direct channel to the best customers.
+      - term: Costs and risks
+        text: The cost of rewards, including those given on sales that would have happened anyway; the cost of running the systems; customers who join every scheme and stay loyal to none; copying by rivals; and the duties and risks that come with holding personal data.
+      - term: Ethical questions
+        text: Do members understand what data they are giving and how it will be used? Are offers personalized in ways that exploit customers' weaknesses, or that give worse prices to those who shop around less? The guide's own suggested knowledge question asks how prejudice and bias might become coded into such programmes.
+      - term: What it depends on
+        text: How much extra spending the scheme really creates, the size of the business's margins, whether it actually uses the data, how easily rivals can copy it, and how much customers trust the business with their information.
+    example:
+      title: Does Marrowby's loyalty app pay?
+      fictional: true
+      text: |
+        Customers who would join spend about $60 million a year at Marrowby. The app would give back 1% of members' spending as vouchers, and the app and the data team would cost $500,000 a year. Each extra dollar members spend adds about 25 cents of contribution, after the cost of the goods. All the figures are simulated.
+
+        If members spent 5% more, their spending would rise to $63 million:
+
+        - Extra contribution: 25% × $3,000,000 = $750,000.
+        - Rewards: 1% × $63,000,000 = $630,000, of which $600,000 is paid on spending that would have happened anyway.
+        - Running costs: $500,000.
+        - Change in profit: $750,000 − $630,000 − $500,000 = **−$380,000**.
+
+        On sales alone, members' spending would have to rise by about 7.6% just to break even. The case looks different once the data is used. If forecasts built on it cut the $2 million of fresh food Marrowby throws away by a quarter, that saves $500,000 and turns the result into **+$120,000**. The programme's value lies more in its data than in the extra shopping, and part of that saving could come from till data alone.
+  - id: data-mining
+    title: Data mining to inform decisions
+    kind: method
+    level: HL
+    body: |
+      **Data mining** is the use of software to search large data sets for patterns, links and trends that are not obvious, and to use them to predict what people or systems will do. Where descriptive analytics reports what happened, data mining looks for the patterns that help a business anticipate what will happen next, and it is one of the main ways big data and loyalty data are turned into decisions.
+
+      Its uses run through every function. Marketing finds which products are bought together and which customers are likely to leave; operations predicts which machines will fail and how much stock each store needs; finance flags transactions that look like fraud; human resources looks for the conditions that come before high absence or labour turnover. A simple version of the same idea, fitting a line to data on two variables, is simple linear regression in the HL toolkit.
+
+      Data mining can make decisions faster and better informed, but it does not make them for the business. It needs good-quality data, because errors in the data produce errors in the patterns; skilled people; and the right questions. With enough data it will always find some pattern, and some patterns are chance. A pattern shows correlation, not cause, so a sensible business tests a pattern, for example with a trial in a few stores, before acting on it across the whole business, and still applies judgement about what the numbers leave out.
+    points:
+      - term: Association
+        text: Finding things that happen together, such as products often bought in the same basket, to plan store layouts, promotions and bundles.
+      - term: Clustering
+        text: Grouping customers with similar behaviour into segments the business had not defined in advance, to target marketing more precisely.
+      - term: Classification and prediction
+        text: Using past cases to predict an outcome for a new one, such as whether a customer is likely to leave or a loan applicant is likely to repay.
+      - term: Anomaly detection
+        text: Spotting cases that do not fit the usual pattern, such as a fraudulent payment or a machine reading that signals a fault.
+      - term: Limits
+        text: Poor data gives poor results; chance patterns look real in large data sets; correlation is not cause; past patterns may not continue; and mining personal data raises legal and ethical questions.
+    example:
+      title: What Marrowby's data shows, and what it does not
+      fictional: true
+      text: Mining six months of loyalty data, Marrowby finds that members who stop buying fresh fruit and vegetables usually stop shopping at Marrowby altogether within two months. It tests the finding by sending half of those members an offer on fresh produce and the other half nothing. The group that receives the offer is noticeably more likely to keep shopping, so the pattern is worth acting on across the chain. Another pattern, that sales of umbrellas rise in weeks when a particular football team wins, is almost certainly chance, and nobody orders umbrellas by the league table.
+  - id: monitoring-employees
+    title: 'Managing and monitoring employees with data: digital Taylorism'
+    kind: evaluation
+    level: HL
+    body: |
+      The same technology that tracks customers can track employees. Scanners record how long each warehouse pick takes; software logs calls answered, keystrokes and time spent in each application; vehicles report their speed and location; apps assign gig workers their next job and rate how quickly they finish it. Managers use the data to set targets, plan shifts, spot training needs, reward performance and, sometimes, discipline or dismiss.
+
+      When data is used to break work into small, timed tasks, set a standard time for each and track every worker against it in real time, the result is called **digital Taylorism**. It is F. W. Taylor's scientific management (subtopic 2.4), the search for the one best way and close supervision of each worker, carried out by software instead of a supervisor with a stopwatch. Supporters point to higher productivity, consistent standards, objective measures of performance and, in some jobs, better safety.
+
+      Critics draw on the other motivation theories. Herzberg would expect close monitoring to work as a hygiene factor that causes dissatisfaction; Deci and Ryan would expect it to crush autonomy and with it intrinsic motivation. Workers under constant measurement report stress, a sense of being treated as machines, and pressure to hit the number rather than do the job well, and labour turnover often rises. There are also limits of law and ethics on what may be monitored and how openly. The judgement usually turns on how the data is used: to support people, by spotting where they need training, help or safer conditions, or to control them.
+    points:
+      - term: Benefits
+        text: Higher productivity and consistency; problems spotted early; fairer, evidence-based appraisal and pay; better safety where data reveals risks; and efficient scheduling of work.
+      - term: Costs and risks
+        text: Stress, demotivation and loss of autonomy; higher absence and labour turnover; workers gaming the measures, such as rushing at the expense of quality; damage to trust; and legal and ethical limits on surveillance.
+      - term: Supportive or controlling?
+        text: The same scanner can coach a new picker on the fastest route or rank every picker in public each hour. Openness about what is measured and why, consultation with employees and their representatives, and limits on the data's use make the difference.
+      - term: What it depends on
+        text: The kind of work (routine and measurable, or creative and varied), the culture and leadership style, the labour market (whether workers can easily leave), and the laws on privacy and employment.
+    formulas:
+      - name: Labour turnover
+        expression: Labour turnover = (number of employees leaving ÷ average number of employees) × 100
+        note: The standard form used in the notes for 2.4; the guide's list of formulae does not include it.
+    example:
+      title: The scanners in Marrowby's warehouse
+      fictional: true
+      text: |
+        Marrowby trials the wrist scanners for a year in a warehouse with an average of 120 pickers. Picks per hour rise from 100 to 112, a 12% gain, which saves $150,000 of agency staff. But the hidden costs grow too. All figures are simulated.
+
+        - **Labour turnover** rises from 20% (24 leavers) to 35% (42 leavers): (42 ÷ 120) × 100. The 18 extra leavers cost about $4,000 each to recruit and train, **$72,000**.
+        - **Errors** rise from 0.5% to 0.9% of a million orders a year, from 5,000 to 9,000, as pickers rush. At $10 each in refunds and redeliveries, the extra 4,000 errors cost **$40,000**.
+
+        The net gain is $150,000 − $72,000 − $40,000 = **$38,000**, far smaller than the 12% headline suggests, before counting absence, complaints or what the remaining pickers now think of their managers. Using the same scanners only to plan routes and coach new staff, without the public ranking, might keep much of the gain and lose less of the workforce.
+  - id: benefits-risks-ethics
+    title: Benefits, risks and ethics for decisions and stakeholders
+    kind: evaluation
+    level: HL
+    body: |
+      The guide's final statement asks you to weigh the benefits, risks and ethical implications of management information systems and technological innovation for business decisions and for stakeholders. It is the statement that draws the rest of the subtopic together, and the one most likely to appear as an extended question.
+
+      The **benefits** for decision-making are real: information arrives faster and in more detail, decisions can rest on evidence rather than habit, patterns can be spotted before they become problems, and routine decisions can be automated so that people concentrate on the difficult ones. This supports the scientific approach to decision-making in subtopic 2.3. The **risks** are as real: the cost of systems, skills and security; dependence on technology and on its suppliers; cyberattacks and data breaches; information overload, where managers have more data than they can use; poor-quality data producing confident but wrong answers; and the temptation to trust a model over judgement.
+
+      The **ethical** questions go beyond what the law allows. What data should a business collect, and have the people concerned really agreed? Are customers and employees treated fairly by algorithms they cannot see? Who is accountable when an AI system makes a harmful decision? What happens to the people whose jobs are automated? And what is the environmental cost of the energy data centres use? A business that answers these well builds trust that becomes part of its brand; one that ignores them risks fines, protests, lost customers and a workforce that does not trust its managers.
+    points:
+      - term: Privacy and consent
+        text: Collecting only the data that is needed, explaining clearly how it will be used, keeping it secure and deleting it when it is no longer needed. Many countries have data protection laws that require this, but trust depends on more than compliance.
+      - term: Bias and fairness
+        text: Systems trained on past decisions can repeat past discrimination, for example in recruitment, lending or which customers receive the best offers. Testing results across different groups of people and keeping humans responsible for decisions reduce the risk.
+      - term: Transparency and accountability
+        text: People affected by an automated decision should be able to find out how it was made and challenge it. A business cannot hand responsibility to an algorithm.
+      - term: Jobs and skills
+        text: Automation removes some jobs and changes many more, while creating new roles in data, security and analysis. How a business retrains and redeploys its people shapes how its employees and community see the change.
+      - term: Sustainability
+        text: Data centres and devices use large amounts of energy and materials, so the efficiency gains of an MIS should be weighed against its environmental footprint.
+applications:
+  - industry: Retail
+    text: Retailers lead in loyalty programmes, data mining of shopping baskets and AI forecasting of demand by store, product and day, which cuts waste and stock-outs. Their warehouses and delivery networks are also where digital Taylorism is most visible, and their huge customer databases make them prime targets for cybercrime.
+  - industry: Healthcare
+    text: AI helps read scans and spot patients at risk, records held in the cloud let clinicians see a patient's history wherever they are, and VR trains staff in rare procedures. Health data is among the most sensitive there is, so privacy, consent and cybersecurity weigh more heavily here than almost anywhere, and a ransomware attack can delay patients' treatment.
+  - industry: Banking
+    text: Banks use neural networks to flag fraudulent payments within a second and AI to make lending decisions, which raises questions of bias and of explaining a refusal to the customer. Trust is their product, so cybersecurity and reliable infrastructure, with backup data centres, are essential.
+  - industry: Manufacturing and logistics
+    text: IoT sensors on machines and vehicles allow predictive maintenance and real-time tracking of every delivery, and VR is used to design products and train staff safely. Data on workers' speed and location is widely collected, which brings the debate about digital Taylorism to the factory floor and the delivery van.
+  - industry: Hospitality and tourism
+    text: Hotels and airlines analyse booking data to change prices with demand, mine online reviews for recurring complaints, and offer virtual tours of rooms and resorts. Loyalty programmes are central in travel, and the personal data they hold, from passport details to travel habits, makes protecting it a priority.
+  - industry: Social enterprise
+    text: Low-cost cloud tools let a small social enterprise run a database, take online donations and measure its impact without owning any servers. The people it serves may be vulnerable, so it has a particular duty to collect as little personal data as possible and to protect it carefully, and funders increasingly expect data that shows results.
+stakeholders:
+  - group: Customers
+    text: They gain convenience, personalized offers, faster service and products that improve with feedback. They also give up data about their lives, may be targeted in ways they find intrusive or unfair, and suffer when a business fails to protect what it holds. Their interest in privacy can conflict with the business's interest in collecting as much as possible.
+  - group: Employees
+    text: Technology can remove dull, repetitive work, give them better information and open new, skilled roles. It can also automate their jobs away or measure their every movement, so their interest in autonomy and security can conflict with managers' interest in productivity and control.
+  - group: Managers
+    text: They gain faster, richer information and tools for forecasting and monitoring. They also face information overload, depend on systems and suppliers they may not fully understand, and remain accountable for decisions an algorithm helped to make.
+  - group: Owners and shareholders
+    text: Management information systems can cut costs, raise sales and support new business models, raising the value of the business. They also need large, continuing investment, and a single serious data breach can wipe out years of gains through fines, compensation and lost trust.
+  - group: Suppliers
+    text: Shared data on sales and stock helps suppliers plan production and deliver just in time. But a large retailer's data also gives it power over its suppliers, who may be required to invest in compatible systems and to accept terms set by the retailer's algorithms.
+  - group: Government and society
+    text: Governments set data protection, consumer and employment laws, fight cybercrime and increasingly regulate AI. Society gains from innovation and productivity, but bears the costs of job losses in some areas, the energy use of data centres and any bias built into widely used systems.
+evaluation:
+  - Technology does not make decisions better on its own. The quality of the data, the questions asked and the judgement of the people using the results decide whether an MIS improves decisions or simply speeds up mistakes.
+  - Patterns found by data mining and big data show correlation, not cause. A strong answer asks whether a pattern makes sense, whether it could be chance, and whether it has been tested before the business acts on it.
+  - Benefits and costs fall unevenly. A loyalty programme may pay mainly through its data rather than extra sales, and digital monitoring may raise output while hidden costs such as labour turnover and errors rise, so look for the costs the headline figures leave out.
+  - Every new device, data set and connection adds to the risk of cybercrime, so the value of an MIS depends on the business's ability to protect it. A business that has just suffered a breach should be cautious about collecting more personal data.
+  - The ethics are not an optional extra. What is legal is not always acceptable to customers and employees, and trust lost through intrusive or unfair use of data is hard to rebuild. Openness, consent and human accountability for automated decisions protect the business as well as its stakeholders.
+  - How far a business should go depends on its context, the kind of work and data involved, its scale, its culture and its legal environment. Monitoring that is reasonable for safety in a chemical plant may be intrusive in an office, and AI that suits thousands of routine insurance claims may not suit decisions about individual patients.
+decision:
+  title: How far should Marrowby go with data?
+  fictional: true
+  brief: |
+    Marrowby's board must decide what to do with the chief digital officer's plan. The analysis so far, all with simulated figures, shows:
+
+    - **The loyalty app** loses about $380,000 a year if members spend 5% more, but gains about $120,000 a year if forecasts built on its data cut fresh food waste by a quarter.
+    - **The wrist scanners** raised picking speed by 12% in a year's trial, but labour turnover rose from 20% to 35% and errors increased, leaving a net gain of about $38,000.
+    - **Security** is weak: last month's phishing attack exposed thousands of customers' email addresses, and the plan would collect detailed shopping histories for about 200,000 members.
+  options:
+    - label: The full plan, now
+      text: Launch the loyalty app, the AI forecasting and the wrist scanners with speed rankings across the business this year.
+    - label: Customers first, scanners changed
+      text: Launch the loyalty app and the forecasting, but use the scanners only to plan routes and coach new pickers, with no individual targets or rankings.
+    - label: Secure, then pilot
+      text: Spend six months on cybersecurity and data protection, including staff training, two-step logins and a named person responsible for data, while piloting the loyalty app in 10 stores. Decide on the rest when the pilot results are in.
+  guidance: |
+    Start with what the figures say. The loyalty app does not pay for itself through extra shopping unless members' spending rises by about 7.6%, so its case rests on the data being used to cut waste. That is plausible but unproven, and part of the saving could come from till data that Marrowby already holds. The scanners earn a small net gain, but only after the costs of turnover and errors that the headline figure hides, and before the costs nobody has measured, such as absence and morale.
+
+    Then weigh the risks the figures leave out. Collecting the shopping histories of 200,000 members through a business that has just been breached multiplies the damage of the next attack: fines, compensation and the loss of the very trust the app is meant to build. Ranking pickers in public is the controlling form of digital Taylorism that motivation theory predicts will demotivate, and the turnover figures suggest it already is.
+
+    The full plan now offers the most data soonest, but it carries the greatest security, ethical and people risk. Customers first, scanners changed, keeps the promising parts and removes the most damaging use of employee data, but it still collects personal data before the security problem is fixed. Secure, then pilot, is slower and may let the discount rival gain ground, but it tests the uncertain assumptions, protects customers and gives the board evidence before it commits.
+
+    A strong recommendation is likely to combine the second and third options: fix the security first, pilot the app, and change how the scanners are used now. Whatever is chosen, say what would change the decision, for example a pilot showing members' spending rising well above 7.6%, or a further security failure that makes any expansion of personal data unwise.
+exam:
+  - q: Describe **two** types of cybercrime that a business might face.
+    marks: 4
+    command: describe
+    level: HL
+    paper: '2'
+    answer: |
+      A strong answer names two distinct types and describes each clearly, with what it does to the business. For example:
+
+      - **Phishing:** fake emails or messages that appear to come from a trusted source and trick employees into giving away passwords or payment details, letting criminals into the business's systems.
+      - **Ransomware:** malicious software that locks or encrypts a business's files and demands payment to release them, stopping operations until it is resolved.
+
+      Hacking, denial-of-service attacks and the theft of customer data are equally valid. Two descriptions of the same type, or a list of names without description, would not be enough.
+  - q: |
+      Corvane Logistics, a fictional business, delivers chilled food from factories to supermarkets in a fleet of 80 refrigerated lorries.
+
+      Explain how the internet of things could help Corvane Logistics improve its operations.
+    marks: 4
+    command: explain
+    level: HL
+    paper: '2'
+    answer: |
+      A strong answer explains the internet of things as devices with sensors that share data automatically, then applies it to Corvane with developed points. For example:
+
+      - **Temperature sensors** in each lorry report in real time, so a failing refrigeration unit can be fixed before food spoils, which cuts waste and protects its reputation with supermarkets.
+      - **Location tracking** lets Corvane reroute lorries around delays and tell supermarkets exactly when deliveries will arrive.
+      - **Engine sensors** allow predictive maintenance, so lorries are repaired before they break down on the road.
+
+      Two points, each explained and linked to Corvane's chilled deliveries, are enough for full credit. A brief note that each connected lorry is also a cybersecurity risk shows wider understanding.
+  - q: |
+      Tidewell Coffee, a fictional chain of cafés, plans a loyalty app. Customers who would join spend $2,000,000 a year at present. The app would give back 5% of members' spending as free drinks and cost $40,000 a year to run. Tidewell expects members' spending to rise by 15%, and each extra dollar of sales adds 60 cents of contribution. All figures are simulated.
+
+      Calculate the expected change in Tidewell's annual profit from the loyalty app.
+    marks: 4
+    command: calculate
+    level: HL
+    paper: '2'
+    answer: |
+      - Members' spending with the app: $2,000,000 × 1.15 = $2,300,000, so extra sales are $300,000.
+      - Extra contribution: 60% × $300,000 = $180,000.
+      - Cost of rewards: 5% × $2,300,000 = $115,000.
+      - Running cost: $40,000.
+      - **Change in profit: $180,000 − $115,000 − $40,000 = +$25,000 a year.**
+
+      This is a contribution calculation, the method of subtopic 5.5 and the HL toolkit. The common error is to charge the rewards only on the extra $300,000; they are paid on all of members' spending. A full answer also notes how thin the gain is: if spending rose by 10% instead of 15%, the app would reduce profit by $30,000.
+  - q: |
+      With reference to Marrowby, analyse how artificial intelligence and big data could improve its decision-making.
+    marks: 6
+    command: analyse
+    level: HL
+    paper: '2'
+    answer: |
+      A strong response explains the two ideas, applies them to Marrowby's decisions and analyses the limits, rather than listing uses.
+
+      - **Big data:** Marrowby can combine till records, loyalty data, weather forecasts and local events, data of high volume, velocity and variety, to see patterns in demand by store and by day that weekly sales reports miss.
+      - **AI:** trained on that data, an AI system can forecast demand for each fresh product in each store, so orders match likely sales. Fewer items are thrown away (Marrowby currently wastes about 4% of its fresh food) and fewer shelves are empty.
+      - **Better decisions:** forecasts arrive faster and more consistently than managers' own estimates, freeing managers to deal with exceptions.
+      - **Limits:** the forecasts are only as good as the data; the system cannot know about events outside its data, such as a road closure; patterns may be chance; and the security weakness shown by the phishing attack means more data also means more risk. Managers should still approve orders.
+  - q: |
+      Evaluate the use of data to monitor employees in Marrowby's warehouse.
+    marks: 10
+    command: evaluate
+    level: HL
+    paper: '2'
+    answer: |
+      A strong response uses the trial's evidence, applies motivation theory, and reaches a judgement about how, not only whether, the data should be used.
+
+      - **The case for:** picks per hour rose 12% and saved $150,000 of agency staff; the data shows where pickers need training or better routes; it gives objective measures for appraisal.
+      - **The case against:** labour turnover rose from 20% to 35%, costing about $72,000, and errors rose to 0.9% of orders, costing about $40,000, so the net gain is only $38,000, before absence and morale are counted. Ranking pickers in public is digital Taylorism in its controlling form: Taylor's assumptions about motivation, applied by software. Herzberg would see close supervision as a hygiene factor that causes dissatisfaction, and Deci and Ryan would expect lost autonomy to destroy intrinsic motivation.
+      - **Wider issues:** employees' privacy and consent, possible conflict with employee representatives, and the warning from the warehouse manager that pickers already feel watched.
+      - **Judgement:** for example, that monitoring should continue in a supportive form, for routes, coaching and safety, without individual rankings, and with the measures explained to staff. The best answers say what would change the judgement, such as turnover falling back once the rankings stop.
+  - q: |
+      Haven Lines, a fictional social enterprise, runs a free telephone and text helpline for young people who are struggling with their mental health. It is staffed by trained volunteers and funded by donations. Its board wants to use a database and data analytics to understand who contacts the helpline, when and why.
+
+      Explain **two** challenges Haven Lines faces in using data about the people who contact it.
+    marks: 6
+    command: explain
+    level: HL
+    paper: '3'
+    answer: |
+      A strong response explains two distinct challenges, each developed and applied to Haven Lines. For example:
+
+      - **Privacy and trust.** The people who contact the helpline are young and vulnerable, and what they share is highly sensitive. If they fear that their details are recorded or could be identified, they may not call at all, so Haven Lines must collect as little as possible, make records anonymous and explain clearly what it keeps and why.
+      - **Security with limited resources.** Funded by donations, Haven Lines may lack the money and expertise for strong cybersecurity, yet a breach of mental health data would be devastating for the young people concerned and for the trust of donors.
+      - **Skills and data quality.** Volunteers record information between difficult conversations, so records may be incomplete or inconsistent, and the organization may have no one trained to analyse them well, so the patterns found could mislead.
+
+      Other valid challenges include meeting data protection laws and the cost of systems taking money from the helpline itself.
+summary:
+  - The guide uses **management information systems** for the advanced computer technologies of 5.9 taken together. They turn data into information that managers can use, if it is accurate, timely, relevant and secure.
+  - A **database** stores organized, searchable records; **data analytics** examines data to describe, explain, predict and recommend, and **data mining** searches large data sets for predictive patterns.
+  - '**Cybercrime** (hacking, phishing, malware and ransomware, denial of service, insider theft) threatens systems and data; **cybersecurity** defends them through technology, training, procedures and contingency plans.'
+  - '**Critical infrastructures** are the foundations an MIS runs on: **data centres**, **cloud computing** (flexible and paid for as used, but a dependence) and **artificial neural networks** (systems that learn patterns from examples and power most AI).'
+  - '**AI** makes fast, consistent predictions and decisions; **big data** (volume, velocity, variety) supplies the examples it learns from. Both find correlation, not cause, and AI can repeat bias.'
+  - The **internet of things** gives real-time data from connected objects; **virtual reality** supports safe training, product trials and design.
+  - '**Loyalty programmes** buy repeat custom and, often more valuably, data, but rewards are paid on sales that would have happened anyway, rivals copy schemes and personal data brings duties and risks.'
+  - '**Digital Taylorism** is scientific management enforced by data; it can raise productivity but often raises stress, turnover and errors, so how the data is used, supportively or to control, decides its effect.'
+  - Judge every MIS by its benefits for decisions, its risks (cost, dependence, breaches, poor data, overload) and its ethics (privacy, consent, bias, accountability, jobs and energy use), for each stakeholder.
+retrieval:
+  - q: What is the difference between data and information?
+    a: Data are raw facts, such as individual till records. Information is data organized and presented so that it is meaningful and useful for a decision, such as weekly sales by store compared with last year.
+  - q: Name the four kinds of question data analytics can answer.
+    a: What happened (descriptive), why it happened (diagnostic), what is likely to happen (predictive) and what to do about it (prescriptive).
+  - q: What is phishing, and why is it so effective?
+    a: Fake messages that pretend to come from a trusted source and trick people into revealing passwords or details. It works by deceiving a person rather than breaking the technology, so staff training is a key defence.
+  - q: Give one benefit and one drawback of cloud computing for a business.
+    a: 'Benefit: for example, flexible capacity paid for as it is used, with access from anywhere. Drawback: for example, dependence on the provider and the internet connection, continuing fees, and questions over where data is stored.'
+  - q: How does an artificial neural network learn?
+    a: It is trained on many examples, adjusting the strength of the connections between its layers of processing units whenever its answers are wrong, until it recognizes the patterns reliably.
+  - q: What are the three Vs of big data?
+    a: Volume (the quantity of data), velocity (the speed at which it arrives) and variety (the many forms it takes).
+  - q: Give two ways the internet of things can help a business.
+    a: For example, predictive maintenance of machines before they fail, real-time tracking of stock and deliveries, and automatic reordering.
+  - q: Why might a loyalty programme reduce profit even if customers spend more?
+    a: Rewards are paid on all members' spending, including what they would have spent anyway, and the systems cost money to run, so the extra contribution from higher spending may not cover both.
+  - q: Why should a business test a pattern found by data mining before acting on it?
+    a: Large data sets always contain some chance patterns, and a pattern shows correlation, not cause. A trial, such as a test in a few stores, shows whether acting on it really works.
+  - q: What is digital Taylorism?
+    a: Using digital technology to apply Taylor's scientific management, breaking work into small timed tasks, setting standard times and tracking each worker's performance against them in real time.
+  - q: Using motivation theory, explain why close electronic monitoring may reduce performance.
+    a: Herzberg's theory suggests that close supervision is a hygiene factor that causes dissatisfaction, and Deci and Ryan's that loss of autonomy undermines intrinsic motivation, so stress, errors and labour turnover may rise.
+  - q: Give three ethical issues raised by management information systems.
+    a: For example, privacy and consent over personal data, bias in algorithms, accountability for automated decisions, surveillance of employees, job losses and the energy use of data centres.
+connections:
+  - code: '2.4'
+    text: Digital Taylorism applies Taylor's scientific management with software, and the other motivation theories explain why it can demotivate.
+  - code: '4.4'
+    text: Loyalty data, online behaviour and data mining are now among the richest sources of market research, with their own risks of bias.
+  - code: '4.5'
+    text: Loyalty programmes aim to build brand loyalty, and data on customers drives personalized promotion and dynamic pricing.
+  - code: '5.7'
+    text: Cybercrime is a growing cause of crises, so cybersecurity needs a contingency plan and a tested crisis response.
+  - code: '5.6'
+    text: Real-time data from the internet of things and shared sales data support just-in-time stock control along the supply chain.
+  - code: '2.3'
+    text: Management information systems support scientific decision-making, but managers' judgement and intuition are still needed to interpret the results.
+terms:
+  - management-information-system
+  - database
+  - data-analytics
+  - data-mining
+  - cybercrime
+  - cybersecurity
+  - critical-infrastructure
+  - data-centre
+  - cloud-computing
+  - artificial-neural-network
+  - artificial-intelligence
+  - big-data
+  - internet-of-things
+  - virtual-reality
+  - customer-loyalty-programme
+  - contribution
+  - employee-monitoring
+  - digital-taylorism
+  - data-privacy
+  - algorithmic-bias
+  - scientific-management
+  - scientific-decision-making
+  - information-overload
+  - correlation
+  - simple-linear-regression
+  - brand-loyalty
+  - price-elasticity-of-demand
+  - labour-turnover
+  - hygiene-factors
+  - autonomy
+  - intrinsic-motivation
+  - contingency-planning
+  - just-in-time
+  - dynamic-pricing
+  - market-research
+  - social-enterprise
+questions: []
+basis:
+  - source: ib-bm-guide-2024
+    pages: 35 to 36
+    note: The content statements and their assessment objectives, and the suggested knowledge questions for unit 5 (p. 36)
+  - source: hodder-bm-2022
+    pages: 549 to 559
+    note: The chapter on 5.9, read to check coverage and terminology; nothing reproduced
+  - source: ib-bm-tsm-2022
+    pages: 80 to 90
+    note: The glossary's definitions of artificial intelligence, big data, customer loyalty programmes, cybercrime, cybersecurity, data analytics, data mining, database, the internet of things and virtual reality, read to check terminology; nothing reproduced
+verification: primary
+updated: '2026-11-03'
