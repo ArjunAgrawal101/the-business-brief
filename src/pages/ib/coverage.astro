@@ -10,7 +10,7 @@ import PageIntro from '../../components/layout/PageIntro.astro';
 import LevelTag from '../../components/ui/LevelTag.astro';
 import VerifyTag from '../../components/ui/VerifyTag.astro';
 import { corpus, href } from '../../lib/content';
-import { STATE_LABEL, subtopicCoverage } from '../../lib/coverage';
+import { STATE_LABEL, coverageSummary, subtopicCoverage } from '../../lib/coverage';
 import { mindmapFor, subtopicHref } from '../../lib/learning';
 
 const c = await corpus();
@@ -21,10 +21,8 @@ const rows = subtopicCoverage(c).map((r) => {
   const map = mindmapFor(c, s.code);
   return { ...r, ixs, calcs, map, page: r.brief && s.topic ? href.topic(s.topic) : subtopicHref(c, s.code) };
 });
-const n = (st: string) => rows.filter((r) => r.state === st).length;
-const verified = rows.filter((r) => r.verified).length;
-const withNotes = rows.filter((r) => r.notes).length;
-const withBriefs = rows.filter((r) => r.brief).length;
+// The same headline figures the home page and the topic library quote.
+const sum = coverageSummary(c);
 ---
 
 <BaseLayout title="Coverage tracker" description="What the platform has for each subtopic of IB DP Business Management: complete, partly built or planned, and verified against the guide." section="topics">
@@ -32,7 +30,7 @@ const withBriefs = rows.filter((r) => r.brief).length;
     trail={[{ label: 'IB course', href: '/ib/' }, { label: 'Coverage' }]}
     kicker="IB Diploma Programme"
     title="Coverage tracker"
-    lead={`${n('complete')} of ${rows.length} subtopics are complete, with full notes (${withNotes}) or a complete brief (${withBriefs}); ${n('partial')} are partly built; ${n('planned')} are planned. ${verified} of ${rows.length} have their content statements verified against the guide. The table is generated from the content itself, so a subtopic shows material only when it exists.`}
+    lead={`${sum.complete} of ${sum.total} subtopics are complete, with full notes (${sum.withNotes}) or a complete brief (${sum.withBriefs}); ${sum.partial} are partly built; ${sum.planned} are planned. ${sum.verified} of ${sum.total} have their content statements verified against the guide. The table is generated from the content itself, so a subtopic shows material only when it exists.`}
   />
   <div class="wrap page-body">
     <ul class="cov-key" aria-label="What the states mean">

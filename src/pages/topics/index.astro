@@ -9,6 +9,7 @@ import PageIntro from '../../components/layout/PageIntro.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import { corpus, href, topicsInOrder } from '../../lib/content';
 import { allSubtopics, mindmapFor, noteFor, subtopicHref } from '../../lib/learning';
+import { coverageSummary } from '../../lib/coverage';
 
 const c = await corpus();
 const topics = await topicsInOrder();
@@ -23,9 +24,10 @@ const rows = allSubtopics(c).map(({ unit, s }) => {
   const state = brief ? 'brief' : note ? 'notes' : s.topic ? 'brief-part' : 'hub';
   return { unit, s, note, map, terms, tools, questions, state };
 });
-const count = (st: string) => rows.filter((r) => r.state === st).length;
 const withMaps = rows.filter((r) => r.map).length;
 const STATE_LABEL: Record<string, string> = { brief: 'Complete brief', notes: 'Full notes', 'brief-part': 'In a brief', hub: 'Notes planned' };
+// The headline figures come from the coverage tracker's own calculation, so the two pages always agree.
+const sum = coverageSummary(c);
 ---
 
 <BaseLayout title="Topic library" description="The IB DP Business Management course, subtopic by subtopic: notes, briefs, mindmaps, key terms, tools and practice for every part of the syllabus." section="topics">
@@ -33,16 +35,17 @@ const STATE_LABEL: Record<string, string> = { brief: 'Complete brief', notes: 'F
     trail={[{ label: 'Topics' }]}
     kicker="Topic library"
     title="The course, subtopic by subtopic"
-    lead={`All ${rows.length} subtopics of IB DP Business Management, in their five units. Every subtopic has a page with what the course asks, its key terms and its tools; ${count('brief') + count('notes')} have complete notes or a full brief, and ${withMaps} have a mindmap. The rest are being written one at a time.`}
+    lead={`All ${sum.total} subtopics of IB DP Business Management, in their five units. Every subtopic has a page with what the course asks, its key terms and its tools. ${sum.complete} of ${sum.total} are complete, with full notes (${sum.withNotes}) or a complete brief (${sum.withBriefs}); the other ${sum.partial} are partly built, with notes being written one at a time.`}
   />
 
   <div class="wrap page-body">
     <dl class="tl-stats">
-      <div><dt>Complete briefs</dt><dd>{count('brief')}</dd></div>
-      <div><dt>Full notes</dt><dd>{count('notes')}</dd></div>
+      <div class="tl-stats__lead"><dt>Subtopics complete</dt><dd>{sum.complete}<span class="tl-stats__of"> of {sum.total}</span></dd></div>
+      <div><dt>With full notes</dt><dd>{sum.withNotes}</dd></div>
+      <div><dt>In a complete brief</dt><dd>{sum.withBriefs}</dd></div>
+      <div><dt>Partly built</dt><dd>{sum.partial}</dd></div>
       <div><dt>Mindmaps</dt><dd>{withMaps}</dd></div>
       <div><dt>Glossary terms</dt><dd>{Object.keys(c.glossary).length}</dd></div>
-      <div><dt>Notes planned</dt><dd>{count('hub') + count('brief-part')}</dd></div>
     </dl>
 
     <section class="tl-briefs" aria-labelledby="tl-briefs-h">
@@ -102,7 +105,7 @@ const STATE_LABEL: Record<string, string> = { brief: 'Complete brief', notes: 'F
 <style>
   .tl-stats {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: 1.4fr repeat(5, minmax(0, 1fr));
     margin: 0 0 var(--sp-7);
     border-top: 1px solid var(--navy-900);
     border-bottom: 1px solid var(--rule-hair);
@@ -131,6 +134,15 @@ const STATE_LABEL: Record<string, string> = { brief: 'Complete brief', notes: 'F
     font-size: 2.25rem;
     font-weight: 500;
     color: var(--navy-900);
+  }
+
+  .tl-stats__lead dd {
+    color: var(--gold-600);
+  }
+
+  .tl-stats__of {
+    font-size: 1.125rem;
+    color: var(--text-muted);
   }
 
   .tl-feature {
@@ -274,6 +286,10 @@ const STATE_LABEL: Record<string, string> = { brief: 'Complete brief', notes: 'F
     .tl-stats > div:nth-child(4) {
       border-left: 0;
       padding-left: 0;
+    }
+
+    .tl-stats > div:nth-child(n + 4) {
+      border-top: 1px solid var(--rule-hair);
     }
 
     .tl-row {

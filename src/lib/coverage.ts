@@ -70,6 +70,37 @@ export function subtopicCoverage(c: Corpus): SubtopicCoverage[] {
   );
 }
 
+/**
+ * The headline figures, from the same rows: the home page, the topic library,
+ * the coverage tracker and the menu all quote these, so they always agree.
+ * A subtopic is complete when it has full notes or its own complete brief.
+ */
+export interface CoverageSummary {
+  total: number;
+  complete: number;
+  partial: number;
+  planned: number;
+  /** Complete with full notes. */
+  withNotes: number;
+  /** Complete through a brief written for it (and no notes yet). */
+  withBriefs: number;
+  verified: number;
+}
+
+export function coverageSummary(c: Corpus): CoverageSummary {
+  const rows = subtopicCoverage(c);
+  const n = (f: (r: SubtopicCoverage) => boolean) => rows.filter(f).length;
+  return {
+    total: rows.length,
+    complete: n((r) => r.state === 'complete'),
+    partial: n((r) => r.state === 'partial'),
+    planned: n((r) => r.state === 'planned'),
+    withNotes: n((r) => r.notes),
+    withBriefs: n((r) => r.brief && !r.notes),
+    verified: n((r) => r.verified),
+  };
+}
+
 export function countBy<T>(list: T[], pick: (t: T) => string): Record<string, number> {
   return list.reduce<Record<string, number>>((acc, t) => {
     const k = pick(t);
