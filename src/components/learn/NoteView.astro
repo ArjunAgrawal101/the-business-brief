@@ -7,6 +7,8 @@
 import SectionHead from '../layout/SectionHead.astro';
 import Diagram from '../diagrams/Diagram.astro';
 import { rich, inline } from '../../lib/markup';
+import { corpus } from '../../lib/content';
+import { noteParts } from '../../lib/learning';
 import type { Note } from '../../lib/schemas';
 
 interface Props {
@@ -14,7 +16,12 @@ interface Props {
   start: number;
 }
 const { note: n, start } = Astro.props;
+const c = await corpus();
 const no = (i: number) => String(start + i).padStart(2, '0');
+// Every numbered part in order; the subtopic page numbers what follows from the same list.
+const parts = noteParts(n);
+const numOf = (part: string) => no(parts.indexOf(part));
+const termOf = (id: string) => c.commandTerms[id]?.term ?? id;
 // Notes for an HL-only subtopic are HL throughout: the page's own level says so, so sections are not hidden one by one.
 const mixed = n.level !== 'HL';
 const hl = (level: string) => mixed && level === 'HL';
@@ -31,6 +38,22 @@ const hl = (level: string) => mixed && level === 'HL';
       </ol>
     </div>
   </div>
+  {
+    n.situation && (
+      <aside class="nv-situation" aria-label={`The situation: ${n.situation.title}`}>
+        <p class="label">{n.situation.fictional ? 'The situation · a fictional business' : 'The situation · a real case'}</p>
+        <h3>{n.situation.title}</h3>
+        <div class="prose" set:html={rich(n.situation.text)} />
+        {!n.situation.fictional && n.situation.source && (
+          <p class="small muted">
+            Source: {c.sources[n.situation.source]?.title ?? n.situation.source}
+            {c.sources[n.situation.source]?.year && `, ${c.sources[n.situation.source]?.year}`}
+            {n.situation.pages && `, ${n.situation.pages}`}.
+          </p>
+        )}
+      </aside>
+    )
+  }
 </section>
 
 {
@@ -111,12 +134,111 @@ const hl = (level: string) => mixed && level === 'HL';
   ))
 }
 
+{
+  (n.applications.length > 0 || n.stakeholders.length > 0) && (
+    <section class="nv-section nv-section--practice" aria-labelledby="nv-practice-h">
+      <SectionHead no={numOf('practice')} title="In practice: industries and stakeholders" id="nv-practice-h" dek="The same ideas look different from one industry to the next, and land differently on each group with a stake in the business." />
+      <div class="nv-practice">
+        {n.applications.length > 0 && (
+          <div>
+            <p class="label">Across industries</p>
+            <dl class="nv-apps">
+              {n.applications.map((a) => (
+                <div>
+                  <dt>{a.industry}</dt>
+                  <dd set:html={rich(a.text)} />
+                </div>
+              ))}
+            </dl>
+          </div>
+        )}
+        {n.stakeholders.length > 0 && (
+          <div>
+            <p class="label">For each stakeholder</p>
+            <dl class="nv-apps nv-apps--stake">
+              {n.stakeholders.map((a) => (
+                <div>
+                  <dt>{a.group}</dt>
+                  <dd set:html={rich(a.text)} />
+                </div>
+              ))}
+            </dl>
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
 <section class="nv-section nv-section--evaluation" aria-labelledby="nv-eval-h">
-  <SectionHead no={no(n.sections.length + 1)} title="Evaluation and limits" id="nv-eval-h" dek="What to weigh before reaching a judgement." />
+  <SectionHead no={numOf('evaluation')} title="Evaluation and limits" id="nv-eval-h" dek="What to weigh before reaching a judgement." />
   <ul class="nv-eval">
     {n.evaluation.map((e) => <li set:html={inline(e)} />)}
   </ul>
 </section>
+
+{
+  n.decision && (
+    <section class="nv-section nv-section--decision" aria-labelledby="nv-decision-h">
+      <SectionHead no={numOf('decision')} title="Make the decision" id="nv-decision-h" dek="Use the ideas on a business choice: weigh the options, decide, and say what would change your mind." />
+      <div class="nv-decision">
+        <p class="label">{n.decision.fictional ? 'Decision brief · a fictional business' : 'Decision brief'}</p>
+        <h3>{n.decision.title}</h3>
+        <div class="prose" set:html={rich(n.decision.brief)} />
+        <ol class="nv-options">
+          {n.decision.options.map((o) => (
+            <li>
+              <p class="nv-options__label">{o.label}</p>
+              <div class="small" set:html={rich(o.text)} />
+            </li>
+          ))}
+        </ol>
+        <details class="nv-disclose">
+          <summary>How to weigh the options</summary>
+          <div class="prose" set:html={rich(n.decision.guidance)} />
+        </details>
+      </div>
+    </section>
+  )
+}
+
+{
+  n.exam.length > 0 && (
+    <section class="nv-section nv-section--exam" aria-labelledby="nv-exam-h">
+      <SectionHead no={numOf('exam')} title="Exam-style practice" id="nv-exam-h" dek="Original questions written by the platform in the style of the papers, with what a strong response does. They are not IB questions and the guidance is not an official markscheme." />
+      <ol class="nv-exam">
+        {n.exam.map((q, i) => (
+          <li class:list={{ 'nv-exam--hl': hl(q.level) }} data-level={hl(q.level) ? 'HL' : undefined}>
+            <p class="nv-exam__meta">
+              <span class="label">Question {i + 1}</span>
+              <span class="tag tag--plain">{termOf(q.command)}</span>
+              <span class="tag tag--plain">{q.marks} {q.marks === 1 ? 'mark' : 'marks'}</span>
+              {q.paper && <span class="tag tag--plain">Paper {q.paper} style</span>}
+              {hl(q.level) && <span class="tag tag--hl">HL</span>}
+              <span class="tag tag--practice">Original practice</span>
+            </p>
+            <div class="prose nv-exam__q" set:html={rich(q.q)} />
+            <details class="nv-disclose">
+              <summary>What a strong response does</summary>
+              <div class="prose" set:html={rich(q.answer)} />
+            </details>
+          </li>
+        ))}
+      </ol>
+    </section>
+  )
+}
+
+{
+  n.summary.length > 0 && (
+    <section class="nv-section nv-section--summary" aria-labelledby="nv-summary-h">
+      <SectionHead no={numOf('summary')} title="Revision summary" id="nv-summary-h" dek="The subtopic on one page: what to remember." />
+      <ul class="nv-summary">
+        {n.summary.map((x) => <li set:html={inline(x)} />)}
+      </ul>
+    </section>
+  )
+}
 
 <style>
   .nv-intro,
@@ -244,6 +366,198 @@ const hl = (level: string) => mixed && level === 'HL';
 
   .nv-eval li + li {
     margin-top: var(--sp-2);
+  }
+
+
+  .nv-situation {
+    margin-top: var(--sp-6);
+    max-width: 52rem;
+    padding: var(--sp-5) var(--sp-6);
+    color: var(--text-on-ink);
+    background:
+      linear-gradient(135deg, rgba(201, 168, 102, 0.12), transparent 42%),
+      var(--surface-ink);
+    border-left: 3px solid var(--gold-400);
+  }
+
+  .nv-situation .label {
+    color: var(--text-gold-on-ink);
+  }
+
+  .nv-situation h3 {
+    margin: var(--sp-2) 0 var(--sp-3);
+    color: var(--text-on-ink);
+    font-size: var(--fs-h3);
+  }
+
+  .nv-situation :global(.prose),
+  .nv-situation :global(.prose p) {
+    color: var(--text-on-ink);
+  }
+
+  .nv-situation .muted {
+    color: var(--text-on-ink-muted);
+  }
+
+  .nv-practice {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-6);
+    margin-top: var(--sp-5);
+  }
+
+  .nv-practice > div:only-child {
+    grid-column: 1 / -1;
+    max-width: 48rem;
+  }
+
+  .nv-apps {
+    margin: var(--sp-2) 0 0;
+    border-top: 1px solid var(--navy-900);
+  }
+
+  .nv-apps > div {
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .nv-apps dt {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .nv-apps dd {
+    margin: var(--sp-1) 0 0;
+  }
+
+  .nv-apps--stake dt::before {
+    content: "";
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-right: 0.5rem;
+    background: var(--gold-500);
+    transform: rotate(45deg) translateY(-0.1rem);
+  }
+
+  .nv-decision {
+    max-width: 52rem;
+    margin-top: var(--sp-5);
+    padding: var(--sp-5) var(--sp-6);
+    background: var(--surface-sheet);
+    border: 1px solid var(--rule-hair);
+    border-top: 3px solid var(--navy-900);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .nv-decision h3 {
+    margin: var(--sp-2) 0 var(--sp-3);
+  }
+
+  .nv-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: var(--sp-3);
+    margin: var(--sp-4) 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: opt;
+  }
+
+  .nv-options li {
+    counter-increment: opt;
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--ivory-50);
+    border: 1px solid var(--rule-hair);
+  }
+
+  .nv-options__label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .nv-options__label::before {
+    content: "Option " counter(opt, upper-alpha) ". ";
+    font-family: var(--font-ui);
+    font-size: var(--fs-label);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .nv-disclose {
+    margin-top: var(--sp-3);
+    border-top: 1px solid var(--rule-hair);
+    padding-top: var(--sp-3);
+  }
+
+  .nv-disclose summary {
+    min-height: 2.75rem;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--cobalt-text);
+  }
+
+  .nv-disclose[open] summary {
+    margin-bottom: var(--sp-2);
+  }
+
+  .nv-exam {
+    display: grid;
+    gap: var(--sp-4);
+    max-width: 52rem;
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .nv-exam > li {
+    padding: var(--sp-4) var(--sp-5);
+    background: var(--surface-sheet);
+    border: 1px solid var(--rule-hair);
+    border-left: 3px solid var(--gold-500);
+  }
+
+  .nv-exam__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+
+  .nv-exam__q {
+    margin-top: var(--sp-3);
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    color: var(--navy-900);
+  }
+
+  .nv-summary {
+    max-width: 52rem;
+    margin: var(--sp-4) 0 0;
+    padding: var(--sp-5) var(--sp-6) var(--sp-5) calc(var(--sp-6) + 1rem);
+    background: var(--surface-gold-wash);
+    border-top: 1px solid var(--gold-500);
+    border-bottom: 1px solid var(--gold-500);
+  }
+
+  .nv-summary li + li {
+    margin-top: var(--sp-2);
+  }
+
+  @media (max-width: 52rem) {
+    .nv-practice {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .nv-situation,
+    .nv-decision {
+      padding: var(--sp-4);
+    }
   }
 
   @media (max-width: 52rem) {

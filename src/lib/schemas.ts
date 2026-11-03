@@ -790,6 +790,47 @@ export const noteSchema = z.object({
     .min(3),
   /** Evaluation and limits of the ideas, as a student should weigh them. */
   evaluation: z.array(md).min(2),
+  /**
+   * The opening situation the notes start from. Fictional unless a source in
+   * the register (with its date) supports every fact in it.
+   */
+  situation: z
+    .object({ title: z.string(), text: md, fictional: z.boolean(), source: z.string().optional(), pages: z.string().optional() })
+    .optional(),
+  /** How the ideas play out in different industries. */
+  applications: z.array(z.object({ industry: z.string(), text: md })).default([]),
+  /** What the ideas mean for each stakeholder group. */
+  stakeholders: z.array(z.object({ group: z.string(), text: md })).default([]),
+  /** A business decision to make with the ideas: the brief, the options and how to weigh them. */
+  decision: z
+    .object({
+      title: z.string(),
+      brief: md,
+      fictional: z.boolean(),
+      options: z.array(z.object({ label: z.string(), text: md })).min(2),
+      guidance: md,
+    })
+    .optional(),
+  /**
+   * Original exam-style practice with a model response outline. Written by the
+   * platform in the style of the papers; never presented as IB questions.
+   */
+  exam: z
+    .array(
+      z.object({
+        q: md,
+        marks: z.number().int().min(1).max(20),
+        /** A command term id from data/command-terms.yaml. */
+        command: z.string(),
+        level: level.default('SL/HL'),
+        paper: z.enum(['1', '2', '3']).optional(),
+        /** What a strong response does, point by point: guidance, not an official markscheme. */
+        answer: md,
+      }),
+    )
+    .default([]),
+  /** The revision summary: what to remember, in a few lines. */
+  summary: z.array(md).default([]),
   connections: z.array(z.object({ code: z.string(), text: md })).default([]),
   /** Glossary entries the notes use. */
   terms: ids,

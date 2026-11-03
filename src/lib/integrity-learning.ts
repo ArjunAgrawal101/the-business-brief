@@ -107,6 +107,15 @@ export function checkLearning(c: Corpus): Problem[] {
     n.sections.forEach((x) => x.diagram && !DIAGRAMS[x.diagram] && add(`section "${x.id}" uses diagram "${x.diagram}", which is not in the library`));
     const ids = n.sections.map((x) => x.id);
     ids.filter((x, i) => ids.indexOf(x) !== i).forEach((d) => add(`section id "${d}" appears twice`));
+    if (n.situation && !n.situation.fictional) {
+      if (!n.situation.source) add('the opening situation is presented as real but names no source');
+      else if (!has(c.sources, n.situation.source)) add(`situation source "${n.situation.source}" is not in the sources register`);
+    }
+    n.exam.forEach((q, i) => {
+      if (!has(c.commandTerms, q.command)) add(`exam question ${i + 1} uses command term "${q.command}", which is not in the register`);
+      if (q.level === 'HL' && n.level === 'SL/HL' && !n.sections.some((x) => x.level === 'HL' || x.points.some((p) => p.level === 'HL')))
+        add(`exam question ${i + 1} is HL, but the notes have no HL material`);
+    });
   }
 
   return out;

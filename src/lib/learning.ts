@@ -42,6 +42,23 @@ export function noteFor(c: Corpus, code: string): [string, Note] | undefined {
   return Object.entries(c.notes).find(([, n]) => n.code === code);
 }
 
+/**
+ * The numbered parts a set of notes adds to its page, in order. NoteView
+ * renders them and the subtopic page numbers what follows from this count, so
+ * the two can never disagree.
+ */
+export function noteParts(n: Note): string[] {
+  return [
+    'intro',
+    ...n.sections.map((s) => `section:${s.id}`),
+    ...(n.applications.length || n.stakeholders.length ? ['practice'] : []),
+    'evaluation',
+    ...(n.decision ? ['decision'] : []),
+    ...(n.exam.length ? ['exam'] : []),
+    ...(n.summary.length ? ['summary'] : []),
+  ];
+}
+
 export async function mindmapsInOrder(): Promise<Array<[string, Mindmap]>> {
   const c = await corpus();
   return Object.entries(c.mindmaps).sort(([, a], [, b]) => a.unit - b.unit || (a.scope === b.scope ? codeKey(a.code) - codeKey(b.code) : a.scope === 'unit' ? -1 : 1));

@@ -17,7 +17,7 @@ import RetrievalCards from '../../components/assess/RetrievalCards.astro';
 import LevelSwitch from '../../components/ui/LevelSwitch.astro';
 import { corpus, href } from '../../lib/content';
 import { inline } from '../../lib/markup';
-import { allSubtopics, hubSubtopics, mindmapFor, noteFor, subtopicHref, subtopicSlug } from '../../lib/learning';
+import { allSubtopics, hubSubtopics, mindmapFor, noteFor, noteParts, subtopicHref, subtopicSlug } from '../../lib/learning';
 
 export async function getStaticPaths() {
   const c = await corpus();
@@ -54,7 +54,7 @@ const titleOf = (cd: string) => list.find((x) => x.s.code === cd)?.s.title ?? cd
 // One numbering for the whole page: "What the IB course asks" is 01, the notes take the numbers after it
 // (introduction, each section, evaluation), and the page's later sections carry on from there.
 const notesStart = 2;
-const notesTaken = note ? note[1].sections.length + 2 : 0; // introduction, sections, evaluation
+const notesTaken = note ? noteParts(note[1]).length : 0; // introduction, sections, practice, evaluation, decision, exam, summary
 let n = 0;
 const num = () => {
   n += 1;

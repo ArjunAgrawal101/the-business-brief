@@ -8,6 +8,7 @@ import '../styles/interactive.css';
 import '../styles/decision.css';
 import '../styles/assess.css';
 import '../styles/pages.css';
+import '../styles/rooms.css';
 import '../styles/motion.css';
 import '../styles/print.css';
 import SiteHeader from '../components/layout/SiteHeader.astro';
@@ -28,9 +29,16 @@ interface Props {
   intro?: boolean;
   /** An image to share instead of the default social card (a path under public/). */
   image?: string;
+  /**
+   * The learning environment the page belongs to (finance, strategy, market,
+   * people, operations, enterprise, boardroom, cases, assessment). It sets
+   * data-room on the body, which gives each room its own visual identity
+   * (src/styles/rooms.css).
+   */
+  room?: string;
 }
 
-const { title, description, section, jsonLd, noindex = false, intro = false, image } = Astro.props;
+const { title, description, section, jsonLd, noindex = false, intro = false, image, room } = Astro.props;
 
 // The integrity gate: building any page loads and checks every relationship.
 await corpus();
@@ -90,7 +98,7 @@ const INTRO_GATE = `try {
     </script>
     {intro && <script is:inline set:html={INTRO_GATE} />}
   </head>
-  <body>
+  <body data-room={room}>
     {intro && <BrandIntro />}
     <a class="skip-link" href="#main">Skip to content</a>
     <SiteHeader current={section} />
