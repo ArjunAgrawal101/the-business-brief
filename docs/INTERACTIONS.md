@@ -301,3 +301,88 @@ On the IA Studio page.
 | **Feedback** | A methods table with the preferred project for each, readings in words (including "the methods disagree" and "neither project is worth its cost" at 20%), a cumulative cash flow chart with a key in words and a data table, the present values year by year, and the eight-part working for every method and project. Invalid inputs are named beside the field |
 | **Misconception diagnosed** | The fastest payback is the best project; a higher ARR means the money arrives sooner; the capital cost is discounted; NPV settles the decision on its own |
 | **Objective** | Appraise investment opportunities by payback and ARR (and NPV at HL), and judge between them when the methods disagree |
+
+---
+
+## The Entrepreneurship and Innovation Lab
+
+Six tools at `/entrepreneurship-lab/<id>/`, each with its data in `src/content/lab/`, its logic in `src/lib/lab/` and its script in `src/scripts/lab/`. Each opens with Refill Round, a fictional start-up whose figures are simulated, and keeps the learner's own work only after they change something.
+
+### Start-up feasibility assessment
+
+`feasibility`. Enrichment: weighted scoring is not a toolkit tool; it builds on 1.1 and 4.4.
+
+| | |
+| --- | --- |
+| **The learner does** | Names up to three ideas, weights eight criteria from 0 to 5, scores each idea from 1 to 5, and sets a pass mark |
+| **Must understand** | A weighted total turns judgements into a ranking; some weaknesses cannot be outweighed; founders overrate their favourite |
+| **Decides or infers** | Which idea to test further, and how far the ranking depends on the weights and on optimistic scores |
+| **Feedback** | Ranking with totals, shares and a verdict in words (worth testing further, fix a must-have first, below the pass mark); the nearest weight at which the leader changes or crosses the pass mark; the optimism test, with every score of the leader one point lower |
+| **Misconception diagnosed** | A high total proves an idea will work; a strength can always make up for a weakness |
+| **Objective** | Analyse the opportunities and challenges of starting up (1.1) with an explicit, testable method |
+
+### Business Model Canvas builder
+
+`business-model-canvas`. Enrichment: the canvas is not in the guide.
+
+| | |
+| --- | --- |
+| **The learner does** | Fills the nine blocks in order from the customer, marks each entry as an assumption or as evidence, rates the damage if it is wrong, says how it will be tested; saves, opens and prints the canvas |
+| **Must understand** | A business model is a chain of beliefs; evidence varies in strength; the riskiest assumption is the one to test first |
+| **Decides or infers** | Which beliefs are assumptions, how much each matters, and the cheapest test |
+| **Feedback** | The riskiest assumptions re-ranked as the learner types, ties broken by desirability, then viability, then feasibility; counts of assumptions and evidence, the empty blocks, and the nine-block sheet redrawn |
+| **Misconception diagnosed** | A survey answer is evidence of demand; the canvas is a finished document |
+| **Objective** | Set out a business model and decide what to test before money is committed |
+
+### Unit economics calculator
+
+`unit-economics`. Enrichment, building on contribution (5.5) and payback (3.8).
+
+| | |
+| --- | --- |
+| **The learner does** | Enters acquisition spending and customers won, revenue and variable cost per customer, churn and a cap on lifetime; tries four scenarios |
+| **Must understand** | Growth multiplies the economics of one customer; lifetime value is contribution, not revenue; churn is the weakest input |
+| **Decides or infers** | Whether winning customers pays, and which input the conclusion depends on |
+| **Feedback** | CAC, contribution, lifetime, LTV, the ratio with a verdict in words and the payback, each in the eight-part working; a payback chart with its table; invalid inputs named beside the field |
+| **Misconception diagnosed** | Lifetime value is lifetime revenue; a 3 to 1 ratio means the business is safe |
+| **Objective** | Calculate and interpret unit economics, and say what they leave out |
+
+### Revenue model planner
+
+`revenue-planner`. IB content (3.3; 4.3 at HL) and enrichment (subscriptions, churn, channel fees).
+
+| | |
+| --- | --- |
+| **The learner does** | Builds up to four revenue streams, by the unit or by subscription, with growth, churn and channel fees; downloads the forecast |
+| **Must understand** | Revenue streams add up to total revenue; subscriptions build up and wear away; growth compounds; a channel takes a share of each sale |
+| **Decides or infers** | Which stream matters most and which assumption the year depends on |
+| **Feedback** | The twelve-month table and a stacked chart (colour and pattern), the year's revenue, month 12, subscribers and cancellations, and four plausible setbacks with what each costs the year |
+| **Misconception diagnosed** | A steady growth rate is a cautious assumption; revenue is cash |
+| **Objective** | Forecast revenue by stream and evaluate the forecast (4.3, HL) |
+
+### Start-up cost calculator
+
+`start-up-costs`. IB content (1.1, 3.2, 3.3, 3.7) and enrichment (runway, burn rate).
+
+| | |
+| --- | --- |
+| **The learner does** | Lists one-off costs, monthly outgoings and funding by kind, sets the contribution, its growth and the month sales start; downloads the projection |
+| **Must understand** | Cash, not profit, decides survival; loan repayments are cash out but not costs; each kind of funding costs the founders something different |
+| **Decides or infers** | How long the money lasts, when sales cover the bills, and how much more to raise |
+| **Feedback** | Runway with the expected sales and with none, the month sales cover outgoings, the funding gap, a chart of the cash with its table, and what the funding mix costs in control and risk |
+| **Misconception diagnosed** | Good unit economics mean the cash will last; equity is free money |
+| **Objective** | Plan start-up finance and judge which sources suit the situation (3.2, AO3) |
+
+### Business plan outline builder
+
+`business-plan`. An IB toolkit tool (guide, p. 14); the outline and prompts are the platform's own.
+
+| | |
+| --- | --- |
+| **The learner does** | Writes twelve sections against prompts, sees progress, and exports Markdown, copies or prints |
+| **Must understand** | Every part of a plan answers to every other part; a plan is only as good as its evidence |
+| **Decides or infers** | What each section must say for this business, and which figures support it |
+| **Feedback** | Words and status for each section and the whole plan; the learner's own results from the other five tools quoted under the sections they belong to |
+| **Misconception diagnosed** | A plan is a formality for the bank; the optimistic case is the plan |
+| **Objective** | Use the toolkit's business plan to bring the course's ideas together for one venture |
+

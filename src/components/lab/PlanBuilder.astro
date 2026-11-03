@@ -10,7 +10,7 @@
 import IbChips from './IbChips.astro';
 import type { LabToolOf } from '../../lib/lab/schemas';
 import { labHref } from '../../lib/integrity-lab';
-import { jsonForScript } from '../../lib/markup';
+import { esc, jsonForScript } from '../../lib/markup';
 
 interface Props {
   data: LabToolOf<'plan'>;
@@ -80,17 +80,7 @@ const config = { uid, sections: data.sections };
             </h3>
             <div class="lab-plan__meta">
               <IbChips codes={s.ib} label="Draws on" />
-              {s.tools.length > 0 && (
-                <p class="small lab-plan__tools">
-                  Use:{' '}
-                  {s.tools.map((t, n) => (
-                    <>
-                      {n > 0 && ', '}
-                      <a href={labHref(t)}>{toolTitles[t] ?? t}</a>
-                    </>
-                  ))}
-                </p>
-              )}
+              {s.tools.length > 0 && <p class="small lab-plan__tools" set:html={`Use: ${s.tools.map((t) => `<a href="${labHref(t)}">${esc(toolTitles[t] ?? t)}</a>`).join(', ')}`} />}
             </div>
             <ul class="lab-plan__prompts">
               {s.prompts.map((p) => (

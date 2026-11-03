@@ -353,6 +353,12 @@ describe('the Business Model Canvas', () => {
     expect(readCanvas(canvas, labels).implication).toContain('Subscribers stay about a year');
   });
 
+  it('writes the reading as whole sentences, with one critical assumption or several', () => {
+    const one: Canvas = { name: '', entries: [{ id: 'x', block: 'channels', text: 'Flyers bring customers', kind: 'assumption', risk: 5, note: '' }] };
+    expect(readCanvas(one, labels).implication).toMatch(/risk 5 of 5\)\. A cheap experiment/);
+    expect(readCanvas(canvas, labels).implication).toContain('6 assumptions are rated high or critical; a cheap experiment');
+  });
+
   it('ignores empty entries and lists nothing when there are no assumptions', () => {
     const blank: Canvas = { name: '', entries: [{ id: 'x', block: 'channels', text: '  ', kind: 'assumption', risk: 5, note: '' }] };
     expect(riskiest(blank)).toEqual([]);

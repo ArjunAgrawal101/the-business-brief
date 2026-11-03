@@ -144,7 +144,7 @@ export function readCanvas(c: Canvas, labels: Record<BlockId, string>): { readin
   const parts = [`${s.entries} ${s.entries === 1 ? 'entry' : 'entries'}: ${s.assumptions} ${s.assumptions === 1 ? 'assumption' : 'assumptions'} and ${s.evidence} backed by evidence (${fmtNumber((s.evidence / s.entries) * 100, 0)}%).`];
   if (s.empty.length) parts.push(`Still empty: ${s.empty.map((b) => labels[b]).join(', ')}.`);
   const implication = top
-    ? `Test first: "${top.text.trim()}" (${labels[top.block]}, risk ${top.risk} of 5). ${s.high > 1 ? `${s.high} assumptions are rated high or critical; ` : ''}a cheap experiment that could prove it wrong is worth more than another week of building.`
+    ? `Test first: "${top.text.trim()}" (${labels[top.block]}, risk ${top.risk} of 5). ${s.high > 1 ? `${s.high} assumptions are rated high or critical; a` : 'A'} cheap experiment that could prove it wrong is worth more than another week of building.`
     : 'Every entry is backed by evidence. Check that the evidence is strong: what people say in a survey is weaker than what they pay for.';
   return { reading: parts.join(' '), implication };
 }
