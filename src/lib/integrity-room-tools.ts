@@ -13,6 +13,7 @@ import { validateEoq } from './eoq';
 import { validateTurnover, validateWorkforce } from './workforce';
 import { validateMatrix } from './location-tool';
 import { validateRatings } from './motivation';
+import { validateChange } from './change-plan';
 import { ROOM_INFO, isRoomTool, toolHref } from './room-tools';
 
 export function checkRoomTools(c: Corpus): Problem[] {
@@ -68,6 +69,13 @@ export function checkRoomTools(c: Corpus): Problem[] {
           [m[1], m[2]].forEach((n) => n === undefined || exhibits.has(`ex-${n}`) || add(`the evidence for "${e.factor}" cites Exhibit ${n}, which no related case has`));
         }
       }
+    }
+
+    if (it.component === 'change-planner') {
+      if (g.room !== 'people') add('the change management planner belongs in People and Culture');
+      validateChange(it).forEach((x) => add(`${x.field}${x.index !== undefined ? ` ${x.index + 1}` : ''}: ${x.message}`));
+      if (it.lever !== undefined && it.lever >= it.restraining.length) add(`lever ${it.lever} is not one of the ${it.restraining.length} restraining forces`);
+      if (!g.related.tools.includes('force-field-analysis')) add('the planner uses force field analysis, so it should link the toolkit page');
     }
 
     if (it.component === 'capacity-calculator') {

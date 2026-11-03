@@ -217,10 +217,12 @@ each('[data-ix="location-assessment"]', (root) => {
     bar.changed('New site added, scored at the middle of the scale on every factor.');
   });
 
+  // The note has its own timer, so typing in it never cancels a pending recalculation.
+  let noteTimer = 0;
   note?.addEventListener('input', () => {
     state.note = note.value;
-    window.clearTimeout(timer);
-    timer = window.setTimeout(() => bar.changed(), 600);
+    window.clearTimeout(noteTimer);
+    noteTimer = window.setTimeout(() => bar.changed(), 600);
   });
   root.querySelector('[data-form]')?.addEventListener('submit', (e) => e.preventDefault());
 

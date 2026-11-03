@@ -57,6 +57,7 @@ export const TOOL_FRAME: Record<RoomTool['component'], ToolFrame> = {
   'org-chart-builder': { ix: 'org-chart', csv: true, open: true, what: 'the chart' },
   'workforce-planner': { ix: 'workforce-planner', csv: true, open: true, what: 'the plan', levelSwitch: true },
   'motivation-analysis': { ix: 'motivation-analysis', csv: true, open: true, what: 'the analysis', levelSwitch: true },
+  'change-planner': { ix: 'change-planner', csv: true, open: true, what: 'the plan', levelSwitch: true },
   'scenario-chooser': { ix: 'scenario-chooser', csv: true, open: true, what: 'your choices', reset: 'Clear my choices' },
   'capacity-calculator': { ix: 'capacity-calculator', csv: true, open: true, what: 'the figures' },
   'stock-simulator': { ix: 'stock-simulator', csv: true, open: true, what: 'the plan' },

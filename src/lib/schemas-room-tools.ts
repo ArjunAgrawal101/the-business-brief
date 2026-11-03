@@ -13,6 +13,7 @@
  */
 import { z } from 'astro/zod';
 import { FACTORS } from './motivation';
+import { REASONS } from './change-plan';
 
 const text = z.string().trim().min(1);
 const ids = z.array(z.string()).default([]);
@@ -101,6 +102,11 @@ const unitNames = z.object({ one: text, many: text, period: text });
 /** A rating from 1 (the job provides this poorly) to 5 (very well) for each motivation factor. */
 const ratings = z.object(Object.fromEntries(FACTORS.map((f) => [f.id, z.number().int().min(1).max(5)])) as Record<(typeof FACTORS)[number]['id'], z.ZodNumber>);
 
+/** A force for or against a change, with its judged strength from 1 to 5. */
+const force = z.object({ label: text.max(90), strength: z.number().int().min(1).max(5) });
+const REASON_IDS = REASONS.map((r) => r.id) as [(typeof REASONS)[number]['id'], ...Array<(typeof REASONS)[number]['id']>];
+const highLow = z.enum(['high', 'low']);
+
 /* ---------- Scenario choices (leadership styles, production methods) ---------- */
 
 const scenarioOutcome = z.object({ fit: z.enum(['strong', 'workable', 'weak']), headline: text, consequence: text });
@@ -164,6 +170,23 @@ export function roomToolSchemas<B extends z.ZodRawShape>(base: B) {
       need: z.enum(['achievement', 'affiliation', 'power', 'unknown']),
       /** The evidence behind the worked example's ratings. */
       evidence: z.array(z.object({ factor: text, note: text })).min(3),
+    }),
+    z.object({
+      component: z.literal('change-planner'),
+      ...base,
+      guide,
+      /** The change, in a line. */
+      change: text.max(200),
+      driving: z.array(force).min(1).max(8),
+      restraining: z.array(force).min(1).max(8),
+      stakeholders: z
+        .array(z.object({ name: text.max(90), power: highLow, interest: highLow, stance: z.enum(['supports', 'neutral', 'opposes']), reason: z.enum(REASON_IDS) }))
+        .min(1)
+        .max(10),
+      /** The restraining force the worked example would weaken first, by its position in the list. */
+      lever: z.number().int().nonnegative().optional(),
+      /** What the worked example's judgements rest on. */
+      context: z.array(text).min(1),
     }),
     z.object({
       component: z.literal('scenario-chooser'),

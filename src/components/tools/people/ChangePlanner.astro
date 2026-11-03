@@ -1,0 +1,593 @@
+---
+/**
+ * The change management planner (2.1): the forces for and against a change
+ * (force field analysis, HL), the stakeholders it affects, the resistance to
+ * expect and the steps to take. The worked example is planned on the server
+ * by src/lib/change-plan.ts; src/scripts/change-planner.ts replans it as the
+ * reader edits it. Every model used is named, with its status in the course.
+ */
+import { LIMITS, readChange } from '../../../lib/change-plan';
+import { forceFieldSvg, forceReadingHtml, forceRowsHtml, lastResortsHtml, leverOptionsHtml, resistanceHtml, stakeholderMapHtml, stakeholderRowsHtml, stepsHtml } from '../../../lib/change-plan-view';
+import { jsonForScript } from '../../../lib/markup';
+import type { RoomTool } from '../../../lib/room-tools';
+
+interface Props {
+  id: string;
+  data: Extract<RoomTool, { component: 'change-planner' }>;
+}
+const { id, data } = Astro.props;
+const uid = `cp-${id}`;
+const lever = data.lever ?? null;
+const input = { change: data.change, driving: data.driving, restraining: data.restraining, stakeholders: data.stakeholders, lever };
+const read = readChange(input);
+const config = { uid, key: data.guide.storageKey, ...input, limits: LIMITS };
+---
+
+<script type="application/json" data-config set:html={jsonForScript(config)} />
+
+<form class="cp" data-form novalidate aria-label="The change, its forces and its stakeholders">
+  <div class="field cp__change">
+    <label for={`${uid}-change`}>The change</label>
+    <input class="input" id={`${uid}-change`} name="change" type="text" maxlength={LIMITS.change} value={data.change} aria-describedby={`${uid}-change-err`} />
+    <span class="field__error" id={`${uid}-change-err`} data-err="change"></span>
+  </div>
+  <details class="disclosure">
+    <summary>What the worked example's judgements rest on</summary>
+    <div class="disclosure__body">
+      <ul class="cp__context">{data.context.map((c) => <li>{c}</li>)}</ul>
+    </div>
+  </details>
+
+  <fieldset class="cp__set" data-level="HL">
+    <legend class="cp__legend">Forces for and against the change <span class="tag tag--hl">HL</span></legend>
+    <p class="tool-note">Force field analysis is a tool in the guide's toolkit for HL. Score each force from 1 (weak) to 5 (strong), and base each score on evidence.</p>
+    <div class="cp__forces">
+      {
+        (['driving', 'restraining'] as const).map((side) => (
+          <div class="cp__side">
+            <h3 class="label label--ink" id={`${uid}-${side}-h`}>{side === 'driving' ? 'Driving forces, for the change' : 'Restraining forces, against it'}</h3>
+            <table class="table tool-table cp-force" aria-labelledby={`${uid}-${side}-h`}>
+              <thead>
+                <tr>
+                  <th scope="col">Force</th>
+                  <th scope="col">Strength</th>
+                  <th scope="col" class="js-only"><span class="sr-only">Remove</span></th>
+                </tr>
+              </thead>
+              <tbody data-forces={side} set:html={forceRowsHtml(side, data[side], uid)}></tbody>
+            </table>
+            <p class="js-only">
+              <button type="button" class="btn btn--small" data-add-force={side}>{side === 'driving' ? 'Add a driving force' : 'Add a restraining force'}</button>
+            </p>
+          </div>
+        ))
+      }
+    </div>
+    <div class="field cp__lever">
+      <label for={`${uid}-lever`}>The restraining force you could weaken first</label>
+      <select class="select" id={`${uid}-lever`} name="lever" aria-describedby={`${uid}-lever-hint`} set:html={leverOptionsHtml(data.restraining, lever)}></select>
+      <span class="field__hint" id={`${uid}-lever-hint`}>Choose one within the manager's reach, not simply the strongest. The diagram shows it weakened by 2 points.</span>
+    </div>
+  </fieldset>
+
+  <fieldset class="cp__set">
+    <legend class="cp__legend">The stakeholders it affects</legend>
+    <ol class="cp__stakeholders" role="list" data-stakeholders set:html={stakeholderRowsHtml(data.stakeholders, uid)}></ol>
+    <p class="js-only">
+      <button type="button" class="btn btn--small" data-add-st>Add a stakeholder</button>
+    </p>
+  </fieldset>
+  <p class="nojs-only tool-note">This is the worked example. With JavaScript on, you can change the change, every force and stakeholder, and add or remove them.</p>
+</form>
+
+<div class="tool-problems" data-problems hidden></div>
+
+<section class="tool-panel" aria-labelledby={`${uid}-res-h`} data-results>
+  <h3 id={`${uid}-res-h`}>The plan</h3>
+  <div class="tool-reading">
+    <p><strong>Reading.</strong> <span data-interp>{read.reading}</span></p>
+    <p class="muted"><strong>Implication.</strong> <span data-impl>{read.implication}</span></p>
+  </div>
+
+  <div class="cp__block" data-level="HL">
+    <h4 class="cp__h">Force field analysis <span class="tag tag--hl">HL</span></h4>
+    <div class="cp__ff">
+      <div class="chart-scroll" role="region" aria-label="Force field diagram" tabindex="0" data-ff-chart set:html={forceFieldSvg(data.driving, data.restraining, lever, `${uid}-ff`)}></div>
+      <div class="cp__ff-read" data-ff-read set:html={forceReadingHtml(data.driving, data.restraining, lever)}></div>
+    </div>
+    <p class="tool-note">The model is Kurt Lewin's (1951). The scores are judgements, so the totals show where the weight of the argument lies, not a measurement.</p>
+  </div>
+
+  <div class="cp__block">
+    <h4 class="cp__h">Who it affects: a stakeholder map <span class="tag">Enrichment</span></h4>
+    <div class="cp-map" data-map set:html={stakeholderMapHtml(data.stakeholders)}></div>
+    <p class="tool-note">Mapping by power and interest is a widely used planning tool, but the guide does not name it, so use it to organize an answer rather than as a requirement.</p>
+  </div>
+
+  <div class="cp__block">
+    <h4 class="cp__h">The resistance to expect</h4>
+    <p class="tool-note">The reasons are those the platform's notes give for resistance to change (subtopic 2.1, AO2). The level of risk follows the platform's rule: opposition matters most where there is the power to act on it.</p>
+    <div data-res set:html={resistanceHtml(data.stakeholders)}></div>
+  </div>
+
+  <div class="cp__block">
+    <h4 class="cp__h">The steps to take</h4>
+    <p class="tool-note">Human resource strategies for reducing the impact of change and resistance to it are AO3 in subtopic 2.1. Where a step uses one of Kotter and Schlesinger's six approaches to resistance (1979), it names it. The guide does not name the model, so it is enrichment.</p>
+    <div data-steps set:html={stepsHtml(input)}></div>
+    <details class="disclosure">
+      <summary>The two approaches the plan never suggests</summary>
+      <div class="disclosure__body">
+        <ul class="cp__last" set:html={lastResortsHtml()}></ul>
+      </div>
+    </details>
+  </div>
+</section>
+
+<div class="field cp__note">
+  <label for={`${uid}-note`}>Your plan in your own words: what you would do first, and why</label>
+  <textarea class="textarea" id={`${uid}-note`} data-note rows="4"></textarea>
+  <span class="field__hint js-only">Kept on this device with the plan.</span>
+</div>
+
+<script>
+  import '../../../scripts/change-planner';
+</script>
+
+<style>
+  .cp {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  .cp__change .input {
+    width: 100%;
+    max-width: 46rem;
+  }
+
+  .cp__context {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  .cp__set {
+    display: grid;
+    gap: var(--sp-3);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .cp__legend {
+    padding: 0;
+    margin-bottom: var(--sp-2);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .cp__forces {
+    display: grid;
+    gap: var(--sp-5);
+  }
+
+  @media (min-width: 60rem) {
+    .cp__forces {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .cp__side {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+    min-width: 0;
+  }
+
+  .cp__side > p {
+    margin: 0;
+  }
+
+  .cp-force {
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  .cp-force th:nth-child(2) {
+    width: 4.5rem;
+  }
+
+  .cp-force th:nth-child(3) {
+    width: 6.5rem;
+  }
+
+  .cp-force :global(td) {
+    vertical-align: top;
+  }
+
+  .cp-force :global(.cp-force__label),
+  .cp-force :global(.cp-force__strength) {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* The column heading names the strength on a wide screen, so its label is for screen readers only there. */
+  .cp-force :global(.cp-force__lab) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .cp-force :global(.cp-force__s) {
+    position: relative;
+  }
+
+  /* On a phone each force takes two lines: its name, then its strength and the button to remove it. */
+  @media (max-width: 40rem) {
+    .cp-force thead {
+      display: none;
+    }
+
+    .cp-force,
+    .cp-force :global(tbody) {
+      display: block;
+    }
+
+    .cp-force :global(tr) {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      justify-items: start;
+      align-items: center;
+      gap: var(--sp-2) var(--sp-4);
+      padding: var(--sp-2) 0;
+      border-bottom: 1px solid var(--rule-hair);
+    }
+
+    .cp-force :global(td) {
+      display: block;
+      padding: 0;
+      border: 0;
+    }
+
+    .cp-force :global(td:first-child) {
+      grid-column: 1 / -1;
+      justify-self: stretch;
+    }
+
+    .cp-force :global(.cp-force__s) {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-2);
+    }
+
+    .cp-force :global(.cp-force__lab) {
+      position: static;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      clip: auto;
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .cp-force :global(.cp-force__strength) {
+      width: 4.5rem;
+    }
+  }
+
+  .cp__lever .select {
+    max-width: 30rem;
+  }
+
+  .cp__stakeholders {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cp__stakeholders :global(.cp-sh) {
+    margin: 0;
+    padding: var(--sp-2) var(--sp-4) var(--sp-3);
+    border: 1px solid var(--rule-hair);
+    border-left: 3px solid var(--room-accent);
+    background: #fff;
+  }
+
+  .cp__stakeholders :global(.cp-sh__set) {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .cp__stakeholders :global(.cp-sh__legend) {
+    padding: 0;
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--room-accent-text);
+  }
+
+  .cp__stakeholders :global(.cp-sh__grid) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: end;
+    gap: var(--sp-2) var(--sp-3);
+    margin-top: var(--sp-1);
+  }
+
+  .cp__stakeholders :global(.cp-sh__name),
+  .cp__stakeholders :global(.cp-sh__stance),
+  .cp__stakeholders :global(.cp-sh__reason) {
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 30rem) {
+    .cp__stakeholders :global(.cp-sh__grid) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .cp__stakeholders :global(.cp-sh__stance) {
+      grid-column: auto;
+    }
+  }
+
+  .cp__stakeholders :global(.cp-sh .field) {
+    min-width: 0;
+  }
+
+  /* One row per stakeholder on a wide screen: name, power, interest, stance, reason, remove. */
+  @media (min-width: 64rem) {
+    .cp__stakeholders :global(.cp-sh__grid) {
+      grid-template-columns: minmax(0, 2.2fr) repeat(3, minmax(0, 1fr)) minmax(0, 2.4fr) auto;
+    }
+
+    .cp__stakeholders :global(.cp-sh__name),
+    .cp__stakeholders :global(.cp-sh__stance),
+    .cp__stakeholders :global(.cp-sh__reason) {
+      grid-column: auto;
+    }
+  }
+
+  .cp__stakeholders :global(.cp-sh .input),
+  .cp__stakeholders :global(.cp-sh .select) {
+    width: 100%;
+  }
+
+  .cp__stakeholders :global(.cp-sh__actions) {
+    margin: 0;
+    padding-bottom: 0.3rem;
+  }
+
+  .cp__block {
+    display: grid;
+    gap: var(--sp-3);
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .cp__h {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.1875rem;
+  }
+
+  .cp__ff {
+    display: grid;
+    gap: var(--sp-4);
+  }
+
+  @media (min-width: 60rem) {
+    .cp__ff {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      align-items: start;
+    }
+  }
+
+  .cp__ff-read :global(p) {
+    max-width: var(--text-max);
+    margin: 0 0 var(--sp-3);
+    font-size: 1rem;
+  }
+
+  .cp-map {
+    display: grid;
+    gap: var(--sp-3);
+  }
+
+  @media (min-width: 48rem) {
+    .cp-map {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-areas:
+        'satisfied closely'
+        'monitor informed';
+    }
+
+    .cp-map :global(.cp-map__q--manage-closely) {
+      grid-area: closely;
+    }
+
+    .cp-map :global(.cp-map__q--keep-satisfied) {
+      grid-area: satisfied;
+    }
+
+    .cp-map :global(.cp-map__q--keep-informed) {
+      grid-area: informed;
+    }
+
+    .cp-map :global(.cp-map__q--monitor) {
+      grid-area: monitor;
+    }
+  }
+
+  .cp-map :global(.cp-map__q) {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-1);
+    padding: var(--sp-3) var(--sp-4);
+    border: 1px solid var(--rule-hair);
+    background: #fff;
+  }
+
+  .cp-map :global(.cp-map__q--manage-closely) {
+    border-top: 3px solid var(--room-accent);
+  }
+
+  .cp-map :global(.cp-map__h) {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+  }
+
+  .cp-map :global(.cp-map__axes),
+  .cp-map :global(.cp-map__what),
+  .cp-map :global(.cp-map__none) {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .cp-map :global(.cp-map__list) {
+    display: grid;
+    gap: var(--sp-1);
+    margin: var(--sp-1) 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cp-map :global(.cp-st) {
+    font-size: 0.9375rem;
+  }
+
+  .cp-map :global(.cp-st__name) {
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .cp-map :global(.cp-st__stance) {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .cp-map :global(.cp-st--opposes .cp-st__stance) {
+    color: var(--signal-text);
+  }
+
+  .cp-map :global(.cp-st--supports .cp-st__stance) {
+    color: var(--green-text);
+  }
+
+  :global(.cp-res),
+  :global(.cp-steps) {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  :global(.cp-res__item),
+  :global(.cp-step) {
+    display: grid;
+    gap: var(--sp-1);
+    margin: 0;
+    padding: var(--sp-3) 0 var(--sp-3) var(--sp-3);
+    border-bottom: 1px solid var(--rule-hair);
+    border-left: 3px solid var(--rule);
+  }
+
+  :global(.cp-res__item--high) {
+    border-left-color: var(--bb-signal);
+  }
+
+  :global(.cp-res__item--medium) {
+    border-left-color: var(--bb-brass);
+  }
+
+  :global(.cp-res__item p),
+  :global(.cp-step p) {
+    max-width: var(--text-max);
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  :global(.cp-res__name) {
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+
+  :global(.cp-res__risk) {
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  :global(.cp-res__item--high .cp-res__risk) {
+    color: var(--signal-text);
+  }
+
+  :global(.cp-res__app),
+  :global(.cp-step__who) {
+    color: var(--text-muted);
+  }
+
+  :global(.cp-steps) {
+    counter-reset: cp-step;
+  }
+
+  :global(.cp-step) {
+    counter-increment: cp-step;
+    border-left-color: var(--room-accent);
+  }
+
+  :global(.cp-step__title) {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+  }
+
+  :global(.cp-step__title::before) {
+    content: counter(cp-step) '. ';
+    color: var(--room-accent-text);
+  }
+
+  :global(.cp-step p.cp-step__model) {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  :global(.cp-step__name) {
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+
+  .cp__last {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  .cp__note {
+    max-width: 46rem;
+  }
+
+  :global(.cp-remove) {
+    min-height: 32px;
+  }
+</style>
