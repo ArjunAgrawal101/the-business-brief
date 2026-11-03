@@ -84,7 +84,7 @@ The label column is what readers see on the page.
 
 ## Subtopic notes
 
-`noteSchema` in `src/lib/schemas.ts`; rendered by `src/components/learn/NoteView.astro` on the subtopic's page. The model is `notes/stakeholders.yaml`.
+`noteSchema` in `src/lib/schemas.ts`; rendered by `src/components/learn/NoteView.astro` on the subtopic's page. The model is `notes/stakeholders.yaml`. Every one of the 34 sets of notes uses every field; the subtopic page numbers its sections from `noteParts()` in `src/lib/learning.ts`, so the notes and the page never disagree.
 
 | Field | What it holds |
 | --- | --- |
@@ -93,6 +93,11 @@ The label column is what readers see on the page.
 | `objectives` | What the reader can do afterwards, each starting with a command term at or below the statements' AO level |
 | `sections` | Each with an `id`, `title`, `kind` (concept, types, theory, framework, method, application, evaluation), `level`, a `body`, and optionally `points` (term and explanation), a `diagram` from the library, a fictional `example`, `formulas`, `advantages` and `limitations`. HL-only material sits in HL sections or points, which the SL view hides |
 | `evaluation` | How to weigh the ideas |
+| `situation` | The opening situation: a fictional business (`fictional: true`), or a real one only with a `source` in the register and its pages. It ends with the question the notes answer |
+| `applications`, `stakeholders` | How the ideas play out in different industries, and what they mean for each stakeholder group, with the conflicts between them |
+| `decision` | A business decision to make with the ideas: a `brief`, three `options` and `guidance` on how to weigh them (judgement, not a single answer) |
+| `exam` | Original exam-style questions, each with `q`, `marks`, `command` (a command-term id), `level`, optional `paper` and `answer`: what a strong response does, never called a markscheme. The build rejects an unknown command term, an HL question in notes with no HL material, and an HL question labelled Paper 1, which assesses no HL extension topics |
+| `summary` | The revision summary: the subtopic in a few lines |
 | `connections` | Other subtopics, each with the reason |
 | `terms`, `questions` | Glossary ids and practice question ids |
 | `retrieval` | Questions with short answers for the recall cards |

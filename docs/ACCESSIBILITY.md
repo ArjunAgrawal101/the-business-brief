@@ -17,7 +17,7 @@
 | Motion | Restrained and functional: page transitions, arrivals, reveals and chart updates of at most half a second, none of which loop or delay reading. Under reduced motion all of it stops, page transitions included, and nothing is held back. Reveals never hide content that is on screen at load, or anything at all without the script that reveals it |
 | Without JavaScript | Every page is complete; answers sit in disclosures; Decision Room choices show what happens; every case lab stage is open; search lists every entry; no page shows a button that needs a script |
 | SL and HL | Hidden HL material always leaves a visible notice; the choice is announced. Pages for HL-only subtopics stay whole in the SL view, with one notice that the page is HL only |
-| The brand opening | Plays once per browser and never under reduced motion; focus starts on Skip; Escape, Enter, Space or a click skips it; the page is `inert` only while it plays, with a six-second backstop and a CSS failsafe if scripts fail |
+| The opening | Plays on every fresh entry, never between the site's own pages. It is decoration: the layer is `aria-hidden`, the page is never `inert`, and screen readers read the page at once. Any key, click, tap or scroll ends it; Tab lands on Skip to content; a visible Skip intro button sits outside the hidden layer. Under reduced motion it is a still card that fades in about 1.2 seconds; CSS ends it on time if scripts fail |
 | Mindmaps | A labelled group with every action on a button (views, fold, zoom, fit, print, downloads); arrow keys pan, + and − zoom, 0 fits; the wheel zooms only with Ctrl or Cmd, so it never traps scrolling; changes are announced; every map is followed by the same content as an outline |
 | Diagrams | A title and a full description inside every SVG, the same description visible under "Text description", and a focusable, labelled region that scrolls sideways on narrow screens |
 | Tables in the Assessment Centre | Scroll inside labelled, focusable regions; long selects never widen the page |
@@ -29,7 +29,7 @@
 | Automated scan of 183 pages (every page of every kind; a fixed sample of the 558 glossary term pages, which share one template) at desktop (1280 px) and phone (Pixel 7) sizes, WCAG 2.0, 2.1 and 2.2 A and AA rules | axe-core 4.11 with Playwright | No violations: 183 pages at both sizes, 366 scans |
 | Horizontal scrolling at phone width, the same pages | Playwright | None |
 | Colour contrast of 34 token pairs, including the navy, ivory and gold identity | `npm run qa:contrast` | All pass |
-| The brand opening: focus, skip, inert page, no replay, reduced motion | Playwright | Pass |
+| The opening: every fresh entry, no replay between pages, Tab to Skip to content, Escape, click, reload, reduced motion, axe while it plays | Playwright | Pass |
 | Skip link, menu keyboard behaviour, focus after decisions, SL and HL switch | Playwright | Pass |
 | Interactions without JavaScript, and no page showing a button that needs a script | Playwright with JavaScript disabled | Pass |
 | Motion rules | Playwright, with and without reduced motion | Pass |
