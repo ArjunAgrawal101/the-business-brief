@@ -1,0 +1,76 @@
+---
+/**
+ * The Entrepreneurship and Innovation Lab: a founder's studio. The room page
+ * frame (icon, number, status, the syllabus it serves) comes from RoomPage;
+ * the studio itself is three compositions: the founder's route on a
+ * blueprint, Refill Round worked through every tool on a whiteboard, and the
+ * register of which ideas are IB content.
+ */
+import RoomPage from '../../components/rooms/RoomPage.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import LabRoute from '../../components/lab/LabRoute.astro';
+import LabWhiteboard from '../../components/lab/LabWhiteboard.astro';
+import IbRegister from '../../components/lab/IbRegister.astro';
+import { lab } from '../../lib/lab/content';
+import '../../styles/lab.css';
+
+// Runs the Lab's integrity checks before the page is built.
+await lab();
+---
+
+<RoomPage
+  id="entrepreneurship-lab"
+  room="enterprise"
+  listItems={false}
+  firstSection={4}
+  description="A founder's studio for aspiring entrepreneurs, founders and students: six briefings and six working tools, from testing an opportunity to a business plan, each labelled as IB content or enrichment."
+>
+  <div class="lab lab-home">
+    <section aria-labelledby="lab-route-h">
+      <SectionHead
+        no={1}
+        title="The founder's route"
+        dek="Six stations from an idea to a plan. At each, read the briefing, then put it to work in the tool. Students can take the stations in any order; founders will find the order is the one a new business usually needs."
+        id="lab-route-h"
+      />
+      <div class="lab-home__panel">
+        <LabRoute />
+      </div>
+    </section>
+
+    <section aria-labelledby="lab-board-h">
+      <SectionHead
+        no={2}
+        title="On the whiteboard: one venture, every tool"
+        dek="Every tool opens with the same fictional start-up, so you can watch the method work end to end before you try it on your own idea. Your own work in a tool replaces the example and stays on your device."
+        id="lab-board-h"
+      />
+      <div class="lab-home__panel">
+        <LabWhiteboard />
+      </div>
+    </section>
+
+    <section aria-labelledby="lab-ib-h">
+      <SectionHead
+        no={3}
+        title="What is IB content, and what is not"
+        dek="Much of the Lab goes beyond the syllabus. Each idea is checked against the IB Business management guide (first assessment 2024): the Business Model Canvas, the lean start-up, unit economics and venture capital are enrichment; the business plan is a toolkit tool; the sources of finance, the pricing methods and the challenges of starting up are IB content."
+        id="lab-ib-h"
+      />
+      <div class="lab-home__panel">
+        <IbRegister />
+      </div>
+    </section>
+  </div>
+</RoomPage>
+
+<style>
+  .lab-home {
+    display: grid;
+    gap: clamp(var(--sp-7), 6vw, var(--sp-8));
+  }
+
+  .lab-home__panel {
+    margin-top: var(--sp-5);
+  }
+</style>

@@ -7,6 +7,9 @@ import { modulesInOrder } from '../../lib/content';
 import { isIcon } from '../../lib/icons';
 
 const rooms = await modulesInOrder();
+/** The number of rooms in words, so the count follows the register in modules.yaml. */
+const NUMBER_WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
+const howMany = NUMBER_WORDS[rooms.length] ?? String(rooms.length);
 const counts = {
   live: rooms.filter((r) => r.data.status === 'live').length,
   partial: rooms.filter((r) => r.data.status === 'partial').length,
@@ -14,12 +17,12 @@ const counts = {
 };
 ---
 
-<BaseLayout title="All rooms" description="The fourteen rooms of The Business Brief, what each is for, what works in it now and what is planned." section="rooms">
+<BaseLayout title="All rooms" description={`The ${howMany} rooms of The Business Brief, what each is for, what works in it now and what is planned.`} section="rooms">
   <PageIntro
     trail={[{ label: 'All rooms' }]}
     kicker="The platform"
     title="All rooms"
-    lead={`One platform, fourteen rooms, each with one job. ${counts.live} are live, ${counts.partial} are partly built and ${counts.planned} are planned. A room is linked only when something in it works.`}
+    lead={`One platform, ${howMany} rooms, each with one job. ${counts.live} are live, ${counts.partial} are partly built and ${counts.planned} are planned. A room is linked only when something in it works.`}
   />
   <div class="wrap page-body">
     <ol class="room-list" role="list">

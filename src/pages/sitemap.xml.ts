@@ -21,6 +21,10 @@ export const GET: APIRoute = async ({ site }) => {
   Object.entries(c.tools).forEach(([id, t]) => t.status === 'complete' && paths.add(`/toolkit/${id}/`));
   Object.keys(c.assessment).forEach((id) => id !== 'internal-assessment' && paths.add(`/exam-desk/${id}/`));
   (await pathwaysInOrder()).forEach((p) => paths.add(`/pathways/${p.id}/`));
+  // The Entrepreneurship and Innovation Lab's briefings and tools.
+  const { lab } = await import('../lib/lab/content');
+  const l = await lab();
+  [...l.briefingList, ...l.toolList].forEach(([id]) => paths.add(`/entrepreneurship-lab/${id}/`));
   // A sitemap must use absolute addresses. Without a site address (a local build), list nothing.
   if (!site) {
     return new Response(
