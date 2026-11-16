@@ -96,7 +96,8 @@ export const collections = {
   concepts: defineCollection({ loader: file('./src/content/data/concepts.yaml'), schema: conceptSchema }),
   pathways: defineCollection({ loader: file('./src/content/data/pathways.yaml'), schema: pathwaySchema }),
   modules: defineCollection({ loader: file('./src/content/data/modules.yaml'), schema: moduleSchema }),
-  sources: defineCollection({ loader: file('./src/content/data/sources.yaml'), schema: sourceSchema }),
+  // The source register, one file per area (register.yaml holds the original entries), so that new material adds its own file.
+  sources: defineCollection({ loader: yamlList('./src/content/sources'), schema: sourceSchema }),
   claims: defineCollection({ loader: file('./src/content/data/claims.yaml'), schema: claimSchema }),
   resources: defineCollection({ loader: file('./src/content/data/resources.yaml'), schema: resourceSchema }),
   studio: defineCollection({ loader: yamlFiles('./src/content/studio'), schema: studioSchema }),

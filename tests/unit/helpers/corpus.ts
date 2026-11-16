@@ -96,7 +96,7 @@ export function loadCorpus() {
     concepts: fileList('data/concepts.yaml', conceptSchema),
     pathways: fileList('data/pathways.yaml', pathwaySchema),
     modules: fileList('data/modules.yaml', moduleSchema),
-    sources: fileList('data/sources.yaml', sourceSchema),
+    sources: lists('sources', sourceSchema),
     claims: fileList('data/claims.yaml', claimSchema),
     mindmaps: perFile('mindmaps', mindmapSchema),
     notes: perFile('notes', noteSchema),
