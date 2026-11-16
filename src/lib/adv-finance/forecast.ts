@@ -491,7 +491,7 @@ export const FLEX_FIELDS: FieldSpec[] = [
 ];
 
 export const ALTERNATIVE_FIELDS: FieldSpec[] = [
-  { key: 'investment', label: 'Investment in year one', kind: 'money', min: 0, name: 'the investment' },
+  { key: 'investment', label: 'Investment in year one', kind: 'money', min: 0, name: 'the investment', hint: 'Depreciated over the life of new assets.' },
   { key: 'borrowing', label: 'New borrowing in year one', kind: 'money', min: 0, name: 'the new borrowing' },
   { key: 'variableCostChange', label: 'Change in variable cost per unit', kind: 'money', name: 'the change in variable cost', hint: 'Negative for a saving.' },
   { key: 'fixedCostChange', label: 'Change in fixed costs, a year', kind: 'money', name: 'the change in fixed costs', hint: 'Negative for a saving.' },

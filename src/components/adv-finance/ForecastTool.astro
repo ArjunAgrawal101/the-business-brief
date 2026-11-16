@@ -31,7 +31,7 @@ const GROUPS: Array<{ id: string; title: string; open: boolean; html: string; no
   { id: 'assets', title: 'Investment and depreciation', open: false, html: DRIVER_FIELDS.assets.map((f) => field(f)).join('') },
   { id: 'working', title: 'Working capital', open: false, html: DRIVER_FIELDS.working.map((f) => field(f)).join('') },
   { id: 'finance', title: 'Interest, tax and dividends', open: false, html: DRIVER_FIELDS.finance.map((f) => field(f)).join('') },
-  { id: 'opening', title: `The position at the start of ${form.fields.firstYear}`, open: false, html: OPENING_FIELDS.map((f) => field(f, 'o.')).join(''), note: 'Retained earnings are whatever makes the opening position balance.' },
+  { id: 'opening', title: 'The opening position', open: false, html: OPENING_FIELDS.map((f) => field(f, 'o.')).join(''), note: 'At the start of the first year. Retained earnings are whatever makes the opening position balance.' },
 ];
 const flexHtml = (p: 'up' | 'down') => FLEX_FIELDS.map((f) => field(f, `${p}.`)).join('');
 const altHtml = (p: 'a' | 'b') => `${textFieldHtml({ name: `${p}.name`, label: 'Name', value: form.names[p], uid })}${ALTERNATIVE_FIELDS.map((f) => field(f, `${p}.`)).join('')}`;
@@ -209,7 +209,7 @@ const optionLabel = (o: (typeof OPTION_IDS)[number]) => (o === 'none' ? 'Making 
         <ul class="fl-actions">
           <li>A forecast is only as good as its drivers, and small errors compound: a growth rate a point too high adds up over five years.</li>
           <li>Scenarios are not probabilities. In practice the drivers move together, and a downside often brings lower prices and lower volume at once.</li>
-          <li>Year-end figures hide what happens within a year: a business can run out of cash in March and look healthy in December. The IB’s monthly cash flow forecast (3.7) shows the months.</li>
+          <li>Year-end figures hide what happens within a year: a business can run out of cash in March and look healthy in December. A cash flow forecast by month, such as the Financial Laboratory’s, shows the months.</li>
           <li>The forecast stops after a few years, so an investment that pays off later looks worse here than over its life. Value it over its whole life with the capital budgeting comparator.</li>
           <li>Interest, tax and dividends are simplified, and all borrowing sits on one line.</li>
         </ul>
