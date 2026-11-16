@@ -1,6 +1,7 @@
 ---
 /** A one-page revision brief, designed to print on two sides of A4. */
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import TutorNote from '../../components/ui/TutorNote.astro';
 import RetrievalCards from '../../components/assess/RetrievalCards.astro';
 import Monogram from '../../components/brand/Monogram.astro';
 import { corpus, href, longDate, topicsInOrder } from '../../lib/content';
@@ -87,6 +88,7 @@ const misconceptions = t.sections.flatMap((s) => s.blocks).filter((b) => b.type 
       <h2 class="label label--ink">Answer from memory</h2>
       <RetrievalCards id={`rev-${id}`} items={t.revision.retrieval} />
     </section>
+    <TutorNote lead="Revising with little time left?" offer="A session can plan what to revise, test you on it and work through the questions that cost marks." />
     <footer class="rev__foot small muted">
       Arjun Agrawal | The Business Brief. Updated {longDate(t.updated)}. Statements about the IB course carry verification statuses on the full brief. Original teaching material; not an IB publication.
     </footer>

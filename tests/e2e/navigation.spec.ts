@@ -22,7 +22,7 @@ test('the current section is marked in the navigation', async ({ page, isMobile 
   await expect(page.locator('.mega-nav a[aria-current="true"]')).toContainText('Glossary');
   await page.goto('/tutorials/');
   await expect(page.locator('.mega.is-current > summary')).toContainText('Connect');
-  await expect(page.locator('.site-header__tools a[href="/tutorials/"]')).toHaveAttribute('aria-current', 'page');
+  await expect(page.locator('a.hdr-btn--cta[href="/tutorials/"]')).toHaveAttribute('aria-current', 'page');
   await page.goto('/advanced/');
   await expect(page.locator('.mega.is-current > summary')).toContainText('Advance');
 });
@@ -30,7 +30,7 @@ test('the current section is marked in the navigation', async ({ page, isMobile 
 test('the Tutorials button is in the header on wide screens, and first in the drawer on small ones', async ({ page, isMobile }) => {
   await page.goto('/');
   if (!isMobile) {
-    await expect(page.locator('.site-header__tools a[href="/tutorials/"]')).toBeVisible();
+    await expect(page.locator('a.hdr-btn--cta[href="/tutorials/"]')).toBeVisible();
     return;
   }
   const drawer = page.locator('[data-drawer]');
