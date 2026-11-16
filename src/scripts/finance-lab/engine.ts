@@ -14,7 +14,9 @@ import { cleanSettings, fillLabel } from '../../lib/finance-lab/fields';
 import { regionsHtml, type Region } from '../../lib/finance-lab/render';
 import type { LabReport, Problem, Raw, Settings } from '../../lib/finance-lab/types';
 import { toCsv } from '../../lib/finance-lab/util';
+import { SNAPSHOTS_KEY, addSnapshot, parseSnapshots } from '../../lib/workspace';
 import { announce, parseNumber } from '../ix';
+import { readItem, storageWorks, writeItem } from '../storage';
 
 export interface Read {
   raw: Raw;
@@ -88,12 +90,16 @@ export function mount(root: HTMLElement, calc: LabCalc): { refresh: (prefix?: st
   const id = root.dataset.calc ?? 'calculator';
   const status = root.querySelector<HTMLElement>('[data-status]');
   const source = root.querySelector<HTMLElement>('[data-source]');
+  const wsButton = root.querySelector<HTMLButtonElement>('[data-act="workspace"]');
+  const wsLink = root.querySelector<HTMLElement>('[data-ws-link]');
   const regions = new Map<Region, HTMLElement>();
   root.querySelectorAll<HTMLElement>('[data-region]').forEach((el) => regions.set(el.dataset.region as Region, el));
   let report: LabReport | null = null;
   let typeTimer = 0;
   let calmTimer = 0;
   let lastSaid = '';
+  /** The figures last saved to the workspace, while they are the ones shown. */
+  let savedFigures = '';
 
   const settingEl = (k: keyof Settings) => root.querySelector<HTMLInputElement | HTMLSelectElement>(`[data-setting="${k}"]`);
   const readSettings = (): Settings =>
@@ -160,6 +166,8 @@ export function mount(root: HTMLElement, calc: LabCalc): { refresh: (prefix?: st
     }
     root.classList.remove('is-invalid');
     report = calc.build(r, s);
+    // A result saved to the workspace is the one shown when it was saved; new figures make a new result.
+    if (wsLink && snapshot() !== savedFigures) wsLink.hidden = true;
     const html = regionsHtml(report, name);
     regions.forEach((el, key) => fill(el, html[key] ?? ''));
     const mine = snapshot() !== example;
@@ -220,6 +228,30 @@ export function mount(root: HTMLElement, calc: LabCalc): { refresh: (prefix?: st
     say('The figures and results have been downloaded as a CSV file.', 0);
   };
 
+  // "Save this result to my workspace": a snapshot of the calculator, the figures, the headline and the date (bb:workspace:snapshots).
+  if (wsButton) wsButton.hidden = !storageWorks();
+  const saveToWorkspace = () => {
+    // The result for the figures as they stand, even if the reader clicked before the page caught up with the typing.
+    window.clearTimeout(typeTimer);
+    update(null);
+    if (!report) return;
+    if (root.classList.contains('is-invalid')) {
+      say('Correct the figure marked in the inputs first: only a complete result can be saved to your workspace.', 0);
+      return;
+    }
+    const mine = snapshot() !== example;
+    const q = calc.toParams ? withSettings(calc.toParams(calc.read(root)), readSettings()).toString() : '';
+    const page = window.location.pathname;
+    const res = addSnapshot(parseSnapshots(readItem(SNAPSHOTS_KEY)), { calc: id, name, url: `${page}${mine && q ? `?${q}` : ''}`, page, headline: report.headline, inputs: report.given, mine }, new Date());
+    if (!res || !writeItem(SNAPSHOTS_KEY, JSON.stringify(res.list))) {
+      say('This browser would not keep the result: its storage is full or blocked.', 0);
+      return;
+    }
+    savedFigures = snapshot();
+    if (wsLink) wsLink.hidden = false;
+    say(`Saved to your workspace: ${report.headline.label}, ${report.headline.value}.`, 0);
+  };
+
   const copyLink = async () => {
     if (!calc.toParams) return;
     const q = withSettings(calc.toParams(calc.read(root)), readSettings()).toString();
@@ -255,6 +287,7 @@ export function mount(root: HTMLElement, calc: LabCalc): { refresh: (prefix?: st
     } else if (act === 'csv') download();
     else if (act === 'print') window.print();
     else if (act === 'link') void copyLink();
+    else if (act === 'workspace') saveToWorkspace();
   });
 
   // Figures carried in the address, from a copied link or from another calculator.
