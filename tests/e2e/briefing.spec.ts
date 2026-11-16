@@ -180,7 +180,7 @@ test.describe('the Business Intelligence Briefing', () => {
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
     await page.goto('/intelligence/');
-    const themes = await page.locator('.ib-theme__name a').evaluateAll((as) => as.map((a) => a.getAttribute('href') ?? ''));
+    const themes = await page.locator('.ib-theme__name a, .ib-themes__more a').evaluateAll((as) => as.map((a) => a.getAttribute('href') ?? ''));
     expect(themes.length).toBeGreaterThanOrEqual(12);
     // Every item's themes, read from the list on the front page.
     const filed = await page.locator('[data-item]').evaluateAll((els) =>

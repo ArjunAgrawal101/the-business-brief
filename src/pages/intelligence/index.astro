@@ -24,6 +24,7 @@ import {
   filterSummary,
   formatDate,
   inTheme,
+  isEditorialTheme,
   itemCount,
   latest,
   regionsLine,
@@ -56,8 +57,9 @@ const docs = [...documents.values()].sort((a, b) => a.s.publisher.localeCompare(
 const citations = items.reduce((n, [, it]) => n + it.sources.length, 0);
 const primaryDocs = docs.filter((d) => d.s.primary).length;
 const usedKinds = INTEL_CATEGORIES.filter((k) => items.some(([, it]) => it.categories.includes(k)));
-// The themes shown as sections: the twelve editorial themes, then any other theme an item carries.
-const themes = [...INTEL_THEMES, ...usedKinds.filter((k) => !(INTEL_THEMES as readonly string[]).includes(k))];
+// The twelve editorial themes are the sections; the first edition's other kinds are listed after them.
+const themes = [...INTEL_THEMES];
+const otherKinds = usedKinds.filter((k) => !isEditorialTheme(k));
 const usedUnits = units.filter((u) => items.some(([, it]) => facetsOf(it).units.includes(String(u.number))));
 const anyTools = items.some(([, it]) => it.concepts.tools.length > 0);
 const regions = new Set(items.flatMap(([, it]) => it.regions));
@@ -233,6 +235,20 @@ const SIX = [
           })
         }
       </ul>
+      {
+        otherKinds.length > 0 && (
+          <p class="small ib-themes__more">
+            Also filed under{' '}
+            {otherKinds.map((k, i) => (
+              <>
+                {i > 0 ? ' and ' : ''}
+                <a href={themeHref(k)}>{THEME_INFO[k].label}</a> ({itemCount(inTheme(items, k).length)})
+              </>
+            ))}
+            , kinds of development kept from the first edition.
+          </p>
+        )
+      }
     </section>
 
     <section aria-labelledby="list-h" data-ix="briefing">
