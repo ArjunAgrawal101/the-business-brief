@@ -11,7 +11,7 @@ It is written first for IB Diploma Programme Business Management (SL and HL), wi
 | | |
 | --- | --- |
 | Opening | Five seconds on every fresh entry, in any browser, never between the site's own pages and decided without storing anything; Skip intro, a progress bar, any key, click or scroll to end it; a still card under reduced motion |
-| Navigation | Explore, Practise, Tools, Assess and Discover: panels on wide screens, a drawer on phones and tablets; footer, search and the home page built from the same list |
+| Navigation | Learn, Practise, Tools, Assess, Advance and Connect: panels on wide screens, a drawer on phones and tablets; a Tutorials button in the header; footer, search and the home page built from the same list |
 | Rooms | Each with its own accent, ground and motif: Finance Desk, Strategy Studio, Market Studio, People and Culture, Operations Floor, Entrepreneurship Lab, Boardroom, Case Room and Case Vault, Assessment Centre |
 | Topic library | All 37 subtopics complete: 34 with full notes (situation, sections, applications, stakeholders, decision, exam-style practice, summary) and 3 with complete briefs; home, Topics and Coverage agree |
 | Knowledge | 701 glossary terms (566 IB, 135 beyond the course); 35 frameworks with diagrams and exercises; 14 of the 15 toolkit guides; 42 course mindmaps and 9 enrichment maps; 90 original diagrams |
