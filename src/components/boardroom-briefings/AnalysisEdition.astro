@@ -1,0 +1,330 @@
+---
+/**
+ * The Analysis edition of a briefing: the worked discussion. What the
+ * evidence shows, the assumptions, the trade-offs, every option judged and
+ * scored against the board's criteria, the recommendation, how to implement
+ * it, how to tell whether it is working, the limits of the analysis, and
+ * notes on the discussion questions.
+ *
+ * It is a disclosure, closed, after the Student edition: without JavaScript a
+ * reader opens it when ready. With JavaScript the edition switch shows it in
+ * place of the Student edition and hides the disclosure's own control.
+ */
+import SectionHead from '../layout/SectionHead.astro';
+import Exhibit from '../blocks/Exhibit.astro';
+import ProvenanceTag from '../ui/ProvenanceTag.astro';
+import { inlineLinked, richLinked } from '../../lib/boardroom-briefings/render';
+import { ANALYSIS_SECTIONS, FIT_LABELS } from '../../lib/boardroom-briefings/series';
+import { roundTo, weightedScores } from '../../lib/boardroom-briefings/figures';
+import type { BoardroomBriefing } from '../../lib/boardroom-briefings/schema';
+
+interface Props {
+  b: BoardroomBriefing;
+  minutes: number;
+}
+const { b, minutes } = Astro.props;
+const ids = new Set([...b.exhibits, ...b.analysis.exhibits].map((e) => e.id));
+const rx = (t: string) => richLinked(t, ids);
+const ix = (t: string) => inlineLinked(t, ids);
+const a = b.analysis;
+const no = (sid: string) => `A${ANALYSIS_SECTIONS.findIndex((s) => s.id === sid) + 1}`;
+const title = (sid: string) => ANALYSIS_SECTIONS.find((s) => s.id === sid)?.title ?? '';
+const optionOf = (oid: string) => b.options.find((o) => o.id === oid);
+const rec = optionOf(a.recommendation.option);
+const totals = weightedScores(b);
+const best = Math.max(...[...totals.values()].map((v) => roundTo(v, 2)));
+const scoreOf = (oid: string) => a.scores.find((s) => s.option === oid);
+const fmtScore = (v: number) => v.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+---
+
+<details class="bbr-analysis" id="analysis" data-panel="analysis">
+  <summary>
+    <span>
+      <span class="bbr-analysis__name">The Analysis <em>edition</em></span>
+      <span class="bbr-analysis__what">The worked discussion: the evidence, the assumptions, every option judged and the recommendation. Open it when you have decided. About {minutes} minutes to read.</span>
+    </span>
+  </summary>
+  <section class="bbr-analysis__body" aria-label="Analysis edition">
+    <div class="bbr-flag" tabindex="-1" data-edition-start>
+      <p class="bbr-flag__name">The Analysis <em>edition</em></p>
+      <p class="bbr-flag__meta">The worked discussion and the recommendation · about {minutes} minutes to read</p>
+    </div>
+
+    <div class="bbr-analysis-mark">
+      <div class="tags"><ProvenanceTag kind="aa-framework" /><span class="tag tag--framework">The Business Brief's analysis</span></div>
+      <p class="small">
+        From here, the page gives the platform's reading of the case: its interpretation of the evidence, its judgement and its recommendation. It adds no new
+        facts, and the same evidence can support other conclusions if they are argued well.
+      </p>
+    </div>
+
+    <nav class="bbr-contents" aria-label="In the Analysis edition">
+      <p class="label label--ink">In this edition</p>
+      <ol>
+        {
+          ANALYSIS_SECTIONS.map((s, i) => (
+            <li>
+              <span class="bbr-contents__no" aria-hidden="true">
+                A{i + 1}
+              </span>
+              <a href={`#${s.id}`}>{s.title}</a>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+
+    <section id="a-summary" aria-labelledby="a-summary-h">
+      <SectionHead no={no('a-summary')} title={title('a-summary')} id="a-summary-h" />
+      <div class="bbr-verdict">
+        <p class="bbr-verdict__pick">
+          <span class="label label--ink">Recommended</span>
+          <span class="bbr-letter" aria-hidden="true">{a.recommendation.option}</span>
+          <strong>
+            <span class="sr-only">Option {a.recommendation.option}: </span>{rec?.label}
+          </strong>
+        </p>
+        <Fragment set:html={rx(a.verdict)} />
+      </div>
+    </section>
+
+    <section id="a-evidence" aria-labelledby="a-evidence-h">
+      <SectionHead no={no('a-evidence')} title={title('a-evidence')} id="a-evidence-h" dek="The exhibits worked through. Every figure here is recomputed from the exhibits on every build." />
+      <ul class="bbr-points">
+        {a.evidence.map((x) => <li set:html={ix(x)} />)}
+      </ul>
+      {
+        a.exhibits.length > 0 && (
+          <div class="exhibit-stack" style="margin-top:var(--sp-5)">
+            {a.exhibits.map((e) => <Exhibit exhibit={e} />)}
+          </div>
+        )
+      }
+    </section>
+
+    <section id="a-assumptions" aria-labelledby="a-assumptions-h">
+      <SectionHead no={no('a-assumptions')} title={title('a-assumptions')} id="a-assumptions-h" dek="What the analysis takes as given, and how a manager would test it before relying on it." />
+      <ul class="bbr-assumptions" role="list">
+        {
+          a.assumptions.map((x) => (
+            <li>
+              <p set:html={ix(x.assumption)} />
+              <p class="small">
+                <span class="label label--ink">How to test it</span> <span set:html={ix(x.test)} />
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section id="a-tradeoffs" aria-labelledby="a-tradeoffs-h">
+      <SectionHead no={no('a-tradeoffs')} title={title('a-tradeoffs')} id="a-tradeoffs-h" dek="What the board gives up to get what it wants. No option avoids all of them." />
+      <div class="bbr-tradeoffs">
+        {
+          a.tradeoffs.map((t) => (
+            <div>
+              <h3>{t.title}</h3>
+              <p set:html={ix(t.body)} />
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section id="a-alternatives" aria-labelledby="a-alternatives-h">
+      <SectionHead no={no('a-alternatives')} title={title('a-alternatives')} id="a-alternatives-h" dek="Every option judged against the evidence, then scored against the board's criteria." />
+      <ol class="debrief-options" role="list">
+        {
+          a.alternatives.map((x) => (
+            <li class="debrief-option">
+              <div>
+                <h3 class="bbr-option__head">
+                  <span class="bbr-letter" aria-hidden="true">
+                    {x.option}
+                  </span>
+                  <span>
+                    <span class="sr-only">Option {x.option}: </span>
+                    {optionOf(x.option)?.label}
+                  </span>
+                </h3>
+              </div>
+              <div class="stack stack-sm">
+                <p>
+                  <span class={`fit fit--${x.fit}`}>{FIT_LABELS[x.fit]}</span>
+                </p>
+                <div class="prose small" set:html={rx(x.body)} />
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <h3 class="bbr-subhead" id="a-matrix-h">The options scored against the board's criteria</h3>
+      <p class="small muted" style="margin-top:var(--sp-2);max-width:46rem">
+        Each option is scored from 1 (poor) to 5 (strong) on each criterion. The weighted score is the sum of each weight times its score, divided by 100. The scores are
+        the analysis's judgement; a scoring matrix organizes judgement, it does not replace it.
+      </p>
+      <div class="table-scroll" role="region" aria-labelledby="a-matrix-h" tabindex="0" style="margin-top:var(--sp-3)">
+        <table class="table bbr-matrix">
+          <thead>
+            <tr>
+              <th scope="col">Criterion</th>
+              <th scope="col" class="n">Weight</th>
+              {
+                b.options.map((o) => (
+                  <th scope="col" class:list={['n', { 'is-best': o.id === a.recommendation.option }]}>
+                    Option {o.id}
+                  </th>
+                ))
+              }
+            </tr>
+          </thead>
+          <tbody>
+            {
+              b.criteria.map((k) => (
+                <tr>
+                  <th scope="row">{k.criterion}</th>
+                  <td class="n">{k.weight}%</td>
+                  {b.options.map((o) => (
+                    <td class:list={['n', { 'is-best': o.id === a.recommendation.option }]}>{scoreOf(o.id)?.scores[k.id]}</td>
+                  ))}
+                </tr>
+              ))
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <th scope="row">Weighted score</th>
+              <td class="n">100%</td>
+              {
+                b.options.map((o) => (
+                  <td class:list={['n', { 'is-best': o.id === a.recommendation.option }]}>
+                    {fmtScore(roundTo(totals.get(o.id) ?? 0, 2))}
+                    {roundTo(totals.get(o.id) ?? 0, 2) === best && <span class="sr-only"> (the highest)</span>}
+                  </td>
+                ))
+              }
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+    <section id="a-recommendation" aria-labelledby="a-recommendation-h">
+      <SectionHead no={no('a-recommendation')} title={title('a-recommendation')} id="a-recommendation-h" />
+      <div class="bbr-rec">
+        <div class="bbr-rec__decision">
+          <p class="label">Option {a.recommendation.option}: {rec?.label}</p>
+          <div class="narrative" set:html={rx(a.recommendation.decision)} />
+        </div>
+        <div class="bbr-rec__side">
+          <div>
+            <h3>Why</h3>
+            <ul>{a.recommendation.reasons.map((r) => <li set:html={ix(r)} />)}</ul>
+          </div>
+          <div>
+            <h3>On these conditions</h3>
+            <div class="prose small" set:html={rx(a.recommendation.conditions)} />
+          </div>
+          {
+            a.recommendation.departsFromScores && (
+              <div>
+                <h3>Why judgement departs from the scores</h3>
+                <div class="prose small" set:html={rx(a.recommendation.departsFromScores)} />
+              </div>
+            )
+          }
+        </div>
+      </div>
+    </section>
+
+    <section id="a-implementation" aria-labelledby="a-implementation-h">
+      <SectionHead no={no('a-implementation')} title={title('a-implementation')} id="a-implementation-h" dek="What happens, in what order, and who answers for it." />
+      <ol class="bbr-timeline" role="list">
+        {
+          a.implementation.map((x) => (
+            <li>
+              <span class="bbr-timeline__when">{x.when}</span>
+              <span set:html={ix(x.action)} />
+              <span class="bbr-timeline__owner">{x.owner}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section id="a-measures" aria-labelledby="a-measures-h">
+      <SectionHead no={no('a-measures')} title={title('a-measures')} id="a-measures-h" dek="The evaluation criteria, applied after the decision: what to measure, what counts as working, and when to look." />
+      <div class="table-scroll" role="region" aria-labelledby="a-measures-h" tabindex="0" style="margin-top:var(--sp-4)">
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">Measure</th>
+              <th scope="col">Target</th>
+              <th scope="col">Reviewed</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              a.measures.map((m) => (
+                <tr>
+                  <th scope="row">{m.measure}</th>
+                  <td set:html={ix(m.target)} />
+                  <td>{m.review}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="a-limitations" aria-labelledby="a-limitations-h">
+      <SectionHead no={no('a-limitations')} title={title('a-limitations')} id="a-limitations-h" dek="What the analysis cannot see, and what would change its recommendation." />
+      <div class="bbr-limits">
+        <div>
+          <h3>The limits of the analysis</h3>
+          <ul>{a.limitations.map((x) => <li set:html={ix(x)} />)}</ul>
+        </div>
+        <div>
+          <h3>What would change the recommendation</h3>
+          <ul>{a.changeMind.map((x) => <li set:html={ix(x)} />)}</ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="a-questions" aria-labelledby="a-questions-h">
+      <SectionHead no={no('a-questions')} title={title('a-questions')} id="a-questions-h" dek="What a strong answer to each discussion question does. Guidance, not a markscheme.">
+        <div class="tags"><ProvenanceTag kind="assessment-explanation" /></div>
+      </SectionHead>
+      <ol class="bbr-notes" role="list">
+        {
+          b.questions.course.map((q, k) => (
+            <li data-level={q.level === 'HL' ? 'HL' : undefined}>
+              <p class="bbr-notes__q">
+                <a href={`#q-${q.id}`}>Question {k + 1}</a> [{q.marks} {q.marks === 1 ? 'mark' : 'marks'}]{q.level === 'HL' && <span class="tag tag--hl" style="margin-left:var(--sp-2)">HL</span>}
+              </p>
+              <div class="prose small" set:html={rx(q.notes)} />
+            </li>
+          ))
+        }
+        {
+          b.questions.seminar.map((q, k) => (
+            <li>
+              <p class="bbr-notes__q">
+                <a href={`#q-${q.id}`}>Seminar question {k + 1}</a> <span class="tag tag--enrichment">Enrichment</span>
+              </p>
+              <div class="prose small" set:html={rx(q.notes)} />
+            </li>
+          ))
+        }
+      </ol>
+      {b.questions.course.some((q) => q.level === 'HL') && <p class="hl-notice">Notes on HL-only questions are hidden in the SL view.</p>}
+    </section>
+
+    <p class="bbr-back js-only">
+      <button type="button" class="btn" data-go="student">Back to the Student edition</button>
+    </p>
+  </section>
+</details>

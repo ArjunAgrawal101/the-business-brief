@@ -1,0 +1,263 @@
+---
+/**
+ * The Boardroom Briefings: the series' front page. A masthead, the briefings
+ * as a numbered series (each with its question, industry, the kind of
+ * decision and the functions involved), how to read the two editions, an
+ * index by IB subtopic, and how the briefings are made. Complete without
+ * JavaScript; nothing on it needs a script.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import { codeKey, subtopicHref } from '../../lib/learning';
+import { FUNCTION_LABELS, INDUSTRY_LABELS } from '../../lib/case-vault';
+import { series } from '../../lib/boardroom-briefings/content';
+import { briefingHref, DECISION_TYPE_LABELS, issueNo, SERIES_NAME } from '../../lib/boardroom-briefings/series';
+import '../../styles/boardroom-briefings.css';
+
+const s = await series();
+const list = s.list;
+const units = s.c.curricula['ib-dp-bm']?.units ?? [];
+const served = new Set(list.flatMap(([, b]) => b.course.subtopics.map((x) => x.code)));
+const byUnit = units
+  .map((u) => ({ ...u, subs: u.subtopics.filter((x) => served.has(x.code)).sort((p, q) => codeKey(p.code) - codeKey(q.code)) }))
+  .filter((u) => u.subs.length);
+const exhibits = list.reduce((n, [, b]) => n + b.exhibits.length + b.analysis.exhibits.length, 0);
+const questions = list.reduce((n, [, b]) => n + b.questions.course.length + b.questions.seminar.length, 0);
+const options = list.reduce((n, [, b]) => n + b.options.length, 0);
+const industries = new Set(list.map(([, b]) => b.industry)).size;
+const fictional = list.every(([, b]) => b.company.fictional);
+const description = `${SERIES_NAME}: ${list.length} editorial cases on how businesses make management decisions, each in a Student edition and an Analysis edition, for IB Diploma, undergraduate, MBA and professional readers.`;
+---
+
+<BaseLayout title={SERIES_NAME} description={description} section="cases" room="boardroom">
+  <div class="wrap">
+    <header class="bbr-mast">
+      <Breadcrumbs trail={[{ label: SERIES_NAME }]} />
+      <div class="bbr-mast__grid">
+        <div>
+          <p class="label label--ink">The Business Brief · An editorial case series</p>
+          <h1>The Boardroom <em>Briefings</em></h1>
+          <p class="lead">
+            How businesses make management decisions, one question at a time: whether to enter a market abroad, buy a rival, automate, or cut back to grow again. Each
+            briefing is a case in two editions. The Student edition sets out the business, the evidence, the people with a stake and the options. The Analysis edition
+            works through them to a recommendation, with its assumptions and its limits.
+          </p>
+          <div class="tags">
+            <ProvenanceTag kind="simulated-data" />
+            {fictional && <span class="tag tag--plain">Fictional companies</span>}
+            <span class="tag tag--plain">IB Diploma, undergraduate, MBA and professional readers</span>
+          </div>
+        </div>
+        <dl class="bbr-figures-ledger" aria-label="The series in figures">
+          <div><dt>Briefings</dt><dd>{list.length}</dd></div>
+          <div><dt>Industries</dt><dd>{industries}</dd></div>
+          <div><dt>Options weighed</dt><dd>{options}</dd></div>
+          <div><dt>Exhibits</dt><dd>{exhibits}</dd></div>
+          <div><dt>Discussion questions</dt><dd>{questions}</dd></div>
+          <div><dt>IB subtopics</dt><dd>{served.size}</dd></div>
+        </dl>
+      </div>
+    </header>
+  </div>
+
+  <div class="wrap page-body">
+    <section aria-labelledby="series-h" id="series">
+      <SectionHead no={1} title="The series" id="series-h" dek="Each briefing asks one question that boards face, through one business. Read them in any order." />
+      <ol class="bbr-series" role="list">
+        {
+          list.map(([id, b]) => {
+            const type = DECISION_TYPE_LABELS[b.decisionType];
+            return (
+              <li class="bbr-issue" data-briefing={id}>
+                <p class="bbr-issue__no" aria-hidden="true">
+                  {String(b.number).padStart(2, '0')}
+                </p>
+                <div class="bbr-issue__body">
+                  <p class="label bbr-issue__type">{type.label}</p>
+                  <h3 class="bbr-issue__q">
+                    <a href={briefingHref(id)}>
+                      <span class="sr-only">{issueNo(b.number)}: </span>
+                      {b.question}
+                    </a>
+                  </h3>
+                  <p class="bbr-issue__title">{b.title}</p>
+                  <p class="bbr-issue__dek">{b.dek}</p>
+                </div>
+                <dl class="bbr-issue__meta">
+                  <div>
+                    <dt>Industry</dt>
+                    <dd>{INDUSTRY_LABELS[b.industry]}</dd>
+                  </div>
+                  <div>
+                    <dt>Decision</dt>
+                    <dd>{type.label}</dd>
+                  </div>
+                  <div>
+                    <dt>Functions</dt>
+                    <dd>{b.functions.map((f) => FUNCTION_LABELS[f]).join(', ')}</dd>
+                  </div>
+                  <div>
+                    <dt>Company</dt>
+                    <dd>
+                      {b.company.name}, {b.company.location}
+                      {b.company.fictional ? ' (fictional)' : ''}
+                    </dd>
+                  </div>
+                </dl>
+              </li>
+            );
+          })
+        }
+      </ol>
+    </section>
+
+    <section aria-labelledby="editions-h">
+      <SectionHead no={2} title="Two editions, one decision" id="editions-h" dek="Every briefing can be read twice: first as a decision to make, then as a decision worked through." />
+      <div class="bbr-rules">
+        <div>
+          <h3>The Student edition</h3>
+          <p>
+            The case: an executive summary of the decision, the business and its context, the evidence and the financial information, the stakeholders, the options and the
+            criteria the board will use, then discussion questions. The recommendation is withheld.
+          </p>
+        </div>
+        <div>
+          <h3>The Analysis edition</h3>
+          <p>
+            The worked discussion: what the evidence shows, the assumptions behind it, the trade-offs, every option judged and scored, the recommended course of action, how
+            to implement it, how to tell whether it is working, and the limits of the analysis.
+          </p>
+        </div>
+        <div>
+          <h3>For IB Diploma students</h3>
+          <p>
+            Each briefing links to the subtopics, frameworks and tools it uses, and its questions follow the course's command terms. Ideas from beyond the course are kept
+            apart and labelled as enrichment. Answer before you open the Analysis edition.
+          </p>
+        </div>
+        <div>
+          <h3>For teachers</h3>
+          <p>
+            A briefing runs as a lesson: the Student edition as reading, the questions as practice, a decision taken in groups, then the Analysis edition as the debrief.
+            The index below finds a briefing for the subtopic you are teaching.
+          </p>
+        </div>
+        <div>
+          <h3>For undergraduate and MBA seminars</h3>
+          <p>
+            Each briefing carries seminar questions and research beyond the course, labelled as enrichment. Argue the decision before reading the analysis, and test its
+            assumptions: it is one defensible answer, not the only one.
+          </p>
+        </div>
+        <div>
+          <h3>For professionals</h3>
+          <p>
+            Read the executive summary and the options, then the trade-offs, the implementation plan and the measures of success: the parts of a board paper that decide
+            whether a good decision is carried out well.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="index-h">
+      <SectionHead no={3} title="The briefings by IB subtopic" id="index-h" dek="Which briefings exercise each IB Diploma subtopic. The subtopic opens its page in the topic library.">
+        <div class="tags"><span class="tag tag--ib">IB course</span></div>
+      </SectionHead>
+      <div class="bbr-index">
+        {
+          byUnit.map((u) => (
+            <div>
+              <h3>
+                Unit {u.number}: {u.title}
+              </h3>
+              <dl>
+                {u.subs.map((sub) => (
+                  <div>
+                    <dt>
+                      <a href={subtopicHref(s.c, sub.code)}>
+                        {sub.code} {sub.title}
+                      </a>
+                      {sub.level === 'HL' && (
+                        <>
+                          {' '}
+                          <span class="tag tag--hl">HL</span>
+                        </>
+                      )}
+                    </dt>
+                    <dd>
+                      <ul role="list">
+                        {list
+                          .filter(([, b]) => b.course.subtopics.some((x) => x.code === sub.code))
+                          .map(([id, b]) => (
+                            <li>
+                              <a href={briefingHref(id)}>
+                                {issueNo(b.number)}: {b.company.name}
+                              </a>
+                            </li>
+                          ))}
+                      </ul>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section aria-labelledby="method-h">
+      <SectionHead no={4} title="How the briefings are made" id="method-h" dek="The rules every briefing follows. The build checks them, and fails if any briefing breaks one." />
+      <div class="bbr-rules">
+        <div>
+          <h3>Fictional companies, simulated figures</h3>
+          <p>
+            Every company in the series is invented, so its figures can be complete and consistent, and nothing can be mistaken for a fact about a real business. Every
+            exhibit is labelled as simulated data.
+          </p>
+        </div>
+        <div>
+          <h3>Figures that add up</h3>
+          <p>
+            Each exhibit carries the checks that rework its results from its inputs, and every figure written in a briefing must be a cell of an exhibit or a figure the
+            briefing works out. The build recomputes them all, and the unit tests rework the key results with the platform's finance functions.
+          </p>
+        </div>
+        <div>
+          <h3>Research apart from interpretation</h3>
+          <p>
+            Established research is cited to its source and stated only as its central idea, with no figures. The context of each industry is given in general terms. The
+            Analysis edition is labelled as the platform's own reading.
+          </p>
+        </div>
+        <div>
+          <h3>The course apart from beyond it</h3>
+          <p>
+            Subtopics, course terms and the frameworks the syllabus or the toolkit names are listed under the IB course. Ideas, terms and frameworks from beyond it are
+            listed separately and labelled as enrichment.
+          </p>
+        </div>
+        <div>
+          <h3>Judged on stated criteria</h3>
+          <p>
+            Each board states its criteria and their weights before the options are judged. The Analysis edition scores every option against them, and says so if its
+            recommendation departs from the scores.
+          </p>
+        </div>
+        <div>
+          <h3>Questions of our own</h3>
+          <p>
+            The discussion questions are written for the platform. They are not IB examination questions, and the notes on them are guidance, not a markscheme.
+          </p>
+        </div>
+      </div>
+      <p class="small" style="margin-top:var(--sp-5)">
+        The research the series cites is listed in the <a href="/sources/">sources register</a>. More cases, with filters by industry and topic, are in the <a
+          href="/case-vault/">Case Vault</a
+        >.
+      </p>
+    </section>
+  </div>
+</BaseLayout>

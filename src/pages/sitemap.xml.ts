@@ -36,6 +36,9 @@ export const GET: APIRoute = async ({ site }) => {
   const items = await briefing();
   items.forEach(([id]) => paths.add(`/intelligence/${id}/`));
   INTEL_CATEGORIES.filter((k) => isEditorialTheme(k) || items.some(([, it]) => it.categories.includes(k))).forEach((k) => paths.add(themeHref(k)));
+  // The Boardroom Briefings.
+  const { series } = await import('../lib/boardroom-briefings/content');
+  (await series()).list.forEach(([id]) => paths.add(`/boardroom-briefings/${id}/`));
   // A sitemap must use absolute addresses. Without a site address (a local build), list nothing.
   if (!site) {
     return new Response(

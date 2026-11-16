@@ -1,0 +1,63 @@
+# Sources for the Boardroom Briefings (src/content/boardroom-briefings/).
+# Every company in the series is fictional, so no source here describes a
+# real organization. The research is cited for its central idea only: each
+# work is a bibliographic reference that was not opened for this release, so
+# the briefings state the idea in the platform's own words, with no figures,
+# findings or quotations from it.
+#
+# A work is registered once across the platform. The briefings cite the
+# entries other parts of the register already hold for the works they share:
+# Porter 1980 and 1985 (framework-lab.yaml, as the framework pages cite them),
+# Johanson and Vahlne 1977, Ghemawat 2001, Coombs 2007, Christensen 1997 and
+# Williamson 1975 (advanced-strategy.yaml), Roll 1986, Jensen 1986 and Miller
+# and Modigliani 1961 (advanced-finance.yaml) and Capron and Mitchell 2012
+# (register.yaml). This file holds the method note and the works no other part
+# of the platform cites; their ids start with bbr-.
+
+- id: bbr-method
+  title: How the Boardroom Briefings and their figures were made
+  author: Arjun Agrawal | The Business Brief
+  year: '2026'
+  kind: method
+  availability: repository
+  note: 'Each briefing is about a fictional company. Its figures come from a small model stated in the briefing itself: the exhibits hold the inputs and the results, each exhibit''s checks rework its results from its inputs, and the briefing declares every other figure its text quotes, with the formula that produces it. The integrity check in `src/lib/boardroom-briefings/integrity.ts` recomputes all of them on every build and fails on any figure in the text that the model does not account for; `tests/unit/boardroom-briefings.test.ts` reworks the key results with the platform''s finance functions.'
+- id: bbr-autor-2015
+  title: 'Why Are There Still So Many Jobs? The History and Future of Workplace Automation'
+  author: David H. Autor
+  publisher: Journal of Economic Perspectives
+  year: '2015'
+  kind: academic
+  availability: referenced
+  note: The argument that automation takes over particular tasks rather than whole jobs, and that it can complement the tasks people keep as well as replace the ones machines take. Cited as a bibliographic reference in the automation briefing; the article was not opened for this release.
+- id: bbr-penrose-1959
+  title: The Theory of the Growth of the Firm
+  author: Edith Penrose
+  publisher: Basil Blackwell
+  year: '1959'
+  kind: academic
+  availability: referenced
+  note: The book that argued a firm's rate of growth is limited by its managers' capacity to plan and absorb expansion. Cited as a bibliographic reference in the growth and profitability briefing; the book was not opened for this release.
+- id: bbr-coase-1937
+  title: The Nature of the Firm
+  author: Ronald H. Coase
+  publisher: Economica
+  year: '1937'
+  kind: academic
+  availability: referenced
+  note: The article that asked why firms exist at all, and answered that using the market has costs, so some exchanges are cheaper to organize inside a firm. Cited as a bibliographic reference in the vertical integration briefing; the article was not opened for this release.
+- id: bbr-lintner-1956
+  title: Distribution of Incomes of Corporations Among Dividends, Retained Earnings, and Taxes
+  author: John Lintner
+  publisher: American Economic Review
+  year: '1956'
+  kind: academic
+  availability: referenced
+  note: The study behind the idea that managers smooth dividends, raising them only when they expect to sustain the increase and cutting them reluctantly. Cited as a bibliographic reference in the shareholder returns briefing; the article was not opened for this release.
+- id: bbr-fombrun-1996
+  title: 'Reputation: Realizing Value from the Corporate Image'
+  author: Charles J. Fombrun
+  publisher: Harvard Business School Press
+  year: '1996'
+  kind: academic
+  availability: referenced
+  note: A book that treats corporate reputation as an intangible asset of real value, formed from the judgements that a company's many stakeholders make of it over time. Cited as a bibliographic reference in the reputation briefing; the book was not opened for this release.

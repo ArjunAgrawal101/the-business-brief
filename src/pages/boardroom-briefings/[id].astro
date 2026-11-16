@@ -1,0 +1,189 @@
+---
+/**
+ * One of the Boardroom Briefings, in two editions. The Student edition is the
+ * case and the questions; the Analysis edition is the worked discussion and
+ * the recommendation. Without JavaScript the Analysis edition follows the
+ * Student edition as a closed disclosure. With it, a switch shows one edition
+ * at a time and keeps the choice in the address (#analysis), so either
+ * edition can be linked to; a link from one edition to a figure or question
+ * in the other opens that edition first.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import SaveButton from '../../components/ui/SaveButton.astro';
+import StudentEdition from '../../components/boardroom-briefings/StudentEdition.astro';
+import AnalysisEdition from '../../components/boardroom-briefings/AnalysisEdition.astro';
+import Connections from '../../components/boardroom-briefings/Connections.astro';
+import { longDate } from '../../lib/content';
+import { CONCEPT_NAMES } from '../../lib/labels';
+import { plain } from '../../lib/markup';
+import { FUNCTION_LABELS, INDUSTRY_LABELS } from '../../lib/case-vault';
+import { series } from '../../lib/boardroom-briefings/content';
+import { briefingHref, DECISION_TYPE_LABELS, issueNo, readingMinutes, SERIES_NAME, SERIES_ROOT } from '../../lib/boardroom-briefings/series';
+import type { BoardroomBriefing } from '../../lib/boardroom-briefings/schema';
+import '../../styles/vault.css';
+import '../../styles/boardroom-briefings.css';
+
+export async function getStaticPaths() {
+  const s = await series();
+  return s.list.map(([id, b], i) => ({
+    params: { id },
+    props: { id, b, prev: s.list[i - 1], next: s.list[i + 1] },
+  }));
+}
+
+interface Props {
+  id: string;
+  b: BoardroomBriefing;
+  prev?: [string, BoardroomBriefing];
+  next?: [string, BoardroomBriefing];
+}
+const { b, prev, next } = Astro.props;
+const s = await series();
+const type = DECISION_TYPE_LABELS[b.decisionType];
+const studentWords = [
+  b.summary.situation,
+  b.summary.decision,
+  b.summary.stakes,
+  ...b.background,
+  ...b.context,
+  ...b.evidence.map((e) => e.body),
+  b.financials.summary,
+  ...b.stakeholders.flatMap((x) => [x.wants, x.implications]),
+  ...b.options.flatMap((o) => [o.summary, o.requires, o.upside, o.risks]),
+  ...b.criteria.map((k) => k.measure),
+  ...b.questions.course.map((q) => q.prompt),
+  ...b.questions.seminar.map((q) => q.prompt),
+];
+const a = b.analysis;
+const analysisWords = [
+  a.verdict,
+  ...a.evidence,
+  ...a.assumptions.flatMap((x) => [x.assumption, x.test]),
+  ...a.tradeoffs.map((t) => t.body),
+  ...a.alternatives.map((x) => x.body),
+  a.recommendation.decision,
+  ...a.recommendation.reasons,
+  a.recommendation.conditions,
+  ...a.implementation.map((x) => x.action),
+  ...a.measures.map((m) => m.target),
+  ...a.limitations,
+  ...a.changeMind,
+  ...b.questions.course.map((q) => q.notes),
+  ...b.questions.seminar.map((q) => q.notes),
+];
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: b.question,
+  alternativeHeadline: b.title,
+  description: b.dek,
+  dateModified: b.updated.toISOString().slice(0, 10),
+  author: { '@type': 'Person', name: 'Arjun Agrawal' },
+  publisher: { '@type': 'Organization', name: 'The Business Brief' },
+  isPartOf: { '@type': 'CreativeWorkSeries', name: SERIES_NAME },
+  position: b.number,
+};
+---
+
+<BaseLayout title={`${b.question} ${SERIES_NAME}, ${issueNo(b.number)}`} description={plain(`${b.title}. ${b.dek}`)} section="cases" room="boardroom" jsonLd={jsonLd}>
+  <div class="wrap">
+    <header class="bbr-head">
+      <Breadcrumbs trail={[{ label: SERIES_NAME, href: SERIES_ROOT }, { label: issueNo(b.number) }]} />
+      <div class="bbr-head__grid">
+        <div>
+          <p class="label bbr-kicker">
+            <span class="bbr-kicker__no">{issueNo(b.number)}</span>
+            <span class="bbr-kicker__series">{SERIES_NAME}</span>
+            <span>{type.label}</span>
+          </p>
+          <h1 class="bbr-head__title">{b.question}</h1>
+          <p class="bbr-head__headline">{b.title}</p>
+          <p class="lead bbr-head__dek">{b.dek}</p>
+          <div class="tags">
+            <ProvenanceTag kind={b.company.fictional ? 'simulated-data' : 'external-evidence'} />
+            <span class="tag tag--plain">{b.company.fictional ? 'Fictional company' : 'Real company'}</span>
+            <span class="tag tag--plain">Updated {longDate(b.updated)}</span>
+            <SaveButton title={`${issueNo(b.number)}: ${b.question}`} kind="case" />
+          </div>
+        </div>
+        <dl class="bbr-ledger" aria-label="This briefing in brief">
+          <div><dt>Company</dt><dd>{b.company.name}, {b.company.location}</dd></div>
+          <div><dt>Industry</dt><dd>{INDUSTRY_LABELS[b.industry]}</dd></div>
+          <div><dt>Decision</dt><dd>{type.label}</dd></div>
+          <div><dt>Functions</dt><dd>{b.functions.map((f) => FUNCTION_LABELS[f]).join(', ')}</dd></div>
+          <div><dt>Key concepts</dt><dd>{b.keyConcepts.map((k) => CONCEPT_NAMES[k]).join(', ')}</dd></div>
+          <div><dt>Editions</dt><dd>Student, then Analysis</dd></div>
+        </dl>
+      </div>
+    </header>
+  </div>
+
+  <div class="wrap page-body">
+    <div class="bbr-editions" data-ix="briefing-editions" data-edition="student">
+      <div class="bbr-switch js-only">
+        <fieldset class="bbr-switch__set">
+          <legend class="bbr-switch__legend">Choose an edition</legend>
+          <div class="bbr-switch__opts">
+            <label class="bbr-switch__opt">
+              <input type="radio" name="edition" value="student" checked />
+              <span class="bbr-switch__name">Student edition</span>
+              <span class="bbr-switch__what">The case and the questions</span>
+            </label>
+            <label class="bbr-switch__opt">
+              <input type="radio" name="edition" value="analysis" />
+              <span class="bbr-switch__name">Analysis edition</span>
+              <span class="bbr-switch__what">The worked discussion and the recommendation</span>
+            </label>
+          </div>
+        </fieldset>
+        <p class="bbr-switch__note" data-edition-note>You are reading the Student edition. The recommendation is withheld.</p>
+      </div>
+      <p class="sr-only" aria-live="polite" data-edition-live></p>
+      <p class="nojs-only small bbr-nojs">
+        This briefing has two editions. The Student edition comes first: the case and the questions. The Analysis edition follows it, closed, so that you can decide
+        before you read the recommendation.
+      </p>
+      <p class="state state--error" data-error hidden>The edition switch could not start. Both editions are on the page: the Analysis edition follows the Student edition.</p>
+
+      <StudentEdition b={b} c={s.c} minutes={readingMinutes(studentWords)} />
+      <AnalysisEdition b={b} minutes={readingMinutes(analysisWords)} />
+    </div>
+
+    <Connections b={b} c={s.c} frameworks={s.frameworks} registry={s.registry} />
+
+    <nav class="bbr-series-nav" aria-label={`More from ${SERIES_NAME}`}>
+      {
+        prev ? (
+          <a href={briefingHref(prev[0])}>
+            <span class="label">Previous · {issueNo(prev[1].number)}</span>
+            <span class="bbr-series-nav__q">{prev[1].question}</span>
+          </a>
+        ) : (
+          <a href={SERIES_ROOT}>
+            <span class="label">The series</span>
+            <span class="bbr-series-nav__q">Every briefing in {SERIES_NAME}</span>
+          </a>
+        )
+      }
+      {
+        next ? (
+          <a class="bbr-series-nav__next" href={briefingHref(next[0])}>
+            <span class="label">Next · {issueNo(next[1].number)}</span>
+            <span class="bbr-series-nav__q">{next[1].question}</span>
+          </a>
+        ) : (
+          <a class="bbr-series-nav__next" href={SERIES_ROOT}>
+            <span class="label">The series</span>
+            <span class="bbr-series-nav__q">Every briefing in {SERIES_NAME}</span>
+          </a>
+        )
+      }
+    </nav>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../scripts/boardroom-briefings';
+</script>

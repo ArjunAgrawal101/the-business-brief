@@ -1,0 +1,584 @@
+# The Boardroom Briefings, No. 7. Scholarline Learning Centres and Tutora are
+# fictional; every figure is simulated. Exhibit 3's totals, revenue per
+# student and margins, Exhibit 2's totals and Exhibit 4's effects are worked
+# by their checks; Exhibit A1 adds each effect to the forecast for 2027.
+
+number: 7
+question: How should a company respond to a disruptive competitor?
+title: Scholarline's tutors meet a tutor that never sleeps
+dek: A Singapore tuition chain is losing secondary students to an AI tutoring app at less than a tenth of its price. The most profitable response in the short run may be the one that loses the market in the long run.
+decisionType: competitive-response
+industry: education
+functions: [strategy, marketing, operations]
+keyConcepts: [creativity, change]
+updated: 2026-11-16
+
+company:
+  name: Scholarline Learning Centres
+  fictional: true
+  sector: Tuition centres for primary and secondary students
+  location: Singapore
+  size: 24 centres, 420 tutors, 7,800 students and revenue of S$28.6m in 2025
+  ownership: Privately held company, owned by its founder and a family investment company
+currency: { code: SGD, symbol: 'S$', unit: thousand }
+
+summary:
+  situation: >-
+    Scholarline runs 24 tuition centres in Singapore, teaching maths, science and English in small groups. Since an AI
+    tutoring app, Tutora, arrived in 2024 at S$29 a month, Scholarline's secondary enrolments have fallen by almost a
+    quarter, and its operating margin from 18.0% to 12.0%.
+  decision: >-
+    How to respond: launch a cheap online tier of its own, move upmarket into premium exam coaching, set up a separate
+    digital business free to compete with its own centres, or rebuild its centres around a hybrid of AI practice and human
+    tutors.
+  stakes: >-
+    The response decides whether Scholarline shrinks into a smaller premium business, fights the app on price, or
+    changes what it does. Its 420 tutors, and the families who rely on them, will feel the answer either way.
+
+background:
+  - >
+    Scholarline was founded in 2008 by a former schoolteacher, who opened a single centre above a shopping mall and grew it
+    into a chain of 24. Its model is simple: groups of up to eight students, a tutor who knows each of them, and weekly
+    practice set and marked by hand. Parents pay S$380 a month for each subject. Most of the 420 tutors work part-time on
+    contracts.
+  - >
+    The business was steadily profitable until 2024. That year Tutora, a start-up, launched an app that sets each student
+    practice questions, explains mistakes step by step and adapts to what the student gets wrong, for S$29 a month. It was
+    weak at first on essays and exam technique, but it has improved quickly, and it is popular with secondary students.
+  - >
+    Scholarline's secondary enrolments fell from 5,400 in 2023 to 4,100 in 2025, while primary enrolments held up (Exhibit
+    1). Revenue fell from S$33.3m to S$28.6m, and operating profit from S$6.0m to S$3.4m (Exhibit 3). In 2025 three centres
+    tried a hybrid model, in which students practised on an AI platform between classes and tutors used its data to plan
+    their lessons.
+
+context:
+  - >
+    Tuition is a large and personal market. Parents choose on results, trust and convenience, and many keep a child with the
+    same centre for years. For decades the competition was other centres and private tutors, who offered much the same
+    service at different prices.
+  - >
+    Software that adapts to each learner has changed what can be done without a tutor. It is tireless and cheap, and good
+    at practice and explanation; it is less good at motivating a reluctant student, teaching a subject's deeper skills or
+    noticing when a child is struggling for reasons that have nothing to do with the work.
+  - >
+    New technologies often enter a market at the bottom, serving customers who want only part of what the leaders offer, at
+    a much lower price. Leaders tend to respond by moving to their most demanding customers, where margins are highest,
+    until the newcomer has improved enough to follow them.
+
+evidence:
+  - kind: company
+    title: The decline is in secondary tuition
+    body: >-
+      Between 2023 and 2025 secondary enrolments fell by 24.1% while primary enrolments rose by 2.8% (Exhibit 1). The
+      operating profit margin fell from 18.0% to 12.0% as fixed costs were spread over fewer students (Exhibit 3).
+    exhibits: [ex-3, ex-1]
+  - kind: company
+    title: Why families left
+    body: >-
+      Of 640 parents who left in 2025, 34% gave price as the main reason and 29% said their child had switched to an app;
+      only 18% moved to another tuition centre (Exhibit 2). Among 1,200 current parents, 46% already use an app alongside
+      Scholarline, and 38% would pay more for exam-focused coaching in smaller groups.
+    exhibits: [ex-2]
+  - kind: company
+    title: The hybrid pilot
+    body: >-
+      In the three pilot centres, 91% of students stayed into the next term, against 82% elsewhere, and tutors spent 20% less
+      time marking (Exhibit 2). Parents said they valued the tutors more, not less, once the practice moved to the app.
+    exhibits: [ex-2]
+  - kind: research
+    title: Disruption starts at the bottom of a market
+    body: >-
+      The theory of disruptive innovation holds that an entrant can begin with a simpler, cheaper product that the leaders'
+      best customers do not want, improve it steadily, and eventually serve the mainstream. Leaders that listen closely to
+      their most profitable customers tend to ignore the entrant until it is too late, and the theory suggests they respond
+      through a separate unit with its own cost structure.
+    sources: [adv-strat-christensen-1997]
+  - kind: research
+    title: Substitutes cap what an industry can charge
+    body: >-
+      In Porter's analysis of competitive forces, a substitute that meets the same need in a different way limits the price
+      an industry can charge, and the closer its performance comes, the tighter the limit.
+    sources: [porter-1980]
+
+financials:
+  summary: >-
+    Exhibit 3 gives three years of enrolments, revenue and operating profit. Exhibit 4 gives the management team's estimates
+    of how each response would change revenue and costs in 2027. If nothing changes, the team forecasts an operating profit
+    of S$1,200k in 2027, as secondary enrolments keep falling.
+  exhibits: [ex-3, ex-4]
+
+exhibits:
+  - id: ex-3
+    title: Scholarline's results, 2023 to 2025 (S$000)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Year }
+      - { label: Students, numeric: true, format: money }
+      - { label: Revenue, numeric: true, format: money }
+      - { label: Revenue per student (S$), numeric: true, format: d1 }
+      - { label: Operating profit, numeric: true, format: money }
+      - { label: Operating profit margin (%), numeric: true, format: d1 }
+    rows:
+      - ['2023', 9000, 33300, 3700.0, 5994, 18.0]
+      - ['2024', 8400, 30900, 3678.6, 4635, 15.0]
+      - ['2025', 7800, 28600, 3666.7, 3432, 12.0]
+    checks:
+      - { column: Students, is: '{ex-1|*|All students}' }
+      - { column: Revenue per student (S$), is: '{Revenue} * 1000 / {Students}' }
+      - { column: Operating profit margin (%), is: '{Operating profit} / {Revenue} * 100' }
+    source: Scholarline's management accounts (simulated).
+
+  - id: ex-1
+    title: Students by level, 2023 to 2025
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Year }
+      - { label: Primary, numeric: true, format: money }
+      - { label: Lower secondary, numeric: true, format: money }
+      - { label: Upper secondary, numeric: true, format: money }
+      - { label: All students, numeric: true, format: money }
+    rows:
+      - ['2023', 3600, 2500, 2900, 9000]
+      - ['2024', 3650, 2250, 2500, 8400]
+      - ['2025', 3700, 1900, 2200, 7800]
+    checks:
+      - { column: All students, is: '{Primary} + {Lower secondary} + {Upper secondary}' }
+    note: Students enrolled at the start of the school year. A student taking two subjects is counted once.
+    source: Scholarline's enrolment records (simulated).
+
+  - id: ex-2
+    title: What parents said, and what the pilot found, 2025
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Finding }
+      - { label: Per cent, numeric: true }
+    rows:
+      - ['Leavers (640 parents): main reason was price', 34]
+      - ['Leavers: child switched to an app', 29]
+      - ['Leavers: moved to another tuition centre', 18]
+      - ['Leavers: timing or travel', 12]
+      - ['Leavers: other reasons', 7]
+      - ['Current parents (1,200): already use an app alongside Scholarline', 46]
+      - ['Current parents: would pay more for exam coaching in smaller groups', 38]
+      - ['Current parents: would switch to an app if results were as good', 31]
+      - ['Pilot centres: students staying into the next term', 91]
+      - ['Other centres: students staying into the next term', 82]
+      - ['Pilot centres: fall in tutors'' marking time', 20]
+    note: The leavers' five reasons add up to 100%. The surveys were run by Scholarline by email, so parents who did not answer may differ from those who did.
+    source: Scholarline's exit survey, parent survey and pilot report (simulated).
+
+  - id: ex-4
+    title: Each response's estimated effect in 2027 (S$000)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Response }
+      - { label: Revenue gained, numeric: true, format: money }
+      - { label: Revenue lost, numeric: true, format: money }
+      - { label: Costs added, numeric: true, format: money }
+      - { label: Costs saved, numeric: true, format: money }
+      - { label: Effect on operating profit, numeric: true, format: money }
+    rows:
+      - ['A. Launch a cheap online tier', 1176, 1231, 1500, 0, -1555]
+      - ['B. Move upmarket and close six centres', 2800, 2100, 0, 1050, 1750]
+      - ['C. Set up a separate digital business', 300, 0, 1550, 0, -1250]
+      - ['D. Rebuild the centres as hybrid learning', 2567, 0, 1300, 0, 1267]
+    checks:
+      - { column: Effect on operating profit, is: '{Revenue gained} - {Revenue lost} - {Costs added} + {Costs saved}' }
+      - { column: Revenue gained, rows: ['A. Launch a cheap online tier'], is: '{@online-students} * {@online-fee} * 12 / 1000' }
+      - { column: Revenue lost, rows: ['A. Launch a cheap online tier'], is: '{@downgrades} * ({ex-3|2025|Revenue} * 1000 / {ex-3|2025|Students} - {@online-fee} * 12) / 1000' }
+      - { column: Revenue gained, rows: ['D. Rebuild the centres as hybrid learning'], is: '{@students-kept} * {ex-3|2025|Revenue per student (S$)} / 1000' }
+    note: >-
+      A wins 2,000 online students at S$49 a month but 400 existing students move down to it. B raises fees by 15% for
+      smaller exam groups, loses students at the six centres it closes, and saves their rent and staff. C spends S$1,550k a year
+      on a new team and platform. D keeps 700 more students a year, the pilot's retention applied to every centre, and pays
+      S$1,000k to license an AI platform and S$300k to train tutors.
+    source: Management team's estimates for the board (simulated).
+
+figures:
+  - { id: founded, label: Year founded, value: 2008 }
+  - { id: centres, label: Centres, value: 24 }
+  - { id: tutors, label: Tutors, value: 420 }
+  - { id: group-size, label: Largest group, value: 8 }
+  - { id: fee, label: Monthly fee a subject (S$), value: 380 }
+  - { id: app-price, label: Tutora's monthly price (S$), value: 29 }
+  - { id: secondary-2023, label: Secondary students in 2023, value: 5400, is: '{ex-1|2023|Lower secondary} + {ex-1|2023|Upper secondary}' }
+  - { id: secondary-2025, label: Secondary students in 2025, value: 4100, is: '{ex-1|2025|Lower secondary} + {ex-1|2025|Upper secondary}' }
+  - { id: secondary-change, label: 'Change in secondary students, 2023 to 2025 (%)', value: -24.1, is: '({@secondary-2025} - {@secondary-2023}) / {@secondary-2023} * 100' }
+  - { id: primary-change, label: 'Change in primary students, 2023 to 2025 (%)', value: 2.8, is: '({ex-1|2025|Primary} - {ex-1|2023|Primary}) / {ex-1|2023|Primary} * 100' }
+  - { id: leavers-surveyed, label: Leavers surveyed, value: 640 }
+  - { id: parents-surveyed, label: Current parents surveyed, value: 1200 }
+  - { id: base-2027, label: Operating profit forecast for 2027 if nothing changes (S$000), value: 1200 }
+  - { id: online-fee, label: 'Option A: monthly fee for the online tier (S$)', value: 49 }
+  - { id: online-students, label: 'Option A: online students won', value: 2000 }
+  - { id: downgrades, label: 'Option A: existing students who move to the online tier', value: 400 }
+  - { id: fee-rise, label: 'Option B: fee rise for smaller exam groups (%)', value: 15 }
+  - { id: closures, label: 'Option B: centres closed', value: 6 }
+  - { id: students-kept, label: 'Option D: more students kept a year', value: 700 }
+  - { id: platform-licence, label: 'Option D: AI platform licence a year (S$000)', value: 1000 }
+  - { id: tutor-training, label: 'Option D: tutor training (S$000)', value: 300 }
+  - { id: c-budget, label: 'Option C: budget over two years (S$000)', value: 2500 }
+  - { id: retention-gain, label: Retention gain in the pilot (percentage points), value: 9, is: '{ex-2|Pilot centres: students staying into the next term|Per cent} - {ex-2|Other centres: students staying into the next term|Per cent}' }
+  - { id: price-ratio, label: Scholarline's fee as a multiple of the app's price, value: 13.1, is: '{@fee} / {@app-price}' }
+
+stakeholders:
+  - name: The founder and the family investment company
+    side: internal
+    interest: high
+    power: high
+    wants: A business that survives the change and remains worth owning.
+    implications: >-
+      Option B protects this year's profit; options C and D cost money now for a business that may be worth more later.
+  - name: Tutors
+    side: internal
+    interest: high
+    power: medium
+    wants: Work, fair pay and teaching they find worthwhile.
+    implications: >-
+      Option B closes six centres and their jobs; option D changes their work, with less marking and more teaching, which
+      the pilot's tutors welcomed; option A asks some of them to teach online at lower rates.
+  - name: Parents
+    side: external
+    interest: high
+    power: high
+    wants: Results for their children at a price they can justify, now that a cheaper alternative exists.
+    implications: >-
+      They decide every term whether to stay. Many already combine an app with tuition; a centre that does the same for
+      them is answering a choice they have already made.
+  - name: Students
+    side: external
+    interest: medium
+    power: medium
+    wants: Help that works for them, at times that suit them.
+    implications: >-
+      Secondary students have shown, by leaving, that practice on an app suits many of them; what they lose without a tutor
+      shows up later, in exam technique and motivation.
+  - name: Tutora
+    side: external
+    interest: high
+    power: medium
+    wants: Growth, and perhaps partners who bring it students and data.
+    implications: >-
+      It could license its platform to Scholarline under option D, which would help it grow; a partnership would make the
+      disruptor a supplier, with the risks that brings.
+
+options:
+  - id: A
+    label: Launch a cheap online tier
+    summary: >-
+      Offer "Scholarline Online", recorded lessons and online practice for S$49 a month, run from the existing business by
+      the existing team.
+    requires: S$1,500k a year for technology and marketing, and tutors willing to record and moderate online lessons.
+    upside: An answer to price-sensitive families, under a brand they already trust.
+    risks: >-
+      It sells at a low price what the centres sell at a high one, so existing students move down to it; it competes with the
+      app on the app's terms; and it is run by people whose skills and habits fit the centres.
+    evidence: [ex-2, ex-4]
+  - id: B
+    label: Move upmarket and close six centres
+    summary: >-
+      Concentrate on exam coaching for the families who will pay most: groups of four, specialist tutors, fees up 15%. Close
+      the six weakest centres.
+    requires: Specialist tutors and confidence that enough parents will pay the higher fees.
+    upside: The highest profit in 2027, S$1,750k above the forecast, from customers least tempted by the app.
+    risks: >-
+      A smaller business serving a narrower market, while the app keeps improving at exactly the exam skills that justify
+      the premium; six centres' staff and students lost.
+    evidence: [ex-2, ex-4]
+  - id: C
+    label: Set up a separate digital business
+    summary: >-
+      Fund a new business under its own brand, with its own team and S$2,500k over two years, free to build an AI-assisted
+      service at a low price even if it takes students from Scholarline's centres.
+    requires: Leaders from outside the centres, patience with losses, and the founder's willingness to let it compete with the core.
+    upside: The best chance of building a business that can win the market the app is creating.
+    risks: Losses of S$1,250k a year at first, uncertain success, and tension with the centres it competes with.
+    evidence: [ex-4]
+  - id: D
+    label: Rebuild the centres as hybrid learning
+    summary: >-
+      Bring an AI practice platform into every centre, licensed from a provider, possibly Tutora, so that students practise
+      between classes and tutors spend their time on what software does badly: exam technique, writing and motivation.
+    requires: A licence that keeps student data and the relationship with families with Scholarline, training for 420 tutors, and S$1,300k a year.
+    upside: The pilot's retention in every centre, 700 more students kept a year, and a service the app cannot copy alone.
+    risks: >-
+      Dependence on a platform owned by others, possibly the disruptor itself; tutors who resist; and no answer for families
+      who want only the cheapest option.
+    evidence: [ex-2, ex-4]
+
+criteria:
+  - id: core
+    criterion: Protecting the core business
+    weight: 25
+    measure: Whether the centres keep their students and their margins over the next three years.
+  - id: new-market
+    criterion: Reaching the new market
+    weight: 20
+    measure: Whether Scholarline can serve families who now want help at a fraction of its current price.
+  - id: return
+    criterion: Financial return
+    weight: 20
+    measure: The effect on operating profit in 2027, from Exhibit 4.
+  - id: capability
+    criterion: Building capabilities
+    weight: 15
+    measure: How much the response teaches Scholarline about learning technology and its customers.
+  - id: risk
+    criterion: Risk
+    weight: 20
+    measure: The money at stake, and the danger of being trapped by the response if the market moves faster than expected.
+
+questions:
+  course:
+    - id: enrolments
+      command: calculate
+      marks: 4
+      subtopics: ['4.1']
+      prompt: Using Exhibit 1, calculate the percentage change in Scholarline's secondary students and in its primary students between 2023 and 2025.
+      notes: >-
+        Secondary: 5,400 in 2023 (2,500 + 2,900) and 4,100 in 2025 (1,900 + 2,200); (4,100 − 5,400) ÷ 5,400 × 100 = −24.1%.
+        Primary: (3,700 − 3,600) ÷ 3,600 × 100 = 2.8%. Two marks for each.
+    - id: margin
+      command: calculate
+      marks: 2
+      subtopics: ['3.5']
+      prompt: Using Exhibit 3, calculate Scholarline's operating profit margin in 2023 and in 2025.
+      notes: >-
+        2023: 5,994 ÷ 33,300 × 100 = 18.0%. 2025: 3,432 ÷ 28,600 × 100 = 12.0%. One mark for each.
+    - id: disruptive
+      command: explain
+      marks: 4
+      level: HL
+      subtopics: ['5.8']
+      prompt: Explain why Tutora's app can be described as a disruptive innovation.
+      notes: >-
+        It entered at the bottom of the market at a far lower price (S$29 a month against S$380 a subject), serving students
+        who wanted only practice, and it has improved until it threatens the incumbents' core. Strong answers contrast it
+        with an incremental innovation, which would improve tuition as it is.
+    - id: upmarket
+      command: discuss
+      marks: 10
+      subtopics: ['4.2', '4.5']
+      prompt: Discuss Scholarline's option of moving upmarket into premium exam coaching.
+      notes: >-
+        Good answers recognize B's strong short-term numbers (S$1,750k added to profit in 2027) and the 38% of parents who
+        would pay more, then weigh the narrower market, the closures, and the risk that the app improves at exam skills
+        too. The strongest answers explain why retreating to the most profitable customers is the usual incumbent response,
+        and why it can fail.
+    - id: respond
+      command: recommend
+      marks: 10
+      level: HL
+      subtopics: ['5.8', '4.2']
+      prompt: Recommend how Scholarline should respond to Tutora.
+      notes: >-
+        Strong answers use the evidence from the exit survey and the pilot, compare the four responses on more than 2027's
+        profit, address whether to partner with the disruptor, and reach a recommendation with conditions. Any response can
+        earn full marks if it is justified against the evidence.
+  seminar:
+    - id: incumbents
+      prompt: Why do well-run incumbents so often lose to disruptors? Which of Scholarline's strengths would make a low-price service hard to build inside its centres?
+      notes: >-
+        Its processes (marking by hand, groups of eight), its cost structure (centres, part-time tutors on hourly rates) and
+        its best customers' wishes all point away from a cheap digital service. Good answers connect these to the theory's
+        prescription of a separate unit.
+    - id: complement
+      prompt: Is an AI tutor a substitute for a human tutor, or a complement? What does the pilot suggest?
+      notes: >-
+        The pilot suggests a complement for many students: retention rose from 82% to 91% when practice moved to software and
+        tutors to teaching. For students who wanted only practice, it is a substitute. Good answers say for whom each holds.
+    - id: partner
+      prompt: Should Scholarline license its platform from the company that is disrupting it?
+      notes: >-
+        It is fast and proven, but it hands a rival students' data and a share of the revenue, and could leave Scholarline
+        dependent on a supplier with its own ambitions. Good answers specify the contract terms that would make it safe.
+
+analysis:
+  verdict: >-
+    Rebuild the centres as hybrid learning (option D), and keep a separate digital business (option C) as the next step
+    once the core is secure. The evidence says Scholarline is not losing because tutors are obsolete, but because practice no
+    longer needs a tutor: in the pilot, students stayed longer when software did the practice and tutors did the teaching.
+    Moving upmarket (B) earns the most in 2027, but it is the classic retreat of an incumbent, into a corner of the market
+    the app is already learning to serve.
+  evidence:
+    - >-
+      The decline is concentrated where the app is strongest: secondary students fell by 24.1% between 2023 and 2025, while
+      primary students rose by 2.8% (Exhibit 1).
+    - >-
+      Families are not rejecting tuition so much as combining it with software: 46% of current parents already use an app
+      alongside Scholarline, and only 18% of leavers moved to another centre (Exhibit 2).
+    - >-
+      The pilot is the strongest evidence in the case: retention rose to 91% from 82%, a gain of 9 percentage points, and
+      tutors' marking time fell by 20%. Applied to every centre, that keeps about 700 more students a year.
+    - >-
+      On the 2027 estimates, B adds the most (S$1,750k) and D the next most (S$1,267k), while A (−S$1,555k) and C (−S$1,250k)
+      cost money (Exhibit A1). The numbers favour B because they stop in 2027.
+  assumptions:
+    - assumption: The pilot's retention would hold in every centre.
+      test: The three pilot centres may have had the keenest tutors. Roll D out in stages and compare each wave with centres not yet changed.
+    - assumption: A licence can keep student data and the relationship with families with Scholarline.
+      test: Negotiate the terms before committing, and talk to more than one platform provider, not only Tutora.
+    - assumption: The app will keep improving.
+      test: Watch its results on essays and exam technique; if it stalls, the premium end of the market is safer than it looks, and B gains.
+    - assumption: The surveys represent all parents.
+      test: They were answered by email, by parents who chose to reply. Interview a sample of those who did not.
+  tradeoffs:
+    - title: This year's profit, or the next decade's market
+      body: >-
+        B adds the most to 2027's profit by serving the customers the app has not yet reached. D adds less, and C costs money,
+        but both prepare for a market in which practice is cheap. The board has to decide how far ahead it is managing.
+    - title: Partnership, or dependence
+      body: >-
+        Licensing a platform is fast and proven by the pilot, but it puts a supplier, possibly the disruptor itself, at the
+        heart of the service. The contract decides which of the two it is.
+    - title: Protecting the core, or competing with it
+      body: >-
+        A separate digital business would take some students from the centres. That is its point: if Scholarline does not
+        compete with its own centres, someone else will.
+  alternatives:
+    - option: A
+      fit: weak
+      body: >-
+        Weakly supported. It fights the app on price with the centres' team and habits, takes students from the centres, and
+        loses S$1,555k in 2027.
+    - option: B
+      fit: conditional
+      body: >-
+        Defensible as part of the answer, for the families who want premium coaching, but weak as the whole answer. It
+        shrinks the business into the segment the app will reach next.
+    - option: C
+      fit: conditional
+      body: >-
+        Defensible, and what the theory of disruption recommends, but it loses S$1,250k a year at first and needs leaders
+        Scholarline does not yet have. It is the right second step once D has steadied the centres.
+    - option: D
+      fit: strong
+      body: >-
+        The best supported. It rests on the case's strongest evidence, the pilot, answers what families are already doing,
+        adds S$1,267k in 2027, and plays to the one thing the app cannot do alone: a tutor who knows the student.
+  scores:
+    - { option: A, scores: { core: 2, new-market: 3, return: 2, capability: 2, risk: 2 }, total: 2.2 }
+    - { option: B, scores: { core: 3, new-market: 1, return: 5, capability: 2, risk: 3 }, total: 2.85 }
+    - { option: C, scores: { core: 2, new-market: 5, return: 2, capability: 5, risk: 3 }, total: 3.25 }
+    - { option: D, scores: { core: 5, new-market: 3, return: 4, capability: 4, risk: 3 }, total: 3.85 }
+  recommendation:
+    option: D
+    decision: >-
+      Rebuild every centre as a hybrid: AI practice between classes, licensed on terms that keep student data and the
+      relationship with families with Scholarline, and tutors retrained to spend their time on teaching, writing, exam
+      technique and motivation. Roll it out in three waves over a school year. In 2027, if the centres are stable, fund a
+      separate digital business (option C) for families who want only the app.
+    reasons:
+      - It rests on the pilot, the best evidence in the case, in which students stayed longer and tutors taught more.
+      - It answers what families are already doing, combining an app with tuition.
+      - It adds S$1,267k to operating profit in 2027 while building capabilities that the premium retreat would not.
+      - It keeps the option of a separate digital business open, funded from a stable core.
+    conditions: >-
+      The recommendation depends on a licence that protects Scholarline's data and relationships. If no provider will agree
+      such terms, Scholarline should build a simpler practice platform itself, accepting a slower roll-out.
+  implementation:
+    - when: Months 1 to 3
+      action: Tender the platform licence among several providers, with terms on data, pricing and exit; share the pilot results with all tutors.
+      owner: Chief executive and operations director
+    - when: Months 3 to 6
+      action: Train the first wave of tutors with the pilot centres' tutors as coaches; launch hybrid learning in eight centres.
+      owner: Head of teaching
+    - when: Months 6 to 12
+      action: Roll out to the remaining centres in two waves, comparing each with centres not yet changed; offer premium exam groups where demand shows.
+      owner: Operations director
+    - when: Month 12
+      action: Decide whether to fund a separate digital business, with its own leader, brand and budget.
+      owner: The board
+  measures:
+    - measure: Retention
+      target: Students staying into the next term rising from 82% to the pilot's 91% across all centres.
+      review: Every term
+    - measure: Secondary enrolments
+      target: The fall stopped by the end of the roll-out, with 4,100 secondary students as the floor.
+      review: Every term
+    - measure: Operating profit
+      target: S$2,467k in 2027, the forecast plus D's estimated effect.
+      review: Every quarter
+    - measure: Tutors
+      target: Most tutors trained and teaching the hybrid model, with marking time down by a fifth.
+      review: Every term
+  limitations:
+    - The pilot ran in three centres for two terms; its results may not hold everywhere or for longer.
+    - The estimates in Exhibit 4 stop in 2027, which favours the response that pays soonest.
+    - The analysis cannot know how fast the app will improve, which is the question on which every response depends.
+  changeMind:
+    - If the hybrid model's retention gains fade after the pilot, the case for a separate digital business (C) would strengthen.
+    - If the app stalled on the skills that justify tuition, moving upmarket (B) would be safer than it now appears.
+    - If the only platform available were Tutora's, on terms that left it holding the families' data, Scholarline should build its own.
+  exhibits:
+    - id: ex-A1
+      title: Operating profit in 2027 under each response (S$000)
+      kind: table
+      provenance: simulated-data
+      columns:
+        - { label: Response }
+        - { label: Effect on operating profit, numeric: true, format: money }
+        - { label: Operating profit in 2027, numeric: true, format: money }
+      rows:
+        - ['No change', 0, 1200]
+        - ['A. Launch a cheap online tier', -1555, -355]
+        - ['B. Move upmarket and close six centres', 1750, 2950]
+        - ['C. Set up a separate digital business', -1250, -50]
+        - ['D. Rebuild the centres as hybrid learning', 1267, 2467]
+      checks:
+        - { column: Effect on operating profit, rows: ['A. Launch a cheap online tier', 'B. Move upmarket and close six centres', 'C. Set up a separate digital business', 'D. Rebuild the centres as hybrid learning'], is: '{ex-4|*|Effect on operating profit}' }
+        - { column: Operating profit in 2027, is: '{@base-2027} + {Effect on operating profit}' }
+      note: The effects are estimates for one year. They leave out what each response would mean for the business after 2027, which is where the responses differ most.
+      source: The Business Brief's analysis of Exhibit 4 (simulated data).
+
+course:
+  subtopics:
+    - { code: '5.8', note: 'Disruptive and incremental innovation, and the importance of research and development.', level: HL }
+    - { code: '4.1', note: 'Market orientation, and how a market changes when a cheaper substitute arrives.' }
+    - { code: '4.2', note: 'Positioning, the unique selling point and how a business differentiates itself.' }
+    - { code: '4.5', note: 'The product life cycle of in-person tuition, extension strategies, and pricing against a cheap rival.' }
+    - { code: '3.5', note: 'The operating profit margin, and why it falls when fixed costs are spread over fewer students.' }
+    - { code: '5.9', note: 'Artificial intelligence and data in a service business.', level: HL }
+  terms: [disruptive-innovation, incremental-innovation, innovation, product-life-cycle, extension-strategy, premium-pricing, penetration-pricing, positioning, unique-selling-point, differentiation, market-orientation, artificial-intelligence]
+
+frameworks:
+  - id: porters-generic-strategies
+    use: The app is a cost leader; option B is a focus strategy; option D tries to differentiate on what software cannot do.
+  - id: product-life-cycle
+    use: In-person secondary tuition may be entering decline; D works as an extension strategy, C as a new product.
+  - id: five-forces
+    use: The app is a substitute whose improving performance caps what tuition centres can charge.
+  - id: bcg-matrix
+    use: Primary tuition is a cash cow, secondary a declining one; a digital business would start as a question mark.
+
+tools:
+  - { kind: studio, id: generic-strategies, use: Position Scholarline and Tutora on cost and differentiation. }
+  - { kind: studio, id: five-forces, use: Analyse how the app changes the forces in tuition. }
+  - { kind: studio, id: bcg-matrix, use: Place Scholarline's services in a portfolio. }
+  - { kind: toolkit, id: porters-generic-strategies, use: The toolkit guide to the generic strategies (HL). }
+
+beyond:
+  - idea: The innovator's dilemma
+    body: >-
+      The theory of disruption explains why good management can be the problem: listening to the best customers and
+      investing where margins are highest leads incumbents away from the low end, where the entrant grows. Its remedy, a
+      separate unit with its own costs and customers, is option C. The IB course names disruptive innovation; the theory of
+      how incumbents respond goes beyond it.
+    terms: [substitute-product, switching-costs, first-mover-advantage]
+    sources: [adv-strat-christensen-1997]
+  - idea: The threat of substitutes
+    body: >-
+      Porter's five forces treat a substitute as a force on the whole industry, not one rival: as the app improves, every
+      tuition centre's prices are capped by it, so the question for Scholarline is how to offer what the substitute cannot.
+    terms: [porters-five-forces, barriers-to-entry]
+    sources: [porter-1980]
+
+sources: [bbr-method, adv-strat-christensen-1997, porter-1980]
+method: >-
+  Scholarline Learning Centres, Tutora and their people are fictional, and every figure is simulated for teaching. The
+  totals, revenue per student and margins in Exhibits 3 and 1, and each response's effect in Exhibit 4, are worked from the
+  figures beside them and the management team's stated estimates; Exhibit A1 adds each effect to the forecast for 2027. The
+  integrity check reworks every figure on every build.
