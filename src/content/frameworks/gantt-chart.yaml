@@ -46,6 +46,54 @@ exercise:
     - "Show at least one task that cannot start until another ends."
     - "Mark the fair itself as the milestone."
     - "Explain the delay using the dependencies, which is where critical path analysis adds detail."
+structure:
+  - name: The task list
+    text: "Every task in the project, in the order they happen, with an estimated duration for each."
+  - name: The timeline
+    text: "A horizontal scale of days, weeks or months across the top of the chart."
+  - name: The bars
+    text: "One bar per task, starting when its dependencies allow and as long as its duration, so overlapping bars show tasks that run at the same time."
+  - name: Dependencies
+    text: "The tasks that must finish before another can start, shown by the bars' positions or by linking arrows."
+  - name: Milestones
+    text: "Key dates, such as an opening day or a sign-off, usually marked with a diamond."
+  - name: Progress
+    text: "How much of each task is done, shaded within its bar or marked against a line for today's date."
+situations:
+  suits:
+    - "Communicating a project's timetable to a team, a client or a board who need to see at a glance what happens when."
+    - "Tracking a project week by week, so that a task that slips is seen early."
+    - "Planning the use of shared people or equipment, by seeing which tasks overlap."
+  poorFit:
+    - "Finding the critical path and the float of each task in a complex network, where critical path analysis is clearer."
+    - "Work whose tasks are unknown or keep changing, where a fixed chart soon misleads."
+interpretation: |
+  Read the chart for its pinch points: places where several tasks overlap and compete for the same people, and chains of dependent tasks with no gap between them, where any delay passes straight through to the finish.
+
+  Compare the plan with progress regularly. A bar that is behind today's line is a problem only if a later task depends on it and has no room to absorb the delay, so check the dependency before reacting.
+implications:
+  justifies:
+    - "Starting early tasks sooner, or adding resources to a chain of dependent tasks, to build in a margin before a fixed date."
+    - "Re-planning the bars when a task slips, and telling the people whose tasks depend on it."
+  doesNotJustify:
+    - "Concluding that tasks without visible dependencies can slip freely; the chart does not calculate float."
+    - "Treating the end date as certain while the durations are estimates."
+mistakes:
+  - mistake: "Drawing bars without showing which tasks depend on which."
+    fix: "Mark the dependencies, so that the effect of a delay can be traced."
+  - mistake: "Making the chart once and never updating it."
+    fix: "Record progress against the plan regularly and move the bars when tasks slip."
+  - mistake: "Treating the Gantt chart as a substitute for critical path analysis in a complex project."
+    fix: "Use critical path analysis to find the critical path and float, and the Gantt chart to communicate and track the plan."
+apply:
+  - href: /market-studio/campaign-planner/
+    scope: part
+    use: "Plan a campaign's channels and tasks week by week; the timeline is drawn as a Gantt chart, with checks on spending and on items outside the campaign."
+  - href: /case-room/halden-diagnosis/
+    scope: part
+    use: "Schedule a change plan against a client's deadline in the case lab's planning stage, and see which activities have no room to slip."
+decisions: [schedule]
+references: []
 terms: [gantt-chart, critical-path-analysis, lead-time]
 related: [critical-path-analysis, raci-matrix, lewin-change-model, business-plan]
 sources: [ib-bm-guide-2024]

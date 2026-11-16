@@ -10,9 +10,10 @@
  * (src/lib/frameworks-content.ts) and in tests/unit/frameworks.test.ts.
  */
 import type { Corpus, Problem } from './integrity';
-import type { Framework } from './framework-schema';
+import { DECISION_IDS, DECISION_INFO, type Framework } from './framework-schema';
 import { DIAGRAMS } from './diagrams';
 import { resolveRef } from './frameworks';
+import { ADVANCED } from './framework-lab';
 
 const has = <T>(d: Record<string, T>, id: string) => Object.prototype.hasOwnProperty.call(d, id);
 
@@ -79,6 +80,15 @@ export function checkFrameworks(frameworks: Record<string, Framework>, c: Corpus
       else if (!has(frameworks, r)) add(`related framework "${r}" does not exist`);
     });
     f.sources.forEach((s) => has(c.sources, s) || add(`source "${s}" is not in the sources register`));
+    f.references.forEach((s) => has(c.sources, s) || add(`reference "${s}" is not in the sources register`));
+    const parts = f.structure.map((p) => p.name.toLowerCase());
+    parts.forEach((p, i) => {
+      if (parts.indexOf(p) !== i) add(`the structure names the part "${p}" twice`);
+    });
+    f.mistakes.forEach((m) => {
+      if (m.mistake.trim() === m.fix.trim()) add('a common mistake repeats itself as its fix');
+    });
+    if (new Set(f.decisions).size !== f.decisions.length) add('a decision is listed twice');
     for (const n of [f.name, ...f.aliases]) {
       const k = n.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
       const prev = names.get(k);
@@ -118,6 +128,39 @@ export function checkFrameworks(frameworks: Record<string, Framework>, c: Corpus
       if (f.level !== 'SL/HL') add('an enrichment framework has no IB level: leave it SL/HL');
       if (f.tool) add('an enrichment framework is not a toolkit tool');
     }
+  }
+  return out;
+}
+
+/**
+ * The Framework Application Lab: every framework's application mode names
+ * tools that exist, lists its Strategy Studio tool among them, and lists none
+ * twice; every question of the hub has a framework to offer; and every studio
+ * tool the hub names exists. `tools` is the directory of pages a framework
+ * can be applied in (applyTools in src/lib/framework-lab.ts); `studio` the
+ * Strategy Studio's tool slugs.
+ */
+export function checkApplications(frameworks: Record<string, Framework>, tools: Map<string, unknown>, studio: string[]): Problem[] {
+  const out: Problem[] = [];
+  const slugs = new Set(studio);
+  // /frameworks/lab/ is the Lab's hub, so no framework may take that address.
+  if (Object.prototype.hasOwnProperty.call(frameworks, 'lab')) out.push({ where: 'frameworks/lab', message: 'the id "lab" is the address of the Framework Application Lab' });
+  for (const [id, f] of Object.entries(frameworks)) {
+    const add = (message: string) => out.push({ where: `frameworks/${id}`, message });
+    const hrefs = f.apply.map((a) => a.href);
+    hrefs.forEach((h, i) => {
+      if (hrefs.indexOf(h) !== i) add(`the tool ${h} is listed twice under apply`);
+      if (!tools.has(h)) add(`apply names ${h}, which is not a tool the Lab knows (a room's working page, a Finance Desk workspace or a Financial Laboratory calculator)`);
+    });
+    if (f.studio && !hrefs.includes(`/strategy-studio/${f.studio}/`)) add(`its Strategy Studio tool "${f.studio}" must be listed under apply`);
+  }
+  for (const d of DECISION_IDS) {
+    if (!Object.values(frameworks).some((f) => f.decisions.includes(d))) out.push({ where: `lab/${d}`, message: 'no framework is filed under this question' });
+    for (const s of DECISION_INFO[d].tools ?? []) if (!slugs.has(s)) out.push({ where: `lab/${d}`, message: `Strategy Studio tool "${s}" does not exist` });
+  }
+  for (const a of ADVANCED) {
+    if (!slugs.has(a.slug)) out.push({ where: `lab/advanced`, message: `Strategy Studio tool "${a.slug}" does not exist` });
+    if (a.framework && !Object.prototype.hasOwnProperty.call(frameworks, a.framework)) out.push({ where: `lab/advanced`, message: `framework "${a.framework}" does not exist` });
   }
   return out;
 }

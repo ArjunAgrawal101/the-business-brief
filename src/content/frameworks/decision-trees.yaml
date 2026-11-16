@@ -50,6 +50,56 @@ exercise:
     - "Show the working: probability times payoff, added, for each option."
     - "Compare the expected values, then consider the risk of a loss."
     - "Add one qualitative factor that might change the recommendation."
+structure:
+  - name: Decision nodes (squares)
+    text: "Points where the manager chooses between options, each branch carrying the cost of choosing it."
+  - name: Chance nodes (circles)
+    text: "Points where the outcome is uncertain. The branches out of each one carry probabilities that add up to 1."
+  - name: Outcomes and payoffs
+    text: "The end of each branch, with the financial result if that outcome happens."
+  - name: Expected values
+    text: "Worked from right to left: at each chance node, the sum of each probability multiplied by its payoff."
+  - name: Net expected values and the choice
+    text: "At each decision node, the expected value of each option minus its cost. The option with the highest value is chosen and the others are crossed out."
+situations:
+  suits:
+    - "Choosing between a few options whose outcomes are uncertain but can be estimated, such as opening a second site or upgrading the first."
+    - "Decisions taken in stages, where a later choice depends on an earlier outcome, such as a trial followed by a full launch."
+    - "Showing how sensitive a choice is to an uncertain probability, by finding the probability at which the decision would change."
+  poorFit:
+    - "Decisions where the probabilities cannot be estimated with any honesty, such as a new technology's adoption over a decade; scenarios serve better."
+    - "One-off decisions where a single bad outcome would ruin the business, so the average matters less than the worst case."
+interpretation: |
+  The expected value is the average result the option would give if the same decision could be taken many times. It ranks options on the numbers, but a decision is usually taken once, so read the spread of outcomes as well: the worst result, and the chance of a loss behind each option.
+
+  When two options are close, the ranking is fragile, and small changes in a probability may reverse it; find the probability at which the decision would change and ask how confident anyone can be on either side of it. The figures are only as good as the estimates, so the tree's chief value is often that it makes those estimates explicit and open to challenge.
+implications:
+  justifies:
+    - "Preferring the option with the highest expected value when the gap is clear and the worst outcome is affordable."
+    - "Choosing a lower-value option with a narrower spread when the business cannot bear the worst outcome of the other."
+    - "Investing in information, such as a trial or market research, when the decision turns on a probability no one can estimate well."
+  doesNotJustify:
+    - "Treating the expected value as the result the business will receive: no single outcome need equal it."
+    - "Ignoring qualitative factors, such as staff, reputation and ethics, which the tree leaves out."
+    - "Precise conclusions from rough estimates; a gap of a few per cent between options is within the error of the guesses."
+mistakes:
+  - mistake: "Probabilities at a chance node that do not add up to 1."
+    fix: "List every outcome at the node and check that the probabilities sum to exactly 1."
+  - mistake: "Forgetting to subtract the cost of each option."
+    fix: "Subtract the cost at the decision node, after working out the expected value of its chance node."
+  - mistake: "Working from left to right."
+    fix: "Roll back from the outcomes on the right: expected values first, then costs, then the choice."
+  - mistake: "Recommending on expected value alone."
+    fix: "Add the spread, the worst case and the qualitative factors, and say how confident the estimates are."
+apply:
+  - href: /strategy-studio/decision-tree/
+    scope: full
+    use: "Build a tree of any shape with decision and chance nodes; it checks that probabilities add up, rolls back the expected values net of costs, marks the best branch and shows the worst result and the chance of a loss behind each option."
+  - href: /strategy-studio/scenarios/
+    scope: part
+    use: "Where the probabilities cannot honestly be estimated, test the options against four scenarios instead of averaging over them."
+decisions: [choose-option, uncertain-future]
+references: [magee-1964]
 terms: [decision-tree, decision-node, chance-node, expected-value]
 related: [ansoff-matrix, bcg-matrix, business-plan, force-field-analysis]
 sources: [ib-bm-guide-2024]
