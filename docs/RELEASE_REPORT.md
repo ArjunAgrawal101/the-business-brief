@@ -56,7 +56,7 @@ On the final 2.2 source and build (details in [TESTING.md](TESTING.md)):
 | Contrast | 56 colour pairs, all pass, including the two new rooms' text colours |
 | Persona walkthroughs | 8 routes passed: first-time visitor, IB student (phone), teacher, undergraduate (tablet), MBA student, entrepreneur (phone), MBA student reading advanced strategy, IB student finding a tutor (phone) |
 | Browser tests | 1,092 tests on the release code (`d7b472c`): 1,089 passed and 3 skipped by design (two wide-screen navigation tests on the phone, one drawer test on the desktop), in 14.2 minutes, with no failures and no retries. The run before it, on the release candidate `c233161`, found one failure: the announcement race described below, fixed in `d7b472c` |
-| GitHub CI | The QA workflow (check, lint, unit tests, build, links, the full browser suite and contrast) passed on `720e6c7`, the first push of this release, and runs again on every push |
+| GitHub CI | The QA workflow (check, lint, unit tests, build, links, the full browser suite and contrast) passed on `720e6c7`, the first push of the release, and on `dc585a0`, with the same results as the local run (1,175 unit tests; 1,089 browser tests passed and 3 skipped; every colour pair passing). The two runs between them were stopped by the job's 20-minute limit with 853 of 1,092 browser tests passed and none failed; the full QA now takes about 20 to 25 minutes on GitHub's two workers, so the limit is 40 |
 
 Found and fixed during QA:
 
