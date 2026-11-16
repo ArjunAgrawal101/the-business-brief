@@ -15,7 +15,7 @@ import SaveButton from '../../../components/ui/SaveButton.astro';
 import { advancedLibrary, citation } from '../../../lib/advanced-content';
 import { AUDIENCE_LABELS, DOMAIN_BY_ID, MODULE_PARTS, advancedHref, moduleWords } from '../../../lib/advanced';
 import type { AdvancedModule } from '../../../lib/advanced-schema';
-import { corpus } from '../../../lib/content';
+import { corpus, longDate } from '../../../lib/content';
 import { allSubtopics, subtopicHref } from '../../../lib/learning';
 import { inline, plain, rich } from '../../../lib/markup';
 import '../../../styles/advanced.css';
@@ -70,7 +70,7 @@ const jsonLd = {
     <p class="am-tags">
       <span class="tag tag--enrichment">Beyond the IB course</span>
       {m.audience.map((a) => <span class="tag tag--plain">{AUDIENCE_LABELS[a]}</span>)}
-      <span class="am-meta">About {m.minutes} minutes · {words.toLocaleString('en-GB')} words · checked {m.updated}</span>
+      <span class="am-meta">About {m.minutes} minutes · {words.toLocaleString('en-GB')} words · checked {longDate(new Date(m.updated))}</span>
     </p>
     <SaveButton title={m.title} kind="page" />
   </PageIntro>

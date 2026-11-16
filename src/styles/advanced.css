@@ -107,7 +107,15 @@
   flex-wrap: wrap;
   align-items: center;
   gap: var(--sp-2);
+  /* Wrap before the room's drawing, which takes up to 42% of the intro on wide screens. */
+  max-width: min(40rem, 58%);
   margin-bottom: var(--sp-3);
+}
+
+@media (max-width: 52rem) {
+  .am-tags {
+    max-width: none;
+  }
 }
 
 .am-meta {
