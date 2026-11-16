@@ -1,0 +1,1144 @@
+# The executive simulation: Corvell Furniture. A fictional company; every
+# figure is simulated. The statements, the dashboard and every figure quoted
+# in the text are computed by the executive engine
+# (src/lib/executive/engine.ts) from the model, the opening position and the
+# years below. Texts quote figures only through tokens:
+#   {{revenue@2026}}                a measure in a year
+#   {{revenue@2023>2026}}           its change between two years
+#   {{pct:revenue@2023>2026}}       the change in per cent, signed, for brackets: (+5.1%)
+#   {{pc:revenue@2023>2026}}        the same without its sign, for a sentence: fell by 7.8%
+#   {{d:spareNormal}}               a figure worked in src/lib/executive/sim.ts (derived)
+#   {{pbit@final}}                  a measure in the last year of the run being described
+# Change a number here and every exhibit follows. tests/unit/executive.test.ts
+# works the engine by hand, checks the accounting identities in every year of
+# every plan it runs, and checks every claim the debrief makes about the
+# strategies' plans.
+
+title: 'Corvell Furniture: three years to restore the margin'
+dek: A family furniture maker whose profit margin has slipped from ten per cent to almost nothing must decide what to fix first, what to spend and what to risk.
+question: How should Corvell restore its profitability by 2029 without exhausting the bank's patience, the workforce's goodwill or the brand it has built?
+company:
+  name: Corvell Furniture
+  industry: Solid-wood furniture for the home
+  location: Wexley Bridge, a fictional mill town in the Pennines, England
+  legalForm: Private limited company
+  founded: '1972'
+  size: 160 makers in the workshop, and about 45 more in design, sales, two showrooms and the office
+  owners: The Corvell family holds 70% of the shares; an investment fund bought the other 30% in 2019.
+currency: { code: GBP, symbol: '£', name: pounds sterling }
+foreign: { code: EUR, symbol: '€', name: euros, market: 'the Netherlands, Belgium and Germany' }
+units: { singular: piece, plural: pieces }
+
+background:
+  - >
+    Corvell Furniture makes dining tables, chairs, sideboards and beds in oak and walnut in a converted mill at
+    Wexley Bridge. Every piece is made to order by 160 makers, finishers and fitters, and sold through two showrooms,
+    the company's website and about forty independent furniture shops. Ruth Corvell's grandfather founded the business
+    in 1972. It has never moved and has never made a loss, though 2026 came close.
+  - >
+    Until recently it was comfortably profitable. In 2023 Corvell delivered {{volume@2023}} pieces and earned
+    {{revenue@2023}}, a profit margin of {{profitMargin@2023}} and a return on capital employed of {{roce@2023}}. In
+    2026 it delivered {{volume@2026}} pieces for {{revenue@2026}}; the profit margin was {{profitMargin@2026}} and the
+    return on capital employed {{roce@2026}}.
+  - >
+    Nothing dramatic happened. Timber, finishes and fittings cost more every year, and the price list rose more
+    slowly. Importers of cheaper solid-wood furniture held or trimmed their prices. To protect profit the marketing budget was cut
+    every year, from {{marketing@2023}} in 2023 to {{marketing@2026}} in 2026, and pay was frozen in 2025 and 2026. A
+    second showroom opened in 2025 on a ten-year lease. Experienced makers began to leave: {{leavers@2026}} left in
+    2026, against {{leavers@2023}} in 2023.
+  - >
+    In November 2026 the board asked its executive team for a three-year plan. You join that team in one of seven
+    roles. The decisions are the team's; your role decides what you watch most closely and what you will answer for.
+
+mandate: >
+  The board has given the executive team three years, 2027 to 2029, and up to {{d:budget}} a year to spend on
+  marketing, new machinery, a people programme and international expansion. Prices and overheads are the team's to
+  set. The board's targets are a profit margin of at least 5% in 2029, and no year ending with the overdraft above the
+  bank's limit of {{d:overdraftLimit}}. Whatever is not spent stays in the bank. The family will take no dividend until
+  the margin recovers.
+
+assumptions: >
+  The board planned on these forecasts: the home market growing by about 3% to 4% a year as house moves recover;
+  competitors raising their prices by 1% to 2% a year; timber, finishes and fittings rising by about 2% a year; the
+  agreed pay award of 2.5% a year; and the euro staying near €1.15 to the pound. They are forecasts. What happens each
+  year is reported when the year is over, and it will not all match.
+
+stakeholders:
+  - name: The Corvell family
+    interest: Owns 70% of the shares. A business that stays independent, stays in Wexley Bridge and keeps its name for craft.
+    power: high
+    view: '“Three generations of my family have made furniture here. I will not be the one who sells it or moves it.” Ruth Corvell, chair'
+  - name: The investment fund
+    interest: Owns 30% of the shares and has a seat on the board. A return on its investment, and a company whose stake it could one day sell.
+    power: high
+    view: '“The margin has gone from ten per cent to one in three years. We want it back, and soon. Cost is the quickest lever.”'
+  - name: The workforce and its union
+    interest: Jobs, pay that keeps up with the town, and a say in how the work changes.
+    power: medium
+    view: '“Two years without a rise, and the best makers go to the kitchen firms down the valley. If you want quality, pay the people who make it.” Sam Hollis, union convenor'
+  - name: The bank
+    interest: Its loan of {{debt@2026}} repaid as agreed, and the overdraft kept inside its limit of {{d:overdraftLimit}}.
+    power: medium
+    view: '“Corvell has banked with us for decades. A plan that borrows to grow is a conversation; a plan that borrows to stand still is not.”'
+  - name: Customers and the independent shops
+    interest: Furniture that lasts twenty years, delivered on the promised date; for the shops, a brand that sells.
+    power: medium
+    view: '“The finish used to be perfect and the delivery date was the delivery date. Our table came three weeks late.” A customer review, 2026'
+  - name: Timber suppliers
+    interest: Steady orders, paid on time.
+    power: low
+    view: '“Oak is dearer everywhere. We could hold prices for a year if Corvell committed to the volumes.”'
+  - name: The town of Wexley Bridge
+    interest: Its largest private employer staying, and staying well.
+    power: low
+    view: '“Corvell is the reason the high street still has a café and a hardware shop.” A town councillor'
+
+model:
+  taxRate: 0.25
+  elasticity: 2.0
+  brandWeight: 0.015
+  brandDecay: 15
+  marketingPower: 7.7
+  marketingScale: 300000
+  reviewWeight: 2.5
+  qualityRef: 75
+  hoursPerWorker: 1650
+  overtimeMax: 0.15
+  overtimePremium: 0.5
+  newStarterOutput: 0.5
+  moraleNorm: 60
+  moraleRecovery: 0.35
+  moraleProductivity: 0.006
+  overtimeStrain: 0.6
+  turnoverBase: 9
+  turnoverPerPoint: 0.7
+  turnoverMin: 4
+  recruitCost: 5000
+  skillLoss: 0.006
+  peopleMorale: 3.0
+  peopleSkill: 0.03
+  peopleScale: 150000
+  cutMorale: 0.5
+  cutSlack: 5
+  cutQuality: 0.6
+  cutCost: 0.15
+  qualityBase: 78
+  qualityStrain: 0.5
+  strainThreshold: 88
+  qualityMorale: 0.7
+  qualitySkill: 40
+  returnsBase: 3
+  returnsPerPoint: 0.25
+  returnsMin: 1
+  capacityPerMillion: 2400
+  capacityHours: 0.08
+  capacityLife: 10
+  intlSetup: 300000
+  intlPotential: 6000
+  intlScale: 900000
+  intlDecay: 0.3
+  intlElasticity: 1.6
+  intlPriceRatio: 0.92
+  fxRef: 1.15
+  intlFreight: 85
+  intlDamage: 4
+  intlDebtorDays: 75
+  debtorDays: 20
+  stockDays: 60
+  creditorDays: 45
+  loanRate: 0.065
+  overdraftRate: 0.09
+  penaltyRate: 0.05
+
+start:
+  label: End of 2022
+  marketSize: 1000000
+  share: 0.024
+  price: 820
+  competitorPrice: 760
+  brand: 64
+  marketing: 800000
+  quality: 77
+  morale: 64
+  headcount: 160
+  wage: 29000
+  hoursPerPiece: 10
+  plantCapacity: 28000
+  materialCost: 278
+  otherCost: 55
+  overheads: 3200000
+  cash: 800000
+  loans: 2000000
+  assets: { label: 'Mill, machinery and showrooms', cost: 9000000, nbv: 6000000, life: 10 }
+  shareCapital: 1000000
+  overdraftLimit: 2500000
+
+history:
+  - label: '2023'
+    note: A steady year, with pay rising in line with wages in the town.
+    levers: { price: 2, costCut: 0, marketing: 760000, capacity: 0, people: 80000, international: 0 }
+    conditions: { marketGrowth: 1.5, competitorPrice: 0, materialCost: 3, wage: 4, overheads: 0, morale: 0, fx: 1.15, dividends: 1000000 }
+  - label: '2024'
+    note: Timber jumped and importers trimmed their prices. Marketing was cut, and the pay award fell below the town's wages.
+    levers: { price: 2, costCut: 0, marketing: 620000, capacity: 0, people: 50000, international: 0 }
+    conditions: { marketGrowth: 1.5, competitorPrice: -1, materialCost: 7, wage: 1, overheads: 0, morale: -5, fx: 1.17, dividends: 800000 }
+  - label: '2025'
+    note: A second showroom opened on a ten-year lease. Pay was frozen and marketing cut again.
+    levers: { price: 2, costCut: 0, marketing: 500000, capacity: 0, people: 30000, international: 0 }
+    conditions: { marketGrowth: 2, competitorPrice: -1, materialCost: 6, wage: 0, overheads: 300000, morale: -6, fx: 1.18, dividends: 400000 }
+  - label: '2026'
+    note: Pay was frozen for a second year and marketing cut for the third year running. No dividend was paid.
+    levers: { price: 1, costCut: 0, marketing: 420000, capacity: 0, people: 20000, international: 0 }
+    conditions: { marketGrowth: 2, competitorPrice: 0, materialCost: 4, wage: 0, overheads: 60000, morale: -6, fx: 1.16, dividends: 0 }
+
+plan:
+  - label: '2027'
+    note: The market recovers as forecast, and the agreed pay award is paid.
+    conditions: { marketGrowth: 3.5, competitorPrice: 1, materialCost: 2, wage: 2.5, overheads: 0, morale: 0, fx: 1.15 }
+  - label: '2028'
+    note: The pound strengthens and timber jumps; a port strike damages exports.
+    news:
+      title: The pound strengthens, and timber jumps
+      text: >
+        In the spring the pound rose against the euro, to {{fx@2028}}, and a dry summer in the forests that supply
+        European oak pushed materials up by {{pc:materialPerPiece@2027>2028}}, twice the forecast. A strike at the port
+        Corvell's distributor uses held shipments for three weeks: for anyone exporting, more pieces arrived damaged and
+        had to be replaced.
+    conditions: { marketGrowth: 4, competitorPrice: 2, materialCost: 4, wage: 2.5, overheads: 0, morale: 0, fx: 1.22, exportDamage: 7 }
+  - label: '2029'
+    note: A steadier year, with the pound easing back and timber rising as forecast.
+    news:
+      title: A steadier year
+      text: The pound eased back to {{fx@2029}}, still above the planning rate. Materials rose by {{pc:materialPerPiece@2028>2029}}, as forecast, and the port worked normally.
+    conditions: { marketGrowth: 4, competitorPrice: 2, materialCost: 2, wage: 2.5, overheads: 0, morale: 0, fx: 1.18 }
+
+rules:
+  budget: 2500000
+  price: { min: -10, max: 10, step: 1 }
+  costCut: { min: 0, max: 15, step: 1 }
+  marketing: { min: 0, max: 2000000, step: 10000 }
+  capacity: { min: 0, max: 2500000, step: 10000 }
+  people: { min: 0, max: 1000000, step: 10000 }
+  international: { min: 0, max: 1500000, step: 10000 }
+  baseline: { price: 0, costCut: 0, marketing: 420000, capacity: 0, people: 20000, international: 0 }
+
+dashboard: [revenue, pbit, profitMargin, roce, netCash, marketShare, brand, quality, utilization, morale]
+
+roles:
+  ceo:
+    brief: >
+      You answer to the board for all of it. In 2023 Corvell earned a profit margin of {{profitMargin@2023}}; in 2026
+      it earned {{profitMargin@2026}}, and the return on the capital the owners have tied up in it fell from
+      {{roce@2023}} to {{roce@2026}}. The family wants the business kept whole and in Wexley Bridge; the fund wants the
+      margin back quickly; the bank wants a plan that does not live on its overdraft.
+
+
+      Your job is the balance. Every executive will argue for their own function; you are the one who has to say what
+      comes first, what can wait, and what the plan will cost the people who carry it out.
+    priorities:
+      - The profit margin back to the board's target of 5% by 2029.
+      - Every year inside the bank's overdraft limit.
+      - A business left stronger than you found it, in its brand, its workforce and its capacity.
+      - The family and the fund behind one plan.
+    pinned: [profitMargin, netCash, brand, morale]
+    goals:
+      - { metric: 'final:profitMargin', op: '>=', value: 5, label: 'A profit margin of at least 5% in 2029' }
+      - { metric: 'min:headroom', op: '>=', value: 0, label: 'No year ending over the overdraft limit' }
+      - { metric: 'final:brand', op: '>=', value: 60, label: 'Brand strength of at least 60 in 2029' }
+      - { metric: 'final:morale', op: '>=', value: 55, label: 'Morale of at least 55 in 2029' }
+    lens:
+      finance: Read the statements for the story behind the margin. Which lines grew, which shrank, and which of them were choices?
+      causes: Separate causes from symptoms. The board will fund what fixes causes.
+      market: Ask where Corvell can win, not only where it is losing.
+      operations: Know the workshop's limit before you promise growth.
+      people: Every way out has a cost to someone. Name who, and decide whether it is fair.
+      strategy: Choose the strategy you can defend to the family, the fund and the workshop at once.
+  cfo:
+    brief: >
+      You look first at what the numbers say and when the cash moves. Operating profit fell from {{pbit@2023}} in 2023
+      to {{pbit@2026}} in 2026, the gross profit margin from {{gpm@2023}} to {{gpm@2026}}, and return on capital
+      employed from {{roce@2023}} to {{roce@2026}}. Liquidity is not yet the problem: net cash was {{netCash@2026}} at
+      the end of 2026, the current ratio {{currentRatio@2026}}, and the overdraft unused.
+
+
+      That comfort will not last if the plan spends the whole budget and the returns come late. Each year's spending is
+      paid for now; most of it earns next year or after. Your task is to make sure the plan is affordable on the way,
+      not only at the end.
+    priorities:
+      - Return on capital employed back to at least 12% by 2029.
+      - Net cash never below zero at a year end.
+      - Every pound of the budget justified by what it returns.
+      - Profit over the three years at least covering the losses on the way.
+    pinned: [roce, netCash, gpm, headroom]
+    goals:
+      - { metric: 'final:roce', op: '>=', value: 12, label: 'Return on capital employed of at least 12% in 2029' }
+      - { metric: 'min:netCash', op: '>=', value: 0, label: 'Net cash never below zero at a year end' }
+      - { metric: 'sum:profit', op: '>=', value: 0, label: 'Profit for the year, added over the three years, of at least zero' }
+    lens:
+      finance: Start with the margins, then the ratios. Is this a problem of profitability, of liquidity, or both?
+      causes: Look for the costs that grew faster than revenue, and for the ones that did not grow at all.
+      market: A price change moves revenue and volume in opposite directions. Work out which one wins.
+      operations: Capacity costs cash before it earns any. Know when it would arrive.
+      people: Turnover has a cost in recruitment, lost output and faults. Put a figure on it.
+      strategy: Prefer the plan whose lowest cash point you can live with, not only the one with the best final year.
+  cmo:
+    brief: >
+      You see the customers Corvell has lost. Market share fell from {{marketShare@2023}} to {{marketShare@2026}} while
+      the market grew, because Corvell's prices rose against rivals that held or trimmed theirs: on an index of its price against
+      competitors' (competitors = 100), Corvell went from {{relativePrice@2023}} to {{relativePrice@2026}}. Marketing was
+      cut from {{marketing@2023}} to {{marketing@2026}}, and the brand, at {{brand@2026}}, has only begun to show it.
+
+
+      You also know what the finance team can forget: a brand fades when it is not maintained, and marketing takes a
+      year to show its full effect.
+    priorities:
+      - Win back share of a growing market.
+      - Rebuild the brand before it fades further.
+      - Price for value, neither the cheapest nor out of reach.
+      - Grow revenue by 2029.
+    pinned: [marketShare, brand, revenue, price]
+    goals:
+      - { metric: 'final:marketShare', op: '>=', value: 2, label: 'Market share of at least 2% in 2029' }
+      - { metric: 'final:brand', op: '>=', value: 65, label: 'Brand strength of at least 65 in 2029' }
+      - { metric: 'change:revenue', op: '>=', value: 2000000, label: 'Revenue up by at least £2m on 2026' }
+    lens:
+      finance: Split revenue into volume and price. Which fell, and why?
+      causes: Find the causes customers would name.
+      market: Compare Corvell with each rival on price and position. Who is taking which customers?
+      operations: Promise only what the workshop can deliver. Late deliveries cost reviews.
+      people: The makers are part of the brand. A customer who finds a fault blames Corvell.
+      strategy: Choose the strategy that wins customers back at a price they will pay.
+  coo:
+    brief: >
+      You run the workshop. It can make about {{normalCapacity@2026}} pieces a year in normal hours and
+      {{capacity@2026}} with overtime; it delivered {{volume@2026}} in 2026. That looks like room to grow, but there is
+      less of it than there was: in 2023, normal hours could make {{normalCapacity@2023}}. Experienced makers have left
+      ({{leavers@2026}} in 2026), new starters are slower, and the share of pieces returned or remade rose from
+      {{returnsRate@2023}} to {{returnsRate@2026}}.
+
+
+      Whoever wins the argument upstairs, you will have to make the plan. If marketing works, can you make the pieces?
+      If the efficiency programme bites, who will check the finish?
+    priorities:
+      - Service quality of at least 75 by 2029.
+      - No year relying on heavy overtime.
+      - Returns below 3% of deliveries.
+      - Capacity ready before the demand arrives.
+    pinned: [utilization, quality, returnsRate, overtimeHours]
+    goals:
+      - { metric: 'final:quality', op: '>=', value: 75, label: 'Service quality of at least 75 in 2029' }
+      - { metric: 'max:overtimeHours', op: '<=', value: 5000, label: 'No more than 5,000 hours of overtime in any year' }
+      - { metric: 'final:returnsRate', op: '<=', value: 3, label: 'No more than 3% of pieces returned or remade in 2029' }
+    lens:
+      finance: Find the costs that come from the workshop. Materials, remakes and overtime.
+      causes: Trace each fault back to its cause. People, pace or materials?
+      market: Every extra order is a piece somebody has to make.
+      operations: Work out what limits output now. The machines, or the people?
+      people: Skill walks out of the door with every leaver.
+      strategy: Choose a plan the workshop can deliver at the quality the brand promises.
+  chro:
+    brief: >
+      You see what the last three years did to the people who make the product. Pay was frozen in 2025 and 2026.
+      Morale in the staff survey fell from {{morale@2023}} to {{morale@2026}}, and labour turnover rose from
+      {{turnover@2023}} to {{turnover@2026}}: {{leavers@2026}} people left in 2026, many of them experienced makers who
+      went to better-paid work down the valley.
+
+
+      The union wants a pay rise; the fund wants costs cut; the makers who stayed want to know whether the company has a
+      future. A plan that ignores them will be carried out by people who no longer believe in it.
+    priorities:
+      - Morale back to at least 60 by 2029.
+      - Labour turnover below 10%.
+      - No year in which morale falls below 50.
+      - Change handled with the workforce, not done to it.
+    pinned: [morale, turnover, skill, overtimeShare]
+    goals:
+      - { metric: 'final:morale', op: '>=', value: 60, label: 'Morale of at least 60 in 2029' }
+      - { metric: 'final:turnover', op: '<=', value: 10, label: 'Labour turnover of no more than 10% in 2029' }
+      - { metric: 'min:morale', op: '>=', value: 50, label: 'Morale never below 50 at a year end' }
+    lens:
+      finance: Find what the people costs are, and what losing people costs.
+      causes: Distinguish what people complain about from what drives them away.
+      market: Customers notice when the best makers leave.
+      operations: Overtime costs morale as well as wages.
+      people: Map the stakeholders. Whose support does the plan need, and whose consent?
+      strategy: Choose the plan the workforce can believe in.
+  strategy:
+    brief: >
+      You look beyond the next year. Corvell has been losing share at home for three years while the market grew by
+      {{pc:marketSize@2023>2026}}, and its return on capital employed has fallen from {{roce@2023}} to {{roce@2026}}. A
+      distributor has offered to sell the range in the Netherlands, Belgium and Germany, and rivals compete on price at home.
+
+
+      Your question is where Corvell will earn its return in 2030 and after: in the same market, defended better, or in
+      new ones? A plan that only repairs the past may leave the company with nowhere to grow.
+    priorities:
+      - Revenue growth by 2029 that the business can sustain.
+      - Return on capital employed back above 10%.
+      - A position that does not depend on one market.
+      - Options for the years after the plan.
+    pinned: [revenue, roce, exportShare, marketShare]
+    goals:
+      - { metric: 'change:revenue', op: '>=', value: 3000000, label: 'Revenue up by at least £3m on 2026' }
+      - { metric: 'final:roce', op: '>=', value: 10, label: 'Return on capital employed of at least 10% in 2029' }
+      - { metric: 'final:exportShare', op: '>=', value: 10, label: 'At least 10% of revenue earned abroad in 2029' }
+    lens:
+      finance: Read the trend, not the year. Where is the return on capital heading?
+      causes: Ask which causes are temporary and which are structural.
+      market: Weigh the offer abroad against the fight at home.
+      operations: Growth anywhere needs capacity, and capacity takes a year.
+      people: A growth strategy needs the skills the workshop is losing.
+      strategy: Decide the position Corvell should hold in 2030, then plan backwards from it.
+  consultant:
+    brief: >
+      The board has hired you for an independent view. You have no function to defend, and you will be judged on
+      whether the plan works for the whole business: the margin, the workshop, the people and the bank.
+
+
+      Your first reading of the figures: revenue fell by {{pc:revenue@2023>2026}} between 2023 and 2026, but operating
+      profit fell from {{pbit@2023}} to {{pbit@2026}}. The company has cash ({{netCash@2026}}) and time, but not
+      unlimited amounts of either, and each executive sees a different part of the problem. Your value is in seeing how
+      the parts connect.
+    priorities:
+      - A profit margin of at least 4% by 2029.
+      - Service quality and morale restored, not traded away.
+      - No breach of the bank's limit.
+      - Recommendations each executive can act on.
+    pinned: [profitMargin, quality, morale, netCash]
+    goals:
+      - { metric: 'final:profitMargin', op: '>=', value: 4, label: 'A profit margin of at least 4% in 2029' }
+      - { metric: 'final:quality', op: '>=', value: 72, label: 'Service quality of at least 72 in 2029' }
+      - { metric: 'final:morale', op: '>=', value: 58, label: 'Morale of at least 58 in 2029' }
+      - { metric: 'min:headroom', op: '>=', value: 0, label: 'No year ending over the overdraft limit' }
+    lens:
+      finance: Build the bridge from 2023's profit to 2026's. Which lines explain the gap?
+      causes: Test each executive's favourite cause against the evidence.
+      market: Check whether the market or the company is the problem.
+      operations: Find the constraint. Everything else waits for it.
+      people: Map who gains and who loses from each option before you recommend one.
+      strategy: Recommend the strategy the evidence supports, and say what would change your mind.
+
+stages:
+  finance:
+    title: Examine the financial information
+    lead: >
+      Read the statements and the ratios for 2023 to 2026. Where has the profit gone, and is this a problem of profit,
+      of cash, or both?
+    ib: ['3.4', '3.5', '3.6', '3.7']
+    hlNote: >
+      Stock days, debtor days, creditor days and the gearing ratio are HL only (3.6). Both questions here can be answered
+      from the statements and the profitability and liquidity ratios.
+    questions:
+      - kind: number
+        id: margin-2026
+        prompt: >
+          Using the statement of profit or loss, calculate Corvell's profit margin for 2026, as a percentage to one
+          decimal place.
+        answer: { kpi: profitMargin, year: '2026' }
+        tolerance: 0.15
+        unit: percent
+        working: >
+          Profit margin = (profit before interest and tax ÷ sales revenue) × 100 = ({{pbit@2026}} ÷ {{revenue@2026}})
+          × 100 = {{profitMargin@2026}}. In 2023 it was {{profitMargin@2023}}: of every pound of sales, Corvell now keeps
+          about a penny from its trading, where it used to keep ten pence.
+      - kind: choice
+        id: how-profit-fell
+        prompt: Which statement best explains how Corvell's profit fell between 2023 and 2026?
+        options:
+          - id: collapse
+            text: Revenue collapsed while costs stayed the same.
+            feedback: >
+              Revenue fell by {{pc:revenue@2023>2026}} over three years: a decline, not a collapse. And costs did not
+              stay the same: cost of sales for each piece rose by {{pc:costPerPiece@2023>2026}}, and overheads by
+              {{pc:overheads@2023>2026}}.
+          - id: squeeze
+            correct: true
+            text: >
+              Each piece cost more to make while prices rose less, fewer pieces were sold, and the costs that do not
+              change with output rose.
+            feedback: >
+              Right. Materials for each piece rose by {{pc:materialPerPiece@2023>2026}} while the average price rose by
+              {{pc:price@2023>2026}}, so the gross profit margin fell from {{gpm@2023}} to {{gpm@2026}}. Pieces
+              delivered fell by {{pc:volume@2023>2026}}, and overheads rose by {{pc:overheads@2023>2026}}. Each effect
+              on its own was modest; together they took operating profit from {{pbit@2023}} to {{pbit@2026}}.
+          - id: interest
+            text: Interest on new borrowing turned an operating profit into a loss.
+            feedback: >
+              There was no new borrowing. Interest was {{interest@2026}} in 2026, the same as in 2023, because the loan
+              did not change and the overdraft was not used.
+          - id: depreciation
+            text: Heavy investment in new machinery raised depreciation.
+            feedback: >
+              Corvell bought no new machinery in these years. Depreciation was {{depreciation@2023}} in 2023 and
+              {{depreciation@2026}} in 2026.
+  causes:
+    title: Identify the causes of the decline
+    lead: >
+      Eleven pieces of evidence from the board pack. Choose the ones that explain the fall in profitability, and leave
+      out what the evidence does not support. Then see what each choice tells you.
+    ib: ['3.3', '3.5', '4.5', '2.4', '5.3']
+    hlNote: >
+      Labour turnover (2.4) and quality management (5.3) are HL only, but the evidence about them can be read at SL.
+    min: 2
+    evidence:
+      - id: materials
+        title: Materials cost more; prices rose less
+        area: finance
+        verdict: cause
+        text: >
+          Timber, finishes and fittings for a piece cost {{materialPerPiece@2023}} in 2023 and {{materialPerPiece@2026}}
+          in 2026 ({{pct:materialPerPiece@2023>2026}}). The average price rose from {{price@2023}} to {{price@2026}}
+          ({{pct:price@2023>2026}}).
+        feedback: >
+          A cause. Each piece's gross profit shrank as costs outran prices: the gross profit margin fell from
+          {{gpm@2023}} to {{gpm@2026}}. The margin on what is sold is the first place to look.
+      - id: competitors
+        title: Rivals held or cut their prices
+        area: marketing
+        verdict: cause
+        text: >
+          Competitors' average price went from {{competitorPrice@2023}} to {{competitorPrice@2026}} while Corvell's rose.
+          On an index of its price against theirs (competitors = 100), Corvell went from {{relativePrice@2023}} to
+          {{relativePrice@2026}}.
+        feedback: >
+          A cause. The marketing team's price tests put the price elasticity of demand at about {{d:elasticity}}: each 1%
+          that Corvell's price rises against its rivals' costs about {{d:elasticity}}% of orders. Its market share fell from
+          {{marketShare@2023}} to {{marketShare@2026}} in a market that grew.
+      - id: marketing
+        title: Marketing was cut every year
+        area: marketing
+        verdict: cause
+        text: >
+          Marketing spend fell from {{marketing@2023}} to {{marketing@2026}}. Brand strength, from the annual customer
+          survey, went from {{brand@2023}} to {{brand@2026}}.
+        feedback: >
+          A cause, and one that has not finished. Half of a year's marketing reaches the brand the following year, so
+          cuts show late: the brand has only begun to fall. To hold it where it is, Corvell would need to spend about
+          {{d:marketingNorm}} a year.
+      - id: morale
+        title: Pay frozen; makers leaving
+        area: people
+        verdict: cause
+        text: >
+          Pay was frozen in 2025 and 2026. Morale in the staff survey fell from {{morale@2023}} to {{morale@2026}}, and
+          labour turnover rose from {{turnover@2023}} to {{turnover@2026}}: {{leavers@2026}} leavers in 2026.
+        feedback: >
+          A cause. Each leaver costs recruitment and a year in which the new maker produces about half as much, and
+          disengaged makers make more mistakes. Pieces delivered per worker fell from {{productivity@2023}} to
+          {{productivity@2026}}; the quality problems follow from it.
+      - id: overheads
+        title: Overheads rose while sales fell
+        area: finance
+        verdict: cause
+        text: >
+          Overheads rose from {{overheads@2023}} to {{overheads@2026}} ({{pct:overheads@2023>2026}}), mostly the lease on
+          the second showroom, while revenue fell by {{pc:revenue@2023>2026}}.
+        feedback: >
+          A cause. A cost that does not change with output weighs more as sales fall. The new showroom has not brought
+          the sales to pay for itself, which also makes it the obvious first target of an efficiency programme.
+      - id: returns
+        title: More pieces coming back
+        area: operations
+        verdict: partial
+        text: >
+          Pieces returned or remade for a fault rose from {{returnsRate@2023}} of deliveries in 2023 to
+          {{returnsRate@2026}} in 2026; the service quality index fell from {{quality@2023}} to {{quality@2026}}.
+        feedback: >
+          Partly. The cost of remaking pieces is real and has grown, but it is a symptom: quality fell because
+          experienced makers left and those who stayed were less engaged. Fixing returns without fixing morale treats
+          the symptom. It matters later too: this year's poor reviews cost next year's brand.
+      - id: market
+        title: The market is shrinking
+        area: external
+        verdict: not
+        text: >
+          A sales manager's view: “Nobody wants solid wood any more.” The home market was {{marketSize@2023}} pieces in
+          2023 and {{marketSize@2026}} in 2026.
+        feedback: >
+          Not supported. The market grew by {{pc:marketSize@2023>2026}} over the three years; it was Corvell's share
+          of it that fell. The problem is Corvell's position in the market, not the market.
+      - id: interest
+        title: Interest on borrowing
+        area: finance
+        verdict: not
+        text: Corvell has a bank loan of {{debt@2026}}. Interest was {{interest@2026}} in 2026.
+        feedback: >
+          Not a cause. Interest was the same in every year, because the loan did not change and the overdraft was not
+          used. It is small beside the fall in operating profit, from {{pbit@2023}} to {{pbit@2026}}.
+      - id: depreciation
+        title: Heavy investment raised depreciation
+        area: finance
+        verdict: not
+        text: >
+          A shop steward's view: “They spent a fortune on the new showroom and the machines.” Depreciation was
+          {{depreciation@2026}} in 2026.
+        feedback: >
+          Not supported. Corvell bought no new machinery in these years, and depreciation was {{depreciation@2023}} in
+          2023 too. The showroom is leased, not owned, so its cost sits in overheads, where the evidence points.
+      - id: dividends
+        title: Dividends drained the company
+        area: finance
+        verdict: not
+        text: The family and the fund took dividends in 2023, 2024 and 2025, and none in 2026.
+        feedback: >
+          Not a cause of the fall in profit. Dividends are paid out of profit once it is made: they reduce cash and
+          retained earnings, not the profit margin. Here cash is not the problem: net cash was {{netCash@2026}} at the
+          end of 2026.
+      - id: exchange
+        title: The exchange rate hurt sales abroad
+        area: external
+        verdict: not
+        text: The pound was worth {{fx@2023}} in 2023 and {{fx@2026}} in 2026.
+        feedback: >
+          Not a cause: Corvell does not yet sell abroad. The exchange rate will matter if it starts to, which is one of
+          the strategies open to it.
+  market:
+    title: Analyse the market
+    lead: >
+      Look at the market Corvell sells into and the one it could enter. Which customers is it losing, and to whom? What
+      would a change of price do?
+    ib: ['4.1', '4.5', '4.6', '1.5']
+    hlNote: >
+      The importance of market share (4.1), price elasticity of demand (4.5) and international marketing (4.6) are HL
+      only. The questions can be answered from the figures given.
+    competitors:
+      - name: Tessaro Living
+        position: Imported solid-wood furniture sold online and in out-of-town stores; a narrower range, delivered in days.
+        priceRatio: 0.82
+        share: 7.5
+      - name: Valdane Home
+        position: A department store chain's own brand, made abroad in pine and oak veneer.
+        priceRatio: 0.88
+        share: 9
+      - name: Brennick and Hale
+        position: A British maker of premium furniture with eight stores of its own.
+        priceRatio: 1.12
+        share: 3.4
+    opportunity: >
+      A distributor has offered to sell Corvell's range in the Netherlands, Belgium and Germany. Setting up (certification, a catalogue in
+      three languages, training the distributor's staff and a stand at a trade fair) would cost about {{d:intlSetup}},
+      and sales would start the year after. With enough spent on building the market, it could take about
+      {{d:intlPotential}} pieces a year at today's prices. The distributor would buy at about {{d:exportPrice}} a piece at
+      the planning rate of €{{d:fxRef}} to the pound, paying in euros after {{d:intlDebtorDays}} days. Freight, duty and
+      insurance would cost {{d:intlFreight}} a piece, and about {{d:intlDamage}} of pieces arrive damaged and are replaced.
+    questions:
+      - kind: choice
+        id: price-rise
+        prompt: >
+          The marketing team's price tests suggest that a 5% price rise would cost about {{d:priceRise5Lost}} of
+          orders. At 2026 costs, what would a 5% rise do to revenue and to gross profit?
+        options:
+          - id: both-up
+            text: Both would rise, because each piece would earn more.
+            feedback: >
+              Each piece would earn more, but there would be fewer of them: revenue would change by
+              {{d:priceRise5Revenue}} and gross profit by {{d:priceRise5Gross}}.
+          - id: small-fall
+            correct: true
+            text: >
+              Revenue would fall, and gross profit would barely change: on its own a price rise would not restore the
+              margin, though it would free capacity.
+            feedback: >
+              Right. With elasticity of about {{d:elasticity}}, orders fall faster than the price rises: revenue
+              changes by {{d:priceRise5Revenue}} and gross profit by {{d:priceRise5Gross}}. Prices should follow costs,
+              but they cannot carry the recovery alone.
+          - id: full-five
+            text: Revenue would fall by the full 5%, and gross profit by more.
+            feedback: >
+              The price rise offsets part of the lost volume: revenue changes by {{d:priceRise5Revenue}}, and gross profit
+              by {{d:priceRise5Gross}}, because each piece not made also saves its materials.
+          - id: no-change
+            text: Nothing would change, because premium customers do not notice price.
+            feedback: >
+              Corvell's customers did notice: as its price rose against its rivals', its market share fell from
+              {{marketShare@2023}} to {{marketShare@2026}}.
+      - kind: choice
+        id: export-offer
+        prompt: What would the distributor's offer add to Corvell, and what would it risk?
+        options:
+          - id: balanced
+            correct: true
+            text: >
+              Demand that does not depend on the home market, at a lower margin on each piece, after a year of set-up
+              costs, with earnings that fall when the pound strengthens.
+            feedback: >
+              Right. At the planning rate each export would leave about {{d:exportMargin}} after its inputs, freight and
+              damage, against {{d:homeMargin}} at home; a pound 5% stronger would cut the price received to
+              {{d:exportPriceStrong}}. The set-up is paid a year before the first sale.
+          - id: quick-profit
+            text: Extra profit from the first year, because the distributor does the selling.
+            feedback: >
+              Nothing is sold abroad until the set-up is complete, a year after it begins, and the market then takes
+              further spending to build.
+          - id: no-risk
+            text: No currency risk, because Corvell would quote its prices in pounds.
+            feedback: >
+              The distributor would pay in euros at a price set at the planning rate. If the pound strengthens, each
+              euro buys fewer pounds: at a rate 5% stronger, each piece would earn {{d:exportPriceStrong}} instead of
+              {{d:exportPrice}}.
+          - id: higher-margin
+            text: Higher margins than at home, because customers abroad pay more.
+            feedback: >
+              The distributor takes its margin, and freight and damage add cost: each export would leave about
+              {{d:exportMargin}}, against {{d:homeMargin}} at home.
+  operations:
+    title: Review operational capacity
+    lead: >
+      How much can the workshop make, what limits it, and what happens to cost and quality when it is pushed?
+    ib: ['5.1', '5.3', '5.6']
+    hlNote: >
+      Capacity utilization, productivity (5.6) and quality management (5.3) are HL only. The questions here use only
+      the capacity figures in the exhibit.
+    questions:
+      - kind: number
+        id: spare-capacity
+        prompt: How many more pieces could the workshop have made in 2026 in normal hours, without overtime?
+        answer: { kpi: normalCapacity, year: '2026', less: volume }
+        tolerance: 60
+        unit: units
+        working: >
+          Capacity in normal hours, {{normalCapacity@2026}} pieces, less pieces delivered, {{volume@2026}}, leaves about
+          {{d:spareNormal}} pieces. In 2023 normal hours could make {{normalCapacity@2023}}: the room has shrunk as
+          experienced makers left.
+      - kind: choice
+        id: demand-up
+        prompt: >
+          Suppose orders rose by 12% in 2027 and nothing else changed. What would happen in the workshop?
+        options:
+          - id: normal-hours
+            text: All of it would be made in normal hours.
+            feedback: >
+              Orders 12% higher would be about {{d:demand12}} pieces, more than the {{d:labourNormal}} that normal
+              hours can make.
+          - id: overtime-quality
+            correct: true
+            text: >
+              Some pieces would need overtime at a premium, and with the workshop running above its normal capacity,
+              service quality would slip.
+            feedback: >
+              Right. About {{d:overtimeAt12}} pieces would be made in overtime, and the workshop would run at
+              {{d:loadAt12}} of its normal capacity, well above the point at which faults and late deliveries rise.
+          - id: machines
+            text: The machines would be the limit, so orders would be lost.
+            feedback: >
+              The plant could make {{plantCapacity@2026}} pieces. The limit is people's hours, and overtime can stretch
+              them for a while.
+          - id: utilization
+            text: Nothing, because utilization was only {{utilization@2026}}.
+            feedback: >
+              Utilization here is measured against capacity with overtime. Against normal hours the workshop was already
+              close to full, so extra orders would come at overtime rates.
+  people:
+    title: Consider employees and other stakeholders
+    lead: >
+      Who is affected by each way out, who can stop it, and what have the last three years done to the people who make
+      the product?
+    ib: ['1.4', '2.1', '2.4', '2.7']
+    hlNote: >
+      Labour turnover (2.4) and industrial and employee relations (2.7) are HL only. At HL, labour turnover in 2026 was
+      {{leavers@2026}} leavers ÷ {{headcount@2026}} staff × 100 = {{turnover@2026}}; every leaver was replaced, so the
+      average number of staff was {{headcount@2026}}.
+    questions:
+      - kind: choice
+        id: conflict
+        prompt: The fund proposes a 12% cut in overheads in 2027. Whose interests conflict most sharply, and why?
+        options:
+          - id: fund-workforce
+            correct: true
+            text: >
+              The fund, which wants profit back quickly, and the workforce, whose morale is already low: a deep cut would
+              lift the first year's profit but risk more leavers and poorer quality.
+            feedback: >
+              Right. Both have real power over the plan: the fund on the board, the workforce in the quality of every
+              piece. With morale at {{morale@2026}}, a cut beyond the obvious slack would land on people already looking
+              for the door.
+          - id: bank-customers
+            text: The bank and the customers, because customers pay the bank.
+            feedback: >
+              Neither has much at stake in an overheads cut. The bank cares about the overdraft; customers care about
+              the finish and the delivery date.
+          - id: none
+            text: Nobody's, because everyone gains when costs fall.
+            feedback: >
+              The saving goes to profit at once, but the cost falls on the people whose jobs or workload change, and,
+              later, on customers if quality slips.
+          - id: family-town
+            text: The family and the town, because the family plans to move production abroad.
+            feedback: >
+              Nothing in the evidence suggests a move. The family's stated aim is the opposite: to keep the business in
+              Wexley Bridge.
+      - kind: choice
+        id: morale-response
+        prompt: Which response to low morale fits the evidence best?
+        options:
+          - id: bonus
+            text: A one-off bonus for everyone this year.
+            feedback: >
+              It would help for a year. But the makers who leave are going to better-paid work and better prospects; a
+              one-off payment changes neither.
+          - id: training-pay
+            correct: true
+            text: A programme of training and development, with pay that rewards new skills.
+            feedback: >
+              Right. Pay that has fallen behind the town is a hygiene factor in Herzberg's terms: it causes
+              dissatisfaction until it is put right. Training and a path to better work are motivators. The evidence
+              shows both problems.
+          - id: overtime
+            text: Cut overtime to reduce stress.
+            feedback: The workshop did not work overtime in 2026. Overtime is not why morale fell.
+          - id: wait
+            text: Do nothing; morale recovers by itself.
+            feedback: >
+              Morale does drift back towards its usual level, but only part of the way each year, and meanwhile
+              turnover keeps draining skill from the workshop.
+  strategy:
+    title: Select a strategic alternative
+    lead: >
+      Four ways forward. Each fits some of the evidence and ignores some of it. Choose the one you will lead with: your
+      plan for 2027 starts from it, and you can change any lever.
+    ib: ['1.3', '1.5', '4.6', '3.8']
+  allocate:
+    title: Allocate resources
+    lead: >
+      Set the plan for 2027: the price, any efficiency programme, and how much of the year's budget goes to marketing,
+      machinery, people and international expansion.
+    ib: ['3.9', '3.8', '3.2']
+    hlNote: Budgets (3.9) are HL only.
+  implement:
+    title: Implement, year by year
+    lead: >
+      Each year runs as soon as you commit it. Read what happened and why, then adjust the plan for the next year. Some
+      of what you decide arrives a year later.
+    ib: ['3.7', '5.6', '4.5']
+  evaluate:
+    title: Evaluate the consequences
+    lead: >
+      Three years on: what did the plan achieve, what did it cost, and who paid for it?
+    ib: ['3.5', '1.4', '1.3']
+    question:
+      kind: number
+      id: roce-final
+      prompt: >
+        From your final year's statements, calculate your return on capital employed for that year, as a percentage to
+        one decimal place.
+      answer: { kpi: roce, year: final }
+      tolerance: 0.3
+      unit: percent
+      working: >
+        ROCE = (profit before interest and tax ÷ capital employed) × 100, where capital employed = non-current
+        liabilities + equity. Here: {{pbit@final}} ÷ ({{debt@final}} + {{equity@final}}) × 100 = {{roce@final}}.
+    reflections:
+      - id: worked
+        label: What worked, and the evidence for it
+        hint: Name the levers that did most, with the figures that show it.
+      - id: cost
+        label: What it cost, and who bore the cost
+        hint: Think of cash, the first year's profit, and the people inside and outside the business.
+      - id: change
+        label: What you would change, and why
+        hint: One decision you would make differently, and what you expect it would have done.
+
+strategies:
+  - id: restore
+    label: Restore the core
+    summary: >
+      Fix what the evidence says is broken: pass rising costs on in modest price rises, rebuild the brand, stop the
+      drain of experienced makers, and trim the overheads that grew while sales fell.
+    involves:
+      - Prices up each year, a little more than competitors' prices.
+      - Marketing back above the level that holds the brand where it is.
+      - A people programme of training and retention pay.
+      - A small efficiency programme aimed at the new showroom and other slack.
+    risks: >
+      It is slow. The first year is likely to be worse before the brand and the workforce recover, and the board will
+      have to hold its nerve.
+    fit: strong
+    feedback: >
+      A strong fit. It treats each cause the evidence supports (the squeezed margin, the brand, morale and the
+      overheads) and none that it does not. Its weakness is time: marketing and training pay back over years, not
+      months.
+    plan:
+      - { price: 4, costCut: 5, marketing: 1100000, capacity: 0, people: 200000, international: 0 }
+      - { price: 3, costCut: 0, marketing: 1100000, capacity: 0, people: 200000, international: 0 }
+      - { price: 3, costCut: 0, marketing: 1000000, capacity: 0, people: 200000, international: 0 }
+    lesson: >
+      The worked example. Its first year was its worst, an operating profit of {{pbit@2027}}, because marketing and
+      training were paid for at once and paid back later. By 2029 the profit margin was {{profitMargin@2029}} and return
+      on capital employed {{roce@2029}}, with morale at {{morale@2029}} and service quality at {{quality@2029}}. Its weak
+      point is growth: market share ended at {{marketShare@2029}}, below 2026's, because every price rise cost orders.
+  - id: cut
+    label: Cut back to profit
+    summary: >
+      Restore the margin quickly by cutting costs: a deep efficiency programme, a lean marketing budget, no new spending,
+      and firm price rises.
+    involves:
+      - A deep efficiency programme in the first year.
+      - Marketing cut below the level that holds the brand.
+      - No people programme, no machinery and no expansion.
+      - Firm price rises every year.
+    risks: >
+      It treats overheads as the whole problem. Cuts beyond the slack thin out support and inspection, morale falls
+      further from an already low level, and the brand keeps fading.
+    fit: weak
+    feedback: >
+      A weak fit. It addresses one cause, the overheads, and deepens two others, the brand and morale. It will lift the
+      first year's profit, which is why it appeals to the fund, but the evidence says the decline runs through the brand
+      and the workforce.
+    plan:
+      - { price: 4, costCut: 12, marketing: 300000, capacity: 0, people: 0, international: 0 }
+      - { price: 3, costCut: 0, marketing: 300000, capacity: 0, people: 0, international: 0 }
+      - { price: 3, costCut: 0, marketing: 300000, capacity: 0, people: 0, international: 0 }
+    lesson: >
+      The quickest result: the best first year of any of the four plans, an operating profit of {{pbit@2027}}. Then the
+      cost of the cuts arrived. The brand fell to {{brand@2029}} and service quality to {{quality@2029}}, and by 2029
+      operating profit was {{pbit@2029}}. Short-term margin was bought with long-term demand.
+  - id: volume
+    label: Win volume
+    summary: >
+      Win back the customers lost to cheaper rivals: cut prices, spend heavily on marketing, and invest in machinery to
+      make the extra pieces.
+    involves:
+      - Price cuts in the first two years.
+      - Heavy marketing in every year.
+      - New machinery in the first two years.
+      - A small people programme.
+    risks: >
+      Demand responds at once but machinery takes a year to arrive. With a price elasticity of about {{d:elasticity}}, the
+      extra pieces each earn less, and the plan spends the whole budget.
+    fit: conditional
+    feedback: >
+      Conditional. It answers the lost market share and the fading brand, but not the squeezed margin: with costs still
+      rising, lower prices mean a thinner margin on every piece. It works only if the workshop can make the extra pieces
+      without overtime, yet the machinery arrives a year after the demand.
+    plan:
+      - { price: -4, costCut: 0, marketing: 1500000, capacity: 900000, people: 100000, international: 0 }
+      - { price: -1, costCut: 0, marketing: 1400000, capacity: 600000, people: 100000, international: 0 }
+      - { price: 0, costCut: 0, marketing: 1200000, capacity: 0, people: 100000, international: 0 }
+    lesson: >
+      The biggest business: revenue of {{revenue@2029}} and the highest market share of the four plans,
+      {{marketShare@2029}}. It was also the least profitable. Demand arrived before the machinery, so the workshop ran on
+      overtime ({{overtimeHours@2027}} hours in 2027), service quality fell to {{quality@2029}}, and net cash ended at
+      {{netCash@2029}}, beyond the bank's limit.
+  - id: international
+    label: Go international
+    summary: >
+      Grow where the price war is not: accept the distributor's offer, build sales in the Netherlands, Belgium and
+      Germany, and add machinery for the export volume, while keeping the home business steady.
+    involves:
+      - Set-up abroad in the first year, then spending to build the market in every year.
+      - New machinery in the first two years for the extra volume.
+      - Marketing a little above the level that holds the brand, and a modest people programme.
+      - Prices up a little each year.
+    risks: >
+      Two years of costs before exports pay; earnings that shrink when the pound strengthens; damage and delay on the
+      way; and the home market's problems only half fixed.
+    fit: conditional
+    feedback: >
+      Conditional. It adds demand that does not depend on the home market, but it leaves the home causes, the brand and
+      the margin, half treated. It also carries risks the home business does not: the exchange rate, freight, and a
+      distributor who pays after {{d:intlDebtorDays}} days.
+    plan:
+      - { price: 3, costCut: 0, marketing: 800000, capacity: 600000, people: 150000, international: 900000 }
+      - { price: 2, costCut: 0, marketing: 800000, capacity: 400000, people: 150000, international: 700000 }
+      - { price: 2, costCut: 0, marketing: 800000, capacity: 0, people: 150000, international: 500000 }
+    lesson: >
+      Growth with a delay and a currency. Exports earned {{exportRevenue@2029}} in 2029, {{exportShare@2029}} of
+      revenue, and operating profit reached {{pbit@2029}}, but only after a first year in which operating profit was
+      {{pbit@2027}}, with net cash as low as {{netCash@2028}}. The pound's rise in 2028 cut what every export earned.
+
+walkthrough:
+  strategy: restore
+  intro: >
+    The worked example follows the first strategy, Restore the core, as a team might have played it: its plan for each
+    year, and the engine's results. With JavaScript you can play your own plan, year by year, and compare it with this
+    one and with the other strategies.
+
+debrief:
+  summary: >
+    Corvell's decline had several causes that fed each other: costs outran prices, the brand was starved, and a
+    workforce whose pay was frozen lost its best makers and some of its care. No single lever fixes all of them, and
+    every lever has a delay or a side effect. The plans that did best treated the causes in proportion, accepted a
+    weaker first year, and did not push the workshop beyond what its people could make.
+  tradeoffs:
+    - title: Short-term margin against long-term demand
+      body: >
+        An efficiency programme lifts profit at once. Beyond the slack every organization carries, it removes the people
+        and checks that keep quality up: morale falls, makers leave, faults rise, and the reviews that follow cost
+        demand a year later. The first year's figures reward a deep cut; the third year's punish it.
+    - title: Demand against capacity
+      body: >
+        Marketing and lower prices raise orders at once, but the workshop's capacity does not move until machinery
+        arrives a year later or skills improve. Orders beyond normal hours are made in overtime at a premium, by tired
+        makers who make more mistakes; beyond overtime they are lost. Growth needs capacity first, or at least at the
+        same time.
+    - title: Price against volume
+      body: >
+        With a price elasticity of demand of about {{d:elasticity}}, a 1% price rise costs about {{d:elasticity}}% of orders. At Corvell's margins
+        that leaves gross profit roughly where it was: prices should follow costs, but price alone cannot restore the
+        margin, and a price cut gives margin away on every piece.
+    - title: Profit against cash
+      body: >
+        Machinery and expansion are paid for before they earn, and export customers pay more slowly. A plan can be
+        profitable by 2029 and still have spent the bank's patience on the way: the lowest point of net cash matters as
+        much as the end.
+    - title: People against payback
+      body: >
+        A people programme costs money this year and pays back next year and after, through lower turnover, better
+        skills and fewer faults. Within three years it barely pays for itself in profit; its value is in the workshop
+        the plan leaves behind.
+  ib:
+    - title: Profitability and liquidity
+      syllabus: ['3.5', '3.4']
+      body: >
+        Corvell's profit margin and return on capital employed fell for three years while its current ratio stayed
+        high: a profitability problem can sit behind healthy liquidity. Strategies to improve the profitability ratios
+        work on price, on costs or on the capital employed, and each lever in this simulation is one of these.
+    - title: Fixed costs, variable costs and contribution
+      syllabus: ['3.3', '5.5']
+      body: >
+        Materials and delivery vary with output; wages and overheads are fixed in the short run. When fewer pieces are
+        sold, the fixed costs are spread over fewer of them, which is why a modest fall in sales did so much damage to
+        profit, and why extra sales are worth so much while there is spare capacity.
+    - title: Pricing and price elasticity of demand
+      syllabus: ['4.5']
+      level: HL
+      body: >
+        Price elasticity of demand measures how far quantity demanded responds to a change in price. Above 1, a price
+        rise lowers revenue; whether it lowers profit depends on the margin on each unit lost. Corvell's own price tests
+        put it at about {{d:elasticity}}, so its price decisions are trade-offs, not free money.
+    - title: Motivation, rewards and training
+      syllabus: ['2.4']
+      body: >
+        In Herzberg's terms, pay that falls behind the local market is a hygiene factor: it causes dissatisfaction, and
+        here departures, until it is put right. Training and development work as motivators. The people programme
+        combines the two, and its effect on productivity arrives a year after the money is spent.
+    - title: Capacity, productivity and quality
+      syllabus: ['5.6', '5.3']
+      level: HL
+      body: >
+        Capacity utilization compares output with productive capacity. Running close to full leaves no slack for
+        mistakes: overtime costs a premium and strains morale, and faults rise. Labour productivity fell at Corvell as
+        experienced makers left, which shrank capacity even though the plant could make more.
+    - title: Investment, profit and cash flow
+      syllabus: ['3.7', '3.8']
+      body: >
+        An investment is paid for in cash when it is made, but reaches the statement of profit or loss only as
+        depreciation over its life, and earns only once it is in use. That is why a plan with machinery can show a
+        profit and a shrinking bank balance in the same year.
+    - title: Entering international markets
+      syllabus: ['4.6', '1.6']
+      level: HL
+      body: >
+        Entering a market abroad brings opportunities (demand that does not depend on the home economy, room to grow)
+        and threats: set-up costs, a distributor's margin, longer payment terms, damage in transit and exchange rate
+        risk. A stronger home currency cuts what each export earns in home currency.
+    - title: Stakeholders and their conflicts
+      syllabus: ['1.4']
+      body: >
+        The family, the fund, the workforce, the bank and the customers want different things from the same plan, and
+        have different power to get them. A plan that ignores a stakeholder with high power, or one whose goodwill the
+        product depends on, is unlikely to be carried out as written.
+  beyond:
+    - title: Decisions whose results arrive late
+      sources: [sterman-1989]
+      body: >
+        John Sterman (1989) asked people to manage a simulated distribution system with time delays between their
+        decisions and the results. They performed poorly, and his analysis found them insensitive to the feedback from
+        their own earlier decisions. Corvell has the same structure: marketing, training and machinery pay back a year or
+        more after they are paid for, and a manager who judges them on the first year will cut them.
+    - title: Anchoring on last year's figures
+      sources: [tversky-kahneman-1974]
+      body: >
+        Tversky and Kahneman (1974) described anchoring: estimates that start from a given value tend to stay close to
+        it. A budget that starts from last year's figures, or from the figures a strategy suggests, tends to stay near
+        them. Ask what each lever is for before asking how much it had last year.
+    - title: Escalating commitment
+      sources: [staw-1976]
+      body: >
+        Staw (1976) found that people who had made a decision that went badly tended to commit more resources to it. A
+        turnaround that disappoints in its first year, as most good ones do, tests this both ways: whether to persist
+        with an investment that has not yet paid back, or to keep feeding one that never will. The test is the evidence
+        about what comes next, not the money already spent.
+    - title: A balanced set of measures
+      sources: [kaplan-norton-1992]
+      body: >
+        Kaplan and Norton (1992) argued that financial measures alone report the past, and proposed a balanced
+        scorecard: financial, customer, internal business, and innovation and learning measures, read together. The
+        seven roles here each watch a different part of such a scorecard; the debrief asks you to read all of it.
+    - title: Good enough, chosen with limited time
+      sources: [simon-1955]
+      body: >
+        Herbert Simon (1955) modelled rational choice by people of limited computational ability, who look for an
+        option that meets their aspirations rather than compute every possibility. With six levers and three years, no
+        one can try every plan; the board's targets act as aspirations, and a plan that meets them is a reasonable place
+        to stop searching.
+  misconceptions:
+    - claim: Cutting costs always improves profit.
+      correction: >
+        Only the first few per cent, the slack. Beyond that, cuts reach what earns the revenue: quality, the brand and
+        the people. The plan that cut deepest had the best first year and the worst third.
+    - claim: If demand rises, profit rises.
+      correction: >
+        Only while there is capacity to meet it at normal cost. Beyond normal hours each piece is made in overtime, with
+        more faults; beyond capacity the orders are lost.
+    - claim: A price cut wins customers, so it raises profit.
+      correction: >
+        With elasticity above 1 a price cut raises revenue if the workshop can make the pieces, but every piece earns
+        less. At Corvell's margins gross profit falls, and the extra volume can overload the workshop.
+    - claim: Profit and cash are the same thing.
+      correction: >
+        Machinery, dividends and slow-paying customers move cash without moving the profit margin in the same way. A plan
+        can be profitable and still run short of cash.
+    - claim: An investment that loses money in its first year has failed.
+      correction: >
+        Marketing, training, machinery and expansion are paid for now and pay back later. Judge each on the years it was
+        meant to change.
+  practice:
+    - prompt: Using the statements of profit or loss, calculate the change in Corvell's gross profit margin between 2023 and 2026.
+      command: calculate
+      marks: 2
+    - prompt: Explain **two** reasons why Corvell's profit margin fell much further than its revenue between 2023 and 2026.
+      command: explain
+      marks: 4
+    - prompt: Evaluate a deep efficiency programme as a way to restore Corvell's profitability.
+      command: evaluate
+      marks: 10
+    - prompt: Discuss whether Corvell should accept the distributor's offer to sell its range in the Netherlands, Belgium and Germany.
+      command: discuss
+      marks: 10
+      level: HL
+    - prompt: Recommend how Corvell should divide its budget for 2027 between marketing, machinery, people and international expansion.
+      command: recommend
+      marks: 10
+  terms:
+    - gross-profit-margin
+    - profit-margin
+    - return-on-capital-employed
+    - price-elasticity-of-demand
+    - capacity-utilization-rate
+    - labour-turnover
+    - financial-rewards
+    - on-the-job-training
+    - quality-assurance
+    - brand
+    - market-share
+    - stakeholder-conflict
+    - cash-flow
+    - investment-appraisal
+    - budget
+    - exchange-rate
+    - balanced-scorecard
+    - lagging-indicator
+    - sensitivity-analysis
+
+method: >
+  Corvell Furniture, its people, its competitors and its distributor are fictional, and every figure is simulated,
+  including the exchange rates. The executive engine (src/lib/executive/engine.ts) works each year from the opening
+  position, the year's levers and its conditions, in the order its file sets out, and every statement, ratio and figure
+  in the text is its output. The coefficients (how strongly price moves orders, how fast the brand fades, how much
+  overtime strains morale) are teaching assumptions, chosen so that the history tells a plausible story and the
+  trade-offs can be seen. They are not estimates for any real business. The unit tests check the engine against
+  figures worked by hand, check the accounting identities in every year of a large grid of plans, and check every claim
+  this debrief makes about the four strategies.
+
+updated: 2026-11-16

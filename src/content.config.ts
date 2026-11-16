@@ -30,6 +30,7 @@ import {
 } from './lib/schemas';
 import { studioSchema } from './lib/schemas-strategy';
 import { scenarioSchema } from './lib/boardroom/schema';
+import { executiveSchema } from './lib/executive/schema';
 import { briefingSchema, labToolSchema } from './lib/lab/schemas';
 import { advancedModuleSchema } from './lib/advanced-schema';
 
@@ -103,6 +104,8 @@ export const collections = {
   resources: defineCollection({ loader: file('./src/content/data/resources.yaml'), schema: resourceSchema }),
   studio: defineCollection({ loader: yamlFiles('./src/content/studio'), schema: studioSchema }),
   boardroom: defineCollection({ loader: yamlFiles('./src/content/boardroom'), schema: scenarioSchema }),
+  // The Boardroom's executive simulation: one fictional company, seven roles, nine stages (src/lib/executive/schema.ts).
+  executive: defineCollection({ loader: yamlFiles('./src/content/executive'), schema: executiveSchema }),
   // The Entrepreneurship and Innovation Lab: its briefings and the data behind its tools.
   briefings: defineCollection({ loader: yamlFiles('./src/content/briefings'), schema: briefingSchema }),
   labTools: defineCollection({ loader: yamlFiles('./src/content/lab'), schema: labToolSchema }),

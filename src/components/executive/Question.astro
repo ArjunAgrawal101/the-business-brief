@@ -1,0 +1,93 @@
+---
+/**
+ * One question in a stage of the executive simulation: a choice of answers or
+ * a figure to calculate. Without JavaScript it is a worksheet: the options or
+ * the answer box, and the answer with its explanation in a disclosure. With
+ * JavaScript, src/scripts/executive.ts checks the answer, marks it in words and
+ * opens the same explanation. Texts arrive with their tokens already filled.
+ */
+import { inline, rich } from '../../lib/markup';
+import type { QuestionDef } from '../../lib/executive/schema';
+
+interface Props {
+  q: QuestionDef;
+  /** Fills a text's tokens from the years this question may quote. */
+  fill: (t: string) => string;
+  /** The engine's answer to a number question, written in its unit. */
+  answerText?: string;
+  /** The tolerance, written in the answer's unit. */
+  toleranceText?: string;
+  no: number;
+}
+const { q, fill, answerText, toleranceText, no } = Astro.props;
+const UNIT_LABELS = { percent: 'as a percentage', money: 'in pounds', units: 'in pieces', points: 'in points' } as const;
+const base = `q-${q.id}`;
+---
+
+{
+  q.kind === 'choice' ? (
+    <fieldset class="ex-q" data-q={q.id} data-kind="choice" aria-describedby={`${base}-msg`}>
+      <legend class="ex-q__prompt">
+        <span class="ex-q__no">Question {no}</span> <span set:html={inline(fill(q.prompt))} />
+      </legend>
+      <div class="ex-q__opts">
+        {q.options.map((o) => (
+          <div class="ex-opt" data-opt={o.id}>
+            <input type="radio" name={base} id={`${base}-${o.id}`} value={o.id} />
+            <label for={`${base}-${o.id}`} set:html={inline(fill(o.text))} />
+          </div>
+        ))}
+      </div>
+      <div class="ex-q__actions js-only">
+        <button type="button" class="btn btn--small" data-act="check" data-q={q.id}>
+          Check my answer<span class="sr-only"> to question {no}</span>
+        </button>
+        <span class="field__error" id={`${base}-msg`} data-msg />
+      </div>
+      <div class="ex-verdict" data-verdict hidden />
+      <details class="ex-answer" data-answer>
+        <summary>Answer and explanation<span class="sr-only"> for question {no}</span></summary>
+        <div class="ex-answer__body">
+          <ul class="ex-answer__list" role="list">
+            {q.options.map((o) => (
+              <li class:list={['ex-answer__item', o.correct && 'is-right']}>
+                <span class="ex-answer__mark">{o.correct ? 'The answer' : 'Not this'}</span>
+                <span class="ex-answer__text" set:html={inline(fill(o.text))} />
+                <span class="ex-answer__why" set:html={inline(fill(o.feedback))} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </details>
+    </fieldset>
+  ) : (
+    <div class="ex-q" data-q={q.id} data-kind="number" role="group" aria-labelledby={`${base}-p`}>
+      <p class="ex-q__prompt" id={`${base}-p`}>
+        <span class="ex-q__no">Question {no}</span> <span set:html={inline(fill(q.prompt))} />
+      </p>
+      <div class="field ex-q__field">
+        <label for={`${base}-in`}>Your answer, {UNIT_LABELS[q.unit]}</label>
+        <input class="input ex-q__input" type="text" inputmode="decimal" autocomplete="off" id={`${base}-in`} data-input aria-describedby={`${base}-msg`} />
+        <span class="field__error" id={`${base}-msg`} data-msg />
+      </div>
+      <div class="ex-q__actions js-only">
+        <button type="button" class="btn btn--small" data-act="check" data-q={q.id}>
+          Check my answer<span class="sr-only"> to question {no}</span>
+        </button>
+      </div>
+      <div class="ex-verdict" data-verdict hidden />
+      <details class="ex-answer" data-answer>
+        <summary>Answer and working<span class="sr-only"> for question {no}</span></summary>
+        <div class="ex-answer__body">
+          {answerText && (
+            <p>
+              The answer: <strong data-answer-value>{answerText}</strong>
+              {toleranceText && <span class="small muted"> (anything within {toleranceText} of it counts as right)</span>}
+            </p>
+          )}
+          <div class="prose small" data-working set:html={rich(fill(q.working))} />
+        </div>
+      </details>
+    </div>
+  )
+}

@@ -14,6 +14,10 @@ import { CHALLENGE_LABELS, ROLE_IDS, ROLE_IN_TEXT, ROLE_TITLES } from '../../lib
 import { corpus } from '../../lib/content';
 import { allSubtopics } from '../../lib/learning';
 import { jsonForScript } from '../../lib/markup';
+import { EXECUTIVE_HREF, executiveSim, SIMULATION_HREF } from '../../lib/executive/content';
+import { executiveView } from '../../lib/executive/view';
+import { fmtKpi as fmtExecKpi, KPI_DEFS as EXEC_KPI_DEFS } from '../../lib/executive/kpis';
+import { ROLE_IDS as EXEC_ROLE_IDS, ROLE_TITLES as EXEC_ROLE_TITLES, STAGE_IDS as EXEC_STAGES } from '../../lib/executive/roles';
 
 const c = await corpus();
 const scenarios = await boardroomScenarios();
@@ -45,6 +49,22 @@ const cards = scenarios.map(([id, sc]) => {
       };
     }),
     codes: sc.syllabus.map((code) => ({ code, title: subs.find((x) => x.s.code === code)?.s.title ?? code })),
+  };
+});
+/* The executive simulation: a separate mode, introduced in its own section below the scenarios. */
+const [, exec] = await executiveSim();
+const execView = executiveView(exec);
+const execHistory = execView.history;
+const execLast = execView.last;
+const execLabels = execHistory.map((h) => h.label);
+const execTiles = (['revenue', 'pbit', 'profitMargin', 'netCash'] as const).map((k) => {
+  const values = execHistory.map((h) => h.kpis[k]);
+  const fmt = (v: number) => fmtExecKpi(k, v, execView.ctx);
+  return {
+    k,
+    label: EXEC_KPI_DEFS[k].short,
+    value: fmt(execLast.kpis[k]),
+    svg: sparkline(values, { id: `ix-exec-${k}`, title: `${EXEC_KPI_DEFS[k].label}, ${execLabels[0]} to ${execLabels[execLabels.length - 1]}`, desc: describeSeries(EXEC_KPI_DEFS[k].label, execLabels, values, fmt), width: 96, height: 28 }),
   };
 });
 const progressConfig = { scenarios: scenarios.map(([id, sc]) => ({ id, rounds: sc.rounds.length })), roles: ROLE_IN_TEXT };
@@ -250,6 +270,45 @@ const MECHANISMS = [
           </ul>
         </section>
       </div>
+    </section>
+
+    <section class="bb-section ex-intro" id="executive" aria-labelledby="executive-h">
+      <SectionHead no={5} title="The executive simulation" id="executive-h" dek="A different mode: one company, seven management roles, nine stages and a budget to allocate. Where the scenarios above put a board's decision to a vote each round, here you lead the analysis and set the plan yourself." />
+      <ol class="bb-papers" role="list">
+        <li class="bb-paper">
+          <div class="bb-paper__body">
+            <p class="bb-paper__kicker">Executive simulation · {exec.company.industry}</p>
+            <h3 class="bb-paper__title"><a href={EXECUTIVE_HREF}>{exec.company.name}: take charge of a business in decline</a></h3>
+            <p class="bb-paper__dek">{exec.dek}</p>
+            <p class="bb-paper__question">{exec.question}</p>
+            <ul class="ex-intro__list">
+              <li><strong>{EXEC_ROLE_IDS.length} roles,</strong> from {EXEC_ROLE_TITLES.ceo.replace(/ \(.*\)$/, '').toLowerCase()} to {EXEC_ROLE_TITLES.consultant.toLowerCase()}, each with its own briefing, measures and goals.</li>
+              <li><strong>{EXEC_STAGES.length} stages:</strong> the accounts, the causes, the market, the workshop, the people, the strategy, the budget, three years of results and an evaluation.</li>
+              <li><strong>A budget across six levers</strong> each year, worked by an engine that links price, marketing, capacity, quality, people, exports and cash, with the lags between them.</li>
+              <li><strong>A debrief</strong> that sets your plan beside four strategies played out by the same engine.</li>
+            </ul>
+            <p class="bb-paper__meta">
+              <span class="bb-chip bb-chip--ink">Fictional company</span>
+              <ProvenanceTag kind="simulated-data" />
+              <span class="bb-chip bb-chip--ink">IB students and beyond</span>
+            </p>
+          </div>
+          <div class="bb-paper__figures">
+            <p class="bb-paper__flabel">At the end of {execLast.label}</p>
+            <ul class="bb-minikpis" role="list">
+              {execTiles.map((t) => (
+                <li>
+                  <span class="bb-minikpis__label">{t.label}</span>
+                  <span class="bb-minikpis__value">{t.value}</span>
+                  <Fragment set:html={t.svg} />
+                </li>
+              ))}
+            </ul>
+            <a class="btn btn--primary bb-paper__cta" href={EXECUTIVE_HREF}>Open the executive simulation</a>
+            <p class="ex-intro__direct"><a href={SIMULATION_HREF}>Or go straight to the simulation</a></p>
+          </div>
+        </li>
+      </ol>
     </section>
 
     <aside class="callout callout--framework">

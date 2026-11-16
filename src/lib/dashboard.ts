@@ -294,6 +294,8 @@ const ROOM_ALIASES: Record<string, string[]> = {
   people: ['people'],
   market: ['market'],
   strategy: ['strategy'],
+  // The Boardroom's executive simulation keeps its work under bb:executive.
+  executive: ['boardroom'],
 };
 
 const firstSegment = (href: string) => href.split('/').filter(Boolean)[0] ?? '';

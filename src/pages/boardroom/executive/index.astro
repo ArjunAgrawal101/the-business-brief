@@ -1,0 +1,314 @@
+---
+import '../../../styles/boardroom.css';
+import '../../../styles/executive.css';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/layout/Breadcrumbs.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import ProvenanceTag from '../../../components/ui/ProvenanceTag.astro';
+import type { KpiId } from '../../../lib/executive/engine';
+import { executiveSim, SIMULATION_HREF } from '../../../lib/executive/content';
+import { fmtKpi, KPI_DEFS } from '../../../lib/executive/kpis';
+import { kpiTiles, leverValue } from '../../../lib/executive/render';
+import { LEVER_HINTS, LEVER_IDS, LEVER_LABELS, ROLE_IDS, ROLE_IN_TEXT, ROLE_TITLES, STAGE_IDS } from '../../../lib/executive/roles';
+import { executiveView } from '../../../lib/executive/view';
+import { corpus } from '../../../lib/content';
+import { allSubtopics, subtopicHref } from '../../../lib/learning';
+import { fmtNumber } from '../../../lib/format';
+import { inline, jsonForScript, rich } from '../../../lib/markup';
+
+const c = await corpus();
+const [, sc] = await executiveSim();
+const view = executiveView(sc);
+const { ctx, history, last } = view;
+const first = history[0] ?? last;
+const subs = allSubtopics(c);
+const codes = [...new Set([...Object.values(sc.stages).flatMap((s) => s.ib), ...sc.debrief.ib.flatMap((t) => t.syllabus)])].sort((a, b) => a.localeCompare(b, 'en', { numeric: true }));
+const ib = codes.map((code) => {
+  const s = subs.find((x) => x.s.code === code)?.s;
+  return { code, title: s?.title ?? code, href: subtopicHref(c, code), hl: s?.level === 'HL' };
+});
+const m = sc.model;
+const facts = [
+  { value: String(ROLE_IDS.length), label: 'roles, each with its own briefing and goals' },
+  { value: String(STAGE_IDS.length), label: 'stages, from the accounts to the evaluation' },
+  { value: String(sc.plan.length), label: 'years of decisions, each run by the engine' },
+  { value: String(LEVER_IDS.length), label: 'levers, four of them sharing one budget' },
+  { value: String(sc.strategies.length), label: 'strategies, every one played out for comparison' },
+];
+const STAGE_LINES: Record<string, string> = {
+  finance: 'Read four years of statements and ratios, and calculate where the margin went.',
+  causes: 'Choose them from eleven pieces of evidence, and see what each choice tells you.',
+  market: 'The home market, the competitors, a price test and an offer to sell abroad.',
+  operations: 'What the workshop can make, what limits it, and what happens when it is pushed.',
+  people: 'The workforce after two years of frozen pay, and the stakeholders who can make or break a plan.',
+  strategy: 'Four ways forward, each fitting some of the evidence. Choose the one you will lead with.',
+  allocate: 'Set a price, any efficiency programme, and a budget across marketing, machinery, people and expansion.',
+  implement: 'Commit each year, see what happened and why, and adjust the plan for the next.',
+  evaluate: 'Your role’s goals, the figures before and after, and the questions to ask of your own plan.',
+};
+const MECHANISMS: Array<[string, string, string, string]> = [
+  ['Price', 'Orders at home and abroad', 'Now', `Through the price elasticity of demand: about ${fmtNumber(m.elasticity, 1)} at home, measured against competitors’ prices.`],
+  ['Marketing', 'Brand strength', 'Half now, half next year', `Diminishing returns: the first pounds do most. Without marketing the brand loses ${fmtNumber(m.brandDecay, 0)}% of its strength a year.`],
+  ['Brand strength', 'Orders at home', 'Now', 'A stronger brand raises demand at any price.'],
+  ['Service quality', 'Brand strength', 'Next year', 'Reviews and recommendations: this year’s finish and delivery dates are next year’s reputation.'],
+  ['Orders against capacity', 'Output, overtime and lost orders', 'Now', `Normal hours first, then overtime of up to ${fmtNumber(m.overtimeMax * 100, 0)}% more hours at a premium of ${fmtNumber(m.overtimePremium * 100, 0)}%; orders beyond that are lost.`],
+  ['Load on the workshop', 'Service quality', 'Now', `Above ${fmtNumber(m.strainThreshold, 0)}% of normal-hours capacity, faults and late deliveries rise.`],
+  ['Efficiency programme', 'Overheads, morale and quality', 'Now, and it lasts', `The saving is immediate, with a one-off cost of ${fmtNumber(m.cutCost * 100, 0)}% of it. The first ${fmtNumber(m.cutSlack, 0)}% of cuts remove slack; beyond that, quality suffers for as long as the cuts last.`],
+  ['People programme', 'Morale, then skill', 'Morale now, skill next year', 'Training, development and retention pay, with diminishing returns.'],
+  ['Morale', 'Turnover, productivity and quality', 'Now; quality next year', 'Low morale means more leavers and slower work, and shows in the finish a year later.'],
+  ['Labour turnover', 'Capacity, skill and cost', 'Now and next year', `Each leaver is replaced at a cost; a new starter makes about ${fmtNumber(m.newStarterOutput * 100, 0)}% as much in the first year, and skill drains away.`],
+  ['Machinery', 'Plant capacity and hours per piece', 'Next year', 'Paid for now, in use a year later, depreciated over its life from then.'],
+  ['International expansion', 'Export orders', 'The year after set-up', 'Set-up first; then each year’s spending builds the market, with diminishing returns, and fades without more.'],
+  ['The exchange rate', 'Export revenue', 'Now', 'The distributor pays in euros at a price set at the planning rate: a stronger pound means fewer pounds for every piece.'],
+  ['Sales, stock and purchases', 'Debtors, stock and creditors', 'Now', 'Working capital follows its days, so profit and cash part company; customers abroad pay more slowly.'],
+  ['The overdraft', 'Interest', 'Next year', 'Interest is charged on the balance at the start of each year; above the limit, a penalty rate is added.'],
+];
+const config = { href: SIMULATION_HREF };
+---
+
+<BaseLayout title="Executive simulation" description={`Take a management role at ${sc.company.name}, a fictional furniture maker in decline: examine the evidence, choose a strategy, allocate a budget and live with three years of results.`} section="boardroom" room="boardroom">
+  <header class="bb-hero ex-hero">
+    <div class="wrap">
+      <Breadcrumbs trail={[{ label: 'Boardroom', href: '/boardroom/' }, { label: 'Executive simulation' }]} />
+      <div class="bb-hero__grid">
+        <div class="bb-hero__main">
+          <p class="bb-hero__kicker">Boardroom · Executive simulation</p>
+          <h1 class="bb-hero__title">Take charge of a business in <em>decline</em></h1>
+          <p class="bb-hero__dek">
+            {sc.company.name} has slipped from a profit margin of {fmtKpi('profitMargin', first.kpis.profitMargin, ctx)} to {fmtKpi('profitMargin', last.kpis.profitMargin, ctx)} in three years. Join its executive team
+            in one of seven roles, find out why, choose a strategy, spend a budget, and live with three years of consequences.
+          </p>
+          <p class="bb-hero__tags">
+            <span class="bb-chip">Fictional company</span>
+            <ProvenanceTag kind="simulated-data" />
+            <span class="bb-chip">For IB students and beyond</span>
+          </p>
+          <p class="ex-hero__cta">
+            <a class="btn btn--primary ex-hero__start" href={SIMULATION_HREF}>Start the simulation</a>
+            <a class="ex-hero__more" href="#roles">See the seven roles</a>
+          </p>
+          <p class="ex-hero__saved js-only" data-ex-saved hidden></p>
+        </div>
+        <dl class="bb-facts">
+          <div><dt>Company</dt><dd>{sc.company.name}</dd></div>
+          <div><dt>Industry</dt><dd>{sc.company.industry}</dd></div>
+          <div><dt>Location</dt><dd>{sc.company.location}</dd></div>
+          <div><dt>Founded</dt><dd>{sc.company.founded}</dd></div>
+          <div><dt>Size</dt><dd>{sc.company.size}</dd></div>
+          <div><dt>Ownership</dt><dd>{sc.company.owners}</dd></div>
+        </dl>
+      </div>
+      <p class="bb-hero__question"><span class="bb-hero__qlabel">The question for the executive team</span> {sc.question}</p>
+      <ul class="bb-roomkpis" role="list" aria-label="The simulation in figures">
+        {
+          facts.map((f) => (
+            <li>
+              <span class="bb-roomkpis__value">{f.value}</span>
+              <span class="bb-roomkpis__label">{f.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </header>
+
+  <div class="wrap page-body bb-page ex-page" data-ex-index>
+    <script type="application/json" data-ex-config set:html={jsonForScript(config)} />
+
+    <section class="bb-section" id="company" aria-labelledby="company-h">
+      <SectionHead no={1} title="The company and its decline" id="company-h" dek={`Four years of ${sc.company.name}'s figures, worked by the simulation's engine from the company's opening position and its decisions.`} />
+      <div class="bb-brief">
+        <div class="bb-brief__story narrative">
+          {sc.background.map((p) => <Fragment set:html={rich(view.fill(p))} />)}
+        </div>
+        <aside class="bb-brief__side" aria-labelledby="stake-h">
+          <h3 class="label label--ink" id="stake-h">Who has a stake in the plan</h3>
+          <ul class="ex-stakelist">
+            {sc.stakeholders.map((s) => <li><strong>{s.name}.</strong> <span set:html={inline(view.fill(s.interest))} /></li>)}
+          </ul>
+        </aside>
+      </div>
+      <figure class="bb-exhibit" aria-labelledby="key-h">
+        <div class="bb-exhibit__head"><span class="bb-exhibit__no">Key figures</span><h3 class="bb-exhibit__title" id="key-h">{sc.company.name} at the end of {last.label}</h3><ProvenanceTag kind="simulated-data" /></div>
+        <div class="bb-board bb-board--pack" set:html={kpiTiles(history, sc.dashboard as KpiId[], [], ctx, 'exi', 0)} />
+        <figcaption class="bb-exhibit__source">Each line runs from {first.label} to {last.label}; changes are against {history[history.length - 2]?.label}. The full statements are in the simulation's first stage.</figcaption>
+      </figure>
+    </section>
+
+    <section class="bb-section" id="mandate" aria-labelledby="mandate-h">
+      <SectionHead no={2} title="The board's mandate" id="mandate-h" dek="Three years, a budget, two targets and six levers." />
+      <div class="ex-rules">
+        <div>
+          <div class="prose" set:html={rich(view.fill(sc.mandate))} />
+          <div class="prose small" set:html={rich(view.fill(sc.assumptions))} />
+        </div>
+        <div class="table-scroll" role="region" aria-labelledby="levers-h" tabindex="0">
+          <table class="table ex-levers">
+            <caption class="ex-levers__cap" id="levers-h">The six levers you set each year</caption>
+            <thead><tr><th scope="col">Lever</th><th scope="col">Range</th><th scope="col">What it does</th></tr></thead>
+            <tbody>
+              {
+                LEVER_IDS.map((l) => (
+                  <tr>
+                    <th scope="row">{LEVER_LABELS[l]}</th>
+                    <td class="ex-levers__range">{leverValue(l, sc.rules[l].min, ctx)} to {leverValue(l, sc.rules[l].max, ctx)}</td>
+                    <td>{LEVER_HINTS[l]}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="bb-section" id="roles" aria-labelledby="roles-h">
+      <SectionHead no={3} title="Seven roles, one company" id="roles-h" dek="The same company seen from seven chairs. Your role sets what you watch, what each stage asks you to look for first, and what you are judged on." />
+      <ol class="ex-rolelist" role="list">
+        {
+          ROLE_IDS.map((r) => {
+            const role = sc.roles[r];
+            return (
+              <li class="ex-role" id={`role-${r}`}>
+                <h3 class="ex-role__title">{ROLE_TITLES[r]}</h3>
+                <div class="prose small ex-role__brief" set:html={rich(view.fill(role.brief))} />
+                <div class="ex-role__grid">
+                  <section aria-labelledby={`role-${r}-p`}>
+                    <h4 class="ex-role__label" id={`role-${r}-p`}>Answers for</h4>
+                    <ul class="ex-role__list">{role.priorities.map((p) => <li set:html={inline(view.fill(p))} />)}</ul>
+                  </section>
+                  <section aria-labelledby={`role-${r}-w`}>
+                    <h4 class="ex-role__label" id={`role-${r}-w`}>Watches, in {last.label}</h4>
+                    <dl class="ex-role__kpis">
+                      {(role.pinned as KpiId[]).map((k) => (
+                        <div>
+                          <dt>{KPI_DEFS[k].short}</dt>
+                          <dd>{fmtKpi(k, last.kpis[k], ctx)}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </section>
+                  <section aria-labelledby={`role-${r}-g`}>
+                    <h4 class="ex-role__label" id={`role-${r}-g`}>Judged on</h4>
+                    <ul class="ex-role__list">{role.goals.map((g) => <li>{g.label}</li>)}</ul>
+                  </section>
+                </div>
+                <a class="btn btn--small ex-role__play" href={`${SIMULATION_HREF}?role=${r}`}>Play as the {ROLE_IN_TEXT[r]}</a>
+              </li>
+            );
+          })
+        }
+      </ol>
+    </section>
+
+    <section class="bb-section" id="how" aria-labelledby="how-h">
+      <SectionHead no={4} title="How the simulation works" id="how-h" dek="Nine stages and a debrief. The first six are analysis; the last three are your plan and its consequences." />
+      <ol class="bb-steps ex-steps" role="list">
+        {
+          STAGE_IDS.map((s, i) => (
+            <li>
+              <span class="bb-steps__no num">{i + 1}</span>
+              <strong>{sc.stages[s].title}.</strong> {STAGE_LINES[s]}
+            </li>
+          ))
+        }
+        <li><span class="bb-steps__no num">10</span><strong>The debrief.</strong> The trade-offs explained, your plan lever by lever, and every strategy played out by the same engine beside yours.</li>
+      </ol>
+      <p class="small">
+        Your work stays on this device, under the name <code>bb:executive</code>, and you can leave and come back. Without JavaScript, the simulation page is a casebook: the evidence, every question with its answer,
+        and a worked example played through three years with its debrief.
+      </p>
+    </section>
+
+    <section class="bb-section" id="model" aria-labelledby="model-h">
+      <SectionHead no={5} title="The model behind the figures" id="model-h" dek="One engine works every year of every plan. It is deterministic: the same plan always gives the same figures, so a plan can be replayed, compared and tested." />
+      <div class="bb-model-intro prose">
+        <p>
+          Each year the engine works through the business in a fixed order: the world moves (the market, competitors' prices, timber, pay and the exchange rate); last year's decisions arrive; this year's levers
+          apply; morale, turnover and productivity are set; the brand and demand follow; capacity, output and quality are worked out; then costs, profit, working capital and cash. The table lists every link
+          from one part of the business to another, and when it takes effect.
+        </p>
+      </div>
+      <div class="table-scroll" role="region" aria-label="How one part of the business moves another" tabindex="0">
+        <table class="table bb-mech">
+          <thead><tr><th scope="col">What changes</th><th scope="col">What it moves</th><th scope="col">When</th><th scope="col">How</th></tr></thead>
+          <tbody>
+            {
+              MECHANISMS.map(([a, b, when, how]) => (
+                <tr>
+                  <th scope="row">{a}</th>
+                  <td>{b}</td>
+                  <td class="bb-mech__when">{when}</td>
+                  <td>{how}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="bb-model-notes">
+        <section>
+          <h3 class="label label--ink">What the tests check</h3>
+          <ul class="prose small">
+            <li>The engine against a small business worked by hand: demand, capacity, overtime, the statements, working capital and cash.</li>
+            <li>In every year of every plan they run: profit before interest and tax equals gross profit less expenses; closing cash equals opening cash plus the operating, investing and financing flows; net assets equal equity.</li>
+            <li>That the model behaves as it says: more marketing never lowers orders; a cut raises the first year's margin and lowers morale, and beyond the slack, quality; machinery adds nothing until the year after; a stronger pound lowers export revenue.</li>
+            <li>Every claim the debrief makes about the four strategies, against the engine's own figures.</li>
+          </ul>
+        </section>
+        <section>
+          <h3 class="label label--ink">What the model leaves out</h3>
+          <ul class="prose small">
+            <li>Chance: a plan always gives the same result. Real decisions are taken under uncertainty that one run cannot show, which is why the debrief shifts the exchange rate to show a plan's exposure.</li>
+            <li>Detail: one average price, one product, one workforce that keeps its size, no new borrowing. Tax is a flat simulated rate.</li>
+            <li>Judgement: the coefficients (how strongly price moves orders, how fast the brand fades) are teaching assumptions, stated in the simulation's file, not estimates for any real business.</li>
+          </ul>
+        </section>
+      </div>
+    </section>
+
+    <section class="bb-section" id="who" aria-labelledby="who-h">
+      <SectionHead no={6} title="Who it is for" id="who-h" />
+      <div class="ex-who">
+        <section>
+          <h3 class="label label--ink">IB Business Management students</h3>
+          <p class="small">The stages exercise these parts of the course. HL-only ideas are marked and kept to notes, so that every question can be answered at SL.</p>
+          <ul class="bb-syllabus__list">
+            {
+              ib.map((x) => (
+                <li>
+                  <a href={x.href}><span class="num">{x.code}</span> {x.title}</a>
+                  {x.hl && <span class="tag tag--hl">HL</span>}
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+        <section>
+          <h3 class="label label--ink">Undergraduates, MBA students and professionals</h3>
+          <p class="small">
+            Beyond the course, the debrief draws on research on decisions whose results arrive late, on anchoring and escalating commitment, and on balanced sets of measures, each labelled as enrichment and
+            cited. Play the same company from two roles and compare what each would have you protect.
+          </p>
+          <h3 class="label label--ink">Teachers</h3>
+          <p class="small">
+            Assign roles across a class and ask each group to defend its plan to the others; the debrief's comparison of strategies gives the discussion its figures. The casebook works without JavaScript and
+            prints.
+          </p>
+        </section>
+      </div>
+    </section>
+
+    <aside class="callout callout--framework">
+      <span class="callout__kicker">Ready</span>
+      <div class="prose">
+        <p>Nine stages, then the debrief. You can stop at any stage and come back: your work is kept on this device.</p>
+        <p><a class="btn btn--primary" href={SIMULATION_HREF}>Start the simulation</a></p>
+      </div>
+    </aside>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../../scripts/executive-index';
+</script>

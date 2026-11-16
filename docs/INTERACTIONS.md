@@ -332,6 +332,19 @@ Ten builders at `/strategy-studio/<tool>/`, each opening on its part of one fict
 | **Misconception diagnosed** | Per scenario: a profitable business cannot run out of cash, and more sales always help it; automation always cuts costs; a full hotel is a profitable one, and sustainability either always costs or always pays |
 | **Objective** | Make, justify and evaluate a chain of strategic decisions across functions, and defend a recommendation in writing, the habit Papers 1 and 2 reward |
 
+### 34a. The Boardroom's executive simulation
+
+`corvell-furniture`, at `/boardroom/executive/` (the brief and the roles) and `/boardroom/executive/simulation/`. The engine is `src/lib/executive/engine.ts`, the runner and comparisons `sim.ts`, the words `narrate.ts`, the markup `render.ts` (shared by the server and the browser), the browser behaviour `src/scripts/executive.ts`; progress is kept under `bb:executive`.
+
+| | |
+| --- | --- |
+| **The learner does** | Takes one of seven roles (CEO, CFO, CMO, COO, CHRO, strategy director or management consultant), works through nine stages (the accounts, the causes chosen from eleven pieces of evidence, the market, the workshop, the people and stakeholders, a strategy), allocates a budget across six levers for each of three years, reads each year's results, evaluates the plan against the role's goals and opens the debrief |
+| **Must understand** | Profitability falls for several linked reasons, and every lever has a lag or a side effect: marketing builds a fading brand over two years; demand beyond normal hours costs overtime and quality, and beyond capacity is lost; a cut lifts the first year and, beyond the slack, dents quality and morale; machinery and training arrive a year late; exports earn less when the pound strengthens; profit and cash part company |
+| **Decides or infers** | Which evidence explains the decline and which does not; what a price change does to revenue and gross profit; whether the workshop can take more orders; whose interests conflict; which strategy fits the evidence; how much of the budget each lever deserves, year by year |
+| **Feedback** | Every answer marked in words with its explanation; each piece of evidence judged as a cause, partly a cause or not; each strategy's fit; for each year, what happened in each part of the business and why, and the year's accounts; at the end, the role's scorecard, the learner's plan beside the four strategies and carrying on as before (all worked by the same engine), the plan lever by lever, its exposure to the exchange rate, trade-offs, theory in the IB course and research beyond it |
+| **Misconception diagnosed** | Cutting costs always improves profit; more demand always means more profit; a price cut raises profit; profit and cash are the same; an investment that loses money in its first year has failed |
+| **Objective** | Diagnose a business from its evidence, choose and fund a strategy under a budget, and evaluate the consequences across functions and stakeholders |
+
 ---
 
 ## 35. The Entrepreneurship and Innovation Lab
