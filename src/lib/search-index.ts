@@ -64,7 +64,7 @@ const STATIC_PAGES: Array<{ kind: SearchKind; type: string; url: string; title: 
   { kind: 'pages', type: 'Course', url: '/ib/', title: 'IB DP Business Management: the course', text: 'The course unit by unit: subtopics, content statements, depth of teaching, SL and HL, teaching hours.' },
   { kind: 'pages', type: 'Course', url: '/ib/coverage/', title: 'Coverage tracker', text: 'What the platform has for each subtopic: complete, partly built or planned, and verified against the guide.' },
   { kind: 'pages', type: 'Platform', url: '/rooms/', title: 'All rooms', text: 'Every room of the platform, what each is for and what works in it now.' },
-  { kind: 'pages', type: 'Platform', url: '/dashboard/', title: 'Your dashboard', text: 'What you have read, practised and saved here, kept on this device only.' },
+  { kind: 'pages', type: 'Platform', url: '/dashboard/', title: 'My Business Workspace', text: 'Your learning list, case notebook and saved analyses, with what you have read, practised and saved here, kept on this device only.' },
   { kind: 'pages', type: 'Platform', url: '/platform/', title: 'The platform', text: 'How the platform is organized: its modules, learning architecture, interactions and content governance.' },
   { kind: 'pages', type: 'Platform', url: '/accessibility/', title: 'Accessibility', text: 'The accessibility standard the platform aims for, how it was tested, and the known limits.' },
   { kind: 'pages', type: 'Platform', url: '/privacy/', title: 'Privacy', text: 'No accounts, no analytics, no cookies: what is kept on your device, and how to clear it.' },
