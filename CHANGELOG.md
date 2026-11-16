@@ -1,6 +1,46 @@
 # Changelog
 
-## Unreleased
+## 2.2.0: 16 November 2026
+
+The Business Brief grows beyond the IB course without changing what made it work: one-to-one tutoring with its creator, a library of advanced management for undergraduates, MBA students and professionals, an executive Boardroom, a Framework Application Lab, advanced financial analysis, and a workspace for the reader's own work. Everything already on the site keeps its address, its design and its behaviour. The audit behind the release is in [docs/audit/NEXT_LEVEL_AUDIT.md](docs/audit/NEXT_LEVEL_AUDIT.md).
+
+### Tutorials
+
+- A tutorials page (`/tutorials/`): IB DP Business Management tutoring with Arjun Agrawal, one-to-one and online, on the same terms as the Economics platform's live Tutorials page: US$20 for a one-hour session, and four packages (IA support, US$100 for six sessions; EE supervisor support, US$150; Marathon Revision, US$300 for twenty sessions; Exam Practice, US$200 for twelve sessions). Group discounts are available on request, with no price stated.
+- What the tutorials cover (the syllabus, Papers 1 and 2, Paper 3 at HL, the internal assessment as guidance only, revision and exam strategy), how a session works, who they are for, a table of which pathway fits, verified facts about the tutor, and ten questions answered.
+- Enquiries by email to the tutor's own address with the subject "IB DP Business Management Tutorials Enquiry"; an enquiry builder writes the reader's level, SL or HL, topics and preferred arrangement into the email and stores nothing. There is no booking calendar, payment, deposit or automatic confirmation, and the page carries no testimonials, results or guarantees.
+- Linked from a gold Tutorials button in the header (first in the drawer on phones), the home page, the footer, the About page, the IB DP pathway and the Assessment Centre, and by one quiet line on subtopic pages, briefs, revision briefs, case files and calculation practice.
+
+### Navigation
+
+- Six groups, Learn, Practise, Tools, Assess, Advance and Connect, adapted from the owner's suggestion to the existing mega menu and drawer; the footer, search and the home page's floor plan (now with an executive wing and an entrance) follow the same list.
+
+### Advanced Management and Strategy
+
+- A library beyond the IB course (`/advanced/`), for undergraduates, MBA students and professionals, in six domains: advanced strategy, advanced financial management, leadership and organisational behaviour, advanced marketing, operations and supply chain strategy, and entrepreneurship and innovation. It has its own room identity (deep claret and a lecture theatre) and is never counted towards the IB course.
+- Thirty modules, each at least 1,500 words and most near 3,000: six in strategy (competitive advantage and industry analysis; corporate strategy and restructuring; mergers, acquisitions and alliances; disruption and business model innovation; international expansion; strategy execution, change and crisis), six in finance (financial statement analysis; capital budgeting; the cost of capital and capital structure; working capital and cash flow modelling; valuation; sensitivity and scenario planning), five in leadership and organizational behaviour, five in marketing, four in operations and supply chain strategy, and four in entrepreneurship and innovation. Together they carry 121 models, 75 real applications and 30 cases.
+- Every module is written in eight parts: a conceptual foundation, an advanced explanation, models and frameworks (each with its origin, use and limits, linked to the frameworks library or a working tool where one exists), real business applications, case studies, critical evaluation, a decision exercise and further reading. Each names the IB subtopics it builds on, so an IB student can see where the course stops.
+- Real organizations appear only with facts read in the company's or regulator's own documents, each dated; interpretations are marked as interpretation; every case and decision exercise is fictional and labelled, and every case exhibit was recomputed.
+- The build refuses a module that is off the plan, cites an unknown source, framework or subtopic, presents a real application without sources and a date, offers IB documents as further reading, or falls short of 1,500 words.
+
+### Finance Desk: advanced financial analysis
+
+- Four tools beyond the IB course at `/finance-desk/advanced/`, beside the Financial Laboratory, which is unchanged: an integrated three-statement forecast that balances every year, with base, upside and downside scenarios and two alternatives; a capital budgeting comparator (NPV, IRR found by a bracketing search that cannot fail, payback, discounted payback, profitability index and the IB's ARR, NPV profiles, a tornado chart with switching values and a WACC helper using CAPM); break-even scenarios comparing two cost structures with operating leverage and the indifference volume; and a performance dashboard with the DuPont split of return on equity, the cash conversion cycle, interest cover and gearing beside the IB's ratios.
+- Every figure is tagged IB, IB HL or beyond the IB course; every page is a complete worked example without JavaScript; work is saved in this browser and appears in the workspace. 57 unit tests check the models against values worked by hand and by a separate reference model.
+
+### Frameworks
+
+- All 35 framework pages gain how the framework is built, when it fits and when it does not, how to read the result and what it does and does not justify, common mistakes with their fixes, and the published works behind it.
+- An Apply it mode on every framework: the tools on the platform that apply it, in full or in part, and a worksheet with a field for each part of the framework, kept in this browser.
+- The Framework Application Lab (`/frameworks/lab/`): frameworks filed under eighteen decisions a reader may face, filtered by question, purpose and standing in the IB course.
+- Three new Strategy Studio tools, all enrichment: a scenario planner (driving forces, four futures on two critical uncertainties, options tested in each), stakeholder salience (power, legitimacy and urgency, Mitchell, Agle and Wood's seven classes) and a strategic fit check (fit with the environment, readiness of capabilities and a 7S consistency check).
+
+### Boardroom
+
+- The executive simulation (`/boardroom/executive/`), a new mode beside the three scenarios, which are unchanged: one fictional company in decline, Corvell Furniture, with simulated figures; seven roles (chief executive, finance, marketing, operations, people, strategy and a consultant), each watching different measures; nine stages, from reading the accounts and weighing eleven pieces of evidence on the causes, through the market, capacity and people, to choosing a strategy, allocating a budget with price and cost levers, three years of results explained function by function, and an evaluation against the role's scorecard.
+- A debrief that runs the reader's plan beside four strategies and a do-nothing baseline on the same deterministic engine, with what each lever contributed, exposure to the exchange rate, every role's scorecard, trade-offs and misconceptions, IB theory and beyond-the-course ideas kept apart. The accounts are checked against each other every year, and the build fails if they disagree. Without JavaScript the page is a complete casebook.
+- The Boardroom Briefings (`/boardroom-briefings/`): ten editorial cases on the decisions boards face, from entering a market and acquiring a competitor to automation, a crisis, a disruptive competitor, vertical integration, shareholder returns and reputational damage. Each has a Student edition (the case, exhibits and questions) and an Analysis edition (the options scored against weighted criteria and a recommendation), switchable and linkable, and readable without JavaScript. Every company is fictional and its figures simulated and labelled; every exhibit and figure is recomputed by the build.
+- Each briefing links to the Advanced Management modules that take its decision further, and each module lists the briefings that put its ideas to a board.
 
 ### My Business Workspace
 
@@ -17,6 +57,12 @@
 - Every item answers six questions in order: what happened, the business context, the management concepts that apply, the choices the organization faced, the implications, and what a student or manager can learn. The concepts link to IB subtopics, glossary terms, toolkit tools (with their framework and Strategy Studio tool), frameworks and the platform's calculators and studios; ideas beyond the course are shown apart and labelled as enrichment.
 - The first eight items are restructured into the six questions without changing a fact or a source, and three items are added: Google Cloud's sovereign cloud partners (global business), Microsoft's retirement of Skype (business failures) and Anaconda's three acquisitions (entrepreneurship).
 - Stricter checks: every fact must cite a source dated on or after it; background comes no later than the development; frameworks and platform tools must exist; every item links to a tool or framework; and the items must cover all twelve themes. Developments from 2024 are in scope.
+
+### Sources and quality
+
+- The source register becomes a folder, one file per area, so new material adds a file of its own; 580 sources in all. A new availability, opened and read online, marks the 114 company and regulator documents that were read in full, apart from pages known only from search excerpts. A work or document cited in several places is registered once.
+- The new modules and briefings follow the site's Oxford spelling.
+- Contextual tutoring notes, the workspace's links from the studios and the Financial Laboratory, and the new pages in search, the menus, the home page's latest additions and the pathways.
 
 ## 2.1.0: 3 November 2026
 

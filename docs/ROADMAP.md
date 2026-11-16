@@ -1,10 +1,10 @@
 # Roadmap
 
-In order of priority. Each step is done completely before the next begins. What 2.1 delivered is in [RELEASE_REPORT.md](RELEASE_REPORT.md).
+In order of priority. Each step is done completely before the next begins. What 2.2 delivered is in [RELEASE_REPORT.md](RELEASE_REPORT.md).
 
 ## Before a public launch
 
-1. **Check the deployed site.** Vercel deploys from `main`, but this environment cannot reach `the-business-brief-dun.vercel.app`. Open it after each deployment, or allow the host in the environment's network settings so it can be checked from here (DEPLOYMENT.md).
+1. **Confirm the tutoring terms.** The brief gave a 90-minute session; the live Economics page, which the tutorials page follows, says one hour. One line in `src/lib/tutorials.ts` changes it.
 2. **Upgrade Astro to 7.4** on Node 24 (SECURITY.md), and set a Content Security Policy.
 3. **Test with people.** Accessibility testing with people who use screen readers, magnification and switch access; Firefox, Safari and real phones; and sessions with each kind of learner the pathways serve: IB students and teachers, undergraduates, MBA students and founders.
 4. **Licensing.** The guide's notice says commercial use by curriculum mapping or teacher resource platforms needs a licence from the IB. The platform paraphrases and cites; if it becomes commercial, ask the IB (SOURCE_GOVERNANCE.md).
@@ -16,7 +16,9 @@ In order of priority. Each step is done completely before the next begins. What 
 3. **Revision briefs** for the 34 subtopics with full notes; the Revision Brief room has them only for the three briefs.
 4. **Examiner observations**, each cited, once subject reports are supplied. Until then guidance is labelled as the platform's recommendation.
 5. **A wider Business Intelligence briefing.** More developments as more publishers' own sites can be read, refreshed each term, every fact dated and cited, so that each of the twelve themes has several items across industries and regions. It stays a curated briefing, never a feed presented as live news.
-6. **Real-organization cases** in the Case Vault, built only from cited, dated evidence.
+6. **Real-organization cases** in the Case Vault and the Boardroom Briefings, built only from cited, dated evidence read in the organizations' own documents.
+7. **Advanced Management, wider and checked.** More organizations, so that the same few companies do not recur across domains; the further reading opened and annotated rather than cited as references; and a test that recomputes every module case exhibit, as the Case Vault's tests do.
+8. **Framework pages for scenario planning and stakeholder salience**, which have tools but no page in the library, and tools for Hofstede's dimensions and RACI.
 
 ## Rooms
 

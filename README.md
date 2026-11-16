@@ -6,22 +6,24 @@ The Business Brief is a business management learning platform built around one i
 
 It is written first for IB Diploma Programme Business Management (SL and HL), with pathways for secondary students, undergraduates, MBA students, teachers, entrepreneurs and independent learners built on the same foundation. It is an independent sibling of [Arjun Agrawal Economics](https://ib-economics-pi.vercel.app/), sharing its standards but not its design.
 
-## What is in this release (2.1.0)
+## What is in this release (2.2.0)
 
 | | |
 | --- | --- |
+| Tutorials | One-to-one online IB DP Business Management tutoring with Arjun Agrawal on the Economics platform's terms (US$20 for a one-hour session; IA, EE, Marathon Revision and Exam Practice packages; group discounts on request), enquiries by email only, and quiet links from the pages where help is useful |
 | Opening | Five seconds on every fresh entry, in any browser, never between the site's own pages and decided without storing anything; Skip intro, a progress bar, any key, click or scroll to end it; a still card under reduced motion |
 | Navigation | Learn, Practise, Tools, Assess, Advance and Connect: panels on wide screens, a drawer on phones and tablets; a Tutorials button in the header; footer, search and the home page built from the same list |
-| Rooms | Each with its own accent, ground and motif: Finance Desk, Strategy Studio, Market Studio, People and Culture, Operations Floor, Entrepreneurship Lab, Boardroom, Case Room and Case Vault, Assessment Centre |
+| Rooms | Each with its own accent, ground and motif: Finance Desk, Strategy Studio, Market Studio, People and Culture, Operations Floor, Entrepreneurship Lab, Boardroom, Case Room and Case Vault, Assessment Centre; Advanced Management and the Tutorials have identities of their own |
 | Topic library | All 37 subtopics complete: 34 with full notes (situation, sections, applications, stakeholders, decision, exam-style practice, summary) and 3 with complete briefs; home, Topics and Coverage agree |
 | Knowledge | 701 glossary terms (566 IB, 135 beyond the course); 35 frameworks with diagrams, exercises and an Apply it mode, and the Framework Application Lab to choose one by the decision you face; 14 of the 15 toolkit guides; 42 course mindmaps and 9 enrichment maps; 90 original diagrams |
-| Financial Laboratory | 20 calculators with formula, working, interpretation, implication, chart, sensitivity and downloads |
-| Studios and tools | Strategy Studio (13 tools), Market Studio (9), People and Culture (5), Operations Floor (5), Entrepreneurship Lab (6 briefings, 6 tools) |
-| Simulations and cases | 3 multi-round Boardroom simulations; 9 fictional Case Vault cases across nine industries with a Case of the Week; 3 Decision Rooms and the Case Room lab |
+| Advanced Management | 30 modules beyond the IB course in six domains (strategy, finance, leadership, marketing, operations, entrepreneurship), each in eight parts with 75 real applications in all, every fact dated and sourced, and fictional cases and decisions labelled |
+| Financial Laboratory | 20 calculators with formula, working, interpretation, implication, chart, sensitivity and downloads; and advanced financial analysis beyond the course: a three-statement forecast, capital budgeting with IRR and WACC, break-even scenarios and a DuPont dashboard |
+| Studios and tools | Strategy Studio (13 tools, with scenarios, stakeholder salience and strategic fit), Market Studio (9), People and Culture (5), Operations Floor (5), Entrepreneurship Lab (6 briefings, 6 tools), and the Framework Application Lab |
+| Simulations and cases | 3 multi-round Boardroom simulations and an executive simulation with seven roles and nine stages; 10 Boardroom Briefings in Student and Analysis editions; 9 fictional Case Vault cases with a Case of the Week; 3 Decision Rooms and the Case Room lab |
 | Assessment Centre | A 269-question bank, Paper 2 calculation practice (23 kinds), the Paper 1 workspace, five IA tools and the HL Strategic Planning Centre; practice is labelled as the platform's own |
 | Business Intelligence | 11 real developments from 2024 to 2026 in an issue-style hub: twelve themes, each with a page of its own, and six questions answered by every item; every fact dated and sourced, the analysis labelled; never presented as live news |
-| Learner | Seven distinct pathways; a dashboard and saved items kept in this browser only; search across 1,743 entries |
-| Pages | 1,011, built statically; the browser tests check every page kind with axe-core at desktop and phone sizes |
+| Learner | Seven distinct pathways; My Business Workspace (a learning list, notes, saved analyses and selective export), kept in this browser only; search across 1,796 entries |
+| Pages | 1,084, built statically; the browser tests check every page kind with axe-core at desktop and phone sizes |
 
 What is not built yet, and why, is in [docs/RELEASE_REPORT.md](docs/RELEASE_REPORT.md) and [docs/ROADMAP.md](docs/ROADMAP.md).
 
@@ -99,7 +101,7 @@ docs/                Architecture, design system, content model and the rest
 | [docs/TESTING.md](docs/TESTING.md) | Test inventory, results for this release, what is not tested |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Vercel setup, separate from the Economics site |
 | [docs/RELEASE_REPORT.md](docs/RELEASE_REPORT.md) | What was completed, what was not, and what is blocked |
-| [docs/audit/](docs/audit/) | The ecosystem audit behind 2.1, the 2.0 audit with the comparison with Arjun Agrawal Economics, the earlier enhancement audit, and the inventory of the supplied materials |
+| [docs/audit/](docs/audit/) | The next-level audit behind 2.2 (with the Economics tutoring terms), the ecosystem audit behind 2.1, the 2.0 audit with the comparison with Arjun Agrawal Economics, the earlier enhancement audit, and the inventory of the supplied materials |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | What comes next |
 | [docs/discovery/DISCOVERY_REPORT.md](docs/discovery/DISCOVERY_REPORT.md) | Phase A discovery |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | How to add and change content and code |
