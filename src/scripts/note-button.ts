@@ -46,13 +46,19 @@ function build(): HTMLDialogElement {
   bindKind(d);
   const form = d.querySelector<HTMLFormElement>('[data-ne-form]')!;
 
-  const close = (saved: boolean) => {
-    const t = target;
+  let saved = false;
+  const close = (wasSaved: boolean) => {
+    saved = wasSaved;
     d.close();
+  };
+  // However the dialog closes (a button, Escape, or the browser closing it on a second Escape), focus goes back to the button that opened it.
+  d.addEventListener('close', () => {
+    const t = target;
     target = null;
     t?.button.focus();
     t?.done(saved);
-  };
+    saved = false;
+  });
   const discard = () => values(d) === initial || window.confirm('Leave without saving this note?');
 
   form.addEventListener('submit', (e) => {
