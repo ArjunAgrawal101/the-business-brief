@@ -35,6 +35,9 @@ import { LAB as FIN_LAB, labHref as finLabHref } from '../../lib/finance-lab/cat
 import { library } from '../../lib/frameworks-content';
 import { frameworkHref, inLibraryOrder } from '../../lib/frameworks';
 import { briefing, briefingHref } from '../../lib/briefing-content';
+import { advancedLibrary } from '../../lib/advanced-content';
+import { DOMAIN_BY_ID, advancedHref } from '../../lib/advanced';
+import { ADVANCED as ADV_FIN, advancedHref as advFinHref } from '../../lib/adv-finance/catalogue';
 import type { DashExercise, DashLab, DashRoomTool, DashTool } from '../../lib/dashboard';
 import '../../styles/dashboard.css';
 import '../../styles/notebook.css';
@@ -233,6 +236,7 @@ interface Pickable {
   kind: SavedKind;
 }
 const frameworks = await library();
+const advanced = await advancedLibrary();
 const desks = [...new Map(FIN_LAB.map((e) => [e.desk.href, e.desk.label])).entries()];
 const catalogue: Array<{ label: string; items: Pickable[] }> = [
   { label: 'Subtopics', items: subtopics.map((s) => ({ url: s.url, title: `${s.code} ${s.title}`, kind: 'topic' })) },
@@ -254,12 +258,18 @@ const catalogue: Array<{ label: string; items: Pickable[] }> = [
   { label: `Tools: ${roomName('strategy-studio', 'Strategy Studio')}`, items: strategy.sequence.map((t) => ({ url: studioHref(t.slug), title: t.title, kind: 'tool' })) },
   { label: `Tools: ${labName}`, items: FIN_LAB.map((e) => ({ url: finLabHref(e.id), title: e.name, kind: 'tool' })) },
   { label: `Tools: ${roomName('finance-desk', 'Finance Desk')}`, items: desks.map(([u, label]) => ({ url: u, title: label, kind: 'tool' })) },
+  { label: 'Tools: Advanced financial analysis, beyond the IB course', items: ADV_FIN.map((t) => ({ url: advFinHref(t.id), title: t.name, kind: 'tool' })) },
+  { label: 'Tools: Framework Application Lab', items: [{ url: '/frameworks/lab/', title: 'Framework Application Lab', kind: 'tool' }] },
   { label: `Tools: ${roomName('market-studio', 'Market Studio')}`, items: MARKET_TOOLS.map((t) => ({ url: marketHref(t.slug), title: t.name, kind: 'tool' })) },
   { label: 'Tools: People and Culture, Operations Floor', items: peopleOps.map((t) => ({ url: t.url, title: t.title, kind: 'tool' })) },
   { label: `Tools: ${roomName('entrepreneurship-lab', 'Entrepreneurship and Innovation Lab')}`, items: theLab.toolList.map(([id, t]) => ({ url: labHref(id), title: t.title, kind: 'tool' })) },
   {
     label: `Tools: ${boardroomName}, Decision Rooms`,
     items: [...scenarios.map(([id, sc]): Pickable => ({ url: boardroomHref(id), title: sc.title, kind: 'tool' })), ...decisions.map(([id, d]): Pickable => ({ url: href.decision(id), title: d.title, kind: 'tool' }))],
+  },
+  {
+    label: 'Advanced Management and Strategy, beyond the IB course',
+    items: advanced.modules.map((m): Pickable => ({ url: advancedHref(m.data.domain, m.id), title: `${m.data.title} (${DOMAIN_BY_ID[m.data.domain].name})`, kind: 'page' })),
   },
   {
     label: 'Briefings',
