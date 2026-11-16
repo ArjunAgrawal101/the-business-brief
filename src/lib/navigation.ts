@@ -105,7 +105,7 @@ export const NAV: NavGroup[] = [
       { label: 'About Arjun Agrawal', href: '/about/', text: 'The educator, his teaching and the story of the platform' },
       { label: 'Resources Library', href: '/resources/', text: 'Guides, notes, maps, cases and sheets, with real downloads' },
       { label: 'Lesson library', href: '/pathways/teachers/#lessons', text: 'Timed lesson sequences for teachers, subtopic by subtopic' },
-      { label: 'Your dashboard', href: '/dashboard/', text: 'What you have read, practised and saved, kept on this device' },
+      { label: 'My Business Workspace', href: '/dashboard/', text: 'Your learning list, notes and saved work, kept on this device' },
       { label: 'Sources and evidence', href: '/sources/', text: 'Where every claim comes from, and how sure we are' },
     ],
   },
