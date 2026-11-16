@@ -17,6 +17,7 @@ import { QUESTION_TYPES } from './market-research';
 import { EXTENSIONS } from './market-plc';
 import { ROLES } from './market-campaign';
 import { roomToolSchemas } from './schemas-room-tools';
+import { INTEL_CATEGORIES, INTEL_REGIONS } from './intel-themes';
 
 /* ------------------------------------------------------------------ */
 /* Shared vocabularies                                                 */
@@ -2022,20 +2023,7 @@ const isoDay = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/,
 /** A day, or only a month when the source gives no day: 2025-09-22 or 2025-10. */
 const isoDayOrMonth = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])(-(0[1-9]|[12]\d|3[01]))?$/, 'a date written as YYYY-MM-DD, or YYYY-MM when the source gives no day');
 
-/** The kinds of development the briefing covers; an item can be more than one. */
-export const INTEL_CATEGORIES = [
-  'corporate-strategy',
-  'mergers-and-acquisitions',
-  'leadership',
-  'marketing',
-  'restructuring',
-  'financial-results',
-  'innovation',
-  'entrepreneurship',
-  'sustainability',
-  'global-trend',
-] as const;
-export type IntelCategory = (typeof INTEL_CATEGORIES)[number];
+export { INTEL_THEMES, INTEL_CATEGORIES, INTEL_REGIONS, type IntelTheme, type IntelCategory, type IntelRegion } from './intel-themes';
 
 /** What kind of document a source is. Primary sources are published by the organization itself. */
 export const INTEL_SOURCE_KINDS = ['press-release', 'annual-report', 'company-report', 'company-blog', 'company-page', 'regulatory-filing', 'press'] as const;
@@ -2075,22 +2063,38 @@ export const intelFactSchema = z.object({
 });
 
 /**
- * One item of the briefing: a real development, what happened (sourced facts
- * only), and the platform's analysis, kept visibly apart: why it matters, the
- * course concepts at work, the choices that were open, the lessons, a
- * discussion question of the platform's own and the limits of the evidence.
+ * One item of the briefing: a real development, read through the six
+ * questions every item answers, in this order:
+ *
+ * 1. What happened? Sourced facts only: the `background` that set the scene,
+ *    the development itself (`happened`) and what followed (`since`).
+ * 2. What is the business context? (`context`)
+ * 3. Which management concepts are relevant? (`concepts`: the IB course, and
+ *    the frameworks library, which labels what lies beyond the course)
+ * 4. What choices did the organization face? (`choices`)
+ * 5. What were the implications? (`implications`)
+ * 6. What can a student or manager learn? (`lessons`)
+ *
+ * Everything after the facts is the platform's analysis and is labelled so;
+ * a discussion question of the platform's own, the limits of the evidence and
+ * the sources close the item.
  */
 export const intelligenceSchema = z.object({
   title: z.string(),
   /** The standfirst: one or two sentences under the headline. */
   dek: z.string(),
   organizations: z.array(z.string()).min(1),
+  /** The item's themes (see INTEL_THEMES); the first is the one it is filed under. */
   categories: z.array(z.enum(INTEL_CATEGORIES)).min(1),
+  /** Where the development took place. */
+  regions: z.array(z.enum(INTEL_REGIONS)).min(1),
+  /** The industry, in a few words, as the page shows it: "Steel", "Oil and gas". */
+  industry: z.string().trim().min(1),
   /** The IB key concepts the item speaks to, for the concept filter. */
   keyConcepts: z.array(conceptId).min(1),
   /** When the development happened: the date of the headline fact. */
   date: isoDayOrMonth,
-  /** When the item was written, and when its sources were last checked. */
+  /** When the item was written and published, and when its sources were last checked. */
   written: isoDay,
   checked: isoDay,
   /** The lead story on the briefing's front page. Exactly one item is the lead. */
@@ -2100,18 +2104,29 @@ export const intelligenceSchema = z.object({
     .array(z.object({ value: z.string(), label: z.string(), source: z.string() }))
     .max(3)
     .default([]),
+  /** Earlier facts that set the scene, sourced like the rest and dated on or before the development. */
+  background: z.array(intelFactSchema).default([]),
   happened: z.array(intelFactSchema).min(3),
   /** Later developments, read on the check date. */
   since: z.array(intelFactSchema).default([]),
-  matters: md,
+  /** The organization, its industry and the situation it faced, read from the facts. */
+  context: md,
   concepts: z.object({
     /** `level: HL` when the connection rests on HL-only content; required when the whole subtopic is HL only. */
     subtopics: z.array(z.object({ code: z.string(), note: z.string(), level: level.default('SL/HL') })).min(1),
+    /** Glossary terms. Terms beyond the IB course are shown apart, labelled as enrichment. */
     terms: z.array(z.string()).default([]),
+    /** IB toolkit tools, each linked to its guide, its entry in the frameworks library and its Strategy Studio tool where they exist. */
     tools: z.array(z.object({ id: z.string(), note: z.string() })).default([]),
+    /** Frameworks from the library that are not toolkit tools: named in the syllabus, or beyond the course. */
+    frameworks: z.array(z.object({ id: z.string(), note: z.string() })).default([]),
+    /** The platform's own working tools to try the ideas on: calculators, studio tools, cases and Decision Rooms. */
+    apply: z.array(z.object({ href: z.string().startsWith('/'), label: z.string(), note: z.string() })).default([]),
   }),
   /** The options that were open. `taken` marks the one the organization chose, which the facts must show. */
   choices: z.array(z.object({ option: z.string(), analysis: md, taken: z.boolean().default(false) })).min(2),
+  /** What followed for the organization, its stakeholders and its industry, and what may follow. */
+  implications: md,
   lessons: z.array(md).min(2),
   /** One discussion question, the platform's own. `command` is an id in the command term register. */
   question: z.object({ command: z.string(), prompt: z.string(), level: level.default('SL/HL') }),

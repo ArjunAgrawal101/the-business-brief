@@ -10,24 +10,49 @@
  * - every source is either dated or says why its page carries no date, was
  *   read on or after the day the briefing began, after it was published and
  *   by the item's check date, and supports at least one fact on the page;
- * - every fact, later development and headline figure cites a source the item
- *   lists, and no fact is dated after the item was checked;
- * - the item's own date is the date of one of its facts, and is in 2025 or later;
+ * - every fact (background, the development and what followed), and every
+ *   headline figure, cites a source the item lists; each fact cites at least
+ *   one source that was published (or, for an undated page, read) on or after
+ *   the fact's own date, so no fact rests only on documents older than it; no
+ *   fact is dated after the item was checked, background comes no later than
+ *   the development and what followed no earlier, each list runs in date order;
+ * - the item's own date is the date of one of its facts, and is in 2024 or later;
  * - no quotation runs past 25 words;
- * - every subtopic, glossary term, toolkit tool and command term it names
- *   exists, and every internal link in its text resolves to a page;
- * - exactly one item is the lead story.
+ * - every subtopic, glossary term, toolkit tool, framework, platform tool and
+ *   command term it names exists, a toolkit tool is named as a tool (where it
+ *   links to its guide, its framework and its studio tool) rather than as a
+ *   framework, and every internal link in its text resolves to a page;
+ * - every item links to at least one toolkit tool, framework or platform tool;
+ * - exactly one item is the lead story, and together the items cover every
+ *   one of the hub's twelve editorial themes.
  */
 import type { Corpus, Problem } from './integrity';
-import type { Intelligence } from './schemas';
-import { dateKey, onOrBefore, parseDate } from './briefing';
+import type { IntelFact, Intelligence } from './schemas';
+import { dateKey, onOrBefore, parseDate, themeHref, uncoveredThemes, THEME_INFO } from './briefing';
+import { INTEL_CATEGORIES } from './intel-themes';
 import { subtopicIndex } from './integrity-learning';
+import { LAB } from './finance-lab/catalogue';
+import { MARKET_TOOLS } from './market-tools';
+import { roomTools, toolHref } from './room-tools';
 
 /** The day the briefing began. No source may claim to have been read before it. */
 export const BRIEFING_BEGAN = '2026-11-03';
 
+/** The earliest year a development may come from. */
+export const EARLIEST_YEAR = 2024;
+
 /** The longest quotation the briefing allows, in words. Paraphrase is the rule. */
 export const MAX_QUOTE_WORDS = 25;
+
+/**
+ * What the briefing's links resolve against beyond the main corpus: the
+ * frameworks library (each entry's standing, its toolkit tool and its studio
+ * tool) and the Strategy Studio's tools by slug.
+ */
+export interface BriefingLibrary {
+  frameworks: Record<string, { name: string; status: 'syllabus' | 'toolkit' | 'enrichment'; tool?: string; studio?: string }>;
+  studio: string[];
+}
 
 /** The same rule as slug() in content.ts, which cannot be imported outside Astro. */
 function routeSlug(s: string): string {
@@ -45,10 +70,13 @@ const STATIC_ROUTES = [
   '/mindmaps/',
   '/diagrams/',
   '/glossary/',
+  '/frameworks/',
   '/assessment/',
   '/resources/',
   '/cases/',
+  '/case-vault/',
   '/decision-room/',
+  '/boardroom/',
   '/finance-desk/',
   '/finance-desk/costs-and-revenue/',
   '/finance-desk/break-even/',
@@ -56,12 +84,14 @@ const STATIC_ROUTES = [
   '/finance-desk/ratios/',
   '/finance-desk/cash-flow/',
   '/finance-desk/investment-appraisal/',
+  '/finance-desk/lab/',
   '/rooms/',
   '/case-room/',
   '/strategy-studio/',
   '/market-studio/',
   '/people-and-culture/',
   '/operations-floor/',
+  '/entrepreneurship-lab/',
   '/toolkit/',
   '/exam-desk/practice/',
   '/examiner-lens/',
@@ -76,8 +106,8 @@ const STATIC_ROUTES = [
   '/intelligence/',
 ];
 
-/** Every internal address an item's text may link to. */
-export function briefingRoutes(c: Corpus, items: Record<string, Intelligence>): Set<string> {
+/** Every internal address an item's text or its platform tools may link to. */
+export function briefingRoutes(c: Corpus, items: Record<string, Intelligence>, lib?: BriefingLibrary): Set<string> {
   const routes = new Set(STATIC_ROUTES);
   for (const s of subtopicIndex(c).values()) routes.add(`/topics/${routeSlug(s.title)}/`);
   for (const id of Object.keys(c.topics)) routes.add(`/topics/${id}/`);
@@ -86,7 +116,13 @@ export function briefingRoutes(c: Corpus, items: Record<string, Intelligence>): 
   for (const id of Object.keys(c.mindmaps)) routes.add(`/mindmaps/${id}/`);
   for (const id of Object.keys(c.cases)) routes.add(`/cases/${id}/`);
   for (const id of Object.keys(c.decisions)) routes.add(`/decision-room/${id}/`);
+  for (const e of LAB) routes.add(`/finance-desk/lab/${e.id}/`);
+  for (const t of MARKET_TOOLS) routes.add(`/market-studio/${t.slug}/`);
+  for (const room of ['people', 'operations'] as const) for (const [, t] of roomTools(c, room)) routes.add(toolHref(t));
+  for (const id of Object.keys(lib?.frameworks ?? {})) routes.add(`/frameworks/${id}/`);
+  for (const slug of lib?.studio ?? []) routes.add(`/strategy-studio/${slug}/`);
   for (const id of Object.keys(items)) routes.add(`/intelligence/${id}/`);
+  for (const k of INTEL_CATEGORIES) routes.add(themeHref(k));
   return routes;
 }
 
@@ -104,17 +140,28 @@ export function linkTargets(text: string): string[] {
   return [...text.matchAll(/\[[^\]]+\]\(([^)\s]+)\)/g)].map((m) => m[1] ?? '');
 }
 
+/** The three lists of sourced facts, in the order the page shows them. */
+export function factLists(it: Intelligence): Array<[string, IntelFact[]]> {
+  return [
+    ['background', it.background],
+    ['what happened', it.happened],
+    ['since then', it.since],
+  ];
+}
+
 /** All the text of an item a reader sees, with where it sits, for the quotation and link checks. */
 function texts(it: Intelligence): Array<[string, string]> {
   return [
     ['title', it.title],
     ['dek', it.dek],
-    ...it.happened.map((f, i): [string, string] => [`what happened ${i + 1}`, f.text]),
-    ...it.since.map((f, i): [string, string] => [`since then ${i + 1}`, f.text]),
-    ['why it matters', it.matters],
+    ...factLists(it).flatMap(([part, list]) => list.map((f, i): [string, string] => [`${part} ${i + 1}`, f.text])),
+    ['business context', it.context],
     ...it.concepts.subtopics.map((s): [string, string] => [`concept ${s.code}`, s.note]),
     ...it.concepts.tools.map((t): [string, string] => [`tool ${t.id}`, t.note]),
+    ...it.concepts.frameworks.map((f): [string, string] => [`framework ${f.id}`, f.note]),
+    ...it.concepts.apply.map((a): [string, string] => [`platform tool ${a.href}`, `${a.label} ${a.note}`]),
     ...it.choices.map((ch, i): [string, string] => [`choice ${i + 1}`, `${ch.option} ${ch.analysis}`]),
+    ['implications', it.implications],
     ...it.lessons.map((l, i): [string, string] => [`lesson ${i + 1}`, l]),
     ['question', it.question.prompt],
     ...it.limits.map((l, i): [string, string] => [`limit ${i + 1}`, l]),
@@ -130,17 +177,21 @@ function validDate(iso: string): boolean {
   }
 }
 
-export function checkIntelligence(items: Record<string, Intelligence>, c: Corpus): Problem[] {
+export function checkIntelligence(items: Record<string, Intelligence>, c: Corpus, lib?: BriefingLibrary): Problem[] {
   const out: Problem[] = [];
   const has = <T>(d: Record<string, T>, id: string) => Object.prototype.hasOwnProperty.call(d, id);
   const subs = subtopicIndex(c);
-  const routes = briefingRoutes(c, items);
+  const routes = briefingRoutes(c, items, lib);
 
   const leads = Object.entries(items)
     .filter(([, it]) => it.lead)
     .map(([id]) => id);
   if (Object.keys(items).length && leads.length !== 1) {
     out.push({ where: 'intelligence', message: `exactly one item must be the lead story; found ${leads.length}${leads.length ? ` (${leads.join(', ')})` : ''}` });
+  }
+  const missing = uncoveredThemes(Object.values(items));
+  if (Object.keys(items).length && missing.length) {
+    out.push({ where: 'intelligence', message: `no item covers these themes: ${missing.map((k) => THEME_INFO[k].label).join(', ')}; every one of the twelve themes needs at least one item` });
   }
 
   for (const [id, it] of Object.entries(items)) {
@@ -150,14 +201,15 @@ export function checkIntelligence(items: Record<string, Intelligence>, c: Corpus
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(id)) add('the file name must be lower-case words joined by hyphens');
 
     /* Dates */
-    const dates = [it.date, it.written, it.checked, ...it.happened.map((f) => f.date), ...it.since.map((f) => f.date), ...it.sources.flatMap((s) => [s.accessed, ...(s.published ? [s.published] : [])])];
+    const facts = factLists(it).flatMap(([, list]) => list);
+    const dates = [it.date, it.written, it.checked, ...facts.map((f) => f.date), ...it.sources.flatMap((s) => [s.accessed, ...(s.published ? [s.published] : [])])];
     const bad = dates.filter((d) => !validDate(d));
     if (bad.length) {
       add(`these dates do not exist: ${[...new Set(bad)].join(', ')}`);
       continue;
     }
     if (!onOrBefore(it.written, it.checked)) add(`checked on ${it.checked}, before it was written on ${it.written}`);
-    if (parseDate(it.date).year < 2025) add(`dated ${it.date}: the briefing covers developments from 2025 onwards`);
+    if (parseDate(it.date).year < EARLIEST_YEAR) add(`dated ${it.date}: the briefing covers developments from ${EARLIEST_YEAR} onwards`);
     if (!onOrBefore(it.date, it.checked)) add(`dated ${it.date}, after the item was checked on ${it.checked}`);
 
     /* Sources */
@@ -168,6 +220,7 @@ export function checkIntelligence(items: Record<string, Intelligence>, c: Corpus
       sourceIds.add(s.id);
       if (!s.url.startsWith('https://')) add(`${sw} needs an https address`);
       if (!s.publisher.trim()) add(`${sw} names no publisher`);
+      if (!s.title.trim()) add(`${sw} has no title`);
       if (!s.published && !s.undated) add(`${sw} has no publication date: give one, or say under "undated" why the page carries none`);
       if (s.published && s.undated) add(`${sw} gives a publication date and also says it is undated`);
       if (!onOrBefore(BRIEFING_BEGAN, s.accessed)) add(`${sw} was accessed on ${s.accessed}, before the briefing began on ${BRIEFING_BEGAN}`);
@@ -181,44 +234,41 @@ export function checkIntelligence(items: Record<string, Intelligence>, c: Corpus
     }
     if (!it.sources.some((s) => s.primary)) add('needs at least one primary source: a document published by the organization itself');
 
-    /* Facts, later developments and figures */
+    /* Facts and figures */
     const cited = new Set<string>();
+    const sourceOf = new Map(it.sources.map((s) => [s.id, s]));
     const cite = (where: string, ids: string[]) =>
       ids.forEach((sid) => {
         cited.add(sid);
         if (!sourceIds.has(sid)) add(`${where} cites source "${sid}", which the item does not list`);
       });
-    const accessedOn = new Map(it.sources.map((s) => [s.id, s.accessed]));
-    const asAtRule = (where: string, f: Intelligence['happened'][number]) => {
+    const checkFact = (where: string, f: IntelFact) => {
+      cite(where, f.sources);
+      const listed = f.sources.map((sid) => sourceOf.get(sid)).filter((s) => s !== undefined);
       // A fact read from an undated page is dated by the day that page was read.
-      if (f.asAt) f.sources.forEach((sid) => accessedOn.has(sid) && accessedOn.get(sid) !== f.date && add(`${where} is marked as at ${f.date}, but source "${sid}" was read on ${accessedOn.get(sid)}`));
+      if (f.asAt) listed.forEach((s) => s.accessed !== f.date && add(`${where} is marked as at ${f.date}, but source "${s.id}" was read on ${s.accessed}`));
+      if (!onOrBefore(f.date, it.checked)) add(`${where} is dated ${f.date}, after the item was checked`);
+      // At least one source must be able to report the fact: published (or, undated, read) on or after its date.
+      if (listed.length && !listed.some((s) => onOrBefore(f.date, s.published ?? s.accessed))) {
+        add(`${where} is dated ${f.date}, but every source it cites is dated before then (${listed.map((s) => `${s.id}, ${s.published ?? s.accessed}`).join('; ')})`);
+      }
     };
-    it.happened.forEach((f, i) => {
-      cite(`what happened ${i + 1}`, f.sources);
-      asAtRule(`what happened ${i + 1}`, f);
-      if (!onOrBefore(f.date, it.checked)) add(`what happened ${i + 1} is dated ${f.date}, after the item was checked`);
-    });
-    it.since.forEach((f, i) => {
-      cite(`since then ${i + 1}`, f.sources);
-      asAtRule(`since then ${i + 1}`, f);
-      if (!onOrBefore(f.date, it.checked)) add(`since then ${i + 1} is dated ${f.date}, after the item was checked`);
-      if (!onOrBefore(it.date, f.date)) add(`since then ${i + 1} is dated ${f.date}, before the development itself`);
-    });
-    it.figures.forEach((g) => cite(`figure "${g.value}"`, [g.source]));
-    // Facts read as a dated record, so each list runs in date order.
-    for (const [part, list] of [
-      ['what happened', it.happened],
-      ['since then', it.since],
-    ] as const) {
+    for (const [part, list] of factLists(it)) {
       list.forEach((f, i) => {
+        const where = `${part} ${i + 1}`;
+        checkFact(where, f);
+        if (part === 'background' && !onOrBefore(f.date, it.date)) add(`${where} is dated ${f.date}, after the development itself (${it.date}); later facts belong under "since"`);
+        if (part === 'since then' && !onOrBefore(it.date, f.date)) add(`${where} is dated ${f.date}, before the development itself`);
+        // Facts read as a dated record, so each list runs in date order.
         const prev = list[i - 1];
-        if (prev && dateKey(f.date) < dateKey(prev.date)) add(`${part} ${i + 1} is dated ${f.date}, before the fact above it (${prev.date}); keep facts in date order`);
+        if (prev && dateKey(f.date) < dateKey(prev.date)) add(`${where} is dated ${f.date}, before the fact above it (${prev.date}); keep facts in date order`);
       });
     }
+    it.figures.forEach((g) => cite(`figure "${g.value}"`, [g.source]));
     for (const s of it.sources) if (!cited.has(s.id)) add(`source "${s.id}" supports nothing on the page: cite it from a fact or remove it`);
     if (!it.happened.some((f) => f.date === it.date)) add(`no fact under "what happened" carries the item's own date, ${it.date}`);
 
-    /* Concepts, the question and the choices */
+    /* Concepts, frameworks, tools, the question and the choices */
     const dupes = (list: string[]) => list.filter((x, i) => list.indexOf(x) !== i);
     it.concepts.subtopics.forEach((s) => {
       const sub = subs.get(s.code);
@@ -228,11 +278,29 @@ export function checkIntelligence(items: Record<string, Intelligence>, c: Corpus
     });
     it.concepts.terms.forEach((t) => has(c.glossary, t) || add(`glossary term "${t}" does not exist`));
     it.concepts.tools.forEach((t) => has(c.tools, t.id) || add(`toolkit tool "${t.id}" does not exist`));
+    for (const f of it.concepts.frameworks) {
+      const fw = lib?.frameworks[f.id];
+      if (!lib) add(`framework "${f.id}" cannot be checked: the frameworks library was not supplied`);
+      else if (!fw) add(`framework "${f.id}" is not in the frameworks library`);
+      else if (fw.status === 'toolkit') add(`framework "${f.id}" is an IB toolkit tool: name it under tools${fw.tool ? ` as "${fw.tool}"` : ''}, where it links to its guide, its framework and its studio tool`);
+    }
+    for (const a of it.concepts.apply) {
+      const path = a.href.replace(/[?#].*$/, '');
+      if (!path.endsWith('/')) add(`platform tool ${a.href} must end with a slash`);
+      else if (!routes.has(path)) add(`platform tool ${a.href} is not a page on the platform`);
+      if (!a.label.trim()) add(`platform tool ${a.href} has no label`);
+    }
+    if (!it.concepts.tools.length && !it.concepts.frameworks.length && !it.concepts.apply.length) {
+      add('links to no toolkit tool, framework or platform tool: name the ones the development illustrates');
+    }
     for (const [what, list] of [
       ['subtopic', it.concepts.subtopics.map((s) => s.code)],
       ['glossary term', it.concepts.terms],
       ['tool', it.concepts.tools.map((t) => t.id)],
-      ['kind of development', it.categories],
+      ['framework', it.concepts.frameworks.map((f) => f.id)],
+      ['platform tool', it.concepts.apply.map((a) => a.href)],
+      ['theme', it.categories],
+      ['region', it.regions],
       ['key concept', it.keyConcepts],
     ] as const) {
       dupes([...list]).forEach((d) => add(`${what} "${d}" is listed twice`));
