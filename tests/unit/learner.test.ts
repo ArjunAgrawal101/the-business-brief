@@ -170,9 +170,10 @@ describe('the kind of a page', () => {
 
   it('does not record the libraries, the dashboard or other pages', () => {
     for (const p of ['/', '/topics/', '/mindmaps/', '/cases/', '/toolkit/', '/glossary/gearing/', '/dashboard/', '/search/', '/topics/a/b/']) expect(kindOfPath(p, tools)).toBeNull();
-    // The Framework Application Lab's hub is not a framework page; it counts as a tool only if the navigation lists it as one.
-    expect(kindOfPath('/frameworks/lab/', tools)).toBeNull();
-    expect(kindOfPath('/frameworks/lab/', [...tools, '/frameworks/lab/'])).toBe('tool');
+    // The Framework Application Lab's hub is not a framework page; it counts as a tool because the navigation lists it under Tools, and only then.
+    expect(tools).toContain('/frameworks/lab/');
+    expect(kindOfPath('/frameworks/lab/', tools)).toBe('tool');
+    expect(kindOfPath('/frameworks/lab/', tools.filter((t) => t !== '/frameworks/lab/'))).toBeNull();
   });
 
   it('cleans a document title for the list', () => {
