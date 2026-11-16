@@ -1,0 +1,191 @@
+# Advanced Management and Strategy, operations module 3. Written in the
+# platform's own words. Real organisations appear only with facts from the
+# documents in src/content/sources/advanced-ops-ent.yaml, opened and read on
+# 16 November 2026. Worked figures: Chen et al. bound 1 + 2L/p + 2L²/p² is
+# 2.5 at L = 2, p = 4 and 5.0 at L = 4, p = 4; 2.5³ = 15.6. Pipeline
+# 2,000 × 4 = 8,000 and 2,000 × 6 = 12,000. Safety stock
+# 1.65 × √(L × 200² + 2,000² × σL²): L 4, σL 0.25 gives 1,057; L 6, σL 1
+# gives 3,398. Exposure 7 weeks × £1.5m = £10.5m. Lumen Home exhibit: stock
+# values at £18 a unit: 8,000 × 18 = 144,000; 12,000 × 18 = 216,000;
+# 1,057 × 18 = 19,026; 3,398 × 18 = 61,164. Fenwick: 6 ÷ 52 × £4.2m =
+# £485,000 of stock × 25% = £121,000; 0.3 × 4.2m × 12% = £151,000; gap
+# (16 − 6) × £400,000 = £4m.
+domain: operations
+title: Supply chain resilience, global sourcing and risk
+order: 3
+dek: Why supply chains amplify shocks, how a business should decide where and from whom to buy, and how much efficiency it should trade for resilience.
+audience: [undergraduate, mba, professional]
+covers: [Supply chain resilience, Global sourcing, Risk management]
+minutes: 25
+updated: '2026-11-16'
+bridge:
+  codes: ['5.4', '5.6', '5.7', '1.6']
+  text: |
+    The IB course covers local and global supply chains, just-in-time against just-in-case, stock control charts and make or buy (5.6), outsourcing, offshoring and reshoring (5.4), contingency planning and crisis management (5.7) and multinationals (1.6). This module adds the dynamics of chains with several tiers (the bullwhip effect, with numbers), inventory when lead times are long and uncertain, frameworks for deciding what to buy and from where, and ways to measure and price resilience. The [stock control](/operations-floor/stock-control/) and [location assessment](/operations-floor/location-assessment/) tools apply the IB versions.
+foundation: |
+  A supply chain is a sequence of firms, each making sensible decisions with local information, linked by orders flowing one way and goods the other. Three facts explain most of its behaviour. First, disturbances **amplify** as they travel upstream, so a small change in consumer demand can become a large swing in orders at a factory. Second, **lead time** is the master variable: stock in transit rises in proportion to it, safety stock rises with its square root, and its variability often matters more than its length. Third, **risk concentrates where firms cannot see it**: in suppliers' suppliers, in single plants and in shipping chokepoints.
+
+  **Resilience** is the ability to absorb a disruption and recover quickly. It usually costs something, in stock, spare capacity or second sources, which is why efficiency and resilience are often presented as a trade-off. The trade-off is real but narrower than it looks, because visibility, flexibility and design can buy resilience more cheaply than inventory.
+advanced:
+  - id: bullwhip
+    title: 'The bullwhip effect: why shocks grow upstream'
+    body: |
+      Jay Forrester (1961) showed with simulation that delays and feedback make orders oscillate more than the demand behind them. Lee, Padmanabhan and Whang (1997) gave the pattern, known as the **bullwhip effect**, its standard analysis and identified four causes, each rational for the firm that acts on it: **demand signal processing** (each stage updates its forecast and safety stock from the orders it receives, treating noise as signal); **order batching** (ordering in large, infrequent lots); **price fluctuation** (promotions that invite forward buying); and **rationing and shortage gaming** (when supply is allocated in proportion to orders, buyers inflate them, and the phantom demand vanishes when supply recovers).
+
+      Chen, Drezner, Ryan and Simchi-Levi (2000) quantified the first cause. A stage that uses an order-up-to policy, forecasting from a moving average of the last p periods, with a lead time of L periods, places orders whose variance is at least (1 + 2L/p + 2L²/p²) times the variance of demand. With a two-week lead time and a four-week average, orders vary 2.5 times as much as demand; with a four-week lead time, five times. If three stages each forecast from their own incoming orders, the amplification compounds to roughly 2.5³, or sixteen times.
+
+      The remedies follow the causes: share point-of-sale data so that every stage forecasts from real demand, shorten lead times, order smaller lots more often, replace promotions with stable prices, and allocate scarce supply by past sales rather than current orders.
+  - id: lead-time-and-inventory
+    title: Lead time, inventory and the cost of distance
+    body: |
+      By Little's law, stock in transit equals the demand rate multiplied by the transit time. A retailer selling 2,000 units a week with a four-week lead time has 8,000 units in the pipeline; if a rerouted voyage adds two weeks, it needs 12,000, half as much working capital again before any safety stock.
+
+      Safety stock covers uncertainty in both demand and supply: z × √(L × σd² + d² × σL²), where d is average weekly demand, σd its standard deviation, L the lead time in weeks and σL the standard deviation of the lead time. With σd = 200 units and z = 1.65 (a 95% chance of not running out in a cycle), a reliable four-week lead time (σL = 0.25 weeks) needs about 1,060 units. A six-week lead time that varies by a week needs about 3,400. The variability of the lead time, not its length, does most of the damage.
+
+      This is why the unit price is a poor guide to sourcing. **Total landed cost** adds freight, duties and tariffs, the carrying cost of pipeline and safety stock, quality failures and expediting, and a premium for disruption risk. A 15% saving on the factory price can disappear once a long, variable lead time is priced in, which is the economic case behind most nearshoring.
+  - id: sourcing-strategy
+    title: 'Sourcing strategy: what to buy, from whom and where'
+    body: |
+      Transaction cost economics (Williamson, 1985) explains when to make rather than buy. When an input requires investments specific to one relationship, when uncertainty makes complete contracts impossible and when transactions recur often, market buying invites hold-up, and firms integrate or build long-term relational contracts. Capability arguments point the other way: firms buy what others do better.
+
+      Kraljic (1983) classified purchases by their profit impact and their supply risk. **Non-critical** items (low impact, low risk) call for efficient buying processes; **leverage** items (high impact, low risk) for competitive tendering; **bottleneck** items (low impact, high risk) for securing supply and developing alternatives; and **strategic** items (high on both) for deep partnerships. A cheap part can be a bottleneck item, and treating it as non-critical is a common source of disruption.
+
+      Fisher (1997) matched chains to products. **Functional** products, with stable demand and thin margins, need **physically efficient** chains that minimise cost; **innovative** products, with unpredictable demand, short lives and high margins, need **market-responsive** chains that buy speed and flexibility. His central observation was that many firms ran innovative products through efficient chains, losing far more in stockouts and markdowns than they saved in cost.
+  - id: resilience-by-design
+    title: 'Resilience by design: measuring and pricing it'
+    body: |
+      Sheffi and Rice (2005) distinguished two sources of resilience: **redundancy** (extra stock, capacity or suppliers) and **flexibility** (standardised parts, interchangeable plants, postponement and cross-trained staff). Redundancy is simple but costly to hold; flexibility is often cheaper and also improves normal operations.
+
+      Simchi-Levi, Schmidt and Wei (2014) offered a way to find where to spend: for each supplier site or other node, estimate its **time to recover** (TTR) after a disruption and the loss of performance while it is out. Compare TTR with how long the firm can keep operating without the node from stock and alternatives, often called its **time to survive** (TTS). The danger lies where TTR exceeds TTS, and it is often at low-spend suppliers. Suppose a sealant bought for £300,000 a year comes from one plant with a TTR of ten weeks, while the firm can survive three weeks on stock and rescheduling. Seven weeks of lost output at £1.5 million of weekly contribution is a £10.5 million exposure, from a part that procurement ranks as trivial.
+
+      Pricing mitigation means comparing its cost, such as qualifying a second source or holding extra stock, with the exposure multiplied by the probability of disruption. That arithmetic understates the case when risks are correlated (one flood closes several suppliers) or when consequences fall on customers and regulators rather than on the firm's own profit. Probability-impact matrices rank such risks poorly, so stress tests that ask "what if this node is lost for its TTR?" are more useful.
+models:
+  - name: The bullwhip effect
+    origin: Lee, Padmanabhan and Whang (1997)
+    summary: |
+      Order variability amplifies upstream through four rational behaviours: forecast updating from orders, batching, promotions and shortage gaming. The amplification grows with lead time and compounds across stages.
+    use: |
+      Compare the variance of orders placed with the variance of demand received at each stage. Share point-of-sale data, shorten lead times, reduce batch sizes, stabilise prices and allocate shortages by past sales.
+    limits: |
+      Some industries smooth production instead of amplifying it, because holding stock is cheaper than changing output, so the effect is not universal. Shared data reduces amplification but cannot remove the effect of lead times.
+    tool: /operations-floor/stock-control/
+    sources: [adv-oe-lee-1997, adv-oe-forrester-1961, adv-oe-chen-2000]
+  - name: Matching the supply chain to the product
+    origin: Fisher (1997)
+    summary: |
+      Functional products need physically efficient chains; innovative products need market-responsive chains. A mismatch costs either excess cost or lost sales and markdowns.
+    use: |
+      Classify each product by demand uncertainty, margin and life cycle, then check whether its chain is designed for cost or for response. Use postponement and buffer capacity for innovative products and lean, low-stock flows for functional ones.
+    limits: |
+      Many products are hybrids, functional at the core with innovative variants, and need a split chain. Disruption risk is a third dimension the original matrix ignored.
+    sources: [adv-oe-fisher-1997]
+  - name: The purchasing portfolio matrix
+    origin: Kraljic (1983)
+    summary: |
+      Purchases are classified by profit impact and supply risk into non-critical, leverage, bottleneck and strategic items, each with its own buying strategy.
+    use: |
+      Score each category on spend and margin impact and on supply risk (concentration, substitutes, lead time, geopolitics), then set a strategy per quadrant and review the scores as markets change.
+    limits: |
+      The scores are judgements, and the matrix takes the buyer's view; a supplier's power and interests may not fit the strategy chosen. It also treats categories one at a time and misses shared risks across them.
+    sources: [adv-oe-kraljic-1983, adv-oe-williamson-1985]
+  - name: Time to recover and risk exposure
+    origin: Simchi-Levi, Schmidt and Wei (2014)
+    summary: |
+      For each node in the supply network, estimate the time it would take to recover from a disruption and the performance lost meanwhile. Comparing that time with how long the firm can operate without the node shows where exposure lies.
+    use: |
+      Estimate TTR with suppliers, calculate TTS from stock and alternatives, and multiply any shortfall by weekly contribution. Spend on second sources, stock or redesign where the exposure is largest, regardless of how much is bought from that node.
+    limits: |
+      TTR estimates depend on suppliers' candour and are uncertain for rare events. Mapping beyond the first tier is costly, and the method does not by itself say how likely a disruption is.
+    sources: [adv-oe-simchi-levi-2014, adv-oe-sheffi-rice-2005]
+applications:
+  - title: 'One plant and a national shortage: US infant formula, 2022'
+    kind: real
+    asOf: '2022-06'
+    sources: [adv-oe-abbott-recall-2022, adv-oe-fda-formula-2022-05, adv-oe-fda-formula-2022-06]
+    body: |
+      On 17 February 2022 Abbott recalled powder infant formulas made at its Sturgis, Michigan plant after four consumer complaints involving Cronobacter or Salmonella in infants; its own testing had found Cronobacter in non-product areas of the plant, though no distributed product had tested positive. The FDA's inspection, begun on 31 January, had found the bacterium and "significant operational deficiencies", and Abbott shut the plant. By May the FDA reported that other manufacturers were producing at expanded capacity (Gerber had raised supply by about 50% in March and April; Reckitt was supplying over 30% more year to date), that in-stock rates were near 80%, and that more product was being sold but in less variety. It sought new powers to collect supply data from the industry. By June it had used enforcement discretion to admit about 17 million cans of formula from six countries, and flooding at Sturgis had set back the restart.
+
+      *Interpretation.* That one plant's closure produced national supply problems shows how concentrated capacity was, and the request for supply data shows that the regulator lacked visibility. Recovery depended on rivals' surge capacity and imports: in effect, the system's time to recover exceeded families' time to survive.
+  - title: 'Jaguar Land Rover: a portfolio of supply risks'
+    kind: real
+    asOf: '2026-02'
+    sources: [adv-oe-jlr-investor-day-2025, adv-oe-penske-q4-2025]
+    body: |
+      At its June 2025 investor day, JLR listed risks it had faced (a semiconductor shortage, vehicle thefts and insurance in the UK, and flooding at an aluminium supplier) and risks it was facing (US tariffs, the transition to battery electric vehicles and China). It had paused shipments to the United States in April 2025 and reallocated vehicles to other markets; a UK-US trade deal would cut the tariff on UK-built vehicles from 27.5% to 10%, while vehicles from its Slovakian plant remained at 27.5%. Its new electrical architecture was designed to consolidate electronic hardware, semiconductors and wiring. In February 2026 the dealer group Penske Automotive, based in the United States, reported that its fourth-quarter Land Rover and Jaguar sales had fallen by 800 units, mainly because of inventory constraints from the manufacturer's cyber incident.
+
+      *Interpretation.* The risks span nature, geopolitics, technology and cyber security, and they reach customers through dealers. Plant location (UK or Slovakia) set tariff exposure, and designing out components is a form of supply risk management.
+  - title: Shortage gaming in a component market
+    kind: illustrative
+    body: |
+      A distributor (illustrative) faces a shortage of a power chip and allocates supply in proportion to orders. Customers who need 1,000 units order 2,500 to secure their share; recorded demand more than doubles, and the chipmaker plans new capacity against it. When supply recovers, the inflated orders are cancelled and the market swings into surplus. Allocating by past purchases, not current orders, removes the incentive to game.
+cases:
+  - title: "Lumen Home's lamps after the shipping route changed"
+    fictional: true
+    situation: |
+      Lumen Home (fictional), a homeware retailer, buys its best-selling table lamp from a factory in Vietnam at £18 a unit. Disruption to its usual shipping route has forced longer voyages that also arrive less predictably. The exhibit compares its position before and after. Stock is carried at a cost of 25% of its value a year. The buying director proposes switching half the volume to a Turkish supplier: a two-week lead time with a standard deviation of a quarter of a week, at £19.80 a unit.
+    exhibit:
+      caption: Lumen Home, table lamp supply before and after rerouting
+      columns: [Measure, Before rerouting, After rerouting]
+      rows:
+        - [Average weekly demand (units), '2,000', '2,000']
+        - [Standard deviation of weekly demand (units), '200', '200']
+        - [Average lead time (weeks), '4', '6']
+        - [Standard deviation of lead time (weeks), '0.25', '1.0']
+        - [Stock in transit (units), '8,000', '12,000']
+        - [Safety stock for 95% cycle service (units), '1,057', '3,398']
+        - [Value of transit and safety stock (£), '163,026', '277,164']
+      note: Safety stock = 1.65 × √(lead time × 200² + 2,000² × standard deviation of lead time²). Stock valued at £18 a unit. Simulated data.
+    questions:
+      - Explain why safety stock more than triples while the lead time rises by only half. Which change matters more, and why?
+      - Calculate the annual carrying cost of the transit and safety stock before and after, and the increase.
+      - Compare the Turkish proposal on total landed cost rather than unit price. What else, beyond the arithmetic, should the buying director weigh?
+      - How might Lumen Home's ordering after the disruption create a bullwhip effect at the Vietnamese factory, and what would reduce it?
+evaluation: |
+  The supply shocks of the 2020s revived an old debate: did lean, just-in-time supply chains make firms fragile? Three positions can be distinguished.
+
+  The **critics' case** is that decades of cutting inventory, consolidating suppliers and offshoring to the cheapest location removed the buffers that absorb shocks. The **defenders' case** is that the problem was concentration and invisibility, not low inventory: firms with deep supplier relationships and good visibility recovered faster, and buffers are only one way to buy resilience. A **middle view**, consistent with Sheffi's work and with TTR and TTS analysis, is that resilience should be targeted: stock and second sources where recovery is slow and consequences severe, lean flows elsewhere.
+
+  Several claims here are well established: the bullwhip effect and its link to lead times, the arithmetic of pipeline and safety stock, and the value of shared demand data. Others are interpretation. Reshoring is far more talked about than done, because the cost gap is large and many inputs have few sources outside Asia; and estimates of disruption costs come mostly from case studies and surveys of affected firms, which overstate typical losses.
+
+  Measurement is the deeper problem. Resilience is invisible until tested, so the costs of building it are certain and current while the benefits are uncertain and future, which biases decisions towards efficiency. Regulators have begun to respond, as the FDA's request for supply data showed. The infant formula and JLR cases also show that disruption costs fall partly on customers and dealers, which is why private incentives to build resilience may be too weak.
+decision:
+  title: One source or two at Fenwick Mobility
+  fictional: true
+  brief: |
+    Fenwick Mobility (fictional) assembles electric wheelchairs in the UK. Its motor controller, 4% of material cost (about £4.2 million a year), comes from one supplier in Shenzhen with an eight-week lead time; stock is carried at 25% of its value a year. A fire at that plant would take an estimated 16 weeks to recover from; Fenwick holds four weeks of controllers and could survive two more by rescheduling. Weekly contribution is £400,000, and many customers are health services that need repairs and replacements quickly.
+  options:
+    - label: A. Stay single-source, hold more stock
+      text: |
+        Raise controller stock from four to ten weeks of demand: about £480,000 more stock, costing about £120,000 a year to carry. No qualification work, but stock cannot cover a disruption longer than ten weeks plus rescheduling.
+    - label: B. Dual source
+      text: |
+        Qualify a Polish supplier for 30% of volume at 12% more per unit (about £150,000 a year extra) plus £250,000 of testing and certification over nine months. Shorter lead time for that share and a second plant.
+    - label: C. Redesign for a standard part
+      text: |
+        Redesign the drive system to use an industry-standard controller available from several suppliers. About £600,000 of engineering and 12 months, with a small risk of performance loss.
+  criteria:
+    - Exposure where time to recover exceeds time to survive
+    - Total annual cost, including carrying and qualification
+    - Quality, certification and patient safety
+    - Time to implement and interim exposure
+    - Flexibility for future disruptions and growth
+  guidance: |
+    Start with the exposure. TTS is six weeks and TTR 16, a ten-week gap worth about £4 million of contribution, before counting the harm to users who cannot get repairs. Any option that closes the gap at a cost well below that, multiplied by a plausible probability, is worth considering.
+
+    Option A raises TTS to about twelve weeks, still short of 16, and its cost recurs each year; it is a quick bridge, not a solution. Option B removes the single point of failure and shortens the lead time on part of the volume; the premium is modest relative to the exposure, but the second supplier must be certified to medical device standards, and if both rely on the same chip makers, part of the risk remains. Option C costs the most up front and takes longest, but it converts a bottleneck item into a leverage item in Kraljic's terms and improves bargaining power permanently.
+
+    A strong answer combines them: raise stock now (A) as a bridge, start qualification of the second source (B), and evaluate C at the next product redesign. The weakest answer accepts the current position because the controller is only 4% of material cost.
+reading:
+  - source: adv-oe-lee-1997
+    note: The standard analysis of the bullwhip effect, setting out its four causes and remedies still used today.
+  - source: adv-oe-fisher-1997
+    note: A short, influential argument that supply chains must be designed for the kind of product they carry.
+  - source: adv-oe-simchi-levi-2014
+    note: The time-to-recover method for finding hidden exposure in a supply network.
+  - source: adv-oe-sheffi-2005
+    note: A book-length treatment of resilience through redundancy and flexibility, built on case studies of disruptions.
+  - source: adv-oe-kraljic-1983
+    note: The purchasing portfolio matrix that turned buying into supply management.
+basis:
+  - source: adv-oe-tang-2006
+    note: A survey of supply chain risk management approaches.
