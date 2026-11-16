@@ -31,6 +31,8 @@ export const ICONS = {
   map: '<circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><circle cx="5" cy="18" r="2"/><path d="M7 6h10M6 8l5.2 8.3M18 8l-5.2 8.3M7 18h3"/>',
   /* A ribbon bookmark for the save button; filled by the button when the page is saved. */
   bookmark: '<path d="M6.5 3.5h11v17L12 16.25 6.5 20.5z"/>',
+  /* A pencil on a line, for "Add a note" beside the save button. */
+  note: '<path d="M4.5 16.5L15.5 5.5l3 3-11 11h-3z"/><path d="M13 8l3 3"/><path d="M13 20.5h7"/>',
 } as const;
 
 export type IconId = keyof typeof ICONS;
