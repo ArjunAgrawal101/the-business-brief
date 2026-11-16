@@ -53,6 +53,8 @@ export const NAV: NavGroup[] = [
       { label: 'Case Vault', href: '/case-vault/', text: 'An archive of cases by industry and topic, with a Case of the Week' },
       { label: 'Decision Room', href: '/decision-room/', text: 'Commit to a decision, then live with its consequences' },
       { label: 'Boardroom', href: '/boardroom/', text: 'Multi-round simulations: take a seat on the board and follow each decision through' },
+      { label: 'Executive simulation', href: '/boardroom/executive/', text: 'Take one of seven management roles at a company in decline and live with three years of results' },
+      { label: 'Boardroom Briefings', href: '/boardroom-briefings/', text: 'Ten editorial cases on the decisions boards face, each in a Student and an Analysis edition' },
     ],
   },
   {

@@ -44,6 +44,7 @@ export interface IndexInput {
   frameworks?: Readonly<Record<string, { name: string; aliases: readonly string[]; summary: string; question: string; status: 'syllabus' | 'toolkit' | 'enrichment'; level: string; subtopics: readonly string[] }>>;
   /** Advanced Management modules: beyond the IB course, so they carry no IB unit or subtopic and never answer an IB filter. */
   advanced?: ReadonlyArray<{ url: string; title: string; dek: string; domain: string; covers: readonly string[] }>;
+  boardroomBriefings?: ReadonlyArray<{ url: string; title: string; text: string; keys: string; codes: readonly string[] }>;
 }
 
 /** A framework page's type in the results: its standing in the course. */
@@ -245,10 +246,15 @@ export function buildSearchIndex(input: IndexInput): SearchEntry[] {
       codes: [],
       hl: t.level === 'HL',
     });
-  // The frameworks library, framework by framework. Enrichment carries no unit or subtopic, so a unit filter never finds it, and its type says it is beyond the course.
+  // Advanced Management modules: beyond the IB course, so no unit, subtopic or level, and the type says so.
   for (const m of input.advanced ?? []) {
     add({ kind: 'advanced', type: `Advanced management · ${m.domain}`, url: m.url, title: m.title, text: m.dek, keys: m.covers.join(' '), units: [], codes: [], hl: false });
   }
+  // The Boardroom Briefings: fictional board decisions, filed under the IB subtopics each exercises.
+  for (const b of input.boardroomBriefings ?? []) {
+    add({ kind: 'cases', type: 'Boardroom Briefing', url: b.url, title: b.title, text: b.text, keys: b.keys, units: [...new Set(b.codes.map((c) => c.slice(0, c.indexOf('.'))))], codes: [...b.codes], hl: false });
+  }
+  // The frameworks library, framework by framework. Enrichment carries no unit or subtopic, so a unit filter never finds it, and its type says it is beyond the course.
 
   for (const [id, f] of Object.entries(input.frameworks ?? {}).sort((a, b) => a[1].name.localeCompare(b[1].name, 'en', { sensitivity: 'base' }))) {
     const ib = f.status !== 'enrichment';

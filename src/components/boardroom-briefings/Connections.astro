@@ -15,14 +15,24 @@ import { TOOL_KIND_LABELS, toolHref, toolName, type ToolRegistry } from '../../l
 import type { BoardroomBriefing } from '../../lib/boardroom-briefings/schema';
 import type { Framework } from '../../lib/framework-schema';
 import type { Corpus } from '../../lib/integrity';
+import { advancedLibrary } from '../../lib/advanced-content';
+import { DOMAIN_BY_ID, advancedHref } from '../../lib/advanced';
+import { BRIEFING_MODULES } from '../../lib/boardroom-briefings/advanced-links';
 
 interface Props {
+  /** The briefing's id, for the Advanced Management modules that take its decision further. */
+  id: string;
   b: BoardroomBriefing;
   c: Corpus;
   frameworks: Record<string, Framework>;
   registry: ToolRegistry;
 }
-const { b, c, frameworks, registry } = Astro.props;
+const { id, b, c, frameworks, registry } = Astro.props;
+const advanced = await advancedLibrary();
+const further = (BRIEFING_MODULES[id] ?? []).flatMap(([domain, mid]) => {
+  const m = advanced.modules.find((x) => x.id === mid && x.data.domain === domain);
+  return m ? [{ href: advancedHref(domain, mid), title: m.data.title, domain: DOMAIN_BY_ID[domain].name }] : [];
+});
 const ids = new Set([...b.exhibits, ...b.analysis.exhibits].map((e) => e.id));
 const ix = (t: string) => inlineLinked(t, ids);
 const subs = allSubtopics(c);
@@ -40,6 +50,7 @@ const AVAIL: Record<string, string> = {
   repository: 'The platform’s own method',
   supplied: 'Supplied to the project',
   'web-search': 'Found by web search',
+  web: 'Opened and read online',
   'not-available': 'Not available',
 };
 ---
@@ -146,6 +157,21 @@ const AVAIL: Record<string, string> = {
                 <li>
                   <a href={`/frameworks/${f.id}/`}>{frameworks[f.id]?.name}</a> <span class="tag tag--plain">Enrichment</span>
                   <span class="bbr-links__note" set:html={ix(f.use)} />
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      }
+      {
+        further.length > 0 && (
+          <>
+            <h3>Go further: Advanced Management</h3>
+            <ul class="bbr-links" role="list">
+              {further.map((f) => (
+                <li>
+                  <a href={f.href}>{f.title}</a> <span class="tag tag--plain">Beyond the IB course</span>
+                  <span class="bbr-links__note">{f.domain}: the module behind this decision, with real organizations, models and a decision exercise.</span>
                 </li>
               ))}
             </ul>

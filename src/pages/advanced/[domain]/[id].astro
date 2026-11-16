@@ -18,6 +18,9 @@ import type { AdvancedModule } from '../../../lib/advanced-schema';
 import { corpus, longDate } from '../../../lib/content';
 import { allSubtopics, subtopicHref } from '../../../lib/learning';
 import { inline, plain, rich } from '../../../lib/markup';
+import { series } from '../../../lib/boardroom-briefings/content';
+import { briefingHref, issueNo } from '../../../lib/boardroom-briefings/series';
+import { briefingsForModule } from '../../../lib/boardroom-briefings/advanced-links';
 import '../../../styles/advanced.css';
 
 export async function getStaticPaths() {
@@ -46,6 +49,11 @@ const cite = (sid: string) => {
 };
 const sourceLine = (ids: string[]) => ids.map(cite).filter(Boolean) as Array<{ text: string; url?: string }>;
 const words = moduleWords(m);
+const briefings = await series();
+const boardCases = briefingsForModule(m.domain, id).flatMap((bid) => {
+  const found = briefings.list.find(([x]) => x === bid);
+  return found ? [{ href: briefingHref(bid), title: `${issueNo(found[1].number)}: ${found[1].question}` }] : [];
+});
 const n = (k: (typeof MODULE_PARTS)[number]['id']) => String(MODULE_PARTS.findIndex((p) => p.id === k) + 1).padStart(2, '0');
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -279,6 +287,20 @@ const jsonLd = {
           <summary>Read the guidance</summary>
           <div class="prose" set:html={rich(m.decision.guidance)} />
         </details>
+        {
+          boardCases.length > 0 && (
+            <aside class="am-board" aria-label="Boardroom Briefings">
+              <p class="label label--ink">Put it to a board</p>
+              <ul role="list">
+                {boardCases.map((bc) => (
+                  <li>
+                    <a href={bc.href}>{bc.title}</a> <span class="am-board__note">A Boardroom Briefing, with an Analysis edition that weighs the options</span>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          )
+        }
       </section>
 
       <section id="reading" class="am-sec" aria-labelledby="reading-h">

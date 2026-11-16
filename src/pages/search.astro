@@ -18,6 +18,8 @@ import { library } from '../lib/resources';
 import { library as frameworkLibrary } from '../lib/frameworks-content';
 import { advancedLibrary } from '../lib/advanced-content';
 import { DOMAIN_BY_ID, advancedHref } from '../lib/advanced';
+import { series as briefingSeries } from '../lib/boardroom-briefings/content';
+import { briefingHref as seriesHref, issueNo } from '../lib/boardroom-briefings/series';
 import { plain } from '../lib/markup';
 import { NAV } from '../lib/navigation';
 import { buildSearchIndex, type SearchLinks } from '../lib/search-index';
@@ -53,6 +55,13 @@ const entries = buildSearchIndex({
   pathways: (await pathwaysInOrder()).map((p) => ({ id: p.id, name: p.data.name, promise: p.data.promise })),
   frameworks: (await frameworkLibrary()).frameworks,
   advanced: (await advancedLibrary()).modules.map((m) => ({ url: advancedHref(m.data.domain, m.id), title: m.data.title, dek: plain(m.data.dek), domain: DOMAIN_BY_ID[m.data.domain].name, covers: m.data.covers })),
+  boardroomBriefings: (await briefingSeries()).list.map(([id, b]) => ({
+    url: seriesHref(id),
+    title: `${issueNo(b.number)}: ${b.question}`,
+    text: plain(b.dek),
+    keys: `${b.title} ${b.company.name} ${b.industry} ${b.decisionType} ${b.functions.join(' ')}`,
+    codes: b.course.subtopics.map((s) => s.code),
+  })),
 });
 const groups = SEARCH_KINDS.map((k) => ({ ...k, items: entries.filter((e) => e.kind === k.id) })).filter((g) => g.items.length);
 const units = c.curricula['ib-dp-bm']?.units ?? [];

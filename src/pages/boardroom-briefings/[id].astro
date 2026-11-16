@@ -39,7 +39,7 @@ interface Props {
   prev?: [string, BoardroomBriefing];
   next?: [string, BoardroomBriefing];
 }
-const { b, prev, next } = Astro.props;
+const { id, b, prev, next } = Astro.props;
 const s = await series();
 const type = DECISION_TYPE_LABELS[b.decisionType];
 const studentWords = [
@@ -151,7 +151,7 @@ const jsonLd = {
       <AnalysisEdition b={b} minutes={readingMinutes(analysisWords)} />
     </div>
 
-    <Connections b={b} c={s.c} frameworks={s.frameworks} registry={s.registry} />
+    <Connections id={id} b={b} c={s.c} frameworks={s.frameworks} registry={s.registry} />
 
     <nav class="bbr-series-nav" aria-label={`More from ${SERIES_NAME}`}>
       {
