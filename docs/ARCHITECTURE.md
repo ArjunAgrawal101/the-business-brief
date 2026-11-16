@@ -21,7 +21,7 @@ There is no UI framework. Components are `.astro` files; browser behaviour is pl
 
 ## Why static
 
-The platform has no accounts and stores nothing on a server. A static site is the simplest thing that meets the requirements: it is fast, cheap to host, has no runtime attack surface, and can be read offline once loaded. The learner dashboard's record of the pages a reader opens stays in that reader's browser, can be paused, exported and cleared, and is described on the privacy page; anything that would leave the device, such as accounts, analytics or progress across devices, needs a privacy and consent review first (see `src/pages/privacy.astro`).
+The platform has no accounts and stores nothing on a server. A static site is the simplest thing that meets the requirements: it is fast, cheap to host, has no runtime attack surface, and can be read offline once loaded. My Business Workspace (the learner dashboard) keeps the reader's record, learning list, notes and saved results in that reader's browser, where it can be paused, exported, imported and cleared, and is described on the privacy page; anything that would leave the device, such as accounts, analytics or progress across devices, needs a privacy and consent review first (see `src/pages/privacy.astro`).
 
 ## The content layer
 
@@ -113,7 +113,15 @@ Each interaction follows the same pattern:
 4. Changing results are announced through a polite live region; errors are shown beside the field and marked with `aria-invalid`.
 5. If a script fails, the component shows its own error message and the server-rendered content remains.
 
-Work that a learner might want back is kept in `localStorage` under keys starting `bb:` (listed on the privacy page). Storage access never throws: if it is blocked, the interaction still works for the visit. The learner dashboard (`/dashboard/`, also rendered at its old address, `/progress/`) reads these keys through `dashboardView()` in `src/lib/dashboard.ts`. Two keys are its own, with their rules (parsing, size caps, merging, the import check) in `src/lib/learner.ts`: `bb:learner`, written by the recorder `src/scripts/learner.ts` with the pages opened by kind and the exercise items checked (it listens for the quiz engine's `quiz:progress`), and `bb:saved`, written by the save button (`src/components/ui/SaveButton.astro`). The recorder runs once a page, only when storage works and the reader has not paused it.
+Work that a learner might want back is kept in `localStorage` under keys starting `bb:` (listed on the privacy page). Storage access never throws: if it is blocked, the interaction still works for the visit. My Business Workspace (`/dashboard/`, also rendered at its old address, `/progress/`; the component is `src/components/learner/Dashboard.astro`) reads these keys through `workspaceView()` in `src/lib/workspace.ts`, which builds on `dashboardView()` in `src/lib/dashboard.ts`. Two keys came with the dashboard, with their rules (parsing, size caps, merging, the import check) in `src/lib/learner.ts`: `bb:learner`, written by the recorder `src/scripts/learner.ts` with the pages opened by kind and the exercise items checked (it listens for the quiz engine's `quiz:progress`), and `bb:saved`, written by the save button (`src/components/ui/SaveButton.astro`) and by the workspace's "Add a page to your list". The recorder runs once a page, only when storage works and the reader has not paused it.
+
+Three keys are the workspace's own, with every rule (parsing damaged input, caps, merging, the selection export and the import's cleaning) in `src/lib/workspace.ts`:
+
+- `bb:workspace:list`: the learning list's arrangement, the order the reader gave the saved items and each one's status (to do, in progress, done) and short note. `bb:saved` itself is unchanged; items saved since the reader last arranged the list come first.
+- `bb:workspace:notes`: the notebook, case notes under six headings (problem identified, evidence, relevant theory, strategic alternatives, recommendation, evaluation) or free notes, each attached to a page or standalone. Notes are written in the workspace or with "Add a note" beside every Save button (`src/scripts/note-button.ts`, one dialog per page built on first use); both use the form in `src/scripts/note-editor.ts`.
+- `bb:workspace:snapshots`: results saved from the Financial Laboratory with "Save this result to my workspace" (in `src/scripts/finance-lab/engine.ts`): the calculator, its figures as `report.given` lists them, the headline and the date, with an address that reopens the calculator on the same figures where it can read them back.
+
+The workspace's saved analyses are read from each tool's own items (`bb:strategy:`, `bb:market:`, `bb:people:`, `bb:ops:`, `bb:lab:` with its summaries, `bb:boardroom:` and the rest), never written. A selection of work exports as Markdown or as JSON in the whole-record export's format, holding only the chosen items, so "Import a copy" reads either file and combines the list, the notebook and the snapshots with what is there. The page's parts are in `src/scripts/workspace/` (the list, notes, analyses and export), joined by `src/scripts/dashboard.ts`.
 
 Controls that need a script outside an interaction carry `needs-js`; an inline script in the head adds the class `js` to `<html>` before the first paint, and the controls stay hidden without it. A browser test checks that no page shows a button it cannot run.
 
@@ -151,7 +159,7 @@ The quiz engine (`src/scripts/quiz.ts`) dispatches a bubbling `quiz:progress` ev
 | `/strategy-studio/[tool]/` | The Strategy Studio's tools: `swot`, `steeple`, `five-forces`, `ansoff`, `bcg-matrix`, `generic-strategies`, `stakeholder-map`, `decision-tree`, `force-field`, `option-appraisal` |
 | `/market-studio/[instrument]/` | The nine Market Studio instruments, from one template (`src/pages/market-studio/[tool].astro`) |
 | `/people-and-culture/[tool]/`, `/operations-floor/[tool]/` | The five People and Culture and five Operations Floor tools, from one frame (`src/components/tools/ToolPage.astro`, `src/lib/room-tools.ts`) |
-| `/dashboard/`, `/progress/` | The learner dashboard: what this browser has kept (the old address renders the same page) |
+| `/dashboard/`, `/progress/` | My Business Workspace, the learner dashboard: the learning list, notes, saved analyses and the export of selected work, with what this browser has kept (the old address renders the same page) |
 | `/toolkit/`, `/toolkit/[id]/` | Toolkit (guides for complete tools only) |
 | `/exam-desk/practice/` | All practice questions, filterable (the other Exam Desk addresses redirect to the Assessment Centre) |
 | `/examiner-lens/`, `/ia-studio/` | Command terms; the IA planner |
