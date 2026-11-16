@@ -1,24 +1,44 @@
 ---
 /**
- * The Business Intelligence Briefing: real business developments from 2025
- * and 2026, curated by hand and read through the ideas of the course. The
- * front page carries a lead story, every item in date order with filters by
- * unit, key concept and kind of development, how the briefing is made, and
- * the documents behind it. Without JavaScript every item is listed; the
- * filters only hide what the reader asks them to.
+ * The Business Intelligence Briefing: real business developments from 2024
+ * to 2026, curated by hand and read through the ideas of the course, laid
+ * out as an issue of a business publication. The front page carries a lead
+ * story and the rest of the issue; the themes, each a page of its own so
+ * they work without JavaScript; every item in date order, with filters by
+ * unit, key concept and theme; the six questions every item answers; how the
+ * briefing is made; and the documents behind it. Without JavaScript every
+ * item is listed and the filters are not shown; the filters only hide what
+ * the reader asks them to.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
 import { briefing, briefingHref } from '../../lib/briefing-content';
-import { CATEGORY_LABELS, SOURCE_KIND_LABELS, dateParts, facetsOf, filterSummary, formatDate, itemCount, latest } from '../../lib/briefing';
+import {
+  CATEGORY_LABELS,
+  SOURCE_KIND_LABELS,
+  THEME_INFO,
+  dateParts,
+  facetsOf,
+  filterSummary,
+  formatDate,
+  inTheme,
+  itemCount,
+  latest,
+  regionsLine,
+  themeHref,
+} from '../../lib/briefing';
 import { corpus } from '../../lib/content';
 import { CONCEPT_NAMES } from '../../lib/labels';
-import { INTEL_CATEGORIES, type IntelSource } from '../../lib/schemas';
+import { INTEL_CATEGORIES, INTEL_THEMES, type IntelSource } from '../../lib/schemas';
+import '../../styles/intelligence.css';
 
 const items = await briefing();
 const c = await corpus();
 const lead = items.find(([, it]) => it.lead);
+// The rest of the issue on the front page: the newest items after the lead.
+const stories = items.filter(([, it]) => !it.lead).slice(0, 6);
 const curated = latest(items.map(([, it]) => it.written)) ?? '';
 const newestCheck = latest(items.map(([, it]) => it.checked)) ?? '';
 const units = c.curricula['ib-dp-bm']?.units ?? [];
@@ -36,16 +56,27 @@ const docs = [...documents.values()].sort((a, b) => a.s.publisher.localeCompare(
 const citations = items.reduce((n, [, it]) => n + it.sources.length, 0);
 const primaryDocs = docs.filter((d) => d.s.primary).length;
 const usedKinds = INTEL_CATEGORIES.filter((k) => items.some(([, it]) => it.categories.includes(k)));
+// The themes shown as sections: the twelve editorial themes, then any other theme an item carries.
+const themes = [...INTEL_THEMES, ...usedKinds.filter((k) => !(INTEL_THEMES as readonly string[]).includes(k))];
 const usedUnits = units.filter((u) => items.some(([, it]) => facetsOf(it).units.includes(String(u.number))));
 const anyTools = items.some(([, it]) => it.concepts.tools.length > 0);
+const regions = new Set(items.flatMap(([, it]) => it.regions));
 const docDate = (s: IntelSource) => (s.published ? formatDate(s.published) : 'Undated page');
 const kindsLine = (cats: string[]) => cats.map((k) => CATEGORY_LABELS[k as keyof typeof CATEGORY_LABELS]).join(' · ');
 const unitsLine = (us: string[]) => us.map((u) => (u === 'toolkit' ? 'Toolkit' : `Unit ${u}`)).join(', ');
+const SIX = [
+  ['What happened?', 'The development and what followed, as dated facts, each traced to the document that states it.', 'external-evidence'],
+  ['What is the business context?', 'The organization, its industry and the position it was in when it acted.', 'analysis'],
+  ['Which management concepts are relevant?', 'The IB subtopics, terms, tools and frameworks at work, with what lies beyond the course labelled apart.', 'analysis'],
+  ['What choices did the organization face?', 'The realistic options, the case for and against each, and the one it took where the facts show it.', 'analysis'],
+  ['What were the implications?', 'What followed, or may follow, for the organization, its stakeholders and its industry.', 'analysis'],
+  ['What can a student or manager learn?', 'Lessons that travel to other businesses, a discussion question of the platform’s own, and the limits of the evidence.', 'analysis'],
+] as const;
 ---
 
 <BaseLayout
   title="Business Intelligence Briefing"
-  description="Real business developments from 2025 and 2026, curated by hand, dated and sourced to the organizations' own documents, and read through the ideas of IB Business Management."
+  description="Real business developments from 2024 to 2026, curated by hand, dated and sourced to the organizations' own documents, filed under twelve themes and read through the ideas of IB Business Management and beyond."
   section="intelligence"
 >
   <div class="wrap">
@@ -55,8 +86,14 @@ const unitsLine = (us: string[]) => us.map((u) => (u === 'toolkit' ? 'Toolkit' :
         <div>
           <p class="label label--ink ib-mast__kicker">The Business Brief · A curated briefing</p>
           <h1 class="ib-mast__title">The Business Intelligence <em>Briefing</em></h1>
+          <ul class="ib-issue" role="list" aria-label="This edition">
+            <li>Edition of <time datetime={curated}>{formatDate(curated)}</time></li>
+            <li>{itemCount(items.length)}</li>
+            <li>{themes.length} themes</li>
+            <li>{regions.size} {regions.size === 1 ? 'region' : 'regions'}</li>
+          </ul>
           <p class="lead ib-mast__lead">
-            Real business developments from 2025 and 2026, read through the ideas of the course. Each item sets out what happened, with every fact dated and traced to the document that states it, and then, labelled as analysis, why it matters, the concepts at work, the choices that were open and what students and managers can learn.
+            Real business developments from 2024 to 2026, read through the ideas of the course. Each item answers six questions in order: what happened, the business context, the management concepts that apply, the choices the organization faced, the implications, and what a student or manager can learn. Every fact is dated and traced to the document that states it; everything after the facts is labelled as analysis.
           </p>
         </div>
         <nav class="ib-contents" aria-label="In this edition">
@@ -91,52 +128,115 @@ const unitsLine = (us: string[]) => us.map((u) => (u === 'toolkit' ? 'Toolkit' :
         </div>
       </dl>
       <p class="ib-notice">
-        <strong>A curated briefing, not a news feed.</strong> Every item was written and checked on the dates it shows, and nothing here updates by itself. Businesses move on, so an item can become outdated after its check date; read it as an account of what was true then.
+        <strong>A curated briefing, not a news feed.</strong> Every item was published and checked on the dates it shows, and nothing here updates by itself. Businesses move on, so an item can become outdated after its check date; read it as an account of what was true then.
       </p>
     </header>
   </div>
 
   <div class="wrap page-body">
-    {
-      lead && (
-        <section class="ib-lead" aria-labelledby="lead-title">
-          <article class="ib-lead__card">
-            <div class="ib-lead__text">
-              <p class="label ib-lead__kicker">
-                <span class="ib-lead__flag">Lead story</span> · {kindsLine(lead[1].categories)} · <time datetime={lead[1].date}>{formatDate(lead[1].date)}</time>
-              </p>
-              <h2 class="ib-lead__title" id="lead-title">
-                <a href={briefingHref(lead[0])}>{lead[1].title}</a>
-              </h2>
-              <p class="ib-lead__dek">{lead[1].dek}</p>
-              <p class="ib-lead__meta small">
-                {lead[1].organizations.join(', ')} · {unitsLine(facetsOf(lead[1]).units)} · Written {formatDate(lead[1].written)}, checked {formatDate(lead[1].checked)}
-              </p>
-              <p>
-                <a class="btn btn--gold" href={briefingHref(lead[0])}>
-                  Read the briefing<span class="sr-only">: {lead[1].title}</span>
-                </a>
-              </p>
-            </div>
-            {
-              lead[1].figures.length > 0 && (
-                <dl class="ib-figures ib-figures--lead" aria-label="Headline figures, from the sources">
-                  {lead[1].figures.map((g) => (
-                    <div>
-                      <dt>{g.label}</dt>
-                      <dd>{g.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              )
-            }
-          </article>
-        </section>
-      )
-    }
+    <div class="ib-front">
+      {
+        lead && (
+          <section class="ib-lead" aria-labelledby="lead-title">
+            <article class="ib-lead__card">
+              <div class="ib-lead__text">
+                <p class="label ib-lead__kicker">
+                  <span class="ib-lead__flag">Lead story</span> · {kindsLine(lead[1].categories)} · <time datetime={lead[1].date}>{formatDate(lead[1].date)}</time>
+                </p>
+                <h2 class="ib-lead__title" id="lead-title">
+                  <a href={briefingHref(lead[0])}>{lead[1].title}</a>
+                </h2>
+                <p class="ib-lead__dek">{lead[1].dek}</p>
+                <p class="ib-lead__meta small">
+                  {lead[1].organizations.join(', ')} · {regionsLine(lead[1].regions)} · {lead[1].industry} · {unitsLine(facetsOf(lead[1]).units)}
+                </p>
+                <ul class="ib-dates" role="list">
+                  <li><span class="label">Published</span><time datetime={lead[1].written}>{formatDate(lead[1].written)}</time></li>
+                  <li><span class="label">Checked</span><time datetime={lead[1].checked}>{formatDate(lead[1].checked)}</time></li>
+                </ul>
+                <p>
+                  <a class="btn btn--gold" href={briefingHref(lead[0])}>
+                    Read the briefing<span class="sr-only">: {lead[1].title}</span>
+                  </a>
+                </p>
+              </div>
+              {
+                lead[1].figures.length > 0 && (
+                  <dl class="ib-figures ib-figures--lead" aria-label="Headline figures, from the sources">
+                    {lead[1].figures.map((g) => (
+                      <div>
+                        <dt>{g.label}</dt>
+                        <dd>{g.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                )
+              }
+            </article>
+          </section>
+        )
+      }
+
+      {
+        stories.length > 0 && (
+          <section aria-labelledby="issue-h">
+            <h2 class="sr-only" id="issue-h">Also in this edition</h2>
+            <ul class="ib-stories" role="list">
+              {stories.map(([id, it]) => (
+                <li class="ib-story">
+                  <p class="label">
+                    {kindsLine(it.categories)} · <time datetime={it.date}>{formatDate(it.date)}</time>
+                  </p>
+                  <h3 class="ib-story__title">
+                    <a href={briefingHref(id)}>{it.title}</a>
+                  </h3>
+                  <p class="ib-story__dek">{it.dek}</p>
+                  <p class="ib-row__where">
+                    {it.organizations.join(', ')} · {regionsLine(it.regions)} · {it.industry}
+                  </p>
+                  <ul class="ib-dates" role="list">
+                    <li><span class="label">Published</span><time datetime={it.written}>{formatDate(it.written)}</time></li>
+                    <li><span class="label">Checked</span><time datetime={it.checked}>{formatDate(it.checked)}</time></li>
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+    </div>
+
+    <section aria-labelledby="themes-h" id="themes">
+      <SectionHead no={1} title="The themes" id="themes-h" dek="Every item is filed under one or more themes. Each theme is a page of its own, with its items newest first." />
+      <ul class="ib-themes" role="list">
+        {
+          themes.map((k) => {
+            const list = inTheme(items, k);
+            return (
+              <li class="ib-theme">
+                <h3 class="ib-theme__name">
+                  <a href={themeHref(k)}>{THEME_INFO[k].label}</a>
+                  <span class="ib-theme__count">{itemCount(list.length)}</span>
+                </h3>
+                <p class="ib-theme__dek">{THEME_INFO[k].dek}</p>
+                {list.length > 0 && (
+                  <ul class="ib-theme__latest" role="list">
+                    {list.slice(0, 2).map(([id, it]) => (
+                      <li>
+                        <a href={briefingHref(id)}>{it.title}</a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            );
+          })
+        }
+      </ul>
+    </section>
 
     <section aria-labelledby="list-h" data-ix="briefing">
-      <SectionHead no={1} title="Every item, newest first" id="list-h" dek="Each development is dated by its headline fact. Filter the list by unit, by the IB's key concepts or by the kind of development." />
+      <SectionHead no={2} title="Every item, newest first" id="list-h" dek="Each development is dated by its headline fact, and each item shows when it was published and when its sources were checked. Filter the list by unit, by the IB's key concepts or by theme." />
 
       <div class="ib-filters js-only" role="group" aria-label="Filter the briefing">
         <div class="ib-filter">
@@ -155,9 +255,9 @@ const unitsLine = (us: string[]) => us.map((u) => (u === 'toolkit' ? 'Toolkit' :
           </select>
         </div>
         <div class="ib-filter">
-          <label class="label" for="ib-kind">Development</label>
+          <label class="label" for="ib-kind">Theme</label>
           <select id="ib-kind" data-filter="kind">
-            <option value="">Every kind</option>
+            <option value="">Every theme</option>
             {usedKinds.map((k) => <option value={k}>{CATEGORY_LABELS[k]}</option>)}
           </select>
         </div>
@@ -189,11 +289,21 @@ const unitsLine = (us: string[]) => us.map((u) => (u === 'toolkit' ? 'Toolkit' :
                     <a href={briefingHref(id)}>{it.title}</a>
                   </h3>
                   <p class="ib-row__dek">{it.dek}</p>
+                  <ul class="ib-dates" role="list">
+                    <li><span class="label">Published</span><time datetime={it.written}>{formatDate(it.written)}</time></li>
+                    <li><span class="label">Checked</span><time datetime={it.checked}>{formatDate(it.checked)}</time></li>
+                  </ul>
                 </div>
                 <dl class="ib-row__side">
                   <div>
                     <dt>Organizations</dt>
                     <dd>{it.organizations.join(', ')}</dd>
+                  </div>
+                  <div>
+                    <dt>Where</dt>
+                    <dd>
+                      {regionsLine(it.regions)} · {it.industry}
+                    </dd>
                   </div>
                   <div>
                     <dt>Course</dt>
@@ -204,9 +314,9 @@ const unitsLine = (us: string[]) => us.map((u) => (u === 'toolkit' ? 'Toolkit' :
                     <dd>{it.keyConcepts.map((k) => CONCEPT_NAMES[k]).join(', ')}</dd>
                   </div>
                   <div>
-                    <dt>Checked</dt>
+                    <dt>Sources</dt>
                     <dd>
-                      <time datetime={it.checked}>{formatDate(it.checked)}</time>, {it.sources.length} {it.sources.length === 1 ? 'source' : 'sources'}
+                      {it.sources.length} {it.sources.length === 1 ? 'source' : 'sources'}, {it.sources.every((s) => s.primary) ? 'all primary' : `${it.sources.filter((s) => s.primary).length} primary`}
                     </dd>
                   </div>
                 </dl>
@@ -221,28 +331,53 @@ const unitsLine = (us: string[]) => us.map((u) => (u === 'toolkit' ? 'Toolkit' :
       </div>
     </section>
 
+    <section aria-labelledby="six-h">
+      <SectionHead no={3} title="Six questions, in order" id="six-h" dek="Every item answers the same six questions, so that items can be compared and a reader always knows where the facts end and the analysis begins." />
+      <ol class="ib-six" role="list">
+        {
+          SIX.map(([q, text, kind]) => (
+            <li>
+              <div>
+                <h3>{q}</h3>
+                <p>{text}</p>
+                {kind === 'external-evidence' ? <ProvenanceTag kind="external-evidence" /> : <span class="tag tag--framework">The Business Brief's analysis</span>}
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
     <section aria-labelledby="method-h">
-      <SectionHead no={2} title="How this briefing is made" id="method-h" dek="The rules every item follows. The build checks them, and fails if any item breaks one." />
+      <SectionHead no={4} title="How this briefing is made" id="method-h" dek="The rules every item follows. The build checks them, and fails if any item breaks one." />
       <div class="ib-rules">
         <div>
           <h3>Curated, not live</h3>
-          <p>Items are chosen by hand for what they teach, not for how recent they are. Each shows when it was written and when its sources were last checked. Nothing changes after that unless the item is checked again and its dates move.</p>
+          <p>Items are chosen by hand for what they teach, not for how recent they are. Each shows when it was published and when its sources were last checked. Nothing changes after that unless the item is checked again and its dates move.</p>
         </div>
         <div>
           <h3>Traced to the document</h3>
-          <p>Every fact names the source that states it, and every source was opened and read in full on its access date. A development is included only when its primary sources could be read: fewer items, rather than weaker ones.</p>
+          <p>Every fact names the source that states it, and every source was opened and read on its access date. A development is included only when its primary sources could be read: fewer items, rather than weaker ones.</p>
         </div>
         <div>
           <h3>Facts apart from analysis</h3>
-          <p>"What happened" holds only sourced facts. Everything after it, from why it matters to the lessons, is the platform's analysis and is labelled as such. Quotations are avoided; facts are given in the platform's own words.</p>
+          <p>"What happened?" holds only sourced facts. Everything after it, from the business context to the lessons, is the platform's analysis and is labelled as such. Quotations are avoided; facts are given in the platform's own words.</p>
         </div>
         <div>
           <h3>Primary sources first</h3>
           <p>The sources are the organizations' own releases, reports and annual reports. They are authoritative on what a business did and said, and partial on why. Each item ends with the limits of its evidence.</p>
         </div>
         <div>
+          <h3>The course, and beyond it</h3>
+          <p>Each item links to the IB subtopics, terms, toolkit tools and frameworks it illustrates. Ideas beyond the IB course, for undergraduate, MBA and professional readers, are shown apart and labelled as enrichment.</p>
+        </div>
+        <div>
+          <h3>Every theme covered</h3>
+          <p>The briefing covers all twelve themes, from corporate strategy to industry developments, and the build fails if a theme is left without an item.</p>
+        </div>
+        <div>
           <h3>Dated as precisely as the source</h3>
-          <p>A fact carries the date its source gives. When a source names only a month, so does the item. Facts read from a live page with no date are marked as at the day the page was read.</p>
+          <p>A fact carries the date its source gives. When a source names only a month, so does the item. Facts read from a live page with no date are marked as at the day the page was read, and no fact is dated later than every source it cites.</p>
         </div>
         <div>
           <h3>A question of our own</h3>
@@ -252,7 +387,7 @@ const unitsLine = (us: string[]) => us.map((u) => (u === 'toolkit' ? 'Toolkit' :
     </section>
 
     <section aria-labelledby="docs-h">
-      <SectionHead no={3} title="The documents behind this edition" id="docs-h" dek={`${docs.length} documents, cited ${citations} times across ${itemCount(items.length)}. Each was read in full on the date shown.`} />
+      <SectionHead no={5} title="The documents behind this edition" id="docs-h" dek={`${docs.length} documents, cited ${citations} times across ${itemCount(items.length)}. Each was read on the date shown.`} />
       <ul class="ib-docs" role="list">
         {
           docs.map(({ s, items: used }) => (
@@ -276,494 +411,6 @@ const unitsLine = (us: string[]) => us.map((u) => (u === 'toolkit' ? 'Toolkit' :
     </section>
   </div>
 </BaseLayout>
-
-<style>
-  .ib-mast {
-    padding-block: var(--sp-5) var(--sp-6);
-  }
-
-  .ib-mast__grid {
-    display: grid;
-    gap: var(--sp-6);
-  }
-
-  @media (min-width: 64rem) {
-    .ib-mast__grid {
-      grid-template-columns: minmax(0, 1fr) minmax(18rem, 22rem);
-      column-gap: var(--sp-8);
-      align-items: start;
-    }
-  }
-
-  .ib-mast__kicker {
-    margin-top: var(--sp-5);
-  }
-
-  .ib-contents {
-    display: none;
-  }
-
-  @media (min-width: 64rem) {
-    .ib-contents {
-      display: block;
-      margin-top: var(--sp-5);
-      padding-top: var(--sp-3);
-      border-top: 2px solid var(--rule-ink);
-    }
-  }
-
-  .ib-contents ol {
-    margin: var(--sp-2) 0 0;
-    padding: 0;
-    list-style: none;
-    counter-reset: contents;
-  }
-
-  .ib-contents li {
-    margin: 0;
-    border-bottom: 1px solid var(--rule-hair);
-  }
-
-  .ib-contents a {
-    display: block;
-    padding: 0.4rem 0;
-    font-family: var(--font-display);
-    font-size: 0.9375rem;
-    line-height: 1.3;
-    color: var(--text-strong);
-    text-decoration: none;
-  }
-
-  .ib-contents a:hover {
-    color: var(--cobalt-text);
-    text-decoration: underline;
-  }
-
-  .ib-mast__title {
-    margin-top: var(--sp-3);
-    max-width: 18ch;
-    font-size: var(--fs-h1);
-    line-height: var(--lh-tight);
-    letter-spacing: -0.015em;
-  }
-
-  .ib-mast__title em {
-    color: var(--brass-text);
-    font-weight: 400;
-  }
-
-  .ib-mast__lead {
-    margin-top: var(--sp-4);
-    max-width: 46rem;
-  }
-
-  .ib-stamp {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0;
-    margin: var(--sp-6) 0 0;
-    border-top: 2px solid var(--rule-ink);
-    border-bottom: 1px solid var(--rule-hair);
-  }
-
-  @media (min-width: 48rem) {
-    .ib-stamp {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-  }
-
-  .ib-stamp > div {
-    padding: var(--sp-3) var(--sp-4) var(--sp-3) 0;
-  }
-
-  /* Two columns on a phone, four from tablet width: a rule between columns, and between rows on a phone. */
-  .ib-stamp > div:nth-child(even) {
-    padding-left: var(--sp-4);
-    border-left: 1px solid var(--rule-hair);
-  }
-
-  .ib-stamp > div:nth-child(n + 3) {
-    border-top: 1px solid var(--rule-hair);
-  }
-
-  @media (min-width: 48rem) {
-    .ib-stamp > div:nth-child(n + 2) {
-      padding-left: var(--sp-4);
-      border-left: 1px solid var(--rule-hair);
-    }
-
-    .ib-stamp > div:nth-child(n + 3) {
-      border-top: 0;
-    }
-  }
-
-  .ib-stamp dt {
-    font-family: var(--font-ui);
-    font-size: var(--fs-label);
-    font-weight: 600;
-    letter-spacing: var(--track-label);
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-
-  .ib-stamp dd {
-    margin: var(--sp-1) 0 0;
-    font-family: var(--font-display);
-    font-size: clamp(1rem, 0.9rem + 0.4vw, 1.1875rem);
-    color: var(--text-strong);
-    font-variant-numeric: tabular-nums lining-nums;
-  }
-
-  .ib-notice {
-    margin-top: var(--sp-4);
-    max-width: 46rem;
-    padding-left: var(--sp-4);
-    border-left: 3px solid var(--gold-500);
-    font-size: var(--fs-small);
-    color: var(--text-body);
-  }
-
-  /* The lead story */
-  .ib-lead__card {
-    display: grid;
-    gap: var(--sp-5);
-    padding: clamp(var(--sp-5), 4vw, var(--sp-7));
-    background: var(--surface-ink);
-    color: var(--text-on-ink);
-    border-top: 3px solid var(--gold-400);
-  }
-
-  @media (min-width: 64rem) {
-    .ib-lead__card {
-      grid-template-columns: minmax(0, 1.6fr) minmax(16rem, 1fr);
-      align-items: end;
-      column-gap: var(--sp-7);
-    }
-  }
-
-  .ib-lead__kicker {
-    color: var(--text-on-ink-muted);
-  }
-
-  .ib-lead__flag {
-    color: var(--text-gold-on-ink);
-  }
-
-  .ib-lead__title {
-    margin-top: var(--sp-3);
-    font-size: var(--fs-h2);
-    line-height: var(--lh-snug);
-    color: var(--text-on-ink);
-  }
-
-  .ib-lead__title a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .ib-lead__title a:hover {
-    text-decoration: underline;
-    text-decoration-color: var(--gold-400);
-    text-decoration-thickness: 2px;
-  }
-
-  .ib-lead__title a:focus-visible {
-    outline: var(--focus-ring-on-ink);
-  }
-
-  .ib-lead__dek {
-    margin-top: var(--sp-4);
-    max-width: 40rem;
-    font-size: var(--fs-lead);
-    line-height: 1.5;
-    color: var(--text-on-ink);
-  }
-
-  .ib-lead__meta {
-    margin-top: var(--sp-3);
-    color: var(--text-on-ink-muted);
-  }
-
-  .ib-lead__text > p:last-child {
-    margin-top: var(--sp-5);
-  }
-
-  .ib-lead .btn--gold:focus-visible {
-    outline: var(--focus-ring-on-ink);
-  }
-
-  .ib-figures {
-    display: grid;
-    gap: 0;
-    margin: 0;
-  }
-
-  .ib-figures > div {
-    padding: var(--sp-3) 0;
-    border-top: 1px solid var(--rule-on-ink);
-  }
-
-  .ib-figures dt {
-    font-size: var(--fs-small);
-    color: var(--text-on-ink-muted);
-  }
-
-  .ib-figures dd {
-    margin: 0.15rem 0 0;
-    font-family: var(--font-display);
-    font-size: clamp(1.75rem, 1.4rem + 1.3vw, 2.5rem);
-    line-height: 1.1;
-    color: var(--text-gold-on-ink);
-    font-variant-numeric: tabular-nums lining-nums;
-  }
-
-  /* Filters */
-  .ib-filters {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: var(--sp-3) var(--sp-5);
-    margin-top: var(--sp-5);
-    padding: var(--sp-4) 0;
-    border-top: 1px solid var(--rule-hair);
-    border-bottom: 1px solid var(--rule-hair);
-  }
-
-  .ib-filter {
-    display: grid;
-    flex: 1 1 13rem;
-    gap: 0.3rem;
-  }
-
-  @media (min-width: 60rem) {
-    .ib-filter {
-      flex: 0 1 17rem;
-    }
-  }
-
-  .ib-filter select {
-    width: 100%;
-    min-height: 2.75rem;
-    padding: 0.35rem 0.6rem;
-    border: 1px solid var(--rule-control);
-    border-radius: var(--radius-2);
-    background: var(--surface-sheet);
-    color: var(--text-strong);
-    font: 500 0.9375rem/1.2 var(--font-ui);
-  }
-
-  .ib-filters__reset {
-    min-height: 2.75rem;
-  }
-
-  .ib-count {
-    margin-left: auto;
-    font-size: var(--fs-small);
-    color: var(--text-muted);
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* The dated list */
-  .ib-list {
-    margin: var(--sp-5) 0 0;
-    padding: 0;
-    list-style: none;
-    border-top: 2px solid var(--rule-ink);
-  }
-
-  .ib-row,
-  .ib-docs li {
-    margin: 0;
-  }
-
-  .ib-row {
-    display: grid;
-    grid-template-columns: 4.25rem minmax(0, 1fr);
-    gap: var(--sp-3) var(--sp-4);
-    padding: var(--sp-5) 0;
-    border-bottom: 1px solid var(--rule-hair);
-  }
-
-  @media (min-width: 60rem) {
-    .ib-row {
-      grid-template-columns: 6rem minmax(0, 1fr) minmax(14rem, 17rem);
-      column-gap: var(--sp-6);
-    }
-  }
-
-  .ib-row__date {
-    margin: 0;
-    font-variant-numeric: tabular-nums lining-nums;
-  }
-
-  .ib-row__date time {
-    display: grid;
-    justify-items: start;
-    line-height: 1.05;
-  }
-
-  .ib-row__day {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    font-weight: 400;
-    color: var(--text-strong);
-  }
-
-  .ib-row__month,
-  .ib-row__year {
-    font-family: var(--font-ui);
-    font-size: var(--fs-label);
-    font-weight: 600;
-    letter-spacing: var(--track-label);
-    text-transform: uppercase;
-    color: var(--brass-text);
-  }
-
-  .ib-row__month {
-    margin-top: 0.3rem;
-  }
-
-  .ib-row__body > * + * {
-    margin-top: var(--sp-2);
-  }
-
-  .ib-row__lead {
-    color: var(--brass-text);
-  }
-
-  .ib-row__title {
-    margin: 0;
-    font-size: var(--fs-h3);
-    line-height: var(--lh-snug);
-  }
-
-  .ib-row__title a {
-    color: var(--text-strong);
-    text-decoration: none;
-  }
-
-  .ib-row__title a:hover {
-    color: var(--cobalt-text);
-    text-decoration: underline;
-  }
-
-  .ib-row__dek {
-    max-width: 44rem;
-    color: var(--text-body);
-  }
-
-  .ib-row__side {
-    grid-column: 2;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--sp-2) var(--sp-4);
-    margin: 0;
-    font-size: var(--fs-small);
-  }
-
-  @media (min-width: 60rem) {
-    .ib-row__side {
-      grid-column: 3;
-      grid-template-columns: minmax(0, 1fr);
-      padding-left: var(--sp-4);
-      border-left: 1px solid var(--rule-hair);
-    }
-  }
-
-  .ib-row__side dt {
-    font-size: var(--fs-label);
-    font-weight: 600;
-    letter-spacing: var(--track-label);
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-
-  .ib-row__side dd {
-    margin: 0.1rem 0 0;
-    color: var(--text-body);
-  }
-
-  .ib-row[hidden] {
-    display: none;
-  }
-
-  .ib-none {
-    margin-top: var(--sp-5);
-  }
-
-  .ib-none .btn {
-    margin-top: var(--sp-3);
-  }
-
-  /* How it is made */
-  .ib-rules {
-    display: grid;
-    gap: var(--sp-5) var(--sp-6);
-    margin-top: var(--sp-5);
-  }
-
-  @media (min-width: 48rem) {
-    .ib-rules {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (min-width: 72rem) {
-    .ib-rules {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  .ib-rules > div {
-    padding-top: var(--sp-3);
-    border-top: 2px solid var(--rule-ink);
-  }
-
-  .ib-rules h3 {
-    font-size: 1.0625rem;
-  }
-
-  .ib-rules p {
-    margin-top: var(--sp-2);
-    font-size: var(--fs-small);
-  }
-
-  /* Documents */
-  .ib-docs {
-    display: grid;
-    gap: 0 var(--sp-6);
-    margin: var(--sp-5) 0 0;
-    padding: 0;
-    list-style: none;
-    border-top: 2px solid var(--rule-ink);
-  }
-
-  @media (min-width: 60rem) {
-    .ib-docs {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  .ib-docs li {
-    display: grid;
-    gap: var(--sp-1);
-    padding: var(--sp-4) 0;
-    border-bottom: 1px solid var(--rule-hair);
-  }
-
-  .ib-docs__title {
-    font-weight: 600;
-    line-height: 1.35;
-  }
-
-  .ib-docs__title a {
-    color: var(--text-strong);
-  }
-
-  .ib-docs__title a:hover {
-    color: var(--cobalt-text);
-  }
-</style>
 
 <script>
   import '../../scripts/briefing';

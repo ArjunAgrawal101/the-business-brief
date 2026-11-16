@@ -1,0 +1,134 @@
+---
+/**
+ * One theme of the Business Intelligence Briefing: every item filed under
+ * it, newest first, with the dates each was published and checked. The
+ * themes are pages rather than a script, so a reader without JavaScript can
+ * still read the briefing one theme at a time, and a theme can be linked to.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/layout/Breadcrumbs.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import { briefing, briefingHref } from '../../../lib/briefing-content';
+import { CATEGORY_LABELS, THEME_INFO, dateParts, facetsOf, formatDate, inTheme, isEditorialTheme, itemCount, regionsLine, themeHref } from '../../../lib/briefing';
+import { CONCEPT_NAMES } from '../../../lib/labels';
+import { INTEL_CATEGORIES, INTEL_THEMES, type IntelCategory, type Intelligence } from '../../../lib/schemas';
+import '../../../styles/intelligence.css';
+
+export async function getStaticPaths() {
+  const items = await briefing();
+  // Every editorial theme has a page; another theme has one when an item carries it.
+  const themes = INTEL_CATEGORIES.filter((k) => isEditorialTheme(k) || items.some(([, it]) => it.categories.includes(k)));
+  return themes.map((k) => ({ params: { theme: THEME_INFO[k].slug }, props: { k } }));
+}
+
+interface Props {
+  k: IntelCategory;
+}
+const { k } = Astro.props;
+const items = await briefing();
+const list: Array<[string, Intelligence]> = inTheme(items, k);
+const info = THEME_INFO[k];
+const others = [...INTEL_THEMES, ...INTEL_CATEGORIES.filter((x) => !isEditorialTheme(x) && items.some(([, it]) => it.categories.includes(x)))];
+const unitsLine = (us: string[]) => us.map((u) => (u === 'toolkit' ? 'Toolkit' : `Unit ${u}`)).join(', ');
+const newestCheck = list.map(([, it]) => it.checked).sort().at(-1);
+---
+
+<BaseLayout title={`${info.label}: Business Intelligence`} description={`${info.dek} Every item in the Business Intelligence Briefing filed under ${info.label.toLowerCase()}, dated and sourced.`} section="intelligence">
+  <div class="wrap">
+    <header class="ib-mast">
+      <Breadcrumbs trail={[{ label: 'Business Intelligence Briefing', href: '/intelligence/' }, { label: 'Themes', href: '/intelligence/#themes' }, { label: info.label }]} />
+      <p class="label label--ink ib-mast__kicker">Business Intelligence · Theme</p>
+      <h1 class="ib-mast__title">{info.label}</h1>
+      <ul class="ib-issue" role="list" aria-label="This theme">
+        <li>{itemCount(list.length)}</li>
+        {newestCheck && <li>Newest check <time datetime={newestCheck}>{formatDate(newestCheck)}</time></li>}
+        {!isEditorialTheme(k) && <li>A theme kept from the first edition</li>}
+      </ul>
+      <p class="lead ib-mast__lead">{info.dek}</p>
+      <p class="ib-notice">
+        <strong>A curated briefing, not a news feed.</strong> Each item shows when it was published and when its sources were last checked, and does not update by itself.
+      </p>
+    </header>
+  </div>
+
+  <div class="wrap page-body">
+    <section aria-labelledby="items-h">
+      <SectionHead title={`Every item on ${info.label.toLowerCase()}, newest first`} id="items-h" dek="An item can sit under more than one theme; its other themes are named above its headline." />
+      {
+        list.length === 0 ? (
+          <p class="state">No item is filed under this theme yet.</p>
+        ) : (
+          <ol class="ib-list" role="list">
+            {list.map(([id, it]) => {
+              const f = facetsOf(it);
+              const d = dateParts(it.date);
+              return (
+                <li class="ib-row" data-theme-item>
+                  <p class="ib-row__date">
+                    <time datetime={it.date}>
+                      {d.day ? <span class="ib-row__day">{d.day}</span> : <span class="ib-row__day">{d.month}</span>}
+                      {d.day && <span class="ib-row__month">{d.month}</span>}
+                      <span class="ib-row__year">{d.year}</span>
+                    </time>
+                  </p>
+                  <div class="ib-row__body">
+                    <p class="label">
+                      {it.categories.map((x) => CATEGORY_LABELS[x]).join(' · ')}
+                      {it.lead && <span class="ib-row__lead"> · Lead story</span>}
+                    </p>
+                    <h3 class="ib-row__title">
+                      <a href={briefingHref(id)}>{it.title}</a>
+                    </h3>
+                    <p class="ib-row__dek">{it.dek}</p>
+                    <ul class="ib-dates" role="list">
+                      <li><span class="label">Published</span><time datetime={it.written}>{formatDate(it.written)}</time></li>
+                      <li><span class="label">Checked</span><time datetime={it.checked}>{formatDate(it.checked)}</time></li>
+                    </ul>
+                  </div>
+                  <dl class="ib-row__side">
+                    <div>
+                      <dt>Organizations</dt>
+                      <dd>{it.organizations.join(', ')}</dd>
+                    </div>
+                    <div>
+                      <dt>Where</dt>
+                      <dd>
+                        {regionsLine(it.regions)} · {it.industry}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Course</dt>
+                      <dd>{unitsLine(f.units)}</dd>
+                    </div>
+                    <div>
+                      <dt>Key concepts</dt>
+                      <dd>{it.keyConcepts.map((x) => CONCEPT_NAMES[x]).join(', ')}</dd>
+                    </div>
+                  </dl>
+                </li>
+              );
+            })}
+          </ol>
+        )
+      }
+    </section>
+
+    <nav class="ib-theme-nav" aria-labelledby="themes-nav-h">
+      <h2 class="label label--ink" id="themes-nav-h">Every theme</h2>
+      <ul role="list">
+        {
+          others.map((x) => (
+            <li>
+              <a href={themeHref(x)} aria-current={x === k ? 'page' : undefined}>
+                {CATEGORY_LABELS[x]} <span class="ib-theme-nav__n">({inTheme(items, x).length})</span>
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a href="/intelligence/">The whole briefing</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</BaseLayout>

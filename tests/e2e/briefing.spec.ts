@@ -1,9 +1,13 @@
 /**
  * The Business Intelligence Briefing: its filters narrow the dated list and
  * say so in a polite live region, keep their state in the address, recover
- * from an empty result, and leave a complete list without JavaScript; and on
- * every item page each fact's citation leads to a source entry that shows its
- * publisher, publication and access dates and an https address.
+ * from an empty result, and leave a complete list without JavaScript; its
+ * themes are pages of their own that list exactly the items filed under them,
+ * without JavaScript; every list shows when each item was published and
+ * checked; every item page answers the six questions in order, keeps the
+ * course apart from what lies beyond it, and ties each fact's citation to a
+ * source entry that shows its publisher, publication and access dates and an
+ * https address.
  */
 import { expect, test, type Page } from '@playwright/test';
 
@@ -54,9 +58,18 @@ test.describe('the Business Intelligence Briefing', () => {
   test('shows a way back when no item matches', async ({ page }) => {
     await page.goto('/intelligence/');
     const total = await page.locator('[data-item]').count();
-    await page.selectOption('#ib-kind', 'leadership');
-    await page.selectOption('#ib-concept', 'sustainability');
-    const none = await rowsWith(page, 'kinds', 'leadership', ['concepts', 'sustainability']);
+    // A theme and a key concept that no item shares, found from the page so that new items cannot break the test.
+    const kinds = await page.locator('#ib-kind option').evaluateAll((os) => os.map((o) => (o as HTMLOptionElement).value).filter(Boolean));
+    const concepts = await page.locator('#ib-concept option').evaluateAll((os) => os.map((o) => (o as HTMLOptionElement).value).filter(Boolean));
+    let pair: [string, string] | undefined;
+    for (const k of kinds) {
+      for (const c of concepts) if (!pair && (await rowsWith(page, 'kinds', k, ['concepts', c])) === 0) pair = [k, c];
+    }
+    expect(pair, 'a theme and a key concept that no item shares').toBeDefined();
+    const [kind, concept] = pair!;
+    await page.selectOption('#ib-kind', kind);
+    await page.selectOption('#ib-concept', concept);
+    const none = await rowsWith(page, 'kinds', kind, ['concepts', concept]);
     expect(none).toBe(0);
     await expect(visibleRows(page)).toHaveCount(0);
     await expect(page.locator('[data-none]')).toBeVisible();
@@ -115,5 +128,99 @@ test.describe('the Business Intelligence Briefing', () => {
       await expect(page.locator('.ib-analysis-mark')).toContainText("The Business Brief's analysis");
       await expect(page.locator('.ib-question')).toContainText('Original practice question');
     }
+  });
+
+  test('answers the six questions in order on every item page, with its dates in view', async ({ page }) => {
+    await page.goto('/intelligence/');
+    const hrefs = await page.locator('.ib-row__title a').evaluateAll((as) => as.map((a) => a.getAttribute('href') ?? ''));
+    const questions = [
+      'What happened?',
+      'What is the business context?',
+      'Which management concepts are relevant?',
+      'What choices did the organization face?',
+      'What were the implications?',
+      'What can a student or manager learn?',
+    ];
+    for (const href of hrefs) {
+      await page.goto(href);
+      const heads = (await page.locator('.ib-doc__main .sec-head h2').allInnerTexts()).map((t) => t.replace(/^Section \d+:\s*/, '').trim());
+      expect(heads.slice(0, 6), href).toEqual(questions);
+      // The facts come first and are labelled; the analysis follows the mark.
+      const order = await page.evaluate(() => {
+        const mark = document.querySelector('.ib-analysis-mark');
+        const facts = document.querySelector('#happened-h');
+        const context = document.querySelector('#context-h');
+        return Boolean(mark && facts && context && facts.compareDocumentPosition(mark) & Node.DOCUMENT_POSITION_FOLLOWING && mark.compareDocumentPosition(context) & Node.DOCUMENT_POSITION_FOLLOWING);
+      });
+      expect(order, `${href}: facts, then the analysis mark, then the context`).toBe(true);
+      const stamp = page.locator('.ib-head__stamp');
+      await expect(stamp).toContainText('Published');
+      await expect(stamp).toContainText('Sources checked');
+      await expect(stamp.locator('time')).toHaveCount(2);
+      // Material beyond the course, where there is any, sits in its own labelled group.
+      const beyond = page.locator('.ib-group--beyond');
+      if (await beyond.count()) await expect(beyond).toContainText('Enrichment');
+    }
+  });
+
+  test('shows when every item in the list was published and checked', async ({ page }) => {
+    await page.goto('/intelligence/');
+    const rows = page.locator('[data-item]');
+    const n = await rows.count();
+    for (let i = 0; i < n; i++) {
+      const dates = rows.nth(i).locator('.ib-dates');
+      await expect(dates).toContainText('Published');
+      await expect(dates).toContainText('Checked');
+      await expect(dates.locator('time')).toHaveCount(2);
+    }
+    await expect(page.locator('.ib-lead .ib-dates time')).toHaveCount(2);
+  });
+
+  test('lists each theme on a page of its own, with exactly the items filed under it, without JavaScript', async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false });
+    const page = await context.newPage();
+    await page.goto('/intelligence/');
+    const themes = await page.locator('.ib-theme__name a').evaluateAll((as) => as.map((a) => a.getAttribute('href') ?? ''));
+    expect(themes.length).toBeGreaterThanOrEqual(12);
+    // Every item's themes, read from the list on the front page.
+    const filed = await page.locator('[data-item]').evaluateAll((els) =>
+      els.map((e) => ({ href: e.querySelector('.ib-row__title a')?.getAttribute('href') ?? '', kinds: (e.getAttribute('data-kinds') ?? '').split(' ') })),
+    );
+    // The theme filter's options pair each theme's label with its id.
+    const options = await page.locator('#ib-kind option').evaluateAll((os) => os.map((o) => ({ value: (o as HTMLOptionElement).value, text: (o.textContent ?? '').trim() })).filter((o) => o.value));
+    for (const href of themes) {
+      await page.goto(href);
+      await expect(page.locator('h1')).toHaveCount(1);
+      const listed = await page.locator('[data-theme-item] .ib-row__title a').evaluateAll((as) => as.map((a) => a.getAttribute('href') ?? ''));
+      // The theme page names its theme in the navigation of every theme, marked as the current page.
+      const current = page.locator('.ib-theme-nav a[aria-current="page"]');
+      await expect(current).toHaveCount(1);
+      const label = (await page.locator('h1').innerText()).trim();
+      await expect(current).toContainText(label);
+      const kind = options.find((o) => o.text === label)?.value;
+      if (!kind) {
+        // A theme no item carries is not offered as a filter, and its page says it is empty.
+        expect(listed, href).toEqual([]);
+        await expect(page.locator('.state')).toContainText('No item is filed under this theme yet');
+        continue;
+      }
+      expect(listed.sort(), href).toEqual(filed.filter((f) => f.kinds.includes(kind)).map((f) => f.href).sort());
+      await expect(page.locator('[data-theme-item] .ib-dates time')).toHaveCount(listed.length * 2);
+    }
+    await context.close();
+  });
+
+  test('covers all twelve themes, and links each item to the themes it is filed under', async ({ page }) => {
+    await page.goto('/intelligence/');
+    const counts = await page.locator('.ib-theme__count').allInnerTexts();
+    expect(counts.length).toBeGreaterThanOrEqual(12);
+    expect(counts.slice(0, 12).every((c) => !/^0 /.test(c)), counts.join(', ')).toBe(true);
+    const first = await page.locator('.ib-row__title a').first().getAttribute('href');
+    await page.goto(first ?? '/intelligence/');
+    const themeLinks = page.locator('.ib-side__facts a[href^="/intelligence/themes/"]');
+    expect(await themeLinks.count()).toBeGreaterThan(0);
+    await themeLinks.first().click();
+    await expect(page).toHaveURL(/\/intelligence\/themes\/[a-z-]+\/$/);
+    await expect(page.locator(`[data-theme-item] a[href="${first}"]`)).toHaveCount(1);
   });
 });
