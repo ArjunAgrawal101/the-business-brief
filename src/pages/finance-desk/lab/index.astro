@@ -9,6 +9,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../../components/layout/Breadcrumbs.astro';
 import SectionHead from '../../../components/layout/SectionHead.astro';
 import LevelSwitch from '../../../components/ui/LevelSwitch.astro';
+import AdvancedDoor from '../../../components/adv-finance/AdvancedDoor.astro';
 import { corpus } from '../../../lib/content';
 import { allSubtopics, subtopicHref } from '../../../lib/learning';
 import { ACCOUNTS, BUSINESS, PROJECT } from '../../../lib/finance-lab/business';
@@ -147,6 +148,8 @@ const counts = { all: LAB.length, hl: LAB.filter((e) => e.level === 'HL').length
         );
       })
     }
+
+    <AdvancedDoor from="lab" />
 
     <aside class="callout callout--framework fl-method">
       <span class="callout__kicker">How the laboratory works</span>
