@@ -1,0 +1,211 @@
+# Advanced financial management, module 3. Real-company facts come from the
+# documents in src/content/sources/advanced-finance.yaml, read on 16 November
+# 2026. Every worked figure (portfolio risk, CAPM, beta adjustment, WACC, the
+# Modigliani and Miller examples), the case and the decision were checked by
+# script.
+domain: finance
+title: Risk, return, the cost of capital and capital structure
+order: 3
+dek: What return must an investment earn to compensate its owners for its risk, and does the mix of debt and equity a company chooses change what the company is worth?
+audience: [undergraduate, mba, professional]
+covers: [Risk and return, Cost of capital, Capital structure]
+minutes: 25
+updated: '2026-11-16'
+bridge:
+  codes: ['3.2', '3.6', '3.8']
+  text: |
+    **What the IB course covers.** The sources of finance (share capital, loan capital, overdrafts, trade credit, leasing and others) and which suits a situation; at HL the gearing ratio, non-current liabilities ÷ capital employed; and in NPV questions a discount rate that is simply given. Risk is discussed in words, as a reason to prefer one source or project over another.
+
+    **What this module adds.** It measures risk, distinguishing the risk that diversification removes from the risk that investors must be paid to bear; derives the cost of equity from the capital asset pricing model and the cost of debt after tax; combines them in the weighted average cost of capital (WACC), the rate the IB course takes as given; shows when one company-wide rate misleads; and asks whether borrowing changes value, from Modigliani and Miller's irrelevance results to the trade-off and pecking order theories and the leverage policies real companies follow.
+foundation: |
+  The cost of capital is an **opportunity cost**: the expected return investors give up by putting money into this business rather than into another investment of the same risk. Two consequences follow, and both surprise students. First, the cost of capital belongs to the use of the money, not its source. A safe project financed with expensive equity is still a safe project, and a risky venture financed with a cheap loan is still risky. Second, not all risk is priced. Investors can hold many shares, and the ups and downs specific to one company largely cancel out in a diversified portfolio; competition among such investors means that only the risk they cannot diversify away, the exposure to the economy as a whole, earns a premium.
+
+  Capital structure asks a different question: given the business's assets and their risk, does it matter how they are financed? Modigliani and Miller (1958) showed that in perfect markets it does not; the size of the pie does not depend on how it is sliced. Every serious theory since then is an account of which market imperfection makes the slicing matter: taxes, the costs of financial distress, conflicts between managers and investors, or information that managers have and investors lack.
+advanced:
+  - id: risk-and-diversification
+    title: What diversification removes
+    body: |
+      The variance of a two-asset portfolio is w1²σ1² + w2²σ2² + 2w1w2ρσ1σ2, where w are the weights, σ the standard deviations and ρ the correlation. Hold two shares in equal amounts, each with a standard deviation of 30% and a correlation of 0.2. The portfolio variance is 0.25 × 0.09 + 0.25 × 0.09 + 2 × 0.25 × 0.2 × 0.09 = 0.054, a standard deviation of 23.2%, well below 30%. With ten such shares the figure falls to 15.9%, with thirty to 14.3%, and with very many it approaches √(0.2 × 0.09) = 13.4%. That floor is the risk the shares share, which no amount of diversification removes.
+
+      A share's contribution to a diversified portfolio is therefore measured by its **beta**: its covariance with the market divided by the market's variance, or equivalently ρ × σ(share) ÷ σ(market). A share with a standard deviation of 30%, a correlation of 0.6 with the market and a market standard deviation of 16% has a beta of 0.6 × 30 ÷ 16 = 1.125. It is highly volatile, but much of that volatility is specific and diversifiable; only the market-related part counts for its required return.
+  - id: capm-and-cost-of-equity
+    title: The capital asset pricing model and the cost of equity
+    body: |
+      The capital asset pricing model (CAPM) of Sharpe (1964) and Lintner (1965) states that the expected return on an asset is r = rf + β × (E[rm] - rf): the risk-free rate plus beta times the equity risk premium (ERP). With a risk-free rate of 4.0%, a beta of 1.2 and an ERP of 5.0%, the cost of equity is 10.0%.
+
+      Each input is a judgement. The **risk-free rate** should be the yield on a long-dated government bond in the currency of the cash flows. **Beta** is usually estimated by regressing the company's returns on the market's over about five years, and the estimate has a wide standard error; a more reliable figure comes from averaging the betas of comparable companies after removing the effect of their borrowing. Using the relation of Hamada (1972), with riskless debt, levered beta = unlevered beta × (1 + (1 - t) × D/E). A peer group with an average unlevered beta of 0.8 implies, for a company with debt equal to half its equity and a 25% tax rate, a beta of 0.8 × 1.375 = 1.10 and a cost of equity of 4.0 + 1.10 × 5.0 = 9.5%.
+
+      The **ERP** is the most contested number in finance. Historical averages depend on the period and the country, and the US record, the one most often quoted, is that of an unusually successful market, as Dimson, Marsh and Staunton (2002) emphasise; Mehra and Prescott (1985) showed that the historical premium is larger than standard economic models can explain. Plausible estimates span several percentage points, and with a beta of 1.2 an ERP of 4% rather than 6% moves the cost of equity from 11.2% to 8.8%.
+  - id: wacc-and-its-misuse
+    title: The weighted average cost of capital, and its misuse
+    body: |
+      WACC = (E ÷ V) × re + (D ÷ V) × rd × (1 - t), where E and D are the market values of equity and debt, V their sum, rd the current yield on the company's debt (not the coupon on old loans) and t the marginal tax rate. With 70% equity at 10%, 30% debt at 6% and tax at 25%, WACC = 7.0% + 0.3 × 6% × 0.75 = 8.35%. The weights should be the target capital structure the company expects to maintain, at market values.
+
+      WACC is the right discount rate only for projects with the same risk as the company's existing assets, financed in the same proportions. Suppose a firm with a WACC of 8.35% considers a risky venture with an IRR of 10% whose own required return is 12%, and a safe project with an IRR of 7% whose required return is 6%. A single company rate accepts the first and rejects the second, the opposite of the right answer in both cases. Repeated over years, the error shifts the firm towards riskier assets than its investors are paid for. Divisional rates built from the betas of focused peers are the practical remedy.
+
+      When a project changes the financing, for example a leveraged acquisition or a subsidised loan, **adjusted present value** (APV) is clearer: value the project as if financed entirely with equity, then add the present value of the financing side effects such as interest tax shields (Myers, 1974).
+  - id: capital-structure-theory
+    title: 'Capital structure: Modigliani and Miller, and what breaks their result'
+    body: |
+      **Without taxes.** Modigliani and Miller (1958) proved that, in perfect markets, a firm's value does not depend on its leverage, because investors can borrow or lend on their own account to undo any structure the firm chooses. The cost of equity rises with leverage just enough to keep WACC constant: re = ra + (ra - rd) × D/E. With a return on assets of 9%, debt at 5% and debt equal to half of equity, re = 9 + 4 × 0.5 = 11%, and WACC = (2/3) × 11% + (1/3) × 5% = 9%, unchanged. Cheap debt is not a free lunch, because it makes the equity riskier.
+
+      **With corporate tax.** Interest is tax-deductible, so debt shields income from tax. Modigliani and Miller (1963) showed that with permanent debt D the value of the levered firm is the unlevered value plus t × D. A firm worth £1,000m unlevered that borrows £400m with tax at 25% is worth £1,100m; its cost of equity becomes 10.7% and its WACC falls to 8.2%. Taken literally, firms should borrow almost everything.
+
+      **The trade-off theory** explains why they do not. Debt raises the probability and expected cost of financial distress: lost customers and suppliers, forced asset sales and management distraction, which Andrade and Kaplan (1998) put at roughly 10 to 20% of firm value in distressed cases. Debt also has agency effects: it disciplines managers who might waste surplus cash (Jensen, 1986), but heavy debt can lead shareholders to pass up good projects whose gains would mostly go to creditors (Myers, 1977). The optimal ratio balances tax shields against these costs, so firms with stable cash flows and tangible assets should borrow more than firms whose value lies in growth opportunities.
+
+      **The pecking order** of Myers (1984) and Myers and Majluf (1984) starts from information instead. Managers know more than investors, so an equity issue signals that the shares may be overvalued and the price falls when one is announced. Firms therefore use retained cash first, then debt, and equity last, and leverage reflects past profitability and investment needs rather than a target.
+models:
+  - name: Capital asset pricing model
+    origin: Sharpe (1964); Lintner (1965)
+    summary: |
+      Expected return = risk-free rate + beta × equity risk premium. Only systematic risk, measured by beta, is priced.
+    use: |
+      Estimate the cost of equity with a long-dated government bond yield, a beta from comparable companies adjusted for leverage, and a stated range for the equity risk premium. Report the answer as a range and show how much it moves with each input.
+    limits: |
+      The relation between beta and average returns has been much flatter in the data than the model predicts (Black, Jensen and Scholes, 1972), size and value effects are left out (Fama and French, 1992), and the true market portfolio cannot be observed (Roll, 1977). The equity risk premium has no agreed value.
+    sources: [adv-fin-sharpe-1964, adv-fin-lintner-1965, adv-fin-fama-french-2004]
+  - name: Weighted average cost of capital and adjusted present value
+    origin: Modigliani and Miller (1963); Myers (1974)
+    summary: |
+      WACC blends the costs of equity and after-tax debt at target market-value weights and discounts cash flows that ignore financing. APV values the business as if all-equity financed and adds the value of financing side effects separately.
+    use: |
+      Use WACC for projects that resemble the firm's existing business and leave its capital structure unchanged; use divisional rates for different risks; use APV when financing changes over time, as in leveraged acquisitions.
+    limits: |
+      A WACC is only as good as its inputs, all of which are estimates; it assumes a constant capital structure; and one company-wide rate misprices projects of different risk.
+    tool: /finance-desk/advanced/capital-budgeting/
+    sources: [adv-fin-modigliani-miller-1963, adv-fin-myers-1974, adv-fin-brealey-myers-allen-2020]
+  - name: Modigliani and Miller propositions
+    origin: Modigliani and Miller (1958)
+    summary: |
+      In perfect markets, firm value is independent of capital structure (Proposition I), and the cost of equity rises linearly with leverage, re = ra + (ra - rd) × D/E (Proposition II), keeping WACC constant.
+    use: |
+      Use the propositions as a benchmark: any claim that a financing change creates value must name the imperfection (tax, distress costs, agency, information, mispricing) that makes it possible.
+    limits: |
+      Its assumptions (no taxes, no distress costs, symmetric information, fixed investment policy) do not hold, so it is a starting point for analysis rather than a description of the world.
+    tool: /finance-desk/lab/gearing-ratio/
+    sources: [adv-fin-modigliani-miller-1958, adv-fin-modigliani-miller-1963]
+  - name: Trade-off and pecking order theories
+    origin: Kraus and Litzenberger (1973); Myers (1984)
+    summary: |
+      The trade-off theory sets the tax benefits of debt against the expected costs of distress and agency, implying a target ratio. The pecking order explains financing by asymmetric information: internal funds first, then debt, equity last.
+    use: |
+      Use the trade-off theory to judge whether leverage suits the stability and tangibility of the cash flows; use the pecking order to anticipate how markets will read a financing announcement.
+    limits: |
+      Neither fits all the evidence. Profitable firms often borrow less than the trade-off theory suggests (Graham, 2000), and small firms issue more equity than the pecking order predicts (Frank and Goyal, 2003).
+    sources: [adv-fin-kraus-litzenberger-1973, adv-fin-myers-1984, adv-fin-myers-majluf-1984]
+applications:
+  - title: 'bp, February 2026: buybacks suspended to strengthen the balance sheet'
+    kind: real
+    asOf: '2026-02'
+    body: |
+      With its 2025 results in February 2026, bp suspended its share buyback and said it would allocate all excess cash to strengthening the balance sheet, retiring its guidance to distribute 30 to 40% of operating cash flow to shareholders. It reiterated its primary target of $14 to 18 billion of net debt by the end of 2027, against $22.2 billion at the end of 2025, and its aim of improving credit metrics within an "A" grade credit range, adding that it also considers hybrid bonds, leases and its Gulf of America settlement liabilities. In its impairment testing it used a post-tax discount rate of 8%, unchanged from the year before.
+
+      *Interpretation, not from the source:* the decision reads like the trade-off theory applied to a business whose cash flows swing with oil and gas prices: the expected cost of distress is high when earnings are volatile, so a strong rating is worth more than the tax shields and payouts that more debt would allow. Two months later bp expected net debt to rise to $25 to 27 billion at the end of the first quarter of 2026 because of a working capital build, a reminder that leverage targets for commodity businesses must allow for large swings.
+    sources: [adv-fin-bp-results-2025, adv-fin-bp-trading-1q26]
+  - title: 'Unilever, 2025: steady leverage, returning surplus cash'
+    kind: real
+    asOf: '2025'
+    body: |
+      Unilever ended 2025 with net debt of €23.1bn, 2.0 times its underlying EBITDA. During the year it completed a €1.5bn share buyback and raised its quarterly dividend, and with its results it announced a further €1.5bn buyback. Its effective tax rate was 29.4% on reported profit and 25.7% on its underlying measure.
+
+      *Interpretation, not from the source:* a consumer goods group with stable cash flows can carry steady, moderate leverage and return surplus cash, consistent with the trade-off theory and with the argument that paying out free cash flow disciplines management (Jensen, 1986). The tax rates also show why the value of the interest tax shield, t × D in the Modigliani and Miller formula, depends on the marginal rate at which interest is actually deducted, which is not simply the headline effective rate.
+    sources: [adv-fin-unilever-results-2025, adv-fin-jensen-1986]
+  - title: 'Nippon Steel, 2023: borrowing first, structure later'
+    kind: real
+    asOf: '2023-12'
+    body: |
+      Announcing its $14.1 billion offer for U. S. Steel in December 2023, Nippon Steel said it would fund the purchase mainly through borrowing from its main Japanese banks, that it had already secured financing commitments, and that the deal was not subject to any financing condition. After completion it would "evaluate the capital structure" of the combined company in the light of its financial performance, market trends and the impact on shareholders and financial stability.
+
+      *Interpretation, not from the source:* committed bank debt gives a bidder certainty of funds, which sellers value, and avoids announcing an equity issue that the pecking order predicts the market would read badly. The long-term mix of debt and equity is then chosen once the acquired business is owned and better understood.
+    sources: [adv-fin-nippon-steel-2023]
+cases:
+  - title: 'Halden Leisure: one discount rate for two businesses?'
+    fictional: true
+    situation: |
+      Halden Leisure, a fictional operator of family leisure parks, uses a single group WACC for every investment. It is now appraising its first hotels, a business with different risks from its parks. The hotel project has an IRR of 9.0%. The finance director has assembled the data below and asks you to recommend a discount rate for the hotels.
+    exhibit:
+      caption: Halden Leisure, market data for the cost of capital
+      columns: ['Item', 'Value']
+      rows:
+        - ['Share price', '£4.20']
+        - ['Shares in issue', '250 million']
+        - ['Market value of debt', '£450 million']
+        - ['Yield to maturity on Halden bonds', '6.2%']
+        - ['Corporate tax rate', '25%']
+        - ['Halden equity beta (5 years, monthly)', '1.35 (standard error 0.25)']
+        - ['Yield on 10-year government bonds', '4.4%']
+        - ['Equity risk premium, advisers'' range', '4.5% to 6.0%']
+        - ['Hotel peer 1: equity beta, debt to equity', '1.10, 0.60']
+        - ['Hotel peer 2: equity beta, debt to equity', '0.95, 0.40']
+        - ['Hotel peer 3: equity beta, debt to equity', '1.25, 0.90']
+      note: Fictional company; simulated figures. Assume all debt is close to riskless when adjusting betas, and that Halden will keep its present capital structure.
+    questions:
+      - Calculate Halden's market-value weights, cost of equity and group WACC with its regression beta and an equity risk premium of 5%.
+      - Recalculate the WACC at the ends of the beta's one-standard-error range combined with the ends of the premium range. What does the spread imply about how precisely the group rate is known?
+      - Unlever the three peer betas, average them and relever the average at Halden's debt to equity ratio. What cost of equity and WACC should the hotels face?
+      - Should the hotel project be accepted? Explain what happens over time to a company that applies one rate to every division.
+      - If the hotels were to be financed separately with much more debt, why might adjusted present value be easier to apply than WACC?
+evaluation: |
+  **The CAPM: rejected by the data, used in practice.** The empirical record is poor. Black, Jensen and Scholes (1972) found the relation between beta and return flatter than predicted; Fama and French (1992) found that beta explained little of the cross-section of average returns once size and book-to-market were included; and Fama and French (2004) conclude that the problems are serious enough to invalidate the model's use in applications. Roll (1977) adds that the model cannot be properly tested at all. Yet in Graham and Harvey's (2001) survey almost three-quarters of chief financial officers always or almost always used it. *Interpretation:* practitioners may value it as a disciplined convention that produces defensible, comparable numbers, and the multi-factor alternatives are less stable for valuing a single project; but anyone using it should report a range and treat the third decimal place as noise.
+
+  **Capital structure: partial theories.** The trade-off theory explains why stable, asset-heavy firms borrow more than research-intensive ones, but many profitable firms use less debt than the tax benefits would justify (Graham, 2000). The pecking order explains the reaction to equity issues and the link between profitability and low leverage, but small, growing firms issue more equity than it predicts (Frank and Goyal, 2003). Baker and Wurgler (2002) find that firms issue equity when valuations are high, and that the effect persists. Executives themselves, in Graham and Harvey's survey, ranked financial flexibility and the credit rating as their main concerns in setting debt, above the tax advantage. *Interpretation:* the theories are best read as a checklist of forces, with the credit rating as the practical constraint through which most of them operate.
+decision:
+  title: Financing a £600m acquisition
+  fictional: true
+  brief: |
+    Corrick Foods, a fictional food manufacturer, has agreed to buy a rival for £600m, ten times the target's EBITDA of £60m. Corrick's own EBITDA is £400m and its net debt £800m (2.0 times). The rating agencies have indicated that leverage above about 2.5 times for more than a short period would cost Corrick its present rating, which its long-term contracts with major retailers assume. The board must choose how to pay.
+  options:
+    - label: All new debt
+      text: Borrow the full £600m. Net debt rises to £1,400m, 3.0 times combined EBITDA of £460m. The cheapest capital after tax, but a downgrade is likely.
+    - label: All new equity
+      text: Place new shares for £600m at a 5% discount to the market price. Leverage falls to 1.7 times, but existing holders are diluted and the issue may be read as a sign the shares are overvalued.
+    - label: Half debt, half equity
+      text: Borrow £300m and issue £300m of shares. Leverage of 2.4 times keeps the rating, with a smaller equity issue.
+    - label: Debt now, disposal later
+      text: Borrow the full amount and commit to selling £250m of non-core businesses (EBITDA £20m) within 18 months, bringing leverage to 2.6 times (1,150 ÷ 440) if the sale succeeds.
+  criteria:
+    - Effect on the credit rating and financial flexibility
+    - Value of tax shields against expected distress costs
+    - Signal sent to investors by the financing choice
+    - Dilution and the price of any new shares
+    - Execution risk
+  guidance: |
+    Start from the constraint. The rating matters commercially, so leverage persistently above 2.5 times has costs beyond interest: the trade-off theory's distress costs arrive early, through customers and suppliers, not only in bankruptcy. All debt breaches the threshold at 3.0 times and leaves no capacity for a bad year. All equity gives up tax shields, dilutes holders and, as the pecking order predicts, risks a fall in the share price on announcement; it is hard to justify when the company can comfortably carry more debt.
+
+    The mixed option keeps leverage at 2.4 times, inside the threshold, with a smaller equity issue, and is the conventional answer. Debt with a committed disposal can be better if the non-core businesses are worth more to other owners than to Corrick and the sale is credible, but it reaches only 2.6 times even if it succeeds, and a failed or delayed sale would leave the company over the limit with a downgrade likely. A sensible board would prefer the mixed structure, perhaps with a smaller equity issue if the disposal is already well advanced. Beware the argument that all debt is best because it adds most to earnings per share: debt nearly always flatters EPS when its after-tax cost is below the earnings yield, but EPS accretion is not value creation, because the equity has become riskier.
+reading:
+  - source: adv-fin-modigliani-miller-1958
+    note: The founding paper of modern capital structure theory; read at least the statement and proof of Proposition I.
+  - source: adv-fin-myers-1984
+    note: A clear, influential essay setting the pecking order against the trade-off theory.
+  - source: adv-fin-fama-french-2004
+    note: An accessible survey of the CAPM's logic and of why its empirical record should worry anyone who uses it.
+  - source: adv-fin-graham-harvey-2001
+    note: How chief financial officers actually estimate the cost of capital and choose their debt.
+basis:
+  - source: ib-bm-guide-2024
+    note: Sources of finance and the gearing ratio in the IB course (pages 28, 29 and 65), for the bridge.
+  - source: adv-fin-hamada-1972
+    note: Levered and unlevered beta.
+  - source: adv-fin-dimson-marsh-staunton-2002
+    note: The equity risk premium across countries.
+  - source: adv-fin-mehra-prescott-1985
+    note: The equity premium puzzle.
+  - source: adv-fin-black-jensen-scholes-1972
+    note: Early tests of the CAPM.
+  - source: adv-fin-fama-french-1992
+    note: Beta, size and book-to-market.
+  - source: adv-fin-roll-1977
+    note: The testability critique of the CAPM.
+  - source: adv-fin-andrade-kaplan-1998
+    note: The costs of financial distress.
+  - source: adv-fin-jensen-meckling-1976
+    note: Agency costs of debt and equity.
+  - source: adv-fin-myers-1977
+    note: Debt overhang.
+  - source: adv-fin-graham-2000
+    note: Debt conservatism.
+  - source: adv-fin-frank-goyal-2003
+    note: Tests of the pecking order.
+  - source: adv-fin-baker-wurgler-2002
+    note: Market timing.

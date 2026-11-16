@@ -1,8 +1,8 @@
 ---
 /**
- * The site header: the brand lockup, the five doors of the information
- * architecture (Explore, Practise, Tools, Assess, Discover) as a mega menu,
- * and search. Every group is a native disclosure (details and summary), so
+ * The site header: the brand lockup, the six doors of the information
+ * architecture (Learn, Practise, Tools, Assess, Advance, Connect) as a mega
+ * menu, a Tutorials button and search. Every group is a native disclosure (details and summary), so
  * the menus open and close without JavaScript; the script adds the rest of
  * a menu's manners: one open at a time, Escape returns focus, a click
  * outside or moving focus away closes it. Below 64rem the groups move into a
@@ -27,9 +27,11 @@ const SECTION_GROUP: Record<string, string> = {
   'exam-desk': 'assess',
   assessment: 'assess',
   rooms: 'tools',
-  toolkit: 'explore',
-  revision: 'explore',
-  topics: 'explore',
+  toolkit: 'learn',
+  revision: 'learn',
+  topics: 'learn',
+  advanced: 'advance',
+  tutorials: 'connect',
 };
 const pos = navPosition(Astro.url.pathname);
 const activeGroup = pos.group ?? (current ? SECTION_GROUP[current] : undefined);
@@ -86,7 +88,7 @@ const GUIDES = [
                       ))}
                     </ul>
                     <aside class="mega__feature" aria-label={`${g.label}: featured`}>
-                      {g.id === 'explore' && (
+                      {g.id === 'learn' && (
                         <>
                           <p class="mega__flabel">Course coverage</p>
                           <p class="mega__stat">
@@ -140,17 +142,30 @@ const GUIDES = [
                           </ul>
                         </>
                       )}
-                      {g.id === 'discover' && (
+                      {g.id === 'advance' && (
                         <>
-                          <p class="mega__flabel">The educator</p>
+                          <p class="mega__flabel">Beyond the IB course</p>
+                          <p class="mega__ftitle">Advanced Management and Strategy</p>
+                          <p class="mega__ftext">Six domains at business school depth, each module with models, real applications, cases, critical evaluation and a decision. Kept apart from the IB syllabus.</p>
+                          <a class="mega__cta" href="/advanced/">
+                            Explore the domains <span aria-hidden="true">&rarr;</span>
+                          </a>
+                        </>
+                      )}
+                      {g.id === 'connect' && (
+                        <>
+                          <p class="mega__flabel">Learn with Arjun</p>
                           <p class="mega__creator">
                             <Monogram height={30} reversed />
                             <span>
-                              <span class="mega__ftitle">Arjun Agrawal</span>
-                              <span class="mega__ftext">IB Diploma Programme educator in Economics, Business Management and Global Politics.</span>
+                              <span class="mega__ftitle">One-to-one tutoring</span>
+                              <span class="mega__ftext">IB DP Business Management, SL and HL: US$20 for a one-hour online session, with packages for the IA, revision and exam practice.</span>
                             </span>
                           </p>
-                          <a class="mega__cta" href="https://ib-economics-pi.vercel.app/" rel="noopener">
+                          <a class="mega__cta" href="/tutorials/">
+                            The tutorials <span aria-hidden="true">&rarr;</span>
+                          </a>
+                          <a class="mega__cta mega__cta--quiet" href="https://ib-economics-pi.vercel.app/" rel="noopener">
                             Arjun Agrawal Economics<span class="sr-only"> (external site)</span> <span aria-hidden="true">&nearr;</span>
                           </a>
                         </>
@@ -166,6 +181,7 @@ const GUIDES = [
     </nav>
 
     <div class="site-header__tools">
+      <a class="hdr-btn hdr-btn--cta" href="/tutorials/" aria-current={current === 'tutorials' ? 'page' : undefined}>Tutorials</a>
       <a class="hdr-btn" href="/search/" aria-current={current === 'search' ? 'page' : undefined}>
         <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false">
           <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.75"></circle>
@@ -181,6 +197,10 @@ const GUIDES = [
         </summary>
         <div class="drawer__panel">
           <nav class="wrap drawer__nav" aria-label="Primary">
+            <a class="drawer__tutorials" href="/tutorials/">
+              <span class="drawer__name">Tutorials</span>
+              <span class="drawer__text">One-to-one IB Business Management tutoring with Arjun Agrawal, from US$20 for a one-hour session</span>
+            </a>
             {
               NAV.map((g) => (
                 <details class:list={['drawer__group', { 'is-current': activeGroup === g.id }]} open={activeGroup === g.id}>
@@ -634,6 +654,71 @@ const GUIDES = [
 
   .hdr-btn--ink:hover {
     background: var(--navy-800);
+  }
+
+  /* Tutorials: the one destination the header names on its own, in gold. */
+  .hdr-btn--cta {
+    color: var(--navy-950);
+    background: var(--gold-400);
+    border-color: var(--gold-400);
+    font-weight: 620;
+  }
+
+  .hdr-btn--cta:hover,
+  .hdr-btn--cta[aria-current='page'] {
+    background: var(--gold-300);
+    border-color: var(--gold-500);
+    color: var(--navy-950);
+  }
+
+  /* With six groups, the wide menu tightens until the screen is wide enough. */
+  @media (min-width: 64rem) and (max-width: 82rem) {
+    .mega__trigger {
+      padding: 0 0.55rem;
+      font-size: 0.875rem;
+    }
+
+    .mega__trigger::after {
+      left: 0.55rem;
+      right: 0.55rem;
+    }
+
+    .site-header__bar {
+      gap: var(--sp-4);
+    }
+
+    .site-header__tools .hdr-btn:not(.hdr-btn--cta) .hdr-btn__text {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+  }
+
+  @media (max-width: 36rem) {
+    .hdr-btn--cta {
+      display: none;
+    }
+  }
+
+  .drawer__tutorials {
+    display: grid;
+    gap: 0.2rem;
+    margin-bottom: var(--sp-4);
+    padding: var(--sp-4);
+    border: 1px solid var(--gold-500);
+    border-left: 4px solid var(--gold-500);
+    background: var(--surface-gold-wash);
+    color: var(--navy-900);
+    text-decoration: none;
+  }
+
+  .drawer__tutorials .drawer__name {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 600;
   }
 
   /* ---------- The drawer (narrow screens) ---------- */

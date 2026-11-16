@@ -57,6 +57,19 @@ const sample = (over: Partial<Framework>): Framework =>
     advantages: ['Good.', 'Also good.'],
     limitations: ['Bad.', 'Also bad.'],
     exercise: { prompt: 'Try it.', guidance: ['Hint one.', 'Hint two.'] },
+    structure: [
+      { name: 'Part one', text: 'The first part.' },
+      { name: 'Part two', text: 'The second part.' },
+    ],
+    situations: { suits: ['A case it suits.', 'Another.'], poorFit: ['A case it does not.'] },
+    interpretation: 'How to read it.',
+    implications: { justifies: ['One thing.', 'Another.'], doesNotJustify: ['Not this.', 'Nor this.'] },
+    mistakes: [
+      { mistake: 'A slip.', fix: 'The fix.' },
+      { mistake: 'Another slip.', fix: 'Its fix.' },
+      { mistake: 'A third slip.', fix: 'Its fix too.' },
+    ],
+    decisions: ['compete'],
     order: 1,
     ...over,
   });

@@ -1,0 +1,674 @@
+/*
+ * Advanced financial analysis: the four tools beyond the IB course and
+ * their index. They build on the Financial Laboratory's classes (finance-lab.css)
+ * so they read as part of the same desk: white sheets on ivory, fine rules,
+ * tabular figures. What is new here: the statements over several years, the
+ * groups of drivers, the side-by-side comparisons with their standing against
+ * the course, and the panel that marks where the course stops.
+ */
+
+/* ---------- Head and notice ---------- */
+
+.af-head h1 {
+  max-width: 26ch;
+}
+
+.af-notice {
+  max-width: 56rem;
+  margin-bottom: var(--sp-6);
+}
+
+.af-notice p {
+  margin: 0;
+  max-width: var(--text-max);
+}
+
+.af-notice .tag {
+  vertical-align: baseline;
+}
+
+/* ---------- The desk ---------- */
+
+.af-horizon {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+}
+
+.af-groups {
+  display: grid;
+}
+
+.af-group {
+  border-top: 1px solid var(--rule-hair);
+}
+
+.af-groups > .af-group:last-child {
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.af-group > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 2.75rem;
+  cursor: pointer;
+  list-style: none;
+  font-size: var(--fs-small);
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  color: var(--text-strong);
+}
+
+.af-group > summary::-webkit-details-marker {
+  display: none;
+}
+
+.af-group > summary::before {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform var(--dur-base) var(--ease);
+}
+
+.af-group[open] > summary::before {
+  transform: rotate(45deg);
+}
+
+.af-group > summary:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.af-group > .fl-fields,
+.af-group > .af-pair,
+.af-group > .field__hint {
+  margin-bottom: var(--sp-4);
+}
+
+.af-group > .field__hint {
+  display: block;
+}
+
+.af-pair {
+  display: grid;
+  gap: var(--sp-5);
+}
+
+@media (min-width: 40rem) {
+  .af-pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .af-pair > .fl-fields {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+  }
+}
+
+.af-saved {
+  flex: 1 1 100%;
+  margin: var(--sp-1) 0 0;
+  color: var(--text-muted);
+}
+
+.af-view {
+  display: grid;
+  gap: var(--sp-3);
+  padding: var(--sp-3) 0 var(--sp-4);
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.af-case {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--text-body);
+}
+
+/* The capital budgeting comparator's projects */
+.af-projects {
+  display: grid;
+  gap: var(--sp-5);
+}
+
+.af-project {
+  display: grid;
+  gap: var(--sp-3);
+  min-width: 0;
+  margin: 0;
+  padding: var(--sp-4) 0 0;
+  border: 0;
+  border-top: 2px solid var(--rule-ink);
+}
+
+.af-project > legend {
+  padding: 0;
+  float: left;
+  width: 100%;
+  margin-bottom: var(--sp-2);
+}
+
+.af-project__years-label {
+  margin: 0;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.af-years {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 8.5rem), 1fr));
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.af-year {
+  margin: 0;
+}
+
+.af-year .affix .input {
+  width: 100%;
+}
+
+.af-choice {
+  margin-top: var(--sp-2);
+}
+
+.af-wacc {
+  margin-top: var(--sp-4);
+}
+
+.af-sens-set {
+  margin-top: var(--sp-2);
+}
+
+/* The dashboard's grid of accounts */
+.af-grid .af-grid__year {
+  min-width: 6.25rem;
+  min-height: 2.25rem;
+  padding: 0.25rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+.af-checks {
+  margin-top: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  border-left: 3px solid var(--bb-green);
+  background: var(--surface-right);
+}
+
+.af-checks--warn {
+  border-left-color: var(--bb-signal);
+  background: var(--surface-wrong);
+}
+
+.af-checks__h {
+  margin: 0;
+  font-size: var(--fs-small);
+  font-weight: 650;
+  color: var(--text-strong);
+}
+
+.af-checks p,
+.af-checks ul {
+  margin: var(--sp-1) 0 0;
+}
+
+.af-checks ul {
+  padding-left: 1.2rem;
+  font-size: var(--fs-small);
+}
+
+/* ---------- Statements over several years ---------- */
+
+.af-statements {
+  display: grid;
+  gap: var(--sp-7);
+  margin-top: var(--sp-5);
+}
+
+.af-st {
+  font-size: 0.875rem;
+}
+
+.af-st th,
+.af-st td {
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+}
+
+.af-st caption {
+  padding-bottom: var(--sp-3);
+}
+
+.af-st__title {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.af-st__cap {
+  display: block;
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+}
+
+.af-st th[scope="col"] {
+  white-space: nowrap;
+}
+
+.af-st__unit {
+  font-style: italic;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+
+.af-st td.n {
+  min-width: 6rem;
+}
+
+.af-st tbody th[scope="row"] {
+  min-width: 13rem;
+  font-weight: 400;
+  color: var(--text-body);
+}
+
+/* Line names stay in view while the years scroll sideways. */
+.af-st tbody th[scope="row"],
+.af-compare tbody th[scope="row"] {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--surface-page);
+  box-shadow: 1px 0 0 var(--rule-hair);
+}
+
+.af-st .af-st__head th {
+  padding-top: var(--sp-4);
+  font-size: var(--fs-label);
+  font-weight: 650;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-strong);
+}
+
+.af-st .af-st__less td {
+  border-bottom: 1px solid var(--rule-ink);
+}
+
+.af-st .af-st__total th[scope="row"],
+.af-st .af-st__total td,
+.af-st .af-st__final th[scope="row"],
+.af-st .af-st__final td {
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.af-st .af-st__final td {
+  border-bottom: 3px double var(--rule-ink);
+}
+
+.af-st__note {
+  margin-top: var(--sp-2);
+  max-width: var(--text-max);
+}
+
+.af-links {
+  margin-top: var(--sp-6);
+  max-width: 56rem;
+}
+
+.af-chain {
+  margin: 0;
+  padding-left: 1.3rem;
+}
+
+.af-chain li + li {
+  margin-top: var(--sp-2);
+}
+
+.af-sub {
+  margin: var(--sp-7) 0 0;
+  font-size: var(--fs-h4);
+}
+
+.af-method {
+  margin-top: var(--sp-4);
+  max-width: var(--text-max);
+}
+
+/* ---------- Comparisons ---------- */
+
+.af-compare td.af-standing {
+  white-space: nowrap;
+}
+
+.af-compare .tag {
+  font-size: 0.59375rem;
+  padding: 0.08rem 0.35rem;
+}
+
+.af-compare th[scope="col"] {
+  white-space: normal;
+  min-width: 6rem;
+}
+
+.af-compare tbody th[scope="row"] {
+  min-width: 12rem;
+}
+
+.af-compare td.n {
+  min-width: 7rem;
+  white-space: normal;
+}
+
+.af-page .fl-sens__reading {
+  margin-top: var(--sp-4);
+}
+
+.af-chart {
+  margin-top: var(--sp-6);
+}
+
+.af-notes {
+  margin: var(--sp-3) 0 0;
+  padding-left: 1.2rem;
+  max-width: var(--text-max);
+}
+
+.af-notes li + li {
+  margin-top: var(--sp-2);
+}
+
+.af-multi {
+  margin-top: var(--sp-6);
+  max-width: 56rem;
+}
+
+.af-multi p {
+  margin: 0;
+}
+
+.af-multi p + .table-scroll,
+.af-multi .table-scroll + p {
+  margin-top: var(--sp-3);
+}
+
+.af-mini {
+  font-size: 0.875rem;
+}
+
+.af-workings {
+  margin-top: var(--sp-5);
+}
+
+.af-working > .disclosure__body > * + * {
+  margin-top: var(--sp-4);
+}
+
+.af-working__h {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: var(--sp-4) 0 var(--sp-2);
+  font-size: var(--fs-h4);
+}
+
+.af-now {
+  margin-top: var(--sp-3);
+  max-width: var(--text-max);
+}
+
+.af-identity {
+  margin-top: var(--sp-3);
+  max-width: var(--text-max);
+}
+
+.af-readings {
+  margin-top: var(--sp-5);
+}
+
+.af-reading .fl-read__h {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.af-reading__limit {
+  color: var(--text-body);
+  font-size: var(--fs-small);
+}
+
+/* ---------- Where the course stops ---------- */
+
+.af-scope {
+  display: grid;
+  gap: var(--sp-5) var(--sp-7);
+  margin-top: var(--sp-5);
+}
+
+@media (min-width: 56rem) {
+  .af-scope {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.af-scope__col {
+  padding-top: var(--sp-3);
+  border-top: 2px solid var(--rule-ink);
+}
+
+.af-scope__col--beyond {
+  border-top-color: var(--bb-green);
+}
+
+.af-scope__h {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0;
+  font-size: var(--fs-h4);
+}
+
+.af-scope__list {
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.af-scope__list li {
+  display: grid;
+  gap: 0.2rem;
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.af-scope__code {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  font-weight: 600;
+}
+
+.af-scope__note {
+  margin-top: var(--sp-4);
+  max-width: 56rem;
+}
+
+.af-sources {
+  margin: var(--sp-4) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 2px solid var(--rule-ink);
+  max-width: 56rem;
+}
+
+.af-sources li {
+  display: grid;
+  gap: 0.15rem;
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.af-sources a {
+  font-weight: 600;
+}
+
+/* ---------- The index ---------- */
+
+.af-ledger {
+  margin-top: var(--sp-2);
+}
+
+@media (min-width: 56rem) {
+  .af-ledger__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 72rem) {
+  .af-ledger__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.af-row__desc {
+  margin: var(--sp-2) 0 0;
+  max-width: var(--text-max);
+  color: var(--text-body);
+}
+
+.af-divide th[scope="row"] {
+  min-width: 10rem;
+}
+
+.af-divide td {
+  min-width: 15rem;
+  font-size: 0.9375rem;
+}
+
+.af-divide__codes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+  margin-bottom: var(--sp-2);
+}
+
+.af-who {
+  display: grid;
+  gap: var(--sp-5);
+  margin: var(--sp-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 56rem) {
+  .af-who {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.af-who li {
+  padding-top: var(--sp-3);
+  border-top: 2px solid var(--rule-ink);
+}
+
+.af-who__h {
+  margin: 0;
+  font-size: var(--fs-h4);
+}
+
+.af-who p {
+  margin: var(--sp-2) 0 0;
+}
+
+/* ---------- The way in, on the Finance Desk and the Financial Laboratory ---------- */
+
+.af-door {
+  display: grid;
+  gap: var(--sp-5);
+  padding: clamp(var(--sp-5), 4vw, var(--sp-7));
+  background: var(--surface-sheet);
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--bb-green);
+  box-shadow: var(--shadow-sheet);
+}
+
+@media (min-width: 60rem) {
+  .af-door {
+    grid-template-columns: minmax(0, 1.3fr) minmax(16rem, 1fr);
+    gap: var(--sp-7);
+    align-items: start;
+  }
+}
+
+.af-door__kicker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0;
+}
+
+.af-door__title {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-h3);
+}
+
+.af-door__lead {
+  margin: var(--sp-3) 0 0;
+  max-width: 40rem;
+}
+
+.af-door__cta {
+  margin: var(--sp-4) 0 0;
+}
+
+.af-door__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 2px solid var(--rule-ink);
+}
+
+.af-door__list li {
+  display: grid;
+  gap: 0.15rem;
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.af-door__list a {
+  font-weight: 600;
+}
+
+/* ---------- Print ---------- */
+
+@media print {
+  .af-view,
+  .af-saved {
+    display: none !important;
+  }
+
+  .af-group {
+    border: 0;
+  }
+
+  .af-st tbody th[scope="row"],
+  .af-compare tbody th[scope="row"] {
+    position: static;
+    box-shadow: none;
+  }
+}

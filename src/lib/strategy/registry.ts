@@ -10,8 +10,11 @@ import * as ansoff from './ansoff';
 import * as appraisal from './appraisal';
 import * as bcg from './bcg';
 import * as forces from './forces';
+import * as fit from './fit';
 import * as forcefield from './forcefield';
 import * as porter from './porter';
+import * as salience from './salience';
+import * as scenarios from './scenarios';
 import * as stakeholders from './stakeholders';
 import * as steeple from './steeple';
 import * as swot from './swot';
@@ -72,6 +75,9 @@ export const TOOL_LIBS: Record<StudioKind, ToolEntry> = {
   'decision-tree': entry(tree),
   'force-field': entry(forcefield),
   appraisal: entry(appraisal),
+  scenarios: entry(scenarios),
+  salience: entry(salience),
+  fit: entry(fit),
 };
 
 export function lib(kind: StudioKind): ToolEntry {

@@ -7,6 +7,7 @@
  * subtopics with a complete brief use the brief as their page.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import TutorNote from '../../components/ui/TutorNote.astro';
 import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import Diagram from '../../components/diagrams/Diagram.astro';
@@ -283,6 +284,8 @@ const num = () => {
         </p>
       )
     }
+
+    <TutorNote lead="Studying this subtopic for an examination?" offer="A one-to-one session works through the ideas, the tools and the questions you find hardest." />
 
     <nav class="sh-pager" aria-label="Neighbouring subtopics">
       {prev ? <a href={subtopicHref(c, prev.s.code)}>&larr; {prev.s.code} {prev.s.title}</a> : <span />}

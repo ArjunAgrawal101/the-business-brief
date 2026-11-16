@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import TutorNote from '../../components/ui/TutorNote.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
 import { href, topicsInOrder } from '../../lib/content';
 
@@ -32,5 +33,6 @@ const topics = await topicsInOrder();
         ))
       }
     </ol>
+    <TutorNote lead="Revising with little time left?" offer="A session can plan what to revise, test you on it and work through the questions that cost marks." />
   </div>
 </BaseLayout>

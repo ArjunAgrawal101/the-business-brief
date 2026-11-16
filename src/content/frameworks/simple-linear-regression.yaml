@@ -48,6 +48,49 @@ exercise:
     - "Explain what the gradient and the correlation coefficient would tell it."
     - "For caution, consider extrapolation and other factors such as weekends or school holidays."
     - "Suggest how the kiosk could check the forecast in practice."
+structure:
+  - name: The two variables
+    text: "The independent variable, x, which is thought to influence the other, and the dependent variable, y, such as advertising spend and sales revenue."
+  - name: The scatter diagram
+    text: "Each observation plotted as a point, which shows the direction, shape and strength of any relationship, and any outliers."
+  - name: The line of best fit
+    text: "The straight line y = a + bx that fits the points most closely. The gradient, b, is the change in y for each unit of x; the intercept, a, is the value of y when x is zero."
+  - name: Correlation
+    text: "How closely the points follow the line, from +1 (a perfect positive relationship) through 0 (none) to −1 (a perfect negative one)."
+  - name: Interpolation and extrapolation
+    text: "Predicting y within the range of the data (interpolation) or beyond it (extrapolation), which assumes the relationship continues."
+situations:
+  suits:
+    - "Testing whether two business variables move together, such as advertising and sales, or temperature and ice cream demand, before planning around the link."
+    - "Making a short-range forecast within or just beyond the observed data."
+    - "Estimating how much one variable changes for each unit of another, such as extra revenue per extra thousand spent."
+  poorFit:
+    - "Proving that one variable causes another; a third factor may drive both."
+    - "Relationships that curve, such as advertising with diminishing returns, or forecasts far beyond the data."
+interpretation: |
+  Read three things in order: the strength of the relationship (the correlation), its size (the gradient, in business terms, such as dollars of sales per dollar of advertising), and its limits (the range of the data and the possible third factors).
+
+  A strong correlation shows that the two variables move together in this data, not that one causes the other. Before acting on the gradient, ask what else changed at the same time, such as the season, and whether the relationship is likely to hold outside the range observed. The further a prediction lies beyond the data, the less it should be trusted.
+implications:
+  justifies:
+    - "Planning on a relationship that is strong, plausible and checked for third factors, within the range of the data."
+    - "Testing the relationship further with a small, controlled change, such as raising spending in one region first."
+  doesNotJustify:
+    - "Concluding that changing x will change y, without other evidence of cause."
+    - "Committing large sums on an extrapolated figure far beyond the observed data."
+mistakes:
+  - mistake: "Reading correlation as causation."
+    fix: "Name a possible third factor and say how the business could test the link, such as a controlled trial."
+  - mistake: "Extrapolating far beyond the data."
+    fix: "State the range of the data and treat predictions beyond it as assumptions, not findings."
+  - mistake: "Giving the gradient without its meaning."
+    fix: "Translate it into business terms, such as 'each extra $1,000 of advertising is associated with about $2,680 of extra revenue'."
+apply:
+  - href: /market-studio/budget-allocation/
+    scope: part
+    use: "See diminishing returns made explicit: the tool's response curves flatten as spending rises, a reminder that a straight line fitted to past spending cannot be extended far beyond the data."
+decisions: [data]
+references: []
 terms: [simple-linear-regression, scatter-diagram, line-of-best-fit, correlation, extrapolation, sales-forecast]
 related: [descriptive-statistics, balanced-scorecard, decision-trees]
 sources: [ib-bm-guide-2024]

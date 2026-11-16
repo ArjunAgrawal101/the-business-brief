@@ -6,7 +6,7 @@
  */
 import { NAV } from '../../lib/navigation';
 
-/** The footer's columns are the five groups of the header, from one list. */
+/** The footer's columns are the six groups of the header, from one list. */
 const COLUMNS = NAV.map((g) => ({ title: g.label, links: g.links.map((l) => [l.label, l.href] as const) }));
 const year = new Date().getFullYear();
 ---
@@ -153,8 +153,8 @@ const year = new Date().getFullYear();
 
   .site-footer__nav {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: var(--sp-5);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-6) var(--sp-5);
   }
 
   .site-footer__h {

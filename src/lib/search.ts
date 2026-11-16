@@ -12,6 +12,7 @@ export const SEARCH_KINDS = [
   { id: 'formulas', label: 'Formulas', one: 'formula', many: 'formulas' },
   { id: 'cases', label: 'Cases', one: 'case', many: 'cases' },
   { id: 'frameworks', label: 'Frameworks', one: 'framework', many: 'frameworks' },
+  { id: 'advanced', label: 'Advanced management', one: 'module', many: 'modules' },
   { id: 'questions', label: 'Questions', one: 'question', many: 'questions' },
   { id: 'tools', label: 'Calculators and tools', one: 'tool', many: 'tools' },
   { id: 'resources', label: 'Resources', one: 'resource', many: 'resources' },

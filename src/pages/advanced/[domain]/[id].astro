@@ -1,0 +1,339 @@
+---
+/**
+ * One module of Advanced Management and Strategy, in its eight parts:
+ * conceptual foundation, advanced explanation, models and frameworks, real
+ * business applications, case studies, critical evaluation, a decision
+ * exercise and further reading. The module is beyond the IB course and says
+ * so; where it builds on an IB subtopic it names it, and it never counts
+ * towards the IB course. Real applications and cases show their sources;
+ * illustrative and fictional ones are labelled.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageIntro from '../../../components/layout/PageIntro.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import SaveButton from '../../../components/ui/SaveButton.astro';
+import { advancedLibrary, citation } from '../../../lib/advanced-content';
+import { AUDIENCE_LABELS, DOMAIN_BY_ID, MODULE_PARTS, advancedHref, moduleWords } from '../../../lib/advanced';
+import type { AdvancedModule } from '../../../lib/advanced-schema';
+import { corpus, longDate } from '../../../lib/content';
+import { allSubtopics, subtopicHref } from '../../../lib/learning';
+import { inline, plain, rich } from '../../../lib/markup';
+import '../../../styles/advanced.css';
+
+export async function getStaticPaths() {
+  const lib = await advancedLibrary();
+  return lib.modules.map((m) => ({ params: { domain: m.data.domain, id: m.id }, props: { id: m.id, module: m.data } }));
+}
+
+interface Props {
+  id: string;
+  module: AdvancedModule;
+}
+const { id, module: m } = Astro.props;
+const lib = await advancedLibrary();
+const c = await corpus();
+const domain = DOMAIN_BY_ID[m.domain];
+const siblings = lib.byDomain[m.domain];
+const i = siblings.findIndex((x) => x.id === id);
+const prev = i > 0 ? siblings[i - 1] : undefined;
+const next = i < siblings.length - 1 ? siblings[i + 1] : undefined;
+const subs = allSubtopics(c);
+const bridgeLinks = m.bridge.codes.map((code) => ({ code, title: subs.find((x) => x.s.code === code)?.s.title ?? code, href: subtopicHref(c, code) }));
+const src = (sid: string) => lib.sources[sid];
+const cite = (sid: string) => {
+  const s = src(sid);
+  return s ? { text: citation(s), url: s.url } : undefined;
+};
+const sourceLine = (ids: string[]) => ids.map(cite).filter(Boolean) as Array<{ text: string; url?: string }>;
+const words = moduleWords(m);
+const n = (k: (typeof MODULE_PARTS)[number]['id']) => String(MODULE_PARTS.findIndex((p) => p.id === k) + 1).padStart(2, '0');
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LearningResource',
+  name: m.title,
+  description: plain(m.dek),
+  educationalLevel: m.audience.map((a) => AUDIENCE_LABELS[a]).join(', '),
+  learningResourceType: 'Module',
+  isAccessibleForFree: true,
+  timeRequired: `PT${m.minutes}M`,
+};
+---
+
+<BaseLayout title={`${m.title}: ${domain.name}`} description={plain(m.dek)} section="advanced" room="advanced" jsonLd={jsonLd}>
+  <PageIntro
+    trail={[{ label: 'Advanced Management', href: '/advanced/' }, { label: domain.name, href: advancedHref(m.domain) }, { label: m.title }]}
+    kicker={`${domain.name} · Module ${m.order}`}
+    title={m.title}
+    lead={m.dek}
+    wide
+  >
+    <p class="am-tags">
+      <span class="tag tag--enrichment">Beyond the IB course</span>
+      {m.audience.map((a) => <span class="tag tag--plain">{AUDIENCE_LABELS[a]}</span>)}
+      <span class="am-meta">About {m.minutes} minutes · {words.toLocaleString('en-GB')} words · checked {longDate(new Date(m.updated))}</span>
+    </p>
+    <SaveButton title={m.title} kind="page" />
+  </PageIntro>
+
+  <div class="wrap page-body am-module">
+    <aside class="am-aside" aria-label="This module">
+      <nav class="am-toc" aria-label="The eight parts of the module">
+        <p class="label label--ink">In this module</p>
+        <ol>
+          {MODULE_PARTS.map((p) => <li><a href={`#${p.id}`}>{p.title}</a></li>)}
+        </ol>
+      </nav>
+      <div class="am-covers">
+        <p class="label label--ink">Covers</p>
+        <ul class="am-chips" role="list">
+          {m.covers.map((t) => <li>{t}</li>)}
+        </ul>
+      </div>
+    </aside>
+
+    <div class="am-body">
+      <section class="am-bridge" aria-labelledby="am-bridge-h">
+        <p class="label label--ink" id="am-bridge-h">From the IB course to this module</p>
+        <div class="prose" set:html={rich(m.bridge.text)} />
+        {
+          bridgeLinks.length > 0 && (
+            <p class="am-bridge__links">
+              Builds on{' '}
+              {bridgeLinks.map((b, k) => (
+                <>
+                  {k > 0 && (k === bridgeLinks.length - 1 ? ' and ' : ', ')}
+                  <a href={b.href}>
+                    {b.code} {b.title}
+                  </a>
+                </>
+              ))}
+              . Nothing on this page is part of the IB syllabus or its assessment.
+            </p>
+          )
+        }
+        {bridgeLinks.length === 0 && <p class="am-bridge__links">Nothing on this page is part of the IB syllabus or its assessment.</p>}
+      </section>
+
+      <section id="foundation" class="am-sec" aria-labelledby="foundation-h">
+        <SectionHead no={n('foundation')} title="Conceptual foundation" id="foundation-h" />
+        <div class="prose am-lead" set:html={rich(m.foundation)} />
+      </section>
+
+      <section id="explanation" class="am-sec" aria-labelledby="explanation-h">
+        <SectionHead no={n('explanation')} title="Advanced explanation" id="explanation-h" />
+        {
+          m.advanced.map((s) => (
+            <section class="am-part" id={s.id} aria-labelledby={`${s.id}-h`}>
+              <h3 id={`${s.id}-h`}>{s.title}</h3>
+              <div class="prose" set:html={rich(s.body)} />
+            </section>
+          ))
+        }
+      </section>
+
+      <section id="models" class="am-sec" aria-labelledby="models-h">
+        <SectionHead no={n('models')} title="Models and frameworks" id="models-h" dek="Where each comes from, how to use it, and where it stops being useful." />
+        <div class="am-models">
+          {
+            m.models.map((x) => (
+              <article class="am-model" aria-labelledby={`model-${id}-${x.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
+                <p class="am-model__origin">{x.origin}</p>
+                <h3 id={`model-${id}-${x.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>{x.name}</h3>
+                <div class="prose" set:html={rich(x.summary)} />
+                <p class="label">How to use it</p>
+                <div class="prose" set:html={rich(x.use)} />
+                <p class="label">Where it fails</p>
+                <div class="prose" set:html={rich(x.limits)} />
+                {(x.framework || x.tool) && (
+                  <p class="am-model__links">
+                    {x.framework && <a href={`/frameworks/${x.framework}/`}>The framework in the library</a>}
+                    {x.framework && x.tool && ' · '}
+                    {x.tool && <a href={x.tool}>Apply it on the platform</a>}
+                  </p>
+                )}
+                <p class="am-src">
+                  {sourceLine(x.sources).map((s, k) => (
+                    <>
+                      {k > 0 && ' '}
+                      <span set:html={inline(s.text)} />
+                    </>
+                  ))}
+                </p>
+              </article>
+            ))
+          }
+        </div>
+      </section>
+
+      <section id="applications" class="am-sec" aria-labelledby="applications-h">
+        <SectionHead no={n('applications')} title="Real business applications" id="applications-h" dek="Real organizations appear only with dated, cited facts; illustrative examples are labelled." />
+        {
+          m.applications.map((a) => (
+            <article class="am-app">
+              <p class="am-app__kind">
+                {a.kind === 'real' ? <span class="tag tag--plain">Real organization{a.asOf ? `, ${a.asOf}` : ''}</span> : <span class="tag tag--plain">Illustrative</span>}
+              </p>
+              <h3>{a.title}</h3>
+              <div class="prose" set:html={rich(a.body)} />
+              {a.sources.length > 0 && (
+                <ul class="am-src am-src--list" role="list">
+                  {sourceLine(a.sources).map((s) => (
+                    <li>
+                      {s.url ? (
+                        <a href={s.url} class="ext" rel="noopener">
+                          <span set:html={inline(s.text)} />
+                          <span class="sr-only"> (external site)</span>
+                        </a>
+                      ) : (
+                        <span set:html={inline(s.text)} />
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </article>
+          ))
+        }
+      </section>
+
+      <section id="cases" class="am-sec" aria-labelledby="cases-h">
+        <SectionHead no={n('cases')} title="Case studies" id="cases-h" />
+        {
+          m.cases.map((cs, k) => (
+            <article class="am-case" aria-labelledby={`case-${id}-${k}`}>
+              <p class="am-app__kind">
+                <span class="tag tag--plain">{cs.fictional ? 'Fictional case, simulated figures' : 'Real organization, cited'}</span>
+              </p>
+              <h3 id={`case-${id}-${k}`}>{cs.title}</h3>
+              <div class="prose" set:html={rich(cs.situation)} />
+              {cs.exhibit && (
+                <div class="table-scroll" role="region" aria-label={cs.exhibit.caption} tabindex="0">
+                  <table class="table am-exhibit">
+                    <caption>{cs.exhibit.caption}</caption>
+                    <thead>
+                      <tr>
+                        {cs.exhibit.columns.map((col, ci) => (
+                          <th scope="col" class={ci > 0 ? 'n' : undefined}>
+                            {col}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {cs.exhibit.rows.map((r) => (
+                        <tr>
+                          {r.map((cell, ci) => (ci === 0 ? <th scope="row">{cell}</th> : <td class="n">{cell}</td>))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {cs.exhibit.note && <p class="small muted am-exhibit__note">{cs.exhibit.note}</p>}
+                </div>
+              )}
+              <p class="label label--ink">Questions</p>
+              <ol class="am-questions">
+                {cs.questions.map((q) => (
+                  <li set:html={inline(q)} />
+                ))}
+              </ol>
+              {cs.sources.length > 0 && (
+                <p class="am-src">
+                  Sources:{' '}
+                  {sourceLine(cs.sources).map((s, j) => (
+                    <>
+                      {j > 0 && ' '}
+                      <span set:html={inline(s.text)} />
+                    </>
+                  ))}
+                </p>
+              )}
+            </article>
+          ))
+        }
+      </section>
+
+      <section id="evaluation" class="am-sec" aria-labelledby="evaluation-h">
+        <SectionHead no={n('evaluation')} title="Critical evaluation" id="evaluation-h" dek="What the evidence supports, where the debate is, and what the models leave out." />
+        <div class="prose" set:html={rich(m.evaluation)} />
+      </section>
+
+      <section id="decision" class="am-sec am-decision" aria-labelledby="decision-h">
+        <SectionHead no={n('decision')} title="Decision exercise" id="decision-h" dek="A fictional situation. Decide before you read the guidance." />
+        <h3>{m.decision.title}</h3>
+        <div class="prose" set:html={rich(m.decision.brief)} />
+        <ol class="am-options" role="list">
+          {
+            m.decision.options.map((o) => (
+              <li>
+                <p class="am-options__label">{o.label}</p>
+                <div class="prose" set:html={rich(o.text)} />
+              </li>
+            ))
+          }
+        </ol>
+        <p class="label label--ink">Judge the options on</p>
+        <ul class="am-chips" role="list">
+          {m.decision.criteria.map((x) => <li>{x}</li>)}
+        </ul>
+        <details class="am-guidance">
+          <summary>Read the guidance</summary>
+          <div class="prose" set:html={rich(m.decision.guidance)} />
+        </details>
+      </section>
+
+      <section id="reading" class="am-sec" aria-labelledby="reading-h">
+        <SectionHead no={n('reading')} title="Further reading" id="reading-h" />
+        <ul class="am-reading" role="list">
+          {
+            m.reading.map((r) => {
+              const s = src(r.source)!;
+              return (
+                <li>
+                  <p class="am-reading__ref">
+                    {s.url ? (
+                      <a href={s.url} class="ext" rel="noopener">
+                        {citation(s)}
+                        <span class="sr-only"> (external site)</span>
+                      </a>
+                    ) : (
+                      citation(s)
+                    )}
+                  </p>
+                  <p class="am-reading__note" set:html={inline(r.note)} />
+                </li>
+              );
+            })
+          }
+        </ul>
+        <p class="small muted am-sources-note">
+          Every work cited here is listed in the platform's <a href="/sources/">sources register</a>. Real organizations appear only with facts from the sources shown; everything else is labelled illustrative or fictional.
+        </p>
+      </section>
+
+      <nav class="am-pager" aria-label={`Modules in ${domain.name}`}>
+        {prev ? (
+          <a class="am-pager__link" href={advancedHref(m.domain, prev.id)} rel="prev">
+            <span class="label">Previous module</span>
+            <span>{prev.data.title}</span>
+          </a>
+        ) : (
+          <a class="am-pager__link" href={advancedHref(m.domain)}>
+            <span class="label">The domain</span>
+            <span>{domain.name}</span>
+          </a>
+        )}
+        {next ? (
+          <a class="am-pager__link am-pager__next" href={advancedHref(m.domain, next.id)} rel="next">
+            <span class="label">Next module</span>
+            <span>{next.data.title}</span>
+          </a>
+        ) : (
+          <a class="am-pager__link am-pager__next" href="/advanced/">
+            <span class="label">All domains</span>
+            <span>Advanced Management and Strategy</span>
+          </a>
+        )}
+      </nav>
+    </div>
+  </div>
+</BaseLayout>

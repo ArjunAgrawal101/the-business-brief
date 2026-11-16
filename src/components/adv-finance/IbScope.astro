@@ -1,0 +1,58 @@
+---
+/**
+ * Where the IB course stops, for one advanced tool: what the course uses,
+ * with the subtopic, its level and the guide's page (as the curriculum file
+ * records them, checked against the guide), and what lies beyond it.
+ */
+import SectionHead from '../layout/SectionHead.astro';
+import { corpus, href } from '../../lib/content';
+import { allSubtopics, subtopicHref } from '../../lib/learning';
+import type { AdvancedTool } from '../../lib/adv-finance/catalogue';
+
+interface Props {
+  tool: AdvancedTool;
+  no: number;
+}
+const { tool, no } = Astro.props;
+const c = await corpus();
+const subs = allSubtopics(c);
+const rows = tool.ibUses.map((u) => {
+  if (u.code === 'toolkit') return { ...u, title: 'Toolkit: contribution', link: href.tool('contribution', c.tools.contribution) ?? '/toolkit/', page: u.where ?? '' };
+  const s = subs.find((x) => x.s.code === u.code)?.s;
+  return { ...u, title: `${u.code} ${s?.title ?? ''}`, link: subtopicHref(c, u.code), page: [s?.page ? `guide, p. ${s.page}` : '', u.where ?? ''].filter(Boolean).join('; ') };
+});
+---
+
+<section aria-labelledby="where-the-course-stops" class="af-scope-section">
+  <SectionHead no={no} title="Where the IB course stops" dek="What this tool takes from the IB course, and what it adds beyond it." id="where-the-course-stops" />
+  <div class="af-scope">
+    <section class="af-scope__col" aria-labelledby={`af-ib-${tool.id}`}>
+      <h3 class="af-scope__h" id={`af-ib-${tool.id}`}><span class="tag tag--ib">IB</span> What the IB course uses</h3>
+      <ul class="af-scope__list" role="list">
+        {
+          rows.map((r) => (
+            <li>
+              <span class="af-scope__code">
+                <a href={r.link}>{r.title}</a>
+                <span class={`tag ${r.level === 'HL' ? 'tag--hl' : 'tag--sl'}`}>{r.level === 'HL' ? 'HL only' : 'SL and HL'}</span>
+              </span>
+              <span>{r.what}</span>
+              {r.page && <span class="small muted">{r.page.charAt(0).toUpperCase() + r.page.slice(1)}</span>}
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+    <section class="af-scope__col af-scope__col--beyond" aria-labelledby={`af-beyond-${tool.id}`}>
+      <h3 class="af-scope__h" id={`af-beyond-${tool.id}`}><span class="tag tag--enrichment">Beyond the IB course</span> What this tool adds</h3>
+      <ul class="af-scope__list" role="list">
+        {tool.beyond.map((b) => <li>{b}</li>)}
+      </ul>
+    </section>
+  </div>
+  <p class="small muted af-scope__note">
+    The course’s content is described in the platform’s words from the Business management guide (first assessment 2024), checked against the guide on 29 October 2026;
+    see <a href="/sources/#claim-formulae">the claims register</a>. The formulas the guide gives are on <a href="/resources/formula-sheet/">the formula sheet</a>. Nothing
+    on this page is an IB method unless it is marked IB, and no question here is an IB question.
+  </p>
+</section>

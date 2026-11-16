@@ -1,0 +1,143 @@
+---
+/**
+ * The Apply it worksheet on a framework's page: the reader's own decision,
+ * one field for each part of the framework's structure, their reading of the
+ * result and what they think it justifies deciding. It is a plain form, so
+ * without JavaScript it works for the visit and prints; with JavaScript the
+ * work is kept on this device (localStorage bb:framework-apply:<id>), can be
+ * downloaded as a text file and cleared (src/scripts/framework-apply.ts).
+ */
+import { jsonForScript } from '../../lib/markup';
+import { partKey } from '../../lib/framework-lab';
+
+interface Props {
+  id: string;
+  name: string;
+  /** The framework's parts, in order: one field each. */
+  parts: Array<{ name: string }>;
+  /** The question the framework answers, offered as the prompt for the decision. */
+  question: string;
+}
+const { id, name, parts, question } = Astro.props;
+const fields = parts.map((p) => ({ key: partKey(p.name), label: p.name }));
+const config = { title: name, parts: fields };
+---
+
+<div class="fw-sheet" data-ix="fw-apply" data-key={`framework-apply:${id}`}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <p class="small" data-error hidden>Your worksheet could not be restored on this page; you can still fill it in and copy your work.</p>
+  <p class="fw-sheet__save small muted">
+    <span class="js-only">Kept on this device as you type, and nowhere else.</span>
+    <span class="nojs-only">Not saved without JavaScript: print the page or copy your answers before you leave.</span>
+  </p>
+  <div class="fw-sheet__top">
+    <div class="field">
+      <label for="fwa-decision">Your decision or question</label>
+      <span class="field__hint" id="fwa-decision-hint">For example: {question}</span>
+      <input class="input" id="fwa-decision" type="text" maxlength="200" autocomplete="off" aria-describedby="fwa-decision-hint" data-field="decision" />
+    </div>
+    <div class="field">
+      <label for="fwa-context">The business and its situation</label>
+      <span class="field__hint" id="fwa-context-hint">Who it is, what it sells, to whom, and what has changed.</span>
+      <textarea class="textarea fw-sheet__box" id="fwa-context" rows="3" maxlength="1200" aria-describedby="fwa-context-hint" data-field="context"></textarea>
+    </div>
+  </div>
+  <fieldset class="fw-sheet__parts">
+    <legend>Part by part</legend>
+    <p class="field__hint" id="fwa-parts-hint">For each part, write what you find for this business and the evidence for it. Leave a part blank only if you can say why it does not apply.</p>
+    {
+      fields.map((f, i) => (
+        <div class="field">
+          <label for={`fwa-part-${i}`}>{f.label}</label>
+          <textarea class="textarea fw-sheet__box" id={`fwa-part-${i}`} rows="3" maxlength="1200" aria-describedby="fwa-parts-hint" data-field={f.key}></textarea>
+        </div>
+      ))
+    }
+  </fieldset>
+  <div class="fw-sheet__end">
+    <div class="field">
+      <label for="fwa-reading">Your reading of the result</label>
+      <span class="field__hint" id="fwa-reading-hint">What the framework shows when the parts are read together, and how sure you are of it.</span>
+      <textarea class="textarea fw-sheet__box" id="fwa-reading" rows="4" maxlength="2000" aria-describedby="fwa-reading-hint" data-field="reading"></textarea>
+    </div>
+    <div class="field">
+      <label for="fwa-decide">What it justifies deciding, and what it does not</label>
+      <span class="field__hint" id="fwa-decide-hint">The decision the result supports, what else you would need to know, and what would change your mind.</span>
+      <textarea class="textarea fw-sheet__box" id="fwa-decide" rows="4" maxlength="2000" aria-describedby="fwa-decide-hint" data-field="decide"></textarea>
+    </div>
+  </div>
+  <div class="fw-sheet__actions js-only">
+    <button class="btn btn--small" type="button" data-download>Download as text</button>
+    <button class="btn btn--small" type="button" data-clear>Clear the worksheet</button>
+    <p class="small muted fw-sheet__status" aria-live="polite" data-status></p>
+  </div>
+</div>
+
+<style>
+  .fw-sheet {
+    display: grid;
+    gap: var(--sp-5);
+    padding: var(--sp-5);
+    max-width: 52rem;
+    background: var(--surface-sheet);
+    border: 1px solid var(--rule-hair);
+    border-top: 3px solid var(--gold-500);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .fw-sheet__save {
+    margin: 0;
+  }
+
+  .fw-sheet__top,
+  .fw-sheet__end {
+    display: grid;
+    gap: var(--sp-4);
+  }
+
+  .fw-sheet__parts {
+    display: grid;
+    gap: var(--sp-4);
+    margin: 0;
+    padding: var(--sp-4) 0 0;
+    border: 0;
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .fw-sheet__parts legend {
+    padding: 0;
+    font-family: var(--font-display);
+    font-size: 1.1875rem;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .fw-sheet__box {
+    min-height: 5.5rem;
+  }
+
+  .fw-sheet__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  .fw-sheet__actions .btn {
+    min-height: 2.75rem;
+  }
+
+  .fw-sheet__status {
+    margin: 0;
+  }
+
+  @media print {
+    .fw-sheet {
+      box-shadow: none;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/framework-apply';
+</script>

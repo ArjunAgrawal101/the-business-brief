@@ -1,0 +1,195 @@
+# Advanced financial management, module 2. Real-company facts come from the
+# documents in src/content/sources/advanced-finance.yaml, read on 16 November
+# 2026. Every worked figure, the case and the decision were checked by script
+# (NPV, IRR, MIRR, payback, profitability index, equivalent annual cost).
+domain: finance
+title: Capital budgeting and investment decisions
+order: 2
+dek: Which investments should a business make, how should it measure whether they create value, and why do the methods managers find most intuitive so often point the wrong way?
+audience: [undergraduate, mba, professional]
+covers: [Capital budgeting, Investment decisions]
+minutes: 25
+updated: '2026-11-16'
+bridge:
+  codes: ['3.8', '3.1']
+  text: |
+    **What the IB course calculates.** Payback (the guide gives no formula, so the standard method with months is used), the average rate of return exactly as the formula sheet gives it, ((total returns - capital cost) ÷ years of use) ÷ capital cost × 100, and at HL net present value using the guide's printed discount factors for 4%, 6%, 8%, 10% and 20% over ten years. The net cash flows and the discount rate are given in the question, and the evaluation weighs qualitative factors beside the numbers.
+
+    **What this module adds.** Where the cash flows come from (incremental, after tax, including working capital and excluding sunk costs), where the discount rate comes from (the cost of capital, the subject of the next module), why NPV is the correct rule and exactly when IRR, payback and ARR mislead, how to choose under capital rationing and between assets of unequal lives, how to value flexibility as a real option, and how to correct for the optimism that inflates almost every forecast.
+foundation: |
+  An investment gives up money now for uncertain money later. It creates value when the present value of the cash it is expected to generate exceeds what it costs, with future cash discounted at the **opportunity cost of capital**: the return investors could earn elsewhere on an investment of the same risk. That is the whole of the net present value rule, and its authority comes from a result usually traced to Fisher (1930). Where owners can borrow and lend in a capital market, they all prefer the business to maximise present value, whatever their personal impatience, because they can rearrange the timing of their own consumption themselves. Managers therefore do not need to know their shareholders' preferences; they need to find projects worth more than they cost.
+
+  The arithmetic is the easy part. The hard parts are forecasting the cash flows honestly, choosing a discount rate that reflects the project's risk rather than the company's average, recognising that many investments are options rather than now-or-never commitments, and running a process in which sponsors cannot simply forecast their way to approval. A good capital budgeting system generates ideas, appraises them consistently, decides, and then audits the results so that the next forecast is better than the last.
+advanced:
+  - id: the-right-cash-flows
+    title: Estimating the right cash flows
+    body: |
+      Discount only the cash flows that change because of the decision. That rules in tax, working capital, the opportunity cost of assets the business already owns (a vacant site that could be sold) and side effects such as lost sales of an existing product. It rules out sunk costs (the feasibility study already paid for), overheads that will be incurred anyway, and financing flows: interest is not deducted, because the discount rate already charges for the capital. Nominal cash flows go with a nominal discount rate and real with real; mixing them is a common, large error.
+
+      Operating cash flow after tax can be written as EBITDA × (1 - t) + t × depreciation, where the second term is the depreciation tax shield. A machine costs £1,000 and needs £100 of working capital at the start, recovered after five years. It adds EBITDA of £350 a year; depreciation is £200 a year and tax 25%. Operating cash flow is 350 × 0.75 + 0.25 × 200 = £312.5. The cash flows are minus 1,100 at the start, 312.5 in years 1 to 4 and 412.5 in year 5. At 10% the NPV is 312.5 × 3.7908 + 100 × 0.6209 - 1,100 = £146.7, and the IRR is 14.9%. If an analyst wrongly charged the project £40 a year of head office overhead that will be incurred anyway, the NPV would fall to £33.0: a good project nearly rejected by an allocation.
+  - id: npv-versus-irr
+    title: Why NPV beats IRR and payback
+    body: |
+      The internal rate of return (IRR) is the discount rate at which NPV is zero. For a single conventional project, accepting when IRR exceeds the cost of capital gives the same answer as NPV. It fails in three situations.
+
+      - **Scale.** Project S costs £100 and returns £130 in a year: IRR 30%, NPV at 10% £18.2. Project L costs £1,000 and returns £1,200: IRR 20%, NPV £90.9. If only one can be chosen, L adds five times the value; the IRR of the extra investment (minus 900 now, plus 1,070 later) is 18.9%, above the cost of capital, which confirms it.
+      - **Timing.** Project A pays £1,650 after three years on £1,000 invested (IRR 18.2%); project B pays £1,200 after one year (IRR 20%). At a cost of capital of 8%, A is worth £309.8 and B £111.1. IRR ranks B first; the usual explanation is that comparing IRRs treats B's early cash as if it could be reinvested at 20%, when the firm can expect only its cost of capital. The two NPV profiles cross at 17.3%.
+      - **Non-conventional cash flows.** A project with flows of minus 100, plus 230 and minus 132 (a later clean-up cost, say) has two IRRs, 10% and 20%, and neither is a guide to its value.
+
+      The modified IRR (MIRR) repairs the reinvestment problem by compounding inflows at the cost of capital: at 8%, B's MIRR is 11.9% against A's 18.2%. Payback ignores everything after the cut-off and the time value of money; discounted payback fixes the second flaw but not the first. The IB's ARR divides an average accounting return by the initial cost, so it ignores timing altogether. NPV is additive across projects and measured in money, which is what owners own.
+  - id: rationing-and-unequal-lives
+    title: Capital rationing and unequal lives
+    body: |
+      When capital is limited, the scarce resource is money, so the profitability index (PI), the present value of inflows per pound invested, ranks divisible projects correctly. Real projects are lumpy. With £600 available, four projects cost £400, £300, £300 and £200, with NPVs of £160, £150, £120 and £100. Ranking by PI picks the £300 project with PI 1.5 and the £200 one with PI 1.5, using £500 for an NPV of £250, and nothing else fits. The two £300 projects together use the full £600 for £270. Lumpy choices need every feasible combination compared, which is why Lorie and Savage (1955) treated rationing as a programming problem. Most rationing is also self-imposed; a firm that turns away positive-NPV projects should ask why it does not raise the capital.
+
+      Machines with different lives cannot be compared on NPV over their own lives. Convert each into an **equivalent annual cost**: the present value of its costs divided by the annuity factor for its life. Machine X costs £50,000, runs for three years at £8,000 a year; machine Y costs £70,000, runs for five years at £6,000. At 10% their present costs are £69,895 and £92,745, but their equivalent annual costs are £28,106 and £24,466, so Y is cheaper, provided it would be replaced on similar terms.
+  - id: real-options
+    title: 'Flexibility: real options'
+    body: |
+      A standard NPV assumes the firm commits now and then manages passively. In reality managers can wait, test, expand, scale back, switch inputs or abandon, and each right has value when the future is uncertain. Myers (1977) described such opportunities as options; Dixit and Pindyck (1994) showed that when an investment is irreversible and waiting reveals information, a positive NPV is not enough: the project must beat the value of keeping the option open.
+
+      A simple tree shows the size of the effect. A pilot costs £10m now. In a year the market will prove good or poor with equal chances; a full plant costing £100m then has a present value at that date of £180m if good and £60m if poor. Committing now to build regardless is worth minus 10 + (0.5 × 180 + 0.5 × 60 - 100) ÷ 1.1 = £8.2m. Building only if the market is good is worth minus 10 + 0.5 × (180 - 100) ÷ 1.1 = £26.4m. The option to abandon is worth £18.2m, more than twice the committed project's NPV. The same logic values staged R&D, modular plants and flexible platforms, and explains why paying more for flexibility can be rational.
+  - id: forecast-bias
+    title: Optimism, misrepresentation and governance
+    body: |
+      The weakest link is the forecast. Kahneman and Lovallo (1993) distinguished the **inside view**, which builds a forecast from the project's own plan, from the **outside view**, which asks how similar projects actually turned out. Inside views are reliably optimistic. In 258 transport projects, Flyvbjerg, Holm and Buhl (2002) found costs underestimated in almost nine cases in ten, which they attributed partly to deliberate misrepresentation by sponsors competing for funds. Remedies are organisational: reference class forecasts, independent review of sponsors' numbers, explicit uplifts for known biases, staged funding, and post-completion audits that compare outcomes with the original case.
+models:
+  - name: The net present value rule
+    origin: Fisher (1930)
+    summary: |
+      NPV = sum over t of CF(t) ÷ (1 + r)^t, where r is the opportunity cost of capital for the project's risk. Accept projects with positive NPV; among mutually exclusive projects, choose the highest NPV.
+    use: |
+      Build incremental, after-tax cash flows, discount at a rate matched to the project's risk and currency, and test the answer's sensitivity to the forecasts and the rate. Add NPVs across projects to value a portfolio.
+    limits: |
+      It is only as good as the forecasts and the rate, it treats the decision as now-or-never, and it says nothing about financing constraints. A single company-wide rate misprices projects that are safer or riskier than average.
+    tool: /finance-desk/lab/net-present-value/
+    sources: [adv-fin-fisher-1930, adv-fin-brealey-myers-allen-2020]
+  - name: Internal rate of return and modified IRR
+    tool: /finance-desk/advanced/capital-budgeting/
+    origin: Keynes (1936); Hirshleifer (1958)
+    summary: |
+      The IRR is the discount rate that sets NPV to zero, the "marginal efficiency of capital" in Keynes's terms. The MIRR compounds inflows at the cost of capital and finds the rate that equates their future value with the outlay.
+    use: |
+      Use IRR to communicate a project's return and its margin of safety on the discount rate. For mutually exclusive choices, compute the IRR of the incremental cash flows, or simply compare NPVs.
+    limits: |
+      It misranks projects of different scale or timing, can have several values or none when cash flows change sign more than once, and cannot be added across projects. Hirshleifer (1958) set out why present value, not IRR, is the correct criterion.
+    sources: [adv-fin-keynes-1936, adv-fin-hirshleifer-1958]
+  - name: Real options valuation
+    origin: Myers (1977); Dixit and Pindyck (1994)
+    summary: |
+      Treats flexibility (to defer, stage, expand, contract, switch or abandon) as options whose value rises with uncertainty and with the information that waiting reveals.
+    use: |
+      Map the decisions as a tree with the points where new information arrives, value each branch by working back from the end, and compare with the committed NPV; the difference is the value of flexibility. Use it to design projects in stages, not only to evaluate them.
+    limits: |
+      Probabilities and branch values are judgements, financial option formulas rarely fit real assets well, and "strategic option value" can become a label for justifying projects that fail on NPV.
+    framework: decision-trees
+    tool: /strategy-studio/decision-tree/
+    sources: [adv-fin-myers-1977, adv-fin-dixit-pindyck-1994, adv-fin-trigeorgis-1996]
+  - name: Outside view and reference class forecasting
+    origin: Kahneman and Lovallo (1993)
+    summary: |
+      Corrects the optimism of plan-based forecasts by anchoring on the distribution of outcomes for a class of similar past projects.
+    use: |
+      Identify a relevant reference class, find its distribution of overruns or shortfalls, start from that distribution, and adjust only for documented differences. Apply it to costs, timetables and revenues.
+    limits: |
+      Choosing the class is a judgement, the data may be thin for novel projects, and a correction tuned to the average can over-penalise unusually well-run projects.
+    sources: [adv-fin-kahneman-lovallo-1993, adv-fin-lovallo-kahneman-2003, adv-fin-flyvbjerg-holm-buhl-2002]
+applications:
+  - title: 'JLR, 2023: a £15 billion programme that kept one option open'
+    kind: real
+    asOf: '2023-04'
+    body: |
+      In April 2023 JLR announced it would invest £15 billion over five years in its industrial footprint, vehicle programmes, technology and people. It made its next medium-size SUV architecture (EMA) pure electric and its Halewood plant all-electric, while retaining the flexible MLA architecture used by Range Rover and Range Rover Sport, which offers combustion, hybrid and battery electric versions; the company said this gave it "uncompromised flexibility" to match markets moving towards net zero at different speeds. Its stated financial goals were a net cash positive position by FY25 and double-digit EBIT by 2026.
+
+      *Interpretation, not from the source:* the announcement contains two capital budgeting choices of different kinds. EMA commits to one technology to gain focus and scale; MLA pays for a switching option between powertrains. Neither can be judged by a single NPV, because their value depends on how fast different markets electrify. This module does not assess whether the programme or its goals were achieved.
+    sources: [adv-fin-jlr-investment-2023]
+  - title: 'Novo Nordisk, 2023 to 2025: capacity built ahead of uncertain demand'
+    kind: real
+    asOf: '2025-07'
+    body: |
+      In November 2023 Novo Nordisk announced more than DKK 42 billion of investment to expand its Kalundborg sites, mostly in active pharmaceutical ingredient capacity, including for its GLP-1 products. The new facility was to be "a multi-product facility" with flexibility for current and future processes, completed in stages from the end of 2025 to 2029. In July 2025 the company cut its outlook for 2025 sales growth at constant exchange rates from 13 to 21% to 8 to 14%, citing the continued use of compounded GLP-1 products, slower market expansion and competition.
+
+      *Interpretation, not from the source:* capacity for a fast-growing product has to be committed years before the demand it serves is known. A multi-product design is a way of buying flexibility: if demand for one product disappoints, the plant can serve others. The outlook cut does not show that the investment was wrong; it shows why the value of such a plant depends on its options as much as on its base case.
+    sources: [adv-fin-novo-kalundborg-2023, adv-fin-novo-outlook-2025]
+  - title: 'Nippon Steel and U. S. Steel, 2025: investment committed, options given up'
+    kind: real
+    asOf: '2025-06'
+    body: |
+      When Nippon Steel completed its acquisition of U. S. Steel in June 2025, the companies entered a National Security Agreement with the US Government. Nippon Steel committed to about $11 billion of new investment in U. S. Steel by 2028, including a greenfield project to be completed after 2028. Through a Golden Share, the President of the United States or a designee gained consent rights over matters including reductions in the committed investment and certain decisions to close or idle existing US plants.
+
+      *Interpretation, not from the source:* in capital budgeting terms the agreement converts options into obligations. The usual rights to defer, scale back or abandon investment if conditions turn out badly now require consent. An appraisal of the acquisition therefore has to include the committed spending and the value of the flexibility surrendered, not just the purchase price.
+    sources: [adv-fin-nippon-steel-2025]
+cases:
+  - title: 'Ashworth Packaging: two lines, one site'
+    fictional: true
+    situation: |
+      Ashworth Packaging, a fictional maker of food packaging, has space for one new production line. Line A is fully automated and larger; Line B is semi-automated, cheaper and smaller. They are mutually exclusive. The finance team's after-tax cash flow forecasts are below, and the company's cost of capital is 9%. The operations director favours B because "it pays back in three years and has the highest return". An internal audit of the company's last eight projects found that, on average, they delivered 85% of the operating cash flows forecast at approval.
+    exhibit:
+      caption: After-tax cash flows of the two lines (£ million)
+      columns: ['Year', 'Line A', 'Line B']
+      rows:
+        - ['0 (investment)', '-12.0', '-5.0']
+        - ['1', '2.0', '1.6']
+        - ['2', '3.2', '1.7']
+        - ['3', '4.0', '1.7']
+        - ['4', '4.4', '1.6']
+        - ['5', '4.4', '1.5']
+        - ['6', '4.2', '1.4']
+        - ['Total, years 1 to 6', '22.2', '9.5']
+      note: Fictional company; simulated figures. Cash flows arise at the end of each year; neither line has a value after year 6.
+    questions:
+      - Calculate the payback period, the ARR on the IB formula, the NPV at 9%, the IRR and the profitability index for each line. Which line does each method prefer?
+      - Calculate the IRR of the incremental cash flows (Line A minus Line B) and explain how it resolves the conflict between the methods.
+      - Recompute both NPVs assuming each line delivers 85% of its forecast operating cash flows. Does the ranking change, and what does the exercise say about the margin of safety in each?
+      - If the board could raise only £8m this year, how would the decision change, and what would that imply about the cost of capital at the margin?
+      - What options to expand, switch or abandon might each line carry, and how would you bring them into the appraisal?
+evaluation: |
+  **What the evidence shows.** In Graham and Harvey's (2001) survey of 392 chief financial officers, about three-quarters always or almost always used NPV and IRR, more than half used payback, about half used sensitivity analysis, and only about a quarter claimed to use real options. Companies' hurdle rates are often well above any plausible cost of capital (Poterba and Summers, 1995), and Jagannathan and colleagues (2016) relate the gap to managerial and organisational constraints, such as limited capacity to execute projects, rather than to risk alone. Forecasts are biased upwards in large projects (Flyvbjerg, Holm and Buhl, 2002).
+
+  **Interpreting the persistence of "wrong" methods.** One reading is that practitioners are simply unsophisticated. A more charitable one is that payback and high hurdle rates are crude corrections for real problems the textbook model omits: optimistic forecasts, scarce management time, limited access to finance and the declining reliability of distant cash flows. On that view the remedy is to deal with those problems directly, by debiasing forecasts, valuing flexibility and rationing management attention explicitly, rather than to distort the discount rate, which penalises long-lived projects most.
+
+  **The short-termism debate.** Hayes and Abernathy (1980) argued that financial techniques had made American managers reluctant to make long-term investments. Defenders of discounted cash flow reply that the fault lies in misuse: excessive hurdle rates, ignored options, and comparisons with a "do nothing" case wrongly assumed to preserve today's cash flows when competitors are investing. Both sides agree that the method cannot be better than its inputs and the incentives of the people who prepare them.
+decision:
+  title: How much capacity, and when?
+  fictional: true
+  brief: |
+    Carrowmore Biologics, a fictional manufacturer of biological medicines, must decide how to supply a new product whose demand depends on trial results and on payers' decisions over the next two years. The board's best estimate is an even chance that demand will be high. The finance team has valued three routes, in present values (£m), under each outcome.
+  options:
+    - label: One large plant now
+      text: Build full capacity at once for £400m. Lowest unit cost if demand is high. NPV £320m if demand is high, minus £180m if it is low.
+    - label: Modular plant in two phases
+      text: Build phase 1 now for £180m and add phase 2 for £260m in two years only if demand is high. Higher total cost, but the second outlay can be avoided. NPV £250m if high, minus £40m if low.
+    - label: Contract manufacturer with an option to build
+      text: Sign a supply agreement with minimum volumes, sharing margin with the contractor, and keep the right to build later. NPV £150m if high, £10m if low.
+  criteria:
+    - Expected NPV
+    - Loss in the poor outcome and its effect on the balance sheet
+    - Value of the flexibility retained
+    - Control of supply and quality
+    - Sensitivity of the choice to the probability of high demand
+  guidance: |
+    At an even chance, the expected NPVs are £70m for the large plant (0.5 × 320 - 0.5 × 180), £105m for the modular plant and £80m for the contract route, so the modular plant leads. Its advantage is the real option in phase 2: it spends the extra £260m only when demand has been revealed.
+
+    The ranking depends on the probability, so find the break-even beliefs. The large plant beats the modular one only if the chance of high demand exceeds two-thirds (320p - 180(1 - p) > 250p - 40(1 - p) gives p > 0.67). The contract route beats the modular plant only if that chance is below one-third. A board confident of success should build big; one with real doubt should keep the option; one expecting failure should rent capacity.
+
+    The qualitative criteria then matter. The large plant's £180m loss in the poor outcome could strain the balance sheet; the contract route gives up control of supply and quality in a regulated product. Unless the board has evidence that moves its estimate well above two-thirds, the modular plant is the robust choice, and its design should make phase 2 as quick to add as possible, because the option is worth most if it can be exercised fast.
+reading:
+  - source: adv-fin-brealey-myers-allen-2020
+    note: The standard treatment of NPV, the cash flows to discount, IRR's pitfalls and real options, at MBA depth.
+  - source: adv-fin-dixit-pindyck-1994
+    note: The rigorous theory of irreversible investment under uncertainty and the value of waiting; demanding but foundational.
+  - source: adv-fin-graham-harvey-2001
+    note: The survey that shows how companies actually appraise investments and estimate their cost of capital.
+  - source: adv-fin-flyvbjerg-holm-buhl-2002
+    note: The evidence on cost underestimation in large projects, and the argument that some of it is deliberate.
+basis:
+  - source: ib-bm-guide-2024
+    note: Payback, ARR and NPV with printed discount factors in the IB course (pages 30, 65 and 66), for the bridge.
+  - source: adv-fin-lorie-savage-1955
+    note: Capital rationing.
+  - source: adv-fin-poterba-summers-1995
+    note: Hurdle rates above the cost of capital.
+  - source: adv-fin-jagannathan-2016
+    note: Explanations for high hurdle rates.
+  - source: adv-fin-hayes-abernathy-1980
+    note: The short-termism critique of financial techniques.

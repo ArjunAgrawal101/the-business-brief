@@ -7,6 +7,7 @@
  * it, so the earliest cases keep the layout they were written for.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import TutorNote from '../../components/ui/TutorNote.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import Exhibit from '../../components/blocks/Exhibit.astro';
@@ -722,5 +723,6 @@ const full = Boolean(cs.exercise || cs.analysisQuestions.length || cs.industryCo
       </aside>
       <p class="small" style="margin-top:var(--sp-5)"><a href="/case-vault/">Back to the Case Vault</a>: every case, with filters and the Case of the Week.</p>
     </section>
+    <TutorNote lead="Want to test your analysis of this case?" offer="A one-to-one session can read your answer the way an examiner would and show you where the argument stops." />
   </div>
 </BaseLayout>

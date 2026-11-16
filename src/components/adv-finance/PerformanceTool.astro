@@ -1,0 +1,119 @@
+---
+/**
+ * The financial performance dashboard: several years of accounts in a grid,
+ * then return on equity taken apart, the cash conversion cycle, interest
+ * cover and gearing, a reading of each measure with its limits, and the IB's
+ * own ratios beside them. Rendered in full on the server;
+ * src/scripts/adv-finance/performance.ts makes it live with the same functions.
+ */
+import SectionHead from '../layout/SectionHead.astro';
+import { BUSINESS } from '../../lib/adv-finance/business';
+import { MAX_YEARS, MIN_YEARS } from '../../lib/adv-finance/performance';
+import { buildPerformanceReport } from '../../lib/adv-finance/performance-view';
+import { accountsGridHtml, openingStockHtml } from '../../lib/adv-finance/forms';
+import { PERFORMANCE_EXAMPLE_FORM, performanceFromForm } from '../../lib/adv-finance/state';
+import { advancedTool } from '../../lib/adv-finance/catalogue';
+import { CURRENCIES } from '../../lib/finance-lab/fields';
+
+const tool = advancedTool('performance-dashboard');
+const form = PERFORMANCE_EXAMPLE_FORM;
+const { input } = performanceFromForm(form);
+if (!input) throw new Error('The performance example does not pass its own checks.');
+const report = buildPerformanceReport(input, form.currency);
+const r = report.regions;
+const uid = 'af-pd';
+const errId = `${uid}-grid-err`;
+---
+
+<div class="fl fl--wide af af--performance" data-ix="adv-finance" data-tool="performance" data-key={tool.storageKey} data-name={tool.name} data-uid={uid} id="tool">
+  <section class="fl-desk" aria-labelledby={`${uid}-desk`}>
+    <header class="fl-desk__bar">
+      <h2 class="fl-desk__title" id={`${uid}-desk`}>The dashboard</h2>
+      <p class="fl-source" data-source>Example figures: {BUSINESS.name}, a fictional business. Simulated data.</p>
+    </header>
+    <p class="state state--error fl-broken" data-error hidden>The dashboard could not start. The worked example below uses the example figures.</p>
+    <div class="fl-desk__grid">
+      <div class="fl-desk__inputs">
+        <form class="fl-form js-only" data-af-form novalidate aria-label="Your accounts">
+          <div class="fl-fields">
+            <Fragment set:html={openingStockHtml(form.openingStock, uid, form.currency)} />
+          </div>
+          <div class="fl-gridblock">
+            <p class="label label--ink" id={`${uid}-grid-h`}>Each year’s accounts, oldest first</p>
+            <div class="table-scroll fl-grid-wrap" role="region" aria-labelledby={`${uid}-grid-h`} tabindex="0" data-grid set:html={accountsGridHtml(form, uid, form.currency, errId)} />
+            <p class="cluster fl-grid__actions">
+              <button type="button" class="btn btn--small" data-act="add-year" aria-disabled={form.labels.length >= MAX_YEARS ? 'true' : undefined}>Add a year</button>
+              <button type="button" class="btn btn--small" data-act="remove-year" aria-disabled={form.labels.length <= MIN_YEARS ? 'true' : undefined}>Remove the last year</button>
+            </p>
+            <p class="field__hint">Between {MIN_YEARS} and {MAX_YEARS} years, in the guide’s line items. A new year starts as a copy of the one before.</p>
+            <ul class="fl-errlist" id={errId} data-err-list hidden></ul>
+          </div>
+          <details class="fl-settings">
+            <summary>Currency</summary>
+            <div class="fl-settings__body">
+              <div class="field">
+                <label for={`${uid}-currency`}>Currency</label>
+                <select class="select" id={`${uid}-currency`} data-setting="currency" name="currency">
+                  {CURRENCIES.map((c) => <option value={c.value} selected={c.value === form.currency}>{c.label}</option>)}
+                </select>
+              </div>
+              <p class="field__hint fl-settings__note">{BUSINESS.name}’s figures are in dollars.</p>
+            </div>
+          </details>
+        </form>
+        <div class="fl-given nojs-only">
+          <p class="label label--ink">The accounts</p>
+          <div data-region="given" set:html={r.given} />
+          <p class="small fl-given__note">Changing these figures needs JavaScript. With it switched off, the page shows the full worked example for the accounts above.</p>
+        </div>
+        <div class="fl-tools js-only" role="group" aria-label="Your figures">
+          <button type="button" class="btn btn--small" data-act="reset">Reset to the example</button>
+          <button type="button" class="btn btn--small" data-act="csv">Download CSV</button>
+          <button type="button" class="btn btn--small" data-act="print">Print</button>
+          <p class="small af-saved" data-save-status>Your figures are kept in this browser once you change them. Nothing is sent anywhere.</p>
+        </div>
+      </div>
+      <div class="fl-desk__results">
+        <p class="label label--ink" id={`${uid}-result`}>Result</p>
+        <p class="fl-paused">These results are for the last complete figures. Correct the figure marked in the accounts to update them.</p>
+        <div>
+          <div class="fl-hero" data-region="headline" set:html={r.headline} />
+          <div data-region="checks" set:html={r.checks} />
+        </div>
+        <dl class="figs fl-figs" data-region="figures" aria-labelledby={`${uid}-result`} set:html={r.figures} />
+      </div>
+    </div>
+    <p class="sr-only" aria-live="polite" data-status></p>
+  </section>
+
+  <section aria-labelledby={`${uid}-d`}>
+    <SectionHead no={1} title="Return on equity, taken apart" dek="The DuPont identity: net profit margin × asset turnover × equity multiplier, and the margin split further into tax, interest and operations." id={`${uid}-d`} />
+    <div data-region="dupont" set:html={r.dupont} />
+    <h3 class="af-sub">How much of each change each factor accounts for</h3>
+    <div data-region="split" set:html={r.split} />
+  </section>
+
+  <section aria-labelledby={`${uid}-c`}>
+    <SectionHead no={2} title="The cash conversion cycle" dek="Days of stock plus days of credit to customers, less days of credit from suppliers: how long cash is tied up in trading." id={`${uid}-c`} />
+    <div data-region="cycle" set:html={r.cycle} />
+  </section>
+
+  <section aria-labelledby={`${uid}-f`}>
+    <SectionHead no={3} title="Interest cover and gearing" dek="How comfortably profit covers interest, and how much of the business is financed by borrowing." id={`${uid}-f`} />
+    <div data-region="finance" set:html={r.finance} />
+  </section>
+
+  <section aria-labelledby={`${uid}-r`}>
+    <SectionHead no={4} title="Reading each measure" dek="What each movement means for these figures, and where each measure stops." id={`${uid}-r`} />
+    <div class="fl-read af-readings" data-region="readings" set:html={r.readings} />
+  </section>
+
+  <section aria-labelledby={`${uid}-ib`}>
+    <SectionHead no={5} title="The IB’s ratios, for comparison" dek="The same years through the ratios the IB course uses, with the guide’s formulas." id={`${uid}-ib`} />
+    <div data-region="ib" set:html={r.ib} />
+  </section>
+</div>
+
+<script>
+  import '../../scripts/adv-finance/performance';
+</script>

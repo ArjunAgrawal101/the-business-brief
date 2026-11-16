@@ -10,6 +10,7 @@
  * Photographs: the creator's own (assets/creator/README.md), cropped only.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { SESSION as TUTOR_SESSION, enquiryMailto } from '../lib/tutorials';
 import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
 import SectionHead from '../components/layout/SectionHead.astro';
 import Monogram from '../components/brand/Monogram.astro';
@@ -45,6 +46,7 @@ const PRINCIPLES = [
   ['Numbers are arguments.', 'A ratio or a break-even point is a claim about a business. Calculate it carefully, then say what it means and what it hides.'],
   ['Judge, and state the condition.', 'A good judgement says what the business should do and what would make that answer wrong.'],
 ];
+const tutorMail = enquiryMailto();
 ---
 
 <BaseLayout
@@ -207,10 +209,26 @@ const PRINCIPLES = [
     </div>
   </section>
 
+  <section class="band" aria-labelledby="ab-tutor-h">
+    <div class="wrap ab-tutor">
+      <SectionHead no="06" title="Learn with me, one to one" id="ab-tutor-h" dek="The same principles, applied to your own work." />
+      <div class="ab-tutor__body">
+        <p>
+          I tutor IB Diploma Programme Business Management students, SL and HL, one to one and online: a single topic, a paper, guidance on the internal assessment, or the whole course before the examinations. A session starts from your own work or question and ends with one clear next step.
+        </p>
+        <p class="ab-tutor__terms">{TUTOR_SESSION.currency}{TUTOR_SESSION.price} for a one-hour session, with packages for the IA, the extended essay, Marathon Revision and Exam Practice.</p>
+        <p class="ab-tutor__actions">
+          <a class="btn btn--primary" href="/tutorials/">The tutorials <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+          <a class="btn" href={tutorMail}>Enquire by email</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
   <section class="band band--white" aria-labelledby="ab-res-h">
     <div class="wrap ab-split ab-split--reverse">
       <div class="ab-split__text">
-        <SectionHead no="06" title="Resources and knowledge sharing" id="ab-res-h" />
+        <SectionHead no="07" title="Resources and knowledge sharing" id="ab-res-h" />
         <div class="prose ab-prose">
           <p>
             Every resource here began as a problem in a real lesson: a handbook to hold a unit together, a presentation that made a mechanism visible, a
@@ -240,7 +258,7 @@ const PRINCIPLES = [
 
   <section class="band" aria-labelledby="ab-plat-h">
     <div class="wrap">
-      <SectionHead no="07" title="Two platforms, one standard" id="ab-plat-h" dek="Siblings under one creator, each designed for its own subject." />
+      <SectionHead no="08" title="Two platforms, one standard" id="ab-plat-h" dek="Siblings under one creator, each designed for its own subject." />
       <div class="ab-plats" data-reveal="group">
         <article class="ab-plat">
           <p class="label">Economics</p>
@@ -272,7 +290,7 @@ const PRINCIPLES = [
         <CreatorPhoto name="traditional" alt="Arjun Agrawal in traditional attire, standing in front of a painted wall" sizes="(min-width: 64rem) 26vw, 70vw" />
       </figure>
       <div class="ab-close__text">
-        <SectionHead no="08" title="A personal note" id="ab-note-h" />
+        <SectionHead no="09" title="A personal note" id="ab-note-h" />
         <blockquote class="ab-quote">
           <p>
             I want students to leave a lesson able to do something they could not do when they arrived: read a situation more precisely, weigh an argument
@@ -299,6 +317,35 @@ const PRINCIPLES = [
 </BaseLayout>
 
 <style>
+  /* ---------- Learn with me ---------- */
+
+  .ab-tutor__body {
+    max-width: 46rem;
+    margin-top: var(--sp-5);
+    padding-left: var(--sp-5);
+    border-left: 3px solid var(--gold-500);
+  }
+
+  .ab-tutor__body p + p {
+    margin-top: var(--sp-3);
+  }
+
+  .ab-tutor__terms {
+    font-family: var(--font-ui);
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .ab-tutor__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+  }
+
+  .ab-tutor__actions.ab-tutor__actions {
+    margin-top: var(--sp-5);
+  }
+
   /* ---------- Hero ---------- */
   .ab-hero {
     padding-block: var(--sp-6) clamp(3rem, 6vw, 5.5rem);

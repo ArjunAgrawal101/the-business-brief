@@ -1,0 +1,214 @@
+# Advanced financial management, module 1. Every figure about a real company
+# comes from the documents listed in src/content/sources/advanced-finance.yaml,
+# read on 16 November 2026; the case and the decision are fictional, and their
+# figures were checked by script (statements reconcile, ratios recompute).
+domain: finance
+title: Financial statement analysis
+order: 1
+dek: How does an analyst read the three financial statements as one system, to judge how good a company's profits are, what return it earns on the capital it uses and how much risk its balance sheet carries?
+audience: [undergraduate, mba, professional]
+covers: [Financial statement analysis]
+minutes: 25
+updated: '2026-11-16'
+bridge:
+  codes: ['3.4', '3.5', '3.6']
+  text: |
+    **What the IB course calculates.** The course teaches the layout of the statement of profit or loss and the statement of financial position, straight-line and units-of-production depreciation (HL), and a fixed set of ratios from the guide's formula sheet: gross profit margin, profit margin and return on capital employed (ROCE); the current and acid test ratios; and, at HL, stock turnover, debtor days, creditor days and the gearing ratio. Each is worked out from given figures and compared with a benchmark.
+
+    **What this module adds.** It adds the statement of cash flows, which the course leaves out, reads the three statements as one system, decomposes returns, tests the quality of earnings against cash, and makes the adjustments (for leases, hybrid capital and costs management calls non-recurring) without which no ratio can be trusted. The working principle throughout: a ratio is a question about the business, not an answer.
+foundation: |
+  Financial statements are a model of a business, built under accounting rules but full of judgement. Revenue is recognised when a performance obligation is judged to be satisfied; assets are depreciated over lives that someone estimated; provisions are management's best guess at future costs. The same economic year can be reported in more than one defensible way, so the analyst's first task is to understand how the numbers were made.
+
+  The three statements describe one set of events from three angles. The **statement of profit or loss** measures performance on the accrual basis, whether or not cash has moved. The **statement of financial position** records what the business controls and how it is financed at one moment. The **statement of cash flows** reports the cash that actually came in and went out, split into operating, investing and financing activities. Because all three are built from the same transactions they must reconcile, and the reconciliations are where most of the insight lies.
+
+  Professional analysis follows a sequence: understand how the business makes money; judge the accounting and the company's adjusted measures; calculate ratios as a connected set; and form a view of the future, which is what lenders and investors care about. A single ratio says little. A current ratio of 0.8 can belong to a consumer goods group with great bargaining power or to a business about to fail; a return on equity of 30% can come from excellent operations or from heavy borrowing. The skill is to ask what produced the number.
+advanced:
+  - id: how-the-statements-fit
+    title: How the three statements fit together
+    body: |
+      Two identities tie the statements together. The **clean surplus relation** says that closing equity = opening equity + profit - dividends + shares issued - shares bought back (plus a few items recognised directly in equity), so profit is the bridge between two balance sheets. The **cash reconciliation**, under the indirect method, starts from profit, adds back non-cash charges such as depreciation, subtracts increases in receivables and inventories, adds increases in payables, and moves the cash from disposals into investing activities.
+
+      A company reports profit of £50m after depreciation of £20m. Its receivables rise by £15m, its inventories by £10m and its payables by £5m. Cash generated from operations is 50 + 20 - 15 - 10 + 5 = £50m. It spends £30m on equipment, so free cash flow is £20m, and it pays dividends of £25m, so net debt rises by £5m. Equity grows from £300m to 300 + 50 - 25 = £325m. The balance sheet balances: assets rise by £35m (equipment 30 - 20 = 10, receivables 15, inventories 10), and liabilities and equity by the same £35m (payables 5, net debt 5, equity 25).
+
+      The habit to build is to follow every profit figure to cash and every balance sheet movement to its cause. When profit and operating cash flow diverge for years, either growth is absorbing working capital, which may be fine, or profit is being recognised before the cash will ever arrive, which is not.
+  - id: decomposing-returns
+    title: 'Decomposing returns: DuPont and the operating view'
+    body: |
+      The IB course measures ROCE as profit before interest and tax divided by capital employed (equity plus non-current liabilities). It mixes operating and financing items and does not say why a return is high or low.
+
+      The **DuPont identity** splits return on equity (ROE) into margin, asset turnover and an equity multiplier: ROE = (profit ÷ revenue) × (revenue ÷ total assets) × (total assets ÷ equity). A discount retailer and a luxury goods house can earn the same ROE, one with thin margins on fast-turning assets, the other with wide margins on a slow-moving asset base.
+
+      The **operating view** of Nissim and Penman (2001) separates the business from its financing. Return on net operating assets (RNOA) is operating profit after tax divided by net operating assets (operating assets less operating liabilities such as trade payables). Then ROE = RNOA + (net debt ÷ equity) × (RNOA - after-tax cost of net debt). Leverage raises ROE only by the spread between what the operations earn and what the debt costs.
+
+      Suppose net operating assets of £1,000m earn £120m after tax, an RNOA of 12%. Net debt is £400m at 4% after tax and equity £600m. Profit is 120 - 16 = £104m, so ROE is 17.3%, as the formula gives: 12% + (400 ÷ 600) × 8%. The company now borrows a further £300m to buy back shares. Profit falls to 120 - 28 = £92m, but with equity of £300m ROE jumps to 30.7%. Nothing in the operations improved; ROE rose because risk rose. Had RNOA been 3%, below the cost of debt, the same leverage would have cut ROE to 0.7%. A manager rewarded on ROE or earnings per share therefore has a reason to borrow that has nothing to do with running the business better, which is why analysts judge performance on an operating return, usually called return on invested capital (ROIC), set against the cost of capital.
+  - id: quality-of-earnings
+    title: 'Quality of earnings: accruals, cash and adjusted measures'
+    body: |
+      Earnings are of high quality when they are a good guide to future earnings and cash. The main threat is not fraud, which is rare, but legitimate judgement exercised consistently in one direction: revenue recognised early, costs capitalised, provisions released, asset lives extended.
+
+      **Accruals** are the part of profit not yet backed by cash, in the simplest form profit minus operating cash flow, scaled by average net operating assets. A company with profit of £80m, operating cash flow of £30m and average net operating assets of £500m has an accrual ratio of 10%; a rival with the same profit and £95m of operating cash flow has minus 3%. Sloan (1996) showed that the accrual component of earnings persists less than the cash component, so high-accrual profits tend to fall back.
+
+      **Adjusted measures** are the other battleground. Most listed companies report "underlying" or "adjusted" profit beside the statutory figure, and European regulators require such measures to be defined, reconciled and applied consistently (ESMA, 2015). Read the reconciliation and ask three questions: do the excluded items recur, are gains excluded as readily as losses, and does management's pay depend on the adjusted figure? Bradshaw and Sloan (2002) document a widening gap between the "street" earnings that analysts and companies emphasise and statutory earnings, and in a survey by Graham, Harvey and Rajgopal (2005) most financial executives said they would give up some economic value to meet an earnings target or smooth reported earnings.
+
+      Warning signs: receivables or inventories growing faster than sales, sharply rising capitalised costs, longer asset lives, and operating cash flow persistently below operating profit.
+  - id: leverage-and-liquidity
+    title: Leverage, liquidity and consistent comparison
+    body: |
+      The IB gearing ratio divides non-current liabilities by capital employed, treating a long-dated pension provision and a bank loan alike and ignoring cash. Practitioners, lenders and rating agencies work with **net debt** (borrowings less cash), **net debt to EBITDA** and **interest cover**. Each depends on definitions. Since IFRS 16 took effect in 2019 most leases are on the balance sheet, and their cost moves from operating expenses into depreciation and interest, raising EBITDA; a ratio is consistent only if leases are in both numerator and denominator or in neither. Perpetual hybrid bonds may be classified as equity although the issuer pays a coupon on them, and pension deficits and supplier finance are debt-like obligations outside headline net debt.
+
+      Liquidity needs the same care. A current ratio below 1 is a warning in a business with slow stock and powerful customers, but normal in one that collects cash from consumers quickly and pays suppliers later. Better questions are how many days of cash the operating cycle ties up (see the module on working capital), how predictable operating cash flow is, and how much committed, undrawn borrowing the company could call on in a bad quarter.
+
+      Comparisons, finally, must be consistent: decompose growth into underlying change, currency and acquisitions; choose peers for their economics; put IFRS and US GAAP reporters on the same definitions; and prefer averages to a single year-end balance sheet.
+models:
+  - name: DuPont analysis
+    origin: DuPont Company, 1910s and 1920s (a method)
+    summary: |
+      Return on equity is the product of the profit margin, asset turnover and the equity multiplier (total assets ÷ equity). It shows whether a return comes from pricing and cost control, from using assets intensively, or from borrowing.
+    use: |
+      Calculate the components over several years and for close peers, and explain each movement; an ROE rising through the equity multiplier deserves a different reaction from one rising through margin.
+    limits: |
+      It mixes operating and financing items, treats all liabilities as leverage and inherits every accounting choice; firms that expense heavy investment in brands or research show inflated margins and turnover. It describes a return without saying whether it beats the cost of capital.
+    tool: /finance-desk/advanced/performance-dashboard/
+    sources: [adv-fin-penman-2013, adv-fin-nissim-penman-2001]
+  - name: Operating and financing decomposition of return on equity
+    origin: Nissim and Penman (2001)
+    summary: |
+      ROE = RNOA + (net debt ÷ equity) × (RNOA - after-tax cost of net debt). Leverage adds to ROE only by the spread between the operating return and the cost of debt.
+    use: |
+      Reclassify the balance sheet into operating and financing items, compute RNOA and the spread, and judge operating performance on RNOA. It sees through returns inflated by buybacks and compares companies with different capital structures.
+    limits: |
+      The reclassification needs judgement (is surplus cash operating? are leases debt?), and different choices change the answer. It still rests on book values, which can be far from the capital economically invested.
+    tool: /finance-desk/lab/gearing-ratio/
+    sources: [adv-fin-nissim-penman-2001, adv-fin-penman-2013]
+  - name: Accrual analysis of earnings quality
+    origin: Sloan (1996)
+    summary: |
+      Profit splits into a cash component and an accrual component, and the accrual component persists less, so firms with high accruals tend to see their earnings fall back.
+    use: |
+      Compute accruals as profit minus operating cash flow, scale by average net operating assets, and track the ratio over time and against peers; investigate high accruals line by line through receivables, inventories, capitalised costs and provisions.
+    limits: |
+      High accruals are not proof of manipulation: growing firms legitimately invest in working capital, and acquisitions and currency movements distort balance sheet changes. The share price anomaly that made the measure famous appears to have faded once investors learned of it (Green, Hand and Soliman, 2011).
+    sources: [adv-fin-sloan-1996, adv-fin-green-hand-soliman-2011]
+  - name: Altman Z-score
+    origin: Altman (1968)
+    summary: |
+      A weighted sum of five ratios: Z = 1.2 × (working capital ÷ total assets) + 1.4 × (retained earnings ÷ total assets) + 3.3 × (EBIT ÷ total assets) + 0.6 × (market value of equity ÷ total liabilities) + 1.0 × (sales ÷ total assets). In the original study, scores below about 1.8 signalled distress and above about 3.0 safety.
+    use: |
+      Use it as a screen, and follow its trend over several years rather than one value.
+    limits: |
+      It was estimated on a small sample of US manufacturers that failed between 1946 and 1965, matched with survivors, so its weights do not transfer cleanly to services, other countries or today. It ignores cash flow and off-balance-sheet obligations, and its thresholds are not probabilities.
+    sources: [adv-fin-altman-1968]
+applications:
+  - title: 'Unilever, 2025: reported profit and underlying profit'
+    kind: real
+    asOf: '2025'
+    body: |
+      Unilever's turnover in 2025 was €50.5bn, down 3.8%. The company attributes the fall to adverse currency (5.9 percentage points) and net disposals (1.2 points), against underlying sales growth of 3.5%, of which volume contributed 1.5%. The pieces compound: 1.035 × 0.941 × 0.988 = 0.962.
+
+      Statutory operating profit was €9,037m, a margin of 17.9%. Underlying operating profit, which excludes €1,047m of non-underlying items, was €10,084m, a margin of 20.0%. The exclusions were restructuring (€599m), acquisition and disposal costs (€288m), a loss on disposals (€36m), impairments (€43m) and other items (€81m). Restructuring was also excluded in 2024 (€710m), so over two years €1.3bn of it sat outside the underlying measure. Underlying return on invested capital was 19.0%, against 16.2% on the statutory basis; diluted earnings per share rose 6.2% and underlying earnings per share 0.7%. Free cash flow of €5,921m reconciles exactly (10,772 - 2,720 - 1,465 - 666), and Unilever's definition deducts neither debt repayments, as it states, nor the €301m of lease capital repayments shown in financing.
+
+      *Interpretation, not from the source:* every adjustment is disclosed, so nothing here is improper. The analyst must still decide whether recurring restructuring and lease payments are costs of the business, and treat every company compared the same way.
+    sources: [adv-fin-unilever-results-2025]
+  - title: 'bp, 31 December 2025: one balance sheet, several gearing ratios'
+    kind: real
+    asOf: '2025-12'
+    body: |
+      bp reported net debt of $22,182m and total equity of $74,000m at the end of 2025: gearing of 23.1% on its own definition, net debt ÷ (net debt + equity). Adding lease liabilities of $14,571m, less $1,067m receivable from partners, takes net debt to $35,686m and gearing to 32.5%, a figure bp also reports.
+
+      Total equity includes $15,955m of perpetual hybrid bonds, shown within non-controlling interests. bp's statement of changes in equity records $802m of payments on them in 2025, charged to equity rather than interest, and the company notes that a $0.5bn hybrid issue by a subsidiary "resulted in a reduction of net debt and gearing". bp says that it also considers hybrid bonds, leases and its Gulf of America settlement liabilities when it looks at its capital structure.
+
+      Treating the hybrids as debt gives gearing of 39.7% before leases ((22,182 + 15,955) ÷ 96,182) and 47.1% with them, and the IB ratio, built on non-current liabilities, would give another figure again. None is the "true" gearing: each answers a different question, and a comparison is valid only on one definition.
+    sources: [adv-fin-bp-results-2025]
+  - title: 'Unilever, 31 December 2025: a current ratio below one'
+    kind: real
+    asOf: '2025-12'
+    body: |
+      Unilever's balance sheet at 31 December 2025 shows current assets of €17,066m and current liabilities of €21,662m: a current ratio of 0.79 and an acid test ratio of 0.60. A mechanical reading would see a liquidity problem, yet in 2025 its continuing operations generated €10,772m of cash before tax, it reported cash conversion of 100%, it held €3,941m of cash and its net debt was 2.0 times underlying EBITDA.
+
+      The business model explains the ratio: trade payables and other current liabilities (€16,939m) far exceed inventories (€4,043m) and trade and other receivables (€7,346m), so creditors finance more of the operating cycle than customers absorb. The company also discloses that receivables and payables are grossed up by a transitional arrangement under which it invoices and collects cash for the ice cream business it demerged during the year, so a ratio taken straight from the balance sheet reflects that arrangement as well as the underlying business.
+    sources: [adv-fin-unilever-results-2025]
+cases:
+  - title: 'Calderbrook Instruments: profits up, cash down'
+    fictional: true
+    situation: |
+      Calderbrook Instruments is a fictional maker of laboratory equipment. Its chief executive's statement for Year 2 celebrates "record adjusted operating profit, up 45%", on revenue growth of 18%. Its bank covenant requires net debt to stay below 2.5 times adjusted EBITDA (adjusted operating profit plus depreciation and amortisation), and the board has raised the dividend. A shareholder asks you to assess the quality of the profit.
+
+      Notes to the exhibit: cost of sales was £240.0m in Year 1 and £278.5m in Year 2. Depreciation and amortisation include amortisation of capitalised development costs of £4.0m in Year 1 and £5.0m in Year 2. In Year 2 the company also spent £15.0m on equipment, received £14.0m from the property sale, paid dividends of £12.0m, paid interest of £6.0m and paid tax of £14.0m.
+    exhibit:
+      caption: Calderbrook Instruments, selected figures (£ million)
+      columns: ['Item', 'Year 1', 'Year 2']
+      rows:
+        - ['Revenue', '400.0', '472.0']
+        - ['Gross profit', '160.0', '193.5']
+        - ['Gain on sale of property (within operating profit)', '0.0', '9.0']
+        - ['Restructuring costs (within operating profit)', '-6.0', '-7.5']
+        - ['Operating profit, reported', '42.0', '62.0']
+        - ['Adjusted operating profit (before restructuring)', '48.0', '69.5']
+        - ['Profit for the year', '28.5', '42.0']
+        - ['Depreciation and amortisation', '17.0', '19.0']
+        - ['Development costs capitalised in the year', '8.0', '19.0']
+        - ['Cash generated from operations', '48.0', '25.5']
+        - ['Trade receivables at year end', '72.0', '104.5']
+        - ['Inventories at year end', '60.0', '78.0']
+        - ['Trade payables at year end', '40.0', '44.0']
+        - ['Net debt at year end', '90.0', '116.5']
+        - ['Equity at year end', '260.0', '290.0']
+      note: Fictional company; simulated figures. Year 2 cash generated from operations reconciles to reported operating profit, and Year 2 net debt and equity reconcile to the cash flows and profit given in the case.
+    questions:
+      - Reconcile Year 2 cash generated from operations to reported operating profit, line by line. Which items explain the gap?
+      - Restate operating profit for both years excluding the property gain, including restructuring costs and expensing development costs as they are incurred. How does the growth rate compare with the 45% the company reports?
+      - Calculate debtor days, stock days (on cost of sales), creditor days and the cash conversion cycle for both years. What do they suggest about how the growth was achieved?
+      - Recalculate net debt to EBITDA on your restated basis and compare it with the covenant measure. How much headroom does the company really have?
+      - Was raising the dividend prudent? What further disclosures would you ask the board for?
+evaluation: |
+  **What is established.** The mechanics are not in dispute: the statements articulate, accruals reverse and leverage magnifies returns in both directions. The finding that the accrual component of earnings persists less than the cash component (Sloan, 1996) has been widely replicated, ratio-based models separate failing from surviving firms far better than chance (Altman, 1968), and surveys show executives managing reported earnings at the margin (Graham, Harvey and Rajgopal, 2005).
+
+  **Where the debate is.** Lev and Gu (2016) argue that financial statements explain less and less of what investors need, because investment in brands, software, data and people is expensed: the balance sheets of the most valuable companies omit their most valuable assets, and their margins and returns are distorted. Others reply that cash flows and the reconciliations still discipline any valuation, and that the answer is to adjust the statements, not abandon them. Adjusted measures divide opinion too: they can strip out genuine noise or act as a one-way filter that removes only bad news, and the evidence (Bradshaw and Sloan, 2002) shows both, which is why regulators insist on reconciliation. Prediction models age: the Z-score's weights come from another era and economy and should be re-estimated before they are relied on for a modern service business.
+
+  **The limits of the method.** Ratio analysis looks backwards, has no theory of the "right" level of any ratio, and is distorted by accounting choices, inflation, currency and acquisitions. The statements show what happened, not why; the why comes from strategy and competition.
+
+  *Interpretation:* the practical lesson is humility about any single number and confidence in reconciliations. When profit, cash and the balance sheet tell the same story, the story is probably true; when they disagree, the disagreement is the finding.
+decision:
+  title: Renewing a revolving credit facility
+  fictional: true
+  brief: |
+    You sit on the credit committee of a bank. Ravensholt Distribution, a fictional wholesaler and a client for eight years, asks to renew its revolving credit facility for three years and to increase it from £60m to £80m to fund expansion. Its reported EBITDA rose 22% to £41m; its own adjusted EBITDA, before restructuring costs it describes as one-off for the fourth year running, is £48m. Operating cash flow fell from £30m to £14m, and debtor days rose from 52 to 68. Its reported net debt of £58m excludes £35m of lease liabilities, although its EBITDA is reported after IFRS 16. It proposes a covenant of net debt to adjusted EBITDA of no more than 3.0 times.
+  options:
+    - label: Renew and increase on the proposed terms
+      text: Agree the £80m facility on the company's definitions, under which leverage is 1.2 times today (58 ÷ 48) and 1.6 times with the extra £20m drawn.
+    - label: Renew at £60m with bank-defined covenants
+      text: Keep the limit, define EBITDA after restructuring and net debt including leases, and add a minimum cash conversion test. Leverage on these definitions is 2.3 times today ((58 + 35) ÷ 41).
+    - label: Renew at £60m as asset-based lending
+      text: Secure the facility on receivables and stock, with a borrowing base that shrinks if debtor days lengthen or stock ages, and monthly reporting.
+    - label: Decline to renew
+      text: Let the facility lapse at maturity, avoiding a client whose earnings quality is deteriorating.
+  criteria:
+    - Quality and sustainability of earnings and cash flow
+    - Covenant headroom on consistent definitions
+    - Recovery for the bank if trading deteriorates
+    - Information rights and early warning
+    - Value of the relationship and the price of the risk
+  guidance: |
+    Put the request on consistent definitions first. With leases included and annual restructuring treated as a cost, leverage is 2.3 times now and would be 2.8 times ((58 + 35 + 20) ÷ 41) with the full £80m drawn. Against a 3.0 times covenant that leaves £10m of debt headroom, or a fall in EBITDA of about 8% (to £37.7m) before a breach. On the company's definitions the same position looks like 1.6 times; the gap between the two views is itself the main finding. The cash evidence points the same way: operating cash flow is only 34% of EBITDA, and debtor days are up by 16, so customers paying later are financing part of the growth and consuming the very facility requested.
+
+    Renewing on the proposed terms gives the bank a covenant that cannot bite until the business is in serious difficulty; declining may overreact to a client that is still profitable. The middle options act on the analysis: bank-defined covenants fix the definitions and add early warning, and asset-based lending ties availability to the collateral most at risk. A reasonable committee might combine them, renewing at £60m on bank definitions with a borrowing base and revisiting the increase once cash conversion recovers. The decision should follow from restated numbers, not the company's headline.
+reading:
+  - source: adv-fin-penman-2013
+    note: The most rigorous textbook treatment of separating operating from financing activities and of tying ratio analysis to valuation.
+  - source: adv-fin-nissim-penman-2001
+    note: The article behind the operating decomposition of return on equity, with evidence on how the ratios behave over time.
+  - source: adv-fin-sloan-1996
+    note: The classic study of accruals and the persistence of earnings, still the starting point for research on earnings quality.
+  - source: adv-fin-lev-gu-2016
+    note: A provocative argument that financial statements have lost relevance, useful for testing how far the methods in this module can be trusted.
+basis:
+  - source: ib-bm-guide-2024
+    note: The statements, depreciation methods and ratios in the IB course (pages 29 and 65), for the bridge.
+  - source: adv-fin-esma-apm-2015
+    note: The requirement to define and reconcile alternative performance measures.
+  - source: adv-fin-bradshaw-sloan-2002
+    note: Evidence on the gap between street and statutory earnings.
+  - source: adv-fin-graham-harvey-rajgopal-2005
+    note: Survey evidence on earnings management.
+  - source: adv-fin-green-hand-soliman-2011
+    note: The fading of the accruals anomaly.

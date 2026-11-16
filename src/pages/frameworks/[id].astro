@@ -1,11 +1,14 @@
 ---
 /**
- * One framework: its diagram, what it is and what it is for, how to use it
- * step by step, a fictional example, its strengths and limits, an exercise
- * with guidance (the reader's draft is kept on this device), and its links to
- * the glossary, the toolkit, the course and other frameworks. Its standing,
- * IB syllabus with the guide's page, IB toolkit or enrichment, is stated at
- * the top. A toolkit tool's full guide lives in the toolkit, linked here.
+ * One framework: its diagram, what it is and what it is for, how it is built,
+ * the situations it suits, how to use it step by step, a fictional example,
+ * how to read the result and what it does and does not justify deciding, its
+ * strengths and limits, the common mistakes, the Apply it mode (the tools
+ * that apply it and a worksheet kept on this device), an exercise with
+ * guidance, and its links to the glossary, the toolkit, the course, other
+ * frameworks and the works it comes from. Its standing, IB syllabus with the
+ * guide's page, IB toolkit or enrichment, is stated at the top. A toolkit
+ * tool's full guide lives in the toolkit, linked here.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
@@ -13,9 +16,11 @@ import SectionHead from '../../components/layout/SectionHead.astro';
 import Diagram from '../../components/diagrams/Diagram.astro';
 import LevelTag from '../../components/ui/LevelTag.astro';
 import SaveButton from '../../components/ui/SaveButton.astro';
+import ApplyWorksheet from '../../components/frameworks/ApplyWorksheet.astro';
 import { corpus, href } from '../../lib/content';
 import { library } from '../../lib/frameworks-content';
 import { FRAMEWORK_GROUP_INFO, type Framework } from '../../lib/framework-schema';
+import { APPLY_ANCHOR, JUDGEMENT, applicationOf } from '../../lib/framework-lab';
 import { STATUS_LABELS, frameworkHref, inLibraryOrder, standing } from '../../lib/frameworks';
 import { allSubtopics, subtopicHref } from '../../lib/learning';
 import { inline, jsonForScript, plain, rich } from '../../lib/markup';
@@ -47,6 +52,9 @@ const i = order.findIndex(([x]) => x === id);
 const prev = i > 0 ? order[i - 1] : undefined;
 const next = i < order.length - 1 ? order[i + 1] : undefined;
 const statusClass = f.status === 'enrichment' ? 'tag--enrichment' : 'tag--ib';
+const app = applicationOf(f, lib.tools);
+const studioOf = (href: string) => lib.studio.find((x) => `/strategy-studio/${x.slug}/` === href);
+const works = f.references.map((r) => ({ id: r, s: c.sources[r]! }));
 const pageRef = f.guidePages ? `${f.guidePages.includes(' ') ? 'pp.' : 'p.'} ${f.guidePages}` : '';
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -131,6 +139,15 @@ const jsonLd = {
               </a>
             )
           }
+          <a class="fw-guide fw-guide--apply" href={`#${APPLY_ANCHOR}`}>
+            <span class="label">Apply it</span>
+            <span class="fw-guide__name">Open the application mode</span>
+            <span class="fw-guide__text">
+              {app.full.length
+                ? `The ${app.full.length === 1 ? 'tool that applies' : 'tools that apply'} it in full, and a worksheet for your own case.`
+                : 'A worksheet for your own case, and the tools that help with parts of it.'}
+            </span>
+          </a>
         </aside>
       </div>
     </section>
@@ -146,8 +163,36 @@ const jsonLd = {
       </div>
     </section>
 
+    <section aria-labelledby="fw-parts">
+      <SectionHead no={3} title="How it is built" id="fw-parts" dek="The parts of the framework, and what each one holds." />
+      <dl class="fw-parts">
+        {
+          f.structure.map((p) => (
+            <div class="fw-parts__item">
+              <dt>{p.name}</dt>
+              <dd set:html={inline(p.text)} />
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+
+    <section aria-labelledby="fw-when">
+      <SectionHead no={4} title="When to use it" id="fw-when" dek="The business situations it suits, and where another tool will serve better." />
+      <div class="fw-weigh fw-when">
+        <div>
+          <h3 class="fw-weigh__h fw-when__h">It suits</h3>
+          <ul class="prose">{f.situations.suits.map((x) => <li set:html={inline(x)} />)}</ul>
+        </div>
+        <div>
+          <h3 class="fw-weigh__h fw-when__h fw-when__h--not">Look elsewhere when</h3>
+          <ul class="prose">{f.situations.poorFit.map((x) => <li set:html={inline(x)} />)}</ul>
+        </div>
+      </div>
+    </section>
+
     <section aria-labelledby="fw-how">
-      <SectionHead no={3} title="How to use it, step by step" id="fw-how" dek={f.status === 'toolkit' && tool?.status === 'complete' ? 'A short method. The toolkit guide gives the full one, with the evidence each step needs.' : undefined} />
+      <SectionHead no={5} title="How to use it, step by step" id="fw-how" dek={f.status === 'toolkit' && tool?.status === 'complete' ? 'A short method. The toolkit guide gives the full one, with the evidence each step needs.' : undefined} />
       <ol class="fw-steps">
         {f.steps.map((s, n) => (
           <li>
@@ -159,7 +204,7 @@ const jsonLd = {
     </section>
 
     <section aria-labelledby="fw-example">
-      <SectionHead no={4} title={`Applied: ${f.example.title}`} id="fw-example" />
+      <SectionHead no={6} title={`Applied: ${f.example.title}`} id="fw-example" />
       <div class="fw-example">
         <div class="tags"><span class="tag tag--simulated">Fictional business</span></div>
         <div class="prose narrative" set:html={rich(f.example.body)} />
@@ -170,8 +215,25 @@ const jsonLd = {
       </div>
     </section>
 
+    <section aria-labelledby="fw-read">
+      <SectionHead no={7} title="Reading the result" id="fw-read" dek="How to interpret what it shows, and what that does and does not justify deciding." />
+      <div class="fw-read">
+        <div class="prose fw-read__body" set:html={rich(f.interpretation)} />
+        <div class="fw-weigh fw-read__implications">
+          <div>
+            <h3 class="fw-weigh__h fw-weigh__h--plus">What it can justify deciding</h3>
+            <ul class="prose">{f.implications.justifies.map((x) => <li set:html={inline(x)} />)}</ul>
+          </div>
+          <div>
+            <h3 class="fw-weigh__h fw-weigh__h--minus">What it does not justify on its own</h3>
+            <ul class="prose">{f.implications.doesNotJustify.map((x) => <li set:html={inline(x)} />)}</ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section aria-labelledby="fw-weigh">
-      <SectionHead no={5} title="Strengths and limits" id="fw-weigh" />
+      <SectionHead no={8} title="Strengths and limits" id="fw-weigh" />
       <div class="fw-weigh">
         <div>
           <h3 class="fw-weigh__h fw-weigh__h--plus">Why it helps</h3>
@@ -184,8 +246,89 @@ const jsonLd = {
       </div>
     </section>
 
+    <section aria-labelledby="fw-mistakes">
+      <SectionHead no={9} title="Common mistakes" id="fw-mistakes" dek="Errors often made with it, by students and by managers, and how to avoid each." />
+      <ol class="fw-mistakes">
+        {
+          f.mistakes.map((m) => (
+            <li>
+              <p class="fw-mistakes__m">
+                <span class="label">Mistake</span>
+                <span set:html={inline(m.mistake)} />
+              </p>
+              <p class="fw-mistakes__f">
+                <span class="label">Instead</span>
+                <span set:html={inline(m.fix)} />
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section aria-labelledby="fw-apply" id={APPLY_ANCHOR} class="fw-apply">
+      <SectionHead no={10} title="Apply it" id="fw-apply" dek="The application mode: the platform's tools that apply this framework, and a worksheet for your own case." />
+      <p class="fw-apply__judgement">{JUDGEMENT}</p>
+      {
+        app.full.length > 0 ? (
+          <div class="fw-apply__block">
+            <h3 class="label label--ink">{app.full.length === 1 ? 'The tool that applies it in full' : 'Tools that apply it in full'}</h3>
+            <ul class="fw-tools" role="list">
+              {app.full.map((t) => {
+                const st = studioOf(t.href);
+                return (
+                  <li class="fw-tool">
+                    <span class="fw-tool__room">
+                      {t.room}
+                      {st && (
+                        <span class={`tag ${st.enrichment ? 'tag--enrichment' : 'tag--ib'}`}>{st.enrichment ? 'Enrichment' : 'IB toolkit'}</span>
+                      )}
+                    </span>
+                    <a class="fw-tool__name" href={t.href}>
+                      {t.title}
+                    </a>
+                    <span class="fw-tool__use" set:html={inline(t.use)} />
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ) : (
+          <p class="fw-apply__none">No interactive tool on the platform applies {f.name.replace(/^The /, 'the ')} in full yet, so the worksheet below is its application mode{app.part.length > 0 ? ', with the tools that help with parts of it' : ''}.</p>
+        )
+      }
+      {
+        app.part.length > 0 && (
+          <div class="fw-apply__block">
+            <h3 class="label label--ink">For part of it</h3>
+            <ul class="fw-tools fw-tools--part" role="list">
+              {app.part.map((t) => (
+                <li class="fw-tool">
+                  <span class="fw-tool__room">{t.room}</span>
+                  <a class="fw-tool__name" href={t.href}>
+                    {t.title}
+                  </a>
+                  <span class="fw-tool__use" set:html={inline(t.use)} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+      <div class="fw-apply__block">
+        <h3 class="label label--ink">Your worksheet</h3>
+        <p class="small muted fw-apply__lead">
+          {app.full.length > 0
+            ? 'The tool is the fuller application. Use the worksheet for a quick pass, or to apply the framework to a second case, part by part.'
+            : 'Work through the framework part by part for a business you know, then say what the result does and does not justify.'}
+        </p>
+        <ApplyWorksheet id={id} name={f.name} parts={f.structure} question={f.question} />
+      </div>
+      <p class="small muted fw-apply__more"><a href="/frameworks/lab/">The Framework Application Lab</a>: choose a framework by the decision you face.</p>
+    </section>
+
     <section aria-labelledby="fw-try">
-      <SectionHead no={6} title="Try it" id="fw-try" dek="The platform's own exercise. Write your answer, then open the guidance." />
+      <SectionHead no={11} title="Try it" id="fw-try" dek="The platform's own exercise. Write your answer, then open the guidance." />
       <div class="fw-try" data-ix="fw-exercise" data-key={`framework:${id}`}>
         <div class="prose fw-try__prompt" set:html={rich(f.exercise.prompt)} />
         <div class="field">
@@ -211,7 +354,7 @@ const jsonLd = {
     </section>
 
     <section aria-labelledby="fw-related">
-      <SectionHead no={7} title="Related concepts" id="fw-related" />
+      <SectionHead no={12} title="Related concepts" id="fw-related" />
       <div class="fw-rel">
         {
           terms.length > 0 && (
@@ -246,6 +389,25 @@ const jsonLd = {
           )
         }
       </div>
+      {
+        works.length > 0 && (
+          <div class="fw-works">
+            <h3 class="label label--ink">Published works behind it</h3>
+            <ul class="fw-works__list">
+              {works.map((w) => (
+                <li>
+                  {w.s.author && <span>{w.s.author} ({w.s.year}). </span>}
+                  <a href={`/sources/#src-${w.id}`}>
+                    <cite>{w.s.title}</cite>
+                  </a>
+                  {w.s.publisher && <span>. {w.s.publisher}.</span>}
+                </li>
+              ))}
+            </ul>
+            <p class="small muted">Cited as bibliographic references in the platform's source register; the explanations on this page are the platform's own.</p>
+          </div>
+        )
+      }
       <p class="small muted fw-note">
         {f.status === 'enrichment'
           ? "The explanation, method, example and exercise are the platform's own, written as enrichment beyond the IB course. The business in the example is fictional."
@@ -570,10 +732,207 @@ const jsonLd = {
     border-top: 1px solid var(--rule-hair);
   }
 
+  .fw-guide--apply {
+    border-color: var(--gold-600);
+    background: var(--surface-gold-wash);
+  }
+
+  .fw-parts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 var(--sp-6);
+    margin: var(--sp-5) 0 0;
+    max-width: 64rem;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .fw-parts__item {
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .fw-parts dt {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--navy-900);
+  }
+
+  .fw-parts dd {
+    margin: var(--sp-1) 0 0;
+    color: var(--text-body);
+  }
+
+  .fw-when__h {
+    color: var(--navy-900);
+  }
+
+  .fw-when__h--not {
+    color: var(--text-muted);
+  }
+
+  .fw-read {
+    display: grid;
+    gap: var(--sp-5);
+    margin-top: var(--sp-5);
+    max-width: 64rem;
+  }
+
+  .fw-read__body {
+    max-width: var(--text-max);
+  }
+
+  .fw-read__implications {
+    margin-top: 0;
+  }
+
+  .fw-mistakes {
+    display: grid;
+    gap: var(--sp-3);
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    max-width: 52rem;
+    list-style: none;
+  }
+
+  .fw-mistakes li {
+    display: grid;
+    gap: var(--sp-2);
+    padding: var(--sp-4) var(--sp-5);
+    background: var(--surface-sheet);
+    border: 1px solid var(--rule-hair);
+    border-left: 3px solid var(--bb-signal);
+  }
+
+  .fw-mistakes p {
+    display: grid;
+    gap: 0.15rem;
+    margin: 0;
+  }
+
+  .fw-mistakes__m .label {
+    color: var(--signal-text);
+  }
+
+  .fw-mistakes__f .label {
+    color: var(--green-text);
+  }
+
+  .fw-apply {
+    scroll-margin-top: var(--sp-8);
+  }
+
+  .fw-apply__judgement {
+    margin: var(--sp-5) 0 0;
+    max-width: 52rem;
+    padding: var(--sp-4) var(--sp-5);
+    border-left: 3px solid var(--navy-900);
+    background: var(--surface-sheet);
+    font-family: var(--font-serif);
+    font-size: 1.125rem;
+    font-style: italic;
+    line-height: 1.45;
+    color: var(--navy-900);
+  }
+
+  .fw-apply__block {
+    margin-top: var(--sp-6);
+  }
+
+  .fw-apply__none {
+    margin: var(--sp-5) 0 0;
+    max-width: 52rem;
+  }
+
+  .fw-apply__lead {
+    margin: var(--sp-2) 0 var(--sp-4);
+    max-width: 52rem;
+  }
+
+  .fw-apply__more {
+    margin-top: var(--sp-5);
+  }
+
+  .fw-tools {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: var(--sp-4);
+    margin: var(--sp-3) 0 0;
+    padding: 0;
+    list-style: none;
+    max-width: 64rem;
+  }
+
+  .fw-tool {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: var(--sp-4);
+    border: 1px solid var(--navy-900);
+    background: var(--ivory-50);
+  }
+
+  .fw-tools--part .fw-tool {
+    border-color: var(--rule);
+    background: var(--surface-sheet);
+  }
+
+  .fw-tool__room {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .fw-tool__room .tag {
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  .fw-tool__name {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .fw-tool__use {
+    font-size: var(--fs-small);
+    color: var(--text-body);
+  }
+
+  .fw-works {
+    margin-top: var(--sp-6);
+    max-width: 52rem;
+  }
+
+  .fw-works__list {
+    margin: var(--sp-2) 0 var(--sp-2);
+    padding-left: 1.2em;
+  }
+
+  .fw-works__list li + li {
+    margin-top: var(--sp-1);
+  }
+
   @media (max-width: 60rem) {
     .fw-glance,
     .fw-what,
     .fw-rel {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 48rem) {
+    .fw-parts {
       grid-template-columns: minmax(0, 1fr);
     }
   }

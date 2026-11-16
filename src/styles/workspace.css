@@ -1,0 +1,534 @@
+/*
+ * My Business Workspace: the learning list, the notebook, the saved analyses
+ * and the export of selected work, in the dashboard's language (ruled rows,
+ * uppercase labels, italic serif counts; dashboard.css). Global, because the
+ * script draws these parts. State is said in words as well as shown: a
+ * status is chosen from a list that names it, and the rule beside an item in
+ * progress or done only repeats it.
+ */
+
+.ws-sub {
+  margin: var(--sp-2) 0 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.ws-sub:empty {
+  display: none;
+}
+
+.ws-sub:focus {
+  outline: none;
+}
+
+.ws-sub:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 4px;
+}
+
+/* Buttons that read as quiet links: move, edit, delete, remove. */
+.ws-act {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0 0.5rem;
+  border: 0;
+  background: none;
+  color: var(--cobalt-text);
+  font: 600 0.875rem/1 var(--font-ui);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.ws-act:hover {
+  color: var(--navy-900);
+}
+
+.ws-act.db-remove:hover {
+  color: var(--signal-text);
+}
+
+.ws-act:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.ws-act[disabled] {
+  color: var(--text-muted);
+  text-decoration: none;
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* ---------- My learning list ---------- */
+
+.ws-list {
+  margin-top: var(--sp-5);
+  max-width: 64rem;
+}
+
+.ws-list__items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ws-li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--sp-2) var(--sp-4);
+  margin: 0;
+  padding: var(--sp-3) 0 var(--sp-3) var(--sp-3);
+  border-bottom: 1px solid var(--rule-hair);
+  border-left: 3px solid transparent;
+}
+
+.ws-li.is-doing {
+  border-left-color: var(--gold-600);
+}
+
+.ws-li.is-done {
+  border-left-color: var(--bb-green);
+}
+
+.ws-li.is-done .db-saved__title {
+  color: var(--text-muted);
+}
+
+.ws-li__head {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.ws-li__head .db-saved__title {
+  justify-self: start;
+  min-height: 24px;
+  font-weight: 560;
+  overflow-wrap: anywhere;
+}
+
+.ws-li__acts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0 var(--sp-1);
+}
+
+.ws-li__fields {
+  display: grid;
+  grid-template-columns: minmax(9rem, 12rem) minmax(0, 1fr);
+  gap: var(--sp-2) var(--sp-4);
+  align-items: end;
+}
+
+.ws-li__field {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.ws-li__field label {
+  font-size: var(--fs-label);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.ws-li__select,
+.ws-li__note {
+  min-height: 2.5rem;
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+  font-size: 0.9375rem;
+}
+
+@media (max-width: 40rem) {
+  .ws-li {
+    grid-template-columns: minmax(0, 1fr);
+    padding-left: var(--sp-2);
+  }
+
+  .ws-li__fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ws-li__acts {
+    justify-content: flex-start;
+    margin-left: -0.5rem;
+  }
+}
+
+/* The editor's fields, spaced as the form spaces its own parts. */
+.ne-fields {
+  display: grid;
+  gap: var(--sp-4);
+  min-width: 0;
+}
+
+.ws-add {
+  margin-top: var(--sp-5);
+  padding: var(--sp-4);
+  background: var(--surface-sheet);
+  border: 1px solid var(--rule-hair);
+  border-top: 2px solid var(--rule-ink);
+}
+
+.ws-add__field .field__hint {
+  margin: 0;
+}
+
+.ws-add__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  align-items: center;
+  margin-top: var(--sp-2);
+}
+
+.ws-add__row .select {
+  flex: 1 1 16rem;
+  min-width: 0;
+  width: auto;
+}
+
+.ws-add .select[aria-invalid="true"] {
+  border-color: var(--bb-signal);
+  border-width: 2px;
+}
+
+/* ---------- Notes ---------- */
+
+.ws-notes {
+  margin-top: var(--sp-5);
+  max-width: 64rem;
+}
+
+.ws-notes__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--sp-3) var(--sp-5);
+}
+
+.ws-search {
+  flex: 0 1 22rem;
+  min-width: 0;
+}
+
+.ws-editor {
+  margin-top: var(--sp-5);
+  background: var(--surface-sheet);
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--bb-ink);
+  box-shadow: var(--shadow-sheet);
+}
+
+.ws-editor[hidden] {
+  display: none;
+}
+
+.ws-editor__h:focus {
+  outline: none;
+}
+
+.ws-editor .ne-actions {
+  justify-content: flex-start;
+}
+
+.ws-notes__list {
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ws-note {
+  margin: 0;
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.ws-note__sum {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem var(--sp-3);
+  min-height: 2.75rem;
+  padding: 0.35rem 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+.ws-note__sum::-webkit-details-marker {
+  display: none;
+}
+
+.ws-note__sum::before {
+  content: "";
+  flex: none;
+  align-self: center;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.25rem;
+  border-right: 2px solid var(--navy-900);
+  border-bottom: 2px solid var(--navy-900);
+  transform: rotate(-45deg);
+  transition: transform var(--dur-base) var(--ease);
+}
+
+.ws-note__d[open] > .ws-note__sum::before {
+  transform: rotate(45deg);
+}
+
+.ws-note__sum:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.ws-note__title {
+  font-family: var(--font-display);
+  font-size: 1.1875rem;
+  font-weight: 600;
+  color: var(--navy-900);
+  overflow-wrap: anywhere;
+}
+
+.ws-note__meta {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.ws-note__content {
+  margin: var(--sp-2) 0 var(--sp-3) 1.25rem;
+  padding-left: var(--sp-4);
+  border-left: 2px solid var(--gold-500);
+  max-width: var(--text-max);
+}
+
+.ws-note__content p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.ws-note__content p + p {
+  margin-top: var(--sp-2);
+}
+
+.ws-note__fields {
+  margin: 0;
+}
+
+.ws-note__fields dt {
+  margin-top: var(--sp-3);
+  font-size: var(--fs-label);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--brass-text);
+}
+
+.ws-note__fields dt:first-child {
+  margin-top: 0;
+}
+
+.ws-note__fields dd {
+  margin: 0.2rem 0 0;
+}
+
+.ws-note__on {
+  margin: 0 0 0 1.25rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.ws-note__acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--sp-1);
+  margin: 0 0 0 calc(1.25rem - 0.5rem);
+}
+
+/* ---------- Saved analyses ---------- */
+
+.ws-analyses {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+  gap: var(--sp-5) var(--sp-7);
+  margin-top: var(--sp-4);
+}
+
+.ws-analyses .db-workgroup + .db-workgroup {
+  margin-top: 0;
+}
+
+.ws-room .db-workgroup__h {
+  display: flex;
+  align-items: baseline;
+  margin: 0;
+  padding-bottom: var(--sp-2);
+  border-bottom: 2px solid var(--rule-ink);
+  font-size: var(--fs-label);
+  letter-spacing: var(--track-label);
+  color: var(--navy-900);
+}
+
+.ws-room .db-work__title {
+  overflow-wrap: anywhere;
+}
+
+.ws-snap {
+  position: relative;
+}
+
+.ws-snap__value {
+  color: var(--navy-900);
+  font-weight: 650;
+}
+
+.ws-snap__figs summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--cobalt-text);
+  cursor: pointer;
+}
+
+.ws-snap__dl {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0 0 var(--sp-2);
+  font-size: 0.875rem;
+}
+
+.ws-snap__dl div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 var(--sp-3);
+  padding: 0.2rem 0;
+  border-bottom: 1px dotted var(--rule);
+}
+
+.ws-snap__dl dt {
+  color: var(--text-muted);
+}
+
+.ws-snap__dl dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-strong);
+}
+
+.ws-snap .ws-act {
+  justify-self: start;
+  margin-left: -0.5rem;
+}
+
+/* ---------- Export selected work ---------- */
+
+.ws-export {
+  margin-top: var(--sp-5);
+}
+
+.ws-export__bar,
+.ws-export__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+
+.ws-export__groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: var(--sp-5);
+  margin-top: var(--sp-4);
+}
+
+.ws-pick {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ws-pick__legend {
+  display: flex;
+  align-items: baseline;
+  width: 100%;
+  padding: 0 0 var(--sp-2);
+  border-bottom: 2px solid var(--rule-ink);
+  font-size: var(--fs-label);
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--navy-900);
+}
+
+.ws-pick__list {
+  max-height: 22rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+}
+
+.ws-pick__opt {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  min-height: 2.5rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--rule-hair);
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.ws-pick__opt input {
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.2rem;
+  accent-color: var(--bb-ink);
+}
+
+.ws-pick__title {
+  overflow-wrap: anywhere;
+}
+
+.ws-pick__meta {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.ws-export__count {
+  margin-top: var(--sp-4);
+}
+
+.ws-export__actions {
+  margin-top: var(--sp-3);
+}
+
+@media print {
+  .ws-add,
+  .ws-notes__bar,
+  .ws-editor,
+  .ws-li__acts,
+  .ws-note__acts,
+  .ws-snap .ws-act,
+  #export {
+    display: none;
+  }
+
+  .ws-note__content {
+    display: block;
+  }
+}

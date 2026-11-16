@@ -29,6 +29,13 @@ export const GET: APIRoute = async ({ site }) => {
   const { lab } = await import('../lib/lab/content');
   const l = await lab();
   [...l.briefingList, ...l.toolList].forEach(([id]) => paths.add(`/entrepreneurship-lab/${id}/`));
+  // The Business Intelligence Briefing's items, and its theme pages (every editorial theme, and any other theme an item carries).
+  const { briefing } = await import('../lib/briefing-content');
+  const { isEditorialTheme, themeHref } = await import('../lib/briefing');
+  const { INTEL_CATEGORIES } = await import('../lib/intel-themes');
+  const items = await briefing();
+  items.forEach(([id]) => paths.add(`/intelligence/${id}/`));
+  INTEL_CATEGORIES.filter((k) => isEditorialTheme(k) || items.some(([, it]) => it.categories.includes(k))).forEach((k) => paths.add(themeHref(k)));
   // The Boardroom Briefings.
   const { series } = await import('../lib/boardroom-briefings/content');
   (await series()).list.forEach(([id]) => paths.add(`/boardroom-briefings/${id}/`));

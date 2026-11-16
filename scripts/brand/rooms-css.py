@@ -53,6 +53,16 @@ def assessment(a):
     rules = ''.join(f"<line x1='40' y1='{y}' x2='390' y2='{y}' />" for y in range(60, 291, 24))
     return f"""<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 300'><g stroke='{N}' stroke-opacity='.12'>{rules}</g><line x1='80' y1='20' x2='80' y2='300' stroke='{a}' stroke-opacity='.5'/><path d='M300 120 l22 22 l46 -58' fill='none' stroke='{a}' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' stroke-opacity='.75'/><g fill='{N}' fill-opacity='.3' font-family='Inter,sans-serif' font-size='11'><text x='48' y='54'>[10]</text><text x='48' y='126'>[4]</text></g></svg>"""
 
+def advanced(a):
+    # A case-method lecture theatre: tiers of seats in arcs facing the board.
+    arcs = ''.join(f"<path d='M{210-r} 272 A{r} {r} 0 0 1 {210+r} 272' />" for r in (70, 104, 138, 172))
+    seats = ''.join(f"<circle cx='{210 + r * c:.1f}' cy='{272 - r * s:.1f}' r='3' />" for r in (104, 138, 172) for c, s in ((-0.94, 0.34), (-0.77, 0.64), (-0.5, 0.87), (-0.17, 0.98), (0.17, 0.98), (0.5, 0.87), (0.77, 0.64), (0.94, 0.34)))
+    return f"""<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 300'><g fill='none' stroke='{N}' stroke-opacity='.18'>{arcs}</g><path d='M{210-70} 272 A70 70 0 0 1 {210+70} 272' fill='none' stroke='{a}' stroke-opacity='.75' stroke-width='2'/><g fill='{a}' fill-opacity='.45'>{seats}</g><rect x='150' y='276' width='120' height='16' fill='{a}' fill-opacity='.7'/><g stroke='#fbf8f1' stroke-opacity='.8'><line x1='160' y1='284' x2='196' y2='284'/><line x1='204' y1='284' x2='236' y2='284'/></g></svg>"""
+
+def tutorials(a):
+    # A desk seen from above: an open book, a pen and a lamp's circle of light.
+    return f"""<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 300'><circle cx='300' cy='96' r='86' fill='{a}' fill-opacity='.08'/><circle cx='300' cy='96' r='54' fill='{a}' fill-opacity='.08'/><g fill='none' stroke='{N}' stroke-opacity='.3' stroke-width='1.5'><path d='M90 150 Q150 128 210 150 Q270 128 330 150 L330 250 Q270 228 210 250 Q150 228 90 250 Z'/><line x1='210' y1='150' x2='210' y2='250'/></g><g stroke='{N}' stroke-opacity='.15'>{''.join(f"<line x1='106' y1='{y}' x2='196' y2='{y - 6}' /><line x1='224' y1='{y - 6}' x2='314' y2='{y}' />" for y in range(176, 240, 14))}</g><path d='M350 270 L392 200' stroke='{a}' stroke-width='5' stroke-linecap='round' stroke-opacity='.8'/><path d='M140 196 q20 -14 40 0' fill='none' stroke='{a}' stroke-width='2' stroke-opacity='.8'/></svg>"""
+
 # accent: rules and marks; text: an AA-safe shade of it on ivory (checked by scripts/qa/contrast.mjs)
 ROOMS = [
   ('finance', '#2f6f5e', '#2b6a59', finance, 'Finance Desk: a spreadsheet grid and a market line'),
@@ -64,6 +74,8 @@ ROOMS = [
   ('boardroom', '#b39350', '#76591f', boardroom, 'Boardroom: the table and the trend on it'),
   ('cases', '#7a2e2e', '#7a2e2e', cases, 'Case Vault: an editorial page of columns'),
   ('assessment', '#1d3cb4', '#1d3cb4', assessment, 'Assessment Centre: a ruled answer page'),
+  ('advanced', '#7b2d4f', '#7b2d4f', advanced, 'Advanced Management: a case-method lecture theatre facing the board'),
+  ('tutorials', '#b39350', '#76591f', tutorials, 'Tutorials: a desk with an open book, a pen and a lamp'),
 ]
 
 css = ["""/*

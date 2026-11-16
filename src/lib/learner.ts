@@ -31,7 +31,7 @@ export const VISIT_KIND_LABELS: Record<VisitKind, string> = {
 };
 
 /** The kinds of thing a reader can save. */
-export const SAVED_KINDS = ['topic', 'term', 'case', 'mindmap', 'framework', 'diagram', 'question', 'tool', 'page'] as const;
+export const SAVED_KINDS = ['topic', 'term', 'case', 'mindmap', 'framework', 'diagram', 'question', 'tool', 'briefing', 'page'] as const;
 export type SavedKind = (typeof SAVED_KINDS)[number];
 
 export const SAVED_KIND_LABELS: Record<SavedKind, string> = {
@@ -43,6 +43,7 @@ export const SAVED_KIND_LABELS: Record<SavedKind, string> = {
   diagram: 'Diagram',
   question: 'Practice question',
   tool: 'Tool',
+  briefing: 'Briefing',
   page: 'Page',
 };
 
@@ -277,7 +278,8 @@ export function kindOfPath(path: string, toolPrefixes: readonly string[]): Visit
   if (/^\/topics\/[^/]+\/$/.test(p)) return 'topic';
   if (/^\/mindmaps\/[^/]+\/$/.test(p)) return 'mindmap';
   if (/^\/cases\/[^/]+\/$/.test(p)) return 'case';
-  if (/^\/(toolkit|frameworks)\/[^/]+\/$/.test(p)) return 'framework';
+  // The Framework Application Lab's hub (/frameworks/lab/) is not a framework.
+  if (/^\/(toolkit|frameworks)\/[^/]+\/$/.test(p) && p !== '/frameworks/lab/') return 'framework';
   if (toolPrefixes.some((pre) => pre !== '/' && p.startsWith(pre))) return 'tool';
   return null;
 }
@@ -411,6 +413,18 @@ export function toggleSaved(list: SavedList, item: { url: string; title: string;
 
 export function removeSaved(list: SavedList, url: string): SavedList {
   return { v: 1, items: list.items.filter((x) => x.url !== url) };
+}
+
+/**
+ * Save the item unless it is saved already (the workspace's "Add to my list",
+ * which never removes). `added` is false when it was there already, or when
+ * the list is full or the item is not one that can be saved.
+ */
+export function addSaved(list: SavedList, item: { url: string; title: string; kind: string }, now: Date, limits: Limits = LIMITS): { list: SavedList; added: boolean } {
+  const url = safePath(item.url);
+  if (!url || !isKind(SAVED_KINDS, item.kind) || isSaved(list, url) || list.items.length >= limits.saved) return { list, added: false };
+  const entry: SavedItem = { url, title: cleanText(item.title, limits.title) ?? url, kind: item.kind, saved: now.toISOString() };
+  return { list: { v: 1, items: [entry, ...list.items] }, added: true };
 }
 
 /* ---------- Combining two records (import) ---------- */
