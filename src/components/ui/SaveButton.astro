@@ -1,16 +1,22 @@
 ---
 /**
  * Save this page (or one item on it) to the reader's saved items, kept in
- * this browser only (bb:saved) and listed on the dashboard. A toggle button
- * with a constant name, "Save", and aria-pressed for its state; when saved, a
- * link to the dashboard appears beside it, so the state is said in words.
- * The button needs JavaScript and storage, so without either it is not shown.
+ * this browser only (bb:saved) and listed on the learning list of My Business
+ * Workspace. A toggle button with a constant name, "Save", and aria-pressed
+ * for its state; when saved, a link to the workspace appears beside it, so
+ * the state is said in words. The button needs JavaScript and storage, so
+ * without either it is not shown.
+ *
+ * Beside it, "Add a note" opens a compact note editor prefilled with the same
+ * title and address, and keeps the note in the workspace's notebook
+ * (src/scripts/note-button.ts); a link then says how many notes there are.
  *
  * It also loads the learner recorder, so a page with a save button notes the
  * visit even before the recorder is loaded on every page.
  */
 import { iconSvg } from '../../lib/icons';
 import type { SavedKind } from '../../lib/learner';
+import '../../styles/notebook.css';
 
 interface Props {
   /** What is saved, as the dashboard will list it. */
@@ -29,12 +35,21 @@ const { title, kind, url = Astro.url.pathname, compact = false } = Astro.props;
     <Fragment set:html={iconSvg('bookmark', compact ? 16 : 18)} />
     <span>Save</span><span class="sr-only">: {title}</span>
   </button>
-  <a class="save__link js-only" href="/dashboard/#saved" data-save-link hidden>{compact ? 'Saved' : 'Saved to your dashboard'}</a>
+  <a class="save__link js-only" href="/dashboard/#saved" data-save-link hidden>{compact ? 'Saved' : 'Saved to your workspace'}</a>
   <span class="sr-only" aria-live="polite" data-save-status></span>
+  <span class="save__notes" data-ix="note-add" data-compact={compact ? 'true' : 'false'}>
+    <button type="button" class="save__btn save__btn--note js-only" aria-haspopup="dialog" data-note-add>
+      <Fragment set:html={iconSvg('note', compact ? 16 : 18)} />
+      <span>Add a note</span><span class="sr-only">: {title}</span>
+    </button>
+    <a class="save__link js-only" href="/dashboard/#notes" data-note-link hidden></a>
+    <span class="sr-only" aria-live="polite" data-note-status></span>
+  </span>
 </div>
 
 <script>
   import '../../scripts/save-button';
+  import '../../scripts/note-button';
   import '../../scripts/learner';
 </script>
 
@@ -46,8 +61,16 @@ const { title, kind, url = Astro.url.pathname, compact = false } = Astro.props;
     gap: var(--sp-2) var(--sp-3);
   }
 
-  .save[hidden] {
+  .save[hidden],
+  .save__notes[hidden] {
     display: none;
+  }
+
+  .save__notes {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
   }
 
   .save__btn {
@@ -90,6 +113,11 @@ const { title, kind, url = Astro.url.pathname, compact = false } = Astro.props;
   .save__btn[aria-pressed='true'] :global(svg) {
     color: var(--gold-400);
     fill: var(--gold-400);
+  }
+
+  /* "Add a note" is the quieter companion of Save: the same shape, a lighter rule. */
+  .save__btn--note {
+    border-color: var(--rule-control);
   }
 
   .save__link {

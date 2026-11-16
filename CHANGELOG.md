@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### My Business Workspace
+
+- The learner dashboard becomes My Business Workspace, at the same addresses (`/dashboard/` and `/progress/`), keeping everything it showed and, as before, keeping everything in the reader's browser only.
+- A learning list: the saved items in the reader's own order, each marked to do, in progress or done, with a short note; any subtopic, case, framework, mindmap, tool or briefing can be added from the workspace.
+- A case notebook: notes under six headings (problem identified, evidence, relevant theory, strategic alternatives, recommendation, evaluation) or free notes, attached to a page or standalone, to write, edit, search and delete. "Add a note" now sits beside every Save button and opens a compact editor prefilled with the page.
+- Saved analyses: the work the Strategy Studio, Market Studio, People and Culture, Operations Floor, Entrepreneurship Lab and Boardroom keep, read from their own items and linked back to each tool, and results saved from any Financial Laboratory calculator with "Save this result to my workspace".
+- Export of selected work as Markdown, to read and print, or as JSON, which "Import a copy" reads back and combines with what is there.
+
 ## 2.1.0: 3 November 2026
 
 The Business Brief becomes an ecosystem: a cinematic opening on every fresh visit, a navigation in five parts, rooms with identities of their own, full notes for every subtopic, and working laboratories, simulations, cases and assessment tools across the course.

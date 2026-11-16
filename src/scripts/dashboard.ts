@@ -1,36 +1,30 @@
 /**
- * The dashboard (/dashboard/). Reads every item this site keeps in this
- * browser, turns them into a view with dashboardView() (src/lib/dashboard.ts)
- * and renders each section. It writes only when the reader asks: removing a
- * saved item, pausing the record, importing a copy or clearing what is kept,
- * and the last three are confirmed first. It re-renders when another tab
- * changes what is kept.
+ * My Business Workspace (/dashboard/, also /progress/). Reads every item this
+ * site keeps in this browser, turns them into a view with workspaceView()
+ * (src/lib/workspace.ts, which builds on dashboardView() in
+ * src/lib/dashboard.ts) and renders each section. The learning list, the
+ * notebook, the saved analyses and the export of selected work are parts of
+ * their own in src/scripts/workspace/. It writes only when the reader asks:
+ * changing the list, writing or deleting a note, removing a saved result,
+ * pausing the record, importing a copy or clearing what is kept; deleting a
+ * note, importing and clearing are confirmed first. It re-renders when
+ * another tab changes what is kept.
  */
 import { each, escapeHtml as h, readConfig } from './ix';
-import { courseChartSvg, dashboardView, shortDate, tallyWords, type DashConfig, type DashboardView, type Row } from '../lib/dashboard';
-import {
-  LEARNER_KEY,
-  SAVED_KEY,
-  SAVED_KIND_LABELS,
-  VISIT_KINDS,
-  VISIT_KIND_LABELS,
-  buildExport,
-  emptyLog,
-  parseLog,
-  parseSaved,
-  planImport,
-  removeSaved,
-  validateImport,
-  type Visit,
-} from '../lib/learner';
+import { courseChartSvg, shortDate, tallyWords, type Row } from '../lib/dashboard';
+import { LEARNER_KEY, SAVED_KEY, VISIT_KINDS, VISIT_KIND_LABELS, buildExport, emptyLog, parseLog, type Visit } from '../lib/learner';
+import { LIST_KEY, NOTES_KEY, SNAPSHOTS_KEY, checkImport, planWorkspaceImport, workspaceView, type WorkspaceConfig, type WorkspaceView } from '../lib/workspace';
 import { readItem, removeItem, siteItems, storageWorks, writeItem } from './storage';
+import { n, plural, type AskOptions, type Ctx } from './workspace/context';
+import { bindList, renderList } from './workspace/list';
+import { bindNotes } from './workspace/notes';
+import { bindAnalyses, renderAnalyses } from './workspace/analyses';
+import { bindExport } from './workspace/export';
 
-const n = (x: number) => x.toLocaleString('en-GB');
-const plural = (x: number, one: string, many: string) => `${n(x)} ${x === 1 ? one : many}`;
 const longDate = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
 each('[data-ix="progress"]', (root) => {
-  const cfg = readConfig<DashConfig>(root);
+  const cfg = readConfig<WorkspaceConfig>(root);
   const $ = <T extends HTMLElement>(sel: string) => root.querySelector<T>(sel);
   const msgEl = $('[data-msg]');
   const say = (text: string) => {
@@ -43,6 +37,46 @@ each('[data-ix="progress"]', (root) => {
     root.querySelectorAll<HTMLElement>('[data-needs-storage]').forEach((el) => (el.hidden = true));
     return;
   }
+
+  /* ---------- Confirmations ---------- */
+
+  const dialog = $<HTMLDialogElement>('[data-dialog]');
+  const ask = (opts: AskOptions): Promise<{ ok: boolean; scope: string }> => {
+    if (!dialog || typeof dialog.showModal !== 'function') {
+      const text = opts.body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      return Promise.resolve({ ok: window.confirm(`${opts.title}\n\n${text}`), scope: 'visits' });
+    }
+    const title = dialog.querySelector<HTMLElement>('[data-dialog-title]');
+    const body = dialog.querySelector<HTMLElement>('[data-dialog-body]');
+    const choice = dialog.querySelector<HTMLFieldSetElement>('[data-dialog-choice]');
+    const confirm = dialog.querySelector<HTMLButtonElement>('[data-dialog-confirm]');
+    if (title) title.textContent = opts.title;
+    if (body) body.innerHTML = opts.body;
+    if (confirm) confirm.textContent = opts.confirm;
+    if (choice) {
+      choice.hidden = !opts.choice;
+      const first = choice.querySelector<HTMLInputElement>('input[value="visits"]');
+      if (first) first.checked = true;
+    }
+    return new Promise((resolve) => {
+      dialog.addEventListener(
+        'close',
+        () => resolve({ ok: dialog.returnValue === 'confirm', scope: choice?.querySelector<HTMLInputElement>('input:checked')?.value ?? 'visits' }),
+        { once: true },
+      );
+      dialog.returnValue = '';
+      dialog.showModal();
+    });
+  };
+
+  /* ---------- The parts ---------- */
+
+  let view: WorkspaceView = workspaceView(siteItems() ?? {}, cfg);
+  const ctx: Ctx = { root, cfg, view: () => view, say, ask, refresh: () => render() };
+  const list = bindList(ctx);
+  const notes = bindNotes(ctx);
+  bindAnalyses(ctx);
+  const exporter = bindExport(ctx);
 
   /* ---------- Rendering ---------- */
 
@@ -62,11 +96,15 @@ each('[data-ix="progress"]', (root) => {
   const visitItem = (v: Visit, now: Date) =>
     `<li><a href="${h(v.url)}">${h(v.title)}</a><span class="db-list__meta">${plural(v.count, 'visit', 'visits')}, last ${h(shortDate(v.last, now))}</span></li>`;
 
-  const render = () => {
+  function render(): void {
+    // A note typed on the learning list is kept before anything is redrawn.
+    list.flush();
     const items = siteItems() ?? {};
-    const view: DashboardView = dashboardView(items, cfg);
+    view = workspaceView(items, cfg);
     const f = view.figures;
     const now = new Date();
+    // Focus stays on the same control when a part is drawn again (another tab changed what is kept).
+    const active = document.activeElement instanceof HTMLElement && root.contains(document.activeElement) ? document.activeElement.dataset.focus : undefined;
 
     const empty = $('[data-empty]');
     if (empty) empty.hidden = view.any;
@@ -75,7 +113,12 @@ each('[data-ix="progress"]', (root) => {
     const status = $('[data-statusline]');
     if (status) {
       const kept = Object.keys(items).length;
-      const times = [...view.log.visits.map((v) => v.last), ...view.saved.items.map((s) => s.saved)].sort();
+      const times = [
+        ...view.log.visits.map((v) => v.last),
+        ...view.saved.items.map((s) => s.saved),
+        ...view.notebook.notes.map((x) => x.updated),
+        ...view.snapshots.items.map((s) => s.saved),
+      ].sort();
       const last = times[times.length - 1];
       status.innerHTML = [
         `<span class="db-dot${view.log.paused ? ' db-dot--off' : ''}" aria-hidden="true"></span>${view.log.paused ? 'Not noting the pages you open: paused' : 'Noting the pages you open'}`,
@@ -106,6 +149,8 @@ each('[data-ix="progress"]', (root) => {
         }</p>`;
     const sum = $('[data-summary]');
     if (sum) {
+      const c = view.listCounts;
+      const caseNotes = view.notebook.notes.filter((x) => x.kind === 'case').length;
       const figs: Array<[string, string, string]> = [
         ['Mindmaps viewed', n(f.mindmaps), `of ${n(cfg.totals.mindmaps)}`],
         ['Cases opened', n(f.cases), `of ${n(cfg.totals.cases)} case files`],
@@ -117,11 +162,18 @@ each('[data-ix="progress"]', (root) => {
         ['Case decisions made', `${n(f.caseDecisions)} of ${n(f.caseDecisionsAll)}`, 'in the case files'],
         ['Boardroom simulations finished', `${n(f.simulationsDone)} of ${n(f.simulations)}`, ''],
         ['Strategy Studio analyses', `${n(f.analyses)} of ${n(f.analysesAll)}`, ''],
-        ['Pieces of work kept', n(f.work), 'by the tools in the rooms'],
-        ['Saved items', n(f.saved), ''],
+        ['Saved analyses', n(view.analyses.length), view.snapshots.items.length ? `${plural(view.snapshots.items.length, 'result', 'results')} from the Financial Laboratory` : 'kept by the tools in the rooms'],
+        ['Saved items', n(f.saved), f.saved ? `${n(c.todo)} to do, ${n(c.doing)} in progress, ${n(c.done)} done` : ''],
+        ['Notes', n(view.notebook.notes.length), view.notebook.notes.length ? `${n(caseNotes)} of them case notes` : ''],
       ];
       sum.innerHTML = figs.map(([k, v, note]) => `<div class="fig"><dt>${h(k)}</dt><dd><span class="fig__v">${h(v)}</span>${note ? `<span class="fig__n">${h(note)}</span>` : ''}</dd></div>`).join('');
     }
+
+    // My learning list, the notebook, saved analyses and the export
+    renderList(ctx, view, now);
+    notes.render(view, now);
+    renderAnalyses(ctx, view, now);
+    exporter.render(view);
 
     // Your course
     const chart = $('[data-course-chart]');
@@ -154,12 +206,12 @@ each('[data-ix="progress"]', (root) => {
     const visits = $('[data-visits]');
     if (visits)
       visits.innerHTML = VISIT_KINDS.map((k) => {
-        const list = view.visits[k];
+        const rows = view.visits[k];
         const start = cfg.starts[k];
-        const head = `<h3 class="db-col__h">${h(VISIT_KIND_LABELS[k])} <span class="db-count">${n(list.length)}</span></h3>`;
-        if (!list.length) return `<div class="db-col">${head}<p class="db-none">None yet. Start with <a href="${h(start.href)}">${h(start.title)}</a>.</p></div>`;
-        const first = list.slice(0, 6).map((v) => visitItem(v, now)).join('');
-        const rest = list.slice(6);
+        const head = `<h3 class="db-col__h">${h(VISIT_KIND_LABELS[k])} <span class="db-count">${n(rows.length)}</span></h3>`;
+        if (!rows.length) return `<div class="db-col">${head}<p class="db-none">None yet. Start with <a href="${h(start.href)}">${h(start.title)}</a>.</p></div>`;
+        const first = rows.slice(0, 6).map((v) => visitItem(v, now)).join('');
+        const rest = rows.slice(6);
         return `<div class="db-col">${head}<ol class="db-list" role="list">${first}</ol>${
           rest.length ? `<details class="db-more"><summary>${plural(rest.length, 'more', 'more')}</summary><ol class="db-list" role="list">${rest.map((v) => visitItem(v, now)).join('')}</ol></details>` : ''
         }</div>`;
@@ -180,93 +232,21 @@ each('[data-ix="progress"]', (root) => {
       ].join('');
     }
 
-    // Saved, and your work
-    const saved = $('[data-saved]');
-    const savedN = $('[data-saved-n]');
-    if (savedN) savedN.textContent = n(view.saved.items.length);
-    if (saved)
-      saved.innerHTML = view.saved.items.length
-        ? `<ul class="db-saved" role="list">${view.saved.items
-            .map(
-              (s, i) =>
-                `<li><span class="db-saved__kind">${h(SAVED_KIND_LABELS[s.kind])}</span><a class="db-saved__title" href="${h(s.url)}">${h(s.title)}</a><span class="db-saved__when">Saved ${h(shortDate(s.saved, now))}</span><button type="button" class="db-remove" data-remove="${h(s.url)}" data-i="${i}" aria-label="Remove ${h(s.title)} from your saved items">Remove</button></li>`,
-            )
-            .join('')}</ul>`
-        : '<p class="db-none">Nothing saved yet. Use <strong>Save</strong> on a subtopic, a glossary term, a case, a mindmap, a toolkit guide, a diagram or a practice question to keep it here.</p>';
-    const work = $('[data-work]');
-    const workN = $('[data-work-n]');
-    if (workN) workN.textContent = n(view.work.length);
-    if (work)
-      work.innerHTML = view.workGroups.length
-        ? view.workGroups
-            .map(
-              (g) =>
-                `<div class="pr-group db-workgroup"><h4 class="db-workgroup__h">${h(g.room)}</h4><ul class="db-work" role="list">${g.items
-                  .map((w) => `<li><a class="db-work__title" href="${h(w.href)}">${h(w.title)}</a><span class="db-work__detail">${h(w.detail)}${w.when ? `, saved ${h(shortDate(w.when, now))}` : ''}</span></li>`)
-                  .join('')}</ul></div>`,
-            )
-            .join('')
-        : '<p class="db-none">No tool work kept yet. The tools in the rooms keep your figures, choices and notes, and list them here: try the <a href="/strategy-studio/">Strategy Studio</a> or the <a href="/entrepreneurship-lab/">Entrepreneurship Lab</a>.</p>';
-
     // Your data
     const record = $<HTMLInputElement>('[data-record]');
     if (record) record.checked = !view.log.paused;
-  };
 
-  /* ---------- Confirmations ---------- */
+    if (active && !(document.activeElement instanceof HTMLElement && root.contains(document.activeElement))) root.querySelector<HTMLElement>(`[data-focus="${CSS.escape(active)}"]`)?.focus();
+  }
 
-  const dialog = $<HTMLDialogElement>('[data-dialog]');
-  const ask = (opts: { title: string; body: string; confirm: string; choice?: boolean }): Promise<{ ok: boolean; scope: string }> => {
-    if (!dialog || typeof dialog.showModal !== 'function') {
-      const text = opts.body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-      return Promise.resolve({ ok: window.confirm(`${opts.title}\n\n${text}`), scope: 'visits' });
-    }
-    const title = dialog.querySelector<HTMLElement>('[data-dialog-title]');
-    const body = dialog.querySelector<HTMLElement>('[data-dialog-body]');
-    const choice = dialog.querySelector<HTMLFieldSetElement>('[data-dialog-choice]');
-    const confirm = dialog.querySelector<HTMLButtonElement>('[data-dialog-confirm]');
-    if (title) title.textContent = opts.title;
-    if (body) body.innerHTML = opts.body;
-    if (confirm) confirm.textContent = opts.confirm;
-    if (choice) {
-      choice.hidden = !opts.choice;
-      const first = choice.querySelector<HTMLInputElement>('input[value="visits"]');
-      if (first) first.checked = true;
-    }
-    return new Promise((resolve) => {
-      dialog.addEventListener(
-        'close',
-        () => resolve({ ok: dialog.returnValue === 'confirm', scope: choice?.querySelector<HTMLInputElement>('input:checked')?.value ?? 'visits' }),
-        { once: true },
-      );
-      dialog.returnValue = '';
-      dialog.showModal();
-    });
-  };
-
-  /* ---------- Actions ---------- */
+  /* ---------- Your data: export, clear, pause, import ---------- */
 
   root.addEventListener('click', async (e) => {
     const t = e.target as HTMLElement;
-    const remove = t.closest<HTMLButtonElement>('[data-remove]');
-    if (remove) {
-      const url = remove.dataset.remove ?? '';
-      const list = parseSaved(readItem(SAVED_KEY));
-      const item = list.items.find((x) => x.url === url);
-      const i = Number(remove.dataset.i ?? 0);
-      if (!writeItem(SAVED_KEY, JSON.stringify(removeSaved(list, url)))) {
-        say('This browser would not change its storage, so nothing was removed.');
-        return;
-      }
-      render();
-      const left = [...root.querySelectorAll<HTMLButtonElement>('[data-remove]')];
-      (left[i] ?? left[i - 1] ?? root.querySelector<HTMLElement>('#db-saved-list-h'))?.focus();
-      say(`Removed ${item?.title ?? 'the item'} from your saved items.`);
-      return;
-    }
 
     const exportBtn = t.closest<HTMLButtonElement>('[data-export]');
     if (exportBtn) {
+      list.flush();
       const items = siteItems() ?? {};
       const file = buildExport(Object.entries(items), new Date());
       const count = Object.keys(file.items).length;
@@ -301,6 +281,7 @@ each('[data-ix="progress"]', (root) => {
 
     const resetBtn = t.closest<HTMLButtonElement>('[data-reset]');
     if (resetBtn) {
+      list.flush();
       const res = await ask({
         title: 'Clear what is kept?',
         body: '<p>Choose what to clear from this browser. It cannot be undone, so download a copy first if you may want it back.</p>',
@@ -316,7 +297,14 @@ each('[data-ix="progress"]', (root) => {
       const keepPause = () => (paused ? writeItem(LEARNER_KEY, JSON.stringify({ ...emptyLog(), paused: true })) : true);
       if (res.scope === 'saved') {
         removeItem(SAVED_KEY);
-        say('Your saved items are cleared.');
+        removeItem(LIST_KEY);
+        say('Your learning list is cleared.');
+      } else if (res.scope === 'notes') {
+        removeItem(NOTES_KEY);
+        say('Your notes are cleared.');
+      } else if (res.scope === 'snapshots') {
+        removeItem(SNAPSHOTS_KEY);
+        say('The results saved from the Financial Laboratory are cleared.');
       } else if (res.scope === 'all') {
         Object.keys(siteItems() ?? {}).forEach((k) => removeItem(k));
         keepPause();
@@ -355,6 +343,7 @@ each('[data-ix="progress"]', (root) => {
   file?.addEventListener('change', async () => {
     const chosen = file.files?.[0];
     if (!chosen) return;
+    list.flush();
     fileError(null);
     let text: string;
     try {
@@ -364,20 +353,20 @@ each('[data-ix="progress"]', (root) => {
       file.value = '';
       return;
     }
-    const check = validateImport(text);
+    const check = checkImport(text);
     if (!check.ok) {
       fileError(check.error);
       say(check.error);
       file.value = '';
       return;
     }
-    const plan = planImport(siteItems() ?? {}, check.items);
+    const plan = planWorkspaceImport(siteItems() ?? {}, check.items);
     const fresh = plan.filter((w) => w.effect === 'new').length;
     const replace = plan.filter((w) => w.effect === 'replace').length;
     const same = plan.filter((w) => w.effect === 'same').length;
     const res = await ask({
       title: 'Import this copy?',
-      body: `<p>The file ${check.exported ? `was exported on ${h(longDate(check.exported))} and ` : ''}holds ${plural(plan.length, 'item', 'items')}: ${n(fresh)} new to this browser, ${n(replace)} replacing an item kept here, and ${n(same)} the same already.</p><p>Saved items and visit history are combined with what is here, not replaced. Nothing the file does not name is changed.</p>${
+      body: `<p>The file ${check.exported ? `was exported on ${h(longDate(check.exported))} and ` : ''}holds ${plural(plan.length, 'item', 'items')}: ${n(fresh)} new to this browser, ${n(replace)} replacing or adding to an item kept here, and ${n(same)} the same already.</p><p>Your learning list, notes, saved results and visit history are combined with what is here, not replaced. Nothing the file does not name is changed.</p>${
         check.skipped.length ? `<p>${plural(check.skipped.length, 'item', 'items')} in the file will be left out, because this site does not use ${check.skipped.length === 1 ? 'it' : 'them'}.</p>` : ''
       }`,
       confirm: 'Import',

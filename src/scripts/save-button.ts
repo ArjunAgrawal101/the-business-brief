@@ -1,7 +1,8 @@
 /**
  * The save button (src/components/ui/SaveButton.astro): keeps a page, a term,
  * a diagram or a question in this browser's saved items (bb:saved), listed on
- * the dashboard. A toggle: pressed when saved; pressing it again removes it.
+ * the learning list of My Business Workspace (/dashboard/). A toggle: pressed
+ * when saved; pressing it again removes it.
  * Where the browser keeps nothing, the button never appears.
  */
 import { announce, each } from './ix';
@@ -31,13 +32,13 @@ each('[data-ix="save"]', (root) => {
       return;
     }
     buttons.forEach((p) => p());
-    announce(status, saved ? 'Saved. It is listed on your dashboard.' : 'Removed from your saved items.');
+    announce(status, saved ? 'Saved. It is on the learning list in your workspace.' : 'Removed from your saved items.');
   });
   buttons.push(paint);
   paint();
 });
 
-// Saved or removed in another tab, or on the dashboard: show it here too.
+// Saved or removed in another tab, or in the workspace: show it here too.
 window.addEventListener('storage', (e) => {
   if (e.key === SAVED_KEY || e.key === null) buttons.forEach((p) => p());
 });
