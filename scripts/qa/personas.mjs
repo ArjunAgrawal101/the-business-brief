@@ -1,5 +1,5 @@
 /**
- * Persona walkthroughs: seven kinds of reader follow a route through the site
+ * Persona walkthroughs: eight kinds of reader follow a route through the site
  * the way they would, by clicking links that are on the page (never by typing
  * an address after the first), on the device they would use. Each step must
  * have a visible link to the next page in its main content, arrive there,
@@ -64,6 +64,14 @@ const ROUTES = [
     start: '/pathways/',
     path: ['/pathways/entrepreneurs/', '/entrepreneurship-lab/', '/entrepreneurship-lab/business-model-canvas/', '/entrepreneurship-lab/business-plan/'],
     expect: 'business plan',
+  },
+  {
+    who: 'MBA student reading advanced strategy',
+    device: ['desktop', DESKTOP],
+    start: '/pathways/',
+    path: ['/pathways/mba/', '/advanced/', '/advanced/strategy/', '/advanced/strategy/competitive-advantage-and-industry-analysis/'],
+    // A module beyond the IB course says so, and opens with its eight parts.
+    expect: 'Beyond the IB course',
   },
   {
     who: 'IB student looking for a tutor',
