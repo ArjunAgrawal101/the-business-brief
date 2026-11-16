@@ -1,0 +1,194 @@
+# Advanced Management and Strategy, operations module 2. Written in the
+# platform's own words. Real organizations appear only with facts from the
+# documents in src/content/sources/advanced-ops-ent.yaml, opened and read on
+# 16 November 2026. Worked figures: critical ratio 50 ÷ (50 + 12) = 0.806,
+# z = 0.865, capacity 100,000 + 0.865 × 15,000 = 112,973 (about 113,000).
+# Capability, spec 50.0 ± 0.6 mm, sd 0.15: Cp 1.33; centred 63 ppm; mean
+# 50.15 gives Cpk 1.00 and 1,350 ppm. Six sigma with a 1.5 sigma shift:
+# 3.4 per million; centred, about 0.002 ppm. Inspection: 1 − 0.9999^100 =
+# 0.0099. Automation: 12,000,000 ÷ 4 = 3,000,000 orders; at 1,800,000
+# orders, 7.2m − 12m = −4.8m. Calder exhibit (tolerance 9.70 to 10.30 ml):
+# Cp = 0.6 ÷ 6σ; Cpk = nearer margin ÷ 3σ; ppm from the normal distribution:
+# 2,700; 63; 3,830; 0.3. Overfill 2,000,000 × 0.10 × 0.80 = £160,000.
+domain: operations
+title: Capacity planning, quality management and technology adoption
+order: 2
+dek: How much capacity to build and when, how to make quality predictable rather than inspected, and why new technology so often disappoints before it pays.
+audience: [undergraduate, mba, professional]
+covers: [Capacity planning, Quality management, Technology adoption]
+minutes: 25
+updated: '2026-11-16'
+bridge:
+  codes: ['5.3', '5.6', '5.8', '5.9', '3.8']
+  text: |
+    The IB course calculates capacity utilisation and the defect rate (5.6, HL), distinguishes quality control from quality assurance and describes TQM and quality standards (5.3, HL), introduces innovation and data systems (5.8 and 5.9) and appraises investments (3.8). This module adds what those tools leave out: capacity as a decision under uncertainty, where the costs of too little and too much are rarely equal; quality as the statistics of variation, with capability indices and sigma levels; and the economics of adopting technology, including why returns arrive late and depend on volume.
+foundation: |
+  Capacity, quality and technology are where operations commits capital, and all three are bets on variation. **Capacity** decisions bet on demand that has not happened yet; they are lumpy, slow to change and expensive to get wrong in either direction. **Quality** is the management of process variation: a product fails when the process that makes it varies more than the customer will tolerate, so quality is designed into the process rather than found by inspecting its output. **Technology adoption** bets on whether a new way of working will be used, absorbed and run at enough volume to pay. Each decision also shapes the others: a capable process needs less spare capacity for rework, and an automated process converts the variable cost of labour into a fixed cost that only high, steady utilisation can recover.
+advanced:
+  - id: capacity-under-uncertainty
+    title: 'Capacity under uncertainty: size, timing and the cushion'
+    body: |
+      Capacity is chosen before demand is known, so the classic strategies are about timing: **lead** (build ahead and risk idle capacity), **lag** (build once demand is proven and risk lost sales) and **match** (add in small steps). The right choice depends on the asymmetry between the cost of being short and the cost of being idle. The newsvendor logic (Arrow, Harris and Marschak, 1951) makes this precise: set capacity where the probability that demand falls below it equals Cu/(Cu + Co), where Cu is the contribution lost per unit short and Co the cost of a unit of idle capacity.
+
+      Suppose each unit short loses £50 of contribution and each unit of idle capacity costs £12 a year. The critical ratio is 50/62 = 0.81. If demand is forecast at 100,000 units with a standard deviation of 15,000, capacity should be about 113,000, a cushion of 13%. If a lost sale loses the customer for good, Cu rises and so does the cushion; a commodity producer with thin margins and heavy fixed costs should build less.
+
+      Long build times worsen the problem because capital is committed before uncertainty resolves, which is why modular, staged expansion has option value. Capacity can also be **bought** (acquiring sites, fast but expensive) or **borrowed** (contract manufacturers, flexible but with less control). And in services, which cannot store output, utilisation targets must leave room for variability, as the queueing logic in [Operations strategy, process optimisation and lean systems](/advanced/operations/operations-strategy-and-process/) shows.
+  - id: variation-and-capability
+    title: Quality as the management of variation
+    body: |
+      Walter Shewhart (1931) separated **common-cause** variation, built into the system, from **special-cause** variation, which has an assignable source, and devised the control chart to tell them apart. W. Edwards Deming (1986) drew the managerial lesson: common causes are management's responsibility, reacting to noise as if it were a signal (tampering) increases variation, and dependence on mass inspection should end.
+
+      **Process capability** compares the tolerance with the spread. Cp = (upper limit − lower limit)/6σ; Cpk = (distance from the mean to the nearer limit)/3σ, so it also penalises an off-centre process. Take a shaft specified at 50.0 ± 0.6 mm with a standard deviation of 0.15 mm. Cp is 1.33 and, if the process is centred, about 63 parts per million fall outside tolerance. If the mean drifts to 50.15 mm, Cpk falls to 1.0 and defects rise to about 1,350 per million: twenty times as many, with no change in the spread.
+
+      **Sigma levels** express the same idea. The well-known six sigma benchmark of 3.4 defects per million assumes that the mean will drift by 1.5σ over time; a perfectly centred six sigma process would produce about 0.002 per million. The 1.5σ shift is a convention, not an empirical law, and quoting a sigma level without stating it misleads.
+  - id: quality-systems
+    title: 'Quality systems: their costs, logic and side effects'
+    body: |
+      The **cost of quality** divides spending into prevention, appraisal, internal failure (scrap and rework) and external failure (returns, warranty, lost customers). Juran (1951) used it to show managers that failure costs dwarfed prevention; Crosby (1979) went further, arguing that quality is free because prevention pays for itself. The older economic view sets an optimal defect rate where the marginal cost of prevention equals the marginal cost of failure; the TQM reply is that prevention costs fall with learning and failure costs are understated, so the optimum lies near zero defects.
+
+      Quality is also multidimensional. Garvin (1987) distinguished performance, features, reliability, conformance, durability, serviceability, aesthetics and perceived quality: a firm chooses which to compete on, and conformance is only one. Six sigma programmes organise improvement through DMAIC projects (define, measure, analyse, improve, control) chosen for financial impact.
+
+      Two limits matter. Inspection cannot assure the absence of rare defects: if one unit in 10,000 is faulty and 100 units are tested per batch, the chance of catching it in a given batch is about 1%. Only a controlled process can. And Benner and Tushman (2003) found that process management programmes raise efficiency in existing technologies but can crowd out the exploration on which future products depend.
+  - id: technology-adoption
+    title: 'Adopting technology: complements, the J-curve and the density test'
+    body: |
+      New technology often raises productivity later and by less than its sponsors promise. Brynjolfsson and Hitt (2000) showed that returns to information technology depend on complementary investment in process redesign, skills and decision rights. Brynjolfsson, Rock and Syverson (2021) formalised a **productivity J-curve**: while firms build unmeasured intangible complements, measured productivity falls, and it rises only once those complements are in place.
+
+      Inside the firm, the technology acceptance model (Davis, 1989) predicts use from perceived usefulness and ease of use, and diffusion research (Rogers, 1962) adds relative advantage, compatibility, complexity, trialability and observability.
+
+      Automation has its own arithmetic. It converts the variable cost of labour into a fixed cost of capacity, so its unit cost depends on volume. A fulfilment system costing £12 million a year that saves £4 of labour per order breaks even at 3 million orders a year; at 1.8 million it loses £4.8 million. Two rules follow: automate a stable, capable process, or you automate its waste; and automate where demand is dense enough to keep the system full.
+models:
+  - name: Capacity timing and the critical fractile
+    origin: Arrow, Harris and Marschak (1951)
+    summary: |
+      When capacity must be set before demand is known, the expected-profit-maximising level is the demand quantile equal to Cu/(Cu + Co). The cushion above the mean forecast grows with the cost of shortage and shrinks with the cost of idle capacity.
+    use: |
+      Estimate the margin lost per unit short (including lost future business) and the cost per unit of idle capacity, describe demand as a distribution rather than a point, and choose the quantile. Use staged expansions to buy time for uncertainty to resolve.
+    limits: |
+      It is a one-period model that ignores lumpy additions, competitors' capacity, learning curves and demand that responds to availability. Capital rationing may make the optimum unaffordable.
+    framework: decision-trees
+    tool: /operations-floor/capacity-and-productivity/
+    sources: [adv-oe-arrow-1951]
+  - name: Statistical process control and process capability
+    origin: Shewhart (1931)
+    summary: |
+      Control charts separate common-cause from special-cause variation; capability indices (Cp, Cpk) compare the process spread and centring with the customer's tolerance and translate them into expected defect rates.
+    use: |
+      Bring the process into statistical control first, then measure capability. Fix centring problems (low Cpk, adequate Cp) by adjustment and spread problems (low Cp) by redesign. Agree minimum Cpk values with customers and suppliers.
+    limits: |
+      Capability indices assume a stable, roughly normal process; defect estimates in the tails are very sensitive to that assumption. They measure conformance to a specification, not whether the specification reflects what customers value.
+    framework: descriptive-statistics
+    sources: [adv-oe-shewhart-1931, adv-oe-deming-1986]
+  - name: The cost of quality
+    origin: Juran (1951); Crosby (1979)
+    summary: |
+      Quality costs fall into prevention, appraisal, internal failure and external failure. Shifting spending towards prevention usually lowers the total, because failure costs, especially external ones, are larger than accounts show.
+    use: |
+      Estimate each category from accounts and operating data, including hidden costs such as expediting and lost customers, and use the profile to justify prevention projects and to track progress.
+    limits: |
+      External failure costs, above all lost goodwill, are hard to measure, so the analysis can be steered to any conclusion. Its claim that quality is free holds only where prevention has not yet reached diminishing returns.
+    sources: [adv-oe-juran-1951, adv-oe-crosby-1979, adv-oe-garvin-1987]
+  - name: Complementarities and the productivity J-curve
+    origin: Brynjolfsson and Hitt (2000); Brynjolfsson, Rock and Syverson (2021)
+    summary: |
+      The return to a general-purpose technology depends on complementary changes to processes, skills and organisation. Because these intangible investments are expensed and unmeasured, productivity can dip before it rises.
+    use: |
+      Budget for the complements explicitly, set milestones for adoption and process change rather than installation, and judge a project over the period in which complements are built rather than in its first year.
+    limits: |
+      The J-curve can excuse projects that simply fail. Measurement error and slow diffusion offer competing explanations of weak early results, and the evidence for recent technologies such as AI is still early.
+    sources: [adv-oe-brynjolfsson-hitt-2000, adv-oe-brynjolfsson-2021, adv-oe-davis-1989]
+applications:
+  - title: 'Novo Nordisk: building, buying and rationing capacity'
+    kind: real
+    asOf: '2025-09'
+    sources: [adv-oe-novo-fy2023-presentation, adv-oe-novo-kalundborg-2023, adv-oe-novo-catalent-2024, adv-oe-novo-transformation-2025]
+    body: |
+      Novo Nordisk restricted US supply of the lower dose strengths of its obesity treatment Wegovy from May 2023 to safeguard continuity of care, began to increase it gradually in January 2024, and continued volume-capped launches in its international markets to balance supply and demand. In November 2023 it announced more than DKK 42 billion of investment at Kalundborg, mostly in active ingredient capacity in a multi-product facility, to be completed gradually from the end of 2025 to 2029. In February 2024 it agreed to buy three fill-finish sites (in Italy, Belgium and the United States) for an upfront $11 billion, mainly debt-financed, to raise filling capacity from 2026 "at scale and speed". In September 2025 it announced about 9,000 job cuts, citing a more competitive, consumer-driven obesity market, a recent slowdown in growth and complexity created by rapid scaling, while continuing to fund its manufacturing ramp-up.
+
+      *Interpretation.* All three capacity tools appear: rationing in the short run, buying for speed and building for the long run. The 2025 announcement points to the other side of a lead strategy: capacity takes years to build, while competition can change the market it was built for.
+  - title: 'Ocado and Kroger: automation needs density'
+    kind: real
+    asOf: '2025-12'
+    sources: [adv-oe-ocado-kroger-2025-11, adv-oe-ocado-kroger-2025-12]
+    body: |
+      In November 2025 Ocado reported that Kroger would close three of its automated customer fulfilment centres, in Maryland, Wisconsin and Florida, in January 2026, while five continued; Ocado noted Kroger's statement that it would keep using automated fulfilment in areas with a higher density of demand. In December the two agreed a one-off payment of $350 million to Ocado, principally in place of future capacity fees, which also covered Kroger's decision not to proceed with a planned centre in North Carolina. Ocado expected the closures to cut its fee revenue by about $50 million in its 2026 financial year, while Kroger ordered more capacity at its Detroit site.
+
+      *Interpretation.* The same technology is kept where orders are dense and closed where they are not. Automation turns labour cost into fixed capacity cost, so its economics stand or fall on utilisation.
+  - title: 'ASML and EUV: decades from invention to adoption'
+    kind: real
+    asOf: '2022-03'
+    sources: [adv-oe-asml-euv-2022, adv-oe-asml-history]
+    body: |
+      ASML began its extreme ultraviolet (EUV) lithography programme in 1997, shipped prototypes to research centres in 2006 and its first pre-production system to Samsung in 2010. In 2012 Intel, Samsung and TSMC agreed to co-fund its EUV research in return for stakes in the company. Customers began ordering production systems in batches in 2016; a 250-watt light source, enabling about 125 wafers an hour, was the decisive step, and by ASML's account customers began investing heavily in 2018. The first phones with EUV-made chips appeared in 2019. ASML says chipmakers needed one or two technology generations to learn to use EUV, because masks, photoresists and design software had to be adapted too; in 2022 the constraint on raising output from about 40 to 60 systems a year lay in its suppliers' capacity. Jos Benschop, who launched the programme, recalled having predicted volume production for 2006, thirteen years too early.
+
+      *Interpretation.* Adoption waited for throughput to cross an economic threshold and for complements to mature: a J-curve at the level of an industry.
+cases:
+  - title: 'Calder Packaging: a capability problem'
+    fictional: true
+    situation: |
+      Calder Packaging (fictional) fills a 10 ml liquid medicine into vials for a pharmaceutical client on four lines. The tolerance is 9.70 to 10.30 ml. The client's new contract requires a Cpk of at least 1.33 on every line. Line 3 fills 2 million vials a year, and Calder bears the cost of overfill at £0.80 a ml. The quality manager proposes checkweighing every vial on every line (£90,000 a year); the engineering manager proposes re-centring line 3 and spending £150,000 to reduce variation on line 1.
+    exhibit:
+      caption: Calder Packaging, fill volume by line over the last quarter
+      columns: [Line, Mean fill (ml), Standard deviation (ml), Cp, Cpk, Expected out of tolerance (per million)]
+      rows:
+        - [Line 1, '10.00', '0.100', '1.00', '1.00', '2,700']
+        - [Line 2, '10.00', '0.075', '1.33', '1.33', '63']
+        - [Line 3, '10.10', '0.075', '1.33', '0.89', '3,830']
+        - [Line 4, '9.95', '0.050', '2.00', '1.67', '0.3']
+      note: Expected rates assume normally distributed fill volumes. Simulated data.
+    questions:
+      - Verify Cp and Cpk for line 3, and explain why a line with the same spread as line 2 produces about sixty times as many out-of-tolerance vials.
+      - Which lines fail the client's requirement, and is each problem one of centring or of spread?
+      - Calculate the annual cost of line 3's overfill and compare it with the likely cost of re-centring.
+      - Evaluate checkweighing every vial against improving the processes, using the distinction between quality control and quality assurance.
+evaluation: |
+  Some points are settled. Variation, not averages, drives defects; capability indices and control charts are standard and well understood; and capacity decisions depend on the asymmetry of shortage and idle costs. The arguments are about practice and evidence.
+
+  **Utilisation as a target.** Accounting systems reward high utilisation because idle assets look like waste, but queueing theory shows that in variable environments high utilisation buys long lead times. The disagreement is less about theory than about which cost is visible.
+
+  **Six sigma.** Critics argue that it repackages statistical process control with a belt hierarchy, that the 1.5σ convention is arbitrary, and that evidence of its financial impact comes mostly from adopters' own reports, which select successes. Benner and Tushman's finding that process management can crowd out exploration gives the debate a firmer basis.
+
+  **The productivity paradox.** The J-curve is one explanation of slow returns from new technology; mismeasurement of output, slow diffusion and simple failure are others, and they are hard to separate for any one firm. For AI the evidence is still early.
+
+  **Capacity races.** Lead strategies are rational for one firm when shortage is costly, but when every competitor leads at once the industry overbuilds. Shipping, semiconductors and chemicals are classic cases of recurrent capacity cycles, and the Novo Nordisk application shows how quickly a market in shortage can become a contested one. The newsvendor model treats demand as given; in practice capacity decisions are moves in a game with rivals.
+decision:
+  title: Build, buy or borrow capacity at Orrin Medical
+  fictional: true
+  brief: |
+    Orrin Medical (fictional) makes a disposable glucose sensor on one line with capacity for 10 million units a year, now fully used. Forecasts for year three range from 12 to 30 million units; each unit short loses about £6 of contribution and risks the patients who depend on continuity of supply. Regulators must approve any new production site, which takes about a year.
+  options:
+    - label: A. Build a new line
+      text: |
+        Build a 15-million-unit automated line for £60 million, available in 24 months once validated. Lowest unit cost and full control, but the largest bet on the forecast.
+    - label: B. Borrow capacity
+      text: |
+        Contract an established manufacturer for 8 million units a year from month 9, at £0.40 more per unit, with Orrin's quality staff on site. Fast and reversible, but it shares know-how and adds a quality interface.
+    - label: C. Stage it
+      text: |
+        Build a 7.5-million-unit module for £32 million (ready in 18 months) with an approved design for a second, and use the contract manufacturer as a bridge until the module is running.
+  criteria:
+    - Expected contribution across demand scenarios
+    - Cost and consequences of shortage for patients
+    - Quality and regulatory control
+    - Capital at risk if demand disappoints
+    - Flexibility to respond as demand becomes clearer
+  guidance: |
+    The shortage cost is high and asymmetric: lost contribution is only part of it, because patients and regulators punish a supplier that cannot deliver. The critical-fractile logic therefore argues for a generous cushion, but demand uncertainty is wide, so a single large line is a big irreversible bet. Option A wins only if management is confident in the upper half of the forecast range.
+
+    Option B is fast and flexible, and the bridge it provides matters, but in a regulated product a second manufacturer is a quality risk to be managed, not just a cost premium. Option C combines the two: the contract manufacturer covers the gap while the module is built, and the second module is an option exercised only if demand rises. Its cost is higher unit cost during the bridge and some loss of scale economies. For most boards C is the strongest answer, provided the contract manufacturer's quality system is audited before it is relied on.
+reading:
+  - source: adv-oe-garvin-1987
+    note: The eight dimensions of quality and why choosing among them is a strategic decision.
+  - source: adv-oe-deming-1986
+    note: The classic argument for building quality into the process and against management by inspection and targets.
+  - source: adv-oe-benner-tushman-2003
+    note: How quality and process management programmes can crowd out exploratory innovation.
+  - source: adv-oe-brynjolfsson-2021
+    note: The productivity J-curve, with the evidence on intangible complements to general-purpose technologies.
+  - source: adv-oe-hopp-spearman-1996
+    note: Capacity, variability and utilisation treated quantitatively, with a clear account of why utilisation targets backfire.
+basis:
+  - source: adv-oe-rogers-1962
+    note: The attributes that govern the diffusion of innovations.
+  - source: adv-oe-kingman-1961
+    note: Utilisation and waiting in services that cannot store output.
