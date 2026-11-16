@@ -1,7 +1,10 @@
 /**
- * The site's information architecture: five groups, each a door into one
- * kind of work. The header's mega menu, the mobile menu and the footer all
- * read this list, so a destination is added in one place.
+ * The site's information architecture: six groups, each a door into one kind
+ * of work. Learn, Practise, Tools and Assess serve the IB course first;
+ * Advance holds the undergraduate, MBA and professional learning, kept apart
+ * from it; Connect holds the tutorials, the educator and the resources. The
+ * header's mega menu, the mobile menu, the footer, the home page's floor plan
+ * and search all read this list, so a destination is added in one place.
  *
  * A link is listed only when the page exists and works: there are no
  * placeholders here. When a new room or library is built, it is added to its
@@ -17,7 +20,7 @@ export interface NavLink {
 }
 
 export interface NavGroup {
-  id: 'explore' | 'practise' | 'tools' | 'assess' | 'discover';
+  id: 'learn' | 'practise' | 'tools' | 'assess' | 'advance' | 'connect';
   label: string;
   /** A sentence that frames the group in its panel. */
   intro: string;
@@ -26,8 +29,8 @@ export interface NavGroup {
 
 export const NAV: NavGroup[] = [
   {
-    id: 'explore',
-    label: 'Explore',
+    id: 'learn',
+    label: 'Learn',
     intro: 'The course and the ideas behind it: every subtopic, every term, every structure, drawn and explained.',
     links: [
       { label: 'The Business Brief', href: '/topics/', text: 'The topic library: all 37 subtopics, with notes, briefs and practice' },
@@ -35,7 +38,6 @@ export const NAV: NavGroup[] = [
       { label: 'Key concepts', href: '/ib/concepts/', text: 'Change, creativity, ethics and sustainability across the course' },
       { label: 'Glossary', href: '/glossary/', text: 'Every term in plain language, with its syllabus meaning' },
       { label: 'Mindmaps', href: '/mindmaps/', text: 'Every subtopic and unit as a map to fold, zoom and print' },
-      { label: 'Enrichment maps', href: '/mindmaps/#enrichment', text: 'Nine maps of management beyond the IB course, labelled enrichment' },
       { label: 'Diagrams', href: '/diagrams/', text: 'Original diagrams for every unit, each with a text description' },
       { label: 'Frameworks', href: '/frameworks/', text: '35 business frameworks by purpose, each with a diagram, method, example and exercise' },
       { label: 'Toolkit', href: '/toolkit/', text: 'The business management toolkit, tool by tool' },
@@ -51,7 +53,6 @@ export const NAV: NavGroup[] = [
       { label: 'Case Vault', href: '/case-vault/', text: 'An archive of cases by industry and topic, with a Case of the Week' },
       { label: 'Decision Room', href: '/decision-room/', text: 'Commit to a decision, then live with its consequences' },
       { label: 'Boardroom', href: '/boardroom/', text: 'Multi-round simulations: take a seat on the board and follow each decision through' },
-      { label: 'Question bank', href: '/assessment/question-bank/', text: 'Every original question, filtered by topic, paper, level and command term, with timed sets' },
     ],
   },
   {
@@ -79,19 +80,31 @@ export const NAV: NavGroup[] = [
       { label: 'Paper 2', href: '/assessment/paper-2/', text: 'Quantitative questions: calculations and constructions' },
       { label: 'Calculation practice', href: '/assessment/paper-2/practice/', text: 'Fresh fictional figures each time, checked, with the working and the slip behind each wrong answer' },
       { label: 'Paper 3', href: '/assessment/paper-3/', text: 'The social enterprise strategic plan', hl: true },
+      { label: 'Practice questions', href: '/assessment/question-bank/', text: 'Every original question, filtered by topic, paper, level and command term, with timed sets' },
       { label: 'Examiner Lens', href: '/examiner-lens/', text: 'The command terms and what each one asks of you' },
     ],
   },
   {
-    id: 'discover',
-    label: 'Discover',
-    intro: 'Resources to learn and teach with, routes through the platform for every learner, and the educator behind it.',
+    id: 'advance',
+    label: 'Advance',
+    intro: 'Beyond the IB course, for undergraduates, MBA students and professionals: management at greater depth, applied to real and simulated decisions.',
     links: [
+      { label: 'MBA and Advanced Management', href: '/advanced/', text: 'Strategy, finance, leadership, marketing, operations and entrepreneurship at business school depth' },
+      { label: 'Undergraduate learning', href: '/pathways/undergraduate/', text: 'A route through the platform for university business and management students' },
       { label: 'Business Intelligence', href: '/intelligence/', text: 'Real developments from 2025 and 2026, dated, sourced and read through the course' },
-      { label: 'Resources Library', href: '/resources/', text: 'Guides, notes, maps, cases and sheets, with real downloads' },
-      { label: 'Learning pathways', href: '/pathways/', text: 'Routes for IB students, teachers, universities and founders' },
-      { label: 'Lesson library', href: '/pathways/teachers/#lessons', text: 'Timed lesson sequences for teachers, subtopic by subtopic' },
+      { label: 'Enrichment maps', href: '/mindmaps/#enrichment', text: 'Nine maps of management beyond the IB course, labelled enrichment' },
+      { label: 'Learning pathways', href: '/pathways/', text: 'Routes for IB students, teachers, universities, MBA students and founders' },
+    ],
+  },
+  {
+    id: 'connect',
+    label: 'Connect',
+    intro: 'One-to-one tutoring, the educator behind the platform, and the resources to learn and teach with.',
+    links: [
+      { label: 'Tutorials', href: '/tutorials/', text: 'One-to-one online IB Business Management tutoring with Arjun Agrawal' },
       { label: 'About Arjun Agrawal', href: '/about/', text: 'The educator, his teaching and the story of the platform' },
+      { label: 'Resources Library', href: '/resources/', text: 'Guides, notes, maps, cases and sheets, with real downloads' },
+      { label: 'Lesson library', href: '/pathways/teachers/#lessons', text: 'Timed lesson sequences for teachers, subtopic by subtopic' },
       { label: 'Your dashboard', href: '/dashboard/', text: 'What you have read, practised and saved, kept on this device' },
       { label: 'Sources and evidence', href: '/sources/', text: 'Where every claim comes from, and how sure we are' },
     ],

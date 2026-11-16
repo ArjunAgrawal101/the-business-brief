@@ -254,6 +254,8 @@ export interface Addition {
  * new notes are added to this list automatically from their `updated` dates.
  */
 export const ADDITIONS: Addition[] = [
+  { date: '2026-11-16', kind: 'Tutorials', title: 'IB DP Business Management tutoring', text: 'One-to-one online sessions with Arjun Agrawal: US$20 for a one-hour session, with packages for the IA, the EE, revision and exam practice.', href: '/tutorials/' },
+  { date: '2026-11-16', kind: 'Platform', title: 'Six doors, and the tutorials in the header', text: 'Learn, Practise, Tools, Assess, Advance and Connect, each with a panel of its own; study beyond the IB course gathered under Advance.', href: '/advanced/' },
   { date: '2026-11-03', kind: 'Library', title: 'The frameworks library and a deeper glossary', text: '35 frameworks by purpose, every term with plain and technical explanations and misconceptions, and terms beyond the course labelled enrichment.', href: '/frameworks/' },
   { date: '2026-11-03', kind: 'Rooms', title: 'People and Culture, and the Operations Floor', text: 'Ten working tools: motivation, leadership, organization charts, workforce and change planning; production methods, location, capacity, stock and order quantities.', href: '/people-and-culture/' },
   { date: '2026-11-03', kind: 'Assessment', title: 'The question bank, calculation practice and IA tools', text: 'Every original question with filters and timed sets, Paper 2 practice with fresh figures and feedback, and tools for the research project.', href: '/assessment/question-bank/' },
@@ -266,7 +268,6 @@ export const ADDITIONS: Addition[] = [
   { date: '2026-11-03', kind: 'Room', title: 'The Entrepreneurship and Innovation Lab', text: 'Six briefings and six tools for founders, from validating an idea to a business plan, worked on one fictional start-up.', href: '/entrepreneurship-lab/' },
   { date: '2026-11-03', kind: 'Simulation', title: 'The Boardroom', text: 'Three multi-round simulations: take a seat on the board of a fictional company and follow each decision through every function.', href: '/boardroom/' },
   { date: '2026-11-03', kind: 'Room', title: 'The Strategy Studio', text: 'Ten analysis tools on one consulting engagement, from SWOT to a recommendation memo.', href: '/strategy-studio/' },
-  { date: '2026-11-03', kind: 'Platform', title: 'A new way round the platform', text: 'Five doors, Explore, Practise, Tools, Assess and Discover, each with a panel of its own.', href: '/rooms/' },
   { date: '2026-11-03', kind: 'Platform', title: 'Rooms with their own identity', text: 'Each learning environment now has its own accent and drawing.', href: '/people-and-culture/' },
   { date: '2026-11-02', kind: 'Library', title: 'The diagram library', text: 'Original diagrams for every unit and the toolkit, each with a text description and an SVG download.', href: '/diagrams/' },
   { date: '2026-11-02', kind: 'Library', title: 'Mindmaps for the whole course', text: 'Every subtopic and unit as a map to fold, zoom, print and download.', href: '/mindmaps/' },

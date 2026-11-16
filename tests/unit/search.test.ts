@@ -170,14 +170,16 @@ describe('the search index', () => {
 
   it('sorts menu links into kinds by group and address', () => {
     expect(navKind('tools', '/finance-desk/')).toBe('tools');
-    expect(navKind('explore', '/glossary/')).toBe('definitions');
-    expect(navKind('explore', '/toolkit/')).toBe('frameworks');
-    expect(navKind('explore', '/frameworks/')).toBe('frameworks');
+    expect(navKind('learn', '/glossary/')).toBe('definitions');
+    expect(navKind('learn', '/toolkit/')).toBe('frameworks');
+    expect(navKind('learn', '/frameworks/')).toBe('frameworks');
     expect(navKind('practise', '/case-room/')).toBe('cases');
     expect(navKind('practise', '/exam-desk/practice/')).toBe('questions');
     expect(navKind('assess', '/assessment/question-bank/')).toBe('questions');
-    expect(navKind('discover', '/resources/')).toBe('resources');
-    expect(navKind('discover', '/about/')).toBe('pages');
+    expect(navKind('connect', '/resources/')).toBe('resources');
+    expect(navKind('connect', '/about/')).toBe('pages');
+    expect(navKind('connect', '/tutorials/')).toBe('pages');
+    expect(navKind('advance', '/advanced/')).toBe('pages');
   });
 
   it('cuts long text at a word, with an ellipsis', () => {
