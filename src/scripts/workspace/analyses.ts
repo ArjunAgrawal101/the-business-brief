@@ -9,7 +9,7 @@
  */
 import { escapeHtml as h } from '../ix';
 import { shortDate } from '../../lib/dashboard';
-import { SNAPSHOTS_KEY, parseSnapshots, removeSnapshot, type Analysis, type Snapshot, type WorkspaceView } from '../../lib/workspace';
+import { SNAPSHOTS_KEY, datedLine, parseSnapshots, removeSnapshot, type Analysis, type Snapshot, type WorkspaceView } from '../../lib/workspace';
 import { readItem, writeItem } from '../storage';
 import { $in, n, plural, type Ctx } from './context';
 
@@ -28,7 +28,7 @@ function snapshotHtml(s: Snapshot, now: Date): string {
 }
 
 const itemHtml = (a: Analysis, now: Date) =>
-  `<li><a class="db-work__title" href="${h(a.href)}">${h(a.title)}</a><span class="db-work__detail">${h(a.line)}${a.when ? `, saved ${h(shortDate(a.when, now))}` : ''}</span></li>`;
+  `<li><a class="db-work__title" href="${h(a.href)}">${h(a.title)}</a><span class="db-work__detail">${h(a.when ? datedLine(a.line, shortDate(a.when, now)) : a.line)}</span></li>`;
 
 export function renderAnalyses(ctx: Ctx, view: WorkspaceView, now: Date): void {
   const box = $in(ctx.root, '[data-work]');

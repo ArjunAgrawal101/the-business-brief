@@ -607,6 +607,16 @@ export function snapshotAnalysis(s: Snapshot, room: string): Analysis {
   };
 }
 
+/**
+ * A line with the date its work was saved: "Two strengths outweigh one
+ * threat, saved today". A line ending in a full stop loses it; one ending in
+ * a question mark, an exclamation or an ellipsis keeps it, and the date
+ * follows as a sentence of its own.
+ */
+export function datedLine(line: string, when: string): string {
+  return /[?!…]$/.test(line) ? `${line} Saved ${when}.` : `${line.replace(/\.$/, '')}, saved ${when}`;
+}
+
 const fromWork = (w: WorkItem): Analysis => ({ id: w.key, keys: w.keys, room: w.where || 'Tools', title: w.title, href: w.href, line: w.detail, when: w.when });
 
 /** The analyses grouped by room: the rooms in `roomOrder` first, in that order, then the rest as they first appear. */
@@ -777,7 +787,7 @@ export function selectionMarkdown(view: Pick<WorkspaceView, 'list' | 'notebook' 
           }
           out.push(`Open the calculator: ${link(origin, snap.url)}`, '');
         } else {
-          out.push(`- **${mdInline(a.title)}**: ${mdInline(a.line)}${a.when ? ` Saved ${longDay(a.when)}.` : ''}  `, `  ${link(origin, a.href)}`);
+          out.push(`- **${mdInline(a.title)}**: ${mdInline(a.when ? datedLine(a.line, longDay(a.when)) : a.line)}  `, `  ${link(origin, a.href)}`);
         }
       }
       if (out[out.length - 1] !== '') out.push('');

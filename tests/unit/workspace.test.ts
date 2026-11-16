@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { familyOf, labSummaryLine, toolDataLine } from '../../src/lib/dashboard';
+import { familyOf, labSummaryLine, toolDataLine, workLine } from '../../src/lib/dashboard';
 import { LIMITS, addSaved, emptySaved, parseSaved, toggleSaved } from '../../src/lib/learner';
 import {
   LIST_KEY,
@@ -11,6 +11,7 @@ import {
   capList,
   checkImport,
   cleanBlock,
+  datedLine,
   deleteNote,
   emptyList,
   emptyNotebook,
@@ -571,7 +572,7 @@ describe('exporting a selection', () => {
         '',
         '### Strategy Studio',
         '',
-        '- **SWOT builder**: Two strengths outweigh one threat Saved 3 November 2026.  ',
+        '- **SWOT builder**: Two strengths outweigh one threat, saved 3 November 2026  ',
         '  <https://example.org/strategy-studio/swot/>',
         '',
         '### Financial Laboratory',
@@ -593,6 +594,22 @@ describe('exporting a selection', () => {
     );
     expect(selectionMarkdown(view, { list: [], notes: [], analyses: [] }, T0, '')).toContain('Nothing was chosen.');
     expect(selectionMarkdown(view, { list: ['/topics/stakeholders/'], notes: [], analyses: [] }, T0, '')).toContain('   </topics/stakeholders/>');
+  });
+
+  it('joins a line and its date without doubling or losing a stop', () => {
+    expect(datedLine('Two strengths outweigh one threat', 'today')).toBe('Two strengths outweigh one threat, saved today');
+    expect(datedLine('3 growth options placed: 2 in market development.', 'today')).toBe('3 growth options placed: 2 in market development, saved today');
+    expect(datedLine('Is the market large enough?', '3 November')).toBe('Is the market large enough? Saved 3 November.');
+    expect(datedLine('Heaviest factor: the brand…', 'today')).toBe('Heaviest factor: the brand… Saved today.');
+  });
+
+  it('cuts a long headline with an ellipsis, not in silence', () => {
+    const long = `Heaviest factor: ${'a very long factor '.repeat(20)}`;
+    const line = workLine(JSON.stringify({ headline: long }));
+    expect(line?.length).toBeLessThanOrEqual(220);
+    expect(line?.length).toBeGreaterThan(200);
+    expect(line?.endsWith('…')).toBe(true);
+    expect(workLine(JSON.stringify({ headline: 'Short.' }))).toBe('Short.');
   });
 
   it('escapes Markdown in a line and in a block', () => {

@@ -341,7 +341,12 @@ export interface WorkItem {
   keys: string[];
 }
 
-const textOf = (v: unknown, max = 160): string | null => (typeof v === 'string' && v.trim() ? v.replace(/\s+/g, ' ').trim().slice(0, max) : null);
+/** Text on one line, cut to `max` characters with an ellipsis when it is longer; null when there is none. */
+const textOf = (v: unknown, max = 160): string | null => {
+  if (typeof v !== 'string' || !v.trim()) return null;
+  const s = v.replace(/\s+/g, ' ').trim();
+  return s.length > max ? `${s.slice(0, max - 1).trimEnd()}…` : s;
+};
 
 /** The Lab's summaries by the name their key ends with (bb:lab:summary:<name>). */
 const LAB_SUMMARY_NAMES = ['feasibility', 'canvas', 'unit', 'costs', 'revenue'] as const;
@@ -394,7 +399,7 @@ export function workLine(raw: unknown): string | null {
   const o = asObject(v);
   if (!o) return null;
   const verdict = textOf(o.verdict);
-  return textOf(o.headline) ?? textOf(o.summary) ?? (verdict ? (textOf(o.idea, 80) ? `${textOf(o.idea, 80)}: ${verdict}` : verdict) : null);
+  return textOf(o.headline, 220) ?? textOf(o.summary, 220) ?? (verdict ? (textOf(o.idea, 80) ? `${textOf(o.idea, 80)}: ${verdict}` : verdict) : null);
 }
 
 function workFromRoom(key: string, raw: string, summaries: Map<string, string>, cfg: Pick<DashConfig, 'rooms' | 'pages' | 'roomTools'>, held: (k: string) => boolean): WorkItem {
