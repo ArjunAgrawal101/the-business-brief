@@ -18,6 +18,7 @@ const CHECKED: Record<string, string> = {
   referenced: 'A bibliographic reference: cited, but the platform has not opened the work',
   repository: 'In the platform repository',
   'web-search': 'Found by web search',
+  web: 'A public document, opened and read online on the date given',
   'not-available': 'Not available to the platform',
 };
 const items = reading.map((r) => ({ ...r, s: c.sources[r.source] })).filter((r) => r.s);

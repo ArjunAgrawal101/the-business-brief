@@ -32,6 +32,7 @@ import { studioSchema } from './lib/schemas-strategy';
 import { scenarioSchema } from './lib/boardroom/schema';
 import { executiveSchema } from './lib/executive/schema';
 import { briefingSchema, labToolSchema } from './lib/lab/schemas';
+import { advancedModuleSchema } from './lib/advanced-schema';
 
 /**
  * Loads every `.yaml` file in a folder, each holding a list of entries with an
@@ -109,4 +110,6 @@ export const collections = {
   briefings: defineCollection({ loader: yamlFiles('./src/content/briefings'), schema: briefingSchema }),
   labTools: defineCollection({ loader: yamlFiles('./src/content/lab'), schema: labToolSchema }),
   intelligence: defineCollection({ loader: yamlFiles('./src/content/intelligence'), schema: intelligenceSchema }),
+  // Advanced Management and Strategy: undergraduate, MBA and professional modules, kept apart from the IB course (src/lib/advanced.ts).
+  advanced: defineCollection({ loader: yamlFiles('./src/content/advanced'), schema: advancedModuleSchema }),
 };

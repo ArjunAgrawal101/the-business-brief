@@ -27,7 +27,7 @@ Every block, exhibit and interaction carries one label, shown on the page. See [
 
 ## The registers
 
-**The source register** (`src/content/sources/*.yaml`, one file per area, shown at `/sources/`) lists each source with its author, publisher, year, kind, availability (supplied, not available, referenced, found by web search, in the creator's repository), address and date accessed, and a note on how it is used.
+**The source register** (`src/content/sources/*.yaml`, one file per area, shown at `/sources/`) lists each source with its author, publisher, year, kind, availability (supplied, not available, referenced, found by web search, opened and read online, in the creator's repository), address and date accessed, and a note on how it is used.
 
 **The claims register** (`src/content/data/claims.yaml`, also shown at `/sources/`) lists each claim the platform makes about a requirement, an institution or a real organization:
 
@@ -53,7 +53,7 @@ The integrity check fails the build if a claim names a source that is not in the
 
 ## Real organizations
 
-Facts about real organizations appear in this release only in the growth brief's evidence section: McDonald's franchised share (from its 10-K for 2025), the Tata Starbucks joint venture (from Tata Consumer Products' announcement), Disney's acquisition of 21st Century Fox's assets (from press coverage of its completion) and the founding of Star Alliance (from press coverage). Each:
+Facts about real organizations appear in two places. The growth brief's evidence section gives McDonald's franchised share (from its 10-K for 2025), the Tata Starbucks joint venture (from Tata Consumer Products' announcement), Disney's acquisition of 21st Century Fox's assets (from press coverage of its completion) and the founding of Star Alliance (from press coverage). The Business Intelligence Briefing (`/intelligence/`) is built from real developments; each item keeps its own sources, with the date each was published and read and the facts it supports, and the build enforces the rules in [CONTENT_MODEL.md](CONTENT_MODEL.md#the-business-intelligence-briefing). Each fact, in either place:
 
 - is dated and cited, with the source in the register;
 - is kept apart from interpretation: the page states the fact, then, separately labelled, what it suggests;

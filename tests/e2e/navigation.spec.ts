@@ -12,14 +12,48 @@ test('the skip link moves focus to the main content', async ({ page }) => {
 test('the current section is marked in the navigation', async ({ page, isMobile }) => {
   test.skip(isMobile, 'On small screens the groups are in the drawer, tested below.');
   await page.goto('/mindmaps/');
-  await expect(page.locator('.mega.is-current > summary')).toContainText('Explore');
+  await expect(page.locator('.mega.is-current > summary')).toContainText('Learn');
   await expect(page.locator('.mega-nav a[aria-current="page"]')).toContainText('Mindmaps');
   await page.goto('/assessment/paper-2/');
   await expect(page.locator('.mega.is-current > summary')).toContainText('Assess');
   await expect(page.locator('.mega-nav a[aria-current="page"]')).toContainText('Paper 2');
   await page.goto('/glossary/break-even-quantity/');
-  await expect(page.locator('.mega.is-current > summary')).toContainText('Explore');
+  await expect(page.locator('.mega.is-current > summary')).toContainText('Learn');
   await expect(page.locator('.mega-nav a[aria-current="true"]')).toContainText('Glossary');
+  await page.goto('/tutorials/');
+  await expect(page.locator('.mega.is-current > summary')).toContainText('Connect');
+  await expect(page.locator('a.hdr-btn--cta[href="/tutorials/"]')).toHaveAttribute('aria-current', 'page');
+  await page.goto('/advanced/');
+  await expect(page.locator('.mega.is-current > summary')).toContainText('Advance');
+});
+
+test('the Tutorials button is in the header on wide screens, and first in the drawer on small ones', async ({ page, isMobile }) => {
+  await page.goto('/');
+  if (!isMobile) {
+    await expect(page.locator('a.hdr-btn--cta[href="/tutorials/"]')).toBeVisible();
+    return;
+  }
+  const drawer = page.locator('[data-drawer]');
+  await drawer.locator('summary').first().click();
+  await expect(drawer.locator('.drawer__tutorials')).toBeVisible();
+  await drawer.locator('.drawer__tutorials').click();
+  await expect(page).toHaveURL(/\/tutorials\/$/);
+});
+
+test('six groups fit the header at the narrowest wide-screen width', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 1024, height: 768 } });
+  const page = await context.newPage();
+  await page.goto('/');
+  await expect(page.locator('.mega-nav')).toBeVisible();
+  await expect(page.locator('.mega-nav__item')).toHaveCount(6);
+  const overflow = await page.evaluate(() => {
+    const bar = document.querySelector('.site-header__bar')!;
+    return bar.scrollWidth - bar.clientWidth;
+  });
+  expect(overflow, 'the header bar does not overflow').toBeLessThanOrEqual(0);
+  const tools = await page.locator('.site-header__tools').boundingBox();
+  expect(tools && tools.x + tools.width).toBeLessThanOrEqual(1024);
+  await context.close();
 });
 
 test('the mega menu opens one group at a time and closes with Escape, returning focus', async ({ page, isMobile }) => {
@@ -47,7 +81,7 @@ test('the drawer holds every group on small screens and closes with Escape', asy
   await expect(toggle).toHaveAccessibleName('Menu');
   await toggle.click();
   await expect(drawer).toHaveAttribute('open', '');
-  await expect(drawer.locator('.drawer__group')).toHaveCount(5);
+  await expect(drawer.locator('.drawer__group')).toHaveCount(6);
   // The current group opens with the drawer, its page marked.
   await expect(drawer.locator('.drawer__group.is-current')).toHaveAttribute('open', '');
   await expect(drawer.locator('a[aria-current="page"]')).toContainText('Finance Desk');

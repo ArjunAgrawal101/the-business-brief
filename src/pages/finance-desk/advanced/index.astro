@@ -1,0 +1,224 @@
+---
+/**
+ * Advanced financial analysis: the Finance Desk beyond the IB course, for
+ * undergraduates, MBA students, professionals and teachers. Four tools, the
+ * line between them and the IB course, Emberly Roasters' results in each
+ * (computed by the same functions the tools use) and how the mode works.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/layout/Breadcrumbs.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import { corpus, href } from '../../../lib/content';
+import { subtopicHref } from '../../../lib/learning';
+import { BUSINESS } from '../../../lib/adv-finance/business';
+import { ADVANCED, advancedHref, ibCodes, type ToolId } from '../../../lib/adv-finance/catalogue';
+import { buildCapitalReport, rateText } from '../../../lib/adv-finance/capital-view';
+import { buildCostReport } from '../../../lib/adv-finance/cost-structure-view';
+import { buildForecastReport } from '../../../lib/adv-finance/forecast-view';
+import { buildPerformanceReport } from '../../../lib/adv-finance/performance-view';
+import { CAPITAL_EXAMPLE_FORM, capitalFromForm, COST_EXAMPLE_FORM, costFromForm, EXAMPLE_FORECAST, FORECAST_EXAMPLE_FORM, PERFORMANCE_EXAMPLE_FORM, performanceFromForm } from '../../../lib/adv-finance/state';
+import { fmtMoney, fmtNumber } from '../../../lib/format';
+import '../../../styles/finance-lab.css';
+import '../../../styles/adv-finance.css';
+
+const c = await corpus();
+const fc = buildForecastReport(EXAMPLE_FORECAST, FORECAST_EXAMPLE_FORM.view, FORECAST_EXAMPLE_FORM.currency);
+const base = fc.runs['base/none'];
+const capState = capitalFromForm(CAPITAL_EXAMPLE_FORM).state;
+const costInput = costFromForm(COST_EXAMPLE_FORM).input;
+const perfInput = performanceFromForm(PERFORMANCE_EXAMPLE_FORM).input;
+if (!capState || !costInput || !perfInput) throw new Error('An advanced example does not pass its own checks.');
+const cap = buildCapitalReport(capState, CAPITAL_EXAMPLE_FORM.currency);
+const cost = buildCostReport(costInput, COST_EXAMPLE_FORM.settings, COST_EXAMPLE_FORM.settings.currency);
+const perf = buildPerformanceReport(perfInput, PERFORMANCE_EXAMPLE_FORM.currency);
+const bestNpv = [...cap.appraisals].sort((a, b) => b.npv - a.npv)[0];
+const lowYear = base.years[base.lowest.index];
+const v = cost.comparison.verdict;
+const firstY = perf.years[0];
+const lastY = perf.years[perf.years.length - 1];
+const pct = (x: number | null | undefined) => (x === null || x === undefined ? 'n/a' : `${fmtNumber(x, 1)}%`);
+
+const RESULT: Record<ToolId, { label: string; value: string; note: string }> = {
+  'integrated-forecast': { label: 'Lowest year-end cash, base case', value: fmtMoney(base.lowest.value, '$', 0), note: `end of ${lowYear?.label}; profit over five years ${fmtMoney(base.totalProfit, '$', 0)}` },
+  'capital-budgeting': { label: `Highest NPV at ${rateText(cap.rate)}, the WACC`, value: bestNpv ? fmtMoney(bestNpv.npv, '$', 0) : 'n/a', note: bestNpv?.project.name ?? '' },
+  'break-even-scenarios': { label: 'Indifference volume', value: v.kind === 'crosses' ? `${fmtNumber(v.volume, 1)} bags` : 'none', note: 'a month: automating pays above it, outsourcing below' },
+  'performance-dashboard': { label: `Return on equity, ${lastY?.label}`, value: pct(lastY?.roe), note: `down from ${pct(firstY?.roe)} in ${firstY?.label}` },
+};
+
+const DIVIDE: Array<{ topic: string; ib: string; codes: string[]; beyond: string; tool: ToolId }> = [
+  { topic: 'Financial statements', ib: 'The statement of profit or loss and the statement of financial position, in set layouts, and a cash flow forecast of receipts and payments.', codes: ['3.4', '3.7'], beyond: 'All three statements forecast together from drivers, with a statement of cash flows built from profit, balancing every year; scenarios and strategic alternatives.', tool: 'integrated-forecast' },
+  { topic: 'Investment appraisal', ib: 'Payback and the average rate of return; at HL, net present value with the guide’s table of discount factors at five rates.', codes: ['3.8'], beyond: 'NPV at any rate, the internal rate of return and its pitfalls, discounted payback, the profitability index, a tornado, and the discount rate from the WACC and the CAPM.', tool: 'capital-budgeting' },
+  { topic: 'Break-even and cost structure', ib: 'Break-even, the margin of safety and the effect of changes in price or cost; at HL, operating leverage (named, with no formula) and cost to make against cost to buy.', codes: ['5.5', '5.6'], beyond: 'Two cost structures side by side, the degree of operating leverage as a formula, and the indifference volume.', tool: 'break-even-scenarios' },
+  { topic: 'Ratio analysis', ib: 'Profitability and liquidity ratios; at HL, stock turnover, debtor and creditor days and gearing, with the guide’s formulas.', codes: ['3.5', '3.6'], beyond: 'Return on equity and its DuPont split, the cash conversion cycle, interest cover and all borrowing to equity, read over several years.', tool: 'performance-dashboard' },
+];
+---
+
+<BaseLayout
+  title="Advanced financial analysis"
+  description="Advanced financial analysis beyond the IB course: an integrated three-statement forecast, a capital budgeting comparator, break-even scenarios and a financial performance dashboard, each saying which parts the IB course uses."
+  section="finance-desk"
+  room="finance"
+>
+  <div class="wrap">
+    <header class="fl-head fl-head--index af-head">
+      <Breadcrumbs trail={[{ label: 'Finance Desk', href: '/finance-desk/' }, { label: 'Advanced financial analysis' }]} />
+      <p class="label label--ink fl-head__kicker">Finance Desk · Beyond the IB course</p>
+      <h1>Advanced financial analysis</h1>
+      <p class="lead fl-head__q">
+        Four tools for undergraduates, MBA students, professionals and teachers that take the Finance Desk past the IB course: a forecast whose three statements link
+        and balance, a comparator for investment projects, break-even scenarios for two cost structures, and a dashboard that takes return on equity apart. Each starts
+        from {BUSINESS.name}, the Financial Laboratory’s fictional coffee roaster, and says exactly which parts the IB course uses.
+      </p>
+      <ul class="fl-scope" role="list">
+        <li><span class="tag tag--enrichment">Beyond the IB course</span></li>
+        <li><span class="tag tag--plain">Undergraduate, MBA, professional and teacher</span></li>
+        <li>
+          <span class="tag tag--simulated">Simulated data</span>
+          <span class="fl-scope__text">Example: {BUSINESS.name}, fictional</span>
+        </li>
+      </ul>
+    </header>
+  </div>
+
+  <div class="wrap page-body fl-page af-page">
+    <aside class="callout callout--enrichment af-notice" aria-labelledby="af-notice-index">
+      <span class="callout__kicker" id="af-notice-index">Advanced financial analysis, not IB content</span>
+      <p>
+        Beyond the parts marked as the course’s own, nothing here is needed for the IB course or assessed by the IB. Those parts are marked <span class="tag tag--ib">IB</span> or <span
+          class="tag tag--hl">IB HL</span
+        > wherever they appear, with the subtopic; for the course itself, use the <a href="/finance-desk/lab/">Financial Laboratory</a> and the <a href="/finance-desk/"
+          >Finance Desk</a
+        >, which work every calculation with the guide’s formulas and layouts.
+      </p>
+    </aside>
+
+    <section class="fl-ledger af-ledger" aria-labelledby="af-ledger-h">
+      <header class="fl-ledger__head">
+        <h2 class="fl-ledger__title" id="af-ledger-h">{BUSINESS.name}, beyond the course</h2>
+        <p class="fl-ledger__note small">
+          <span class="tag tag--simulated">Simulated data</span> A fictional business; every figure below is worked by the tool it links to.
+        </p>
+      </header>
+      <ul class="fl-ledger__grid af-ledger__grid" role="list">
+        {
+          ADVANCED.map((t) => (
+            <li class="fl-ledger__cell">
+              <a class="fl-ledger__link" href={advancedHref(t.id)}>
+                <span class="fl-ledger__label">{RESULT[t.id].label}</span>
+                <span class="fl-ledger__value">{RESULT[t.id].value}</span>
+                <span class="fl-ledger__sub">{RESULT[t.id].note}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section aria-labelledby="af-tools-h">
+      <SectionHead no={1} title="The four tools" dek="Each with inputs you can change, results that follow, charts drawn from the figures, saving in this browser and a CSV of everything; and each a complete worked example without JavaScript." id="af-tools-h" />
+      <ol class="fl-rows af-rows" role="list">
+        {
+          ADVANCED.map((t, k) => (
+            <li class="fl-row">
+              <span class="fl-row__code" aria-hidden="true">
+                {String(k + 1).padStart(2, '0')}
+              </span>
+              <div class="fl-row__main">
+                <h3 class="fl-row__name">
+                  <a href={advancedHref(t.id)}>{t.name}</a>
+                </h3>
+                <p class="fl-row__q">{t.question}</p>
+                <p class="small af-row__desc">{t.description}</p>
+              </div>
+              <div class="fl-row__result">
+                <span class="fl-row__label">Example</span>
+                <span class="fl-row__value">{RESULT[t.id].value}</span>
+              </div>
+              <div class="fl-row__tags">
+                <span class="tag tag--enrichment">Beyond the IB course</span>
+                <span class="tag tag--ib">Builds on IB {ibCodes(t).join(', ')}</span>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section aria-labelledby="af-divide-h">
+      <SectionHead no={2} title="Where the IB course stops" dek="What the course covers in each area, and what this mode adds beyond it." id="af-divide-h" />
+      <div class="table-scroll" role="region" aria-label="The IB course and the advanced mode" tabindex="0">
+        <table class="table af-divide">
+          <caption class="sr-only">For each area of finance, what the IB course covers and what the advanced mode adds</caption>
+          <thead>
+            <tr>
+              <th scope="col">Area</th>
+              <th scope="col">The IB course</th>
+              <th scope="col">Beyond it, in this mode</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              DIVIDE.map((d) => (
+                <tr>
+                  <th scope="row">
+                    <a href={advancedHref(d.tool)}>{d.topic}</a>
+                  </th>
+                  <td>
+                    <span class="af-divide__codes">
+                      {d.codes.map((code) => (
+                        <a class="tag tag--ib" href={subtopicHref(c, code)}>
+                          IB {code}
+                        </a>
+                      ))}
+                    </span>
+                    {d.ib}
+                  </td>
+                  <td>{d.beyond}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted af-scope__note">
+        The course’s content is described in the platform’s words from the Business management guide (first assessment 2024), checked against the guide on 29 October 2026;
+        the formulas the guide gives are on <a href="/resources/formula-sheet/">the formula sheet</a>. Each tool’s page sets out its own line in full.
+      </p>
+    </section>
+
+    <section aria-labelledby="af-who-h">
+      <SectionHead no={3} title="Who it is for" id="af-who-h" />
+      <ul class="af-who" role="list">
+        <li>
+          <h3 class="af-who__h">Undergraduates</h3>
+          <p>The methods of a first course in corporate finance and financial analysis, worked on one business, with every formula and working shown. <a href={href.pathway('undergraduate')}>The undergraduate pathway</a>.</p>
+        </li>
+        <li>
+          <h3 class="af-who__h">MBA students and professionals</h3>
+          <p>A quick, transparent model to test a plan, an investment or a cost structure against your own figures, and to explain the result to others. <a href={href.pathway('mba')}>The MBA pathway</a>.</p>
+        </li>
+        <li>
+          <h3 class="af-who__h">Readers of the finance modules</h3>
+          <p>The ideas behind these tools, with real companies, cases and further reading, are in the six finance modules of Advanced Management and Strategy. <a href="/advanced/finance/">Advanced financial management</a>.</p>
+        </li>
+        <li>
+          <h3 class="af-who__h">Teachers</h3>
+          <p>Extension for able IB students after the course’s methods are secure, labelled so that nothing beyond the syllabus is mistaken for it. <a href={href.pathway('teachers')}>The teachers’ pathway</a>.</p>
+        </li>
+      </ul>
+    </section>
+
+    <aside class="callout callout--framework fl-method">
+      <span class="callout__kicker">How the advanced mode works</span>
+      <div class="prose">
+        <p>
+          Every figure comes from tested functions that run both on the server, for the worked example, and in your browser, after every change, so the two always agree;
+          the break-even and ratio figures use the same functions as the Financial Laboratory. Results update as you type. Your figures stay in this browser: each tool keeps
+          them once you change something, you can return to the example at any time, download everything as a CSV file or print the page, and nothing is sent anywhere
+          (see <a href="/privacy/">privacy</a>).
+        </p>
+        <p>The methods follow standard references, cited on each tool’s page and in the <a href="/sources/">source register</a>, explained in the platform’s own words.</p>
+      </div>
+    </aside>
+  </div>
+</BaseLayout>

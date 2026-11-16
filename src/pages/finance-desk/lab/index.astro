@@ -9,6 +9,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../../components/layout/Breadcrumbs.astro';
 import SectionHead from '../../../components/layout/SectionHead.astro';
 import LevelSwitch from '../../../components/ui/LevelSwitch.astro';
+import AdvancedDoor from '../../../components/adv-finance/AdvancedDoor.astro';
 import { corpus } from '../../../lib/content';
 import { allSubtopics, subtopicHref } from '../../../lib/learning';
 import { ACCOUNTS, BUSINESS, PROJECT } from '../../../lib/finance-lab/business';
@@ -148,6 +149,8 @@ const counts = { all: LAB.length, hl: LAB.filter((e) => e.level === 'HL').length
       })
     }
 
+    <AdvancedDoor from="lab" />
+
     <aside class="callout callout--framework fl-method">
       <span class="callout__kicker">How the laboratory works</span>
       <div class="prose">
@@ -155,7 +158,7 @@ const counts = { all: LAB.length, hl: LAB.filter((e) => e.level === 'HL').length
           Every calculator uses the platform’s one set of tested finance functions, the same ones behind the Finance Desk’s case workspaces, the worked examples and the
           practice answers, so a result here always agrees with the rest of the site. Results update as you type; each page also shows the formula, the working, a chart
           with its data, a sensitivity table and what the result means. Your figures stay in this browser: nothing is sent anywhere, and you can download them as a CSV
-          file or print the page.
+          file, print the page, or save a result to <a href="/dashboard/#analyses">My Business Workspace</a>.
         </p>
         <p>
           The <a href="/finance-desk/">Finance Desk</a> works the same ideas on fictional cases, and the <a href="/resources/formula-sheet/">formula sheet</a> has every

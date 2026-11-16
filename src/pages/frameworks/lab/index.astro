@@ -1,0 +1,443 @@
+---
+/**
+ * The Framework Application Lab: choose a framework by the decision or the
+ * question in front of you, narrowed by purpose and by standing (IB syllabus,
+ * IB toolkit or enrichment), and open its application mode, the Apply it
+ * section of its page. Below, the advanced applications in the Strategy
+ * Studio and how to use any framework well. Without JavaScript every question
+ * is listed with its frameworks; the filters only narrow the list.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageIntro from '../../../components/layout/PageIntro.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import { library } from '../../../lib/frameworks-content';
+import { FRAMEWORK_GROUPS, FRAMEWORK_GROUP_INFO, FRAMEWORK_STATUS } from '../../../lib/framework-schema';
+import { ADVANCED, JUDGEMENT, applicationOf, applyHref, byDecision } from '../../../lib/framework-lab';
+import { STATUS_LABELS, frameworkHref, standing } from '../../../lib/frameworks';
+import { studioHref } from '../../../lib/strategy/content';
+
+const lib = await library();
+const questions = byDecision(lib.frameworks);
+const all = Object.entries(lib.frameworks);
+const studioOf = (slug: string) => lib.studio.find((t) => t.slug === slug);
+const withTool = all.filter(([, f]) => applicationOf(f, lib.tools).full.length > 0).length;
+const STATUS_TEXT = {
+  syllabus: "named in the guide's syllabus",
+  toolkit: "one of the guide's toolkit tools",
+  enrichment: 'beyond the IB course',
+} as const;
+---
+
+<BaseLayout
+  title="Framework Application Lab"
+  description={`Choose a framework by the decision you face, read how to interpret it, and apply it: ${all.length} frameworks, each with an Apply it mode, and advanced tools for scenarios, stakeholder salience and strategic fit.`}
+  section="toolkit"
+>
+  <PageIntro
+    trail={[{ label: 'Frameworks', href: '/frameworks/' }, { label: 'Application Lab' }]}
+    kicker="The frameworks library"
+    title="The Framework Application Lab"
+    lead={`Start from the decision in front of you, not from a framework. Choose the question you face, narrow it by purpose and by standing in the IB course, and open the framework's application mode: the tools that apply it and a worksheet for your own case. ${all.length} frameworks, ${withTool} of them with an interactive tool that applies them in full.`}
+  />
+
+  <div class="wrap page-body" data-ix="fw-lab">
+    <aside class="fl-judgement" aria-label="What a framework can do">
+      <p class="label label--ink">Before you choose</p>
+      <p class="fl-judgement__text">{JUDGEMENT}</p>
+    </aside>
+
+    <section aria-labelledby="fl-choose">
+      <SectionHead no={1} title="Start from your question" id="fl-choose" dek={`${questions.length} decisions and questions a manager, a student or a consultant may face, each with the frameworks that help structure it.`} />
+
+      <div class="fl-filters js-only" role="group" aria-labelledby="fl-filter-h">
+        <p class="label label--ink" id="fl-filter-h">Narrow the choice</p>
+        <div class="fl-filter fl-filter--wide">
+          <label class="label" for="fl-question">The question you face</label>
+          <select id="fl-question" data-filter="question">
+            <option value="">Every question</option>
+            {questions.map((q) => <option value={q.id}>{q.question}</option>)}
+          </select>
+        </div>
+        <div class="fl-filter">
+          <label class="label" for="fl-group">Purpose</label>
+          <select id="fl-group" data-filter="group">
+            <option value="">Every purpose</option>
+            {FRAMEWORK_GROUPS.map((g) => <option value={g}>{FRAMEWORK_GROUP_INFO[g].title}</option>)}
+          </select>
+        </div>
+        <div class="fl-filter">
+          <label class="label" for="fl-status">Standing</label>
+          <select id="fl-status" data-filter="status">
+            <option value="">IB and beyond</option>
+            {FRAMEWORK_STATUS.map((s) => <option value={s}>{`${STATUS_LABELS[s]}: ${STATUS_TEXT[s]}`}</option>)}
+          </select>
+        </div>
+        <p class="fl-count" aria-live="polite" data-count></p>
+      </div>
+      <p class="state" data-none hidden>No framework matches these choices. Choose another purpose or standing.</p>
+
+      <ol class="fl-questions" role="list">
+        {
+          questions.map((q) => (
+            <li class="fl-q" id={`q-${q.id}`} data-decision={q.id}>
+              <h3 class="fl-q__question">{q.question}</h3>
+              <p class="fl-q__situation">
+                <span class="label">The situation</span> {q.situation}
+              </p>
+              <ul class="fl-fws" role="list">
+                {q.items.map(([id, f]) => {
+                  const app = applicationOf(f, lib.tools);
+                  const main = app.full[0];
+                  return (
+                    <li class="fl-fw" data-fw data-group={f.group} data-status={f.status}>
+                      <div class="fl-fw__head">
+                        <a class="fl-fw__name" href={frameworkHref(id)}>
+                          {f.name}
+                        </a>
+                        <span class="tags">
+                          <span class={`tag ${f.status === 'enrichment' ? 'tag--enrichment' : 'tag--ib'}`}>{standing(f)}</span>
+                          {f.level === 'HL' && f.status !== 'enrichment' && <span class="tag tag--hl">HL only</span>}
+                        </span>
+                      </div>
+                      <p class="fl-fw__q">{f.question}</p>
+                      <p class="fl-fw__suits small">
+                        <span class="label">It suits</span> {f.situations.suits[0]}
+                      </p>
+                      <p class="fl-fw__go">
+                        <a href={applyHref(id)}>Open its application mode</a>
+                        {main && (
+                          <span class="small muted">
+                            {' '}
+                            or go straight to the <a href={main.href}>{main.title}</a> ({main.room})
+                          </span>
+                        )}
+                      </p>
+                    </li>
+                  );
+                })}
+              </ul>
+              {q.tools.length > 0 && (
+                <p class="fl-q__tools small">
+                  <span class="label">Tools for this question</span>{' '}
+                  {q.tools.map((slug, i) => {
+                    const t = studioOf(slug);
+                    return t ? (
+                      <>
+                        {i > 0 && ', '}
+                        <a href={studioHref(slug)}>{t.title}</a>
+                      </>
+                    ) : null;
+                  })}
+                </p>
+              )}
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section aria-labelledby="fl-adv">
+      <SectionHead no={2} title="Advanced applications" id="fl-adv" dek="Tools in the Strategy Studio that go beyond drawing a framework to computing what it implies, for undergraduate, MBA and professional study as well as the IB. Each opens on a worked example for Northvale Cycles, a fictional business, and keeps your own analysis on this device." />
+      <ul class="fl-adv" role="list">
+        {
+          ADVANCED.map((a) => {
+            const t = studioOf(a.slug);
+            const f = a.framework ? lib.frameworks[a.framework] : undefined;
+            return t ? (
+              <li class="fl-adv__item">
+                <p class="fl-adv__tags tags">
+                  <span class={`tag ${t.enrichment ? 'tag--enrichment' : 'tag--ib'}`}>{t.enrichment ? 'Enrichment' : 'IB toolkit'}</span>
+                  {a.added && <span class="tag tag--plain">New in the Lab</span>}
+                </p>
+                <h3 class="fl-adv__name">
+                  <a href={studioHref(a.slug)}>{a.name}</a>
+                </h3>
+                <p class="fl-adv__text">{a.computes}</p>
+                <p class="small muted fl-adv__more">
+                  In the Strategy Studio: {t.title}.
+                  {f && a.framework && (
+                    <>
+                      {' '}
+                      The framework: <a href={frameworkHref(a.framework)}>{f.name}</a>.
+                    </>
+                  )}
+                </p>
+              </li>
+            ) : null;
+          })
+        }
+      </ul>
+    </section>
+
+    <section aria-labelledby="fl-well">
+      <SectionHead no={3} title="Using a framework well" id="fl-well" dek="What every framework page now sets out, and the habits that turn a framework into an argument." />
+      <div class="fl-well">
+        <ol class="fl-well__list">
+          <li>
+            <strong>Start from the decision.</strong> A framework chosen before the question is a framework looking for a use. Name the decision first, then choose the framework that structures it.
+          </li>
+          <li>
+            <strong>Know how it is built.</strong> Each page sets out the framework's parts, the situations it suits and where another tool serves better.
+          </li>
+          <li>
+            <strong>Evidence before labels.</strong> A box, a score or a quadrant is only as good as the evidence behind it. Every tool asks for the evidence and checks for entries without it.
+          </li>
+          <li>
+            <strong>Read the result, then judge it.</strong> Each page explains how to interpret what the framework shows, and what that does and does not justify deciding.
+          </li>
+          <li>
+            <strong>Avoid the usual mistakes.</strong> Each page lists the errors most often made with the framework, and how to avoid them.
+          </li>
+          <li>
+            <strong>Use two or three well.</strong> A strong analysis combines a few frameworks that answer the question, and says where they agree and where they pull apart.
+          </li>
+        </ol>
+        <aside class="callout callout--note fl-labels">
+          <span class="callout__kicker">How the Lab is labelled</span>
+          <div class="prose">
+            <p>
+              <strong>IB syllabus</strong> frameworks are named in the Business management guide's content statements, with the page. <strong>IB toolkit</strong> tools are listed in the guide's toolkit (p. 14). <strong>Enrichment</strong> frameworks and tools are not part of the IB course: they are here for students going further and for university, MBA and professional learners. The questions, explanations, examples and tools are the platform's own, never IB material, and every business in them is fictional.
+            </p>
+            <p><a href="/frameworks/">The whole frameworks library</a>, by purpose and standing.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .fl-judgement {
+    max-width: 52rem;
+    margin: 0 0 var(--sp-6);
+    padding: var(--sp-4) var(--sp-5);
+    border-left: 3px solid var(--gold-500);
+    background: var(--surface-gold-wash);
+  }
+
+  .fl-judgement .label {
+    margin: 0 0 var(--sp-1);
+  }
+
+  .fl-judgement__text {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: 1.1875rem;
+    font-style: italic;
+    line-height: 1.45;
+    color: var(--navy-900);
+  }
+
+  .fl-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--sp-3) var(--sp-5);
+    margin-top: var(--sp-5);
+    padding: var(--sp-4) 0;
+    border-top: 1px solid var(--rule-hair);
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .fl-filters > .label {
+    flex-basis: 100%;
+    margin: 0;
+  }
+
+  .fl-filter {
+    display: grid;
+    gap: 0.3rem;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .fl-filter--wide {
+    flex: 1 1 22rem;
+  }
+
+  .fl-filter select {
+    width: 100%;
+    max-width: 100%;
+    min-height: 2.75rem;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--rule-control);
+    border-radius: var(--radius-2);
+    background: var(--surface-sheet);
+    color: var(--text-strong);
+    font: 500 0.9375rem/1.2 var(--font-ui);
+  }
+
+  .fl-count {
+    margin: 0 0 0 auto;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .fl-questions {
+    display: grid;
+    gap: var(--sp-6);
+    margin: var(--sp-6) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fl-q {
+    margin: 0;
+    padding-top: var(--sp-4);
+    border-top: 2px solid var(--rule-ink);
+    scroll-margin-top: var(--sp-8);
+  }
+
+  .fl-q[hidden] {
+    display: none;
+  }
+
+  .fl-q__question {
+    max-width: 44rem;
+    font-size: 1.5rem;
+    line-height: 1.25;
+  }
+
+  .fl-q__situation {
+    max-width: 52rem;
+    margin: var(--sp-2) 0 0;
+    color: var(--text-body);
+  }
+
+  .fl-q__situation .label,
+  .fl-fw__suits .label,
+  .fl-q__tools .label {
+    margin-right: 0.35rem;
+  }
+
+  .fl-fws {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+    gap: var(--sp-4);
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fl-fw {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: var(--sp-4);
+    background: var(--surface-sheet);
+    border: 1px solid var(--rule-hair);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .fl-fw[hidden] {
+    display: none;
+  }
+
+  .fl-fw__head {
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .fl-fw__name {
+    font-family: var(--font-display);
+    font-size: 1.1875rem;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .fl-fw__q {
+    margin: 0;
+    padding-left: var(--sp-3);
+    border-left: 2px solid var(--gold-500);
+    font-family: var(--font-serif);
+    font-style: italic;
+    line-height: 1.4;
+    color: var(--navy-900);
+  }
+
+  .fl-fw__suits {
+    margin: 0;
+    color: var(--text-body);
+  }
+
+  .fl-fw__go {
+    margin: var(--sp-1) 0 0;
+    font-weight: 600;
+  }
+
+  .fl-fw__go .small {
+    font-weight: 400;
+  }
+
+  .fl-q__tools {
+    margin: var(--sp-4) 0 0;
+  }
+
+  .fl-adv {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    gap: var(--sp-4);
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fl-adv__item {
+    display: grid;
+    align-content: start;
+    gap: var(--sp-2);
+    margin: 0;
+    padding: var(--sp-4) var(--sp-5);
+    border: 1px solid var(--navy-900);
+    border-top: 3px solid var(--navy-900);
+    background: var(--ivory-50);
+  }
+
+  .fl-adv__tags {
+    margin: 0;
+  }
+
+  .fl-adv__name {
+    font-size: 1.25rem;
+    line-height: 1.25;
+  }
+
+  .fl-adv__text {
+    margin: 0;
+  }
+
+  .fl-adv__more {
+    margin: 0;
+  }
+
+  .fl-well {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: var(--sp-6);
+    margin-top: var(--sp-5);
+    align-items: start;
+  }
+
+  .fl-well__list {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
+    padding-left: 1.4em;
+    max-width: 44rem;
+  }
+
+  section + section {
+    margin-top: var(--sp-8);
+  }
+
+  @media (max-width: 60rem) {
+    .fl-well {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
+
+<script>
+  import '../../../scripts/framework-lab';
+</script>

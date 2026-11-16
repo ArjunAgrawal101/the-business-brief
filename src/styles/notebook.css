@@ -1,0 +1,182 @@
+/*
+ * The note editor: the "Add a note" dialog beside every Save button and the
+ * notebook's editor in My Business Workspace (src/scripts/note-editor.ts).
+ * Global, because the dialog is built by a script. A sheet with a navy rule
+ * on top, like the dashboard's confirmations; fields in the platform's form
+ * style; the six headings of case notes as short boxes that grow with the
+ * text where the browser can.
+ */
+
+/* ---------- The dialog ---------- */
+
+.ne-dialog {
+  width: min(40rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--bb-ink);
+  border-radius: var(--radius-1);
+  background: var(--surface-sheet);
+  color: var(--text-body);
+  box-shadow: var(--shadow-lift);
+  overflow: auto;
+}
+
+.ne-dialog::backdrop {
+  background: rgba(7, 18, 38, 0.55);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ne-dialog[open] {
+    animation: ne-arrive var(--dur-slow) var(--ease-out);
+  }
+}
+
+@keyframes ne-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.ne-form {
+  display: grid;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+}
+
+@media (max-width: 30rem) {
+  .ne-form {
+    padding: var(--sp-4);
+  }
+}
+
+.ne-h {
+  margin: 0;
+  font-size: var(--fs-h3);
+}
+
+/* What the note is attached to: the page's title and its address. */
+.ne-on {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem var(--sp-2);
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--surface-page);
+  border-left: 3px solid var(--gold-500);
+  font-size: var(--fs-small);
+}
+
+.ne-on .label {
+  flex-basis: 100%;
+}
+
+.ne-on__title {
+  font-weight: 600;
+  color: var(--navy-900);
+}
+
+.ne-on__url {
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.ne-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--sp-3);
+}
+
+.ne-foot {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+/* ---------- The fields ---------- */
+
+.ne-field {
+  min-width: 0;
+}
+
+.ne-field .field__hint {
+  margin: 0;
+}
+
+.ne-kind {
+  display: grid;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.ne-kind legend {
+  padding: 0;
+  margin-bottom: var(--sp-2);
+}
+
+.ne-kind__opt {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  min-height: 24px;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.ne-kind__opt input {
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.2rem;
+  accent-color: var(--bb-ink);
+}
+
+.ne-kind__hint {
+  margin: 0;
+}
+
+.ne-part {
+  display: grid;
+  gap: var(--sp-4);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.ne-part[hidden] {
+  display: none;
+}
+
+/* Short boxes that grow with what is written, where the browser can. */
+.ne-text {
+  min-height: 3.6rem;
+  max-height: 18rem;
+  field-sizing: content;
+}
+
+.ne-text--body {
+  min-height: 8rem;
+}
+
+.ne-form .textarea[aria-invalid="true"] {
+  border-color: var(--bb-signal);
+  border-width: 2px;
+}
+
+.ne-form-err:not([hidden]) {
+  margin: 0;
+}
+
+@media print {
+  .ne-dialog {
+    display: none;
+  }
+}

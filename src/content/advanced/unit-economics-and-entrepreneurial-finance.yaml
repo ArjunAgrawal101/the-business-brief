@@ -1,0 +1,201 @@
+# Advanced Management and Strategy, entrepreneurship module 2. Written in the
+# platform's own words. Real organisations appear only with facts from the
+# documents in src/content/sources/advanced-ops-ent.yaml, opened and read on
+# 16 November 2026. Worked figures: m = 30 × 0.7 = £21; undiscounted LTV
+# 21 ÷ 0.03 = £700; discounted 21 × 0.97 ÷ (1.01 − 0.97) = £509.25; LTV/CAC
+# 509 ÷ 350 = 1.45 and 700 ÷ 350 = 2.0; simple payback 350 ÷ 21 = 16.7
+# months; with churn, 700 × (1 − 0.97^n) = 350 gives n = 22.8 months.
+# Heterogeneity: 0.5 × 21 ÷ 0.01 + 0.5 × 21 ÷ 0.08 = £1,181; 21 ÷ 0.045 =
+# £467. NRR (100 − 10 − 5 + 25) ÷ 100 = 110%; gross 85%. Cash trough: revenue
+# £150k growing 8% a month against £550k of costs reaches break-even in month
+# 17 after cumulative burn of £4.29m; at 5% a month, month 27 and £6.65m.
+# VC method: 6 × 10 ÷ 300 = 20%; ÷ 0.6 = 33.3%; post-money 6 ÷ 0.333 = £18m.
+# Deliveroo per order: 2024 revenue 2,071.9 ÷ 296.0 = £7.00, gross profit
+# 766.9 ÷ 296.0 = £2.59, adjusted EBITDA 129.6 ÷ 296.0 = £0.44, difference
+# £2.15; 2023 EBITDA 85.4 ÷ 290.2 = £0.29. Bramble Box: 18 × 3.6 = £64.80;
+# 18 × 2.9 = £52.20; marginal CAC (120,000 − 60,000) ÷ 600 = £100 and
+# (198,000 − 120,000) ÷ 600 = £130; blended 378,000 ÷ 4,800 = £78.75.
+domain: entrepreneurship
+title: Unit economics and entrepreneurial finance
+order: 2
+dek: When each additional customer makes a young business richer rather than poorer, and how founders should model the cash it takes to reach that point.
+audience: [undergraduate, mba, professional]
+covers: [Unit economics, Entrepreneurial finance]
+minutes: 25
+updated: '2026-11-16'
+bridge:
+  codes: ['3.3', '3.7', '3.8', '5.5']
+  text: |
+    The IB course covers costs and revenues (3.3), cash flow forecasts (3.7), payback and net present value (3.8) and contribution and break-even (5.5). The Lab briefings [Pricing a start-up and its unit economics](/entrepreneurship-lab/pricing-and-unit-economics/) and [Financial projections](/entrepreneurship-lab/financial-projections/) introduce customer acquisition cost, lifetime value, payback, burn and runway with simple formulas. This module adds discounted, cohort-based lifetime value, the effect of differences between customers, payback that allows for churn, net revenue retention, the cash trough of a growing venture, working capital as a source of finance, valuation by the venture capital method, and the ways reported metrics mislead.
+foundation: |
+  **Unit economics** asks whether a business makes money one unit at a time. Define the unit (an order, a customer, a subscription or a monthly cohort); measure what each unit contributes after the costs it causes; compare that with what it cost to acquire; and allow for time, because acquisition is paid for at once while contribution arrives over months or years.
+
+  **Entrepreneurial finance** asks the second question: how much cash is needed to reach the point at which contribution covers fixed costs, and what happens if growth is slower than planned. The two are tightly linked. A business with sound unit economics but slow payback can still run out of cash while growing fast, because every new customer absorbs money before repaying it. Growth is then the cause of the cash problem rather than its cure.
+advanced:
+  - id: contribution-layers
+    title: The unit and its contribution layers
+    body: |
+      Start by choosing the unit that drives costs and revenue. For a delivery platform it is the order; for a subscription business, the customer month; for a hardware firm, the device and the services sold with it. Then peel the layers:
+
+      - revenue less direct costs gives the **gross margin**;
+      - less the variable costs of fulfilment, payment processing and support gives the **contribution** of the unit;
+      - less the cost of acquiring the customer, spread over the units the customer buys, gives contribution after marketing;
+      - less fixed overheads gives operating profit.
+
+      Two judgements decide whether the layers tell the truth. **Average or marginal?** The next customer usually costs more to win than the average one, because the cheapest channels saturate first, so an average acquisition cost flatters growth plans. **Fixed or variable?** Support, compliance and engineering costs that look fixed rise in steps as volume grows, and classifying them as overhead makes the unit look better than it is.
+
+      Platforms need a further distinction. Gross transaction value (the value of goods sold through the platform) is not revenue; the platform's revenue is its take of that value, and unit economics must be built on revenue and contribution, not on transaction value.
+  - id: lifetime-value
+    title: Lifetime value done properly
+    body: |
+      The simplest **lifetime value** (LTV) divides the monthly contribution per customer, m, by the monthly churn rate. A subscription at £30 a month with a 70% gross margin contributes £21; with 3% monthly churn the undiscounted LTV is £700. Money received later is worth less, so Gupta and Lehmann (2003) discount it: LTV = m × r/(1 + i − r), where r is the monthly retention rate and i the monthly discount rate. With r = 0.97 and i = 1%, LTV falls to about £509. Against an acquisition cost (CAC) of £350, the ratio is 1.45, not the 2.0 the simple formula suggests. Simple payback is 350/21 = 16.7 months; allowing for churn, a cohort recovers its acquisition cost only after about 23 months.
+
+      Averages hide differences between customers. If half a cohort churns at 1% a month and half at 8%, the average churn is 4.5% and implies an LTV of £467; the true undiscounted value is £1,181, because loyal customers stay far longer. This is why retention curves flatten as fickle customers leave, and why Fader and Hardie (2007) model retention with probability distributions rather than a single rate. The error can also run the other way: early cohorts from a new channel are often unrepresentative.
+
+      In subscription software, expansion can outweigh churn. If a cohort starts with £100,000 of annual recurring revenue, loses £10,000 to churn and £5,000 to downgrades, and gains £25,000 from upgrades, its **net revenue retention** is 110% and its gross retention 85%. Above 100%, the installed base grows without any new customers.
+  - id: burn-and-runway
+    title: Burn, runway and the cash trough
+    body: |
+      **Net burn** is the monthly cash outflow after receipts; **runway** is cash divided by net burn. A growing venture's cumulative cash follows a J-curve, falling until monthly receipts exceed costs and then rising. The low point is the **cash trough**, the minimum funding the plan requires before any buffer.
+
+      Consider a venture with £6 million of cash, monthly costs of £550,000 and revenue of £150,000 growing 8% a month. Revenue overtakes costs in month 17, after a cumulative burn of about £4.3 million, so on these assumptions the company reaches break-even with cash to spare. If growth is 5% a month instead, break-even moves to month 27 and the cumulative burn to about £6.6 million: the company runs out of cash first. A three-point change in a growth assumption decides survival, which is why investors test the plan's sensitivity rather than its central case.
+
+      Working capital can be a source of finance as well as a use. The **cash conversion cycle** (Richards and Laughlin, 1980) is days of inventory plus days of receivables less days of payables. A marketplace that collects from customers at once and pays merchants weeks later has a negative cycle, so growth releases cash; a hardware start-up that buys components months before it is paid has a positive one, so growth consumes cash. The same unit economics can need very different funding.
+  - id: valuing-a-venture
+    title: 'Valuing a venture: the venture capital method'
+    body: |
+      Discounted cash flow struggles with young ventures, whose cash flows are negative for years and whose outcomes are close to all-or-nothing. Investors therefore use the **venture capital method**, set out in texts such as Metrick and Yasuda (2010). Estimate the company's value at exit (say £300 million in year six); divide by the target multiple the investor needs (say ten times, reflecting the high chance that the investment fails); and adjust for dilution from later rounds.
+
+      If the investor puts in £6 million, it needs £60 million at exit, or 20% of the company then. If later rounds are expected to leave it with 60% of its stake, it must own 33.3% now, implying a post-money valuation of £18 million and a pre-money valuation of £12 million.
+
+      The high target multiple is not an expectation that every investment returns ten times. It is the success-case return that, combined with likely failures, gives an acceptable expected return across a portfolio. The method is only as good as its exit estimate, and founders should read it as a negotiation over assumptions.
+
+      The same discipline applies to metrics. Gross transaction value is not revenue, adjusted earnings exclude real costs, and lifetime value computed on revenue rather than contribution, or from a few flattering cohorts, can make almost any business look attractive.
+models:
+  - name: Customer lifetime value
+    origin: Gupta and Lehmann (2003)
+    summary: |
+      The value of a customer is the discounted stream of contribution it generates while it stays. With constant margin and retention, LTV = m × r/(1 + i − r).
+    use: |
+      Calculate it on contribution, not revenue; discount it; compare it with the marginal, not average, acquisition cost; and track it by cohort and channel rather than as a single blended figure.
+    limits: |
+      Constant retention is rarely true, so the simple formula can understate or overstate value. Short histories make long-run retention a guess, and it ignores expansion revenue and referrals.
+    framework: contribution
+    tool: /entrepreneurship-lab/unit-economics/
+    sources: [adv-oe-gupta-lehmann-2003, adv-oe-gupta-2004]
+  - name: Probability models of customer retention
+    origin: Fader and Hardie (2007)
+    summary: |
+      Customers differ in their propensity to churn, so aggregate retention rises over time as high-churn customers leave. Modelling that heterogeneity gives better projections than a single churn rate.
+    use: |
+      Fit a simple model to each cohort's survival curve, project retention beyond the observed period, and compare cohorts and channels on projected value rather than early retention.
+    limits: |
+      The models assume customers' propensities do not change and that new cohorts resemble old ones; a change of product, price or channel breaks both assumptions.
+    sources: [adv-oe-fader-hardie-2007]
+  - name: The cash conversion cycle
+    origin: Richards and Laughlin (1980)
+    summary: |
+      Days of inventory plus days of receivables less days of payables measures how long cash is tied up in operations, and so whether growth consumes or releases cash.
+    use: |
+      Calculate it for the business model being planned, not just for existing accounts, and include it in the funding plan; negotiate customer prepayment and supplier terms as financing decisions.
+    limits: |
+      It ignores the size of each balance and can be improved by squeezing suppliers in ways that damage the supply chain or reputation.
+    tool: /entrepreneurship-lab/start-up-costs/
+    sources: [adv-fin-richards-laughlin-1980]
+  - name: The venture capital method
+    origin: Practitioners' method, as set out in Metrick and Yasuda (2010)
+    summary: |
+      Value a venture from an estimated exit value, a target multiple that reflects the risk of failure, and expected dilution, to derive the ownership an investor needs now.
+    use: |
+      Use it to understand an investor's offer: change the exit value, multiple and dilution and see how the implied valuation moves, then negotiate over the assumptions.
+    limits: |
+      It compresses all risk into one multiple and depends heavily on a speculative exit value; it says nothing about the terms, such as liquidation preferences, that also divide value.
+    framework: decision-trees
+    sources: [adv-oe-metrick-yasuda-2010]
+applications:
+  - title: 'Deliveroo: the economics of one order'
+    kind: real
+    asOf: '2025-05'
+    sources: [adv-oe-deliveroo-fy2024, adv-oe-deliveroo-offer-2025]
+    body: |
+      Deliveroo's results for 2024 reported 296.0 million orders (290.2 million in 2023), gross transaction value of £7,433.5 million, or £25.10 an order, and revenue of £2,071.9 million, a take rate of 27.9% (28.7% in 2023). Gross profit was £766.9 million, 10.3% of transaction value, and adjusted EBITDA £129.6 million (1.7%), up from £85.4 million (1.2%). The company reported its first profit for a full year, £2.9 million, and free cash flow of £85.5 million, which included a £77 million working capital inflow that it attributed mainly to the timing of the year end. It said average order frequency had risen in every annual cohort. Its medium-term target was an adjusted EBITDA margin of 4% or more of transaction value. In May 2025 DoorDash made a recommended cash offer of 180 pence a share, valuing the equity at about £2.9 billion and implying an enterprise value of about £2.4 billion.
+
+      *Interpretation.* Per order, 2024 revenue was about £7.00, gross profit (as Deliveroo reports it) £2.59 and adjusted EBITDA £0.44, up from £0.29: costs below gross profit absorbed about £2.15 an order. Margins this thin depend on order frequency and scale, and the working capital inflow shows how a marketplace's cash timing can flatter one year's free cash flow.
+  - title: 'Retention metrics in software: same name, different definitions'
+    kind: real
+    asOf: '2025-12'
+    sources: [adv-oe-couchbase-2025, adv-oe-blackberry-2024, adv-oe-databricks-2025]
+    body: |
+      Couchbase reported in September 2025 that its dollar-based net retention rate had returned to more than 115%, defining the rate as the average of four quarterly rates, each comparing the current annual recurring revenue of customers who were customers a year earlier with their revenue then; it also stated that annual recurring revenue should be viewed independently of revenue. BlackBerry reported a rate of 87% for its cybersecurity division in June 2024, rising for a third consecutive quarter, and cautioned that such metrics have no standardised meaning and are unlikely to be comparable with similarly named measures at other companies. Databricks, raising private capital in December 2025, said its net retention rate was above 140%.
+
+      *Interpretation.* Above 100%, existing customers spend more each year than churn removes; below it, the business must win new customers just to stand still. But definitions differ (averaging periods, treatment of usage-based revenue, which customers count), so a rate is comparable only with the definition beside it.
+  - title: A marketplace financed by its customers
+    kind: illustrative
+    body: |
+      A tutoring marketplace (illustrative) takes payment for a ten-lesson bundle upfront and pays tutors 30 days after each lesson. Each new customer therefore puts cash into the business weeks before its costs fall due, and faster growth raises the cash balance. A rival selling tutoring robots must buy stock three months before sale: with identical margins, it needs outside funding to grow at the same rate.
+cases:
+  - title: "Bramble Box: reading a meal-kit start-up's cohorts"
+    fictional: true
+    situation: |
+      Bramble Box (fictional) sells weekly meal kits by subscription. Each active customer contributes £18 a month after food, packaging, delivery and payment costs. The marketing team reports a blended acquisition cost of £78.75 (total spend divided by new customers) against a lifetime value of £400 based on the January cohort, and asks for a larger budget. The finance director has prepared the cohort data below.
+    exhibit:
+      caption: Bramble Box, customer cohorts this year
+      columns: [Cohort, New customers, Marketing spend (£), Acquisition cost per customer (£), Active at month 3, Average months active in first six]
+      rows:
+        - [January, '1,000', '60,000', '60', '50%', '3.6']
+        - [April, '1,600', '120,000', '75', '40%', '2.9']
+        - [July, '2,200', '198,000', '90', '33%', 'Not yet known']
+      note: The July cohort is three months old. Simulated data.
+    questions:
+      - Calculate six-month contribution per acquired customer for the January and April cohorts and compare it with each cohort's acquisition cost. Which cohort has paid back within six months?
+      - Calculate the marginal acquisition cost of the extra customers won in April compared with January, and in July compared with April. What does the trend imply for the growth plan?
+      - Critique the marketing team's comparison of a blended acquisition cost with a lifetime value from the January cohort.
+      - What would you need to know before concluding that Bramble Box has a unit economics problem rather than a seasonal one?
+evaluation: |
+  The arithmetic of unit economics is not controversial: discounting, cohort analysis and the distinction between marginal and average costs are standard finance and marketing. The arguments are about how the numbers are used.
+
+  **Rules of thumb.** Investors often look for a lifetime value at least three times acquisition cost, or payback within a year. These are heuristics without a theoretical basis; the right threshold depends on the cost of capital, the uncertainty of retention and how fast payback must happen to fund growth.
+
+  **Customers as assets.** Research valuing companies from customer metrics (Gupta, Lehmann and Stuart, 2004) showed how a firm can be valued from customer data, with estimates close to market values for some firms, which supports managing customers as an asset. But projections built on a few cohorts carry large errors, and customer behaviour in a young market changes as the market matures.
+
+  **Growth before profit.** One school holds that in winner-take-most markets, subsidising growth before unit economics are proven is rational, because scale and network effects will lower costs and raise prices later. The other holds that growth on negative unit economics simply scales losses. Deliveroo's thin per-order margins after more than a decade of trading show how long the path from scale to profit can be; the evidence depends on whether the market really rewards the largest player.
+
+  **Metric quality.** Start-ups choose and define their own metrics, often for investors, and companies themselves warn that retention and recurring revenue measures are not comparable. The established lesson is procedural: insist on definitions, cohorts and contribution rather than revenue.
+decision:
+  title: Grow, slow or raise at Ledgerline
+  fictional: true
+  brief: |
+    Ledgerline (fictional) sells accounting software to small firms. It has £2.4 million of cash and burns £200,000 a month, a runway of 12 months. Net revenue retention is 104%, gross retention 88%, and payback on acquisition cost is 20 months. Its last round valued it at £30 million; investors say a new round would be at a similar valuation at best, and fundraising takes six months.
+  options:
+    - label: A. Raise now and keep growing
+      text: |
+        Start raising £5 million at a flat valuation and keep spending on acquisition, aiming to double revenue in 18 months. Dilution of about 14%, and a risk of a down round if growth disappoints.
+    - label: B. Cut burn and grow the base
+      text: |
+        Cut paid acquisition sharply, reducing burn to £110,000 a month (a runway of about 22 months), and focus on upgrades and retention to lift net revenue retention. Slower growth, a weaker story for the next round.
+    - label: C. Extend with debt
+      text: |
+        Take £1.5 million of revenue-based financing, repaid as a share of monthly revenue, adding about seven months of runway without dilution, and keep the current plan.
+  criteria:
+    - Runway to the next value-creating milestone
+    - Dilution and valuation risk
+    - Quality of the unit economics being scaled
+    - Default risk and lender claims on cash
+    - Signal to future investors
+  guidance: |
+    Begin with the unit economics, because they decide whether growth is worth buying. A 20-month payback with 88% gross retention means each new customer takes nearly two years to repay its acquisition cost, and about one in eight leaves each year; net retention of 104% shows modest expansion. That is not bad, but it is not strong enough to justify buying growth at any price with only 12 months of cash.
+
+    Option A is reasonable only if investors will fund on these numbers; starting a six-month raise with 12 months of runway leaves little room for delay, and a flat round in a weak market risks worse terms. Option C buys time without dilution, but repayments take cash from every month's revenue, deepening the trough unless growth improves; it suits a business with a clear, near milestone, which Ledgerline lacks.
+
+    Option B is the most defensive and probably the strongest: it doubles runway, improves the metrics investors will scrutinise, and keeps the option to raise later from a stronger position. A good answer combines B with preparation for a raise in 9 to 12 months, setting the milestones (payback under 15 months, net retention above 110%) that would justify spending again.
+reading:
+  - source: adv-oe-gupta-lehmann-2003
+    note: The derivation of customer lifetime value with retention and discounting, and the case for treating customers as assets.
+  - source: adv-oe-gupta-2004
+    note: Valuing whole companies from customer metrics, with the strengths and limits of the approach.
+  - source: adv-oe-fader-hardie-2007
+    note: Why retention rises over time in a cohort and how to project it with a simple probability model.
+  - source: adv-oe-metrick-yasuda-2010
+    note: The standard text on venture capital, including the venture capital method of valuation.
+  - source: adv-fin-richards-laughlin-1980
+    note: The original statement of the cash conversion cycle as a measure of liquidity.

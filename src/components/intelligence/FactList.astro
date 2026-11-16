@@ -1,0 +1,51 @@
+---
+/**
+ * A dated list of sourced facts, each with the documents that state it,
+ * numbered as they are in the item's list of sources. Used for an item's
+ * background, the development itself and what followed.
+ */
+import { SOURCE_KIND_LABELS, formatDate } from '../../lib/briefing';
+import { rich } from '../../lib/markup';
+import type { IntelFact, IntelSource } from '../../lib/schemas';
+
+interface Props {
+  facts: IntelFact[];
+  sources: IntelSource[];
+}
+const { facts, sources } = Astro.props;
+const sourceNo = new Map(sources.map((s, i) => [s.id, i + 1]));
+const sourceOf = (sid: string) => sources.find((s) => s.id === sid);
+const citeLabel = (s: IntelSource) => `${s.publisher}, ${SOURCE_KIND_LABELS[s.kind]?.toLowerCase()}${s.published ? ` of ${formatDate(s.published)}` : `, read ${formatDate(s.accessed)}`}`;
+const factDate = (f: IntelFact) => (f.asAt ? `As at ${formatDate(f.date)}` : formatDate(f.date));
+---
+
+<ol class="ib-facts" role="list">
+  {
+    facts.map((f) => (
+      <li class="ib-fact">
+        <p class="ib-fact__date">
+          <time datetime={f.date}>{factDate(f)}</time>
+        </p>
+        <div class="ib-fact__body">
+          <div class="ib-fact__text" set:html={rich(f.text)} />
+          <p class="ib-fact__src">
+            {f.sources.length === 1 ? 'Source' : 'Sources'}:{' '}
+            {f.sources.map((sid, i) => {
+              const s = sourceOf(sid);
+              return (
+                s && (
+                  <>
+                    {i > 0 ? '; ' : ''}
+                    <a href={`#src-${s.id}`}>
+                      [{sourceNo.get(s.id)}] {citeLabel(s)}
+                    </a>
+                  </>
+                )
+              );
+            })}
+          </p>
+        </div>
+      </li>
+    ))
+  }
+</ol>

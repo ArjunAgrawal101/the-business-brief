@@ -1,0 +1,48 @@
+---
+/**
+ * A quiet, contextual pointer to one-to-one tutoring: one line in the
+ * platform's voice, said where personal help is most useful (after a hard
+ * calculation, at the end of a subtopic, beside an assessment guide). It is
+ * never a banner, appears at most once on a page, and states the terms from
+ * src/lib/tutorials.ts so they cannot drift.
+ */
+import { SESSION } from '../../lib/tutorials';
+
+interface Props {
+  /** The opening question or sentence, fitted to the page. */
+  lead: string;
+  /** What a session would do here. */
+  offer?: string;
+}
+const { lead, offer = 'A one-to-one session works through it with you, from your own questions.' } = Astro.props;
+---
+
+<aside class="tutor-note" aria-label="Personal support">
+  <p>
+    <strong>{lead}</strong>
+    {' '}{offer} One-to-one online tutoring with Arjun Agrawal, {SESSION.currency}{SESSION.price} for a one-hour session.
+    {' '}<a href="/tutorials/">See the tutorials</a>
+  </p>
+</aside>
+
+<style>
+  .tutor-note {
+    max-width: 46rem;
+    margin-top: var(--sp-7);
+    padding: var(--sp-3) var(--sp-4);
+    border-left: 3px solid var(--gold-500);
+    background: var(--surface-gold-wash);
+    font-size: var(--fs-small);
+    color: var(--text-body);
+  }
+
+  .tutor-note strong {
+    color: var(--text-strong);
+  }
+
+  .tutor-note a {
+    font-family: var(--font-ui);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+</style>

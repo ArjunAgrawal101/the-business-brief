@@ -9,7 +9,7 @@
  */
 import { z } from 'astro/zod';
 
-export const STUDIO_KINDS = ['swot', 'steeple', 'five-forces', 'ansoff', 'bcg', 'porter', 'stakeholders', 'decision-tree', 'force-field', 'appraisal'] as const;
+export const STUDIO_KINDS = ['swot', 'steeple', 'five-forces', 'ansoff', 'bcg', 'porter', 'stakeholders', 'decision-tree', 'force-field', 'appraisal', 'scenarios', 'salience', 'fit'] as const;
 export type StudioKind = (typeof STUDIO_KINDS)[number];
 
 const stage = z.enum(['diagnose', 'options', 'decide', 'plan']);

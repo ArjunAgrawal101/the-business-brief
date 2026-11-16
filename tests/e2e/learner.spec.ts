@@ -81,10 +81,10 @@ test.describe('Saved items and the dashboard', () => {
     await expect(page.locator('.db-row[data-code="3.3"]')).toHaveClass(/is-practised/);
   });
 
-  test('the old progress address shows the dashboard', async ({ page }) => {
+  test('the old progress address shows the dashboard, now My Business Workspace', async ({ page }) => {
     await page.goto('/progress/');
     await ready(page, '[data-ix="progress"]');
-    await expect(page.locator('h1')).toHaveText('Your dashboard');
+    await expect(page.locator('h1')).toHaveText('My Business Workspace');
   });
 
   test('a room tool\'s work is listed under its room, with a link back to the tool', async ({ page }) => {

@@ -1,0 +1,78 @@
+---
+/**
+ * One domain of Advanced Management and Strategy: its question, what it
+ * covers, and its modules in order. Only domains with modules have a page,
+ * and only modules that exist are listed.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageIntro from '../../../components/layout/PageIntro.astro';
+import { advancedLibrary } from '../../../lib/advanced-content';
+import { AUDIENCE_LABELS, DOMAINS, advancedHref, type DomainInfo } from '../../../lib/advanced';
+import { plain } from '../../../lib/markup';
+import '../../../styles/advanced.css';
+
+export async function getStaticPaths() {
+  const lib = await advancedLibrary();
+  return DOMAINS.filter((d) => lib.byDomain[d.id].length > 0).map((d) => ({ params: { domain: d.id }, props: { domain: d } }));
+}
+
+interface Props {
+  domain: DomainInfo;
+}
+const { domain: d } = Astro.props;
+const lib = await advancedLibrary();
+const modules = lib.byDomain[d.id];
+const others = DOMAINS.filter((x) => x.id !== d.id && lib.byDomain[x.id].length > 0);
+const minutes = modules.reduce((s, m) => s + m.data.minutes, 0);
+---
+
+<BaseLayout title={d.name} description={plain(d.intro)} section="advanced" room="advanced">
+  <PageIntro trail={[{ label: 'Advanced Management', href: '/advanced/' }, { label: d.name }]} kicker={`Advanced Management and Strategy · ${d.short}`} title={d.name} lead={d.intro} wide>
+    <p class="am-tags">
+      <span class="tag tag--enrichment">Beyond the IB course</span>
+      <span class="am-meta">{modules.length} {modules.length === 1 ? 'module' : 'modules'} · about {Math.round(minutes / 60 * 10) / 10} hours of reading</span>
+    </p>
+  </PageIntro>
+
+  <div class="wrap page-body">
+    <p class="am-question"><span class="label label--ink">The question</span> {d.question}</p>
+
+    <ol class="am-modules" role="list">
+      {
+        modules.map((m) => (
+          <li class="am-modcard">
+            <span class="am-modcard__no" aria-hidden="true">{String(m.data.order).padStart(2, '0')}</span>
+            <div>
+              <h2 class="am-modcard__title">
+                <a href={advancedHref(d.id, m.id)}>{m.data.title}</a>
+              </h2>
+              <p class="am-modcard__dek">{plain(m.data.dek)}</p>
+              <p class="am-modcard__meta">
+                {m.data.covers.join(' · ')}
+                <span aria-hidden="true"> · </span>
+                <span>
+                  {m.data.audience.map((a) => AUDIENCE_LABELS[a]).join(', ')}, about {m.data.minutes} minutes
+                </span>
+              </p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    {
+      others.length > 0 && (
+        <nav class="am-others" aria-label="Other domains">
+          <p class="label label--ink">Other domains</p>
+          <ul role="list">
+            {others.map((o) => (
+              <li>
+                <a href={advancedHref(o.id)}>{o.name}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )
+    }
+  </div>
+</BaseLayout>

@@ -121,6 +121,12 @@ describe('the search index', () => {
   ];
   const entries = buildSearchIndex({ c: corpus, nav: NAV, links, modules, library: [], diagrams: { 'test-diagram': { title: 'A test diagram', syllabus: ['3.3'], level: 'SL/HL', group: 'unit-3' } } });
 
+  it('indexes advanced management modules as their own kind, with no IB unit, subtopic or level', () => {
+    const withAdvanced = buildSearchIndex({ c: corpus, nav: NAV, links, advanced: [{ url: '/advanced/finance/valuation-fundamentals/', title: 'Valuation fundamentals', dek: 'What is a business worth?', domain: 'Advanced financial management', covers: ['Valuation fundamentals'] }] });
+    const e = withAdvanced.find((x) => x.kind === 'advanced');
+    expect(e).toMatchObject({ url: '/advanced/finance/valuation-fundamentals/', type: 'Advanced management · Advanced financial management', units: [], codes: [], hl: false });
+  });
+
   it('lists every subtopic once, at its own page, with its unit and level', () => {
     const list = entries.filter((e) => e.kind === 'subtopics' && e.codes.length === 1);
     expect(list).toHaveLength(subs.length);
@@ -170,14 +176,16 @@ describe('the search index', () => {
 
   it('sorts menu links into kinds by group and address', () => {
     expect(navKind('tools', '/finance-desk/')).toBe('tools');
-    expect(navKind('explore', '/glossary/')).toBe('definitions');
-    expect(navKind('explore', '/toolkit/')).toBe('frameworks');
-    expect(navKind('explore', '/frameworks/')).toBe('frameworks');
+    expect(navKind('learn', '/glossary/')).toBe('definitions');
+    expect(navKind('learn', '/toolkit/')).toBe('frameworks');
+    expect(navKind('learn', '/frameworks/')).toBe('frameworks');
     expect(navKind('practise', '/case-room/')).toBe('cases');
     expect(navKind('practise', '/exam-desk/practice/')).toBe('questions');
     expect(navKind('assess', '/assessment/question-bank/')).toBe('questions');
-    expect(navKind('discover', '/resources/')).toBe('resources');
-    expect(navKind('discover', '/about/')).toBe('pages');
+    expect(navKind('connect', '/resources/')).toBe('resources');
+    expect(navKind('connect', '/about/')).toBe('pages');
+    expect(navKind('connect', '/tutorials/')).toBe('pages');
+    expect(navKind('advance', '/advanced/')).toBe('pages');
   });
 
   it('cuts long text at a word, with an ellipsis', () => {

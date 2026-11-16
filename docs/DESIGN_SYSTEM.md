@@ -48,9 +48,10 @@ A five-second cinematic sequence (`src/components/brand/CinematicIntro.astro`), 
 
 ### Navigation
 
-Five doors, Explore, Practise, Tools, Assess and Discover, from one list (`src/lib/navigation.ts`) that drives the header, the phone drawer and the footer. A link is listed only when its page exists.
-- **Wide screens:** each door is a mega panel with its links, a line on each, and a feature on navy: course coverage, a case lab to start with, the formula sheet, the creator's guides, or the educator.
-- **Below 64rem:** the doors move into a full-height drawer, with the current door open.
+Six groups, Learn, Practise, Tools, Assess, Advance and Connect, from one list (`src/lib/navigation.ts`) that drives the header, the phone drawer, the footer, search and the home page's floor plan. A link is listed only when its page exists. Learn holds the course (topics, concepts, glossary, mindmaps, diagrams, frameworks, toolkit, revision); Advance holds everything beyond the IB course; Connect holds the tutorials, the creator and the reader's own dashboard.
+- **Wide screens:** each group is a mega panel with its links, a line on each, and a feature on navy: course coverage, a case lab to start with, the formula sheet, the creator's guides, the Advanced Management hub, or one-to-one tutoring with its terms.
+- **The Tutorials button:** a gold button beside Search, on every screen wider than 36rem, marked as current on the tutorials page; on phones it is the first link in the drawer instead. Between 64rem and 82rem the triggers tighten and the search label hides, so six groups and both buttons fit on one line from 1024 pixels.
+- **Below 64rem:** the groups move into a full-height drawer, with the current group open.
 - Every menu is a native disclosure (`details` and `summary`), so it works without JavaScript. The script adds one open at a time, Escape with focus returned, and closing when focus or a click leaves.
 
 ### Room identities
@@ -68,6 +69,8 @@ Each learning environment sets `room` on BaseLayout (`data-room` on the body). I
 | Boardroom | gold | the table and the trend on it |
 | Cases | oxblood | an editorial page of columns |
 | Assessment | deep cobalt | a ruled answer page |
+| Advanced | deep claret | a lecture theatre's tiers |
+| Tutorials | antique gold | a desk with an open book |
 
 The accent marks the header's hairline, the page intro's kicker and the section heads; the drawing sits beside the intro on wide screens and gives way to the colour on narrow ones.
 
@@ -81,6 +84,14 @@ The front door of the ecosystem (`src/pages/index.astro`, with `src/components/h
 - **A working break-even preview.**
 - **The libraries, learning objectives and pathways.**
 - **The Assessment Centre**, **the latest additions**, **the creator** and **a closing invitation.**
+
+### The Business Intelligence Briefing
+
+The briefing (`src/pages/intelligence/`, styled by `src/styles/intelligence.css`) reads as an edition of a serious business publication:
+- **The masthead:** the title with its gold italic accent, an issue line (the edition's date, the number of items, themes and regions), the standfirst, a stamp of the curation and check dates and the document count, and a notice that the briefing is curated, not live.
+- **The front page:** the lead story on navy with its headline figures, then the rest of the edition in ruled columns, each story with its themes, development date, standfirst, organizations, region and industry, and the dates it was published and checked.
+- **The themes:** twelve sections in a ruled grid, each with its count, a line on what it covers and its newest headlines, each linking to a page of its own.
+- **An item:** the six questions as numbered section heads; the sourced facts first, labelled External evidence, then a gold-ruled mark where the analysis begins; the course and what lies beyond it in separate groups, the second on white with a green rule and the Enrichment tag; a side rail with the item's dates, region, industry, themes and contents.
 
 ### Raster assets and templates
 

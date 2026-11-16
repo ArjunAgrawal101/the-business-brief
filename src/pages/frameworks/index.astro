@@ -28,15 +28,21 @@ const STATUS_TEXT = {
 } as const;
 ---
 
-<BaseLayout title="Frameworks" description={`${all.length} business frameworks, each with a diagram, a step-by-step method, a fictional example, strengths and limits and an exercise, labelled IB syllabus, IB toolkit or enrichment.`} section="toolkit">
+<BaseLayout title="Frameworks" description={`${all.length} business frameworks, each with a diagram, how it is built, a step-by-step method, a fictional example, how to read the result, strengths, limits and common mistakes, an Apply it mode and an exercise, labelled IB syllabus, IB toolkit or enrichment.`} section="toolkit">
   <PageIntro
     trail={[{ label: 'Frameworks' }]}
     kicker="The frameworks library"
     title="Frameworks for business decisions"
-    lead={`${all.length} frameworks, models and tools, each with a diagram, a method you can follow, a fictional example, its strengths and limits, and an exercise. ${count('syllabus')} are named in the IB syllabus, ${count('toolkit')} are IB toolkit tools and ${count('enrichment')} are enrichment beyond the course, for university, MBA and professional study.`}
+    lead={`${all.length} frameworks, models and tools, each with a diagram, how it is built and when to use it, a method you can follow, a fictional example, how to read the result and what it justifies, its strengths, limits and common mistakes, an Apply it mode and an exercise. ${count('syllabus')} are named in the IB syllabus, ${count('toolkit')} are IB toolkit tools and ${count('enrichment')} are enrichment beyond the course, for university, MBA and professional study.`}
   />
 
   <div class="wrap page-body" data-ix="frameworks">
+    <aside class="fwi-lab" aria-labelledby="fwi-lab-h">
+      <p class="label label--ink" id="fwi-lab-h">The Framework Application Lab</p>
+      <p class="fwi-lab__text">Not sure which framework you need? Start from the decision you face, and open the framework's application mode: the tools that apply it and a worksheet for your own case.</p>
+      <a class="btn btn--small fwi-lab__go" href="/frameworks/lab/">Choose by your question</a>
+    </aside>
+
     <section aria-labelledby="fwi-map">
       <SectionHead no={1} title="The library at a glance" id="fwi-map" dek="Each framework by what it helps you do, and by its standing in the IB course." />
       <p class="fwi-swipe small muted" aria-hidden="true">Scroll the table sideways to see all five purposes.</p>
@@ -148,6 +154,32 @@ const STATUS_TEXT = {
 </BaseLayout>
 
 <style>
+  .fwi-lab {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-5);
+    margin: 0 0 var(--sp-7);
+    padding: var(--sp-4) var(--sp-5);
+    max-width: 64rem;
+    border-left: 3px solid var(--gold-500);
+    background: var(--surface-gold-wash);
+  }
+
+  .fwi-lab .label {
+    flex-basis: 100%;
+    margin: 0;
+  }
+
+  .fwi-lab__text {
+    flex: 1 1 24rem;
+    margin: 0;
+  }
+
+  .fwi-lab__go {
+    min-height: 2.75rem;
+  }
+
   .fwi-map {
     margin-top: var(--sp-5);
   }

@@ -15,7 +15,7 @@ In order of priority. Each step is done completely before the next begins. What 
 2. **Full notes for 1.5, 2.3 and 3.3**, the three subtopics taught in complete briefs, so every subtopic reads the same way.
 3. **Revision briefs** for the 34 subtopics with full notes; the Revision Brief room has them only for the three briefs.
 4. **Examiner observations**, each cited, once subject reports are supplied. Until then guidance is labelled as the platform's recommendation.
-5. **A wider Business Intelligence briefing.** More developments as more publishers' own sites can be read, refreshed each term, every fact dated and cited. It stays a curated briefing, never a feed presented as live news.
+5. **A wider Business Intelligence briefing.** More developments as more publishers' own sites can be read, refreshed each term, every fact dated and cited, so that each of the twelve themes has several items across industries and regions. It stays a curated briefing, never a feed presented as live news.
 6. **Real-organization cases** in the Case Vault, built only from cited, dated evidence.
 
 ## Rooms

@@ -42,6 +42,8 @@ export interface IndexInput {
   pathways?: ReadonlyArray<{ id: string; name: string; promise: string }>;
   /** The frameworks library (src/content/frameworks), by id: each framework's page, labelled by its standing in the course. */
   frameworks?: Readonly<Record<string, { name: string; aliases: readonly string[]; summary: string; question: string; status: 'syllabus' | 'toolkit' | 'enrichment'; level: string; subtopics: readonly string[] }>>;
+  /** Advanced Management modules: beyond the IB course, so they carry no IB unit or subtopic and never answer an IB filter. */
+  advanced?: ReadonlyArray<{ url: string; title: string; dek: string; domain: string; covers: readonly string[] }>;
 }
 
 /** A framework page's type in the results: its standing in the course. */
@@ -49,6 +51,10 @@ const FRAMEWORK_TYPES = { syllabus: 'Framework · IB syllabus', toolkit: 'Framew
 
 /** Pages that are not content and not in the menu, written out once. */
 const STATIC_PAGES: Array<{ kind: SearchKind; type: string; url: string; title: string; text: string; hl?: boolean }> = [
+  { kind: 'pages', type: 'Advanced financial analysis', url: '/finance-desk/advanced/integrated-forecast/', title: 'Integrated three-statement forecast', text: 'Beyond the IB course: drivers to a statement of profit or loss, a statement of cash flows and a balance sheet that balances, with scenarios and alternatives.' },
+  { kind: 'pages', type: 'Advanced financial analysis', url: '/finance-desk/advanced/capital-budgeting/', title: 'Capital budgeting comparator', text: 'Beyond the IB course: NPV, IRR, payback, discounted payback, profitability index and ARR side by side, NPV profiles, a tornado chart and a WACC helper.' },
+  { kind: 'pages', type: 'Advanced financial analysis', url: '/finance-desk/advanced/break-even-scenarios/', title: 'Break-even scenarios and operating leverage', text: 'Beyond the IB course: two cost structures compared on break-even, margin of safety, operating leverage and the volume at which they cost the same.' },
+  { kind: 'pages', type: 'Advanced financial analysis', url: '/finance-desk/advanced/performance-dashboard/', title: 'Performance dashboard', text: 'Beyond the IB course: the DuPont split of return on equity, the cash conversion cycle, interest cover and gearing over several years, beside the IB ratios.' },
   { kind: 'pages', type: 'Assessment', url: '/assessment/internal-assessment/', title: 'Internal assessment: the business research project', text: 'The research question, the key concept, supporting documents, the criteria, word count and submission, with tools for each part.' },
   { kind: 'pages', type: 'Assessment', url: '/assessment/paper-1/', title: 'Paper 1: the case study paper', text: 'The pre-released statement, Section A and Section B, command terms and application to the case, with practice.' },
   { kind: 'pages', type: 'Assessment', url: '/assessment/paper-2/', title: 'Paper 2: the quantitative paper', text: 'Reading the stimulus, formulas, working and rounding, evaluation and constructions, with an answer builder.' },
@@ -64,7 +70,7 @@ const STATIC_PAGES: Array<{ kind: SearchKind; type: string; url: string; title: 
   { kind: 'pages', type: 'Course', url: '/ib/', title: 'IB DP Business Management: the course', text: 'The course unit by unit: subtopics, content statements, depth of teaching, SL and HL, teaching hours.' },
   { kind: 'pages', type: 'Course', url: '/ib/coverage/', title: 'Coverage tracker', text: 'What the platform has for each subtopic: complete, partly built or planned, and verified against the guide.' },
   { kind: 'pages', type: 'Platform', url: '/rooms/', title: 'All rooms', text: 'Every room of the platform, what each is for and what works in it now.' },
-  { kind: 'pages', type: 'Platform', url: '/dashboard/', title: 'Your dashboard', text: 'What you have read, practised and saved here, kept on this device only.' },
+  { kind: 'pages', type: 'Platform', url: '/dashboard/', title: 'My Business Workspace', text: 'Your learning list, case notebook and saved analyses, with what you have read, practised and saved here, kept on this device only.' },
   { kind: 'pages', type: 'Platform', url: '/platform/', title: 'The platform', text: 'How the platform is organized: its modules, learning architecture, interactions and content governance.' },
   { kind: 'pages', type: 'Platform', url: '/accessibility/', title: 'Accessibility', text: 'The accessibility standard the platform aims for, how it was tested, and the known limits.' },
   { kind: 'pages', type: 'Platform', url: '/privacy/', title: 'Privacy', text: 'No accounts, no analytics, no cookies: what is kept on your device, and how to clear it.' },
@@ -240,6 +246,10 @@ export function buildSearchIndex(input: IndexInput): SearchEntry[] {
       hl: t.level === 'HL',
     });
   // The frameworks library, framework by framework. Enrichment carries no unit or subtopic, so a unit filter never finds it, and its type says it is beyond the course.
+  for (const m of input.advanced ?? []) {
+    add({ kind: 'advanced', type: `Advanced management · ${m.domain}`, url: m.url, title: m.title, text: m.dek, keys: m.covers.join(' '), units: [], codes: [], hl: false });
+  }
+
   for (const [id, f] of Object.entries(input.frameworks ?? {}).sort((a, b) => a[1].name.localeCompare(b[1].name, 'en', { sensitivity: 'base' }))) {
     const ib = f.status !== 'enrichment';
     add({

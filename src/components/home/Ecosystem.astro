@@ -1,9 +1,9 @@
 ---
 /**
  * The learning ecosystem as the floor plan of an institution: a library wing
- * (Explore), case rooms (Practise), laboratories (Tools), an examination
- * hall (Assess) and an entrance hall (Discover), around the atrium of The
- * Business Brief. The plan is a drawing (aria-hidden); the list beside it is
+ * (Learn), case rooms (Practise), laboratories (Tools), an examination hall
+ * (Assess), an executive wing (Advance) and the entrance hall (Connect),
+ * around the atrium of The Business Brief. The plan is a drawing (aria-hidden); the list beside it is
  * the real navigation, read from src/lib/navigation.ts. Pointing at a wing
  * lights its list, and pointing at or focusing a list lights its wing; a
  * click on a wing takes focus to its first link.
@@ -18,11 +18,12 @@ interface Props {
 const { complete, total } = Astro.props;
 
 const WINGS: Record<string, { x: number; y: number; w: number; h: number; room: string }> = {
-  explore: { x: 24, y: 24, w: 236, h: 150, room: 'The library' },
+  learn: { x: 24, y: 24, w: 236, h: 150, room: 'The library' },
   practise: { x: 380, y: 24, w: 236, h: 150, room: 'The case rooms' },
   tools: { x: 24, y: 286, w: 236, h: 150, room: 'The laboratories' },
   assess: { x: 380, y: 286, w: 236, h: 150, room: 'The examination hall' },
-  discover: { x: 262, y: 356, w: 116, h: 80, room: 'Entrance' },
+  advance: { x: 262, y: 24, w: 116, h: 80, room: 'Executive wing' },
+  connect: { x: 262, y: 356, w: 116, h: 80, room: 'Entrance' },
 };
 const count = (id: string) => NAV.find((g) => g.id === id)?.links.length ?? 0;
 ---
@@ -43,11 +44,12 @@ const count = (id: string) => NAV.find((g) => g.id === id)?.links.length ?? 0;
         <path d="M260 340 L262 310 Q276 294 270 284" />
         <path d="M380 340 L378 310 Q364 294 370 284" />
         <path d="M320 356 L320 314" />
+        <path d="M320 104 L320 146" />
       </g>
 
       <!-- The library: shelves -->
-      <g class="eco__wing" data-wing="explore">
-        <rect x={WINGS.explore!.x} y={WINGS.explore!.y} width={WINGS.explore!.w} height={WINGS.explore!.h} />
+      <g class="eco__wing" data-wing="learn">
+        <rect x={WINGS.learn!.x} y={WINGS.learn!.y} width={WINGS.learn!.w} height={WINGS.learn!.h} />
         <g class="eco__detail">
           {[0, 1, 2, 3, 4].map((i) => <line x1="44" y1={88 + i * 16} x2="160" y2={88 + i * 16} />)}
           {[0, 1, 2, 3, 4].map((i) => <line x1="176" y1={88 + i * 16} x2="240" y2={88 + i * 16} />)}
@@ -83,9 +85,17 @@ const count = (id: string) => NAV.find((g) => g.id === id)?.links.length ?? 0;
         </g>
       </g>
 
+      <!-- The executive wing: a lecture theatre facing its board -->
+      <g class="eco__wing" data-wing="advance">
+        <rect x={WINGS.advance!.x} y={WINGS.advance!.y} width={WINGS.advance!.w} height={WINGS.advance!.h} />
+        <g class="eco__detail">
+          <path d="M290 98 A30 30 0 0 1 350 98 M278 98 A42 42 0 0 1 362 98" />
+        </g>
+      </g>
+
       <!-- The entrance hall: doors -->
-      <g class="eco__wing" data-wing="discover">
-        <rect x={WINGS.discover!.x} y={WINGS.discover!.y} width={WINGS.discover!.w} height={WINGS.discover!.h} />
+      <g class="eco__wing" data-wing="connect">
+        <rect x={WINGS.connect!.x} y={WINGS.connect!.y} width={WINGS.connect!.w} height={WINGS.connect!.h} />
         <g class="eco__detail">
           <path d="M300 436 A20 20 0 0 1 320 416 M340 436 A20 20 0 0 0 320 416" />
         </g>
@@ -100,7 +110,7 @@ const count = (id: string) => NAV.find((g) => g.id === id)?.links.length ?? 0;
       {
         NAV.map((g) => {
           const w = WINGS[g.id]!;
-          const small = g.id === 'discover';
+          const small = g.id === 'advance' || g.id === 'connect';
           return (
             <g class="eco__label" data-wing={g.id}>
               <text x={w.x + (small ? w.w / 2 : 16)} y={w.y + (small ? 30 : 30)} text-anchor={small ? 'middle' : 'start'} class="eco__room">
@@ -124,7 +134,7 @@ const count = (id: string) => NAV.find((g) => g.id === id)?.links.length ?? 0;
       <span class="eco__core-name">The Business Brief</span>
       <span class="eco__core-stat">{complete} of {total} subtopics complete</span>
     </div>
-    <figcaption class="sr-only">The platform drawn as a building: five wings around a central atrium. The same destinations are listed beside the plan.</figcaption>
+    <figcaption class="sr-only">The platform drawn as a building: six wings around a central atrium. The same destinations are listed beside the plan.</figcaption>
   </figure>
 
   <div class="eco__list">
@@ -201,11 +211,12 @@ const count = (id: string) => NAV.find((g) => g.id === id)?.links.length ?? 0;
     transition: stroke var(--dur-base) var(--ease);
   }
 
-  .eco__wing[data-wing="explore"] { --wing: #0b1a33; }
+  .eco__wing[data-wing="learn"] { --wing: #0b1a33; }
   .eco__wing[data-wing="practise"] { --wing: #7a2e2e; }
   .eco__wing[data-wing="tools"] { --wing: #2f6f5e; }
   .eco__wing[data-wing="assess"] { --wing: #1d3cb4; }
-  .eco__wing[data-wing="discover"] { --wing: #8a6b2a; }
+  .eco__wing[data-wing="advance"] { --wing: #7b2d4f; }
+  .eco__wing[data-wing="connect"] { --wing: #8a6b2a; }
 
   .eco__wing.is-lit > rect,
   .eco__wing:hover > rect {
@@ -247,7 +258,8 @@ const count = (id: string) => NAV.find((g) => g.id === id)?.links.length ?? 0;
     fill: #0b1a33;
   }
 
-  .eco__label[data-wing="discover"] .eco__group {
+  .eco__label[data-wing="advance"] .eco__group,
+  .eco__label[data-wing="connect"] .eco__group {
     font-size: 17px;
   }
 
@@ -304,11 +316,12 @@ const count = (id: string) => NAV.find((g) => g.id === id)?.links.length ?? 0;
       background-color var(--dur-base) var(--ease);
   }
 
-  .eco__groupbox[data-wing="explore"] { --wing: #0b1a33; }
+  .eco__groupbox[data-wing="learn"] { --wing: #0b1a33; }
   .eco__groupbox[data-wing="practise"] { --wing: #7a2e2e; }
   .eco__groupbox[data-wing="tools"] { --wing: #2f6f5e; }
   .eco__groupbox[data-wing="assess"] { --wing: #1d3cb4; }
-  .eco__groupbox[data-wing="discover"] { --wing: #8a6b2a; }
+  .eco__groupbox[data-wing="advance"] { --wing: #7b2d4f; }
+  .eco__groupbox[data-wing="connect"] { --wing: #8a6b2a; }
 
   .eco__groupbox.is-lit {
     border-left-color: var(--wing);

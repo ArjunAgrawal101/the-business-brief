@@ -1,30 +1,47 @@
 ---
 /**
- * The learner dashboard: what this reader has done on The Business Brief, on
- * this device. It reads the items this browser keeps (src/lib/dashboard.ts):
+ * My Business Workspace (the learner dashboard, grown into a place to work):
+ * what this reader keeps and has done on The Business Brief, on this device.
+ * It reads the items this browser keeps (src/lib/dashboard.ts and
+ * src/lib/workspace.ts): the learning list (the saved items, bb:saved, with
+ * their order, status and note, bb:workspace:list), the notebook
+ * (bb:workspace:notes), the analyses every tool keeps under its own items and
+ * the results saved from the Financial Laboratory (bb:workspace:snapshots),
  * the pages opened and the exercises checked (bb:learner, kept by the
- * recorder in src/scripts/learner.ts), the saved items (bb:saved), and what
- * every tool and room keeps of its own. Nothing is collected beyond that,
- * nothing is sent anywhere, and every figure is a count of something stored.
- * Without JavaScript the page says what it would show and lists the course
- * with the platform's coverage. Rendered at /dashboard/ and at the old
- * address, /progress/, so every link to either keeps working.
+ * recorder in src/scripts/learner.ts), and what every room keeps of its own.
+ * Nothing is collected beyond that, nothing is sent anywhere, and every figure
+ * is a count of something stored. Without JavaScript the page says what it
+ * would show and lists the course with the platform's coverage. Rendered at
+ * /dashboard/ and at the old address, /progress/, so every link to either
+ * keeps working.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../layout/PageIntro.astro';
 import SectionHead from '../layout/SectionHead.astro';
 import { casesInOrder, corpus, decisionsInOrder, href, modulesInOrder, questionsInOrder, toolsInOrder, topicsInOrder } from '../../lib/content';
 import { STATE_LABEL, subtopicCoverage } from '../../lib/coverage';
-import { mindmapFor, mindmapsInOrder, noteFor, subtopicHref } from '../../lib/learning';
+import { enrichmentMapsInOrder, mindmapFor, mindmapsInOrder, noteFor, subtopicHref } from '../../lib/learning';
 import { jsonForScript } from '../../lib/markup';
 import { NAV } from '../../lib/navigation';
-import { LIMITS } from '../../lib/learner';
+import { LIMITS, type SavedKind } from '../../lib/learner';
+import { WS_LIMITS, type WorkspaceConfig } from '../../lib/workspace';
 import { studio, studioHref } from '../../lib/strategy/content';
 import { lab, labHref } from '../../lib/lab/content';
 import { boardroomHref, boardroomScenarios } from '../../lib/boardroom/content';
+import { ROLE_IN_TEXT } from '../../lib/boardroom/roles';
 import { MARKET_TOOLS, toolHref as marketHref, toolKey as marketKey } from '../../lib/market-tools';
-import type { DashConfig, DashExercise, DashLab, DashRoomTool, DashTool } from '../../lib/dashboard';
+import { ROOM_INFO, roomTools as roomToolsOf, toolHref as roomToolHref } from '../../lib/room-tools';
+import { LAB as FIN_LAB, labHref as finLabHref } from '../../lib/finance-lab/catalogue';
+import { library } from '../../lib/frameworks-content';
+import { frameworkHref, inLibraryOrder } from '../../lib/frameworks';
+import { briefing, briefingHref } from '../../lib/briefing-content';
+import { advancedLibrary } from '../../lib/advanced-content';
+import { DOMAIN_BY_ID, advancedHref } from '../../lib/advanced';
+import { ADVANCED as ADV_FIN, advancedHref as advFinHref } from '../../lib/adv-finance/catalogue';
+import type { DashExercise, DashLab, DashRoomTool, DashTool } from '../../lib/dashboard';
 import '../../styles/dashboard.css';
+import '../../styles/notebook.css';
+import '../../styles/workspace.css';
 
 const c = await corpus();
 const cur = c.curricula['ib-dp-bm'];
@@ -75,13 +92,17 @@ tools.push(
   { keys: ['bb:p3:plan'], title: 'Paper 3 plan builder', url: '/assessment/paper-3/#p3-board-h', detail: 'Your plan of action across the functions', room: centre },
 );
 
-// The rooms' own tools that keep work under keys of their own: the Strategy Studio's analyses, the Market Studio's instruments and the Lab's tools.
+// The rooms' own tools that keep work under keys of their own: the Strategy Studio's analyses, the Market Studio's instruments, the People and Culture and Operations Floor tools, and the Lab's tools.
 const strategy = await studio();
 const theLab = await lab();
 const LAB_SUMMARY: Record<string, string> = { 'unit-economics': 'unit' };
+const peopleOps = (['people', 'operations'] as const).flatMap((room) =>
+  roomToolsOf(c, room).map(([, t]) => ({ key: `bb:${t.guide.storageKey}`, title: t.title, url: roomToolHref(t), room: roomName(ROOM_INFO[room].module, ROOM_INFO[room].name) })),
+);
 const roomTools: DashRoomTool[] = [
   ...strategy.sequence.map((t) => ({ key: `bb:strategy:${t.slug}`, title: t.title, url: studioHref(t.slug), room: roomName('strategy-studio', 'Strategy Studio') })),
   ...MARKET_TOOLS.map((t) => ({ key: `bb:${marketKey(t.slug)}`, title: t.name, url: marketHref(t.slug), room: roomName('market-studio', 'Market Studio') })),
+  ...peopleOps,
   ...theLab.toolList.map(([id, t]) => ({
     key: `bb:lab:${t.kind}`,
     title: t.title,
@@ -91,7 +112,7 @@ const roomTools: DashRoomTool[] = [
   })),
 ];
 
-const subtopics: DashConfig['subtopics'] = coverage.map((r) => {
+const subtopics: WorkspaceConfig['subtopics'] = coverage.map((r) => {
   const s = r.subtopic;
   const note = noteFor(c, s.code);
   const map = mindmapFor(c, s.code);
@@ -115,7 +136,7 @@ const subtopics: DashConfig['subtopics'] = coverage.map((r) => {
   };
 });
 
-const retrieval: DashConfig['retrieval'] = [
+const retrieval: WorkspaceConfig['retrieval'] = [
   ...Object.values(c.notes)
     .sort((a, b) => a.code.localeCompare(b.code, 'en', { numeric: true }))
     .map((n) => ({ key: `bb:rc:notes-${n.code.replace('.', '-')}`, title: `${n.code} ${n.title}: notes`, url: `${subtopicHref(c, n.code)}#sh-rev-h`, count: n.retrieval.length, codes: [n.code] })),
@@ -134,8 +155,12 @@ const firstTool = (await toolsInOrder()).find(([, t]) => t.status === 'complete'
 const firstCase = (await casesInOrder())[0];
 const firstSub = coverage[0];
 const firstRoom = NAV.find((g) => g.id === 'tools')?.links[0];
+const scenarios = await boardroomScenarios();
+const decisions = await decisionsInOrder();
+const labName = 'Financial Laboratory';
+const boardroomName = roomName('boardroom', 'Boardroom');
 
-const config: DashConfig = {
+const config: WorkspaceConfig = {
   units: (cur?.units ?? []).map((u) => ({ number: u.number, title: u.title })),
   subtopics,
   questions: (await questionsInOrder()).map(([id, q]) => ({
@@ -150,11 +175,11 @@ const config: DashConfig = {
   })),
   exercises,
   labs,
-  decisions: (await decisionsInOrder()).map(([id, d]) => ({ id, title: d.title, url: href.decision(id), rounds: d.rounds.map((r) => r.id), codes: caseCodes(d.case) })),
+  decisions: decisions.map(([id, d]) => ({ id, title: d.title, url: href.decision(id), rounds: d.rounds.map((r) => r.id), codes: caseCodes(d.case) })),
   retrieval,
   tools,
   roomTools,
-  simulations: (await boardroomScenarios()).map(([id, sc]) => ({ id, title: sc.title, url: boardroomHref(id), rounds: sc.rounds.length, codes: sc.syllabus })),
+  simulations: scenarios.map(([id, sc]) => ({ id, title: sc.title, url: boardroomHref(id), rounds: sc.rounds.length, codes: sc.syllabus })),
   caseDecisions: (await casesInOrder())
     .filter(([, cs]) => cs.exercise)
     .map(([id, cs]) => ({ id, title: cs.title, url: `${href.case(id)}#exercise`, codes: caseCodes(id) })),
@@ -188,17 +213,82 @@ const config: DashConfig = {
   },
   totals: { mindmaps: maps.length, cases: Object.keys(c.cases).length, frameworks: Object.values(c.tools).filter((t) => t.status === 'complete').length },
   ia: { href: '/ia-studio/', steps: 10 },
+  seats: { ...ROLE_IN_TEXT },
+  roomOrder: [
+    roomName('strategy-studio', 'Strategy Studio'),
+    labName,
+    roomName('market-studio', 'Market Studio'),
+    roomName('people-and-culture', 'People and Culture'),
+    roomName('operations-floor', 'Operations Floor'),
+    roomName('entrepreneurship-lab', 'Entrepreneurship and Innovation Lab'),
+    boardroomName,
+  ],
+  labName,
+  boardroomName,
 };
 const units = config.units.map((u) => ({ ...u, rows: subtopics.filter((s) => s.unit === u.number) }));
 const complete = subtopics.filter((s) => s.state === 'complete').length;
+
+// Every page a reader can add to the learning list from the workspace: the kinds that carry a Save button, and the tools and briefings that do not.
+interface Pickable {
+  url: string;
+  title: string;
+  kind: SavedKind;
+}
+const frameworks = await library();
+const advanced = await advancedLibrary();
+const desks = [...new Map(FIN_LAB.map((e) => [e.desk.href, e.desk.label])).entries()];
+const catalogue: Array<{ label: string; items: Pickable[] }> = [
+  { label: 'Subtopics', items: subtopics.map((s) => ({ url: s.url, title: `${s.code} ${s.title}`, kind: 'topic' })) },
+  { label: 'Cases', items: (await casesInOrder()).map(([id, cs]) => ({ url: href.case(id), title: cs.title, kind: 'case' })) },
+  {
+    label: 'Frameworks and toolkit guides',
+    items: [
+      ...inLibraryOrder(frameworks.frameworks).map(([id, f]): Pickable => ({ url: frameworkHref(id), title: f.name, kind: 'framework' })),
+      ...(await toolsInOrder()).filter(([, t]) => t.status === 'complete').map(([id, t]): Pickable => ({ url: `/toolkit/${id}/`, title: `${t.name}: toolkit guide`, kind: 'framework' })),
+    ],
+  },
+  {
+    label: 'Mindmaps',
+    items: [
+      ...maps.map(([id, m]): Pickable => ({ url: href.mindmap(id), title: m.scope === 'unit' ? `Unit ${m.unit}: ${m.title}` : `${m.code} ${m.title}`, kind: 'mindmap' })),
+      ...(await enrichmentMapsInOrder()).map(([id, m]): Pickable => ({ url: href.enrichmentMap(id), title: `${m.title}, beyond the course`, kind: 'mindmap' })),
+    ],
+  },
+  { label: `Tools: ${roomName('strategy-studio', 'Strategy Studio')}`, items: strategy.sequence.map((t) => ({ url: studioHref(t.slug), title: t.title, kind: 'tool' })) },
+  { label: `Tools: ${labName}`, items: FIN_LAB.map((e) => ({ url: finLabHref(e.id), title: e.name, kind: 'tool' })) },
+  { label: `Tools: ${roomName('finance-desk', 'Finance Desk')}`, items: desks.map(([u, label]) => ({ url: u, title: label, kind: 'tool' })) },
+  { label: 'Tools: Advanced financial analysis, beyond the IB course', items: ADV_FIN.map((t) => ({ url: advFinHref(t.id), title: t.name, kind: 'tool' })) },
+  { label: 'Tools: Framework Application Lab', items: [{ url: '/frameworks/lab/', title: 'Framework Application Lab', kind: 'tool' }] },
+  { label: `Tools: ${roomName('market-studio', 'Market Studio')}`, items: MARKET_TOOLS.map((t) => ({ url: marketHref(t.slug), title: t.name, kind: 'tool' })) },
+  { label: 'Tools: People and Culture, Operations Floor', items: peopleOps.map((t) => ({ url: t.url, title: t.title, kind: 'tool' })) },
+  { label: `Tools: ${roomName('entrepreneurship-lab', 'Entrepreneurship and Innovation Lab')}`, items: theLab.toolList.map(([id, t]) => ({ url: labHref(id), title: t.title, kind: 'tool' })) },
+  {
+    label: `Tools: ${boardroomName}, Decision Rooms`,
+    items: [...scenarios.map(([id, sc]): Pickable => ({ url: boardroomHref(id), title: sc.title, kind: 'tool' })), ...decisions.map(([id, d]): Pickable => ({ url: href.decision(id), title: d.title, kind: 'tool' }))],
+  },
+  {
+    label: 'Advanced Management and Strategy, beyond the IB course',
+    items: advanced.modules.map((m): Pickable => ({ url: advancedHref(m.data.domain, m.id), title: `${m.data.title} (${DOMAIN_BY_ID[m.data.domain].name})`, kind: 'page' })),
+  },
+  {
+    label: 'Briefings',
+    items: [
+      ...theLab.briefingList.map(([id, b]): Pickable => ({ url: labHref(id), title: b.title, kind: 'briefing' })),
+      ...(await briefing()).map(([id, it]): Pickable => ({ url: briefingHref(id), title: it.title, kind: 'briefing' })),
+      ...topics.map(([id, t]): Pickable => ({ url: href.revision(id), title: `${t.code} ${t.title}: revision brief`, kind: 'briefing' })),
+    ],
+  },
+];
+const TITLE = 'My Business Workspace';
 ---
 
-<BaseLayout title="Your dashboard" description="What you have read, practised and saved on The Business Brief, read from this browser only. Nothing is sent anywhere." section="platform" noindex>
+<BaseLayout title={TITLE} description="Your learning list, your notes and the analyses you have saved, with what you have read and practised on The Business Brief, read from this browser only. Nothing is sent anywhere." section="platform" noindex>
   <PageIntro
-    trail={[{ label: 'Your dashboard' }]}
+    trail={[{ label: TITLE }]}
     kicker="On this device"
-    title="Your dashboard"
-    lead="What you have read, practised and saved here, read from this browser's own storage. There is no account and nothing is sent anywhere; another browser or device starts with nothing."
+    title={TITLE}
+    lead="Your learning list, your case notebook and the analyses the tools keep for you, with what you have read and practised, all in this browser's own storage. There is no account and nothing is sent anywhere; another browser or device starts with nothing."
   />
 
   <div class="wrap page-body db" data-ix="progress">
@@ -206,18 +296,21 @@ const complete = subtopics.filter((s) => s.state === 'complete').length;
     <p class="db-statusline js-only" data-statusline data-needs-storage></p>
 
     <div class="db-nojs nojs-only">
-      <p class="db-nojs__lead">This page reads what this browser keeps for The Business Brief, and it needs JavaScript to do that. Nothing is kept anywhere else. With JavaScript on, it shows:</p>
+      <p class="db-nojs__lead">This workspace reads and keeps what this browser holds for The Business Brief, and it needs JavaScript to do that. Nothing is kept anywhere else. With JavaScript on, it shows:</p>
       <ol class="db-nojs__list">
-        <li><span class="db-nojs__no" aria-hidden="true">01</span> <strong>At a glance:</strong> the subtopics you have explored, the mindmaps and cases you have opened, your practice answers, the exercises you checked, the cards you rated and the pages you saved.</li>
-        <li><span class="db-nojs__no" aria-hidden="true">02</span> <strong>Your course:</strong> each of the 37 subtopics with what you have read, recalled and practised, beside what the platform has for it. The platform's side is listed below.</li>
-        <li><span class="db-nojs__no" aria-hidden="true">03</span> <strong>Where you have been:</strong> the subtopics, mindmaps, cases, toolkit guides, frameworks and tools you opened, most recent first.</li>
-        <li><span class="db-nojs__no" aria-hidden="true">04</span> <strong>Practice and activities:</strong> your answers and self-checks, what was right in the exercises you checked, the case labs, the Decision Rooms and your recall.</li>
-        <li><span class="db-nojs__no" aria-hidden="true">05</span> <strong>Saved, and your work:</strong> the pages you saved and the work the tools keep, with a link back to each.</li>
-        <li><span class="db-nojs__no" aria-hidden="true">06</span> <strong>Your data:</strong> what is kept and where, with a copy to download, a copy to import, and a way to clear it. What is kept is described below.</li>
+        <li><span class="db-nojs__no" aria-hidden="true">01</span> <strong>At a glance:</strong> the subtopics you have explored, the mindmaps and cases you have opened, your practice answers, the exercises you checked, the cards you rated, your notes and your saved work.</li>
+        <li><span class="db-nojs__no" aria-hidden="true">02</span> <strong>My learning list:</strong> the pages you saved, and any subtopic, case, framework, mindmap, tool or briefing you add, to put in order, mark to do, in progress or done, and note.</li>
+        <li><span class="db-nojs__no" aria-hidden="true">03</span> <strong>Notes:</strong> a case notebook, with notes under six headings (problem identified, evidence, relevant theory, strategic alternatives, recommendation, evaluation) or free notes, attached to a page or standalone, to edit, search and delete.</li>
+        <li><span class="db-nojs__no" aria-hidden="true">04</span> <strong>Saved analyses:</strong> the work the tools keep for you, room by room, and the results you saved from the Financial Laboratory, each with a link back to its tool.</li>
+        <li><span class="db-nojs__no" aria-hidden="true">05</span> <strong>Your course:</strong> each of the 37 subtopics with what you have read, recalled and practised, beside what the platform has for it. The platform's side is listed below.</li>
+        <li><span class="db-nojs__no" aria-hidden="true">06</span> <strong>Where you have been:</strong> the subtopics, mindmaps, cases, toolkit guides, frameworks and tools you opened, most recent first.</li>
+        <li><span class="db-nojs__no" aria-hidden="true">07</span> <strong>Practice and activities:</strong> your answers and self-checks, what was right in the exercises you checked, the case labs, the Decision Rooms and your recall.</li>
+        <li><span class="db-nojs__no" aria-hidden="true">08</span> <strong>Export selected work:</strong> the items, notes and analyses you choose, as Markdown to read and print or as a file to import elsewhere.</li>
+        <li><span class="db-nojs__no" aria-hidden="true">09</span> <strong>Your data:</strong> what is kept and where, with a copy to download, a copy to import, and a way to clear it. What is kept is described below.</li>
       </ol>
     </div>
 
-    <p class="state state--error" data-error hidden>The dashboard could not start. Your work is still kept by each tool, and the <a href="/privacy/">privacy page</a> can clear it.</p>
+    <p class="state state--error" data-error hidden>The workspace could not start. Your work is still kept by each tool, and the <a href="/privacy/">privacy page</a> can clear it.</p>
 
     <div class="state db-unavailable js-only" data-unavailable hidden>
       <p class="state__title">This browser is not letting the site keep anything.</p>
@@ -225,8 +318,8 @@ const complete = subtopics.filter((s) => s.state === 'complete').length;
     </div>
 
     <div class="db-empty js-only" data-empty hidden>
-      <p class="db-empty__title">Nothing is recorded on this device yet.</p>
-      <p>Open a subtopic, read a mindmap, answer a practice question or save a page, and it will appear here. Each section below says what it is waiting for. Good places to start:</p>
+      <p class="db-empty__title">Nothing is kept on this device yet.</p>
+      <p>Open a subtopic, read a mindmap, answer a practice question, save a page or add a note, and it will appear here. Each section below says what it is waiting for. Good places to start:</p>
       <ul class="db-empty__starts">
         <li><a href={config.starts.topic.href}>{config.starts.topic.title}</a>, the first subtopic</li>
         <li><a href="/topics/">The topic library</a>, all 37 subtopics</li>
@@ -243,8 +336,72 @@ const complete = subtopics.filter((s) => s.state === 'complete').length;
       </div>
     </section>
 
+    <section class="db-sec js-only" id="saved" aria-labelledby="db-saved-h" data-needs-storage>
+      <SectionHead no={2} title="My learning list" id="db-saved-h" dek="The pages you saved, in the order you choose, each marked to do, in progress or done, with a short note of your own. Pages saved since you last arranged the list join at the top." />
+      <div class="ws-list">
+        <h3 class="db-panel__h" id="db-saved-list-h" tabindex="-1">Saved <span class="db-count" data-saved-n></span></h3>
+        <p class="ws-sub" data-list-counts></p>
+        <div data-saved></div>
+        <form class="ws-add" data-list-add-form>
+          <div class="field ws-add__field">
+            <label for="ws-add-page">Add a page to your list</label>
+            <p class="field__hint" id="ws-add-hint">Any subtopic, case, framework, mindmap, tool or briefing. A page with a Save button can also be saved from the page itself.</p>
+            <div class="ws-add__row">
+              <select class="select" id="ws-add-page" name="page" aria-describedby="ws-add-hint ws-add-err" data-list-pick>
+                <option value="">Choose a page</option>
+                {
+                  catalogue.map((g) => (
+                    <optgroup label={g.label}>
+                      {g.items.map((p) => (
+                        <option value={p.url} data-kind={p.kind}>
+                          {p.title}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))
+                }
+              </select>
+              <button type="submit" class="btn btn--small">Add to my list</button>
+            </div>
+            <p class="field__error" id="ws-add-err" data-list-add-err hidden></p>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="db-sec js-only" id="notes" aria-labelledby="ws-notes-h" data-needs-storage>
+      <SectionHead no={3} title="Notes" id="ws-notes-h" dek="A case notebook: notes under the six headings of a case analysis, or free notes, each attached to a page or standalone. **Add a note**, beside **Save** on a page, starts one there." />
+      <div class="ws-notes">
+        <div class="ws-notes__bar">
+          <button type="button" class="btn btn--small btn--primary" data-note-new aria-expanded="false" aria-controls="ws-editor">New note</button>
+          <div class="field ws-search">
+            <label for="ws-note-q">Search your notes</label>
+            <input class="input" type="search" id="ws-note-q" autocomplete="off" data-note-q aria-describedby="ws-note-count" />
+          </div>
+        </div>
+        <div class="ws-editor" id="ws-editor" data-note-editor hidden>
+          <form class="ne-form ws-editor__form" data-note-form aria-labelledby="ws-editor-h">
+            <h3 class="ne-h ws-editor__h" id="ws-editor-h" tabindex="-1" data-note-editor-h>New note</h3>
+            <div class="ne-fields" data-note-fields></div>
+            <div class="ne-actions">
+              <button type="button" class="btn" data-note-cancel>Cancel</button>
+              <button type="submit" class="btn btn--primary">Save note</button>
+            </div>
+          </form>
+        </div>
+        <p class="ws-sub" id="ws-note-count" data-note-count></p>
+        <div data-notes></div>
+      </div>
+    </section>
+
+    <section class="db-sec js-only" id="analyses" aria-labelledby="ws-analyses-h" data-needs-storage>
+      <SectionHead no={4} title="Saved analyses" id="ws-analyses-h" dek="The work the tools keep for you, room by room, each with a link back to its tool, and the results you saved from the Financial Laboratory with **Save this result to my workspace**." />
+      <p class="ws-sub" data-work-n tabindex="-1"></p>
+      <div class="ws-analyses" data-work></div>
+    </section>
+
     <section class="db-sec" id="course" aria-labelledby="db-course-h">
-      <SectionHead no={2} title="Your course" id="db-course-h" dek={`The ${subtopics.length} subtopics of IB DP Business Management. Each row shows what you have done here beside what the platform has for that subtopic: ${complete} are complete, with full notes or a complete brief.`} />
+      <SectionHead no={5} title="Your course" id="db-course-h" dek={`The ${subtopics.length} subtopics of IB DP Business Management. Each row shows what you have done here beside what the platform has for that subtopic: ${complete} are complete, with full notes or a complete brief.`} />
       <div class="db-course-top js-only" data-needs-storage>
         <figure class="db-chart" data-course-chart></figure>
         <div class="table-scroll db-units-wrap" role="region" aria-label="Your progress by unit" tabindex="0">
@@ -288,42 +445,48 @@ const complete = subtopics.filter((s) => s.state === 'complete').length;
     </section>
 
     <section class="db-sec js-only" aria-labelledby="db-visits-h" data-needs-storage>
-      <SectionHead no={3} title="Where you have been" id="db-visits-h" dek="The pages you opened on this device, most recent first. Visits are noted from the first time you open a page after the dashboard arrived; earlier visits were never recorded." />
+      <SectionHead no={6} title="Where you have been" id="db-visits-h" dek="The pages you opened on this device, most recent first. Visits are noted from the first time you open a page after the dashboard arrived; earlier visits were never recorded." />
       <div class="db-visits" data-visits></div>
     </section>
 
     <section class="db-sec js-only" aria-labelledby="db-practice-h" data-needs-storage>
-      <SectionHead no={4} title="Practice and activities" id="db-practice-h" dek="Your answers and self-checks, what was right in the exercises you checked, the case labs, the Decision Rooms and your recall. A self-check is your own judgement against the platform's mark scheme, not a grade." />
+      <SectionHead no={7} title="Practice and activities" id="db-practice-h" dek="Your answers and self-checks, what was right in the exercises you checked, the case labs, the Decision Rooms and your recall. A self-check is your own judgement against the platform's mark scheme, not a grade." />
       <div class="db-groups" data-groups></div>
     </section>
 
-    <section class="db-sec js-only" id="saved" aria-labelledby="db-saved-h" data-needs-storage>
-      <SectionHead no={5} title="Saved, and your work" id="db-saved-h" dek="The pages you saved, and the work the tools keep for you, with a link back to each." />
-      <div class="db-two">
-        <div class="db-panel">
-          <h3 class="db-panel__h" id="db-saved-list-h" tabindex="-1">Saved <span class="db-count" data-saved-n></span></h3>
-          <div data-saved></div>
+    <section class="db-sec js-only" id="export" aria-labelledby="ws-export-h" data-needs-storage>
+      <SectionHead no={8} title="Export selected work" id="ws-export-h" dek="Choose items from your list, notes and analyses. **Markdown** is a document to read and print; **JSON** is a file that **Import a copy**, below, reads back here or in another browser, combined with what is there. To copy everything instead, use **Download a copy**." />
+      <div class="ws-export" role="group" aria-labelledby="ws-export-h" aria-describedby="ws-sel-count">
+        <div class="ws-export__bar">
+          <button type="button" class="btn btn--small" data-sel-all>Choose everything</button>
+          <button type="button" class="btn btn--small" data-sel-none>Clear the choice</button>
         </div>
-        <div class="db-panel">
-          <h3 class="db-panel__h">Your work <span class="db-count" data-work-n></span></h3>
-          <div data-work></div>
+        <div class="ws-export__groups" data-export-groups></div>
+        <p class="ws-sub ws-export__count" id="ws-sel-count" data-sel-count aria-live="polite"></p>
+        <div class="ws-export__actions">
+          <button type="button" class="btn btn--primary" data-export-md>Download Markdown</button>
+          <button type="button" class="btn" data-export-json>Download JSON</button>
         </div>
+        <p class="field__error" data-export-err hidden></p>
       </div>
     </section>
 
     <section class="db-sec" id="data" aria-labelledby="db-data-h">
-      <SectionHead no={6} title="Your data" id="db-data-h" dek="What is kept, where it is, and what you can do with it." />
+      <SectionHead no={9} title="Your data" id="db-data-h" dek="What is kept, where it is, and what you can do with it." />
       <div class="db-data">
         <div class="prose db-data__text">
           <p>
             Everything on this page is read from this browser's local storage, on this device. Nothing is sent to the platform or to anyone else, there is no account, and the platform cannot see it. Every item's name starts with <code>bb:</code>.
           </p>
-          <p>Two items belong to the dashboard:</p>
+          <p>Five items belong to the workspace:</p>
           <ul>
             <li>
               <code>bb:learner</code>: the subtopic, mindmap, case, toolkit, framework and tool pages you open, each with the time of your first and latest visit and a count of visits (at most one in any half hour), and the exercise items you check, with whether each was right. It keeps the {LIMITS.visits} most recent pages and stays under {Math.round(LIMITS.bytes / 1000)} KB.
             </li>
-            <li><code>bb:saved</code>: the pages and items you saved, with the date, up to {LIMITS.saved}.</li>
+            <li><code>bb:saved</code>: the pages and items on your learning list, with the date each was saved, up to {LIMITS.saved}.</li>
+            <li><code>bb:workspace:list</code>: the order you gave your learning list, and each item's status and short note.</li>
+            <li><code>bb:workspace:notes</code>: your notes, with the page each is attached to and when it was written, up to {WS_LIMITS.notes} notes.</li>
+            <li><code>bb:workspace:snapshots</code>: the results you saved from the Financial Laboratory, each with its figures and date, up to the {WS_LIMITS.snapshots} most recent.</li>
           </ul>
           <p>
             The rest is kept by the tools themselves, so that your work is there when you return: answers and self-checks, ratings, choices, plans and notes. The <a href="/privacy/">privacy page</a> lists every item and can clear them all.
@@ -345,12 +508,12 @@ const complete = subtopics.filter((s) => s.state === 'complete').length;
           <div class="db-control">
             <input type="file" id="db-import" class="db-file" accept="application/json,.json" data-import aria-describedby="db-import-hint db-import-err" />
             <label for="db-import" class="btn db-file__label">Import a copy</label>
-            <p class="db-control__hint" id="db-import-hint">A file this dashboard downloaded. You are asked before anything is changed.</p>
+            <p class="db-control__hint" id="db-import-hint">A file this workspace downloaded: a whole copy, or a selection exported as JSON. You are asked before anything is changed.</p>
             <p class="field__error" id="db-import-err" data-import-err hidden></p>
           </div>
           <div class="db-control">
             <button type="button" class="btn" data-reset>Clear what is kept</button>
-            <p class="db-control__hint">The visit history, the saved items, or everything. You choose, then confirm.</p>
+            <p class="db-control__hint">The visit history, the learning list, your notes, the saved results, or everything. You choose, then confirm.</p>
           </div>
         </div>
       </div>
@@ -364,7 +527,9 @@ const complete = subtopics.filter((s) => s.state === 'complete').length;
         <fieldset class="db-dialog__choice" data-dialog-choice hidden>
           <legend class="label">What to clear</legend>
           <label><input type="radio" name="scope" value="visits" checked /> The visit history: the pages opened and the exercises checked</label>
-          <label><input type="radio" name="scope" value="saved" /> The saved items</label>
+          <label><input type="radio" name="scope" value="saved" /> The learning list: the saved items, with their order, status and notes</label>
+          <label><input type="radio" name="scope" value="notes" /> Your notes</label>
+          <label><input type="radio" name="scope" value="snapshots" /> The results saved from the Financial Laboratory</label>
           <label><input type="radio" name="scope" value="all" /> Everything this site keeps in this browser, including your answers, ratings, plans and notes</label>
         </fieldset>
         <div class="db-dialog__actions">
