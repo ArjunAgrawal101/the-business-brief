@@ -1,0 +1,108 @@
+---
+/**
+ * Advanced Management and Strategy: the hub of the platform's undergraduate,
+ * MBA and professional learning. It is kept apart from the IB course: it
+ * states that plainly, shows how each module is built, and lists the six
+ * domains with the modules that exist in each. Practice at this level (the
+ * Boardroom, the briefings, the laboratories) is linked from here.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import { advancedLibrary } from '../../lib/advanced-content';
+import { DOMAINS, MODULE_PARTS, advancedHref } from '../../lib/advanced';
+import { plain } from '../../lib/markup';
+import '../../styles/advanced.css';
+
+const lib = await advancedLibrary();
+const domains = DOMAINS.map((d) => ({ d, modules: lib.byDomain[d.id] })).filter((x) => x.modules.length > 0);
+const total = lib.modules.length;
+const hours = Math.round(lib.modules.reduce((s, m) => s + m.data.minutes, 0) / 60);
+const PRACTICE = [
+  { title: 'The Boardroom', href: '/boardroom/', text: 'Multi-round simulations: take a seat on the board and follow each decision through every function.' },
+  { title: 'Business Intelligence', href: '/intelligence/', text: 'Real developments, dated and sourced, read through management concepts.' },
+  { title: 'Strategy Studio', href: '/strategy-studio/', text: 'Industry analysis, portfolio and growth options, decision trees and option appraisal on your own case.' },
+  { title: 'Case Vault', href: '/case-vault/', text: 'Cases by industry with exhibits, stakeholders and a decision to defend.' },
+  { title: 'Enrichment maps', href: '/mindmaps/#enrichment', text: 'Nine maps of management beyond the IB course, to see each field whole.' },
+];
+---
+
+<BaseLayout
+  title="Advanced Management and Strategy"
+  description="Undergraduate, MBA and professional management study, kept apart from the IB course: strategy, finance, leadership, marketing, operations and entrepreneurship, each module with models, real applications, cases, critical evaluation and a decision."
+  section="advanced"
+  room="advanced"
+>
+  <section class="am-hero">
+    <div class="wrap">
+      <Breadcrumbs trail={[{ label: 'Advanced Management' }]} />
+      <p class="am-hero__kicker">Beyond the IB course · Undergraduate, MBA and professional</p>
+      <h1 class="am-hero__title">Advanced Management and <em>Strategy</em></h1>
+      <p class="am-hero__lead">
+        Management at the depth of a university or business school course. Each module sets out the idea, the evidence behind it, the models that structure it, how real organizations use it, where it fails, and a decision for you to make.
+      </p>
+      <dl class="am-hero__stats">
+        <div><dt>Domains</dt><dd>{domains.length}</dd></div>
+        <div><dt>Modules</dt><dd>{total}</dd></div>
+        <div><dt>Hours of reading</dt><dd>{hours}</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <div class="wrap page-body">
+    <section class="am-sec" aria-labelledby="am-apart-h">
+      <SectionHead no="01" title="Kept apart from the IB course" id="am-apart-h" />
+      <div class="am-apart">
+        <div class="prose">
+          <p>
+            Nothing here is part of the IB Diploma Programme Business Management syllabus or its assessment, and none of it counts towards the platform's IB coverage. Where a module starts from something the IB course teaches, it names the subtopic, so an IB student who wants to look further can see where the course ends and this begins.
+          </p>
+          <p>
+            The audience is undergraduates, MBA students, professionals and curious IB students. Real organizations appear only with dated, cited facts; illustrative examples and fictional cases are labelled as such, and every work cited is in the <a href="/sources/">sources register</a>.
+          </p>
+        </div>
+        <ol class="am-parts" aria-label="How every module is built">
+          {MODULE_PARTS.map((p, k) => <li><span class="am-parts__no">{String(k + 1).padStart(2, '0')}</span> {p.title}</li>)}
+        </ol>
+      </div>
+    </section>
+
+    <section class="am-sec" aria-labelledby="am-domains-h">
+      <SectionHead no="02" title="The six domains" id="am-domains-h" dek="Each domain opens with the question it helps a manager answer." />
+      <ul class="am-domains" role="list">
+        {
+          domains.map(({ d, modules }) => (
+            <li class="am-domain">
+              <p class="am-domain__no" aria-hidden="true">{String(d.order).padStart(2, '0')}</p>
+              <h3 class="am-domain__name">
+                <a href={advancedHref(d.id)}>{d.name}</a>
+              </h3>
+              <p class="am-domain__q">{d.question}</p>
+              <ol class="am-domain__mods" role="list">
+                {modules.map((m) => (
+                  <li>
+                    <a href={advancedHref(d.id, m.id)}>{m.data.title}</a>
+                  </li>
+                ))}
+              </ol>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="am-sec" aria-labelledby="am-practise-h">
+      <SectionHead no="03" title="Practise at this level" id="am-practise-h" dek="The ideas are worth most when you use them on a decision." />
+      <ul class="am-practise" role="list" data-practice>
+        {
+          PRACTICE.map((p) => (
+            <li>
+              <a href={p.href}>{p.title}</a>
+              <p>{plain(p.text)}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
