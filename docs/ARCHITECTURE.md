@@ -29,7 +29,7 @@ The platform has no accounts and stores nothing on a server. A static site is th
 
 | Collection | Source | Loader |
 | --- | --- | --- |
-| topics, cases, decisions, tools, interactives, curricula, mindmaps, notes, boardroom | one YAML file per entry | Astro `glob` |
+| topics, cases, decisions, tools, interactives, curricula, mindmaps, notes, boardroom, executive | one YAML file per entry | Astro `glob` |
 | questions, glossary | several YAML files, each a list of entries with ids | custom `yamlList` loader (checks for duplicate ids) |
 | calculations, assessment, commandTerms, concepts, pathways, modules, sources, claims, resources | one YAML file of entries in `src/content/data/` | Astro `file` |
 | studio | one YAML file per Strategy Studio tool, and one for its engagement, in `src/content/studio/` (schema in `src/lib/schemas-strategy.ts`) | Astro `glob` |
@@ -87,6 +87,7 @@ The same checks run in the unit tests (`tests/unit/integrity.test.ts`), which lo
 | `src/lib/force-field.ts` | Force field totals and the effect of weakening a force |
 | `src/lib/decision-room.ts` | Which choices a round offers, how outcomes combine into the board pack, how measures are written and compared |
 | `src/lib/boardroom/` | The Boardroom: `engine.ts` (one business worked period by period: pure, deterministic, its cross-functional links and lags documented at the top), `scenario.ts` (history, rounds, events chosen by the state, scorecards, every path compared), `kpis.ts`, `narrate.ts` (tokens, effects and consequences in words), `charts.ts`, `render.ts` (markup shared by server and browser), `view.ts` (the board pack's statements), `schema.ts` and `roles.ts`; `src/lib/integrity-boardroom.ts` runs every path and fails the build on a broken identity or reference |
+| `src/lib/executive/` | The Boardroom's executive simulation: `engine.ts` (one business worked a year at a time from a budget across six levers: pure, deterministic, its links and lags documented at the top; statements, cash flow and position reconcile every year), `sim.ts` (history, plans, the rules a year's plan must keep, scorecards, the comparison of strategies, each lever's contribution, the figures the questions quote), `kpis.ts`, `narrate.ts` (tokens such as `{{revenue@2026}}`, and each year explained), `render.ts` and `charts.ts` (markup shared by server and browser, reusing the Boardroom's tiles and sparklines), `view.ts`, `config.ts`, `schema.ts`, `roles.ts`, `content.ts`; `integrity.ts` fails the build on a broken reference, an unfillable token or a broken identity |
 | `src/lib/cashflow.ts` | The cash flow forecast in the guide's layout, ways of paying for an investment, working capital measures, the profit for the period and its reconciliation to cash, worked in cents |
 | `src/lib/ratios.ts`, `src/lib/investment.ts` | The guide's ratios from two years of statements, with strategies applied to the accounts; payback, ARR and NPV with the guide's printed discount factors |
 | `src/lib/budget.ts` | Budget variances for 3.9, marked [F] or [A] by their effect on profit, with totals in the layout of the guide's budget |
@@ -145,6 +146,7 @@ The quiz engine (`src/scripts/quiz.ts`) dispatches a bubbling `quiz:progress` ev
 | `/case-vault/`, `/cases/[id]/` | The Case Vault (the archive, its filters and the Case of the Week) and the case files; `/cases/` sends readers on to the vault |
 | `/decision-room/`, `/decision-room/[id]/` | Decision Rooms |
 | `/boardroom/`, `/boardroom/[id]/` | The Boardroom: multi-round simulations, each a brief, a generated board pack, the simulation (a casebook without JavaScript) and a debrief |
+| `/boardroom/executive/`, `/boardroom/executive/simulation/` | The Boardroom's executive simulation: the company brief, the seven roles and how it works; then the nine stages and the debrief (a casebook with a worked example without JavaScript) |
 | `/finance-desk/`, `/finance-desk/costs-and-revenue/`, `/finance-desk/break-even/`, `/finance-desk/contribution/`, `/finance-desk/ratios/`, `/finance-desk/cash-flow/`, `/finance-desk/investment-appraisal/` | Finance Desk |
 | `/finance-desk/lab/`, `/finance-desk/lab/[id]/` | The Financial Laboratory and its twenty calculators (`src/lib/finance-lab/catalogue.ts`) |
 | `/rooms/`, `/case-room/`, `/case-room/halden-diagnosis/`, `/strategy-studio/`, `/market-studio/`, `/people-and-culture/`, `/operations-floor/` | All rooms; the rooms with pages of their own; the case lab |
