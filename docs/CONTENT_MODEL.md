@@ -204,7 +204,7 @@ Narratives, event texts, the brief and the first round may use tokens such as `{
 | `strategies`, `walkthrough` | Each strategy's summary, what it involves, risks, fit with the evidence and feedback, its plan year by year and the lesson the debrief draws from it; the strategy the worked example follows |
 | `debrief`, `method` | Trade-offs, theory in the IB course by subtopic, ideas beyond it with their sources, misconceptions, original practice questions and glossary terms; how the figures were made |
 
-Texts quote figures only through tokens: `{{revenue@2026}}`, a change `{{morale@2023>2026}}`, a change in per cent `{{pct:revenue@2023>2026}}`, a figure worked in `sim.ts` `{{d:spareNormal}}`, and in texts about a run `{{pbit@final}}`. The integrity check fails on a token a text cannot fill, including one that quotes a year the text cannot yet see. Claims a strategy's lesson or the debrief makes about the figures belong in the unit tests.
+Texts quote figures only through tokens: `{{revenue@2026}}`, a change `{{morale@2023>2026}}`, a change in per cent with its sign `{{pct:revenue@2023>2026}}` (for brackets) or without it `{{pc:revenue@2023>2026}}` (for a sentence that says which way), a figure worked in `sim.ts` `{{d:spareNormal}}`, and in texts about a run `{{pbit@final}}`. The integrity check fails on a token a text cannot fill, including one that quotes a year the text cannot yet see. Claims a strategy's lesson or the debrief makes about the figures belong in the unit tests.
 
 ## Interactions
 

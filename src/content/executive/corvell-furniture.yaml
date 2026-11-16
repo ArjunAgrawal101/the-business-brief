@@ -5,7 +5,8 @@
 # years below. Texts quote figures only through tokens:
 #   {{revenue@2026}}                a measure in a year
 #   {{revenue@2023>2026}}           its change between two years
-#   {{pct:revenue@2023>2026}}       the change in per cent
+#   {{pct:revenue@2023>2026}}       the change in per cent, signed, for brackets: (+5.1%)
+#   {{pc:revenue@2023>2026}}        the same without its sign, for a sentence: fell by 7.8%
 #   {{d:spareNormal}}               a figure worked in src/lib/executive/sim.ts (derived)
 #   {{pbit@final}}                  a measure in the last year of the run being described
 # Change a number here and every exhibit follows. tests/unit/executive.test.ts
@@ -41,7 +42,7 @@ background:
     return on capital employed {{roce@2026}}.
   - >
     Nothing dramatic happened. Timber, finishes and fittings cost more every year, and the price list rose more
-    slowly. Importers of cheaper solid-wood furniture held their prices. To protect profit the marketing budget was cut
+    slowly. Importers of cheaper solid-wood furniture held or trimmed their prices. To protect profit the marketing budget was cut
     every year, from {{marketing@2023}} in 2023 to {{marketing@2026}} in 2026, and pay was frozen in 2025 and 2026. A
     second showroom opened in 2025 on a ten-year lease. Experienced makers began to leave: {{leavers@2026}} left in
     2026, against {{leavers@2023}} in 2023.
@@ -66,7 +67,7 @@ stakeholders:
   - name: The Corvell family
     interest: Owns 70% of the shares. A business that stays independent, stays in Wexley Bridge and keeps its name for craft.
     power: high
-    view: '“My grandfather made furniture here for fifty years. I will not be the one who sells it or moves it.” Ruth Corvell, chair'
+    view: '“Three generations of my family have made furniture here. I will not be the one who sells it or moves it.” Ruth Corvell, chair'
   - name: The investment fund
     interest: Owns 30% of the shares and has a seat on the board. A return on its investment, and a company whose stake it could one day sell.
     power: high
@@ -78,7 +79,7 @@ stakeholders:
   - name: The bank
     interest: Its loan of {{debt@2026}} repaid as agreed, and the overdraft kept inside its limit of {{d:overdraftLimit}}.
     power: medium
-    view: '“Corvell has banked with us for forty years. A plan that borrows to grow is a conversation; a plan that borrows to stand still is not.”'
+    view: '“Corvell has banked with us for decades. A plan that borrows to grow is a conversation; a plan that borrows to stand still is not.”'
   - name: Customers and the independent shops
     interest: Furniture that lasts twenty years, delivered on the promised date; for the shops, a brand that sells.
     power: medium
@@ -200,7 +201,7 @@ plan:
       title: The pound strengthens, and timber jumps
       text: >
         In the spring the pound rose against the euro, to {{fx@2028}}, and a dry summer in the forests that supply
-        European oak pushed materials up by {{pct:materialPerPiece@2027>2028}}, twice the forecast. A strike at the port
+        European oak pushed materials up by {{pc:materialPerPiece@2027>2028}}, twice the forecast. A strike at the port
         Corvell's distributor uses held shipments for three weeks: for anyone exporting, more pieces arrived damaged and
         had to be replaced.
     conditions: { marketGrowth: 4, competitorPrice: 2, materialCost: 4, wage: 2.5, overheads: 0, morale: 0, fx: 1.22, exportDamage: 7 }
@@ -208,7 +209,7 @@ plan:
     note: A steadier year, with the pound easing back and timber rising as forecast.
     news:
       title: A steadier year
-      text: The pound eased back to {{fx@2029}}, still above the planning rate. Materials rose by {{pct:materialPerPiece@2028>2029}}, as forecast, and the port worked normally.
+      text: The pound eased back to {{fx@2029}}, still above the planning rate. Materials rose by {{pc:materialPerPiece@2028>2029}}, as forecast, and the port worked normally.
     conditions: { marketGrowth: 4, competitorPrice: 2, materialCost: 2, wage: 2.5, overheads: 0, morale: 0, fx: 1.18 }
 
 rules:
@@ -283,7 +284,7 @@ roles:
   cmo:
     brief: >
       You see the customers Corvell has lost. Market share fell from {{marketShare@2023}} to {{marketShare@2026}} while
-      the market grew, because Corvell's prices rose against rivals that held theirs: on an index of its price against
+      the market grew, because Corvell's prices rose against rivals that held or trimmed theirs: on an index of its price against
       competitors' (competitors = 100), Corvell went from {{relativePrice@2023}} to {{relativePrice@2026}}. Marketing was
       cut from {{marketing@2023}} to {{marketing@2026}}, and the brand, at {{brand@2026}}, has only begun to show it.
 
@@ -365,7 +366,7 @@ roles:
   strategy:
     brief: >
       You look beyond the next year. Corvell has been losing share at home for three years while the market grew by
-      {{pct:marketSize@2023>2026}}, and its return on capital employed has fallen from {{roce@2023}} to {{roce@2026}}. A
+      {{pc:marketSize@2023>2026}}, and its return on capital employed has fallen from {{roce@2023}} to {{roce@2026}}. A
       distributor has offered to sell the range in the Netherlands, Belgium and Germany, and rivals compete on price at home.
 
 
@@ -394,7 +395,7 @@ roles:
       whether the plan works for the whole business: the margin, the workshop, the people and the bank.
 
 
-      Your first reading of the figures: revenue fell by {{pct:revenue@2023>2026}} between 2023 and 2026, but operating
+      Your first reading of the figures: revenue fell by {{pc:revenue@2023>2026}} between 2023 and 2026, but operating
       profit fell from {{pbit@2023}} to {{pbit@2026}}. The company has cash ({{netCash@2026}}) and time, but not
       unlimited amounts of either, and each executive sees a different part of the problem. Your value is in seeing how
       the parts connect.
@@ -447,18 +448,18 @@ stages:
           - id: collapse
             text: Revenue collapsed while costs stayed the same.
             feedback: >
-              Revenue fell by {{pct:revenue@2023>2026}} over three years: a decline, not a collapse. And costs did not
-              stay the same: cost of sales for each piece rose by {{pct:costPerPiece@2023>2026}}, and overheads by
-              {{pct:overheads@2023>2026}}.
+              Revenue fell by {{pc:revenue@2023>2026}} over three years: a decline, not a collapse. And costs did not
+              stay the same: cost of sales for each piece rose by {{pc:costPerPiece@2023>2026}}, and overheads by
+              {{pc:overheads@2023>2026}}.
           - id: squeeze
             correct: true
             text: >
               Each piece cost more to make while prices rose less, fewer pieces were sold, and the costs that do not
               change with output rose.
             feedback: >
-              Right. Materials for each piece rose by {{pct:materialPerPiece@2023>2026}} while the average price rose by
-              {{pct:price@2023>2026}}, so the gross profit margin fell from {{gpm@2023}} to {{gpm@2026}}. Pieces
-              delivered fell by {{pct:volume@2023>2026}}, and overheads rose by {{pct:overheads@2023>2026}}. Each effect
+              Right. Materials for each piece rose by {{pc:materialPerPiece@2023>2026}} while the average price rose by
+              {{pc:price@2023>2026}}, so the gross profit margin fell from {{gpm@2023}} to {{gpm@2026}}. Pieces
+              delivered fell by {{pc:volume@2023>2026}}, and overheads rose by {{pc:overheads@2023>2026}}. Each effect
               on its own was modest; together they took operating profit from {{pbit@2023}} to {{pbit@2026}}.
           - id: interest
             text: Interest on new borrowing turned an operating profit into a loss.
@@ -492,7 +493,7 @@ stages:
           A cause. Each piece's gross profit shrank as costs outran prices: the gross profit margin fell from
           {{gpm@2023}} to {{gpm@2026}}. The margin on what is sold is the first place to look.
       - id: competitors
-        title: Rivals held their prices
+        title: Rivals held or cut their prices
         area: marketing
         verdict: cause
         text: >
@@ -531,7 +532,7 @@ stages:
         verdict: cause
         text: >
           Overheads rose from {{overheads@2023}} to {{overheads@2026}} ({{pct:overheads@2023>2026}}), mostly the lease on
-          the second showroom, while revenue fell by {{pct:revenue@2023>2026}}.
+          the second showroom, while revenue fell by {{pc:revenue@2023>2026}}.
         feedback: >
           A cause. A cost that does not change with output weighs more as sales fall. The new showroom has not brought
           the sales to pay for itself, which also makes it the obvious first target of an efficiency programme.
@@ -554,7 +555,7 @@ stages:
           A sales manager's view: “Nobody wants solid wood any more.” The home market was {{marketSize@2023}} pieces in
           2023 and {{marketSize@2026}} in 2026.
         feedback: >
-          Not supported. The market grew by {{pct:marketSize@2023>2026}} over the three years; it was Corvell's share
+          Not supported. The market grew by {{pc:marketSize@2023>2026}} over the three years; it was Corvell's share
           of it that fell. The problem is Corvell's position in the market, not the market.
       - id: interest
         title: Interest on borrowing
@@ -624,7 +625,7 @@ stages:
       - kind: choice
         id: price-rise
         prompt: >
-          The marketing team's price tests suggest that a 5% price rise would cost about {{d:priceRise5Volume}} of
+          The marketing team's price tests suggest that a 5% price rise would cost about {{d:priceRise5Lost}} of
           orders. At 2026 costs, what would a 5% rise do to revenue and to gross profit?
         options:
           - id: both-up
@@ -908,7 +909,7 @@ strategies:
     feedback: >
       Conditional. It answers the lost market share and the fading brand, but not the squeezed margin: with costs still
       rising, lower prices mean a thinner margin on every piece. It works only if the workshop can make the extra pieces
-      without overtime, and the machinery arrives a year after the demand.
+      without overtime, yet the machinery arrives a year after the demand.
     plan:
       - { price: -4, costCut: 0, marketing: 1500000, capacity: 900000, people: 100000, international: 0 }
       - { price: -1, costCut: 0, marketing: 1400000, capacity: 600000, people: 100000, international: 0 }
@@ -942,8 +943,8 @@ strategies:
       - { price: 2, costCut: 0, marketing: 800000, capacity: 0, people: 150000, international: 500000 }
     lesson: >
       Growth with a delay and a currency. Exports earned {{exportRevenue@2029}} in 2029, {{exportShare@2029}} of
-      revenue, and operating profit reached {{pbit@2029}}, but only after an operating loss of {{pbit@2027}} in the first
-      year, with net cash as low as {{netCash@2028}}. The pound's rise in 2028 cut what every export earned.
+      revenue, and operating profit reached {{pbit@2029}}, but only after a first year in which operating profit was
+      {{pbit@2027}}, with net cash as low as {{netCash@2028}}. The pound's rise in 2028 cut what every export earned.
 
 walkthrough:
   strategy: restore

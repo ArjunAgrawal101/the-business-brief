@@ -285,7 +285,7 @@ export const baselinePlan = (sc: Pick<SimCore, 'rules' | 'plan'>): Levers[] => s
  * for the analysis stages' questions and explanations. The content quotes
  * them as {{d:name}}; the unit tests check the answers keyed on them.
  */
-export function derived(sc: Pick<SimCore, 'model' | 'start' | 'history' | 'plan' | 'rules'>): Record<string, { value: number; kind: 'percent' | 'money' | 'units' | 'price' | 'signedPercent' | 'number' | 'decimal' }> {
+export function derived(sc: Pick<SimCore, 'model' | 'start' | 'history' | 'plan' | 'rules'>): Record<string, { value: number; kind: 'percent' | 'wholePercent' | 'money' | 'units' | 'price' | 'signedPercent' | 'number' | 'decimal' }> {
   const { history } = cachedHistory(sc);
   const last = history[history.length - 1];
   const first = history[0];
@@ -301,6 +301,7 @@ export function derived(sc: Pick<SimCore, 'model' | 'start' | 'history' | 'plan'
   const inputs = unitCost;
   return {
     priceRise5Volume: { value: (volumeFactor - 1) * 100, kind: 'signedPercent' },
+    priceRise5Lost: { value: (1 - volumeFactor) * 100, kind: 'percent' },
     priceRise5Revenue: { value: (1.05 * volumeFactor - 1) * 100, kind: 'signedPercent' },
     priceRise5Gross: { value: (gpAfter / gpBefore - 1) * 100, kind: 'signedPercent' },
     unitCost: { value: unitCost, kind: 'price' },
@@ -328,7 +329,7 @@ export function derived(sc: Pick<SimCore, 'model' | 'start' | 'history' | 'plan'
     intlSetup: { value: m.intlSetup, kind: 'money' },
     intlPotential: { value: m.intlPotential, kind: 'units' },
     intlDebtorDays: { value: m.intlDebtorDays, kind: 'units' },
-    intlFreight: { value: m.intlFreight, kind: 'price' },
-    intlDamage: { value: m.intlDamage, kind: 'percent' },
+    intlFreight: { value: m.intlFreight, kind: 'money' },
+    intlDamage: { value: m.intlDamage, kind: 'wholePercent' },
   };
 }

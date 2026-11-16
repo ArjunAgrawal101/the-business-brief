@@ -593,7 +593,10 @@ describe('tokens and formatting', () => {
     expect(fillTokens('{{revenue@2026}}', src, ctx)).toBe(fmtKpi('revenue', k.revenue, ctx));
     expect(fillTokens('{{revenue}}', src, ctx)).toBe(fmtKpi('revenue', k.revenue, ctx));
     expect(fillTokens('{{morale@2023>2026}}', src, ctx)).toBe(kpiChange('morale', history[0]!.kpis.morale, k.morale, ctx).text);
-    expect(fillTokens('{{pct:marketSize@2023>2026}}', src, ctx)).toMatch(/^\+⁠\d+\.\d%$/);
+    expect(fillTokens('{{pct:marketSize@2023>2026}}', src, ctx)).toMatch(/^\+\u2060\d+\.\d%$/);
+    // In a sentence that says which way, the change carries no sign: "revenue fell by 7.8%".
+    const fall = ((history[0]!.kpis.revenue - k.revenue) / history[0]!.kpis.revenue) * 100;
+    expect(fillTokens('fell by {{pc:revenue@2023>2026}}', src, ctx)).toBe(`fell by ${fall.toFixed(1)}%`);
     expect(fillTokens('{{d:elasticity}}', src, ctx)).toBe('2.0');
   });
 
@@ -608,8 +611,8 @@ describe('tokens and formatting', () => {
   });
 
   it('writes changes in whole pounds for prices, and points for percentages', () => {
-    expect(kpiChange('price', 878.89, 914.05, ctx).text).toBe('+⁠£35');
-    expect(kpiChange('profitMargin', 1, 5.5, ctx)).toMatchObject({ verdict: 'better', text: '+⁠4.5 pts' });
+    expect(kpiChange('price', 878.89, 914.05, ctx).text).toBe('+\u2060£35');
+    expect(kpiChange('profitMargin', 1, 5.5, ctx)).toMatchObject({ verdict: 'better', text: '+\u20604.5 pts' });
     expect(kpiChange('turnover', 15, 8, ctx)).toMatchObject({ verdict: 'better', words: 'Down, better' });
   });
 });

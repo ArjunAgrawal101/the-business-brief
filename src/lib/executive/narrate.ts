@@ -40,6 +40,8 @@ export function fmtDerived(d: Derived[string], ctx: FormatContext): string {
   switch (d.kind) {
     case 'percent':
       return `${fmtNumber(d.value, 1)}%`;
+    case 'wholePercent':
+      return `${fmtNumber(d.value, 0)}%`;
     case 'signedPercent':
       return `${d.value > 0 ? '+' : d.value < 0 ? `${MINUS}${JOIN}` : ''}${fmtNumber(Math.abs(d.value), 1)}%`;
     case 'money':
@@ -61,13 +63,17 @@ export function fmtDerived(d: Derived[string], ctx: FormatContext): string {
 
 const TOKEN = /\{\{\s*([^{}]+?)\s*\}\}/g;
 
-/** A token, read: a derived figure, or a KPI in a year (or its change between two years, in figures or per cent). */
-type Parsed = { kind: 'derived'; name: string } | { kind: 'kpi'; id: string; pct: boolean; year?: string; to?: string };
+/**
+ * A token, read: a derived figure, or a KPI in a year, or its change between
+ * two years in its own terms, in per cent with its sign (pct:, for brackets)
+ * or in per cent without it (pc:, for a sentence that says which way).
+ */
+type Parsed = { kind: 'derived'; name: string } | { kind: 'kpi'; id: string; pct: false | 'signed' | 'plain'; year?: string; to?: string };
 
 function parse(inner: string): Parsed | null {
   if (inner.startsWith('d:')) return { kind: 'derived', name: inner.slice(2) };
-  const pct = inner.startsWith('pct:');
-  const body = pct ? inner.slice(4) : inner;
+  const pct = inner.startsWith('pct:') ? 'signed' : inner.startsWith('pc:') ? 'plain' : false;
+  const body = pct === 'signed' ? inner.slice(4) : pct === 'plain' ? inner.slice(3) : inner;
   const m = /^([a-zA-Z]+)(?:@(\d{4}|final)(?:>(\d{4}|final))?)?$/.exec(body);
   if (!m) return null;
   return { kind: 'kpi', id: m[1] ?? '', pct, year: m[2], to: m[3] };
@@ -102,6 +108,7 @@ export function fillTokens(text: string, src: TokenSource, ctx: FormatContext): 
       const a = yearOf(src, t.year);
       const b = yearOf(src, t.to);
       if (!a || !b) return whole;
+      if (t.pct === 'plain') return `${fmtNumber(Math.abs(((b.kpis[id] - a.kpis[id]) / Math.abs(a.kpis[id] || 1)) * 100), 1)}%`;
       return t.pct ? fmtPctChange(a.kpis[id], b.kpis[id]) : kpiChange(id, a.kpis[id], b.kpis[id], ctx).text;
     }
     if (t.pct) return whole;
@@ -250,9 +257,15 @@ export function explainYear(r: YearResult, prev: YearResult, ctx: NarrateContext
   out.finance.push(
     `Revenue ${fmtMoneyCompact(k.revenue, ctx.symbol)}, gross profit margin ${pc(k.gpm)}, profit before interest and tax ${fmtMoneyCompact(k.pbit, ctx.symbol)} (a profit margin of ${pc(k.profitMargin)}), profit for the year ${fmtMoneyCompact(k.profit, ctx.symbol)}.`,
   );
+  const spent = -r.cash.investing;
+  const machinery = -r.cash.capex;
   out.finance.push(
-    `Cash from trading was ${fmtMoneyCompact(r.cash.operating, ctx.symbol)}; investment ${fmtMoneyCompact(-r.cash.investing, ctx.symbol)}. Net cash ended the year at ${fmtMoneyCompact(k.netCash, ctx.symbol)}, ${
-      k.headroom >= 0 ? `${fmtMoneyCompact(k.headroom, ctx.symbol)} inside the overdraft limit` : `${fmtMoneyCompact(-k.headroom, ctx.symbol)} over the overdraft limit: the bank charges a penalty rate and wants a plan`
+    `Cash from trading was ${fmtMoneyCompact(r.cash.operating, ctx.symbol)}; ${fmtMoneyCompact(spent, ctx.symbol)} went on the plant (${machinery > 0 ? `${fmtMoneyCompact(machinery, ctx.symbol)} of new machinery, the rest upkeep` : 'upkeep alone'}). Net cash ended the year at ${fmtMoneyCompact(k.netCash, ctx.symbol)}${
+      k.overdraft <= 0
+        ? ', with the overdraft unused'
+        : k.headroom >= 0
+          ? `: an overdraft ${fmtMoneyCompact(k.headroom, ctx.symbol)} inside its limit`
+          : `: an overdraft ${fmtMoneyCompact(-k.headroom, ctx.symbol)} over its limit, so the bank charges a penalty rate and wants a plan`
     }.`,
   );
   out.finance.push(`Return on capital employed: ${pc(k.roce)}.`);
