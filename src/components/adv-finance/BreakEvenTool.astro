@@ -1,0 +1,161 @@
+---
+/**
+ * Break-even scenarios: one price and forecast, two cost structures, and the
+ * comparison between them: break-even, margin of safety, operating leverage
+ * and the indifference volume, with the profit at each volume charted.
+ * Rendered in full on the server; src/scripts/adv-finance/break-even.ts makes
+ * it live with the same functions.
+ */
+import SectionHead from '../layout/SectionHead.astro';
+import { BUSINESS } from '../../lib/adv-finance/business';
+import { SHARED_FIELDS, STRUCTURE_FIELDS } from '../../lib/adv-finance/cost-structure';
+import { buildCostReport } from '../../lib/adv-finance/cost-structure-view';
+import { fieldHtml, textFieldHtml } from '../../lib/adv-finance/forms';
+import { COST_EXAMPLE_FORM, costFromForm } from '../../lib/adv-finance/state';
+import { advancedTool } from '../../lib/adv-finance/catalogue';
+import { BREAK_EVEN } from '../../lib/finance-lab/business';
+import { CURRENCIES, PERIODS } from '../../lib/finance-lab/fields';
+import { contributionPerUnit, operatingLeverage, profit } from '../../lib/finance';
+import { fmtMoney, fmtNumber } from '../../lib/format';
+import type { FieldSpec } from '../../lib/finance-lab/types';
+import { labHref } from '../../lib/finance-lab/catalogue';
+
+const tool = advancedTool('break-even-scenarios');
+const form = COST_EXAMPLE_FORM;
+const { input } = costFromForm(form);
+if (!input) throw new Error('The break-even example does not pass its own checks.');
+const s = form.settings;
+const report = buildCostReport(input, s, s.currency);
+const r = report.regions;
+const uid = 'af-be';
+const field = (spec: FieldSpec, prefix = '') => fieldHtml({ spec, name: `${prefix}${spec.key}`, value: form.fields[`${prefix}${spec.key}`] ?? '', uid, currency: s.currency, settings: s });
+// Packing as it is done now, from the Financial Laboratory, for comparison.
+const nowProfit = profit(BREAK_EVEN.price, BREAK_EVEN.variableCost, BREAK_EVEN.fixedCosts, BREAK_EVEN.quantity);
+const nowDol = operatingLeverage(contributionPerUnit(BREAK_EVEN.price, BREAK_EVEN.variableCost) * BREAK_EVEN.quantity, nowProfit);
+---
+
+<div class="fl af af--break-even" data-ix="adv-finance" data-tool="break-even" data-key={tool.storageKey} data-name={tool.name} id="tool">
+  <section class="fl-desk" aria-labelledby={`${uid}-desk`}>
+    <header class="fl-desk__bar">
+      <h2 class="fl-desk__title" id={`${uid}-desk`}>The comparison</h2>
+      <p class="fl-source" data-source>Example figures: {BUSINESS.name}, a fictional business. Simulated data.</p>
+    </header>
+    <p class="state state--error fl-broken" data-error hidden>The comparison could not start. The worked example below uses the example figures.</p>
+    <div class="fl-desk__grid">
+      <div class="fl-desk__inputs">
+        <form class="fl-form js-only" data-af-form novalidate aria-label="Your figures">
+          <fieldset class="fl-fields">
+            <legend class="label label--ink">Both structures</legend>
+            <Fragment set:html={SHARED_FIELDS.map((f) => field(f)).join('')} />
+          </fieldset>
+          <div class="af-pair">
+            {
+              (['a', 'b'] as const).map((k) => (
+                <fieldset class="fl-fields">
+                  <legend class="label label--ink">{k === 'a' ? 'First structure' : 'Second structure'}</legend>
+                  <Fragment set:html={textFieldHtml({ name: `${k}.name`, label: 'Name', value: form.names[k], uid })} />
+                  <Fragment set:html={STRUCTURE_FIELDS.map((f) => field(f, `${k}.`)).join('')} />
+                </fieldset>
+              ))
+            }
+          </div>
+          <details class="fl-settings">
+            <summary>Currency, units and period</summary>
+            <div class="fl-settings__body">
+              <div class="field">
+                <label for={`${uid}-currency`}>Currency</label>
+                <select class="select" id={`${uid}-currency`} data-setting="currency" name="currency">
+                  {CURRENCIES.map((c) => <option value={c.value} selected={c.value === s.currency}>{c.label}</option>)}
+                </select>
+              </div>
+              <div class="field">
+                <label for={`${uid}-unit`}>One unit is called</label>
+                <input class="input" type="text" autocomplete="off" maxlength="24" id={`${uid}-unit`} data-setting="unit" name="unit" value={s.unit} />
+              </div>
+              <div class="field">
+                <label for={`${uid}-units`}>More than one are called</label>
+                <input class="input" type="text" autocomplete="off" maxlength="24" id={`${uid}-units`} data-setting="units" name="units" value={s.units} />
+              </div>
+              <div class="field">
+                <label for={`${uid}-per`}>Period</label>
+                <select class="select" id={`${uid}-per`} data-setting="period" name="period">
+                  {PERIODS.map((p) => <option value={p} selected={p === s.period}>{p}</option>)}
+                </select>
+              </div>
+              <p class="field__hint fl-settings__note">{BUSINESS.name}’s figures are in dollars, bags and months.</p>
+            </div>
+          </details>
+          <ul class="fl-errlist" data-err-list hidden></ul>
+        </form>
+        <div class="fl-given nojs-only">
+          <p class="label label--ink">The figures</p>
+          <dl class="fl-given__list" data-region="given" set:html={r.given} />
+          <p class="small fl-given__note">Changing these figures needs JavaScript. With it switched off, the page shows the full worked example for the figures above.</p>
+        </div>
+        <div class="fl-tools js-only" role="group" aria-label="Your figures">
+          <button type="button" class="btn btn--small" data-act="reset">Reset to the example</button>
+          <button type="button" class="btn btn--small" data-act="csv">Download CSV</button>
+          <button type="button" class="btn btn--small" data-act="print">Print</button>
+          <p class="small af-saved" data-save-status>Your figures are kept in this browser once you change them. Nothing is sent anywhere.</p>
+        </div>
+      </div>
+      <div class="fl-desk__results">
+        <p class="label label--ink" id={`${uid}-result`}>Result</p>
+        <p class="fl-paused">These results are for the last complete figures. Correct the figure marked in the inputs to update them.</p>
+        <div class="fl-hero" data-region="headline" set:html={r.headline} />
+        <dl class="figs fl-figs" data-region="figures" aria-labelledby={`${uid}-result`} set:html={r.figures} />
+      </div>
+    </div>
+    <p class="sr-only" aria-live="polite" data-status></p>
+  </section>
+
+  <section aria-labelledby={`${uid}-c`}>
+    <SectionHead no={1} title="The two structures side by side" dek="Break-even, the margin of safety and profit, from the IB course, beside the measures that go beyond it." id={`${uid}-c`} />
+    <div data-region="compare" set:html={r.compare} />
+    <p class="small muted af-now">
+      For comparison, packing as {BUSINESS.name} does now, in the <a href={labHref('break-even-quantity')}>Financial Laboratory’s</a> month: fixed costs of
+      {fmtMoney(BREAK_EVEN.fixedCosts, '$', 0)} and a variable cost of {fmtMoney(BREAK_EVEN.variableCost, '$', 2)} a bag earn {fmtMoney(nowProfit, '$', 0)} at
+      {fmtNumber(BREAK_EVEN.quantity)} bags, with a degree of operating leverage of {nowDol === null ? 'n/a' : fmtNumber(nowDol, 2)}. The example’s two structures earn
+      {fmtMoney(report.comparison.a.profitAtForecast, '$', 0)} and {fmtMoney(report.comparison.b.profitAtForecast, '$', 0)} at the same volume.
+    </p>
+  </section>
+
+  <section aria-labelledby={`${uid}-v`}>
+    <SectionHead no={2} title="Profit at every volume" dek="Where each structure breaks even, where they cross, and the forecast between." id={`${uid}-v`} />
+    <div data-region="chart" set:html={r.chart} />
+    <div class="fl-sens" data-region="profits" set:html={r.profits} />
+  </section>
+
+  <section aria-labelledby={`${uid}-w`}>
+    <SectionHead no={3} title="The working" dek="Each structure’s break-even, margin of safety and operating leverage in eight parts, and the indifference volume." id={`${uid}-w`} />
+    <div class="af-workings" data-region="workings" set:html={r.workings} />
+  </section>
+
+  <section aria-labelledby={`${uid}-i`}>
+    <SectionHead no={4} title="What it means" dek="For the figures above: the reading, what a manager might weigh, and where break-even analysis stops." id={`${uid}-i`} />
+    <div class="fl-read">
+      <section class="fl-read__part" aria-labelledby={`${uid}-i1`}>
+        <h3 class="fl-read__h" id={`${uid}-i1`}>The reading</h3>
+        <div data-region="meaning" set:html={r.meaning} />
+      </section>
+      <section class="fl-read__part fl-read__part--act" aria-labelledby={`${uid}-i2`}>
+        <h3 class="fl-read__h" id={`${uid}-i2`}>What a manager might weigh</h3>
+        <p class="fl-read__note small">The platform’s suggestions, not IB requirements.</p>
+        <div data-region="actions" set:html={r.actions} />
+      </section>
+      <section class="fl-read__part" aria-labelledby={`${uid}-i3`}>
+        <h3 class="fl-read__h" id={`${uid}-i3`}>Where break-even analysis stops</h3>
+        <ul class="fl-actions">
+          <li>It assumes a price and a variable cost per unit that stay the same at every volume, fixed costs that are fixed over the whole range, and that everything made is sold.</li>
+          <li>Fixed costs are fixed only within a range: beyond capacity a business needs another machine or another shift, and the costs step up.</li>
+          <li>The degree of operating leverage holds only near the volume it is worked at, and has no meaning at or below break-even.</li>
+          <li>The indifference volume compares profit in one period. It leaves out the investment the higher fixed costs may need, its finance and how long it lasts; the integrated forecast and the capital budgeting comparator take those in.</li>
+        </ul>
+      </section>
+    </div>
+  </section>
+</div>
+
+<script>
+  import '../../scripts/adv-finance/break-even';
+</script>

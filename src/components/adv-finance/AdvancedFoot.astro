@@ -1,0 +1,120 @@
+---
+/**
+ * The foot of an advanced tool's page: where the IB course stops, the sources
+ * the method rests on, where to work the IB parts with the Financial
+ * Laboratory and the case workspaces, and the other advanced tools.
+ */
+import SectionHead from '../layout/SectionHead.astro';
+import IbScope from './IbScope.astro';
+import { corpus, href } from '../../lib/content';
+import { subtopicHref } from '../../lib/learning';
+import { ADVANCED, ADVANCED_HREF, advancedHref, type AdvancedTool } from '../../lib/adv-finance/catalogue';
+import { labEntry, labHref } from '../../lib/finance-lab/catalogue';
+
+interface Props {
+  tool: AdvancedTool;
+  /** The number of the first section here: the tool's own sections come first. */
+  start: number;
+}
+const { tool, start } = Astro.props;
+const c = await corpus();
+const sources = tool.sources.map((id) => ({ id, s: c.sources[id] })).filter((x) => x.s);
+const at = ADVANCED.findIndex((t) => t.id === tool.id);
+const prev = at > 0 ? ADVANCED[at - 1] : undefined;
+const next = at < ADVANCED.length - 1 ? ADVANCED[at + 1] : undefined;
+const codes = [...new Set(tool.ibUses.map((u) => u.code).filter((x) => x !== 'toolkit'))];
+---
+
+<div class="wrap page-body af-foot">
+  <IbScope tool={tool} no={start} />
+
+  <section aria-labelledby={`af-src-${tool.id}`}>
+    <SectionHead no={start + 1} title="Sources" dek="The method rests on standard references, cited here and in the source register. They were not opened for this release; the explanations are the platform’s own." id={`af-src-${tool.id}`} />
+    <ul class="af-sources" role="list">
+      {
+        sources.map(({ id, s }) => (
+          <li>
+            <a href={href.source(id)}>{s?.title}</a>
+            <span class="small muted">{[s?.author, s?.publisher, s?.year].filter(Boolean).join(', ')}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section aria-labelledby={`af-more-${tool.id}`}>
+    <SectionHead no={start + 2} title="The IB parts, worked on their own" dek="The Financial Laboratory and the Finance Desk work the parts the IB course uses, with the guide’s formulas and layouts." id={`af-more-${tool.id}`} />
+    <div class="fl-more">
+      <ul class="fl-more__links" role="list">
+        {
+          tool.lab.map((id) => {
+            const e = labEntry(id);
+            return (
+              <li>
+                <span class="label">Laboratory</span>
+                <a href={labHref(id)}>{e.name}</a>
+                <span class="small muted">
+                  IB {e.subtopic}, {e.level === 'HL' ? 'HL only' : 'SL and HL'}. {e.question}
+                </span>
+              </li>
+            );
+          })
+        }
+        {
+          tool.desk.map((d) => (
+            <li>
+              <span class="label">On a case</span>
+              <a href={d.href}>{d.label}</a>
+              <span class="small muted">The same ideas worked on a fictional case at the Finance Desk.</span>
+            </li>
+          ))
+        }
+      </ul>
+      <nav class="fl-more__group" aria-label="Notes for the subtopics this tool builds on">
+        <p class="label label--ink">The notes</p>
+        <ul role="list">
+          {
+            codes.map((code) => {
+              const s = c.curricula['ib-dp-bm']?.units.flatMap((u) => u.subtopics).find((x) => x.code === code);
+              return (
+                <li>
+                  <a href={subtopicHref(c, code)}>
+                    {code} {s?.title}
+                  </a>
+                  {s?.level === 'HL' && <span class="tag tag--hl">HL</span>}
+                </li>
+              );
+            })
+          }
+        </ul>
+      </nav>
+    </div>
+  </section>
+
+  <nav class="fl-pager" aria-label="Advanced tools in order">
+    {
+      prev ? (
+        <a class="fl-pager__link" href={advancedHref(prev.id)} rel="prev">
+          <span class="label">Previous</span>
+          <span>{prev.name}</span>
+        </a>
+      ) : (
+        <span />
+      )
+    }
+    <a class="fl-pager__link fl-pager__index" href={ADVANCED_HREF}>
+      <span class="label">Advanced financial management</span>
+      <span>All four tools</span>
+    </a>
+    {
+      next ? (
+        <a class="fl-pager__link fl-pager__next" href={advancedHref(next.id)} rel="next">
+          <span class="label">Next</span>
+          <span>{next.name}</span>
+        </a>
+      ) : (
+        <span />
+      )
+    }
+  </nav>
+</div>

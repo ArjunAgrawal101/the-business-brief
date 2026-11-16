@@ -1,0 +1,25 @@
+---
+/**
+ * Advanced financial management, beyond the IB course: the performance dashboard tool.
+ * The page frame (the head that labels it beyond the course, where the course
+ * stops, the sources and the way back to the IB parts) is shared by all four
+ * advanced tools; the tool itself is PerformanceTool.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import AdvancedFoot from '../../../components/adv-finance/AdvancedFoot.astro';
+import AdvancedHead from '../../../components/adv-finance/AdvancedHead.astro';
+import PerformanceTool from '../../../components/adv-finance/PerformanceTool.astro';
+import { advancedTool } from '../../../lib/adv-finance/catalogue';
+import '../../../styles/finance-lab.css';
+import '../../../styles/adv-finance.css';
+
+const tool = advancedTool('performance-dashboard');
+---
+
+<BaseLayout title={`${tool.name}: advanced financial management`} description={`Beyond the IB course: ${tool.description}`} section="finance-desk" room="finance">
+  <AdvancedHead tool={tool} />
+  <div class="wrap page-body fl-page af-page">
+    <PerformanceTool />
+  </div>
+  <AdvancedFoot tool={tool} start={6} />
+</BaseLayout>

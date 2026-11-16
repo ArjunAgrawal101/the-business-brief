@@ -1,0 +1,241 @@
+---
+/**
+ * The integrated forecast: the drivers and the opening position on the left,
+ * the case in view and its key results on the right, then the three
+ * statements, the measures, the scenarios, the two alternatives side by side,
+ * what it all means and how the model works. The whole worked example is
+ * rendered here on the server; src/scripts/adv-finance/forecast.ts makes it
+ * live with the same functions.
+ */
+import SectionHead from '../layout/SectionHead.astro';
+import { BUSINESS } from '../../lib/adv-finance/business';
+import { ALTERNATIVE_FIELDS, DRIVER_FIELDS, FIRST_YEAR, FLEX_FIELDS, MAX_YEARS, MIN_YEARS, OPENING_FIELDS, OPTION_IDS, SCENARIO_IDS, SCENARIO_NAMES } from '../../lib/adv-finance/forecast';
+import { buildForecastReport } from '../../lib/adv-finance/forecast-view';
+import { fieldHtml, textFieldHtml } from '../../lib/adv-finance/forms';
+import { EXAMPLE_FORECAST, FORECAST_EXAMPLE_FORM } from '../../lib/adv-finance/state';
+import type { FieldSpec } from '../../lib/finance-lab/types';
+import { CURRENCIES } from '../../lib/finance-lab/fields';
+import { advancedTool } from '../../lib/adv-finance/catalogue';
+import { BREAK_EVEN } from '../../lib/finance-lab/business';
+import { fmtMoney } from '../../lib/format';
+
+const tool = advancedTool('integrated-forecast');
+const form = FORECAST_EXAMPLE_FORM;
+const report = buildForecastReport(EXAMPLE_FORECAST, form.view, form.currency);
+const r = report.regions;
+const uid = 'af-fc';
+const field = (spec: FieldSpec, prefix = '') => fieldHtml({ spec, name: `${prefix}${spec.key}`, value: form.fields[`${prefix}${spec.key}`] ?? '', uid, currency: form.currency });
+const GROUPS: Array<{ id: string; title: string; open: boolean; html: string; note?: string }> = [
+  { id: 'sales', title: 'Sales', open: true, html: DRIVER_FIELDS.sales.map((f) => field(f)).join('') },
+  { id: 'costs', title: 'Costs', open: true, html: DRIVER_FIELDS.costs.map((f) => field(f)).join('') },
+  { id: 'assets', title: 'Investment and depreciation', open: false, html: DRIVER_FIELDS.assets.map((f) => field(f)).join('') },
+  { id: 'working', title: 'Working capital', open: false, html: DRIVER_FIELDS.working.map((f) => field(f)).join('') },
+  { id: 'finance', title: 'Interest, tax and dividends', open: false, html: DRIVER_FIELDS.finance.map((f) => field(f)).join('') },
+  { id: 'opening', title: `The position at the start of ${form.fields.firstYear}`, open: false, html: OPENING_FIELDS.map((f) => field(f, 'o.')).join(''), note: 'Retained earnings are whatever makes the opening position balance.' },
+];
+const flexHtml = (p: 'up' | 'down') => FLEX_FIELDS.map((f) => field(f, `${p}.`)).join('');
+const altHtml = (p: 'a' | 'b') => `${textFieldHtml({ name: `${p}.name`, label: 'Name', value: form.names[p], uid })}${ALTERNATIVE_FIELDS.map((f) => field(f, `${p}.`)).join('')}`;
+const optionLabel = (o: (typeof OPTION_IDS)[number]) => (o === 'none' ? 'Making no change' : form.names[o]);
+---
+
+<div class="fl af af--forecast" data-ix="adv-finance" data-tool="forecast" data-key={tool.storageKey} data-name={tool.name} id="tool">
+  <section class="fl-desk" aria-labelledby={`${uid}-desk`}>
+    <header class="fl-desk__bar">
+      <h2 class="fl-desk__title" id={`${uid}-desk`}>The forecast</h2>
+      <p class="fl-source" data-source>Example figures: {BUSINESS.name}, a fictional business. Simulated data.</p>
+    </header>
+    <p class="state state--error fl-broken" data-error hidden>The forecast could not start. The worked example below uses the example figures.</p>
+    <div class="fl-desk__grid">
+      <div class="fl-desk__inputs">
+        <form class="fl-form js-only" data-af-form novalidate aria-label="Your drivers">
+          <div class="fl-fields af-horizon">
+            <div class="field">
+              <label for={`${uid}-years`}>Years to forecast</label>
+              <select class="select" id={`${uid}-years`} name="years" aria-describedby={`${uid}-years-err`}>
+                {Array.from({ length: MAX_YEARS - MIN_YEARS + 1 }, (_, k) => MIN_YEARS + k).map((n) => <option value={String(n)} selected={String(n) === form.fields.years}>{n}</option>)}
+              </select>
+              <span class="field__error" id={`${uid}-years-err`} data-err="years"></span>
+            </div>
+            <Fragment set:html={field(FIRST_YEAR)} />
+          </div>
+          <div class="af-groups">
+          {
+            GROUPS.map((g) => (
+              <details class="af-group" open={g.open}>
+                <summary>{g.title}</summary>
+                <fieldset class="fl-fields">
+                  <legend class="sr-only">{g.title}</legend>
+                  <Fragment set:html={g.html} />
+                  {g.note && <p class="field__hint fl-fields__wide">{g.note}</p>}
+                </fieldset>
+              </details>
+            ))
+          }
+          <details class="af-group">
+            <summary>Scenarios</summary>
+            <p class="field__hint">Each scenario moves the base case’s drivers: per cent changes, and percentage points for growth.</p>
+            <div class="af-pair">
+              <fieldset class="fl-fields">
+                <legend class="label label--ink">Upside</legend>
+                <Fragment set:html={flexHtml('up')} />
+              </fieldset>
+              <fieldset class="fl-fields">
+                <legend class="label label--ink">Downside</legend>
+                <Fragment set:html={flexHtml('down')} />
+              </fieldset>
+            </div>
+          </details>
+          <details class="af-group">
+            <summary>Two strategic alternatives</summary>
+            <p class="field__hint">Each alternative changes the year-one drivers, in year-one prices, and may invest and borrow in the first year.</p>
+            <div class="af-pair">
+              <fieldset class="fl-fields">
+                <legend class="label label--ink">Alternative A</legend>
+                <Fragment set:html={altHtml('a')} />
+              </fieldset>
+              <fieldset class="fl-fields">
+                <legend class="label label--ink">Alternative B</legend>
+                <Fragment set:html={altHtml('b')} />
+              </fieldset>
+            </div>
+          </details>
+          </div>
+          <details class="fl-settings">
+            <summary>Currency</summary>
+            <div class="fl-settings__body">
+              <div class="field">
+                <label for={`${uid}-currency`}>Currency</label>
+                <select class="select" id={`${uid}-currency`} data-setting="currency" name="currency">
+                  {CURRENCIES.map((c) => <option value={c.value} selected={c.value === form.currency}>{c.label}</option>)}
+                </select>
+              </div>
+              <p class="field__hint fl-settings__note">{BUSINESS.name}’s figures are in dollars.</p>
+            </div>
+          </details>
+          <ul class="fl-errlist" data-err-list hidden></ul>
+        </form>
+        <div class="fl-given nojs-only">
+          <p class="label label--ink">The drivers and the opening position</p>
+          <dl class="fl-given__list" data-region="given" set:html={r.given} />
+          <p class="small fl-given__note">Changing these figures needs JavaScript. With it switched off, the page shows the full worked example for the figures above.</p>
+        </div>
+        <div class="fl-tools js-only" role="group" aria-label="Your figures">
+          <button type="button" class="btn btn--small" data-act="reset">Reset to the example</button>
+          <button type="button" class="btn btn--small" data-act="csv">Download CSV</button>
+          <button type="button" class="btn btn--small" data-act="print">Print</button>
+          <p class="small af-saved" data-save-status>Your figures are kept in this browser once you change them. Nothing is sent anywhere.</p>
+        </div>
+      </div>
+      <div class="fl-desk__results">
+        <p class="label label--ink" id={`${uid}-result`}>Result</p>
+        <div class="af-view js-only" data-af-view>
+          <fieldset class="fl-choice">
+            <legend>Scenario</legend>
+            {
+              SCENARIO_IDS.map((s) => (
+                <label class="fl-choice__opt">
+                  <input type="radio" name="view.scenario" value={s} checked={s === form.view.scenario} />
+                  <span>{SCENARIO_NAMES[s]}</span>
+                </label>
+              ))
+            }
+          </fieldset>
+          <fieldset class="fl-choice">
+            <legend>Option</legend>
+            {
+              OPTION_IDS.map((o) => (
+                <label class="fl-choice__opt">
+                  <input type="radio" name="view.option" value={o} checked={o === form.view.option} />
+                  <span data-alt-name={o}>{optionLabel(o)}</span>
+                </label>
+              ))
+            }
+          </fieldset>
+        </div>
+        <p class="fl-paused">These results are for the last complete figures. Correct the figure marked in the inputs to update them.</p>
+        <p class="af-case" data-region="case" set:html={r.case} />
+        <div class="fl-hero" data-region="headline" set:html={r.headline} />
+        <dl class="figs fl-figs" data-region="figures" aria-labelledby={`${uid}-result`} set:html={r.figures} />
+      </div>
+    </div>
+    <p class="sr-only" aria-live="polite" data-status></p>
+  </section>
+
+  <section aria-labelledby={`${uid}-st`}>
+    <SectionHead no={1} title="The three statements" dek="The statement of profit or loss, the statement of cash flows and the statement of financial position for the case in view, linked year by year." id={`${uid}-st`} />
+    <div class="af-statements">
+      <div data-region="pl" set:html={r.pl} />
+      <div data-region="cf" set:html={r.cf} />
+      <div data-region="bs" set:html={r.bs} />
+    </div>
+    <aside class="callout callout--note af-links">
+      <span class="callout__kicker">How the statements link</span>
+      <ol class="af-chain">
+        <li>The profit for the year adds to retained earnings, in equity.</li>
+        <li>The statement of cash flows starts from the same profit, adds back depreciation, which uses no cash, and takes off the cash tied up in more stock and debtors, less the extra credit suppliers give.</li>
+        <li>Capital expenditure adds to non-current assets; depreciation takes from them.</li>
+        <li>Borrowing and repayments change both cash and the borrowing on the balance sheet; dividends leave cash and retained earnings together.</li>
+        <li>So the cash the statement of cash flows arrives at is the cash on the balance sheet, and assets less liabilities equal equity every year. The model checks it rather than assuming it.</li>
+      </ol>
+    </aside>
+  </section>
+
+  <section aria-labelledby={`${uid}-m`}>
+    <SectionHead no={2} title="Measures year by year" dek="The IB’s ratios where the course has them, and measures beyond it, for the case in view." id={`${uid}-m`} />
+    <div data-region="measures" set:html={r.measures} />
+  </section>
+
+  <section aria-labelledby={`${uid}-s`}>
+    <SectionHead no={3} title="Base, upside and downside" dek="The same plan with the drivers moved: how far profit and cash move with them, for the option in view." id={`${uid}-s`} />
+    <div data-region="scenarios" set:html={r.scenarios} />
+  </section>
+
+  <section aria-labelledby={`${uid}-o`}>
+    <SectionHead no={4} title="Two strategic alternatives, side by side" dek="Each alternative run through every statement, then every scenario with every option." id={`${uid}-o`} />
+    <div data-region="options" set:html={r.options} />
+    <h3 class="af-sub">Every scenario with every option</h3>
+    <div data-region="matrix" set:html={r.matrix} />
+  </section>
+
+  <section aria-labelledby={`${uid}-i`}>
+    <SectionHead no={5} title="What it means" dek="For the case in view: the reading, then what a forecast like this cannot tell you." id={`${uid}-i`} />
+    <div class="fl-read">
+      <section class="fl-read__part" aria-labelledby={`${uid}-i1`}>
+        <h3 class="fl-read__h" id={`${uid}-i1`}>The reading</h3>
+        <div data-region="meaning" set:html={r.meaning} />
+      </section>
+      <section class="fl-read__part fl-read__part--act" aria-labelledby={`${uid}-i2`}>
+        <h3 class="fl-read__h" id={`${uid}-i2`}>Where a forecast stops</h3>
+        <ul class="fl-actions">
+          <li>A forecast is only as good as its drivers, and small errors compound: a growth rate a point too high adds up over five years.</li>
+          <li>Scenarios are not probabilities. In practice the drivers move together, and a downside often brings lower prices and lower volume at once.</li>
+          <li>Year-end figures hide what happens within a year: a business can run out of cash in March and look healthy in December. The IB’s monthly cash flow forecast (3.7) shows the months.</li>
+          <li>The forecast stops after a few years, so an investment that pays off later looks worse here than over its life. Value it over its whole life with the capital budgeting comparator.</li>
+          <li>Interest, tax and dividends are simplified, and all borrowing sits on one line.</li>
+        </ul>
+      </section>
+    </div>
+  </section>
+
+  <section aria-labelledby={`${uid}-h`}>
+    <SectionHead no={6} title="How the model works" dek="The assumptions behind every figure, stated so they can be challenged." id={`${uid}-h`} />
+    <div class="af-method prose">
+      <ul>
+        <li>Units sold grow by the growth rate from year two; the price rises by its own rate; the variable cost per unit and the fixed costs rise with cost inflation. Every figure is rounded to a whole unit of money as it is worked out, so every total adds up exactly.</li>
+        <li>Cost of sales is every cost that varies with output. For {BUSINESS.name} that includes delivery, so its gross margin is not directly comparable with the 2025 accounts, whose cost of sales leaves delivery among the expenses.</li>
+        <li>Depreciation is straight line: the assets owned at the start over the years left in them, and each year’s capital expenditure over its life, with a full year’s charge in the year of purchase.</li>
+        <li>Year-end debtors are sales revenue × debtor days ÷ 365; stock and trade creditors are cost of sales × days ÷ 365. The IB’s stock turnover uses average stock; a forecast sets the closing balance instead.</li>
+        <li>Interest is charged on the borrowing and any overdraft at the start of each year, with new borrowing drawn at the start of year one. Tax is a rate on profit before tax, none on a loss; both are paid in the year. Dividends are a share of the profit for the year, none from a loss.</li>
+        <li>
+          The first year uses the Financial Laboratory’s month of 2026 for twelve months: a price of {fmtMoney(BREAK_EVEN.price, '$', 2)} a bag, a variable cost of {fmtMoney(BREAK_EVEN.variableCost, '$', 2)}
+          and fixed costs of {fmtMoney(BREAK_EVEN.fixedCosts, '$', 0)} a month. The opening position is the lab’s statement of financial position at 31 December 2025, with its
+          short-term loans and long-term borrowing on one line.
+        </li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<script>
+  import '../../scripts/adv-finance/forecast';
+</script>
