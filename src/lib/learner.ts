@@ -277,7 +277,8 @@ export function kindOfPath(path: string, toolPrefixes: readonly string[]): Visit
   if (/^\/topics\/[^/]+\/$/.test(p)) return 'topic';
   if (/^\/mindmaps\/[^/]+\/$/.test(p)) return 'mindmap';
   if (/^\/cases\/[^/]+\/$/.test(p)) return 'case';
-  if (/^\/(toolkit|frameworks)\/[^/]+\/$/.test(p)) return 'framework';
+  // The Framework Application Lab's hub (/frameworks/lab/) is not a framework.
+  if (/^\/(toolkit|frameworks)\/[^/]+\/$/.test(p) && p !== '/frameworks/lab/') return 'framework';
   if (toolPrefixes.some((pre) => pre !== '/' && p.startsWith(pre))) return 'tool';
   return null;
 }
