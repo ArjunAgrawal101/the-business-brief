@@ -121,6 +121,12 @@ describe('the search index', () => {
   ];
   const entries = buildSearchIndex({ c: corpus, nav: NAV, links, modules, library: [], diagrams: { 'test-diagram': { title: 'A test diagram', syllabus: ['3.3'], level: 'SL/HL', group: 'unit-3' } } });
 
+  it('indexes advanced management modules as their own kind, with no IB unit, subtopic or level', () => {
+    const withAdvanced = buildSearchIndex({ c: corpus, nav: NAV, links, advanced: [{ url: '/advanced/finance/valuation-fundamentals/', title: 'Valuation fundamentals', dek: 'What is a business worth?', domain: 'Advanced financial management', covers: ['Valuation fundamentals'] }] });
+    const e = withAdvanced.find((x) => x.kind === 'advanced');
+    expect(e).toMatchObject({ url: '/advanced/finance/valuation-fundamentals/', type: 'Advanced management · Advanced financial management', units: [], codes: [], hl: false });
+  });
+
   it('lists every subtopic once, at its own page, with its unit and level', () => {
     const list = entries.filter((e) => e.kind === 'subtopics' && e.codes.length === 1);
     expect(list).toHaveLength(subs.length);

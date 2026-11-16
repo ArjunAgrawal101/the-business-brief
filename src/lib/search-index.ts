@@ -42,6 +42,8 @@ export interface IndexInput {
   pathways?: ReadonlyArray<{ id: string; name: string; promise: string }>;
   /** The frameworks library (src/content/frameworks), by id: each framework's page, labelled by its standing in the course. */
   frameworks?: Readonly<Record<string, { name: string; aliases: readonly string[]; summary: string; question: string; status: 'syllabus' | 'toolkit' | 'enrichment'; level: string; subtopics: readonly string[] }>>;
+  /** Advanced Management modules: beyond the IB course, so they carry no IB unit or subtopic and never answer an IB filter. */
+  advanced?: ReadonlyArray<{ url: string; title: string; dek: string; domain: string; covers: readonly string[] }>;
 }
 
 /** A framework page's type in the results: its standing in the course. */
@@ -240,6 +242,10 @@ export function buildSearchIndex(input: IndexInput): SearchEntry[] {
       hl: t.level === 'HL',
     });
   // The frameworks library, framework by framework. Enrichment carries no unit or subtopic, so a unit filter never finds it, and its type says it is beyond the course.
+  for (const m of input.advanced ?? []) {
+    add({ kind: 'advanced', type: `Advanced management · ${m.domain}`, url: m.url, title: m.title, text: m.dek, keys: m.covers.join(' '), units: [], codes: [], hl: false });
+  }
+
   for (const [id, f] of Object.entries(input.frameworks ?? {}).sort((a, b) => a[1].name.localeCompare(b[1].name, 'en', { sensitivity: 'base' }))) {
     const ib = f.status !== 'enrichment';
     add({
