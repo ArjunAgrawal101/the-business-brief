@@ -29,7 +29,22 @@
 
 ## Test results for this release (2.2.0, 16 November 2026)
 
-{{A11Y}}
+| Check | Tool | Result |
+| --- | --- | --- |
+| Automated scan of 410 pages at desktop (1280 px) and phone (Pixel 7) sizes, against the WCAG 2.0, 2.1 and 2.2 A and AA rules: every page of every kind, including all of the new ones, plus a fixed sample of the glossary term pages, which share one template | axe-core | No violations |
+| Horizontal scrolling at phone width (412 px), the same pages | Playwright | None |
+| Reflow at 320 px | `reflow.spec.ts` on 410 pages | None scroll sideways |
+| Colour contrast of 56 token pairs, including each room's accent text and the Advanced Management and Tutorials rooms | `npm run qa:contrast` | All pass |
+| The new interactions used from the keyboard and pointer: the tutorials enquiry builder, the Briefings' edition switch, the executive simulation's nine stages (with axe at nine states), the Framework Lab's worksheets and tools, the advanced finance tools and the workspace's list, notes and export | Playwright | Pass |
+| Interactions without JavaScript, and no page showing a button that needs a script | Playwright with JavaScript disabled | Pass |
+| Motion rules, with and without reduced motion | Playwright | Pass |
+
+Problems found and fixed during 2.2 QA:
+
+- **A prohibited label.** The tutorials price block carried an `aria-label` on a plain container, which is not announced; the full sentence is now visually hidden text.
+- **Script-only text without the script.** The enquiry builder's fallback paragraph showed with JavaScript on; the builder now sits inside an enhanced region.
+- **Focus after a dialog.** The workspace's note dialog now returns focus to the button that opened it, however it closes.
+- **Stale announcements.** Two messages to one live region within 60 ms could be read in the wrong order, the older last. A newer announcement now cancels a pending one, in every interactive component.
 
 ## Known gaps
 

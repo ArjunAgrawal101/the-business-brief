@@ -48,7 +48,15 @@ On the final 2.2 source and build (details in [TESTING.md](TESTING.md)):
 
 | Check | Result |
 | --- | --- |
-{{TESTS}}
+| `astro check` | 0 errors, 0 warnings, 0 hints |
+| ESLint and the content lint | No problems (1,000 source files, 1,088 built pages) |
+| Unit tests | 1,175 passed in 61 files |
+| Build | 1,084 pages; every integrity check passes (the content, the Advanced Management modules, the Boardroom Briefings, the executive simulation's accounts and the Business Intelligence dating rules) |
+| Link check | 213,346 internal links and assets, none broken; 157 external links listed, not fetched |
+| Contrast | 56 colour pairs, all pass, including the two new rooms' text colours |
+| Persona walkthroughs | 8 routes passed: first-time visitor, IB student (phone), teacher, undergraduate (tablet), MBA student, entrepreneur (phone), MBA student reading advanced strategy, IB student finding a tutor (phone) |
+| Browser tests | 1,092 tests on the release candidate (`c233161`): 1,088 passed, 3 skipped by design (two wide-screen navigation tests on the phone, one drawer test on the desktop) and 1 failed, in 14.9 minutes, with no retries. The failure was the announcement race described below, fixed in `d7b472c`; that test then passed ten times in a row, and the full suite is being run again on the fixed code |
+| GitHub CI | The QA workflow (check, lint, unit tests, build, links, the full browser suite and contrast) passed on `720e6c7`, the first push of this release, and runs again on every push |
 
 Found and fixed during QA:
 
@@ -93,5 +101,6 @@ The full order is in [ROADMAP.md](ROADMAP.md).
 ## Delivery
 
 - **Source:** `main`. This report is in the release commit, and `git log` lists every commit.
-{{DELIVERY}}
+- **Pushed in two steps.** The first push (`720e6c7`) carried everything but the executive simulation and the Boardroom Briefings; GitHub's QA workflow passed on it, and Vercel reported the deployment complete. The live site, opened from this environment, then served the Tutorials page with its terms, Advanced Management (six domains, thirty modules), the Framework Application Lab, the advanced financial analysis tools, My Business Workspace and the Business Intelligence hub. The release commit adds the simulation, the Briefings and this report; its deployment is checked the same way after the push.
+- **Network:** the environment allows `the-business-brief-dun.vercel.app` and `ib-economics-pi.vercel.app`, so each deployment can be opened from here.
 - **Supplied files:** never committed. The photographs used are in `assets/creator/originals/`, with rights reserved, outside the code licence.
