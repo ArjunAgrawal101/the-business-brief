@@ -662,7 +662,7 @@ describe('the catalogue of advanced tools', () => {
   });
 
   it('every source cited by the mode is a referenced academic work or the method note', () => {
-    for (const id of ['brealey-myers-allen-2020', 'koller-goedhart-wessels-2020', 'sharpe-1964', 'lorie-savage-1955', 'richards-laughlin-1980']) {
+    for (const id of ['adv-fin-brealey-myers-allen-2020', 'adv-fin-koller-goedhart-wessels-2020', 'adv-fin-sharpe-1964', 'adv-fin-lorie-savage-1955', 'adv-fin-richards-laughlin-1980']) {
       expect(c.sources[id]).toMatchObject({ kind: 'academic', availability: 'referenced' });
     }
     expect(c.sources['method-adv-finance']?.kind).toBe('method');

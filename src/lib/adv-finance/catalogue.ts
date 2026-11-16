@@ -67,7 +67,7 @@ export const ADVANCED: AdvancedTool[] = [
       { href: '/finance-desk/cash-flow/', label: 'Cash flow lab (Atelier Barro)' },
       { href: '/finance-desk/ratios/', label: 'Ratio desk (Halden Distribution)' },
     ],
-    sources: ['koller-goedhart-wessels-2020', 'brealey-myers-allen-2020', 'ib-bm-guide-2024', 'method-adv-finance'],
+    sources: ['adv-fin-koller-goedhart-wessels-2020', 'adv-fin-brealey-myers-allen-2020', 'ib-bm-guide-2024', 'method-adv-finance'],
   },
   {
     id: 'capital-budgeting',
@@ -88,7 +88,7 @@ export const ADVANCED: AdvancedTool[] = [
     ],
     lab: ['payback-period', 'average-rate-of-return', 'net-present-value'],
     desk: [{ href: '/finance-desk/investment-appraisal/', label: 'Investment appraisal desk (Halden Distribution)' }],
-    sources: ['brealey-myers-allen-2020', 'sharpe-1964', 'lorie-savage-1955', 'ib-bm-guide-2024', 'method-adv-finance'],
+    sources: ['adv-fin-brealey-myers-allen-2020', 'adv-fin-sharpe-1964', 'adv-fin-lorie-savage-1955', 'ib-bm-guide-2024', 'method-adv-finance'],
   },
   {
     id: 'break-even-scenarios',
@@ -111,7 +111,7 @@ export const ADVANCED: AdvancedTool[] = [
       { href: '/finance-desk/break-even/', label: 'Break-even workspace (Atelier Barro)' },
       { href: '/finance-desk/contribution/', label: 'Contribution decisions (HL)' },
     ],
-    sources: ['brealey-myers-allen-2020', 'ib-bm-guide-2024', 'method-adv-finance'],
+    sources: ['adv-fin-brealey-myers-allen-2020', 'ib-bm-guide-2024', 'method-adv-finance'],
   },
   {
     id: 'performance-dashboard',
@@ -131,7 +131,7 @@ export const ADVANCED: AdvancedTool[] = [
     ],
     lab: ['roce', 'profit-margin', 'gearing-ratio', 'debtor-days', 'creditor-days', 'stock-turnover'],
     desk: [{ href: '/finance-desk/ratios/', label: 'Ratio desk (Halden Distribution)' }],
-    sources: ['richards-laughlin-1980', 'koller-goedhart-wessels-2020', 'ib-bm-guide-2024', 'method-adv-finance'],
+    sources: ['adv-fin-richards-laughlin-1980', 'adv-fin-koller-goedhart-wessels-2020', 'ib-bm-guide-2024', 'method-adv-finance'],
   },
 ];
 
