@@ -37,10 +37,10 @@ const tool = (kind: string) => {
 };
 
 describe('Strategy Studio content', () => {
-  it('has the engagement and ten tools, one of each kind', () => {
+  it('has the engagement and thirteen tools, one of each kind', () => {
     expect(entries.filter(([, e]) => e.type === 'engagement')).toHaveLength(1);
-    expect(tools).toHaveLength(10);
-    expect(new Set(tools.map((t) => t.kind)).size).toBe(10);
+    expect(tools).toHaveLength(13);
+    expect(new Set(tools.map((t) => t.kind)).size).toBe(13);
     expect(Object.keys(TOOL_LIBS).sort()).toEqual(tools.map((t) => t.kind).sort());
   });
 
@@ -56,7 +56,7 @@ describe('Strategy Studio content', () => {
     // Toolkit, HL only (guide, p. 14)
     for (const k of ['porter', 'force-field']) expect(level(k)).toMatchObject({ kind: 'ib-toolkit', level: 'HL' });
     // Not in the guide
-    for (const k of ['five-forces', 'stakeholders', 'appraisal']) expect(level(k)?.kind).toBe('enrichment');
+    for (const k of ['five-forces', 'stakeholders', 'appraisal', 'scenarios', 'salience', 'fit']) expect(level(k)?.kind).toBe('enrichment');
     expect(level('swot')?.extensions.map((x) => x.name)).toEqual(['TOWS matrix']);
   });
 

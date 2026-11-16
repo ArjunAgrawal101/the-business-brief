@@ -1,5 +1,5 @@
 /**
- * The Strategy Studio tools in the browser. One controller serves all ten:
+ * The Strategy Studio tools in the browser. One controller serves every tool:
  * it reads each change into the tool's state, redraws the analysis with the
  * tool's own functions (the same ones that drew the worked example on the
  * server), keeps the work in local storage under bb:strategy:<tool>, and

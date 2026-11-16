@@ -2088,3 +2088,56 @@ tr.is-best td {
     display: none !important;
   }
 }
+
+/* Scenario planner: the four futures */
+
+.sx-q--future {
+  --q-rule: var(--gold-600);
+}
+
+.sx-futures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+.sx-future {
+  min-width: 0;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--gold-600);
+  background: var(--surface-sheet);
+}
+
+.sx-future .sx-out__h5 {
+  margin-top: 0;
+}
+
+.sx-future__poles {
+  margin: 0 0 var(--sp-1);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sx-future__signs {
+  margin: var(--sp-1) 0 0;
+  padding-left: 1.2em;
+}
+
+/* Strategic fit check: the 7S elements */
+
+.sx-q--element {
+  --q-rule: var(--navy-800);
+  margin-top: var(--sp-3);
+}
+
+.sx-q--element legend .muted {
+  font-family: var(--font-ui);
+  font-size: var(--fs-small);
+  font-weight: 400;
+}
