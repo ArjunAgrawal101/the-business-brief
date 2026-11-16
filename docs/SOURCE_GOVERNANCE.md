@@ -53,7 +53,7 @@ The integrity check fails the build if a claim names a source that is not in the
 
 ## Real organizations
 
-Facts about real organizations appear in this release only in the growth brief's evidence section: McDonald's franchised share (from its 10-K for 2025), the Tata Starbucks joint venture (from Tata Consumer Products' announcement), Disney's acquisition of 21st Century Fox's assets (from press coverage of its completion) and the founding of Star Alliance (from press coverage). Each:
+Facts about real organizations appear in two places. The growth brief's evidence section gives McDonald's franchised share (from its 10-K for 2025), the Tata Starbucks joint venture (from Tata Consumer Products' announcement), Disney's acquisition of 21st Century Fox's assets (from press coverage of its completion) and the founding of Star Alliance (from press coverage). The Business Intelligence Briefing (`/intelligence/`) is built from real developments; each item keeps its own sources, with the date each was published and read and the facts it supports, and the build enforces the rules in [CONTENT_MODEL.md](CONTENT_MODEL.md#the-business-intelligence-briefing). Each fact, in either place:
 
 - is dated and cited, with the source in the register;
 - is kept apart from interpretation: the page states the fact, then, separately labelled, what it suggests;

@@ -2,25 +2,135 @@
  * The Business Intelligence Briefing: the pure functions behind its pages.
  *
  * The briefing is curated by hand, not fed. These helpers format its dates,
- * order its items, work out which units, key concepts and kinds of
- * development each item belongs to, and decide whether an item passes the
- * reader's filters. The server render and the browser script use the same
+ * order its items, name its themes and regions, work out which units, key
+ * concepts and themes each item belongs to, and decide whether an item passes
+ * the reader's filters. The server render and the browser script use the same
  * functions, so the list a reader filters is the list the page was built from.
  */
-import type { IntelCategory } from './schemas';
+import { INTEL_CATEGORIES, INTEL_THEMES, type IntelCategory, type IntelRegion, type IntelTheme } from './intel-themes';
 
-export const CATEGORY_LABELS: Record<IntelCategory, string> = {
-  'corporate-strategy': 'Corporate strategy',
-  'mergers-and-acquisitions': 'Mergers and acquisitions',
-  leadership: 'Leadership change',
-  marketing: 'Marketing',
-  restructuring: 'Restructuring',
-  'financial-results': 'Financial results',
-  innovation: 'Innovation',
-  entrepreneurship: 'Entrepreneurship and start-ups',
-  sustainability: 'Sustainability',
-  'global-trend': 'Global trend',
+/** What each theme is called on the page, its address and the line that says what it covers. */
+export const THEME_INFO: Record<IntelCategory, { label: string; slug: string; dek: string }> = {
+  'corporate-strategy': {
+    label: 'Corporate strategy',
+    slug: 'corporate-strategy',
+    dek: 'Where a business chooses to compete and how: focus, portfolios, growth and retreat.',
+  },
+  'mergers-and-acquisitions': {
+    label: 'Mergers and acquisitions',
+    slug: 'mergers-and-acquisitions',
+    dek: 'Buying, merging and selling businesses: why deals are done, how they are approved, and what happens after.',
+  },
+  leadership: {
+    label: 'Leadership decisions',
+    slug: 'leadership-decisions',
+    dek: 'Appointments, dismissals and successions, and the choices made at the top of an organization.',
+  },
+  marketing: {
+    label: 'Marketing and campaigns',
+    slug: 'marketing-and-campaigns',
+    dek: 'Campaigns, brands, launches and prices: the marketing mix at work, and how customers respond.',
+  },
+  'financial-results': {
+    label: 'Financial performance',
+    slug: 'financial-performance',
+    dek: 'Results, cash flow and finance: what the accounts show, and what they leave out.',
+  },
+  'business-failure': {
+    label: 'Business failures',
+    slug: 'business-failures',
+    dek: 'Businesses and products that fail or are withdrawn, from insolvency to closure, and what led there.',
+  },
+  entrepreneurship: {
+    label: 'Entrepreneurship and start-ups',
+    slug: 'entrepreneurship',
+    dek: 'Founders, start-ups and scale-ups, and the investors and buyers who back them.',
+  },
+  innovation: {
+    label: 'Technology and innovation',
+    slug: 'technology-and-innovation',
+    dek: 'New products, processes and platforms, and the research and development behind them.',
+  },
+  'global-business': {
+    label: 'Global business',
+    slug: 'global-business',
+    dek: 'Crossing borders: foreign investment, multinational companies and the governments they deal with.',
+  },
+  sustainability: {
+    label: 'Sustainability',
+    slug: 'sustainability',
+    dek: 'Environmental and social objectives, and how they are weighed against growth and profit.',
+  },
+  'corporate-governance': {
+    label: 'Corporate governance',
+    slug: 'corporate-governance',
+    dek: 'Boards, owners and regulators: who controls a company, and how it is held to account.',
+  },
+  'industry-developments': {
+    label: 'Industry developments',
+    slug: 'industry-developments',
+    dek: 'Changes that reach a whole industry: new rules, new rivals and new ways of working.',
+  },
+  restructuring: {
+    label: 'Restructuring',
+    slug: 'restructuring',
+    dek: 'Changes to how a business is organized, owned or financed.',
+  },
+  'global-trend': {
+    label: 'Global trend',
+    slug: 'global-trends',
+    dek: 'Shifts measured across many countries that reach every kind of business.',
+  },
 };
+
+/** The theme names alone, by id: the label shown in kickers, filters and lists. */
+export const CATEGORY_LABELS: Record<IntelCategory, string> = /* @__PURE__ */ Object.fromEntries(INTEL_CATEGORIES.map((k) => [k, THEME_INFO[k].label])) as Record<IntelCategory, string>;
+
+/** The address of a theme's page. */
+export const themeHref = (k: IntelCategory): string => `/intelligence/themes/${THEME_INFO[k].slug}/`;
+
+/** The theme a page address names, or undefined. */
+export function themeBySlug(slug: string): IntelCategory | undefined {
+  return INTEL_CATEGORIES.find((k) => THEME_INFO[k].slug === slug);
+}
+
+/** Whether a theme is one of the hub's twelve editorial themes, which the briefing must cover. */
+export const isEditorialTheme = (k: string): k is IntelTheme => (INTEL_THEMES as readonly string[]).includes(k);
+
+export const REGION_LABELS: Record<IntelRegion, string> = {
+  'north-america': 'North America',
+  'latin-america': 'Latin America',
+  europe: 'Europe',
+  africa: 'Africa',
+  'middle-east': 'Middle East',
+  asia: 'Asia',
+  oceania: 'Oceania',
+  global: 'Global',
+};
+
+/** "Europe and Asia", "North America, Europe and Asia". */
+export function regionsLine(regions: IntelRegion[]): string {
+  const names = regions.map((r) => REGION_LABELS[r]);
+  return names.length <= 1 ? (names[0] ?? '') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}
+
+/** The items carrying a theme, in the order given (newest first when the list is). */
+export function inTheme<T extends { categories: string[] }>(items: Array<[string, T]>, theme: IntelCategory): Array<[string, T]> {
+  return items.filter(([, it]) => it.categories.includes(theme));
+}
+
+/** How many items carry each theme, every theme present even at nought. */
+export function themeCounts(items: Array<{ categories: string[] }>): Record<IntelCategory, number> {
+  const out = Object.fromEntries(INTEL_CATEGORIES.map((k) => [k, 0])) as Record<IntelCategory, number>;
+  for (const it of items) for (const k of it.categories) if (k in out) out[k as IntelCategory] += 1;
+  return out;
+}
+
+/** The editorial themes no item covers yet: empty when the briefing covers them all. */
+export function uncoveredThemes(items: Array<{ categories: string[] }>): IntelTheme[] {
+  const counts = themeCounts(items);
+  return INTEL_THEMES.filter((k) => counts[k] === 0);
+}
 
 export const SOURCE_KIND_LABELS: Record<string, string> = {
   'press-release': 'Press release',

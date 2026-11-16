@@ -10,6 +10,14 @@
 - Saved analyses: the work the Strategy Studio, Market Studio, People and Culture, Operations Floor, Entrepreneurship Lab and Boardroom keep, read from their own items and linked back to each tool, and results saved from any Financial Laboratory calculator with "Save this result to my workspace".
 - Export of selected work as Markdown, to read and print, or as JSON, which "Import a copy" reads back and combines with what is there.
 
+### Business Intelligence
+
+- The briefing becomes an editorial hub laid out as an issue: an issue line, the lead story, the rest of the edition in ruled columns, twelve themes as sections, the dated list with its filters, and the documents behind the edition. Every story and row shows when the item was published and checked.
+- Twelve themes, from corporate strategy and business failures to corporate governance and industry developments, each with a page of its own at `/intelligence/themes/<theme>/`, so the briefing can be read one theme at a time without JavaScript. The theme filter in the list keeps its address and behaviour.
+- Every item answers six questions in order: what happened, the business context, the management concepts that apply, the choices the organization faced, the implications, and what a student or manager can learn. The concepts link to IB subtopics, glossary terms, toolkit tools (with their framework and Strategy Studio tool), frameworks and the platform's calculators and studios; ideas beyond the course are shown apart and labelled as enrichment.
+- The first eight items are restructured into the six questions without changing a fact or a source, and three items are added: Google Cloud's sovereign cloud partners (global business), Microsoft's retirement of Skype (business failures) and Anaconda's three acquisitions (entrepreneurship).
+- Stricter checks: every fact must cite a source dated on or after it; background comes no later than the development; frameworks and platform tools must exist; every item links to a tool or framework; and the items must cover all twelve themes. Developments from 2024 are in scope.
+
 ## 2.1.0: 3 November 2026
 
 The Business Brief becomes an ecosystem: a cinematic opening on every fresh visit, a navigation in five parts, rooms with identities of their own, full notes for every subtopic, and working laboratories, simulations, cases and assessment tools across the course.
