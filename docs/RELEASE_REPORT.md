@@ -58,6 +58,7 @@ Found and fixed during QA:
 - Spelling in the new modules drifted from the site's Oxford spelling; normalized, with cited titles left as published.
 - The Finance Desk's new tools and the Advanced Management finance domain shared a name; the tools are now Advanced financial analysis, and the two link to each other.
 - A module's details line ran into the room's drawing on wide screens, and its date was written as digits.
+- A stale announcement: two messages to the same live region within 60 ms (a wrong answer, then Show the answer at once) let the older one be read out after the newer. A pending announcement is now cancelled by a newer one, everywhere. The final browser run caught it as one failed Paper 2 practice test; the suite was run again in full after the fix.
 
 ## In development
 

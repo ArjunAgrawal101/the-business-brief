@@ -62,6 +62,7 @@ The Business Brief grows beyond the IB course without changing what made it work
 
 - The source register becomes a folder, one file per area, so new material adds a file of its own; 580 sources in all. A new availability, opened and read online, marks the 114 company and regulator documents that were read in full, apart from pages known only from search excerpts. A work or document cited in several places is registered once.
 - The new modules and briefings follow the site's Oxford spelling.
+- A newer announcement to screen readers now replaces one still waiting to be read, in every interactive component, so two quick messages are never heard in the wrong order.
 - Contextual tutoring notes, the workspace's links from the studios and the Financial Laboratory, and the new pages in search, the menus, the home page's latest additions and the pathways.
 
 ## 2.1.0: 3 November 2026
