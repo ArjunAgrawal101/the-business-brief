@@ -1,0 +1,200 @@
+# Advanced financial management, module 5. Real-company facts come from the
+# documents in src/content/sources/advanced-finance.yaml, read on 16 November
+# 2026. The worked figures (enterprise value bridge, terminal values, the
+# value-driver formula, residual income), the multiples quoted for U. S. Steel,
+# the case and the decision were checked by script.
+domain: finance
+title: Valuation fundamentals
+order: 5
+dek: What is a business worth, how do the main valuation methods reach an answer, and why do careful valuations of the same company still disagree?
+audience: [undergraduate, mba, professional]
+covers: [Valuation fundamentals]
+minutes: 25
+updated: '2026-11-16'
+bridge:
+  codes: ['3.8', '3.4']
+  text: |
+    **What the IB course calculates.** The net present value of a single project from given cash flows and the guide's printed discount factors, and the book values in a statement of financial position, including intangible assets. It does not value a whole business or its shares.
+
+    **What this module adds.** It values the whole enterprise and then its equity: discounting free cash flow at the cost of capital, estimating a terminal value and seeing why growth creates value only when returns exceed the cost of capital, bridging from enterprise value to the value per share, using multiples without forgetting the assumptions they hide, linking value to the accounts through residual income, and separating value from price in takeovers and venture funding rounds.
+foundation: |
+  A business is worth the present value of the cash it will generate for the people who finance it. Williams (1938) put this as the value of a share being the present value of its future dividends; modern practice discounts the free cash flow of the whole business and then subtracts the claims of lenders. Price is different: it is what a buyer pays in a particular market or negotiation, and it can be above or below any estimate of value.
+
+  Practitioners use four families of method. **Intrinsic** methods discount forecast cash flows. **Relative** methods apply multiples, such as enterprise value to EBITDA, observed for similar companies. **Accounting-based** methods start from book value and add the present value of profits above a normal return. **Transaction** analysis asks what buyers have paid for control. Done consistently, the first three must agree, because they rest on the same forecasts; when they disagree, the disagreement shows which assumption is doing the work.
+
+  Three drivers determine value in every method: how fast the business grows, the return it earns on the capital it invests, and the cost of that capital. Miller and Modigliani (1961) showed that growth adds value only when the return on new investment exceeds the cost of capital. A valuation is therefore a structured argument about those three things, not a calculation to be trusted to the pound.
+advanced:
+  - id: enterprise-and-equity
+    title: Enterprise value and equity value
+    body: |
+      **Enterprise value** (EV) is the value of the operating business to all its investors. Equity value is what remains for shareholders after the other claims are paid, plus any assets outside the operations. Going from the market value of equity to EV: add net debt, lease liabilities, pension deficits, minority interests and other prior claims such as preference shares or hybrid capital, and subtract non-operating assets such as stakes in associates. A company with equity worth £800m, net debt of £300m, leases of £100m, a pension deficit of £50m and minority interests of £30m, holding an associate worth £40m, has an EV of 800 + 300 + 100 + 50 + 30 - 40 = £1,240m.
+
+      Value per share must count every claim on the equity: options, restricted shares and convertible bonds, not just the shares in issue (a fully diluted basis). And multiples must be consistent: EV goes with measures before financing costs, such as EBITDA or EBIT, while equity value goes with measures after interest, such as net profit. Dividing an equity value by EBITDA, or an EV by earnings per share, produces a number with no meaning.
+  - id: dcf-and-terminal-value
+    title: Free cash flow, terminal value and the value of growth
+    body: |
+      Free cash flow to the firm is operating profit after tax (NOPAT) plus depreciation, minus capital expenditure and investment in working capital. Discount it at the WACC for an explicit forecast period, then add a **terminal value** for the years beyond, usually with the constant-growth formula of Gordon (1959): TV = FCF in the first year after the forecast ÷ (WACC - g).
+
+      The danger lies in treating growth as free. Growth needs investment, and the reinvestment rate needed is g ÷ RONIC, the growth rate divided by the return on new invested capital. So TV = NOPAT × (1 - g ÷ RONIC) ÷ (WACC - g). Take next year's NOPAT of £100m, growth of 3% and a WACC of 8%. If new investment earns 12%, a quarter of NOPAT is reinvested and TV = 75 ÷ 0.05 = £1,500m. If it earns 8%, equal to the WACC, TV = 62.5 ÷ 0.05 = £1,250m, exactly the value with no growth at all (100 ÷ 0.08). If it earns 6%, TV falls to £1,000m: the growth destroys value. Many spreadsheet valuations hold reinvestment fixed while raising growth, and so create value from nothing.
+
+      Terminal values typically make up most of a DCF value, which makes them acutely sensitive. With RONIC at 12% and growth at 3%, moving the WACC from 8% to 7% raises the terminal value from £1,500m to £1,875m; moving it to 9% cuts it to £1,250m. Report a range, and check what the terminal value implies as a multiple and as a return on capital.
+  - id: multiples
+    title: Multiples as compressed valuations
+    body: |
+      A multiple is a DCF in disguise. Under the same assumptions, EV ÷ NOPAT = (1 - g ÷ RONIC) ÷ (WACC - g), which with 3% growth, a 12% return and an 8% WACC is 15 times. Two companies deserve the same multiple only if they share growth, returns and risk, so the choice of peers is the valuation. Multiples are quick, market-based and easy to explain, which is why bankers and investors rely on them; they also import any mispricing in the peer group and hide the assumptions that justify them.
+
+      Three rules improve them. Use **forward** measures, which reflect the future being valued: Liu, Nissim and Thomas (2002) found forward earnings multiples the most accurate of those they tested and sales multiples the least. **Normalise** cyclical earnings, because a multiple of peak profit understates value relative to the cycle and a multiple of trough profit overstates it. And **match numerator and denominator** to the same claims, as above.
+  - id: residual-income
+    title: Residual income and the accounts
+    body: |
+      Residual income valuation, developed from Edwards and Bell (1961) and given its modern form by Ohlson (1995), writes value as book value plus the present value of future profit above a normal return: residual income in year t is profit minus the cost of equity × opening book value. If the clean surplus relation holds, it gives the same answer as discounting dividends.
+
+      Take book equity of £1,000m, a return on equity of 12% every year, a cost of equity of 10% and book value growing at 4%. Residual income next year is (0.12 - 0.10) × 1,000 = £20m, growing at 4%, so value = 1,000 + 20 ÷ (0.10 - 0.04) = £1,333m. The dividend view agrees: profit of £120m less the £40m retained to grow book value leaves £80m of dividends, and 80 ÷ 0.06 = £1,333m. The price-to-book ratio of 1.33 exists only because ROE exceeds the cost of equity; at ROE equal to 10%, value would equal book. The method keeps valuation honest by anchoring it to the balance sheet and makes the source of value, returns above the cost of capital, explicit.
+  - id: price-control-and-private-value
+    title: Price, control and private values
+    body: |
+      In an acquisition the buyer creates value only if the target's standalone value plus the present value of synergies, minus integration costs, exceeds the price. The premium over the market price pays the seller in advance for synergies the buyer has yet to deliver, and competitive auctions tend to transfer them to the seller entirely. Roll (1986) argued that bidders' overconfidence in their own valuations explains why they pay so much.
+
+      Private companies raise further problems. A venture round's **post-money valuation** is the price of the new shares multiplied by all the shares outstanding afterwards; pre-money is post-money minus the new money. Because the newest shares typically carry rights the ordinary shares lack, such as being repaid first in a sale, the headline figure overstates the value of the company's ordinary shares; Gornall and Strebulaev (2020) estimate the overstatement to be large for highly valued venture-backed companies.
+models:
+  - name: Discounted cash flow valuation
+    origin: Williams (1938)
+    summary: |
+      Enterprise value is the present value of free cash flow to the firm, discounted at the WACC over an explicit forecast plus a terminal value; equity value follows by deducting net debt and other claims.
+    use: |
+      Forecast drivers (growth, margins, reinvestment), discount at a rate matched to the risk, check that the terminal value's implied return on capital and multiple are plausible, and present results as a range over the key assumptions.
+    limits: |
+      Small changes in the WACC or long-term growth move the answer a lot, the terminal value usually dominates, and the forecasts carry the optimism of whoever prepares them.
+    tool: /finance-desk/lab/net-present-value/
+    sources: [adv-fin-williams-1938, adv-fin-koller-goedhart-wessels-2020]
+  - name: Constant-growth and value-driver formulas
+    origin: Gordon (1959); Miller and Modigliani (1961)
+    summary: |
+      Value = next year's cash flow ÷ (r - g). With reinvestment made explicit, value = NOPAT × (1 - g ÷ RONIC) ÷ (WACC - g), so growth adds value only when the return on new capital exceeds the cost of capital.
+    use: |
+      Use it for terminal values and quick sanity checks, and to show management that growth at returns below the cost of capital destroys value.
+    limits: |
+      It assumes constant growth, returns and risk forever, and it explodes as g approaches r; a long-run growth rate above the economy's is not credible.
+    sources: [adv-fin-gordon-1959, adv-fin-miller-modigliani-1961]
+  - name: Residual income valuation
+    origin: Edwards and Bell (1961); Ohlson (1995)
+    summary: |
+      Value = book value + present value of (profit - cost of equity × opening book value). It gives the same value as discounted dividends when the accounts obey the clean surplus relation.
+    use: |
+      Use it where book values are meaningful, such as banks and asset-heavy firms, and to cross-check a DCF by asking what returns on equity the DCF implicitly assumes.
+    limits: |
+      It is only as good as the accounting: where brands and research are expensed, book value understates capital and residual income overstates excess returns.
+    sources: [adv-fin-edwards-bell-1961, adv-fin-ohlson-1995]
+  - name: Valuation multiples
+    origin: Practitioner method; evidence in Liu, Nissim and Thomas (2002)
+    summary: |
+      Value a company by applying the ratio of value to a performance measure (EV ÷ EBITDA, price ÷ earnings) observed for comparable companies or transactions.
+    use: |
+      Choose peers for similar growth, returns and risk, prefer forward and normalised measures, keep numerator and denominator consistent, and use multiples to cross-check a DCF rather than replace it.
+    limits: |
+      Multiples import any mispricing in the peer group, hide the assumptions that justify them, and mislead badly when earnings are cyclical or temporarily depressed.
+    sources: [adv-fin-liu-nissim-thomas-2002, adv-fin-damodaran-2012]
+applications:
+  - title: 'Nippon Steel and U. S. Steel, 2023 to 2025: a price on cyclical earnings'
+    kind: real
+    asOf: '2025-06'
+    body: |
+      Nippon Steel agreed in December 2023 to pay $55.00 a share in cash for U. S. Steel, a 40% premium to the closing price of $39.33 on 15 December 2023. The release gave 223,135,077 shares to be acquired and an acquisition value of $14,126m, a figure that includes options, restricted stock units and convertible notes; the shares alone at $55 come to about $12,272m, so roughly $1.85bn went to these other claims on the equity. Adding assumed debt gave an enterprise value of $14.9 billion.
+
+      The release reported U. S. Steel's earnings before interest and tax as a loss of $1,075m in 2020, then profits of $4,946m in 2021 and $3,160m in 2022. On those figures the price was 3.0 times 2021 EBIT, 4.7 times 2022 EBIT and about 6.4 times the three-year average, and 1.2 times the 2022 net assets per share of $45.14. When the deal closed in June 2025, Nippon Steel also committed to about $11 billion of new investment by 2028 under an agreement that gave the US Government a Golden Share.
+
+      *Interpretation, not from the source:* a multiple on one year of a steelmaker's earnings says more about the cycle than about value, so analysts normalise across it. And the economic cost of control was more than the purchase price: it included the committed investment and the flexibility given up.
+    sources: [adv-fin-nippon-steel-2023, adv-fin-nippon-steel-2025]
+  - title: 'MultiChoice and Canal+, 2024: an independent valuation range'
+    kind: real
+    asOf: '2024-06'
+    body: |
+      Groupe Canal+ made a mandatory offer of R125.00 a share for MultiChoice. The combined offer circular of 4 June 2024 compared it with R75.00, the last closing price before Canal+ delivered its non-binding offer (a premium of 66.66%, as stated), and with the 30-day volume-weighted average price of R76.24 (63.96%). The independent expert, Standard Bank, valued MultiChoice on a sum-of-the-parts basis, chiefly by discounted cash flow for the main businesses, supported by comparable companies, precedent transactions and carrying values. It named subscriber growth, price per package, revenue growth, EBITDA margins, the WACC, long-term growth, exchange rates and inflation as key drivers, ran sensitivity analyses, and set a range of R113.00 to R129.00 with a likely value of R120.00 at 1 May 2024. The offer lay within the range, and the expert judged it fair and reasonable. Canal+ completed the compulsory acquisition of the remaining shares on 5 December 2025.
+
+      *Interpretation, not from the source:* the likely value was 60% above the pre-offer share price, a reminder that a market price for a minority stake and a valuation for a change of control answer different questions. A range running from about 6% below to about 8% above R120 also looks narrow beside the sensitivity of any DCF to its WACC and growth assumptions.
+    sources: [adv-fin-multichoice-circular-2024, adv-fin-multichoice-delisting-2025]
+  - title: 'Mistral AI, 2025: what a post-money valuation measures'
+    kind: real
+    asOf: '2025-09'
+    body: |
+      On 9 September 2025 Mistral AI announced a Series C round of €1.7 billion "at a 11.7B€ post-money valuation", led by ASML, with participation from existing investors. By definition the pre-money valuation was €11.7bn - €1.7bn = €10.0bn, and the new money bought claims equal to 1.7 ÷ 11.7 = 14.5% of the post-money figure.
+
+      *Interpretation, not from the source:* the announcement does not disclose the terms of the shares issued. Venture rounds commonly use preferred shares with rights the ordinary shares lack, and where they do, multiplying the price of the newest shares by every share outstanding overstates the value of the company's ordinary equity (Gornall and Strebulaev, 2020). A headline valuation is the price of one class of security, not an appraisal of the whole company.
+    sources: [adv-fin-mistral-series-c-2025, adv-fin-gornall-strebulaev-2020]
+cases:
+  - title: 'Tarnside Analytics: valuing a company for sale'
+    fictional: true
+    situation: |
+      Tarnside Analytics, a fictional provider of data software to logistics firms, is for sale. Its owners have commissioned the forecast below and quote peer multiples of 9 to 13 times EBITDA. You advise a possible buyer and must produce a valuation range before the first round of bids.
+    exhibit:
+      caption: Tarnside Analytics, forecast and market inputs
+      columns: ['Item', 'Value']
+      rows:
+        - ['Free cash flow to the firm, Year 1', '£14.0m']
+        - ['Free cash flow to the firm, Year 2', '£16.5m']
+        - ['Free cash flow to the firm, Year 3', '£18.8m']
+        - ['Free cash flow to the firm, Year 4', '£20.6m']
+        - ['Free cash flow to the firm, Year 5', '£21.8m']
+        - ['Operating profit after tax (NOPAT), Year 5', '£26.0m']
+        - ['WACC', '9.5%']
+        - ['Growth of free cash flow after Year 5', '2.5% a year']
+        - ['Net debt', '£45.0m']
+        - ['EBITDA, latest year', '£31.0m']
+        - ['EV to EBITDA of listed peers', '9 to 13 times']
+      note: Fictional company; simulated figures. Cash flows arise at the end of each year.
+    questions:
+      - Calculate the enterprise value by discounted cash flow, the share of it that comes from the terminal value, and the equity value.
+      - What EV to EBITDA multiple does your DCF imply? Suggest reasons why it might differ from the peers' range.
+      - Recalculate the enterprise value for WACCs of 8.5% and 10.5% and growth rates of 1.5% and 3.5%. Which assumption matters more, and why?
+      - Using Year 5 NOPAT and free cash flow, what return on new capital does 2.5% perpetual growth imply? What would you need to believe about Tarnside's competitive position for that to hold?
+      - Combine the DCF and the multiples into a range you would defend to the buyer's board.
+evaluation: |
+  **How accurate are valuations?** Kaplan and Ruback (1995) compared discounted cash flow values, built from the forecasts in transaction documents, with the prices actually paid in highly leveraged transactions and found that the DCF values came close on average, performing at least as well as multiples. Liu, Nissim and Thomas (2002) found forward earnings multiples the most accurate multiple and sales multiples the least. Both studies describe average accuracy; individual valuations still vary widely.
+
+  **The problem of the terminal value.** Because most value usually lies beyond the forecast, DCF answers rest on assumptions about the distant future that nobody can verify. Critics conclude that DCF offers false precision; defenders reply that it at least makes the assumptions explicit, whereas a multiple hides them. *Interpretation:* the best practice is to use both, reconcile them, and spend effort where the sensitivity is greatest.
+
+  **Prices and values.** If markets are efficient, the share price is the best available estimate of value and the valuer's task is to explain it, not beat it. Takeovers complicate the picture: control is worth more than a minority stake because the owner can change strategy, and studies of acquisitions find that target shareholders capture most of the gains on announcement while bidders' shareholders, on average, gain little or nothing (Andrade, Mitchell and Stafford, 2001), consistent with Roll's (1986) hubris hypothesis that bidders pay away the synergies they expect. Valuation in practice is therefore partly negotiation: the analyst's job is to know the walk-away price before the bidding starts.
+decision:
+  title: How much to bid for Tarnside
+  fictional: true
+  brief: |
+    Your client, a fictional logistics software group, wants to buy Tarnside Analytics (see the case). Your DCF puts Tarnside's standalone equity value at £226.8m. The client's team estimates cost synergies with a present value of £40m, which it is confident of, and revenue synergies of £30m, which it rates as a coin toss. Integration will cost £15m in present value. A rival bidder is rumoured.
+  options:
+    - label: Bid £230m and hold
+      text: Offer close to standalone value, keeping almost all the synergies for the client's shareholders, at the risk of losing the deal.
+    - label: Bid up to £250m
+      text: Pay away part of the cost synergies to win, keeping the expected revenue synergies as upside.
+    - label: Bid up to £280m
+      text: Pay for all the cost synergies and all the revenue synergies to be sure of beating the rival.
+    - label: Walk away
+      text: Decline to bid and look for other targets or organic investment.
+  criteria:
+    - Value created for the buyer's shareholders at each price
+    - Confidence in each kind of synergy
+    - Probability of winning against the rival
+    - Downside if integration disappoints
+    - Discipline of a walk-away price set in advance
+  guidance: |
+    Set the walk-away price before the auction does it for you. Standalone value plus the confident cost synergies minus integration costs is 226.8 + 40 - 15 = £251.8m. Adding half of the revenue synergies as their expected value gives at most £266.8m. Paying £280m would destroy about £13m of value in expectation (266.8 - 280) and much more if the revenue synergies fail.
+
+    A bid of £230m keeps most of the value but may lose the deal; that is acceptable if the client has alternatives, because losing a deal at a fair price costs nothing. A bid of up to £250m leaves the client with a small cushion of about £2m from the confident synergies alone and about £17m if the revenue synergies are counted at half their value: a defensible ceiling. The £280m bid is the winner's curse in action: winning only because the client values the uncertain synergies more highly than anyone else is a reason to worry, not to celebrate.
+
+    A disciplined board would open near £230m, be prepared to rise towards £250m, and walk away above about £252m unless new evidence makes the revenue synergies more certain.
+reading:
+  - source: adv-fin-koller-goedhart-wessels-2020
+    note: The practitioner's standard on discounted cash flow, return on invested capital and the value of growth.
+  - source: adv-fin-damodaran-2012
+    note: A comprehensive reference across intrinsic, relative and option-based valuation, with many special cases.
+  - source: adv-fin-kaplan-ruback-1995
+    note: The classic test of how close discounted cash flow values come to the prices actually paid.
+  - source: adv-fin-liu-nissim-thomas-2002
+    note: Which valuation multiples work best, and why forward earnings beat sales.
+basis:
+  - source: ib-bm-guide-2024
+    note: Net present value and final accounts in the IB course (pages 29, 30, 65 and 66), for the bridge.
+  - source: adv-fin-roll-1986
+    note: The hubris hypothesis of takeovers.
+  - source: adv-fin-andrade-mitchell-stafford-2001
+    note: Evidence on who gains from mergers.
+  - source: adv-fin-gornall-strebulaev-2020
+    note: Venture capital valuations and preferred share terms.

@@ -1,0 +1,198 @@
+# Advanced financial management, module 6. Real-company facts come from the
+# documents in src/content/sources/advanced-finance.yaml, read on 16 November
+# 2026. Every worked figure (switching values, tornado ranges, the correlation
+# and capacity examples), the case and the regret table were checked by script.
+domain: finance
+title: Sensitivity analysis and scenario planning
+order: 6
+dek: How should a manager test a forecast that is certain to be wrong, and what can sensitivity analysis, simulation and scenarios each tell a decision-maker that the others cannot?
+audience: [undergraduate, mba, professional]
+covers: [Sensitivity analysis, Scenario planning]
+minutes: 25
+updated: '2026-11-16'
+bridge:
+  codes: ['5.5', '3.8', '3.9', '5.7']
+  text: |
+    **What the IB course covers.** The margin of safety in break-even analysis, budget variances, simple "what if" tests in investment appraisal (what if the returns were 20% lower?), decision trees at HL, and contingency planning for crises. Each varies one figure, or a few, around a single forecast.
+
+    **What this module adds.** It finds the inputs that matter through switching values and tornado charts; builds scenarios as consistent combinations rather than stacked extremes; shows why a plan built on average inputs does not give the average outcome; explains what simulation with correlated inputs adds and how it misleads; distinguishes stress tests and reverse stress tests; and introduces strategic scenario planning, which prepares an organisation for futures to which no one can attach probabilities.
+foundation: |
+  Every forecast in a business plan will be wrong. The useful questions are how wrong it might be, in which direction, and whether the decision would change. Four tools answer different versions of those questions.
+
+  **Sensitivity analysis** varies one input at a time to find which assumptions the answer depends on. **Scenario analysis** combines inputs into a few internally consistent stories about the future and values the decision in each. **Simulation** assigns probability distributions to the inputs and computes the distribution of outcomes. **Strategic scenario planning**, which Royal Dutch Shell developed for business use and Wack (1985) described, uses a handful of contrasting futures, deliberately without probabilities, to change how managers think and to test whether a strategy survives futures they had not imagined.
+
+  The distinction behind the last tool goes back to Knight (1921): **risk** is variation we can describe with probabilities, **uncertainty** is variation we cannot. Sensitivity and simulation handle risk; scenario planning is built for uncertainty. A finance team that treats deep uncertainty as if it were measurable risk produces precise answers to the wrong question.
+advanced:
+  - id: switching-values-and-tornadoes
+    title: Switching values and tornado charts
+    body: |
+      A project costs £300,000 and runs for five years. It sells 10,000 units a year at £50, with a variable cost of £30 a unit and fixed cash costs of £80,000. The annual cash flow is 10,000 × 20 - 80,000 = £120,000 and, at 10%, the NPV is 120,000 × 3.7908 - 300,000 = £154,894.
+
+      Rather than asking "what if sales fall 10%?", ask how far each input must move before the NPV reaches zero: its **switching value**. The cash flow must fall to 300,000 ÷ 3.7908 = £79,139, so price can fall only 8.2% (to £45.91), volume 20.4%, while variable cost can rise 13.6% and fixed costs 51.1%; the investment can rise 51.6%, and the discount rate can reach the IRR of 28.6%. The project is a bet on price above all. The IB margin of safety is the same idea for volume in a single period.
+
+      Switching values ignore how likely each movement is, so combine them with plausible ranges in a **tornado chart**: vary each input across its range, holding the others at base, and sort the bars by the swing in NPV. With price ±10%, volume ±20%, variable cost ±10%, fixed costs ±15%, investment ±10% and a discount rate of 8 to 12%, the swings are £379,000, £303,000, £227,000, £91,000, £60,000 and £47,000. Management attention, market research and contract terms should follow the top of the tornado.
+  - id: consistent-scenarios
+    title: Consistent scenarios, not stacked extremes
+    body: |
+      One-at-a-time analysis assumes inputs move independently. They rarely do: in a recession volume and price fall together, and input costs may fall too. A "worst case" built by setting every input to its pessimistic value at once is usually far less likely than it looks, and a "best case" built the same way is just as implausible. A scenario should be a coherent story in which the inputs move together for a reason.
+
+      Correlation changes both the average and the risk. Suppose in the project above price can be £45 or £55 and volume 8,000 or 12,000. The four combinations give NPVs of minus £148,369 (both low), £79,079 (low price, high volume), £154,894 (high price, low volume) and £533,973 (both high). If price and volume are independent and each equally likely, the expected NPV is £154,894 and there is a 25% chance of a loss. If they move together, only the two extremes occur: the expected NPV rises to £192,802 because revenue is price times volume, but the chance of a loss doubles to 50%.
+  - id: flaw-of-averages
+    title: Why the plan at average inputs is not the average outcome
+    body: |
+      A plan built on the average of each input gives the average outcome only if the outcome is a straight-line function of the inputs. Capacity limits, contracts, options and taxes make most business outcomes kinked, and then the plan at average inputs is biased, a point Savage (2009) calls the flaw of averages.
+
+      A plant can make 100,000 units, earns £5 a unit and has fixed costs of £400,000. Demand will be 80,000, 100,000 or 120,000 units with equal probability, an average of 100,000. At average demand profit is £100,000. But the plant cannot sell the extra 20,000 units in the good year, while it does lose sales in the bad one: profits are £0, £100,000 and £100,000, and the expected profit is £66,667. The average outcome is a third lower than the outcome at the average, purely because of the capacity limit. The same asymmetry runs the other way for options, which gain from upside and are protected from downside.
+  - id: simulation
+    title: 'Simulation: what it adds and how it misleads'
+    body: |
+      Monte Carlo simulation, brought to capital investment by Hertz (1964), draws thousands of combinations of inputs from their probability distributions, including correlations, and reports the distribution of the result: the expected NPV, the chance it is negative, and the range within which, say, 90% of outcomes fall. It captures interactions and kinks that one-at-a-time analysis misses, and global methods, which vary all inputs together, are needed to rank the importance of inputs that interact (Saltelli and others, 2008).
+
+      It misleads in three ways. Its output is only as good as the distributions, which are usually judgements, and forecasters' ranges are typically too narrow, so tails are understated. Correlations are hard to estimate and easy to ignore. And the distribution of NPVs, each computed at a risk-adjusted discount rate, is not a description of the project's risk to investors, who are already compensated for priced risk through the rate; the useful outputs are the drivers of loss and the probability of hitting a constraint, such as running out of cash.
+  - id: stress-tests-and-strategic-scenarios
+    title: Stress tests and strategic scenarios
+    body: |
+      A **stress test** asks whether the business survives a severe but plausible shock, such as a 30% fall in volume for two years. A **reverse stress test** starts from failure, such as a covenant breach or running out of cash, and works back to the combinations of events that would cause it, so that management can judge their plausibility and watch for their early signs. Banks are required by their regulators to do both, and UK-listed companies have published viability statements since the governance code introduced them in 2014 (Financial Reporting Council, 2014).
+
+      **Strategic scenario planning** has a different purpose: learning, not measurement. Wack (1985) described how Shell's planners separated predetermined elements, which will happen in any future, from critical uncertainties, and wrote a few contrasting, plausible stories about how the uncertainties might resolve. The stories were meant to challenge managers' assumptions, not to be averaged. A strategy is then tested against each: a robust strategy performs acceptably in all of them, and signposts tell the organisation which future is arriving so that it can exercise options it has prepared.
+models:
+  - name: Switching values and tornado analysis
+    origin: A method of decision analysis (no single originator)
+    summary: |
+      The switching value is the change in an input that brings NPV to zero; a tornado chart ranks inputs by the swing in NPV across their plausible ranges.
+    use: |
+      Compute switching values for every input, set realistic ranges with the people who know each market, and focus research, contract negotiation and monitoring on the inputs at the top of the tornado.
+    limits: |
+      It varies one input at a time, so it misses correlations and interactions, and it says nothing about probabilities; a long bar may belong to an input that is very unlikely to move.
+    tool: /finance-desk/lab/margin-of-safety/
+    sources: [adv-fin-brealey-myers-allen-2020, adv-fin-saltelli-2008]
+  - name: Monte Carlo simulation in capital investment
+    origin: Hertz (1964)
+    summary: |
+      Draws repeated combinations of inputs from probability distributions, with correlations, to produce a distribution of outcomes and the probability of breaching a threshold.
+    use: |
+      Model the few inputs that matter most, with distributions and correlations agreed in advance, and report the probability of loss or of breaching a cash or covenant limit, together with the inputs that drive the bad outcomes.
+    limits: |
+      Distributions are judgements and usually too narrow; correlations are often guessed; and an NPV distribution computed at a risk-adjusted rate double-counts risk if read as the risk to investors.
+    framework: descriptive-statistics
+    sources: [adv-fin-hertz-1964, adv-fin-savage-2009]
+  - name: Strategic scenario planning
+    origin: Wack (1985); Schoemaker (1995)
+    summary: |
+      Builds a few contrasting, internally consistent and plausible futures around the critical uncertainties facing an organisation, without assigning probabilities, to test strategies and change mental models.
+    use: |
+      Identify driving forces, separate predetermined elements from critical uncertainties, write two to four scenarios, test each strategic option against every scenario, and agree signposts that would show which future is unfolding.
+    limits: |
+      Scenarios can become elaborate stories that change nothing, the choice of uncertainties reflects the planners' own blind spots, and without probabilities the method cannot by itself choose between options; success stories, including Shell's, are mostly told in retrospect.
+    sources: [adv-fin-wack-1985, adv-fin-schoemaker-1995, adv-fin-van-der-heijden-1996]
+  - name: Minimax regret
+    origin: Savage (1951)
+    summary: |
+      For each strategy and scenario, regret is the gap between that strategy's payoff and the best payoff available in that scenario. The criterion chooses the strategy whose largest regret is smallest.
+    use: |
+      Use it alongside expected value when probabilities are contested: it identifies strategies that are never badly wrong, which boards and investors often value more than the best expected outcome.
+    limits: |
+      It depends on which scenarios are included, ignores how likely each is, and can favour timid choices when one scenario is extreme.
+    sources: [adv-fin-savage-1951]
+applications:
+  - title: 'bp, 2026: rules of thumb, and why profit and cash diverge'
+    kind: real
+    asOf: '2026-04'
+    body: |
+      bp publishes "rules of thumb" for the sensitivity of its results to market prices. For 2026, it estimated that a change of $1 a barrel in Brent would move pre-tax replacement cost operating profit by $340m, a change of $0.10 per mmBtu in Henry Hub gas by $40m, and a change of $1 a barrel in its refining indicator margin by $550m. It warns that they are approximate, that "the relationship between prices and results is not necessarily linear across a wide range of oil and gas prices", and that hedging and the way governments take their share of oil revenues can cause large differences.
+
+      Brent averaged $81.13 in the first quarter of 2026, $17.40 more than in the previous quarter. *Interpretation, not from the source:* applied mechanically to a full year at that higher price, the rule of thumb would suggest roughly $5.9bn more pre-tax profit, which is exactly the kind of extrapolation bp cautions against. In the same quarter bp expected a working capital build of $4 to 7 billion, so the price rise was consuming cash while it raised profit. A sensitivity analysis of profit alone would have missed the effect on net debt.
+    sources: [adv-fin-bp-trading-1q26]
+  - title: 'bp, 2025: scenarios for strategy, one price deck for the accounts'
+    kind: real
+    asOf: '2025'
+    body: |
+      bp's Energy Outlook 2025 explores the energy transition to 2050 through two scenarios, Current Trajectory and Below 2°. bp states that they "are not predictions of what is likely to happen", that the probability of either "materialising exactly as described is negligible", and that together they span a wide range of outcomes. Oil demand in 2035 lies between 85 and 100 million barrels a day across them; by 2050 it is a little below 85 in Current Trajectory and a little below 35 in Below 2°. A further sensitivity with weaker gains in energy efficiency raises oil demand by almost 6 million barrels a day, to close to 106, by 2035; bp describes its assumption there, that all the extra energy demand is met by fossil fuels, as "a limiting case".
+
+      For its accounts bp needs a single set of assumptions. Its impairment tests at the end of 2025 used Brent at $70 a barrel in 2026 and 2030, $67 in 2040 and $60 in 2050 (in real 2024 terms), discounted at a post-tax rate of 8%.
+
+      *Interpretation, not from the source:* the contrast is instructive. Strategy needs a range of coherent futures and a sense of which way the world is moving; accounting needs one defensible base case. Both are legitimate, and confusing them, by treating a scenario as a forecast or a price deck as a prediction, is a common error.
+    sources: [adv-fin-bp-energy-outlook-2025, adv-fin-bp-results-2025]
+  - title: 'Novo Nordisk, 2025: when a forecast range moves'
+    kind: real
+    asOf: '2025-07'
+    body: |
+      On 7 May 2025 Novo Nordisk expected 2025 sales growth of 13 to 21% and operating profit growth of 16 to 24%, at constant exchange rates. On 29 July it lowered the ranges to 8 to 14% and 10 to 16%, citing the persistent use of compounded GLP-1 products, slower market expansion and competition in the United States, and lower than expected uptake in some international markets. The midpoint of the sales range fell by six percentage points, most of the width of the original eight-point range.
+
+      *Interpretation, not from the source:* a guidance range is not a probability interval; it usually reflects outcomes within the company's base view. The drivers that moved the forecast were scenario variables that a few months earlier sat outside or at the edge of that view. Research on executives' forecasts suggests that ranges are generally too narrow (Ben-David, Graham and Harvey, 2013).
+    sources: [adv-fin-novo-outlook-2025, adv-fin-ben-david-graham-harvey-2013]
+cases:
+  - title: 'Hollin Foods: an oat drink line on a thin margin'
+    fictional: true
+    situation: |
+      Hollin Foods, a fictional maker of plant-based drinks, is considering a new production line. The project team has produced a base case with a positive NPV and, at the board's request, pessimistic and optimistic values for each input. The finance director worries that the "pessimistic" column, which shows a large loss, will frighten the board, and that the base case hides how fragile the project is. Cash flows are after tax, the line lasts eight years with no residual value, and the discount rate is 9% in every case (an annuity factor of 5.5348).
+    exhibit:
+      caption: Hollin Foods, inputs and results for the new line
+      columns: ['Input', 'Pessimistic', 'Base', 'Optimistic']
+      rows:
+        - ['Volume (million packs a year)', '4.8', '6.0', '7.0']
+        - ['Net price per pack (£)', '1.70', '1.90', '2.05']
+        - ['Variable cost per pack (£)', '1.30', '1.10', '1.00']
+        - ['Fixed cash costs (£m a year)', '1.4', '1.2', '1.1']
+        - ['Investment (£m, Year 0)', '19.5', '18.0', '17.0']
+        - ['Annual cash flow with every input at this level (£m)', '0.52', '3.60', '6.25']
+        - ['NPV at 9% with every input at this level (£m)', '-16.62', '1.93', '17.59']
+      note: Fictional company; simulated figures. Annual cash flow = volume × (price - variable cost) - fixed costs.
+    questions:
+      - Calculate the switching value of each input from the base case. Which input is the project most exposed to?
+      - Construct a tornado chart across the pessimistic and optimistic values. Does its ranking agree with the switching values?
+      - Explain why the all-pessimistic and all-optimistic columns are poor guides to the project's risk.
+      - Value two consistent scenarios. In a supermarket price war, price falls 8% while volume rises 10%. In a poor oat harvest, variable cost rises 15% while volume falls 5%. What do the results tell the board?
+      - Design a simulation for the project. Which inputs would you model, which correlations would you include, and what would you report?
+evaluation: |
+  **What is established.** The arithmetic results are not in dispute: switching values and tornado charts identify the inputs an answer depends on, correlated inputs change both the mean and the spread of outcomes, and non-linear payoffs make the plan at average inputs a biased estimate of the average outcome (Savage, 2009). Survey evidence shows that sensitivity analysis is common and simulation rare: in Graham and Harvey's (2001) survey about half of chief financial officers used sensitivity analysis, and far fewer used simulation.
+
+  **Calibration.** Ranges are only as good as the judgement behind them. In a long-running survey, Ben-David, Graham and Harvey (2013) found that finance executives' 80% confidence intervals for stock market returns contained the outcome only about a third of the time. *Interpretation:* sensitivity ranges and simulation inputs supplied by the same people are likely to be too narrow, which argues for using historical forecast errors to set them.
+
+  **Does scenario planning work?** The case for strategic scenarios rests mostly on accounts by practitioners, notably Shell's, written after the events, and is hard to test: a company that prepared for a shock it then weathered cannot know what would have happened otherwise. Advocates argue that the benefit lies in faster recognition of change and in options prepared in advance; sceptics note that scenario exercises can become rituals detached from decisions. *Interpretation:* scenarios are most useful when each is linked to specific signposts and to decisions that would be taken if it began to unfold.
+
+  **Risk and uncertainty.** Knight's (1921) distinction remains the deepest limit. Probability-based tools need probabilities; for genuinely novel developments they do not exist, and the honest response is robustness and flexibility, not more decimal places.
+decision:
+  title: Building for an uncertain regulation
+  fictional: true
+  brief: |
+    Pellworth Chemicals, a fictional specialty chemicals firm, has developed a low-emission additive whose demand depends on a regulation that may be adopted early, delayed or abandoned. The board can choose one of three strategies; the finance team has valued each in each scenario. Directors disagree about the probabilities: some think early adoption is likely, others that the regulation may well be abandoned.
+  options:
+    - label: Dedicated large plant
+      text: Build a single-product plant at full scale now. NPV £240m if the regulation is adopted early, £40m if it is delayed, minus £160m if it is abandoned.
+    - label: Flexible multi-product plant
+      text: Build a smaller plant that can also make existing products, at a higher cost per unit. NPV £170m early, £60m delayed, minus £40m abandoned.
+    - label: License and wait
+      text: License the technology to producers now and keep the option to build later. NPV £60m early, £30m delayed, £10m abandoned.
+  criteria:
+    - Expected value under each director's probabilities
+    - Largest regret across scenarios
+    - Loss in the worst scenario and the balance sheet's capacity to absorb it
+    - Value of options retained for later
+    - Signposts available to revise the choice
+  guidance: |
+    Compute regret first, because the probabilities are disputed. The best payoffs are £240m (early), £60m (delayed) and £10m (abandoned). The dedicated plant's regrets are 0, 20 and 170, a maximum of £170m; the flexible plant's are 70, 0 and 50, a maximum of £70m; licensing's are 180, 30 and 0, a maximum of £180m. Minimax regret chooses the flexible plant.
+
+    Then test expected values under the directors' different beliefs. With equal probabilities the expected NPVs are £40m for the dedicated plant, £63m for the flexible plant and £33m for licensing. If early adoption has a 60% chance, delay 30% and abandonment 10%, the dedicated plant leads with £140m against £116m. If the probabilities are 20%, 40% and 40%, it falls to zero while the flexible plant still earns £42m.
+
+    The flexible plant is the robust choice: never the worst, rarely far from the best, and its worst loss of £40m is affordable where the dedicated plant's £160m might not be. The board should go further and agree signposts, such as the outcome of the regulator's consultation, that would justify converting the flexible plant to dedicated production or adding capacity, so that it keeps the upside of the bold option without betting the company on it.
+reading:
+  - source: adv-fin-wack-1985
+    note: The classic account of scenario planning at Shell and of scenarios as a way of changing how managers see the world.
+  - source: adv-fin-hertz-1964
+    note: The article that brought simulation into capital investment appraisal; still a clear statement of why single-point estimates mislead.
+  - source: adv-fin-savage-2009
+    note: An accessible and witty account of why plans built on averages fail, with many business examples.
+  - source: adv-fin-saltelli-2008
+    note: A technical primer on sensitivity analysis that varies inputs together, for readers who build models.
+basis:
+  - source: ib-bm-guide-2024
+    note: Break-even, investment appraisal, budgets and contingency planning in the IB course (pages 30, 34 and 35), for the bridge.
+  - source: adv-fin-knight-1921
+    note: The distinction between risk and uncertainty.
+  - source: adv-fin-frc-code-2014
+    note: The introduction of viability statements.
+  - source: adv-fin-graham-harvey-2001
+    note: The use of sensitivity analysis and simulation in practice.
+  - source: adv-fin-schoemaker-1995
+    note: The method of building scenarios.

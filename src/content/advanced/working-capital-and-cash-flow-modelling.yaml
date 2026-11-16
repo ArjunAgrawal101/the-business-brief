@@ -1,0 +1,190 @@
+# Advanced financial management, module 4. Real-company facts come from the
+# documents in src/content/sources/advanced-finance.yaml, read on 16 November
+# 2026. The worked figures, the seasonal case (receipts, payments and closing
+# balances by quarter, with the two remedies) and the decision were checked by
+# script.
+domain: finance
+title: Working capital, forecasting and cash flow modelling
+order: 4
+dek: How much cash does a business tie up in running itself, how can it forecast the cash it will need, and why can a profitable, growing company still run out of money?
+audience: [undergraduate, mba, professional]
+covers: [Working capital management, Financial forecasting, Cash flow modelling]
+minutes: 25
+updated: '2026-11-16'
+bridge:
+  codes: ['3.7', '3.6', '3.9', '4.3']
+  text: |
+    **What the IB course calculates.** Working capital as current assets minus current liabilities; the difference between profit and cash; cash flow forecasts with inflows, outflows, net cash flow and opening and closing balances; strategies for cash flow problems; and at HL stock turnover, debtor days and creditor days, budget variances, and sales forecasting, including simple linear regression.
+
+    **What this module adds.** It treats working capital as an investment that grows with sales and has a cost, measured through the cash conversion cycle; shows why growth consumes cash and how fast a business can grow on its own resources; moves from the receipts-and-payments forecast to the integrated, driver-based model that links profit, balance sheet and cash; measures forecast accuracy and bias; and weighs the financing levers (supplier finance, invoice discounting, inventory policy, committed facilities) that companies use, and their side effects.
+foundation: |
+  Every business has an operating cycle. It buys stock, makes or holds it, sells it, waits for customers to pay, and in the meantime its suppliers wait to be paid. The money tied up in that cycle, **operating working capital** (inventories plus trade receivables minus trade payables), is as much an investment as a machine, and it usually grows in proportion to sales. Note that it differs from the IB definition, current assets minus current liabilities, which also counts cash and short-term borrowing; analysts separate the operating cycle from the financing of it.
+
+  Cash flow modelling forecasts the cash a business will generate and need, period by period, by linking profit to cash through working capital, investment, tax and financing. Its central lesson is uncomfortable: profit and growth consume cash before they produce it. A business that sells more must buy more stock and wait for more customers to pay before the extra profit arrives as cash. That is why profitable companies fail. In the short run, liquidity, not profitability, decides survival, and the model's job is to show the peak need for cash early enough to arrange it.
+advanced:
+  - id: cash-conversion-cycle
+    title: The cash conversion cycle and what it costs
+    body: |
+      The **cash conversion cycle** (CCC) is the number of days between paying for inputs and receiving cash from customers: CCC = days inventory outstanding (DIO) + days sales outstanding (DSO) - days payables outstanding (DPO). Use consistent bases: receivables against revenue, inventories and payables against cost of sales, and averages rather than year-end balances where seasonality is strong.
+
+      A distributor has revenue of £120m, cost of sales of £84m, inventories of £14m, receivables of £18m and payables of £10m. DIO = 14 ÷ 84 × 365 = 60.8 days; DSO = 18 ÷ 120 × 365 = 54.8 days; DPO = 10 ÷ 84 × 365 = 43.5 days; the CCC is 72.1 days. Operating working capital is 14 + 18 - 10 = £22m, which at an 8% cost of capital costs £1.76m a year to finance. Collecting from customers ten days sooner frees 120 ÷ 365 × 10 = £3.3m of cash once, and saves about £0.26m a year.
+
+      Some businesses run a negative cycle: they collect from customers before they pay suppliers, so suppliers finance the business and growth releases cash. Grocery retail and many subscription businesses work this way. The mirror image is less often noticed: if such a business shrinks, the cycle runs in reverse and contraction drains cash.
+  - id: growth-consumes-cash
+    title: Growth consumes cash
+    body: |
+      If net operating assets (working capital plus fixed assets) must grow in line with sales, the fastest a business can grow without new external finance is the rate at which retained profit covers the extra assets. With a net margin m, all of it retained, and net operating assets of k per pound of sales, the self-financing growth rate is g = m ÷ (k - m). A business with a 5% margin and 50 pence of net operating assets per pound of sales can grow at 0.05 ÷ 0.45 = 11.1% a year. On sales of £100m that growth adds £5.56m of profit and needs exactly £5.56m of extra assets. At 25% growth it would earn £6.25m but need £12.5m, a funding gap of £6.25m, however profitable it is.
+
+      Higgins (1977) framed the same idea as the **sustainable growth rate**, the growth a firm can finance while holding its leverage constant: g = return on equity × retention ratio. A firm earning 15% on equity and retaining 60% of profit can grow at 9% a year without issuing shares or raising its gearing. Growth faster than that must be financed by new equity, more borrowing, a better margin or a leaner operating cycle; the formula tells management which lever it will have to pull.
+  - id: integrated-models
+    title: From cash budget to integrated model
+    body: |
+      The IB cash flow forecast is a receipts-and-payments schedule. Professional cash flow modelling builds an **integrated three-statement model** in which a small set of drivers generates everything else. Revenue is volume times price; cost of sales and overheads follow their own drivers; receivables, inventories and payables follow from the days assumptions; capital expenditure and depreciation follow an asset schedule; interest follows a debt schedule; and tax follows profit. The statement of profit or loss, the balance sheet and the statement of cash flows are then derived, and cash (or the revolving facility) is the balancing item. A model that does not balance has an error.
+
+      Three design rules separate useful models from dangerous ones. Keep inputs in one place, clearly labelled, so that every scenario is a change of drivers rather than of formulas. Model at the frequency of the risk: an annual model of a seasonal business shows a healthy year-end and hides the month in which the overdraft is breached, and even month-end balances can hide intra-month peaks around payroll and supplier runs. And build in checks: the balance sheet balances, cash reconciles, and ratios such as DSO stay within plausible ranges. The case below shows how a profitable year can contain a funding crisis that the annual figures conceal.
+  - id: forecast-accuracy
+    title: Forecasting accuracy and bias
+    body: |
+      Forecasts combine judgement, extrapolation of past patterns and causal relationships, such as regression of sales on advertising or on economic activity. Whatever the method, measure its record. **Bias** is the average error (forecast minus actual); **mean absolute percentage error** (MAPE) is the average size of the error. If a company forecast quarterly sales of 110, 125, 100 and 120 and achieved 100, 120, 90 and 110, its errors were 10, 5, 10 and 10: a bias of plus 8.75, a persistent tendency to over-forecast, and a MAPE of 8.6%. A forecast with low MAPE but a steady bias is easy to improve; one with no bias but a high MAPE needs wider ranges and more cash headroom.
+
+      Two findings are robust. Simple combinations of forecasts are usually more accurate than the best single method, and forecasters are overconfident: their ranges are too narrow. Tetlock and Gardner (2015) show that accuracy improves when forecasters keep score, update in small steps and break questions into parts. For cash flow, that means forecasting drivers rather than totals, tracking errors driver by driver, and holding liquidity against the error, not only against the forecast.
+models:
+  - name: Cash conversion cycle
+    origin: Richards and Laughlin (1980)
+    summary: |
+      CCC = days inventory outstanding + days sales outstanding - days payables outstanding: the days of operating costs the business must finance between paying suppliers and collecting from customers.
+    use: |
+      Compute it on consistent, averaged bases, compare it over time and with peers, and translate days into cash: one day of revenue or cost of sales, multiplied by the change in days, is the cash released or absorbed.
+    limits: |
+      Published balance sheet lines mix trade and non-trade items, year-end figures can be managed, and a short cycle achieved by squeezing suppliers or customers may cost more in prices, service or supply risk than it saves.
+    tool: /finance-desk/lab/debtor-days/
+    sources: [adv-fin-richards-laughlin-1980]
+  - name: Sustainable growth rate
+    origin: Higgins (1977)
+    summary: |
+      The growth rate a firm can finance from retained profit while keeping its leverage constant: g = return on equity × retention ratio. A related form, g = m ÷ (k - m), gives the growth that retained profit alone can fund.
+    use: |
+      Compare planned growth with the sustainable rate. If the plan is faster, the gap must be closed by new equity, more debt, higher margins, faster asset turnover or lower payouts, and the plan should say which.
+    limits: |
+      It assumes constant margins, asset intensity and payout, and treats assets as growing in proportion to sales, which ignores spare capacity and lumpy investment.
+    sources: [adv-fin-higgins-1977]
+  - name: Miller and Orr cash management model
+    origin: Miller and Orr (1966); building on Baumol (1952)
+    summary: |
+      For a cash balance that moves unpredictably, set a lower limit L, a return point Z = L + (3 × b × σ² ÷ (4 × i))^(1/3) and an upper limit L + 3 × (3 × b × σ² ÷ (4 × i))^(1/3), where b is the cost of a transfer, σ² the variance of daily net cash flows and i the daily interest rate.
+    use: |
+      With b = £50, a daily standard deviation of £2,000, i = 0.025% a day and L = £10,000, the return point is about £18,400 and the upper limit about £35,300. Buy or sell short-term investments only when the balance hits a limit. The logic matters more than the formula: hold more cash when flows are volatile and transfers costly, less when interest is high.
+    limits: |
+      It assumes random, independent daily flows and ignores predictable patterns such as payroll and seasonality, which a forecast captures better; for most firms the precautionary buffer is set by judgement and covenant headroom.
+    sources: [adv-fin-miller-orr-1966, adv-fin-baumol-1952]
+  - name: Driver-based integrated forecasting model
+    origin: Practitioner method (no single originator)
+    summary: |
+      A three-statement model in which a few drivers (volume, price, unit costs, working capital days, capital expenditure, financing terms) generate profit, balance sheet and cash flow, with cash or a revolving facility as the balancing item.
+    use: |
+      Estimate each driver from history (regression can quantify relationships such as sales against market activity), set its range, and run scenarios by changing drivers only. Report the peak funding need, not just the year-end balance.
+    limits: |
+      Models create false precision, embed their builders' optimism, and break silently when formulas are overwritten; they need version control, checks and independent review.
+    framework: simple-linear-regression
+    tool: /finance-desk/lab/cash-flow-forecast/
+    sources: [adv-fin-hyndman-athanasopoulos-2021, adv-fin-brealey-myers-allen-2020]
+applications:
+  - title: 'bp, first quarter 2026: higher prices, more working capital'
+    kind: real
+    asOf: '2026-04'
+    body: |
+      In its trading statement of 14 April 2026 bp reported that Brent crude had averaged $81.13 a barrel in the first quarter, against $63.73 in the fourth quarter of 2025, amid heightened volatility linked to the situation in the Middle East. It expected net debt at the end of the quarter to be $25 to 27 billion, up from $22.2 billion, "driven primarily by a significant working capital build in the range of $4 to 7 billion, largely due to the price environment". In the fourth quarter of 2025, operating cash flow had included a working capital release of $0.9 billion.
+
+      *Interpretation, not from the source:* in a commodity business, inventories and receivables are valued at market prices, so working capital scales with the price as well as the volume. A price rise lifts profit but consumes cash first, and a fall does the reverse. A cash flow model for such a business must link its working capital days to prices, and its leverage targets must leave room for swings of several billion dollars within a quarter.
+    sources: [adv-fin-bp-trading-1q26, adv-fin-bp-results-2025]
+  - title: 'Unilever, 2025: suppliers financing the cycle'
+    kind: real
+    asOf: '2025-12'
+    body: |
+      At 31 December 2025 Unilever's balance sheet showed inventories of €4,043m and trade and other current receivables of €7,346m, against trade payables and other current liabilities of €16,939m. On these broad lines, operating working capital was negative: minus €5,550m. In its 2025 cash flow statement, working capital released €116m in total: inventories absorbed €281m and receivables €2,620m, while payables and other liabilities provided €3,017m. The company explains that receivables and payables include a gross-up from its transitional service arrangement with the ice cream business it demerged, under which it invoices and collects on that business's behalf.
+
+      *Interpretation, not from the source:* negative working capital means growth releases cash, which is one reason consumer goods groups can convert profit into cash at high rates. The large, offsetting movements in 2025 show why an analyst should read the notes before reading a cash conversion cycle off the balance sheet: a temporary arrangement can move both sides by billions without changing the economics of the business.
+    sources: [adv-fin-unilever-results-2025]
+  - title: 'Novo Nordisk, July 2025: a sales forecast cut flows into cash'
+    kind: real
+    asOf: '2025-07'
+    body: |
+      When Novo Nordisk lowered its 2025 outlook on 29 July 2025, it also cut its expectation for free cash flow to DKK 35 to 45 billion. It attributed the change to lower expected sales growth, "mainly driven by lower volume growth of GLP-1-based treatments in the US and related cash flow implications amplified by the US gross-to-net system".
+
+      *Interpretation, not from the source:* in pharmaceuticals the gap between list price and the cash finally received is closed through rebates and other deductions settled after the sale, so changes in volumes and in expected deductions move cash with a lag and can amplify a revenue revision. An integrated model shows this only if it models the deductions and their timing as drivers, and the company's choice to give free cash flow as a ten-billion-kroner range is itself a statement about how uncertain the cash forecast is.
+    sources: [adv-fin-novo-outlook-2025]
+cases:
+  - title: 'Fernhill Outdoor: a profitable year with a cash crisis inside it'
+    fictional: true
+    situation: |
+      Fernhill Outdoor, a fictional importer of garden furniture, sells mostly in spring and summer. It buys stock one quarter before it sells it and must pay its overseas suppliers on delivery. Its trade customers pay 20% of each quarter's sales in the same quarter and 80% in the following quarter; last year's fourth-quarter sales were £3.0m. Fernhill starts the year with £1.0m of cash and an overdraft limit of £4.0m. The owners are planning the year from the forecast below and are pleased that it shows a profit of £6.8m.
+    exhibit:
+      caption: Fernhill Outdoor, forecast for the year (£ million)
+      columns: ['Item', 'Q1', 'Q2', 'Q3', 'Q4', 'Year']
+      rows:
+        - ['Sales', '6.0', '14.0', '9.0', '3.0', '32.0']
+        - ['Cost of goods sold (60% of sales)', '3.6', '8.4', '5.4', '1.8', '19.2']
+        - ['Overheads, paid in the quarter', '1.5', '1.5', '1.5', '1.5', '6.0']
+        - ['Profit before tax and depreciation', '0.9', '4.1', '2.1', '-0.3', '6.8']
+        - ['Stock bought and paid for in the quarter', '8.4', '5.4', '1.8', '3.6', '19.2']
+      note: Fictional company; simulated figures. Stock bought in each quarter is the cost of goods to be sold in the next; fourth-quarter purchases are for next year's first quarter, assumed equal to this year's.
+    questions:
+      - Prepare the quarterly receipts from customers and the closing cash balance for each quarter. In which quarters does Fernhill exceed its overdraft limit, and by how much?
+      - Cash at the end of the year exceeds the opening balance by exactly the year's profit. Explain why the business is nonetheless in breach of its limit during the year.
+      - Test two remedies separately. First, suppliers agree to be paid one quarter after delivery. Second, customers pay half of each quarter's sales in the same quarter. Which removes the breach?
+      - Why might even quarter-end balances understate the true peak overdraft, and how would you model it?
+      - If you rebuilt this forecast as an integrated model, which drivers would you expose for scenarios, and what would you report to the bank?
+evaluation: |
+  **What the evidence says about working capital.** Deloof (2003) found that Belgian firms with fewer days of receivables and inventory were more profitable, which is often read as advice to squeeze the cycle. The causality is unclear: less profitable firms may simply pay their suppliers later because they must. Shorter cycles can cost sales, service or supplier resilience, and a large buyer that lengthens its payment terms transfers its financing cost, and some of its risk, to smaller suppliers whose cost of capital is usually higher. *Interpretation:* minimising working capital is not the same as maximising value.
+
+  **Supplier finance.** Programmes in which a bank pays suppliers early and the buyer pays the bank later let buyers stretch terms while suppliers are paid quickly at a discount. They are legitimate and useful, but they can make debt look like trade payables and can be withdrawn when they are needed most. The International Accounting Standards Board now requires their terms and effects to be disclosed (IASB, 2023), because investors could not previously see them.
+
+  **How much cash to hold.** Firms with riskier cash flows and better investment opportunities hold more cash (Opler and colleagues, 1999), which is consistent with a precautionary motive; agency theory warns that surplus cash can also be wasted (Jensen, 1986). Neither view gives a number; the forecast's error and the cost of running out do.
+
+  **The limits of forecasting.** Cash forecasts inherit the optimism of the plans they rest on, and integrated models lend that optimism an air of precision. The defences are scorekeeping, ranges rather than points, and funding sized to the downside rather than the base case.
+decision:
+  title: Finding £20m of liquidity
+  fictional: true
+  brief: |
+    Tamsworth Engineering, a fictional engineering supplier, expects to need about £20m of extra liquidity over the next year as it fulfils a large contract. It buys £120m of materials a year on 60-day terms, has trade receivables of £30m, and has £10m of slow-moving inventory. Four proposals reach the board.
+  options:
+    - label: Supplier finance programme
+      text: Extend supplier terms from 60 to 120 days through a bank programme that lets suppliers be paid early at a discount. Frees about £19.7m (120 × 60 ÷ 365) at no direct cost to Tamsworth; suppliers who discount after about 10 days would bear roughly £2.2m a year at a 6% rate.
+    - label: Invoice discounting
+      text: Borrow 80% of the £30m of receivables (£24m) at about 7% a year, a cost of about £1.7m if fully drawn, with the receivables as security.
+    - label: Cut slow-moving inventory
+      text: Rationalise product ranges and sell off slow lines to release up to £10m over the year, at some risk to sales and customer service.
+    - label: Larger committed facility
+      text: Increase the revolving credit facility by £25m at a margin that costs about £1.4m a year if fully drawn, with the bank's usual covenants.
+  criteria:
+    - Total cost, including costs pushed onto suppliers or customers
+    - Reliability of the funding when it is most needed
+    - Effect on suppliers' and customers' resilience and goodwill
+    - Treatment by lenders, rating agencies and disclosure rules
+    - Reversibility once the contract is complete
+  guidance: |
+    The supplier finance programme looks cheapest because Tamsworth pays nothing directly, but the cost has not disappeared: it falls on suppliers, roughly £2.2m a year if all of them discount, and those suppliers may raise prices or deprioritise Tamsworth. Lenders and analysts increasingly treat such programmes as debt-like, they must now be disclosed, and a bank can withdraw a programme at short notice, so it is least reliable exactly when liquidity is tight.
+
+    Cutting slow-moving inventory is the only option that improves the business rather than financing it: it releases cash permanently and lowers storage and obsolescence costs, though it cannot be relied on for the full £20m or for speed. Invoice discounting ties funding to collateral that grows with the contract, a reasonable match, but at a higher cost and with an operational burden. The committed facility is the most reliable source and, if only partly drawn, cheap insurance.
+
+    A balanced plan would release what inventory can be released, put a larger committed facility in place as the backstop sized to the downside, and use supplier finance only for suppliers who want it, on terms that do not simply push the cost onto them. The test is whether the plan still works if the contract runs late and the cash need is larger than forecast.
+reading:
+  - source: adv-fin-richards-laughlin-1980
+    note: The article that introduced the cash conversion cycle as a measure of liquidity.
+  - source: adv-fin-higgins-1977
+    note: A short, clear derivation of the sustainable growth rate and of the choices that growth forces on a firm.
+  - source: adv-fin-opler-1999
+    note: The leading empirical study of why companies hold the cash they do.
+  - source: adv-fin-hyndman-athanasopoulos-2021
+    note: A rigorous, freely available text on forecasting methods and on measuring forecast accuracy.
+basis:
+  - source: ib-bm-guide-2024
+    note: Cash flow, efficiency ratios, budgets and sales forecasting in the IB course (pages 29 to 31), for the bridge.
+  - source: adv-fin-deloof-2003
+    note: Working capital and profitability.
+  - source: adv-fin-iasb-supplier-finance-2023
+    note: Disclosure of supplier finance arrangements.
+  - source: adv-fin-tetlock-gardner-2015
+    note: Improving forecast accuracy.
+  - source: adv-fin-jensen-1986
+    note: The agency cost of surplus cash.
