@@ -1,0 +1,79 @@
+---
+import '../../../styles/boardroom.css';
+import '../../../styles/executive.css';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/layout/Breadcrumbs.astro';
+import ProvenanceTag from '../../../components/ui/ProvenanceTag.astro';
+import Simulation from '../../../components/executive/Simulation.astro';
+import { EXECUTIVE_HREF, executiveSim, SIMULATION_HREF } from '../../../lib/executive/content';
+import { executiveView } from '../../../lib/executive/view';
+import { corpus } from '../../../lib/content';
+import { allSubtopics, subtopicHref } from '../../../lib/learning';
+import { rich } from '../../../lib/markup';
+
+const c = await corpus();
+const [id, sc] = await executiveSim();
+const view = executiveView(sc);
+const subs = allSubtopics(c);
+const codes = new Set([...Object.values(sc.stages).flatMap((s) => s.ib), ...sc.debrief.ib.flatMap((t) => t.syllabus)]);
+const subtopics = Object.fromEntries(
+  [...codes].map((code) => {
+    const s = subs.find((x) => x.s.code === code)?.s;
+    return [code, { href: subtopicHref(c, code), title: s?.title ?? code, hl: s?.level === 'HL' }];
+  }),
+);
+const glossary = Object.fromEntries(sc.debrief.terms.map((t) => [t, c.glossary[t]?.term ?? t]));
+const commandTerms = Object.fromEntries(sc.debrief.practice.map((p) => [p.command, c.commandTerms[p.command]?.term ?? p.command]));
+const sources = Object.fromEntries(
+  sc.debrief.beyond.flatMap((b) => b.sources).map((s) => {
+    const src = c.sources[s];
+    return [s, { title: src?.title ?? s, author: src?.author, year: src?.year, publisher: src?.publisher }];
+  }),
+);
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LearningResource',
+  name: `${sc.company.name}: the executive simulation`,
+  description: sc.dek,
+  learningResourceType: 'Simulation',
+  isAccessibleForFree: true,
+};
+---
+
+<BaseLayout title={`${sc.company.name}: executive simulation`} description={`${sc.dek} A nine-stage executive simulation with a fictional company and simulated figures.`} section="boardroom" room="boardroom" jsonLd={jsonLd}>
+  <header class="bb-hero bb-hero--case ex-hero">
+    <div class="wrap">
+      <Breadcrumbs trail={[{ label: 'Boardroom', href: '/boardroom/' }, { label: 'Executive simulation', href: EXECUTIVE_HREF }, { label: 'The simulation' }]} />
+      <div class="bb-hero__grid">
+        <div class="bb-hero__main">
+          <p class="bb-hero__kicker">Boardroom · Executive simulation</p>
+          <h1 class="bb-hero__title">{sc.company.name}: three years to restore the <em>margin</em></h1>
+          <p class="bb-hero__dek">{sc.dek}</p>
+          <p class="bb-hero__tags">
+            <span class="bb-chip">Fictional company</span>
+            <ProvenanceTag kind="simulated-data" />
+            <span class="bb-chip">7 roles</span>
+            <span class="bb-chip">9 stages</span>
+            <span class="bb-chip">{sc.plan.length} years of decisions</span>
+          </p>
+        </div>
+        <div class="ex-hero__mandate">
+          <p class="bb-hero__qlabel">The board's mandate</p>
+          <div class="ex-hero__mandate-text" set:html={rich(view.fill(sc.mandate))} />
+        </div>
+      </div>
+      <p class="bb-hero__question"><span class="bb-hero__qlabel">The question for the executive team</span> {sc.question}</p>
+      <nav class="bb-jump" aria-label="On this page">
+        <a href="#stage-finance">The evidence</a>
+        <a href="#stage-strategy">The strategies</a>
+        <a href="#stage-implement">The plan, year by year</a>
+        <a href="#debrief">The debrief</a>
+        <a href={EXECUTIVE_HREF}>The brief and the roles</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap page-body bb-page ex-page">
+    <Simulation id={id} sc={sc} view={view} pageHref={SIMULATION_HREF} subtopics={subtopics} glossary={glossary} commandTerms={commandTerms} sources={sources} />
+  </div>
+</BaseLayout>
