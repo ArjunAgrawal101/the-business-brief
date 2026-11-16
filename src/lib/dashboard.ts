@@ -21,6 +21,7 @@ import {
   type Visit,
   type VisitKind,
 } from './learner';
+import { cleanSummaries, digest, type LabSummaries } from './lab/plan';
 
 export type CoverageState = 'complete' | 'partial' | 'planned';
 
@@ -163,6 +164,7 @@ export type Family =
   | 'case-decision'
   | 'tool'
   | 'checklist'
+  | 'workspace'
   | 'work';
 
 const FAMILIES: Array<[RegExp, Family]> = [
@@ -181,6 +183,8 @@ const FAMILIES: Array<[RegExp, Family]> = [
   [/^bb:(studio|ff|cash-flow):.+$/, 'tool'],
   [/^bb:(ia-plan|ia:rq|ia:sd|p3:plan)$/, 'tool'],
   [/^bb:ck:.+$/, 'checklist'],
+  // My Business Workspace's own items: the learning list, the notebook and the Financial Laboratory results (src/lib/workspace.ts).
+  [/^bb:workspace:.+$/, 'workspace'],
 ];
 
 /** What a stored item is. Anything the platform's own tools do not write is work from a room's tool. */
@@ -333,9 +337,48 @@ export interface WorkItem {
   detail: string;
   /** When the tool says it was saved. */
   when: string | null;
+  /** Every stored item that holds this work (the main one, its summary or note), for exporting it as it is. */
+  keys: string[];
 }
 
 const textOf = (v: unknown, max = 160): string | null => (typeof v === 'string' && v.trim() ? v.replace(/\s+/g, ' ').trim().slice(0, max) : null);
+
+/** The Lab's summaries by the name their key ends with (bb:lab:summary:<name>). */
+const LAB_SUMMARY_NAMES = ['feasibility', 'canvas', 'unit', 'costs', 'revenue'] as const;
+
+/**
+ * A line for one of the Entrepreneurship Lab's summaries (bb:lab:summary:<name>),
+ * in the words the business plan quotes it in, or null when the value does not
+ * have the summary's shape.
+ */
+export function labSummaryLine(name: string, raw: unknown): string | null {
+  if (!(LAB_SUMMARY_NAMES as readonly string[]).includes(name)) return null;
+  const v = asObject(raw);
+  if (!v) return null;
+  const clean: LabSummaries = cleanSummaries({ [name]: v });
+  const lines = Object.values(digest(clean)).flat();
+  return lines[0] ? textOf(lines[0], 220) : null;
+}
+
+/**
+ * A line for work the People and Culture and Operations Floor tools keep as
+ * { v, data }: what it holds, counted, or the reader's own note. Null when
+ * there is nothing to count.
+ */
+export function toolDataLine(raw: unknown): string | null {
+  const d = asObject(asObject(raw)?.data);
+  if (!d) return null;
+  if (Array.isArray(d.posts)) {
+    const org = textOf(d.organization, 80);
+    return `${org ? `${org}: ` : ''}${plural(d.posts.length, 'post', 'posts')} on the chart`;
+  }
+  const choices = asObject(d.choices);
+  if (choices) {
+    const made = Object.values(choices).filter((x) => typeof x === 'string' && x).length;
+    if (made) return `${plural(made, 'situation', 'situations')} decided`;
+  }
+  return textOf(d.note, 140);
+}
 
 /** A line that says what a saved piece of work holds, when the tool wrote one: its headline, summary or verdict. */
 export function workLine(raw: unknown): string | null {
@@ -354,7 +397,7 @@ export function workLine(raw: unknown): string | null {
   return textOf(o.headline) ?? textOf(o.summary) ?? (verdict ? (textOf(o.idea, 80) ? `${textOf(o.idea, 80)}: ${verdict}` : verdict) : null);
 }
 
-function workFromRoom(key: string, raw: string, summaries: Map<string, string>, cfg: Pick<DashConfig, 'rooms' | 'pages' | 'roomTools'>): WorkItem {
+function workFromRoom(key: string, raw: string, summaries: Map<string, string>, cfg: Pick<DashConfig, 'rooms' | 'pages' | 'roomTools'>, held: (k: string) => boolean): WorkItem {
   const [room = '', ...rest] = key.slice(3).split(':');
   const tool = rest.join(':');
   const v = asObject(raw);
@@ -362,9 +405,11 @@ function workFromRoom(key: string, raw: string, summaries: Map<string, string>, 
   const roomTitle = known?.room ?? cfg.rooms.find((r) => roomMatches(room, r.href))?.title ?? humanize(room);
   const own = safePath(v?.href);
   const title = known?.title ?? textOf(v?.title, 90) ?? (tool ? humanize(tool) : humanize(room));
-  const detail = workLine(raw) ?? (known?.summary ? summaries.get(known.summary) : undefined) ?? summaries.get(key) ?? 'Your work is kept here.';
+  const detail = workLine(raw) ?? (known?.summary ? summaries.get(known.summary) : undefined) ?? summaries.get(key) ?? toolDataLine(raw) ?? 'Your work is kept here.';
   const when = [v?.savedAt, v?.saved, v?.updated].map((x) => (typeof x === 'string' && Number.isFinite(Date.parse(x)) ? new Date(x).toISOString() : null)).find(Boolean) ?? null;
-  return { key, title, where: roomTitle, href: known?.url ?? own ?? workLink(room, tool, cfg.rooms, cfg.pages), detail, when };
+  // The work's own item, and a summary kept beside it, by the tool's declared name or by the room's pattern.
+  const companions = [known?.summary, tool ? `bb:${room}:summary:${tool}` : undefined].filter((k): k is string => Boolean(k) && k !== key && held(k as string));
+  return { key, title, where: roomTitle, href: known?.url ?? own ?? workLink(room, tool, cfg.rooms, cfg.pages), detail, when, keys: [key, ...new Set(companions)] };
 }
 
 /* ---------- The whole view ---------- */
@@ -610,7 +655,7 @@ export function dashboardView(items: Readonly<Record<string, string>>, cfg: Dash
       detail = `${steps} of ${cfg.ia.steps} steps done`;
     }
     if (key === 'bb:ia:sd' && v && Array.isArray(v.docs)) detail = plural(v.docs.length, 'document listed', 'documents listed');
-    work.push({ key, title: t.title, where: t.room, href: t.url, detail, when: null });
+    work.push({ key, title: t.title, where: t.room, href: t.url, detail, when: null, keys: held });
   }
   for (const c of cfg.checklists) {
     const lists = keys.filter((k) => k.startsWith(`bb:ck:${c.prefix}`));
@@ -622,21 +667,22 @@ export function dashboardView(items: Readonly<Record<string, string>>, cfg: Dash
         return n;
       }
     }, 0);
-    if (ticked) work.push({ key: `bb:ck:${c.prefix}`, title: c.title, where: c.room, href: c.href, detail: `${plural(ticked, 'item', 'items')} ticked in ${plural(lists.length, 'list', 'lists')}`, when: null });
+    if (ticked) work.push({ key: `bb:ck:${c.prefix}`, title: c.title, where: c.room, href: c.href, detail: `${plural(ticked, 'item', 'items')} ticked in ${plural(lists.length, 'list', 'lists')}`, when: null, keys: lists });
   }
   // Summaries a room keeps beside its tools' work (bb:<room>:summary:<tool>), by their own key and by the work's.
   const summaries = new Map<string, string>();
   for (const k of keys) {
     const m = /^bb:([^:]+):summary:(.+)$/.exec(k);
     if (!m) continue;
-    const s = workLine(items[k] ?? '');
+    const s = workLine(items[k] ?? '') ?? (m[1] === 'lab' ? labSummaryLine(m[2] ?? '', items[k] ?? '') : null);
     if (!s) continue;
     summaries.set(k, s);
     summaries.set(`bb:${m[1]}:${m[2]}`, s);
   }
+  const isHeld = (k: string) => items[k] !== undefined && !EMPTY.has(items[k] ?? '');
   for (const k of keys) {
     if (familyOf(k) !== 'work' || /^bb:[^:]+:summary:/.test(k)) continue;
-    work.push(workFromRoom(k, items[k] ?? '', summaries, cfg));
+    work.push(workFromRoom(k, items[k] ?? '', summaries, cfg, isHeld));
   }
 
   const complete = cfg.subtopics.filter((s) => s.state === 'complete');
