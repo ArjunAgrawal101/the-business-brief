@@ -1,0 +1,41 @@
+---
+/**
+ * The way into advanced financial management from the Finance Desk and the
+ * Financial Laboratory: a panel of its own, ruled in the enrichment green and
+ * labelled beyond the IB course, so that it never reads as part of the course.
+ */
+import { ADVANCED, ADVANCED_HREF, advancedHref } from '../../lib/adv-finance/catalogue';
+import '../../styles/adv-finance.css';
+
+interface Props {
+  /** Where the panel sits, for its wording. */
+  from: 'desk' | 'lab';
+}
+const { from } = Astro.props;
+const id = `af-door-${from}`;
+---
+
+<section class="af-door" aria-labelledby={id}>
+  <div>
+    <p class="af-door__kicker"><span class="tag tag--enrichment">Beyond the IB course</span> <span class="label label--ink">For undergraduates, MBA students, professionals and teachers</span></p>
+    <h2 class="af-door__title" id={id}>Advanced financial management</h2>
+    <p class="af-door__lead">
+      {
+        from === 'desk'
+          ? 'Four tools that take the desk past the IB course: a forecast whose three statements link and balance, a capital budgeting comparator, break-even scenarios and a performance dashboard. Not needed for the IB and not assessed by it; each page says which parts the course uses.'
+          : 'When the calculators here are secure, four tools take the same business further than the IB course goes: a linked three-statement forecast, NPV at any rate with the IRR and a WACC, two cost structures side by side, and return on equity taken apart. Each page marks which parts the course uses.'
+      }
+    </p>
+    <p class="af-door__cta"><a class="btn" href={ADVANCED_HREF}>Open advanced financial management</a></p>
+  </div>
+  <ul class="af-door__list" role="list">
+    {
+      ADVANCED.map((t) => (
+        <li>
+          <a href={advancedHref(t.id)}>{t.name}</a>
+          <span class="small muted">{t.question}</span>
+        </li>
+      ))
+    }
+  </ul>
+</section>

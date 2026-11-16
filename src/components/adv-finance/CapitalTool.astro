@@ -1,0 +1,180 @@
+---
+/**
+ * The capital budgeting comparator: projects and the cost of capital on the
+ * left, the best NPV and how the methods compare on the right, then the
+ * discount rate's working, every method side by side, the NPV profiles, the
+ * tornado, what it means, the limits of each method and the working for each
+ * project. Rendered in full on the server; src/scripts/adv-finance/capital.ts
+ * makes it live with the same functions.
+ */
+import SectionHead from '../layout/SectionHead.astro';
+import { BUSINESS } from '../../lib/adv-finance/business';
+import { irr, MAX_PROJECTS, npvAt } from '../../lib/adv-finance/capital';
+import { buildCapitalReport, rateText } from '../../lib/adv-finance/capital-view';
+import { projectsHtml, rateFieldsHtml } from '../../lib/adv-finance/forms';
+import { CAPITAL_EXAMPLE_FORM, capitalFromForm, FLEX_CHOICES } from '../../lib/adv-finance/state';
+import { CURRENCIES } from '../../lib/finance-lab/fields';
+import { advancedTool } from '../../lib/adv-finance/catalogue';
+import { fmtMoney } from '../../lib/format';
+
+const tool = advancedTool('capital-budgeting');
+const form = CAPITAL_EXAMPLE_FORM;
+const { state } = capitalFromForm(form);
+if (!state) throw new Error('The capital budgeting example does not pass its own checks.');
+const report = buildCapitalReport(state, form.currency);
+const r = report.regions;
+const uid = 'af-cb';
+// A stylized project whose cash flows change sign twice: pay now, receive next year, pay again the year after.
+const odd = [-10000, 36000, -31500];
+const oddIrr = irr(odd);
+const oddAt = [0, 10, 50, 80, 110, 150].map((rate) => ({ rate, npv: npvAt(odd, rate) }));
+---
+
+<div class="fl af af--capital" data-ix="adv-finance" data-tool="capital" data-key={tool.storageKey} data-name={tool.name} data-uid={uid} id="tool">
+  <section class="fl-desk" aria-labelledby={`${uid}-desk`}>
+    <header class="fl-desk__bar">
+      <h2 class="fl-desk__title" id={`${uid}-desk`}>The comparator</h2>
+      <p class="fl-source" data-source>Example figures: {BUSINESS.name}, a fictional business. Simulated data.</p>
+    </header>
+    <p class="state state--error fl-broken" data-error hidden>The comparator could not start. The worked example below uses the example figures.</p>
+    <div class="fl-desk__grid">
+      <div class="fl-desk__inputs">
+        <form class="fl-form js-only" data-af-form novalidate aria-label="Your projects and cost of capital">
+          <div class="af-projects" data-projects set:html={projectsHtml(form.projects, uid, form.currency)} />
+          <p class="cluster fl-grid__actions">
+            <button type="button" class="btn btn--small" data-act="add-project" aria-disabled={form.projects.length >= MAX_PROJECTS ? 'true' : undefined}>Add a third project</button>
+          </p>
+          <div class="af-rate" set:html={rateFieldsHtml({ values: form.fields, rateSource: form.rateSource, uid, currency: form.currency })} />
+          <fieldset class="fl-fields af-sens-set">
+            <legend class="label label--ink">Sensitivity</legend>
+            <div class="field">
+              <label for={`${uid}-flex`}>Move each estimate by</label>
+              <select class="select" id={`${uid}-flex`} name="flex">
+                {FLEX_CHOICES.map((f) => <option value={f} selected={f === form.flex}>{f}%</option>)}
+              </select>
+            </div>
+            <div class="field">
+              <label for={`${uid}-focus`}>For the project</label>
+              <select class="select" id={`${uid}-focus`} name="focus" data-focus>
+                <option value="best" selected={form.focus === 'best'}>With the highest NPV</option>
+                {form.projects.map((p, i) => <option value={String(i)} selected={form.focus === String(i)}>{p.name}</option>)}
+              </select>
+            </div>
+          </fieldset>
+          <details class="fl-settings">
+            <summary>Currency</summary>
+            <div class="fl-settings__body">
+              <div class="field">
+                <label for={`${uid}-currency`}>Currency</label>
+                <select class="select" id={`${uid}-currency`} data-setting="currency" name="currency">
+                  {CURRENCIES.map((c) => <option value={c.value} selected={c.value === form.currency}>{c.label}</option>)}
+                </select>
+              </div>
+              <p class="field__hint fl-settings__note">{BUSINESS.name}’s figures are in dollars.</p>
+            </div>
+          </details>
+          <ul class="fl-errlist" data-err-list hidden></ul>
+        </form>
+        <div class="fl-given nojs-only">
+          <p class="label label--ink">The figures</p>
+          <dl class="fl-given__list" data-region="given" set:html={r.given} />
+          <p class="small fl-given__note">Changing these figures needs JavaScript. With it switched off, the page shows the full worked example for the figures above.</p>
+        </div>
+        <div class="fl-tools js-only" role="group" aria-label="Your figures">
+          <button type="button" class="btn btn--small" data-act="reset">Reset to the example</button>
+          <button type="button" class="btn btn--small" data-act="csv">Download CSV</button>
+          <button type="button" class="btn btn--small" data-act="print">Print</button>
+          <p class="small af-saved" data-save-status>Your figures are kept in this browser once you change them. Nothing is sent anywhere.</p>
+        </div>
+      </div>
+      <div class="fl-desk__results">
+        <p class="label label--ink" id={`${uid}-result`}>Result</p>
+        <p class="fl-paused">These results are for the last complete figures. Correct the figure marked in the inputs to update them.</p>
+        <div class="fl-hero" data-region="headline" set:html={r.headline} />
+        <dl class="figs fl-figs" data-region="figures" aria-labelledby={`${uid}-result`} set:html={r.figures} />
+      </div>
+    </div>
+    <p class="sr-only" aria-live="polite" data-status></p>
+  </section>
+
+  <section aria-labelledby={`${uid}-r`}>
+    <SectionHead no={1} title="The discount rate" dek="The weighted average cost of capital, with the cost of equity by the capital asset pricing model, in eight parts." id={`${uid}-r`} />
+    <div class="fl-workings" data-region="rate" set:html={r.rate} />
+  </section>
+
+  <section aria-labelledby={`${uid}-c`}>
+    <SectionHead no={2} title="Every method, side by side" dek="The IB’s methods and the ones beyond the course, for every project at the same discount rate." id={`${uid}-c`} />
+    <div data-region="compare" set:html={r.compare} />
+    <h3 class="af-sub">Which project each method puts first</h3>
+    <div data-region="ranks" set:html={r.ranks} />
+  </section>
+
+  <section aria-labelledby={`${uid}-p`}>
+    <SectionHead no={3} title="Net present value at every rate" dek="Each project’s NPV as the discount rate rises, and its internal rate of return where the line crosses zero." id={`${uid}-p`} />
+    <div data-region="profile" set:html={r.profile} />
+    <h3 class="af-sub">The internal rate of return, project by project</h3>
+    <div data-region="irr" set:html={r.irr} />
+    <aside class="callout callout--caution af-multi" aria-labelledby={`${uid}-multi`}>
+      <span class="callout__kicker" id={`${uid}-multi`}>When the cash flows change sign more than once</span>
+      <p>
+        A stylized project, with simulated figures: pay {fmtMoney(10000, '$', 0)} now, receive {fmtMoney(36000, '$', 0)} in a year, then pay {fmtMoney(31500, '$', 0)} the year
+        after, for example to restore a site. The cash flows change sign twice, so there can be two internal rates of return, and there are: NPV is zero at {oddIrr.rates.map((x) => rateText(x)).join(' and at ')}.
+      </p>
+      <div class="table-scroll" role="region" aria-label="NPV of the stylized project at several rates" tabindex="0">
+        <table class="table fl-table af-mini">
+          <caption>NPV of the stylized project at several rates</caption>
+          <thead>
+            <tr>
+              <th scope="col">Discount rate</th>
+              {oddAt.map((x) => <th scope="col" class="n">{rateText(x.rate)}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">NPV</th>
+              {oddAt.map((x) => <td class="n">{fmtMoney(Math.round(x.npv), '$', 0)}</td>)}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        At a cost of capital of 10% the NPV is {fmtMoney(Math.round(oddAt[1]?.npv ?? 0), '$', 0)}, so the project destroys value, even though both internal rates of return are far above 10%. With more than one change of sign the rule “accept if the IRR is above the cost of capital” breaks down: there can be as many rates as changes of sign, or none at all, and none of them need say whether the project adds value. The comparator therefore reports every rate it finds between −99% and 1,000%, says when there may be others, and judges such a project by its NPV at the business’s own rate. Its search brackets each change in the sign of NPV on a fine grid and narrows it by bisection, which cannot fail to converge; a rate where NPV only touches zero without crossing it would be missed. The problem was set out by Lorie and Savage (1955).
+      </p>
+    </aside>
+  </section>
+
+  <section aria-labelledby={`${uid}-t`}>
+    <SectionHead no={4} title="What moves the NPV" dek="A tornado: one estimate at a time moved down and up, its effect on NPV, the widest bar first." id={`${uid}-t`} />
+    <div class="fl-sens" data-region="tornado" set:html={r.tornado} />
+  </section>
+
+  <section aria-labelledby={`${uid}-i`}>
+    <SectionHead no={5} title="What it means" dek="For the figures above: the reading, then where each method stops." id={`${uid}-i`} />
+    <div class="fl-read">
+      <section class="fl-read__part" aria-labelledby={`${uid}-i1`}>
+        <h3 class="fl-read__h" id={`${uid}-i1`}>The reading</h3>
+        <div data-region="meaning" set:html={r.meaning} />
+      </section>
+      <section class="fl-read__part fl-read__part--act" aria-labelledby={`${uid}-i2`}>
+        <h3 class="fl-read__h" id={`${uid}-i2`}>Where each method stops</h3>
+        <ul class="fl-actions">
+          <li><strong>Net present value</strong> is only as good as the cash flow estimates and the discount rate, and it assumes the money can be raised at that rate.</li>
+          <li><strong>The internal rate of return</strong> ranks by return, not by size, so it favours small, quick projects; it can be more than one rate, or none, when cash flows change sign more than once.</li>
+          <li><strong>Payback and discounted payback</strong> ignore every cash flow after the money is recovered, so they say nothing about how much a project adds in the end.</li>
+          <li><strong>The profitability index</strong> helps when money is short and projects can be scaled down; when they cannot, compare the total NPV of the combinations the budget allows. Some textbooks define it as NPV ÷ investment instead, which is this figure less 1 and ranks projects the same way.</li>
+          <li><strong>The WACC</strong> is the right rate only for a project as risky as the business’s existing assets and paid for in the same mix of debt and equity. Its inputs are estimates; for a business without listed shares, beta is usually taken from similar listed businesses.</li>
+          <li><strong>The tornado</strong> moves one estimate at a time. In practice estimates move together, which the integrated forecast’s scenarios test.</li>
+        </ul>
+      </section>
+    </div>
+  </section>
+
+  <section aria-labelledby={`${uid}-w`}>
+    <SectionHead no={6} title="The working for each project" dek="The net present value in eight parts, and every year’s cash flow, discount factor and running totals." id={`${uid}-w`} />
+    <div class="af-workings" data-region="workings" set:html={r.workings} />
+  </section>
+</div>
+
+<script>
+  import '../../scripts/adv-finance/capital';
+</script>
