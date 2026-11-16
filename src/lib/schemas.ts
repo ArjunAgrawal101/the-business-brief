@@ -1224,7 +1224,7 @@ export const sourceSchema = z.object({
     'secondary-education',
     'method',
   ]),
-  availability: z.enum(['supplied', 'not-available', 'referenced', 'web-search', 'repository']),
+  availability: z.enum(['supplied', 'not-available', 'referenced', 'web-search', 'web', 'repository']),
   url: z.url().optional(),
   accessed: z.string().optional(),
   note: md,
