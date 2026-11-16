@@ -459,6 +459,7 @@ describe('No. 4, automating operations', () => {
     expect(breakEvenExact(8960, 2.1, 1.46)).toBeCloseTo(14000, 6);
     expect(r1(breakEvenExact(10706, 2.1, 1.33))).toBe(13903.9);
     expect(r1(breakEvenExact(10916, 2.1, 1.33))).toBe(14176.6);
+    expect(cell(b, 'ex-A2', 'Automated, bought', 'Break-even quantity (000 loaves)')).toBe(r1(breakEvenExact(10706, 2.1, 1.33)));
   });
 
   it('appraises the proposals with the guide\'s factors', () => {
