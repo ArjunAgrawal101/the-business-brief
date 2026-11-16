@@ -39,12 +39,12 @@ export const DOMAINS: DomainInfo[] = [
   },
   {
     id: 'leadership',
-    name: 'Leadership and organisational behaviour',
+    name: 'Leadership and organizational behaviour',
     short: 'Leadership',
     order: 3,
     question: 'How do people, structures and cultures turn a decision into results?',
     intro:
-      'How organisations actually behave: leading when the facts are uncertain, designing structures, what culture is and whether it can be changed, incentives and their side effects, politics and conflict, managing talent, and the governance that holds executives to account.',
+      'How organizations actually behave: leading when the facts are uncertain, designing structures, what culture is and whether it can be changed, incentives and their side effects, politics and conflict, managing talent, and the governance that holds executives to account.',
   },
   {
     id: 'marketing',
@@ -107,7 +107,7 @@ export const MODULE_PLAN: Record<AdvancedDomain, Array<{ id: string; title: stri
     { id: 'mergers-acquisitions-and-alliances', title: 'Mergers, acquisitions and strategic alliances', covers: ['Mergers and acquisitions', 'Strategic alliances'] },
     { id: 'disruption-and-business-model-innovation', title: 'Disruption, digital transformation and business model innovation', covers: ['Business model innovation', 'Disruptive innovation', 'Digital transformation'] },
     { id: 'international-expansion', title: 'International expansion', covers: ['International expansion'] },
-    { id: 'strategy-execution-change-and-crisis', title: 'Strategy execution, change and crisis', covers: ['Strategic execution', 'Organisational change', 'Crisis management'] },
+    { id: 'strategy-execution-change-and-crisis', title: 'Strategy execution, change and crisis', covers: ['Strategic execution', 'Organizational change', 'Crisis management'] },
   ],
   finance: [
     { id: 'financial-statement-analysis', title: 'Financial statement analysis', covers: ['Financial statement analysis'] },
@@ -119,9 +119,9 @@ export const MODULE_PLAN: Record<AdvancedDomain, Array<{ id: string; title: stri
   ],
   leadership: [
     { id: 'leadership-under-uncertainty', title: 'Leadership under uncertainty and executive decision-making', covers: ['Leadership under uncertainty', 'Executive decision-making'] },
-    { id: 'organisational-design-and-culture', title: 'Organisational design and corporate culture', covers: ['Organisational design', 'Corporate culture'] },
+    { id: 'organizational-design-and-culture', title: 'Organizational design and corporate culture', covers: ['Organizational design', 'Corporate culture'] },
     { id: 'motivation-incentives-and-talent', title: 'Motivation, incentives and talent', covers: ['Motivation and incentives', 'Talent management'] },
-    { id: 'change-politics-and-conflict', title: 'Change, organisational politics and conflict', covers: ['Change management', 'Organisational politics', 'Conflict resolution'] },
+    { id: 'change-politics-and-conflict', title: 'Change, organizational politics and conflict', covers: ['Change management', 'Organizational politics', 'Conflict resolution'] },
     { id: 'governance-and-accountability', title: 'Governance and accountability', covers: ['Governance and accountability'] },
   ],
   marketing: [
@@ -132,7 +132,7 @@ export const MODULE_PLAN: Record<AdvancedDomain, Array<{ id: string; title: stri
     { id: 'international-marketing', title: 'International marketing', covers: ['International marketing'] },
   ],
   operations: [
-    { id: 'operations-strategy-and-process', title: 'Operations strategy, process optimisation and lean systems', covers: ['Operations strategy', 'Process optimisation', 'Lean systems'] },
+    { id: 'operations-strategy-and-process', title: 'Operations strategy, process optimization and lean systems', covers: ['Operations strategy', 'Process optimization', 'Lean systems'] },
     { id: 'capacity-quality-and-technology', title: 'Capacity planning, quality management and technology adoption', covers: ['Capacity planning', 'Quality management', 'Technology adoption'] },
     { id: 'supply-chain-resilience-and-sourcing', title: 'Supply chain resilience, global sourcing and risk', covers: ['Supply chain resilience', 'Global sourcing', 'Risk management'] },
     { id: 'sustainable-operations', title: 'Sustainable operations', covers: ['Sustainable operations'] },
