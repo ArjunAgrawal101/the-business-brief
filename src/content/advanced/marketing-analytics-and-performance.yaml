@@ -1,0 +1,197 @@
+# Advanced Management and Strategy: marketing, module 4.
+# Real applications rest on documents read on 16 November 2026: Tesco's
+# interim results for 2026/27 and Autotrader's full-year results for 2025/26
+# (both via Investegate). Everything else is illustrative or fictional and
+# labelled.
+domain: marketing
+title: Marketing analytics, performance measurement and digital transformation
+order: 4
+dek: How can a business tell which of its marketing actually caused sales, which measures deserve a manager's attention, and what changes when marketing runs on data?
+audience: [undergraduate, mba, professional]
+covers:
+  - Marketing analytics
+  - Marketing performance measurement
+  - Digital transformation
+minutes: 18
+updated: '2026-11-16'
+bridge:
+  codes: ['4.3', '4.4', '5.9']
+  text: |
+    The IB course covers sales forecasting and, at HL, simple linear regression (4.3), research methods and sampling (4.4), and management information systems including data analytics, artificial intelligence and customer relationship management (5.9). This module turns to causal measurement through experiments, marketing mix models and attribution, to the design of marketing metrics, and to what digital transformation changes, and does not change, about knowing what works.
+foundation: |
+  Every marketing measurement answers, or dodges, a counterfactual question: what would have happened without the marketing? Sales and spending move together for many reasons other than cause. Firms spend more when they expect demand to be high, and digital advertising is shown disproportionately to people already likely to buy, so comparing buyers who saw an advertisement with those who did not mostly measures who was targeted.
+
+  Three families of method attempt the counterfactual. **Experiments** randomize who is exposed, by person, region or time, so that the only systematic difference between groups is the marketing. **Marketing mix models** use statistical analysis of sales, spending, prices and other factors over time to estimate each activity's contribution. **Attribution** assigns credit for each sale to the touchpoints a customer passed through, by rules or by algorithms. They answer different questions at different costs, and only experiments identify cause directly.
+
+  **Performance measurement** asks which numbers deserve attention. Useful metrics are linked, by evidence rather than assumption, to the value marketing creates: incremental contribution, customer equity and brand strength. Activity measures that are easy to count, such as clicks, impressions and followers, are often only loosely related to value.
+
+  **Digital transformation** has made data plentiful and testing cheap, but it has not removed the counterfactual problem. In some ways it has disguised it, since the platforms that sell advertising also report how well it works.
+advanced:
+  - id: causal-measurement
+    title: The counterfactual problem, and what experiments show
+    body: |
+      The scale of the problem became clear when large companies ran experiments. At eBay, Blake, Nosko and Tadelis (2015) found that when the company stopped paying for search advertisements on its own brand name, almost all the traffic arrived anyway through the free search results; a regional experiment with advertising on other search terms found effects concentrated among infrequent users who did not already know the site. Gordon, Zettelmeyer, Bhargava and Chapsky (2019) compared large randomized experiments at Facebook with the estimates standard observational methods produced from the same data, and found the observational methods often badly wrong, usually overstating the effect of advertising.
+
+      Experiments face a problem of their own: precision. Lewis and Rao (2015) showed that the effect of advertising on a person's purchases is tiny compared with how much individual purchases vary, so even very large experiments can fail to pin down the return on investment. A worked example: if advertising lifts the conversion rate from 1.00% to 1.05%, a 5% relative gain, an experiment needs roughly 640,000 people in each group to detect it reliably (80% power at the 5% significance level). Halve the lift and the sample needed roughly quadruples.
+
+      Two consequences follow. Experiments should target the largest spending decisions, where the stakes justify the cost, and they can be run on **regions** rather than people, switching campaigns on in some matched areas and off in others. And because many firms cannot measure returns precisely, their marketing budgets rest more on judgement than their dashboards suggest.
+  - id: mmm-and-attribution
+    title: Marketing mix modelling and attribution
+    body: |
+      A **marketing mix model** regresses sales over time on marketing inputs and on controls such as price, distribution, season and the economy. Two features make it specific to marketing. **Adstock** captures carry-over: this week's advertising keeps working, decaying at a rate λ, so the model uses A(t) = x(t) + λ × A(t − 1) rather than spending alone. **Saturation** captures diminishing returns: each extra pound in a channel buys less than the one before. The output is a response curve for each channel, which supports budget allocation.
+
+      The method has known weaknesses. Spending in different channels often moves together, so their effects are hard to separate; there are few independent observations; and spending responds to expected demand, which biases estimates upwards. Bayesian versions add prior knowledge, which helps but makes results depend on the priors. Good practice is to **calibrate** the model with experiments.
+
+      Generalizations across many studies give a sense of scale. A meta-analysis by Sethuraman, Tellis and Briesch (2011) put the average short-term advertising elasticity at about 0.12 and the long-term elasticity at about 0.24: a 10% rise in advertising lifts sales by about 1.2% in the short run.
+
+      **Attribution** works on individual customer journeys. **Last-click** attribution gives all the credit to the final touch before purchase, which favours search and retargeting, channels that often collect demand created elsewhere. Rules that share credit across touches are arbitrary, and algorithmic attribution remains correlational. Privacy changes that limit tracking across sites have made user-level attribution less complete, pushing firms back towards experiments and aggregate models.
+  - id: metrics-design
+    title: Metrics that matter, and metrics that mislead
+    body: |
+      Marketing metrics form a chain: **inputs** (spending, reach), **intermediate** measures (awareness, consideration, satisfaction), **outcomes** (sales, share, margin) and **value** (customer equity, cash flow). A useful dashboard keeps a few measures at each level and checks, in the firm's own data, that the links between levels hold.
+
+      Returns must be measured on contribution, not revenue. A worked example: a campaign costs £200,000 and an experiment shows it raised sales by £900,000. The **return on advertising spend** of 4.5 looks excellent. At a contribution margin of 35%, however, incremental contribution is £315,000 and the return on investment is (315,000 − 200,000) ÷ 200,000 = 57.5%: positive, but far less impressive. At a 20% margin the campaign would lose money.
+
+      The **Net Promoter Score**, the percentage of customers scoring 9 or 10 out of 10 on willingness to recommend minus the percentage scoring 0 to 6, was promoted by Reichheld (2003) as the one number a company needs to grow. Keiningham, Cooil, Andreassen and Aksoy (2007) found that it predicted growth no better than other satisfaction measures. Its simplicity and comparability are real virtues, provided it is treated as one signal among several.
+
+      All metrics are exposed to **Goodhart's law**: when a measure becomes a target, people improve the measure rather than what it was meant to show. Click targets produce cheap clicks; satisfaction targets produce staff who ask customers for high scores. A [balanced scorecard](/frameworks/balanced-scorecard/) of linked measures resists this better than any single number.
+  - id: digital-transformation
+    title: What digital transformation changes
+    body: |
+      Digital transformation in marketing has four strands. **First-party data**: firms collect information directly from their own customers through loyalty schemes, accounts and apps, which is more reliable, and easier to defend under privacy law, than data bought from others. **Retail media**: retailers sell advertising on their own sites, apps and screens, targeted with purchase data and measured against actual purchases, closing the loop between exposure and sale. **Personalization and automation**: algorithms choose offers, creative and bids at a scale no team could manage. **Experimentation at scale**: digital channels make tests cheap, so organizations can build a habit of testing ideas before rolling them out (Kohavi, Tang and Xu, 2020).
+
+      Each strand has a counterweight. Personalization tuned for short-term response can erode brands and fairness. Platforms and retailers that sell advertising also measure its results, a conflict of interest that calls for independent checks. And capability matters more than tools: Germann, Lilien and Rangaswamy (2013) found that firms gained from deploying marketing analytics when top managers championed it and the organization had the people and culture to use the results.
+models:
+  - name: Randomized experiments
+    origin: Fisher (1935); Kohavi, Tang and Xu (2020)
+    summary: |
+      Randomly assigning people, regions or periods to receive the marketing or not makes the groups alike in everything except the marketing, so the difference in outcomes estimates its causal effect. Holdout groups and geo tests apply the idea to campaigns.
+    use: |
+      Define the outcome and the minimum effect worth detecting before the test, calculate the sample needed, randomize, and resist stopping early when results look good. Use experiments to calibrate models and to settle the largest budget questions.
+    limits: |
+      Small effects need very large samples. Tests measure short-term effects in a specific context, spill over between groups, and can be expensive when the holdout forgoes sales.
+    tool: /market-studio/campaign-planner/
+    sources: [adv-pm-fisher-1935, adv-pm-kohavi-2020]
+  - name: Marketing mix modelling
+    origin: Hanssens, Parsons and Schultz (2001)
+    summary: |
+      Regression on time series of sales and marketing inputs, with adstock for carry-over and saturation for diminishing returns, estimates each channel's contribution and response curve.
+    use: |
+      Build the model on at least two to three years of weekly data, with controls for price, distribution and season, calibrate it against experiments, and use the response curves to move budget towards channels with higher marginal returns.
+    limits: |
+      Correlated spending, few observations and spending that follows demand make estimates fragile; results can depend heavily on modelling choices and priors. It measures channels, not creative or targeting.
+    framework: simple-linear-regression
+    tool: /market-studio/budget-allocation/
+    sources: [adv-pm-hanssens-2001, adv-pm-sethuraman-2011]
+  - name: The Net Promoter Score
+    origin: Reichheld (2003)
+    summary: |
+      One question, how likely a customer is to recommend the firm, scored 0 to 10. The score is the percentage of promoters (9 or 10) minus the percentage of detractors (0 to 6).
+    use: |
+      Track it over time and by segment, and follow up the scores with the reasons behind them. Its value lies more in prompting action on detractors' complaints than in the number itself.
+    limits: |
+      Evidence that it predicts growth better than other satisfaction measures is weak. Collapsing an 11-point scale into three groups discards information, and the score is easily inflated when staff are rewarded for it.
+    sources: [adv-pm-reichheld-2003, adv-pm-keiningham-2007]
+  - name: The balanced scorecard
+    origin: Kaplan and Norton (1992)
+    summary: |
+      Performance is measured from four linked perspectives, financial, customer, internal process, and learning and growth, so that short-term financial results are balanced by the measures that drive future performance.
+    use: |
+      For marketing, link a small set of measures in a causal chain, for instance capability, then customer awareness and retention, then incremental contribution, and test the links in the firm's own data each year.
+    limits: |
+      The links between perspectives are often assumed rather than tested, and scorecards tend to grow until they measure everything and prioritize nothing.
+    framework: balanced-scorecard
+    sources: [adv-pm-kaplan-norton-1992]
+applications:
+  - title: 'Tesco: personalization, testing and retail media (2026)'
+    kind: real
+    asOf: '2026-08'
+    sources: [adv-pm-tesco-interim-2026]
+    body: |
+      Tesco's interim results for the 26 weeks to 29 August 2026 present data and testing as central to its marketing. The company reported extending personalized Your Clubcard Prices to around 2.5 million customers and beginning the customer roll-out of an AI meal-planning assistant. It said its innovation lab with Adobe had more than doubled its capacity to test and optimize customer communications, with uses including targeted push notifications for its rapid delivery service. Tesco Media, its retail media business, grew strongly, with 17% more active advertisers, and offered improved analytics and automation through a self-service platform. Its headline customer measure was a UK Net Promoter Score of 33, up three points on the previous year.
+
+      *Interpretation.* The elements map onto the four strands above: first-party data, retail media, personalization and testing at scale. Doubling testing capacity matters because, as the precision problem shows, many effects are too small to detect without many tests. Retail media closes the loop between exposure and purchase, but the seller of the advertising is also the one measuring its results.
+  - title: 'Autotrader: from more leads to better leads (2026)'
+    kind: real
+    asOf: '2026-03'
+    sources: [adv-pm-autotrader-fy2026]
+    body: |
+      Autotrader, the UK car marketplace, has been shifting what it offers retailers from more enquiries to better ones. Its Deal Builder product lets car buyers take a deal further online, up to a reservation, and the company says it produces higher-quality enquiries that convert into sales at double the rate. By March 2026 more than 6,700 retailers used it, against 2,000 a year earlier, and 137,000 deals with a full reservation had been placed in the year, against 49,000. The roll-out met resistance: the company reported that some retailers advertised fewer cars in response, acknowledged the need to change its approach and parts of the product, and created customer advisory groups to give retailers a voice in product decisions.
+
+      *Interpretation.* Changing the measure of value, from the number of leads to their conversion, changes who captures value and how customers judge the platform. A metric that is better for one party is not automatically accepted by the other.
+  - title: A charity switches off its best channel, briefly
+    kind: illustrative
+    body: |
+      A charity mails an appeal to lapsed donors every spring and credits it with every gift received within six weeks. One year it holds back a random tenth of the list. The held-back donors give at two-thirds of the rate of those mailed, so only a third of the gifts previously credited to the appeal were caused by it. The appeal still pays, but the charity moves part of its budget to the segments where the gap between mailed and held-back donors is largest.
+cases:
+  - title: 'Fennick Home: what did the television campaign do?'
+    fictional: true
+    situation: |
+      Fennick Home, a fictional online furniture retailer, ran its first television campaign for six weeks in half of its regions, chosen to match the other half on past sales trends. The paid search team reports that its channel had a record six weeks and asks for a bigger budget; the brand team says the television campaign drove the growth. The board wants to know what the campaign actually did.
+    exhibit:
+      caption: Six-week television test in matched regions (weekly averages unless stated)
+      columns: [Measure, Test regions (television on), Control regions (no television)]
+      rows:
+        - [Weekly sales before the test (£000), '800', '780']
+        - [Weekly sales during the test (£000), '904', '811']
+        - [Branded search clicks per week before the test, '40,000', '39,000']
+        - [Branded search clicks per week during the test, '52,000', '40,170']
+        - [Sales credited to paid search by last click before the test (£000 a week), '200', '205']
+        - [Sales credited to paid search by last click during the test (£000 a week), '260', '212']
+        - [Television spending over the six weeks (£000), '300', '0']
+      note: Simulated figures. Contribution margin is 40% of sales.
+    questions:
+      - Estimate the extra weekly sales caused by television, using the control regions to estimate what test-region sales would have been without it.
+      - At a 40% contribution margin, what was the return on the television spending over the six weeks? How much more incremental sales would carry-over need to deliver for it to pay back?
+      - Use the branded search and last-click rows to explain why a last-click report credits paid search with much of television's effect.
+      - What threats to validity does a matched-region test face, and how would you strengthen the design next time?
+evaluation: |
+  **What is established.** Large field experiments have shown that observational estimates of advertising effects are often badly biased, usually upwards, and that some heavily used channels, such as search advertising on a firm's own brand name, can do much less than standard reports suggest. The precision problem is also well established: many firms cannot measure the return on their advertising precisely even with experiments.
+
+  **What is debated.** How far results from particular firms and platforms generalize is open; eBay's customers, for example, were unusually familiar with its brand. Marketing mix models are widely used, but their estimates depend on modelling choices and, in Bayesian versions, on priors, so different vendors can produce different answers from the same data. Average advertising elasticities summarize many studies of established brands and may not fit new ones.
+
+  **Metrics.** Evidence that the Net Promoter Score is a superior predictor of growth is weak, though it remains useful as a simple tracking measure. The broader lesson is to test whether any intermediate metric predicts outcomes in one's own business rather than adopting it on reputation.
+
+  **Brand and short-term measurement.** Measurement methods that capture quick, direct responses best, last-click attribution and short experiments, systematically favour activation over brand building, whose effects are slower and more diffuse. Budgets drift towards what is easiest to measure, a bias firms should correct deliberately.
+
+  **Digital transformation.** Claims that data and AI transform marketing performance rest heavily on vendors' case studies. Independent evidence suggests the gains depend on organizational capability and on resolving the conflicts of interest in measurement, not on technology alone.
+decision:
+  title: Choosing how to measure a £20m media budget
+  fictional: true
+  brief: |
+    Harbour & Field, a fictional home and garden retailer, spends £20m a year on media across television, search, social, retail media and email. Each channel team reports its own results using the platforms' figures, and the totals credit marketing with more sales than the company made. The new marketing director must choose a measurement approach for next year.
+  options:
+    - label: A. Platform figures and last click
+      text: Standardize on last-click attribution in the company's analytics, supplemented by each platform's own reports. Cheap and immediate.
+    - label: B. An annual marketing mix model
+      text: Commission an agency to build a mix model once a year and set budgets from its response curves.
+    - label: C. Model plus experiments
+      text: Build a mix model and calibrate it with a rolling programme of geo experiments and holdout tests on the largest channels, run by an in-house team.
+  criteria:
+    - Accuracy of causal estimates
+    - Cost and speed
+    - Resistance from channel owners
+    - Robustness to privacy changes
+    - Capability the company must build
+  guidance: |
+    Start with the size of the stakes: on a £20m budget, misallocating even 5% wastes £1m a year, which justifies serious measurement. **A** is cheap but systematically biased: last click favours channels that collect demand, platform reports grade their own homework, and the double counting the director has already found will continue.
+
+    **B** gives a consistent cross-channel view and is robust to privacy changes, since it needs no individual tracking, but a model run once a year is slow, and without experiments its estimates for correlated channels may be little better than guesses.
+
+    **C** is the strongest choice for a budget this size. Experiments anchor the model where it is weakest, and the model extends the experiments' lessons to decisions that cannot be tested directly. Its costs are real: an in-house team, and a willingness to switch spending off in some regions for weeks. Expect resistance from channel teams whose reported results will fall; the director should agree in advance that budgets will follow the calibrated estimates.
+reading:
+  - source: adv-pm-lewis-rao-2015
+    note: Why even large experiments struggle to measure advertising returns; essential for anyone who manages a media budget.
+  - source: adv-pm-blake-nosko-tadelis-2015
+    note: The eBay search experiments, a model of how to test a channel's real effect.
+  - source: adv-pm-gordon-2019
+    note: Direct comparison of experimental and observational estimates of advertising effects.
+  - source: adv-pm-hanssens-2001
+    note: The standard reference on market response and marketing mix models.
+  - source: adv-pm-farris-2010
+    note: A practical guide to marketing metrics, their definitions and their pitfalls.
+  - source: adv-pm-keiningham-2007
+    note: The test of the Net Promoter Score against other measures.
+basis:
+  - source: adv-pm-germann-2013
+    note: Organizational conditions for gains from marketing analytics.
