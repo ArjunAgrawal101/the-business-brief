@@ -27,7 +27,7 @@ Every block, exhibit and interaction carries one label, shown on the page. See [
 
 ## The registers
 
-**The source register** (`src/content/sources/*.yaml`, one file per area, shown at `/sources/`) lists each source with its author, publisher, year, kind, availability (supplied, not available, referenced, found by web search, opened and read online, in the creator's repository), address and date accessed, and a note on how it is used.
+**The source register** (`src/content/sources/*.yaml`, one file per area, shown at `/sources/`) lists each source with its author, publisher, year, kind, availability (supplied, not available, referenced, found by web search, opened and read online, in the creator's repository), address and date accessed, and a note on how it is used. "Found by web search" means the page itself was not opened; "opened and read online" means the document was read in full on the date given. A work or document is registered once, in whichever file first needed it, and every other page that relies on it cites that entry; ids are unique across the files, and the build fails on a repeated id.
 
 **The claims register** (`src/content/data/claims.yaml`, also shown at `/sources/`) lists each claim the platform makes about a requirement, an institution or a real organization:
 
