@@ -1,0 +1,455 @@
+---
+/**
+ * IB DP Business Management tutorials with Arjun Agrawal: a premium, personal
+ * page for one-to-one online tutoring, with the same commercial offering as
+ * the Economics platform's Tutorials page (src/lib/tutorials.ts holds every
+ * term). Enquiries go by email, with the owner's subject line and a short
+ * template, or by WhatsApp; there is no booking system, no payment and no
+ * deposit, and the page collects nothing. No testimonial, rating, outcome or
+ * guarantee appears.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
+import SectionHead from '../components/layout/SectionHead.astro';
+import CreatorPhoto from '../components/brand/CreatorPhoto.astro';
+import { ENQUIRY_SUBJECT, GROUP_DISCOUNT, PATHWAYS, SESSION, TUTOR, enquiryMailto } from '../lib/tutorials';
+import '../styles/tutorials.css';
+
+const COVERS = [
+  {
+    id: 'syllabus',
+    title: 'Complete syllabus support',
+    items: ['IB DP Business Management SL', 'IB DP Business Management HL', 'All five syllabus units', 'Conceptual understanding', 'Business terminology', 'Management theories and frameworks', 'Real-world business applications', 'Case-based explanations', 'Quantitative business applications'],
+  },
+  {
+    id: 'paper-1',
+    title: 'Paper 1 preparation',
+    items: ['Understanding the pre-released case', 'Analysing business situations', 'Identifying key challenges', 'Applying relevant business management tools', 'Using case evidence', 'Developing structured answers', 'Evaluation and judgement', 'Examination practice'],
+  },
+  {
+    id: 'paper-2',
+    title: 'Paper 2 preparation',
+    items: ['Quantitative business management', 'Financial calculations', 'Data interpretation', 'Financial statements and ratios', 'Break-even analysis', 'Investment appraisal', 'Cash flow', 'Budgets and the other syllabus calculations', 'Structured examination practice'],
+  },
+  {
+    id: 'paper-3',
+    title: 'Paper 3 preparation (HL)',
+    items: ['Understanding social enterprises', 'Identifying human needs', 'Analysing challenges', 'Using resource materials', 'Developing strategic plans', 'Applying relevant management tools', 'Evaluating recommendations', 'Integrating marketing, finance, HR and operations'],
+  },
+  {
+    id: 'ia',
+    title: 'Internal assessment support',
+    items: ['Research question development', 'Selecting an appropriate organization', 'Choosing a key concept', 'Selecting supporting documents', 'Research methodology', 'Choosing suitable business management tools', 'Analysis and evaluation', 'Criterion-based self-review', 'Academic integrity and referencing'],
+    note: 'Tutoring provides guidance, feedback and academic mentoring. You remain responsible for your own research, analysis and submitted work.',
+  },
+  {
+    id: 'revision',
+    title: 'Revision and examination strategy',
+    items: ['Topic-wise revision', 'SL and HL revision', 'Command terms', 'Application and analysis', 'Evaluation', 'Time management', 'Practice questions', 'Identifying common errors', 'Improving answer quality'],
+  },
+];
+
+const SEQUENCE = [
+  ['Find the difficulty', 'The topic, the tool or the question that is not working yet.'],
+  ['Build the foundation', 'The concept in plain terms, before the detail.'],
+  ['Explain the theory and tools', 'The relevant theories, frameworks and calculations.'],
+  ['Apply them to a business', 'A real or realistic situation, with its evidence.'],
+  ['Work an example', 'A worked example or an examination question.'],
+  ['Discuss your response', 'What your answer does well, and where the reasoning stops.'],
+  ['Find what to improve', 'Specific changes, sentence by sentence or step by step.'],
+  ['Set the next steps', 'What to practise before the next session.'],
+];
+
+const HOUR = [
+  ['5', 'Diagnose', 'Start from your work or a question'],
+  ['15', 'Concept and tools', 'Rebuild the idea until it is yours'],
+  ['15', 'Apply it', 'Use it on a business situation'],
+  ['15', 'Practice', 'Write or calculate under light time pressure'],
+  ['10', 'Feedback and next step', 'What improved, and one thing to do next'],
+];
+
+const FOR_WHOM = [
+  'Students beginning IB DP Business Management who want a strong start',
+  'Students who want a firmer conceptual understanding',
+  'Students who find the quantitative topics difficult',
+  'Students preparing for Paper 1, Paper 2 or Paper 3',
+  'Students who want guidance on the internal assessment',
+  'Students who want structured revision',
+  'Students aiming to improve application, analysis and evaluation',
+];
+
+const FIT = [
+  ['need help with one topic, tool, calculation or question', 'regular'],
+  ['are working on the internal assessment research project', 'ia'],
+  ['are writing a Business Management extended essay', 'ee'],
+  ['want the entire syllabus revisited before your exams', 'marathon'],
+  ['know the content and want to practise papers', 'exam'],
+  ['are not sure', 'regular'],
+] as const;
+
+const START = [
+  ['Identify the need', 'A topic, a paper, the IA, the EE or the whole course.'],
+  ['Choose the pathway', 'Use the table above, or start with one session.'],
+  ['Enquire', 'Email or WhatsApp with your level, SL or HL, your school and what you need.'],
+  ['Learn', 'One-to-one, online, from your own work.'],
+  ['Practise', 'Questions and writing between sessions, with the platform.'],
+  ['Refine', 'Feedback, then the next step.'],
+];
+
+const FAQ: Array<[string, string]> = [
+  ['Are sessions conducted online?', 'Yes. Every session is one-to-one and online.'],
+  ['Are sessions available for both SL and HL?', 'Yes. HL-only material, including Paper 3, is covered for HL students.'],
+  ['Can I book a session for one particular topic?', `Yes. That is what a regular session is for: ${SESSION.currency}${SESSION.price} for one hour, on any topic of your choice.`],
+  ['Can I receive support for all examination papers?', 'Yes. A regular session can focus on any paper, and Exam Practice is twelve one-hour sessions (US$200) of questions only, across Paper 1, Paper 2 and Paper 3 (HL).'],
+  ['Is IA guidance available?', 'Yes. IA support is six one-hour sessions (US$100) of structured guidance through your research project: the research question, the organization, the key concept, supporting documents, tools, analysis, evaluation and self-review against the criteria. You write the project; I do not write any part of it.'],
+  ['What does EE supervision include?', 'Academic supervision and guidance for a Business Management extended essay (US$150): the research question, the theory and tools, research direction, structure and feedback on drafts. It is guidance rather than ghostwriting, and the meeting schedule is agreed when you enquire.'],
+  ['Are group sessions available?', `Sessions are one-to-one. ${GROUP_DISCOUNT}`],
+  ['How long is a session?', 'One hour, one-to-one, online.'],
+  ['How do I enquire about availability?', 'Send an email or a WhatsApp message with your level, SL or HL, your school and what you would like help with. I reply personally with available times; there is no automated booking.'],
+  ['Can sessions be arranged around examination preparation?', 'Yes. Marathon Revision is twenty one-hour sessions (US$300) covering the entire syllabus before external assessment, and Exam Practice works through papers. Say when your examinations are when you enquire, and we plan from there.'],
+];
+
+const nameOf = (k: string) => PATHWAYS.find((p) => p.key === k)!.name;
+const mainMail = enquiryMailto();
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'IB DP Business Management tutoring',
+  provider: { '@type': 'Person', name: TUTOR.name },
+  serviceType: 'One-to-one online tutoring',
+  areaServed: 'Online',
+  offers: PATHWAYS.map((p) => ({ '@type': 'Offer', name: p.name, price: String(p.price), priceCurrency: 'USD', description: `${p.sessions}${p.length ? `, ${p.length}` : ''}` })),
+};
+---
+
+<BaseLayout
+  title="IB DP Business Management Tutoring"
+  description="One-to-one online IB DP Business Management tutoring with Arjun Agrawal, SL and HL: the whole syllabus, Papers 1, 2 and 3, the internal assessment and revision. US$20 for a one-hour session; packages for the IA, the EE, revision and exam practice."
+  section="tutorials"
+  room="tutorials"
+  jsonLd={jsonLd}
+>
+  <section class="tu-hero" aria-labelledby="tu-title">
+    <div class="wrap tu-hero__grid">
+      <div class="tu-hero__text">
+        <Breadcrumbs trail={[{ label: 'Tutorials' }]} />
+        <p class="tu-hero__kicker">Business Management tutorials · Arjun Agrawal</p>
+        <h1 id="tu-title" class="tu-hero__title">IB DP Business Management <em>Tutoring</em></h1>
+        <p class="tu-hero__sub">Understand the business. Master the tools. Think strategically. Perform with confidence.</p>
+        <p class="tu-hero__intro">Personalised one-to-one online sessions for SL and HL students, from a single topic to the whole course, taught the way this platform is built: the situation, the evidence, the decision and its consequences.</p>
+        <div class="tu-price" aria-label={`${SESSION.currency}${SESSION.price} for a one-hour session, one-to-one and online, on any topic of your choice`}>
+          <span class="tu-price__cur" aria-hidden="true">{SESSION.currency}</span><span class="tu-price__amt" aria-hidden="true">{SESSION.price}</span>
+          <span class="tu-price__per" aria-hidden="true">one-hour session<br />one-to-one, online · any topic</span>
+        </div>
+        <p class="tu-hero__actions">
+          <a class="btn btn--gold btn--large" href={mainMail} data-enquire>Enquire About Business Management Tutorials</a>
+          <a class="btn btn--on-ink btn--large" href="#pathways">See the five pathways</a>
+        </p>
+        <dl class="tu-stats">
+          <div><dt>Session</dt><dd>1 hour</dd><dd class="tu-stats__d">one-to-one, online</dd></div>
+          <div><dt>Levels</dt><dd>SL · HL</dd><dd class="tu-stats__d">Papers 1, 2 and 3</dd></div>
+          <div><dt>Pathways</dt><dd>Five</dd><dd class="tu-stats__d">from {SESSION.currency}{SESSION.price}</dd></div>
+        </dl>
+      </div>
+      <figure class="tu-hero__fig" aria-hidden="true">
+        <svg viewBox="0 0 420 340" class="tu-tree">
+          <g class="tu-tree__grid">{[0, 1, 2, 3, 4, 5, 6].map((i) => <line x1="0" y1={40 + i * 44} x2="420" y2={40 + i * 44} />)}</g>
+          <path class="tu-tree__branch" d="M70 170 L180 92 M70 170 L180 248" />
+          <path class="tu-tree__branch tu-tree__branch--soft" d="M196 92 L320 56 M196 92 L320 128 M196 248 L320 212 M196 248 L320 284" />
+          <rect class="tu-tree__decision" x="52" y="152" width="36" height="36" />
+          <circle class="tu-tree__chance" cx="188" cy="92" r="16" />
+          <circle class="tu-tree__chance" cx="188" cy="248" r="16" />
+          {[56, 128, 212, 284].map((y) => <path class="tu-tree__end" d={`M322 ${y} l18 -10 v20 z`} />)}
+          <g class="tu-tree__labels">
+            <text x="70" y="214" text-anchor="middle">Situation</text>
+            <text x="120" y="112">Expand</text>
+            <text x="120" y="236">Hold</text>
+            <text x="250" y="66">0.6</text>
+            <text x="250" y="122">0.4</text>
+            <text x="250" y="222">0.7</text>
+            <text x="250" y="278">0.3</text>
+            <text x="350" y="60">Consequence</text>
+          </g>
+        </svg>
+        <figcaption>Every choice has consequences. A decision tree: the business at the square, the outcomes at the circles.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <div class="wrap page-body tu">
+    <section class="tu-sec" aria-labelledby="tu-covers-h">
+      <SectionHead no="01" title="What the tutorials cover" id="tu-covers-h" dek="The whole course and every component of its assessment, at Standard and Higher Level." />
+      <div class="tu-covers">
+        {
+          COVERS.map((c, k) => (
+            <section class="tu-cover" id={`tu-cover-${c.id}`} aria-labelledby={`tu-cover-${c.id}-h`}>
+              <p class="tu-cover__no" aria-hidden="true">{String(k + 1).padStart(2, '0')}</p>
+              <h3 id={`tu-cover-${c.id}-h`}>{c.title}</h3>
+              <ul role="list">
+                {c.items.map((x) => (
+                  <li>{x}</li>
+                ))}
+              </ul>
+              {c.note && <p class="tu-cover__note">{c.note}</p>}
+            </section>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="tu-sec" aria-labelledby="tu-how-h">
+      <SectionHead no="02" title="How a session works" id="tu-how-h" dek="Each session is built around what you need, with understanding, application and independent thinking ahead of memorisation." />
+      <ol class="tu-seq" role="list">
+        {
+          SEQUENCE.map(([t, d], k) => (
+            <li>
+              <span class="tu-seq__no" aria-hidden="true">{k + 1}</span>
+              <strong>{t}</strong>
+              <span>{d}</span>
+            </li>
+          ))
+        }
+      </ol>
+      <h3 class="tu-hour__h">What an hour looks like</h3>
+      <p class="tu-hour__dek">A typical shape; it changes with what you need.</p>
+      <ol class="tu-hour" role="list">
+        {
+          HOUR.map(([m, h, d]) => (
+            <li style={`flex:${m}`}>
+              <span class="tu-hour__bar" aria-hidden="true" />
+              <span class="tu-hour__min">{m} minutes</span>
+              <strong>{h}</strong>
+              <span>{d}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="tu-sec" aria-labelledby="tu-who-h">
+      <SectionHead no="03" title="Who the tutorials are for" id="tu-who-h" />
+      <ul class="tu-who" role="list">
+        {FOR_WHOM.map((x) => <li>{x}</li>)}
+      </ul>
+    </section>
+
+    <section class="tu-sec" id="pathways" aria-labelledby="tu-paths-h">
+      <SectionHead no="04" title="Pathways and fees" id="tu-paths-h" dek="Exact terms. Every session is one-to-one and online." />
+      <div class="tu-grid">
+        {
+          PATHWAYS.map((p) => (
+            <article class:list={['tu-card', { 'tu-card--lead': p.key === 'regular' }]} id={`tu-${p.key}`} aria-labelledby={`tu-${p.key}-h`}>
+              <div class="tu-card__a">
+                <p class="tu-card__tag">{p.tag}</p>
+                <h3 class="tu-card__name" id={`tu-${p.key}-h`}>
+                  {p.name}
+                </h3>
+                <p class="tu-card__price">
+                  <span class="tu-card__cur">US$</span>
+                  <span class="tu-card__amt">{p.price}</span>
+                  <span class="tu-card__unit">{p.unit}</span>
+                </p>
+                <dl class="tu-card__terms">
+                  <div>
+                    <dt>Sessions</dt>
+                    <dd>{p.sessions}</dd>
+                  </div>
+                  {p.length && (
+                    <div>
+                      <dt>Length</dt>
+                      <dd>{p.length}</dd>
+                    </div>
+                  )}
+                </dl>
+              </div>
+              <div class="tu-card__b">
+                <p>{p.what}</p>
+                <p class="tu-card__k">For</p>
+                <p>{p.who}</p>
+              </div>
+              <div class="tu-card__c">
+                <p class="tu-card__k">What we do</p>
+                <ul>
+                  {p.does.map((d) => (
+                    <li>{d}</li>
+                  ))}
+                </ul>
+                <p class="tu-card__k">What to expect</p>
+                <p>{p.expect}</p>
+                <a class:list={['btn', p.key === 'regular' ? 'btn--primary' : '', 'tu-card__cta']} href={enquiryMailto(p.name)}>
+                  {p.cta}
+                </a>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+      <div class="tu-notes">
+        <div class="tu-note tu-note--line">
+          <p class="label label--ink">A clear line</p>
+          <p>
+            IA and extended essay work is guidance, not ghostwriting: coaching on your question, organization, key concept, documents, tools, structure, analysis and evaluation, and feedback on your drafts. I do not write projects or essays for students, no session produces text for you to submit, and no grade is promised.
+          </p>
+        </div>
+        <div class="tu-note">
+          <p class="label label--ink">Groups</p>
+          <p>{GROUP_DISCOUNT}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="tu-sec" aria-labelledby="tu-fit-h">
+      <SectionHead no="05" title="Which pathway fits?" id="tu-fit-h" />
+      <div class="table-scroll" role="region" aria-label="Which pathway fits" tabindex="0">
+        <table class="table tu-fit">
+          <thead>
+            <tr><th scope="col">If you…</th><th scope="col">Start with</th></tr>
+          </thead>
+          <tbody>
+            {
+              FIT.map(([a, k]) => (
+                <tr>
+                  <td>{a}</td>
+                  <td>
+                    <a href={`#tu-${k}`}>{a === 'are not sure' ? 'A regular session first' : nameOf(k)}</a>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="tu-sec tu-why" aria-labelledby="tu-why-h">
+      <SectionHead no="06" title="Why learn with Arjun Agrawal?" id="tu-why-h" />
+      <div class="tu-why__grid">
+        <figure class="tu-why__photo">
+          <CreatorPhoto name="audience-wide" alt="Arjun Agrawal teaching a class, standing in front of a screen showing a budget table" sizes="(min-width: 64rem) 40vw, 92vw" />
+        </figure>
+        <div class="tu-why__text">
+          <ul class="tu-why__facts" role="list">
+            <li><strong>IB Diploma Programme educator</strong> in Economics, Business Management and Global Politics, at Standard and Higher Level, with teaching and academic work at BLISS International School and Symbiosis International School, Pune.</li>
+            <li><strong>Higher education:</strong> studied Economics at St. Stephen's College, University of Delhi, and taught undergraduate Economics as an Assistant Professor at Fergusson College, Pune.</li>
+            <li><strong>Mentorship:</strong> Economics mentor to UPSC Civil Services aspirants.</li>
+            <li><strong>Resource creator:</strong> the author of this platform and of Arjun Agrawal Economics.</li>
+          </ul>
+          <div class="prose">
+            <p>
+              Business Management is where economics, people and power meet a single organization with a budget, a deadline and people who have to carry the plan out. Sessions connect each theory to the decisions it informs: start with a situation, weigh the evidence, use a tool only when it changes a decision, remember that stakeholders are people, treat numbers as arguments, and judge while stating what would make the judgement wrong.
+            </p>
+          </div>
+          <p class="tu-why__more"><a href="/about/">About Arjun Agrawal</a></p>
+          <p class="small muted">There are no testimonials, ratings, student counts or grade claims on this page, because none could be checked by you. What you can check is the platform itself: open any page and you are looking at how I teach.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="tu-sec" aria-labelledby="tu-start-h">
+      <SectionHead no="07" title="How to get started" id="tu-start-h" />
+      <ol class="tu-journey" role="list">
+        {
+          START.map(([t, d], k) => (
+            <li>
+              <span class="tu-journey__no" aria-hidden="true">{k + 1}</span>
+              <strong>{t}</strong>
+              <span>{d}</span>
+            </li>
+          ))
+        }
+      </ol>
+
+      <div class="tu-enquire" data-ix="tutorials">
+      <form class="tu-builder js-only" aria-labelledby="tu-builder-h">
+        <h3 id="tu-builder-h">Write your enquiry</h3>
+        <p class="tu-builder__dek">Choose what applies, then open the email in your own mail app. Nothing is sent or stored by this site.</p>
+        <div class="tu-builder__grid">
+          <label class="tu-field">
+            <span class="label">Pathway</span>
+            <select name="pathway" class="select">
+              {PATHWAYS.map((p) => <option value={p.name}>{p.name}</option>)}
+              <option value="Not sure yet">Not sure yet</option>
+            </select>
+          </label>
+          <label class="tu-field">
+            <span class="label">Year or level</span>
+            <select name="level" class="select">
+              <option value="DP1">DP1 (first year)</option>
+              <option value="DP2">DP2 (second year)</option>
+              <option value="Before the Diploma Programme">Before the Diploma Programme</option>
+              <option value="Other">Other</option>
+            </select>
+          </label>
+          <fieldset class="tu-field">
+            <legend class="label">SL or HL</legend>
+            <label class="tu-check"><input type="radio" name="option" value="SL" /> SL</label>
+            <label class="tu-check"><input type="radio" name="option" value="HL" /> HL</label>
+            <label class="tu-check"><input type="radio" name="option" value="Not decided" checked /> Not decided</label>
+          </fieldset>
+          <fieldset class="tu-field tu-field--wide">
+            <legend class="label">Topics or papers</legend>
+            {['Unit 1', 'Unit 2', 'Unit 3', 'Unit 4', 'Unit 5', 'Paper 1', 'Paper 2', 'Paper 3', 'Internal assessment', 'Extended essay', 'Revision'].map((t) => (
+              <label class="tu-check">
+                <input type="checkbox" name="topics" value={t} /> {t}
+              </label>
+            ))}
+          </fieldset>
+          <label class="tu-field tu-field--wide">
+            <span class="label">Preferred session arrangement</span>
+            <input class="input" name="arrangement" type="text" autocomplete="off" placeholder="For example: weekday evenings, Indian Standard Time" />
+          </label>
+        </div>
+        <p class="tu-builder__actions">
+          <a class="btn btn--primary" href={mainMail} data-compose>Open the email</a>
+          <button type="button" class="btn" data-copy-email>Copy the address</button>
+          <span class="small muted" aria-live="polite" data-status></span>
+        </p>
+      </form>
+      <p class="nojs-only tu-nojs">
+        Write to <a href={mainMail}>{TUTOR.email}</a> with the subject "{ENQUIRY_SUBJECT}", saying your year, SL or HL, your school, the topics or papers you want help with and the days and times that suit you.
+      </p>
+      </div>
+    </section>
+
+    <section class="tu-sec" aria-labelledby="tu-faq-h">
+      <SectionHead no="08" title="Questions" id="tu-faq-h" />
+      <div class="tu-faq">
+        {
+          FAQ.map(([q, a]) => (
+            <details>
+              <summary>{q}</summary>
+              <p>{a}</p>
+            </details>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="tu-close" aria-labelledby="tu-close-h">
+      <p class="tu-hero__kicker">Ask about the right pathway</p>
+      <h2 id="tu-close-h">Start with one session, or tell me what you need.</h2>
+      <p>Write with your level, SL or HL, your school and what you would like help with. I reply personally with available times.</p>
+      <p class="tu-close__actions">
+        <a class="btn btn--gold" href={mainMail}>Email Arjun</a>
+        <a class="btn btn--on-ink" href={TUTOR.whatsapp.href} rel="noopener">WhatsApp<span class="sr-only"> (opens WhatsApp)</span></a>
+        <a class="btn btn--on-ink" href="/about/">About Arjun</a>
+      </p>
+      <p class="tu-close__line">{TUTOR.email} · no booking system, no deposit: enquiries are answered personally.</p>
+    </section>
+
+    <section class="tu-contact" aria-labelledby="tu-contact-h">
+      <h2 id="tu-contact-h" class="tu-contact__h">Contact</h2>
+      <dl>
+        <div><dt>Email</dt><dd><a href={`mailto:${TUTOR.email}`}>{TUTOR.email}</a></dd></div>
+        <div><dt>WhatsApp</dt><dd><a href={TUTOR.whatsapp.href} rel="noopener">{TUTOR.whatsapp.display}</a></dd></div>
+        <div><dt>LinkedIn</dt><dd><a href={TUTOR.linkedin.href} rel="noopener" class="ext">{TUTOR.linkedin.display}<span class="sr-only"> (external site)</span></a></dd></div>
+        <div><dt>Instagram</dt><dd><a href={TUTOR.instagram.href} rel="noopener" class="ext">{TUTOR.instagram.display}<span class="sr-only"> (external site)</span></a></dd></div>
+      </dl>
+      <p class="small muted">Messages go to Arjun directly. This site stores nothing and sends nothing on your behalf.</p>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../scripts/tutorials';
+</script>
