@@ -56,13 +56,22 @@ export const store = {
   },
 };
 
+/** Announcements still waiting to be written, by region, so a newer one replaces an older one instead of following it. */
+const pendingAnnouncements = new WeakMap<HTMLElement, number>();
+
 /** Announce a message to screen readers through a polite live region. */
 export function announce(region: HTMLElement | null, message: string): void {
   if (!region) return;
+  const pending = pendingAnnouncements.get(region);
+  if (pending !== undefined) window.clearTimeout(pending);
   region.textContent = '';
-  window.setTimeout(() => {
-    region.textContent = message;
-  }, 60);
+  pendingAnnouncements.set(
+    region,
+    window.setTimeout(() => {
+      pendingAnnouncements.delete(region);
+      region.textContent = message;
+    }, 60),
+  );
 }
 
 export function escapeHtml(s: string): string {

@@ -222,7 +222,8 @@ test('Paper 2 practice explains a slip, shows the working and accepts the right 
   await expect(root.locator('[data-session]')).toHaveText('This session: 0 of 1 question right first time.');
 
   await root.locator('[data-reveal]').click();
-  await expect(root.locator('[data-live]')).toContainText('The answer is ');
+  // Wait for the reveal's own announcement, not the check's, which says the answer too.
+  await expect(root.locator('[data-live]')).toContainText('The working is shown below the question.');
   const said = (await root.locator('[data-live]').textContent()) ?? '';
   const right = /The answer is (.+?)\. The working/.exec(said)?.[1] ?? '';
   expect(right).not.toBe('');
