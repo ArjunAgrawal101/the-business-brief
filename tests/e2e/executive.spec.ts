@@ -116,18 +116,22 @@ test.describe('the executive simulation with JavaScript', () => {
     await axe(page, 'stage 6 checked');
     await page.click('[data-stage="strategy"] [data-act="next"]');
 
-    // Stage 7: the form opens with the strategy's figures; the rules refuse a plan over budget and a price out of range.
+    // Stage 7: the form opens with the strategy's figures; the rules refuse a plan over budget, a price out of range and an empty field.
     await expect(page.locator('#ex-lever-marketing')).toHaveValue('1100');
     await page.fill('#ex-lever-price', '15');
     await page.fill('#ex-lever-marketing', '2000');
     await page.fill('#ex-lever-capacity', '800');
+    await page.fill('#ex-lever-people', '');
     await expect(page.locator('[data-meter-text]')).toContainText('too much');
     await page.click('[data-act="commit"]');
     await expect(page.locator('[data-err="price"]')).toHaveText('Enter a figure from −10% to 10%.');
     await expect(page.locator('[data-err="budget"]')).toContainText('more than the budget');
+    await expect(page.locator('[data-err="people"]')).toHaveText('Enter a number.');
+    await expect(page.locator('#ex-lever-people')).toHaveValue('');
     await expect(page.locator('#ex-lever-price')).toHaveAttribute('aria-invalid', 'true');
     await expect(page.locator('#ex-lever-price')).toBeFocused();
     await axe(page, 'the plan refused');
+    await page.fill('#ex-lever-people', '200');
     await page.fill('#ex-lever-price', '3');
     await page.fill('#ex-lever-marketing', '1000');
     await page.fill('#ex-lever-capacity', '400');
@@ -203,6 +207,13 @@ test.describe('the executive simulation with JavaScript', () => {
     await page.reload();
     await expect(page.locator('[data-yours] .ex-compare')).toBeVisible();
     await expect(page.locator('#ex-r-worked')).toHaveValue('Marketing rebuilt the brand by 2029.');
+
+    // What the simulation keeps is declared on the privacy page, as every stored item must be.
+    const privacy = await (await page.request.get('/privacy/')).text();
+    const declared = [...privacy.matchAll(/<code[^>]*>\s*(bb:[^<]+?)\s*<\/code>/g)].map((m) => (m[1] ?? '').trim());
+    const kept = await page.evaluate(() => Object.keys(localStorage).filter((k) => k.startsWith('bb:')));
+    expect(kept).toContain('bb:executive');
+    expect(kept.filter((k) => !declared.some((d) => (d.endsWith('…') ? k.startsWith(d.slice(0, -1)) : k === d)))).toEqual([]);
 
     // Starting again clears the work and keeps the role.
     await page.click('[data-act="restart"]');

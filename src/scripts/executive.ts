@@ -60,7 +60,7 @@ interface Saved {
   savedAt: string;
 }
 
-/** A figure typed by a person: "4.2", "4.2%", "1,955", "£120k" is not accepted; a typographic minus is. */
+/** A figure typed by a person: "4.2", "4.2%", "1,955", "£120" and a typographic minus are accepted; "£120k" is not. */
 function parseTyped(raw: string): number | null {
   const cleaned = raw.trim().replace(/[\s,%£€]/g, '').replace(/−/g, '-');
   if (!/^-?\d+(\.\d+)?$|^-?\.\d+$/.test(cleaned)) return null;
@@ -78,6 +78,8 @@ each('[data-ix="executive"]', (root) => {
   const qa = <T extends HTMLElement>(sel: string, within: ParentNode = root) => [...within.querySelectorAll<T>(sel)];
   const status = q('[data-status]');
   let choosingRole = false;
+  /** The role whose briefing is drawn: it is redrawn only when the role changes, so a reader's open or closed choice stays. */
+  let briefed: RoleId | undefined;
   const reviewing = new Set<StageId>();
 
   /* ---------------- State: restored, then kept honest ---------------- */
@@ -426,7 +428,7 @@ ${beforeAfterHtml(start, end, ids, ctx, `Your plan: ${start.label} against ${end
 ${checked ? '' : `<div class="ex-q__actions"><button type="button" class="btn btn--small" data-act="check" data-q="${esc(ev.id)}">Check my answer</button></div>`}
 ${
   checked && answer !== null
-    ? `<div class="ex-verdict ex-verdict--${right ? 'right' : 'wrong'}" data-verdict tabindex="-1"><p class="ex-verdict__head">${right ? 'Right.' : 'Not quite.'} <span class="ex-verdict__yours">Your answer: ${esc(typed)}. The engine's: ${esc(unitWords(ev.unit, answer))}.</span></p><div class="prose small">${rich(fill(ev.working))}</div></div>`
+    ? `<div class="ex-verdict ex-verdict--${right ? 'right' : 'wrong'}" data-verdict tabindex="-1"><p class="ex-verdict__head">${right ? 'Right.' : 'Not quite.'} <span class="ex-verdict__yours">Your answer: ${esc(typed)}${ev.unit === 'percent' && !/%/.test(typed) ? '%' : ''}. The engine's: ${esc(unitWords(ev.unit, answer))}.</span></p><div class="prose small">${rich(fill(ev.working))}</div></div>`
     : ''
 }
 </div>
@@ -532,7 +534,8 @@ ${exported ? `<h4 class="label label--ink">Your exposure to the exchange rate</h
     qa('.ex-stage').forEach((s) => (s.hidden = picking ? true : s.hidden));
     if (!picking && state.role) {
       renderDashboard(state.role);
-      renderBriefing(state.role);
+      if (briefed !== state.role) renderBriefing(state.role);
+      briefed = state.role;
       renderRail();
       renderStages();
       renderQuestions();
@@ -583,7 +586,13 @@ ${exported ? `<h4 class="label label--ink">Your exposure to the exchange rate</h
       const kept: Levers = { ...formValues() };
       for (const id of LEVER_IDS) if (typeof vals[id] === 'number') kept[id] = vals[id] as number;
       state.draft = kept;
+      const typed = LEVER_IDS.map((id) => [id, form.querySelector<HTMLInputElement>(`[data-lever="${id}"]`)?.value ?? ''] as const);
       render();
+      // A field that held no number stays as it was typed (often empty) beside its message, not refilled with an older figure.
+      for (const [id, text] of typed) {
+        const input = root.querySelector<HTMLInputElement>(`[data-lever="${id}"]`);
+        if (input && parseTyped(text) === null) input.value = text;
+      }
       const first = problems[0];
       const msg = q('[data-form-msg]');
       const n = problems.length;
