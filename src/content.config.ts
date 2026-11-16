@@ -31,6 +31,7 @@ import {
 import { studioSchema } from './lib/schemas-strategy';
 import { scenarioSchema } from './lib/boardroom/schema';
 import { briefingSchema, labToolSchema } from './lib/lab/schemas';
+import { boardroomBriefingSchema } from './lib/boardroom-briefings/schema';
 
 /**
  * Loads every `.yaml` file in a folder, each holding a list of entries with an
@@ -106,4 +107,6 @@ export const collections = {
   briefings: defineCollection({ loader: yamlFiles('./src/content/briefings'), schema: briefingSchema }),
   labTools: defineCollection({ loader: yamlFiles('./src/content/lab'), schema: labToolSchema }),
   intelligence: defineCollection({ loader: yamlFiles('./src/content/intelligence'), schema: intelligenceSchema }),
+  // The Boardroom Briefings: an editorial case series on management decisions (src/lib/boardroom-briefings/).
+  boardroomBriefings: defineCollection({ loader: yamlFiles('./src/content/boardroom-briefings'), schema: boardroomBriefingSchema }),
 };
