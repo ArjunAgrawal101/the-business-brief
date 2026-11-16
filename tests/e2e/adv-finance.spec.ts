@@ -1,5 +1,5 @@
 /**
- * Advanced financial management in the browser: each tool answers a change,
+ * Advanced financial analysis in the browser: each tool answers a change,
  * explains a problem beside its field, keeps the reader's figures in this
  * browser under a declared key, resets with a confirmation, exports a CSV, and
  * reads as a complete worked example without JavaScript. The pages fit a 320
@@ -117,7 +117,7 @@ test('the comparator: rate, years and projects, and the CSV', async ({ page }) =
   const { readFileSync } = await import('node:fs');
   const text = readFileSync(await download.path(), 'utf8');
   expect(text).toContain('Second roaster for supermarket orders: NPV');
-  expect(text).toContain('Advanced financial management, beyond the IB course');
+  expect(text).toContain('Advanced financial analysis, beyond the IB course');
   await expectDeclared(page);
   expect(errors).toEqual([]);
 });

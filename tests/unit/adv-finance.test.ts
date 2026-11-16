@@ -1,5 +1,5 @@
 /**
- * Advanced financial management (beyond the IB course) against values worked
+ * Advanced financial analysis (beyond the IB course) against values worked
  * by hand and textbook-style examples. Every expected figure below was worked
  * independently of the code: by hand where the arithmetic is short, and for
  * the five-year forecasts and the tornado in a separate Python script written

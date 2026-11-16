@@ -1,5 +1,5 @@
 /**
- * The advanced financial management mode of the Finance Desk: four tools
+ * The advanced financial analysis mode of the Finance Desk: four tools
  * beyond the IB course, for undergraduates, MBA students, professionals and
  * teachers. Each entry says which parts of the IB course the tool uses (with
  * the subtopic, whose guide page the curriculum file records) and which parts

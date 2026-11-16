@@ -7,7 +7,7 @@
  *
  * Beyond the IB course: the guide's final accounts (3.4) and cash flow
  * forecasts (3.7) are separate tools; linking them through a statement of
- * cash flows built from profit is advanced financial management.
+ * cash flows built from profit is advanced financial analysis.
  *
  * How the three statements link, in one year:
  * - profit for the year adds to retained earnings;

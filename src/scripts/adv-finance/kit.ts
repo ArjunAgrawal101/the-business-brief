@@ -192,7 +192,7 @@ export function mountTool<F>(o: ToolOptions<F>): { refresh: (prefix?: string) =>
     const mine = JSON.stringify(o.read()) !== exampleText;
     const rows: Array<Array<string | number>> = [
       ['Section', 'Item', 'Value', 'Unit or note'],
-      ['Tool', o.title, '', 'Advanced financial management, beyond the IB course'],
+      ['Tool', o.title, '', 'Advanced financial analysis, beyond the IB course'],
       ['Figures', mine ? 'Entered by the reader' : `Example: ${BUSINESS.name} (fictional; simulated data)`, '', ''],
       ['Source', 'The Business Brief, Finance Desk', '', ''],
       ...last.csv,

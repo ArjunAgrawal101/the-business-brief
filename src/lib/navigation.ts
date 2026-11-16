@@ -62,6 +62,7 @@ export const NAV: NavGroup[] = [
     links: [
       { label: 'Finance Desk', href: '/finance-desk/', text: 'Costs, break-even, cash flow, ratios and investment appraisal' },
       { label: 'Financial Laboratory', href: '/finance-desk/lab/', text: 'Twenty calculators for your own figures, each with the working and what it means' },
+      { label: 'Advanced financial analysis', href: '/finance-desk/advanced/', text: 'Beyond the IB course: a linked three-statement forecast, capital budgeting, break-even scenarios and a performance dashboard' },
       { label: 'Strategy Studio', href: '/strategy-studio/', text: 'SWOT, STEEPLE, five forces, Ansoff, BCG, decision trees and a recommendation memo' },
       { label: 'Market Studio', href: '/market-studio/', text: 'STP, personas, positioning, the marketing mix, life cycles, campaigns and budgets' },
       { label: 'People and Culture', href: '/people-and-culture/', text: 'Motivation, leadership scenarios, organization charts, workforce and change planning' },
