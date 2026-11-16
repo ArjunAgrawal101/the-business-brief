@@ -1,0 +1,579 @@
+# The Boardroom Briefings, No. 10. Rowan & Rill and the campaign group are
+# fictional; every figure is simulated. Exhibit 1's margins, Exhibit 3's
+# weighted average and Exhibit 4's forecast profits are worked by their
+# checks; Exhibit A1 extends the forecasts to 2029 on the stated assumptions.
+
+number: 10
+question: How should a company respond to reputational damage?
+title: Rowan & Rill's recycled range turns out to be partly recycled
+dek: A Bristol clothing brand built on sustainability has been found to have overstated its green claims. Sales and trust have fallen; the board must decide what kind of company it will be when they recover.
+decisionType: reputation-recovery
+industry: fashion
+functions: [marketing, operations, strategy]
+keyConcepts: [ethics, sustainability]
+updated: 2026-11-16
+
+company:
+  name: Rowan & Rill
+  fictional: true
+  sector: Outdoor and casual clothing
+  location: Bristol, England
+  size: 380 employees, nine shops and revenue of £72.4m in 2025, most of it online
+  ownership: Privately held company, 55% owned by its founder and 45% by private investors
+currency: { code: GBP, symbol: '£', unit: thousand }
+
+summary:
+  situation: >-
+    Rowan & Rill sold its Recloth range as made from 100% recycled materials and carbon neutral. In May 2026 the advertising
+    regulator ruled both claims misleading: tests found the range was on average 61.6% recycled, and the carbon-neutral claim
+    rested on offsets whose benefits could not be verified. Recloth sales fell by 38.0% over the summer, and trust in the
+    brand fell with them.
+  decision: >-
+    How to respond: contest the ruling and defend the brand's record, correct the claims and apologize, rebuild the range
+    so that every claim can be independently verified, or retire the Recloth name and start again.
+  stakes: >-
+    The brand's promise of sustainability is the reason many customers buy from it. The response decides whether that
+    promise can be trusted again, and what it will cost the company to make it true.
+
+background:
+  - >
+    Holly Mercer founded Rowan & Rill in Bristol in 2010, selling jackets and fleeces for walking and everyday wear. It grew
+    online and now has nine shops, 380 employees and revenue of £72.4m, about 70% of it from its website (Exhibit 1). Its
+    customers are loyal and, by its own surveys, chose the brand above all for its values. Holly owns 55% of the company;
+    private investors own the rest.
+  - >
+    In 2023 the company launched Recloth, a range it described as made from 100% recycled materials and carbon neutral. It
+    became the brand's best-known line. In 2025 a campaign group, which tests clothing claims, sent Recloth garments to an
+    independent laboratory and complained to the advertising regulator. The tests found recycled content averaging 61.6%
+    across the range, and as little as 48% in jackets (Exhibit 3).
+  - >
+    The regulator's ruling, in May 2026, was reported by the national press and shared widely online. Recloth sales from
+    June to September fell from £6,000k a year earlier to £3,720k; the brand's trust score fell from 71 to 48 out of 100
+    (Exhibit 2); three retailers that stock the brand paused their orders. The company had not checked its suppliers'
+    claims for itself. The board meets next month to agree its response.
+
+context:
+  - >
+    Claims about sustainability have become central to how many clothing brands compete. Customers who care about them
+    are often willing to pay more and stay loyal, but they rarely have the means to check what they are told, so the claims
+    rest on trust, and on the rules and regulators that police them.
+  - >
+    Clothing supply chains are long and spread across many countries: fibre makers, spinners, mills, garment factories and
+    agents. A brand that buys finished garments may know little of what happens in its suppliers' suppliers, unless it pays
+    for audits, certification and tracing.
+  - >
+    Damage to a reputation tends to be quick and recovery slow. Customers forgive a mistake more readily than an attempt to
+    hide or excuse it, and they judge a company less by its first statement than by whether its later actions match its
+    words.
+
+evidence:
+  - kind: company
+    title: A sharp fall in a strong business
+    body: >-
+      Revenue rose from £64,200k in 2024 to £72,400k in 2025 at a steady operating margin of 9.0%. The forecast for 2026 is
+      £63,900k, down 11.7%, with the margin falling to 4.0% (Exhibit 1).
+    exhibits: [ex-1]
+  - kind: company
+    title: Trust fell faster than sales
+    body: >-
+      Between January and September 2026 the brand's trust score fell from 71 to 48, the share of shoppers who would consider
+      buying from it from 44% to 29%, and its net promoter score from +42 to −6 (Exhibit 2).
+    exhibits: [ex-2]
+  - kind: company
+    title: What was actually in the range
+    body: >-
+      Weighted by the units sold in 2025, Recloth's recycled content was 61.6%, from 81% in fleeces to 48% in jackets
+      (Exhibit 3). The suppliers' certificates the company relied on covered the fibre, not the finished garments.
+    exhibits: [ex-3]
+  - kind: research
+    title: The response should match the responsibility
+    body: >-
+      Situational crisis communication theory holds that the more responsibility the public attributes to an organization
+      for a crisis, the more its response must accept that responsibility, apologize and put things right. For a crisis the
+      organization could have prevented, denial and excuses tend to make the damage worse.
+    sources: [bbr-coombs-2007]
+  - kind: research
+    title: Reputation is an asset
+    body: >-
+      Corporate reputation can be treated as an intangible asset: the judgements that customers, employees, investors and
+      others form of a company over time, which shape what they are willing to pay it, work for it and invest in it.
+    sources: [bbr-fombrun-1996]
+
+financials:
+  summary: >-
+    Exhibit 1 gives the company's results for 2024 and 2025 and its forecast for 2026. Exhibit 4 gives the management team's
+    estimates for each response: its one-off cost, any cost that would recur each year, and the revenue and operating profit
+    it would produce in 2027. The forecasts assume the operating margin before those recurring costs returns to 9.0%.
+  exhibits: [ex-1, ex-4]
+
+exhibits:
+  - id: ex-1
+    title: Rowan & Rill's results (£000)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Year }
+      - { label: Revenue, numeric: true, format: money }
+      - { label: Operating profit, numeric: true, format: money }
+      - { label: Operating profit margin (%), numeric: true, format: d1 }
+    rows:
+      - ['2024', 64200, 5778, 9.0]
+      - ['2025', 72400, 6516, 9.0]
+      - ['2026 (forecast)', 63900, 2556, 4.0]
+    checks:
+      - { column: Operating profit margin (%), is: '{Operating profit} / {Revenue} * 100' }
+    note: The forecast for 2026 includes the costs of responding to the ruling so far, but none of the options in Exhibit 4.
+    source: Rowan & Rill's management accounts and forecast (simulated).
+
+  - id: ex-2
+    title: The brand tracker, 2026
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Month }
+      - { label: Trust score (out of 100), numeric: true }
+      - { label: Would consider buying (%), numeric: true }
+      - { label: Net promoter score, numeric: true }
+    rows:
+      - ['January', 71, 44, 42]
+      - ['April', 70, 43, 40]
+      - ['June', 52, 31, 3]
+      - ['September', 48, 29, -6]
+    note: A monthly online survey of 1,000 people who buy outdoor clothing. The net promoter score is the share who would recommend the brand less the share who would warn against it, and runs from −100 to +100.
+    source: Brand tracking survey commissioned by Rowan & Rill (simulated).
+
+  - id: ex-3
+    title: Recycled content of the Recloth range, as tested
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Product family }
+      - { label: Units sold in 2025 (000), numeric: true }
+      - { label: Recycled content (%), numeric: true, format: d1 }
+    rows:
+      - ['Fleeces', 180, 81]
+      - ['Jackets', 120, 48]
+      - ['T-shirts and tops', 260, 55]
+      - ['Trousers', 90, 60]
+      - ['The whole range, weighted by units sold', 650, 61.6]
+    totals: ['The whole range, weighted by units sold']
+    checks:
+      - { row: 'The whole range, weighted by units sold', columns: [Units sold in 2025 (000)], is: '{Fleeces} + {Jackets} + {T-shirts and tops} + {Trousers}' }
+      - { row: 'The whole range, weighted by units sold', columns: [Recycled content (%)], is: '({ex-3|Fleeces|Units sold in 2025 (000)} * {Fleeces} + {ex-3|Jackets|Units sold in 2025 (000)} * {Jackets} + {ex-3|T-shirts and tops|Units sold in 2025 (000)} * {T-shirts and tops} + {ex-3|Trousers|Units sold in 2025 (000)} * {Trousers}) / {ex-3|The whole range, weighted by units sold|Units sold in 2025 (000)}' }
+    note: Recycled content is the share of each garment's fibre by weight that came from recycled sources, from laboratory tests of samples from each family.
+    source: Independent laboratory tests commissioned by the campaign group and confirmed by Rowan & Rill (simulated).
+
+  - id: ex-4
+    title: The management team's estimates for each response (£000)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Response }
+      - { label: One-off cost, numeric: true, format: money }
+      - { label: Extra cost each year, numeric: true, format: money }
+      - { label: Revenue in 2027, numeric: true, format: money }
+      - { label: Operating profit in 2027, numeric: true, format: money }
+    rows:
+      - ['A. Contest the ruling and defend the record', 400, 0, 64000, 5760]
+      - ['B. Correct the claims and apologize', 2150, 0, 70000, 6300]
+      - ['C. Rebuild the range so every claim is verified', 2500, 1500, 74500, 5205]
+      - ['D. Retire Recloth and relaunch under a new name', 3900, 0, 66000, 5940]
+    checks:
+      - { column: Operating profit in 2027, is: '{Revenue in 2027} * {@base-margin} / 100 - {Extra cost each year}' }
+      - { column: One-off cost, rows: ['C. Rebuild the range so every claim is verified'], is: '{ex-4|B. Correct the claims and apologize|One-off cost} + {@tracing-platform}' }
+      - { column: Extra cost each year, rows: ['C. Rebuild the range so every claim is verified'], is: '{@certification} + {@fibre-premium} - {@price-uplift}' }
+    note: >-
+      A's one-off cost is legal fees. B's covers relabelling, withdrawing the claims, refunds for customers who ask and an
+      apology campaign. C adds a platform that traces every garment to its fibre (£350k), and each year independent
+      certification and audits (£900k) and a premium for verified recycled fibre (£2,400k), partly recovered by a 6% price
+      rise on the range (£1,800k). D writes off stock with the old labels and pays for a new brand.
+    source: Management team's estimates for the board (simulated).
+
+figures:
+  - { id: base-margin, label: Operating margin before any recurring cost of the response (%), value: 9 }
+  - { id: founded, label: Year founded, value: 2010 }
+  - { id: employees, label: Employees, value: 380 }
+  - { id: online-share, label: Share of revenue sold online (%), value: 70 }
+  - { id: founder-stake, label: The founder's shareholding (%), value: 55 }
+  - { id: investors-stake, label: The private investors' shareholding (%), value: 45 }
+  - { id: claimed-content, label: Recycled content claimed (%), value: 100 }
+  - { id: recloth-summer-2025, label: 'Recloth sales, June to September 2025 (£000)', value: 6000 }
+  - { id: recloth-summer-2026, label: 'Recloth sales, June to September 2026 (£000)', value: 3720 }
+  - { id: recloth-fall, label: Fall in Recloth sales over the summer (%), value: -38.0, decimals: 1, is: '({@recloth-summer-2026} - {@recloth-summer-2025}) / {@recloth-summer-2025} * 100' }
+  - { id: revenue-change-2026, label: 'Change in revenue, 2025 to 2026 (%)', value: -11.7, is: '({ex-1|2026 (forecast)|Revenue} - {ex-1|2025|Revenue}) / {ex-1|2025|Revenue} * 100' }
+  - { id: weighted-total, label: 'Units times recycled content, summed across the range', value: 40040, is: '{ex-3|Fleeces|Units sold in 2025 (000)} * {ex-3|Fleeces|Recycled content (%)} + {ex-3|Jackets|Units sold in 2025 (000)} * {ex-3|Jackets|Recycled content (%)} + {ex-3|T-shirts and tops|Units sold in 2025 (000)} * {ex-3|T-shirts and tops|Recycled content (%)} + {ex-3|Trousers|Units sold in 2025 (000)} * {ex-3|Trousers|Recycled content (%)}' }
+  - { id: simple-average, label: Simple average of the four families' recycled content (%), value: 61.0, decimals: 1, is: '({ex-3|Fleeces|Recycled content (%)} + {ex-3|Jackets|Recycled content (%)} + {ex-3|T-shirts and tops|Recycled content (%)} + {ex-3|Trousers|Recycled content (%)}) / 4' }
+  - { id: tracker-sample, label: People surveyed each month by the brand tracker, value: 1000 }
+  - { id: tracing-platform, label: 'Option C: tracing platform (£000)', value: 350 }
+  - { id: certification, label: 'Option C: certification and audits a year (£000)', value: 900 }
+  - { id: fibre-premium, label: 'Option C: premium for verified recycled fibre a year (£000)', value: 2400 }
+  - { id: price-uplift, label: 'Option C: revenue from a 6% price rise on the range (£000)', value: 1800 }
+  - { id: price-rise, label: 'Option C: price rise on the range (%)', value: 6 }
+  - { id: retailers-paused, label: Retailers that paused orders, value: 3 }
+  - { id: pride-before, label: Employees proud to work at the company before the ruling (%), value: 84 }
+  - { id: pride-after, label: Employees proud to work at the company after the ruling (%), value: 61 }
+  - { id: c-premium-2029, label: 'Option C: extra cost each year by 2029, as verified fibre becomes cheaper (£000)', value: 600 }
+
+stakeholders:
+  - name: Holly Mercer and the investors
+    side: internal
+    interest: high
+    power: high
+    wants: A brand that recovers its sales and its standing, and is worth what they built it to be.
+    implications: >-
+      Option C costs the most in the short run, with operating profit of £5,205k in 2027 against £6,300k for option B, and
+      asks them to bet that verified claims will pay back over time.
+  - name: Customers
+    side: external
+    interest: high
+    power: high
+    wants: Clothes that are what the label says, from a company that tells them the truth.
+    implications: >-
+      Many chose the brand for its values and feel misled. A defence of the claims would confirm their doubts; an apology
+      without change may not convince them either.
+  - name: Employees
+    side: internal
+    interest: high
+    power: medium
+    wants: To be proud of where they work again.
+    implications: >-
+      In the staff survey, 61% said they were proud to work at the company, against 84% before the ruling. Shop and service
+      staff have taken the customers' anger in person.
+  - name: The advertising regulator and the campaign group
+    side: external
+    interest: medium
+    power: high
+    wants: Claims that are accurate and can be proved.
+    implications: >-
+      Contesting the ruling would invite closer scrutiny and further complaints; verified claims would end the dispute.
+  - name: Suppliers
+    side: external
+    interest: medium
+    power: medium
+    wants: Steady orders, and fair terms for any extra checks or materials.
+    implications: >-
+      Option C asks them to trace their fibre, accept audits and switch to verified recycled materials, for which Rowan & Rill
+      would pay a premium.
+  - name: Retailers that stock the brand
+    side: external
+    interest: medium
+    power: medium
+    wants: Products their own customers trust.
+    implications: >-
+      Three have paused orders. They are likely to return only when the brand's claims are settled and its products can be
+      sold without explanation.
+
+options:
+  - id: A
+    label: Contest the ruling and defend the record
+    summary: >-
+      Appeal against the ruling, point to the brand's real progress (most of the range is recycled in part), and keep the
+      Recloth range and its marketing largely as they are.
+    requires: Legal advice and a willingness to argue in public.
+    upside: The lowest cost, £400k, and no admission that could be used against the company.
+    risks: >-
+      It treats a preventable failure as an unfair attack; customers, retailers and the regulator are likely to read it as
+      denial, and further tests could make things worse.
+    evidence: [ex-2, ex-3]
+  - id: B
+    label: Correct the claims and apologize
+    summary: >-
+      Withdraw the claims, relabel the range with its true recycled content, apologize publicly and offer refunds to
+      customers who ask.
+    requires: £2,150k, and a clear, unconditional apology from the founder.
+    upside: The fastest recovery in the estimates, with the highest operating profit in 2027, £6,300k.
+    risks: The range would no longer stand out, and nothing would change in the supply chain that let the claims go unchecked.
+    evidence: [ex-3, ex-4]
+  - id: C
+    label: Rebuild the range so every claim is verified
+    summary: >-
+      Do everything in option B, then trace every Recloth garment to its fibre, pay for independent certification and
+      audits, switch to verified recycled fibre, and publish the results each year.
+    requires: £2,500k at once, £1,500k a year after a 6% price rise, and suppliers willing to be traced and audited.
+    upside: Claims that can be proved, the strongest basis for trust, and the highest revenue in 2027, £74,500k.
+    risks: The lowest operating profit in 2027, a price rise customers may resist, and two years before the verified range is complete.
+    evidence: [ex-3, ex-4]
+  - id: D
+    label: Retire Recloth and relaunch under a new name
+    summary: >-
+      Withdraw the Recloth name and its stock, and launch a new range under a new name with modest, accurate claims.
+    requires: £3,900k, including writing off stock with the old labels.
+    upside: A break with the damaged name.
+    risks: Customers may see it as hiding rather than fixing; the brand that was damaged, Rowan & Rill, remains.
+    evidence: [ex-4]
+
+criteria:
+  - id: trust
+    criterion: Trust and reputation
+    weight: 30
+    measure: How far the response is likely to restore customers' and retailers' trust in the brand.
+  - id: regulatory
+    criterion: Regulatory and legal risk
+    weight: 20
+    measure: The risk of further rulings, complaints or claims.
+  - id: financial
+    criterion: Financial effect
+    weight: 20
+    measure: The cost of the response and the operating profit it leaves in 2027, from Exhibit 4.
+  - id: integrity
+    criterion: Integrity of the brand's claims
+    weight: 15
+    measure: Whether the brand's sustainability claims would be true and could be proved.
+  - id: people
+    criterion: Employees and partners
+    weight: 15
+    measure: The effect on employees' pride and on relations with suppliers and retailers.
+
+questions:
+  course:
+    - id: weighted
+      command: calculate
+      marks: 3
+      level: HL
+      subtopics: ['5.3']
+      prompt: Using Exhibit 3, calculate the recycled content of the Recloth range as a whole, weighted by the units sold in 2025.
+      notes: >-
+        Multiply each family's recycled content by its units, add them and divide by all the units: (180 × 81 + 120 × 48 + 260
+        × 55 + 90 × 60) ÷ 650 = 40,040 ÷ 650 = 61.6%. A simple average of the four families, 61.0%, would give too much
+        weight to jackets and trousers.
+    - id: revenue
+      command: calculate
+      marks: 2
+      subtopics: ['3.3']
+      prompt: Using Exhibit 1, calculate the percentage change in Rowan & Rill's revenue between 2025 and the forecast for 2026.
+      notes: >-
+        (63,900 − 72,400) ÷ 72,400 × 100 = −11.7%. One mark for the method, one for the answer.
+    - id: csr
+      command: explain
+      marks: 4
+      subtopics: ['1.3']
+      prompt: Explain why corporate social responsibility claims matter to Rowan & Rill's competitive position.
+      notes: >-
+        Its customers chose it for its values, so its claims are part of what it sells; true claims can justify higher prices
+        and loyalty, while false ones turn that advantage into a liability, as the fall in trust shows. Each point applied
+        to the case.
+    - id: brand
+      command: explain
+      marks: 4
+      subtopics: ['4.5']
+      prompt: Explain the effect of the regulator's ruling on Rowan & Rill's brand loyalty and brand value.
+      notes: >-
+        Loyalty: the share of shoppers who would consider buying fell from 44% to 29%, and the net promoter score from +42 to
+        −6. Value: a brand worth a premium because of its values loses that premium when the values are doubted.
+    - id: respond
+      command: recommend
+      marks: 10
+      subtopics: ['1.3', '1.4']
+      prompt: Recommend how Rowan & Rill should respond to the damage to its reputation.
+      notes: >-
+        Strong answers recognize that the crisis was preventable, compare the options on trust and integrity as well as on
+        2027's profit (where B leads), consider each stakeholder's view, and make a clear recommendation with its conditions.
+  seminar:
+    - id: preventable
+      prompt: This crisis was preventable. What does that imply for the tone and substance of Rowan & Rill's response?
+      notes: >-
+        Situational crisis communication theory suggests that a preventable crisis calls for accepting responsibility,
+        apologizing and putting things right; defending the record or changing the name looks like evasion.
+    - id: supply-chain
+      prompt: Is greenwashing a marketing failure or a supply chain failure?
+      notes: >-
+        Both: marketing made claims the business had not checked, and the business did not know enough about its supply
+        chain to check them. Good answers say which failure the response must fix first.
+    - id: trust-again
+      prompt: Can a brand that has overstated its sustainability ever be trusted on it again? What would it take?
+      notes: >-
+        Evidence that others can check: independent certification, published data, admitted shortfalls. Good answers note
+        that the brand now carries a burden of proof its competitors do not.
+
+analysis:
+  verdict: >-
+    Correct, apologize and then rebuild, so that every claim can be verified (option C). The failure was preventable, so
+    customers will judge the brand on whether it accepts responsibility and puts things right; an apology alone (B) recovers
+    sales fastest but leaves unchanged the supply chain that let the claims go unchecked. Rebuilding costs £1,500k a year
+    after a modest price rise and leaves less profit in 2027, but it is the only response that makes the brand's promise true,
+    and on the team's assumptions it overtakes the others by 2029.
+  evidence:
+    - >-
+      The claims were wrong by a wide margin: 61.6% recycled across the range, against a claim of 100%, and 48% in jackets
+      (Exhibit 3). The company relied on certificates that covered the fibre, not the garments.
+    - >-
+      The damage is to trust more than to sales so far: the trust score fell from 71 to 48 and the net promoter score from
+      +42 to −6, while revenue is forecast to fall by 11.7% (Exhibits 1 and 2).
+    - >-
+      In 2027, B leaves the most operating profit (£6,300k), then D (£5,940k), A (£5,760k) and C (£5,205k). By 2029, if the
+      premium for verified fibre falls as the team expects, C leaves the most, £6,960k (Exhibit A1).
+    - >-
+      The company can afford C: its 2026 forecast still shows an operating profit of £2,556k, and C's one-off cost of £2,500k
+      can be spread across the year of the change.
+  assumptions:
+    - assumption: Customers will reward verified claims with loyalty and a 6% higher price on the range.
+      test: Test the new labels and prices in a few products before the whole range, and track the brand's trust score month by month.
+    - assumption: The premium for verified recycled fibre will fall from £2,400k a year as supply grows, leaving an extra cost of £600k by 2029.
+      test: Ask suppliers for prices fixed for two or three years, and plan for the premium staying high.
+    - assumption: The operating margin, before the cost of the response, returns to 9.0%.
+      test: It was 9.0% in 2024 and 2025. Watch whether discounts to win customers back eat into it.
+    - assumption: Suppliers will accept tracing and audits.
+      test: Start with the suppliers of fleeces, where content is already highest, and make continued orders depend on taking part.
+  tradeoffs:
+    - title: Speed, or depth
+      body: >-
+        An apology and new labels recover sales soonest. Making the claims true takes two years, and customers will judge the
+        company by whether its later actions match its apology.
+    - title: Profit now, or the promise later
+      body: >-
+        The verified range costs more and leaves less profit in 2027. Its value lies in a promise that can be proved, which is
+        what customers bought Rowan & Rill for in the first place.
+    - title: A clean break, or an honest one
+      body: >-
+        Retiring the Recloth name would remove a reminder of the failure, but the failure was the company's, not the name's.
+        Keeping the name and fixing the range is the harder, more credible course.
+  alternatives:
+    - option: A
+      fit: weak
+      body: >-
+        Weakly supported. It treats a preventable failure as an unfair attack, invites more scrutiny, and is the response
+        most likely to deepen the loss of trust.
+    - option: B
+      fit: conditional
+      body: >-
+        Defensible as a first step, and necessary within any good response, but not sufficient: it fixes the labels and
+        leaves the supply chain that produced the false claims as it was.
+    - option: C
+      fit: strong
+      body: >-
+        The best supported. It accepts responsibility, corrects the claims and makes them provable, which is what a
+        preventable crisis demands, and it is the response most likely to restore the brand's value over time.
+    - option: D
+      fit: weak
+      body: >-
+        Weakly supported. It costs more than B, looks like hiding rather than fixing, and leaves the damaged brand, Rowan &
+        Rill, where it was.
+  scores:
+    - { option: A, scores: { trust: 1, regulatory: 1, financial: 3, integrity: 1, people: 1 }, total: 1.4 }
+    - { option: B, scores: { trust: 3, regulatory: 3, financial: 5, integrity: 3, people: 3 }, total: 3.4 }
+    - { option: C, scores: { trust: 5, regulatory: 5, financial: 3, integrity: 5, people: 5 }, total: 4.6 }
+    - { option: D, scores: { trust: 2, regulatory: 3, financial: 4, integrity: 2, people: 2 }, total: 2.6 }
+  recommendation:
+    option: C
+    decision: >-
+      Accept the ruling at once. Have the founder apologize without conditions, withdraw the claims, relabel the range with
+      its tested recycled content and offer refunds. Then rebuild Recloth over two years so that every claim is verified:
+      trace every garment to its fibre, pay for independent certification and audits, switch to verified recycled fibre,
+      and publish the results, shortfalls included, every year.
+    reasons:
+      - The failure was preventable, so the response must accept responsibility and fix the cause, not only the labels.
+      - Verified claims are the only basis on which the brand's promise can be trusted again.
+      - It brings back the retailers and the regulator's confidence, which a defence or a new name would not.
+      - On the team's assumptions it leaves the most profit by 2029.
+    conditions: >-
+      The recommendation depends on customers accepting a 6% higher price for a verified range. If tests show they will not,
+      the company should keep the verification and reduce the range to the products, such as fleeces, where verified
+      content is already high.
+  implementation:
+    - when: Weeks 1 to 2
+      action: Accept the ruling; publish an apology from the founder; withdraw the claims from every page, label and advertisement; open refunds.
+      owner: Holly Mercer and the head of communications
+    - when: Weeks 1 to 4
+      action: Tell staff first, with the facts and the plan; brief the retailers and the regulator on the steps being taken.
+      owner: Head of people and head of sales
+    - when: Months 1 to 6
+      action: Relabel the range with its tested content; appoint an independent certifier; require suppliers to trace their fibre.
+      owner: Head of sourcing
+    - when: Months 6 to 24
+      action: Switch the range to verified recycled fibre, family by family, starting with fleeces; raise prices on the range by 6% as each family is verified.
+      owner: Head of product
+    - when: Every year
+      action: Publish the range's verified content and any shortfalls, checked by the certifier.
+      owner: The board
+  measures:
+    - measure: Trust
+      target: The trust score back above the 70 of early 2026 within two years.
+      review: Every month
+    - measure: Recommendation
+      target: A net promoter score positive again within a year, and back towards +42 within two.
+      review: Every month
+    - measure: Verified content
+      target: Every Recloth family independently verified within two years, with its content on the label.
+      review: Every quarter
+    - measure: Retailers
+      target: All three paused retailers ordering again.
+      review: Every quarter
+  limitations:
+    - The revenue forecasts for 2027 and 2029 are the management team's judgements about how customers will respond, which no one can know.
+    - The brand tracker surveys people who buy outdoor clothing in general, not only the brand's own customers.
+    - The analysis cannot know whether the regulator or the campaign group will examine the brand's other ranges.
+  changeMind:
+    - If customers would not pay more for a verified range, a smaller verified range, or option B alone, would be the more affordable choice.
+    - If new tests found problems beyond Recloth, the response would have to cover the whole brand, and the case for a fresh start under a new name would grow.
+    - If the premium for verified fibre stayed at £2,400k a year, C would not overtake B by 2029, and its case would rest on trust alone.
+  exhibits:
+    - id: ex-A1
+      title: Operating profit under each response, 2027 and 2029 (£000)
+      kind: table
+      provenance: simulated-data
+      columns:
+        - { label: Response }
+        - { label: Revenue in 2029, numeric: true, format: money }
+        - { label: Extra cost each year by 2029, numeric: true, format: money }
+        - { label: Operating profit in 2027, numeric: true, format: money }
+        - { label: Operating profit in 2029, numeric: true, format: money }
+      rows:
+        - ['A. Contest the ruling and defend the record', 66000, 0, 5760, 5940]
+        - ['B. Correct the claims and apologize', 74000, 0, 6300, 6660]
+        - ['C. Rebuild the range so every claim is verified', 84000, 600, 5205, 6960]
+        - ['D. Retire Recloth and relaunch under a new name', 70000, 0, 5940, 6300]
+      checks:
+        - { column: Operating profit in 2027, is: '{ex-4|*|Operating profit in 2027}' }
+        - { column: Operating profit in 2029, is: '{Revenue in 2029} * {@base-margin} / 100 - {Extra cost each year by 2029}' }
+        - { column: Extra cost each year by 2029, rows: ['C. Rebuild the range so every claim is verified'], is: '{@c-premium-2029}' }
+      note: The 2029 revenues are the management team's forecasts. Under C, the premium for verified fibre is assumed to fall as supply grows, leaving an extra cost of £600k a year by 2029.
+      source: The Business Brief's analysis of Exhibit 4 and the management team's longer forecasts (simulated data).
+
+course:
+  subtopics:
+    - { code: '1.3', note: 'Corporate social responsibility and ethical objectives, and what happens when claims about them are false.' }
+    - { code: '1.4', note: 'Customers, employees, owners, suppliers and the regulator, and the conflicts between their interests in the response.' }
+    - { code: '4.5', note: 'Brand loyalty and brand value, promotion through social media, and the price of a premium range.' }
+    - { code: '5.3', note: 'Quality assurance and quality standards: checking what suppliers claim, and independent certification.', level: HL }
+    - { code: '5.7', note: 'Managing the crisis: transparency, communication, speed and control.', level: HL }
+    - { code: '2.6', note: 'Communicating with staff, customers and partners when the company is at fault.' }
+    - { code: '3.3', note: 'Revenue, and the costs a response adds.' }
+  terms: [corporate-social-responsibility, ethical-objectives, business-ethics, stakeholder-conflict, brand-loyalty, brand-value, brand-image, social-media-marketing, quality-assurance, quality-standard, crisis-management, supply-chain]
+
+frameworks:
+  - id: mendelow-matrix
+    use: Decide whom to manage closely through the recovery; customers and the regulator both have high power.
+  - id: steeple-analysis
+    use: The ecological and ethical factors, and the legal one, explain why the claims mattered so much.
+  - id: circular-business-models
+    use: A verified recycled range is a circular supply model; the case shows what it takes to make one real.
+  - id: swot-analysis
+    use: A strength (loyal, values-led customers) has become a threat now that the values are in doubt.
+
+tools:
+  - { kind: studio, id: stakeholder-map, use: Map the stakeholders and plan the communication with each. }
+  - { kind: studio, id: swot, use: Rework the brand's SWOT after the ruling. }
+  - { kind: toolkit, id: circular-business-models, use: The toolkit guide to circular business models. }
+  - { kind: toolkit, id: descriptive-statistics, use: 'The toolkit guide to the mean, and why a weighted average differs from a simple one.' }
+
+beyond:
+  - idea: Responding to a preventable crisis
+    body: >-
+      Situational crisis communication theory distinguishes crises in which an organization is a victim, those that are
+      accidents, and those it could have prevented, and holds that the last call for full acceptance of responsibility. Its
+      reasoning is why defending the record (option A) and changing the name (option D) are the weakest responses here.
+    terms: [greenwashing, esg]
+    sources: [bbr-coombs-2007]
+  - idea: Reputation as an asset
+    body: >-
+      Treating reputation as an asset changes how the board should count the options' costs. Money spent on verified claims
+      is an investment in the asset that lets the brand charge more and keep its customers, not just a cost of the crisis.
+    terms: [sustainability-reporting, materiality-assessment, net-promoter-score, scope-3-emissions]
+    sources: [bbr-fombrun-1996]
+
+sources: [bbr-method, bbr-coombs-2007, bbr-fombrun-1996]
+method: >-
+  Rowan & Rill, the campaign group and their people are fictional, and every figure is simulated for teaching; the ruling
+  is a fictional event. The margins in Exhibit 1, the weighted recycled content in Exhibit 3 and the forecast profits in
+  Exhibit 4 are worked from the figures beside them and the stated assumptions; Exhibit A1 extends the forecasts to 2029.
+  The integrity check reworks every figure on every build.

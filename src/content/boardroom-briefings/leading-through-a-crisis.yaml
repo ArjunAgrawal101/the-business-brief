@@ -1,0 +1,598 @@
+# The Boardroom Briefings, No. 5. Velantra Cold Chain is fictional; every
+# figure is simulated. Exhibit 1's revenue by customer and margin, and Exhibit
+# 4's branch totals, are worked by their checks; the expected costs in
+# Exhibit A1 are each response's branches weighted by their probabilities.
+
+number: 5
+question: How should a CEO manage a major organizational crisis?
+title: Velantra Cold Chain's systems go dark at three in the morning
+dek: Criminals have locked a cold-chain distributor out of its own warehouses, with hospitals, pharmacies and supermarkets waiting for deliveries. The chief executive has hours, not weeks, to decide how to lead.
+decisionType: crisis-leadership
+industry: logistics
+functions: [strategy, operations, human-resources, marketing, finance]
+keyConcepts: [ethics, change]
+updated: 2026-11-16
+
+company:
+  name: Velantra Cold Chain
+  fictional: true
+  sector: Temperature-controlled distribution of food and medicines
+  location: Columbus, Ohio, United States
+  size: Three warehouses, 140 refrigerated trucks, 1,100 employees and revenue of US$214.0m in 2025
+  ownership: Privately held company, 70% owned by a private equity firm and 30% by its managers
+currency: { code: USD, symbol: 'US$', unit: thousand }
+
+summary:
+  situation: >-
+    At three in the morning on a Monday, ransomware encrypted the systems that run Velantra Cold Chain's three warehouses
+    and its delivery routes. The cold stores are still cold, but nobody can see what is in them or plan a delivery. Forty-six
+    hospital deliveries, mostly temperature-sensitive medicines, are due in the next 72 hours.
+  decision: >-
+    How the chief executive should lead the company through the crisis: rebuild the systems safely from offline backups
+    while running a manual service for the most urgent customers, restore quickly from the latest backup and accept the
+    risk of reinfection, pay the criminals for a key, or hand the deliveries to competitors until the systems are rebuilt.
+  stakes: >-
+    Patients waiting for medicines, supermarket shelves, the jobs of 1,100 people and the trust of every customer are at
+    stake. What the chief executive does and says in the first hours will shape how all of them judge the company long
+    after the systems are back.
+
+background:
+  - >
+    Velantra Cold Chain stores and delivers food and medicines that must be kept cold: chilled and frozen food for two
+    supermarket chains, medicines for independent pharmacies, and vaccines and other temperature-sensitive medicines for
+    four hospital systems in Ohio. It runs three warehouses and 140 refrigerated trucks and employs 1,100 people. In 2025 it
+    earned revenue of US$214.0m and an operating profit of US$12.8m (Exhibit 1).
+  - >
+    Dana Okafor became chief executive in 2023, after the company was bought by a private equity firm, which owns 70%; the
+    managers own the rest. Under her the company tested its contingency plan every quarter: offline backups of its systems
+    were kept apart from the network and restored in practice, and a crisis team was named. The plan did not say how to
+    deliver without the warehouse system.
+  - >
+    The attack came in the early hours of a Monday (Exhibit 2). By the time Dana convened the crisis team, the IT director
+    had cut the network off from the internet, the temperature loggers in the cold stores, which run on their own, showed
+    every store at the right temperature, and the attackers had demanded US$4.5m for a key to unlock the systems.
+
+context:
+  - >
+    Cold-chain distribution sits between producers and the shops, pharmacies and hospitals that depend on it. Its customers
+    plan on deliveries arriving on time and at the right temperature, and many hold only a few days of stock. When a
+    distributor stops, the effects spread quickly, and for medicines they can reach patients.
+  - >
+    Ransomware attacks encrypt an organization's systems and demand payment for the key. Attackers increasingly copy data
+    before they encrypt it, and threaten to publish it. Paying does not guarantee that the key works, that the data is
+    destroyed or that the attackers will not return, and the authorities in many countries advise organizations not to pay.
+  - >
+    In a crisis, the first hours matter most. Customers, employees, regulators and the media all want to know what has
+    happened and what the organization is doing about it. Silence is filled by rumour, and a statement that later proves
+    wrong is hard to take back.
+
+evidence:
+  - kind: company
+    title: A business that can afford any response
+    body: >-
+      Velantra ended 2025 with US$9,600k in cash and an undrawn credit facility of US$15,000k (Exhibit 1). Even the costliest
+      outcome in the incident team's estimates, US$9,280k if a fast restore is reinfected, would not exhaust that. The choice
+      is not about whether the company can pay, but about what it should do.
+    exhibits: [ex-1, ex-4]
+  - kind: company
+    title: Who is waiting
+    body: >-
+      In the next 72 hours Velantra is due to make 46 deliveries to hospitals, 1,280 to pharmacies and 410 to supermarket
+      stores (Exhibit 3). Hospitals bring 18% of revenue and supermarkets 58%, but the hospitals' medicines are the
+      deliveries that cannot wait.
+    exhibits: [ex-3]
+  - kind: company
+    title: Four responses, costed
+    body: >-
+      The incident team has estimated the cost of each response, with probabilities where the outcome is uncertain (Exhibit
+      4). Rebuilding from offline backups takes seven days and costs about US$3,920k. Restoring from last night's backup
+      takes two days if it works, but the team puts the chance of reinfection at 35%.
+    exhibits: [ex-4]
+  - kind: research
+    title: The response should match the responsibility
+    body: >-
+      Situational crisis communication theory holds that an organization's response should fit how much responsibility
+      the public attributes to it. When it is seen as a victim, information and support for those affected come first;
+      when it is seen as at fault, it needs to accept responsibility and make amends.
+    sources: [bbr-coombs-2007]
+  - kind: market
+    title: What customers need to hear
+    body: >-
+      In any supply crisis, customers need to know three things quickly: whether their orders will arrive, when they will
+      hear more, and whom to call. Telling them early, even with incomplete information, usually does less damage than
+      telling them late.
+
+financials:
+  summary: >-
+    Exhibit 1 gives Velantra's results and liquidity at the end of 2025, with its revenue by kind of customer. Exhibit 4 sets
+    out the incident team's estimates for each response: the days of reduced service, the loss for each of those days, the
+    cost of the incident response, stock that would spoil, and the ransom or a lost contract where they apply. Where an
+    outcome is uncertain, the response has two branches, each with its probability.
+  exhibits: [ex-1, ex-4]
+
+exhibits:
+  - id: ex-1
+    title: Velantra Cold Chain in 2025 (US$000)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Item }
+      - { label: '2025', numeric: true }
+    rows:
+      - ['Revenue', 214000]
+      - ['from supermarkets (58%)', 124120]
+      - ['from pharmacies (24%)', 51360]
+      - ['from hospitals (18%)', 38520]
+      - ['Operating profit', 12840]
+      - ['Operating profit margin (%)', 6]
+      - ['Cash at the year end', 9600]
+      - ['Undrawn credit facility', 15000]
+    checks:
+      - { row: from supermarkets (58%), is: '{Revenue} * {@share-supermarkets} / 100' }
+      - { row: from pharmacies (24%), is: '{Revenue} * {@share-pharmacies} / 100' }
+      - { row: from hospitals (18%), is: '{Revenue} * {@share-hospitals} / 100' }
+      - { row: Revenue, is: '{from supermarkets (58%)} + {from pharmacies (24%)} + {from hospitals (18%)}' }
+      - { row: Operating profit margin (%), is: '{Operating profit} / {Revenue} * 100' }
+    note: A cyber insurance policy covers incident response costs up to US$5,000k after the first US$500k, but not lost business or a ransom.
+    source: Velantra's management accounts and insurance schedule (simulated).
+
+  - id: ex-2
+    title: The first six hours
+    kind: list
+    provenance: simulated-data
+    items:
+      - { label: Hour 1, value: 'Every screen in the three warehouses shows a ransom note. The warehouse system, route planning and the customer portal stop.' }
+      - { label: Hour 2, value: 'The night manager calls the IT director, who disconnects the network from the internet to stop the attack spreading.' }
+      - { label: Hour 3, value: 'Dana Okafor convenes the crisis team by phone. The temperature loggers in the cold stores, which run on their own, show every store in range.' }
+      - { label: Hour 4, value: 'The IT director confirms that the offline backups were not touched. The forensic firm on the insurer''s panel is called in.' }
+      - { label: Hour 5, value: 'The first trucks should be loading. Drivers arrive and are asked to wait.' }
+      - { label: Hour 6, value: 'The attackers'' note demands US$4.5m in cryptocurrency within 72 hours, and claims they have copied customer data.' }
+    source: Crisis team's log (simulated).
+
+  - id: ex-3
+    title: Deliveries due in the next 72 hours
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Customers }
+      - { label: Deliveries due, numeric: true, format: money }
+      - { label: What they carry }
+    rows:
+      - ['Hospitals (four systems)', 46, 'Vaccines, insulin and other temperature-sensitive medicines']
+      - ['Independent pharmacies', 1280, 'Medicines, some refrigerated']
+      - ['Supermarket stores (two chains)', 410, 'Chilled and frozen food']
+    source: Velantra's delivery schedule, reconstructed from the customers' order emails (simulated).
+
+  - id: ex-4
+    title: The incident team's estimates for each response (US$000)
+    kind: table
+    provenance: simulated-data
+    columns:
+      - { label: Response and outcome }
+      - { label: Days of reduced service, numeric: true }
+      - { label: Loss a day, numeric: true, format: money }
+      - { label: Incident response, numeric: true, format: money }
+      - { label: Spoiled stock, numeric: true, format: money }
+      - { label: Ransom or lost contract, numeric: true, format: money }
+      - { label: Probability, numeric: true, format: d2 }
+      - { label: Total cost, numeric: true, format: money }
+    rows:
+      - ['A. Rebuild from offline backups, with a manual service for urgent customers', 7, 260, 1200, 900, 0, 1.00, 3920]
+      - ['B. Restore fast from last night''s backup: it works', 2, 420, 1200, 500, 0, 0.65, 2540]
+      - ['B. Restore fast from last night''s backup: reinfected', 14, 420, 1800, 1600, 0, 0.35, 9280]
+      - ['C. Pay the ransom: the key works', 2, 420, 1200, 500, 4500, 0.60, 7040]
+      - ['C. Pay the ransom: the key fails', 7, 260, 1200, 900, 4500, 0.40, 8420]
+      - ['D. Hand deliveries to competitors for three weeks: customers stay', 21, 150, 1200, 300, 0, 0.70, 4650]
+      - ['D. Hand deliveries to competitors for three weeks: a supermarket leaves', 21, 150, 1200, 300, 4000, 0.30, 8650]
+    checks:
+      - { column: Total cost, is: '{Days of reduced service} * {Loss a day} + {Incident response} + {Spoiled stock} + {Ransom or lost contract}' }
+    note: >-
+      A full day without service loses US$420k of contribution and penalties; a day of manual service for urgent customers
+      loses US$260k. Under D, the loss a day is the premium paid to the competitors. If a supermarket moves its contract, the
+      contribution lost over the following year is US$4,000k. The probabilities are the incident team's judgement.
+    source: Incident team's estimates for the chief executive (simulated).
+
+figures:
+  - { id: employees, label: Employees, value: 1100 }
+  - { id: trucks, label: Refrigerated trucks, value: 140 }
+  - { id: pe-stake, label: The private equity firm's shareholding (%), value: 70 }
+  - { id: managers-stake, label: The managers' shareholding (%), value: 30 }
+  - { id: share-supermarkets, label: Supermarkets' share of revenue (%), value: 58 }
+  - { id: share-pharmacies, label: Pharmacies' share of revenue (%), value: 24 }
+  - { id: share-hospitals, label: Hospitals' share of revenue (%), value: 18 }
+  - { id: key-works-chance, label: Chance that a paid key works (%), value: 60, is: '{ex-4|C. Pay the ransom: the key works|Probability} * 100' }
+  - { id: contract-loss-chance, label: Chance of losing a supermarket contract under D (%), value: 30, is: '{ex-4|D. Hand deliveries to competitors for three weeks: a supermarket leaves|Probability} * 100' }
+  - { id: ev-b-works, label: 'B: weighted cost if it works (US$000)', value: 1651, is: '{ex-4|B. Restore fast from last night''s backup: it works|Probability} * {ex-4|B. Restore fast from last night''s backup: it works|Total cost}' }
+  - { id: ev-b-fails, label: 'B: weighted cost if reinfected (US$000)', value: 3248, is: '{ex-4|B. Restore fast from last night''s backup: reinfected|Probability} * {ex-4|B. Restore fast from last night''s backup: reinfected|Total cost}' }
+  - { id: ev-c-works, label: 'C: weighted cost if the key works (US$000)', value: 4224, is: '{ex-4|C. Pay the ransom: the key works|Probability} * {ex-4|C. Pay the ransom: the key works|Total cost}' }
+  - { id: ev-c-fails, label: 'C: weighted cost if the key fails (US$000)', value: 3368, is: '{ex-4|C. Pay the ransom: the key fails|Probability} * {ex-4|C. Pay the ransom: the key fails|Total cost}' }
+  - { id: window, label: Hours in the ransom deadline and the delivery window, value: 72 }
+  - { id: hospital-deliveries, label: Hospital deliveries due in the window, value: 46, is: '{ex-3|Hospitals (four systems)|Deliveries due}' }
+  - { id: insurance-limit, label: Cyber insurance limit (US$000), value: 5000 }
+  - { id: insurance-excess, label: Cyber insurance excess (US$000), value: 500 }
+  - { id: liquidity, label: Cash and undrawn credit (US$000), value: 24600, is: '{ex-1|Cash at the year end|2025} + {ex-1|Undrawn credit facility|2025}' }
+  - { id: daily-revenue, label: Revenue a day in 2025 (US$000), value: 586.3, is: '{ex-1|Revenue|2025} / 365' }
+  - { id: ev-b, label: 'Expected cost of B (US$000)', value: 4899, is: '{ex-4|B. Restore fast from last night''s backup: it works|Probability} * {ex-4|B. Restore fast from last night''s backup: it works|Total cost} + {ex-4|B. Restore fast from last night''s backup: reinfected|Probability} * {ex-4|B. Restore fast from last night''s backup: reinfected|Total cost}' }
+  - { id: ev-c, label: 'Expected cost of C (US$000)', value: 7592, is: '{ex-4|C. Pay the ransom: the key works|Probability} * {ex-4|C. Pay the ransom: the key works|Total cost} + {ex-4|C. Pay the ransom: the key fails|Probability} * {ex-4|C. Pay the ransom: the key fails|Total cost}' }
+  - { id: ev-d, label: 'Expected cost of D (US$000)', value: 5850, is: '{ex-4|D. Hand deliveries to competitors for three weeks: customers stay|Probability} * {ex-4|D. Hand deliveries to competitors for three weeks: customers stay|Total cost} + {ex-4|D. Hand deliveries to competitors for three weeks: a supermarket leaves|Probability} * {ex-4|D. Hand deliveries to competitors for three weeks: a supermarket leaves|Total cost}' }
+  - { id: reinfection-chance, label: Chance of reinfection under B (%), value: 35, is: '{ex-4|B. Restore fast from last night''s backup: reinfected|Probability} * 100' }
+  - { id: statement-hours, label: Hours within which customers are told, value: 24 }
+  - { id: update-hours, label: Hours between updates in the first week, value: 12 }
+
+stakeholders:
+  - name: Hospitals and their patients
+    side: external
+    interest: high
+    power: medium
+    wants: Their medicines on time and at the right temperature, and honest warning if they will not be.
+    implications: >-
+      Forty-six deliveries are due in 72 hours. A manual service that puts them first protects patients; a response that
+      fails halfway would leave the hospitals finding other suppliers at the last moment.
+  - name: Pharmacies and supermarkets
+    side: external
+    interest: high
+    power: high
+    wants: Their orders, or enough notice to buy elsewhere; the supermarkets can move their contracts.
+    implications: >-
+      Most of Velantra's revenue comes from them. They will forgive a delay they are told about more readily than one they
+      discover, and they will remember who supplied them in the meantime.
+  - name: Employees
+    side: internal
+    interest: high
+    power: medium
+    wants: To know what is happening, to be paid, and to be able to help.
+    implications: >-
+      A manual service depends on drivers and warehouse staff working from paper lists and phone calls, often for long
+      hours; their goodwill is part of the response.
+  - name: The owners and the board
+    side: internal
+    interest: high
+    power: high
+    wants: A recovery that protects the value of the business and its reputation.
+    implications: >-
+      The private equity firm will want the cost contained; the board must also weigh what the company would become if it
+      paid criminals.
+  - name: Regulators and the authorities
+    side: external
+    interest: medium
+    power: high
+    wants: Prompt notice of the attack and of any data taken, and no payments to criminals.
+    implications: >-
+      If customer data was copied, Velantra must notify those affected. Paying a ransom could break the law if the attackers
+      are on a sanctions list.
+  - name: The insurer
+    side: external
+    interest: medium
+    power: medium
+    wants: A recovery that follows its panel firms' advice and keeps the claim down.
+    implications: >-
+      Covers incident response costs up to US$5,000k after the first US$500k, but not lost business or a ransom.
+
+options:
+  - id: A
+    label: Contain, rebuild and serve the urgent customers by hand
+    summary: >-
+      Keep every system shut until the forensic firm clears it, rebuild from the untouched offline backups over seven days,
+      and run a manual service from paper lists for hospitals first, then pharmacies, with supermarkets told plainly what
+      they will and will not receive. Tell every customer and employee within 24 hours, and update them twice a day.
+    requires: The crisis team working around the clock, staff willing to work by hand, and the discipline to say only what is known.
+    upside: The safest recovery, the most urgent deliveries protected, and no money paid to criminals.
+    risks: A week of reduced service, about US$3,920k of cost, and supermarket shelves short of some products.
+    evidence: [ex-3, ex-4]
+  - id: B
+    label: Restore fast from last night's backup
+    summary: >-
+      Restore the systems from the most recent backup within two days, before the forensic firm can confirm the attackers
+      have gone, and resume full service.
+    requires: A judgement that the backup is clean, which nobody can yet make.
+    upside: Full service in two days if it works.
+    risks: >-
+      The incident team puts the chance of reinfection at 35%, which would mean 14 days of disruption, more spoiled stock and
+      the loss of customers' confidence in the company's judgement.
+    evidence: [ex-4]
+  - id: C
+    label: Pay the ransom for a key
+    summary: >-
+      Negotiate with the attackers and pay up to US$4.5m for a key to unlock the systems, hoping to restore within two days.
+    requires: Cryptocurrency, a negotiator, and the board's willingness to pay criminals.
+    upside: A chance, put at 60%, of a fast recovery.
+    risks: >-
+      The key may not work; the copied data may still be published; the payment may be unlawful if the attackers are under
+      sanctions; it funds crime and marks Velantra as a company that pays.
+    evidence: [ex-4]
+  - id: D
+    label: Hand the deliveries to competitors
+    summary: >-
+      Pay two rival distributors to make Velantra's deliveries for three weeks, while the systems are rebuilt without any
+      pressure of time.
+    requires: Rivals with spare capacity and cold storage, and the customers' agreement.
+    upside: Customers kept supplied, a calm rebuild, and no money paid to criminals.
+    risks: >-
+      Three weeks of premiums, and customers introduced to the rivals' service: the team puts the chance of losing a
+      supermarket contract at 30%.
+    evidence: [ex-4]
+
+criteria:
+  - id: safety
+    criterion: Patients and customers
+    weight: 30
+    measure: Whether the most urgent deliveries arrive safely, and how well every customer is served and informed.
+  - id: cost
+    criterion: Expected cost
+    weight: 20
+    measure: The expected cost of the response, from the incident team's estimates and probabilities.
+  - id: time
+    criterion: Time to recover
+    weight: 15
+    measure: How quickly full service would return.
+  - id: legal
+    criterion: Law and ethics
+    weight: 20
+    measure: Whether the response is lawful, and whether the company could defend it to its customers, staff and the public.
+  - id: trust
+    criterion: Trust and reputation
+    weight: 15
+    measure: How customers, staff and regulators would judge the company once the crisis is over.
+
+questions:
+  course:
+    - id: expected-value
+      command: calculate
+      marks: 4
+      level: HL
+      subtopics: ['5.7']
+      prompt: Using Exhibit 4, calculate the expected cost of option B and of option C.
+      notes: >-
+        Expected value = the sum of each outcome times its probability. B: 0.65 × 2,540 + 0.35 × 9,280 = 1,651 + 3,248 =
+        US$4,899k. C: 0.60 × 7,040 + 0.40 × 8,420 = 4,224 + 3,368 = US$7,592k. Both are higher than A's certain US$3,920k.
+        Two marks for each, with the working.
+    - id: contingency
+      command: distinguish
+      marks: 4
+      level: HL
+      subtopics: ['5.7']
+      prompt: Distinguish between crisis management and contingency planning, using Velantra Cold Chain as an example.
+      notes: >-
+        Contingency planning is done before a crisis: Velantra's offline backups, tested every quarter, and its named crisis
+        team. Crisis management is the response once it happens: the decisions Dana Okafor's team takes in the first hours.
+        The case also shows a gap in the plan: no way to deliver without the warehouse system.
+    - id: communication
+      command: explain
+      marks: 4
+      subtopics: ['2.6']
+      prompt: Explain two barriers to communication that Velantra's chief executive faces in the first day of the crisis.
+      notes: >-
+        The company's own systems, including the customer portal, are down; many audiences need different messages at once;
+        the facts are uncertain, so early statements may have to change; rumour fills any silence. Each barrier explained
+        with its effect in the case.
+    - id: leadership
+      command: discuss
+      marks: 10
+      subtopics: ['2.3']
+      prompt: Discuss which leadership style Velantra's chief executive should use in the first 72 hours of the crisis.
+      notes: >-
+        Strong answers argue that a crisis calls for fast, clear decisions (an autocratic element), while the crisis team's
+        expertise and the staff's goodwill call for consultation (democratic and situational elements). Many conclude that a
+        situational style, decisive on the priorities and open in how they are carried out, fits best.
+    - id: response
+      command: evaluate
+      marks: 10
+      level: HL
+      subtopics: ['5.7', '1.4']
+      prompt: Evaluate the chief executive's options for responding to the attack.
+      notes: >-
+        Good answers use the expected costs (A US$3,920k, B US$4,899k, C US$7,592k, D US$5,850k) but go beyond them: the
+        hospitals' medicines, the legal and ethical case against paying, the risk to customers' trust under B and D, and the
+        factors in effective crisis management (transparency, communication, speed and control).
+  seminar:
+    - id: responsibility
+      prompt: How much responsibility will customers attribute to Velantra for an attack by criminals? What does that imply for the tone of its first statement?
+      notes: >-
+        Customers may see Velantra as a victim of the attack, but as responsible for its preparedness and its response. Good
+        answers suggest a statement that is informative and supportive, and accepts responsibility for putting things right
+        without speculating about the cause.
+    - id: ransom
+      prompt: Should a company ever pay a ransom? Consider who gains and who loses if it does.
+      notes: >-
+        Arguments for: lives or essential services at risk, no other way to recover. Against: no guarantee, legal risk,
+        funding crime and encouraging more attacks on others. Good answers separate the company's interest from society's.
+    - id: prepared
+      prompt: What should a board have in place before an attack, and what can only be decided during one?
+      notes: >-
+        Before: tested offline backups, a named crisis team, a manual way to serve the most critical customers, prepared
+        statements and agreed authority to spend. During: the judgement calls, such as how long to wait for forensic
+        clearance, which only the facts of the attack can settle.
+
+analysis:
+  verdict: >-
+    Contain and rebuild, and serve the most urgent customers by hand (option A). It has the lowest expected cost of the four
+    responses (US$3,920k, against US$4,899k for a fast restore, US$5,850k for handing deliveries to competitors and
+    US$7,592k for paying the ransom), it protects the hospitals' medicines first, and it pays nothing to criminals. Its
+    success depends less on the systems than on leadership: decisive priorities from the chief executive, honest and
+    regular communication with every customer and employee, and the staff's willingness to work by hand for a week.
+  evidence:
+    - >-
+      On the incident team's estimates, A is both the cheapest response and the only certain one: US$3,920k against expected
+      costs of US$4,899k for B, US$7,592k for C and US$5,850k for D (Exhibit A1).
+    - >-
+      The fast restore looks cheap only if it works: US$2,540k. With a 35% chance of reinfection costing US$9,280k, it is the
+      riskiest option, and a second outage would destroy the customers' confidence that A protects.
+    - >-
+      Paying the ransom is the most expensive response even when the key works, US$7,040k, and the copied data may be
+      published anyway. Its legal and ethical risks are not in the numbers at all.
+    - >-
+      The company can afford any response: cash and undrawn credit of US$24,600k cover the worst outcome in Exhibit 4 more
+      than twice over. The decision is about safety, trust and conduct, not survival.
+  assumptions:
+    - assumption: The offline backups are clean and can be restored in seven days.
+      test: They were tested every quarter, and the IT director confirmed they were untouched. The forensic firm should confirm it before restoring.
+    - assumption: Staff can run a manual service for urgent customers.
+      test: Ask the warehouse supervisors and drivers in the first hours, and start with the 46 hospital deliveries, which are few enough to plan by hand.
+    - assumption: The incident team's probabilities are right.
+      test: They are judgements made in hours. Exhibit A1 shows that B would still cost more than A even with a much lower chance of reinfection.
+    - assumption: Customers will accept a week of reduced service if they are told honestly.
+      test: Ask the largest customers directly on the first day what they most need, and agree priorities with them.
+  tradeoffs:
+    - title: Speed, or control
+      body: >-
+        A fast restore or a ransom promises speed; containing and rebuilding keeps control. The guide's factors in effective
+        crisis management include both, and here control has to come first, because a second outage would cost more than a
+        slow first recovery.
+    - title: Transparency, or certainty
+      body: >-
+        The chief executive will not know for days whether data was copied or when service will return. Speaking early with
+        what is known, and saying what is not, earns more trust than waiting for certainty.
+    - title: The urgent, or the important
+      body: >-
+        Supermarkets bring most of the revenue; hospitals bring the deliveries that cannot wait. A manual service cannot do
+        everything, and the chief executive has to say openly who comes first.
+  alternatives:
+    - option: A
+      fit: strong
+      body: >-
+        The best supported. The lowest expected cost, the safest recovery, the most urgent deliveries protected, and nothing
+        paid to criminals. Its week of reduced service is the price of doing it right, and honest communication can make
+        that price bearable for customers.
+    - option: B
+      fit: weak
+      body: >-
+        Weakly supported. It gambles the customers' trust on a backup nobody can yet vouch for, and its expected cost is
+        higher than A's even before the damage to confidence of a second outage.
+    - option: C
+      fit: weak
+      body: >-
+        Weakly supported. It is the costliest response even if it works, it may be unlawful, it funds crime, and it offers no
+        protection for the copied data.
+    - option: D
+      fit: conditional
+      body: >-
+        Defensible for particular customers, for example to cover the supermarkets' frozen deliveries during the rebuild, but
+        not as the whole response: it hands the company's customers to its rivals for three weeks.
+  scores:
+    - { option: A, scores: { safety: 5, cost: 5, time: 2, legal: 5, trust: 5 }, total: 4.55 }
+    - { option: B, scores: { safety: 2, cost: 3, time: 4, legal: 3, trust: 2 }, total: 2.7 }
+    - { option: C, scores: { safety: 3, cost: 1, time: 4, legal: 1, trust: 1 }, total: 2.05 }
+    - { option: D, scores: { safety: 4, cost: 3, time: 3, legal: 5, trust: 3 }, total: 3.7 }
+  recommendation:
+    option: A
+    decision: >-
+      Keep the systems shut until the forensic firm clears them and rebuild from the offline backups. Run a manual service
+      from the first morning: hospital deliveries first, then pharmacies' refrigerated medicines, then the rest. Tell every
+      customer, employee and regulator within 24 hours what has happened, what will and will not arrive, and when they will
+      hear more, and update them every 12 hours. Do not pay the ransom.
+    reasons:
+      - It has the lowest expected cost and the only certain outcome.
+      - It puts the medicines patients need ahead of everything else.
+      - It is lawful and defensible, and it pays nothing to criminals.
+      - Honest, regular communication turns a week of disruption into evidence that the company can be trusted in a crisis.
+    conditions: >-
+      If the manual service cannot reach the hospitals, the chief executive should arrange for a competitor to carry those
+      deliveries at once, taking that part of option D, rather than let a single patient go without.
+  implementation:
+    - when: Hours 1 to 6
+      action: Name a single crisis lead for each stream (systems, deliveries, communications, legal); confirm the backups are untouched; bring in the forensic firm; inform the authorities.
+      owner: Chief executive
+    - when: Hours 6 to 24
+      action: Rebuild the delivery schedule from customers' emails and paper records; run the 46 hospital deliveries by hand; speak to every hospital and the largest customers directly.
+      owner: Operations director with the warehouse supervisors
+    - when: Hours 12 to 24
+      action: Issue the first statement to customers, employees and regulators, saying what is known, what is not, and when the next update will come; brief staff before the public.
+      owner: Chief executive and head of communications
+    - when: Days 2 to 7
+      action: Restore systems from the offline backups once cleared; extend the manual service to pharmacies, then supermarkets; update everyone every 12 hours; notify anyone whose data was copied.
+      owner: IT director and operations director
+    - when: Weeks 2 to 6
+      action: Review what happened, close the gap in the contingency plan by adding a tested manual delivery procedure, and report openly to customers on what has changed.
+      owner: The board
+  measures:
+    - measure: Urgent deliveries
+      target: Every one of the 46 hospital deliveries made on time and at the right temperature.
+      review: Every few hours in the first week
+    - measure: Recovery
+      target: Full service restored within the seven days of the plan, with no reinfection.
+      review: Every day
+    - measure: Communication
+      target: Every customer and employee told within 24 hours, with an update every 12 hours until service is restored.
+      review: Every day
+    - measure: Customers kept
+      target: No contract lost as a result of the attack, six months on.
+      review: After six months
+  limitations:
+    - The probabilities and costs in Exhibit 4 are judgements made in the first hours of a crisis, and could prove badly wrong.
+    - The analysis cannot know whether customer data was copied, which would add costs and obligations to every option.
+    - The expected costs compare averages; a board may rightly care more about the worst outcome than about the average.
+  changeMind:
+    - If the offline backups proved damaged, the case for option A would weaken, and handing more deliveries to competitors (D) would grow.
+    - If patients' safety could be protected in no other way, the case against handing deliveries to rivals would fall away entirely.
+    - If the authorities confirmed that the attackers' key works and that no data was taken, the economics of paying would change, though its ethics would not.
+  exhibits:
+    - id: ex-A1
+      title: Expected cost of each response (US$000)
+      kind: table
+      provenance: simulated-data
+      columns:
+        - { label: Response }
+        - { label: Best outcome, numeric: true, format: money }
+        - { label: Worst outcome, numeric: true, format: money }
+        - { label: Expected cost, numeric: true, format: money }
+      rows:
+        - ['A. Contain, rebuild and serve the urgent customers by hand', 3920, 3920, 3920]
+        - ['B. Restore fast from last night''s backup', 2540, 9280, 4899]
+        - ['C. Pay the ransom for a key', 7040, 8420, 7592]
+        - ['D. Hand the deliveries to competitors', 4650, 8650, 5850]
+      checks:
+        - { column: Expected cost, rows: ['A. Contain, rebuild and serve the urgent customers by hand'], is: '{ex-4|A. Rebuild from offline backups, with a manual service for urgent customers|Total cost}' }
+        - { column: Expected cost, rows: ['B. Restore fast from last night''s backup'], is: '{@ev-b}' }
+        - { column: Expected cost, rows: ['C. Pay the ransom for a key'], is: '{@ev-c}' }
+        - { column: Expected cost, rows: ['D. Hand the deliveries to competitors'], is: '{@ev-d}' }
+        - { column: Best outcome, rows: ['B. Restore fast from last night''s backup'], is: '{ex-4|B. Restore fast from last night''s backup: it works|Total cost}' }
+        - { column: Worst outcome, rows: ['B. Restore fast from last night''s backup'], is: '{ex-4|B. Restore fast from last night''s backup: reinfected|Total cost}' }
+        - { column: Best outcome, rows: ['C. Pay the ransom for a key'], is: '{ex-4|C. Pay the ransom: the key works|Total cost}' }
+        - { column: Worst outcome, rows: ['C. Pay the ransom for a key'], is: '{ex-4|C. Pay the ransom: the key fails|Total cost}' }
+        - { column: Best outcome, rows: ['D. Hand the deliveries to competitors'], is: '{ex-4|D. Hand deliveries to competitors for three weeks: customers stay|Total cost}' }
+        - { column: Worst outcome, rows: ['D. Hand the deliveries to competitors'], is: '{ex-4|D. Hand deliveries to competitors for three weeks: a supermarket leaves|Total cost}' }
+      note: The expected cost weights each outcome by the incident team's probability, as in a decision tree. It does not count the legal and ethical risks of paying a ransom, or the damage a second outage would do to customers' trust.
+      source: The Business Brief's analysis of Exhibit 4 (simulated data).
+
+course:
+  subtopics:
+    - { code: '5.7', note: 'Crisis management against contingency planning, and the factors in effective crisis management: transparency, communication, speed and control.', level: HL }
+    - { code: '5.9', note: 'Cybersecurity and cybercrime, and the risks of depending on management information systems.', level: HL }
+    - { code: '2.3', note: 'Which leadership style suits the first hours of a crisis.' }
+    - { code: '2.6', note: 'Formal communication with many audiences when the usual channels are down, and the barriers to it.' }
+    - { code: '1.4', note: 'Stakeholders whose needs conflict in a crisis: patients, customers, staff, owners and regulators.' }
+    - { code: '3.7', note: 'Liquidity: whether the business has the cash and credit to see the crisis through.' }
+  terms: [crisis-management, contingency-planning, cybersecurity, cybercrime, management-information-system, situational-leadership, autocratic-leadership, democratic-leadership, formal-communication, barriers-to-communication, stakeholder-conflict, liquidity, expected-value]
+
+frameworks:
+  - id: decision-trees
+    use: Weigh the four responses by their expected costs, with the incident team's probabilities on the uncertain branches.
+  - id: leadership-styles
+    use: Choose the style for each phase of the crisis, from the first hours to the review.
+  - id: mendelow-matrix
+    use: Decide whom to tell first and how closely to manage each stakeholder through the week.
+  - id: raci-matrix
+    use: Make clear who is responsible, accountable, consulted and informed for each stream of the response.
+
+tools:
+  - { kind: studio, id: decision-tree, use: Build the decision tree for the four responses and test the probabilities. }
+  - { kind: studio, id: stakeholder-map, use: Map the stakeholders and plan the communication with each. }
+  - { kind: toolkit, id: decision-trees, use: The toolkit guide to decision trees and expected values. }
+  - { kind: calculator, id: current-ratio, use: Check Velantra's liquidity before and during the crisis. }
+
+beyond:
+  - idea: Situational crisis communication
+    body: >-
+      Situational crisis communication theory asks first how much responsibility the public will attribute to the
+      organization, and chooses the response to fit: information and care for those affected when it is seen as a victim,
+      apology and amends when it is seen as at fault. A cyberattack sits between the two: the attack is not Velantra's
+      fault, but its preparation and its response are its own.
+    terms: []
+    sources: [bbr-coombs-2007]
+
+sources: [bbr-method, bbr-coombs-2007]
+method: >-
+  Velantra Cold Chain, its people and its customers are fictional, and every figure is simulated for teaching. The revenue
+  by customer and the margin in Exhibit 1, and the total cost of each branch in Exhibit 4, are worked by their checks; the
+  probabilities are the fictional incident team's judgements; the expected costs in Exhibit A1 weight each branch by its
+  probability. The integrity check reworks every figure on every build.
