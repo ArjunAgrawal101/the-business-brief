@@ -19,7 +19,7 @@ It is written first for IB Diploma Programme Business Management (SL and HL), wi
 | Studios and tools | Strategy Studio (10 tools), Market Studio (9), People and Culture (5), Operations Floor (5), Entrepreneurship Lab (6 briefings, 6 tools) |
 | Simulations and cases | 3 multi-round Boardroom simulations; 9 fictional Case Vault cases across nine industries with a Case of the Week; 3 Decision Rooms and the Case Room lab |
 | Assessment Centre | A 269-question bank, Paper 2 calculation practice (23 kinds), the Paper 1 workspace, five IA tools and the HL Strategic Planning Centre; practice is labelled as the platform's own |
-| Business Intelligence | 8 real developments from 2025 and 2026, every fact dated and sourced, the analysis labelled; never presented as live news |
+| Business Intelligence | 11 real developments from 2024 to 2026 in an issue-style hub: twelve themes, each with a page of its own, and six questions answered by every item; every fact dated and sourced, the analysis labelled; never presented as live news |
 | Learner | Seven distinct pathways; a dashboard and saved items kept in this browser only; search across 1,743 entries |
 | Pages | 1,011, built statically; the browser tests check every page kind with axe-core at desktop and phone sizes |
 

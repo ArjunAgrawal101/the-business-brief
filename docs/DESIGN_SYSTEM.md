@@ -82,6 +82,14 @@ The front door of the ecosystem (`src/pages/index.astro`, with `src/components/h
 - **The libraries, learning objectives and pathways.**
 - **The Assessment Centre**, **the latest additions**, **the creator** and **a closing invitation.**
 
+### The Business Intelligence Briefing
+
+The briefing (`src/pages/intelligence/`, styled by `src/styles/intelligence.css`) reads as an edition of a serious business publication:
+- **The masthead:** the title with its gold italic accent, an issue line (the edition's date, the number of items, themes and regions), the standfirst, a stamp of the curation and check dates and the document count, and a notice that the briefing is curated, not live.
+- **The front page:** the lead story on navy with its headline figures, then the rest of the edition in ruled columns, each story with its themes, development date, standfirst, organizations, region and industry, and the dates it was published and checked.
+- **The themes:** twelve sections in a ruled grid, each with its count, a line on what it covers and its newest headlines, each linking to a page of its own.
+- **An item:** the six questions as numbered section heads; the sourced facts first, labelled External evidence, then a gold-ruled mark where the analysis begins; the course and what lies beyond it in separate groups, the second on white with a green rule and the Enrichment tag; a side rail with the item's dates, region, industry, themes and contents.
+
 ### Raster assets and templates
 
 Rendered from the monogram's master by `npm run brand` (`scripts/brand/render-assets.mjs`):
