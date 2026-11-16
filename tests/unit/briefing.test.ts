@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  CATEGORY_LABELS,
+  REGION_LABELS,
+  THEME_INFO,
   byDateDesc,
   dateKey,
   dateParts,
@@ -7,14 +10,22 @@ import {
   filterSummary,
   filtersFromQuery,
   formatDate,
+  inTheme,
+  isEditorialTheme,
   itemCount,
   latest,
   matches,
   onOrBefore,
   parseDate,
   queryFromFilters,
+  regionsLine,
+  themeBySlug,
+  themeCounts,
+  themeHref,
+  uncoveredThemes,
   unitOf,
 } from '../../src/lib/briefing';
+import { INTEL_CATEGORIES, INTEL_REGIONS, INTEL_THEMES } from '../../src/lib/intel-themes';
 
 describe('briefing dates', () => {
   it('formats a day and a month the British way', () => {
@@ -108,5 +119,58 @@ describe('briefing facets and filters', () => {
     expect(queryFromFilters({})).toBe('');
     expect(queryFromFilters({ unit: '3' })).toBe('?unit=3');
     expect(queryFromFilters({ unit: 'toolkit', concept: 'ethics', kind: 'innovation' })).toBe('?unit=toolkit&concept=ethics&kind=innovation');
+  });
+});
+
+describe('briefing themes and regions', () => {
+  it('names every theme, with a label, a one-line description and an address of its own', () => {
+    const slugs = INTEL_CATEGORIES.map((k) => THEME_INFO[k].slug);
+    expect(new Set(slugs).size).toBe(INTEL_CATEGORIES.length);
+    for (const k of INTEL_CATEGORIES) {
+      expect(THEME_INFO[k].label.length).toBeGreaterThan(3);
+      expect(THEME_INFO[k].dek).toMatch(/\.$/);
+      expect(CATEGORY_LABELS[k]).toBe(THEME_INFO[k].label);
+      expect(themeHref(k)).toBe(`/intelligence/themes/${THEME_INFO[k].slug}/`);
+      expect(themeBySlug(THEME_INFO[k].slug)).toBe(k);
+    }
+    expect(themeBySlug('no-such-theme')).toBeUndefined();
+  });
+
+  it('keeps the twelve editorial themes first, and the first edition\'s two kinds after them', () => {
+    expect(INTEL_THEMES).toHaveLength(12);
+    expect(INTEL_CATEGORIES.slice(0, 12)).toEqual([...INTEL_THEMES]);
+    expect(INTEL_CATEGORIES.slice(12)).toEqual(['restructuring', 'global-trend']);
+    expect(isEditorialTheme('business-failure')).toBe(true);
+    expect(isEditorialTheme('restructuring')).toBe(false);
+    expect(THEME_INFO.leadership.label).toBe('Leadership decisions');
+    expect(THEME_INFO['financial-results'].label).toBe('Financial performance');
+    expect(THEME_INFO.innovation.label).toBe('Technology and innovation');
+  });
+
+  it('counts the items in each theme and finds the themes nobody covers', () => {
+    const items: Array<[string, { categories: string[] }]> = [
+      ['a', { categories: ['corporate-strategy', 'sustainability'] }],
+      ['b', { categories: ['sustainability'] }],
+      ['c', { categories: ['global-trend'] }],
+    ];
+    const counts = themeCounts(items.map(([, it]) => it));
+    expect(counts.sustainability).toBe(2);
+    expect(counts['corporate-strategy']).toBe(1);
+    expect(counts['global-trend']).toBe(1);
+    expect(counts['business-failure']).toBe(0);
+    expect(inTheme(items, 'sustainability').map(([id]) => id)).toEqual(['a', 'b']);
+    const missing = uncoveredThemes(items.map(([, it]) => it));
+    expect(missing).not.toContain('sustainability');
+    expect(missing).toContain('business-failure');
+    expect(missing).toHaveLength(10);
+    expect(uncoveredThemes([{ categories: [...INTEL_THEMES] }])).toEqual([]);
+  });
+
+  it('names regions in plain English, joined as a list', () => {
+    for (const r of INTEL_REGIONS) expect(REGION_LABELS[r].length).toBeGreaterThan(3);
+    expect(regionsLine(['europe'])).toBe('Europe');
+    expect(regionsLine(['north-america', 'asia'])).toBe('North America and Asia');
+    expect(regionsLine(['north-america', 'europe', 'asia'])).toBe('North America, Europe and Asia');
+    expect(regionsLine([])).toBe('');
   });
 });
