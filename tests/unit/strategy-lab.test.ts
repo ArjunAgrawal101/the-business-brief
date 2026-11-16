@@ -199,6 +199,7 @@ describe('strategic fit check', () => {
     expect(fit.headline(s)).toBe('Weak fit; weakest: capability readiness and 7s alignment.');
     const r = fit.reading(s);
     expect(r).toContain('External fit +61% (strong), capability readiness 57% (major gaps) and 7S support averaging 2.7 of 5 (misaligned).');
+    expect(r).toContain('Weak fit. The capabilities the strategy needs are not ready: close the largest gaps, by building, borrowing or buying them, before or while launching. The organization is not aligned behind the strategy:');
     expect(r).toContain('The largest capability gaps are servicing fleets within a day (2 of the 5 needed)');
     expect(r).toContain('Structure, Systems and Staff pull against the strategy, and structure sits at the centre of the most conflicts.');
     expect(fit.checks(s)).toEqual([]);

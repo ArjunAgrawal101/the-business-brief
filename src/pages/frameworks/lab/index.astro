@@ -22,9 +22,9 @@ const all = Object.entries(lib.frameworks);
 const studioOf = (slug: string) => lib.studio.find((t) => t.slug === slug);
 const withTool = all.filter(([, f]) => applicationOf(f, lib.tools).full.length > 0).length;
 const STATUS_TEXT = {
-  syllabus: 'Named in the syllabus',
-  toolkit: 'An IB toolkit tool',
-  enrichment: 'Beyond the IB course',
+  syllabus: "named in the guide's syllabus",
+  toolkit: "one of the guide's toolkit tools",
+  enrichment: 'beyond the IB course',
 } as const;
 ---
 
@@ -69,7 +69,7 @@ const STATUS_TEXT = {
           <label class="label" for="fl-status">Standing</label>
           <select id="fl-status" data-filter="status">
             <option value="">IB and beyond</option>
-            {FRAMEWORK_STATUS.map((s) => <option value={s}>{`${STATUS_LABELS[s]}: ${STATUS_TEXT[s].toLowerCase()}`}</option>)}
+            {FRAMEWORK_STATUS.map((s) => <option value={s}>{`${STATUS_LABELS[s]}: ${STATUS_TEXT[s]}`}</option>)}
           </select>
         </div>
         <p class="fl-count" aria-live="polite" data-count></p>

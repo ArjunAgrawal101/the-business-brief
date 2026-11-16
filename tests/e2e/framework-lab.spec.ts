@@ -152,7 +152,7 @@ test.describe('the Lab tools in the Strategy Studio', () => {
     // Servicing from 2 to 5: (49 + 5 x 3) / 86 = 64 / 86, 74%.
     await root.locator('#sx-strategic-fit-c3-cur').selectOption('5');
     await expect(root.locator('[data-reading]').first()).toContainText('capability readiness 74% (gaps to close)');
-    await expect(root.locator('[data-reading]').first()).toContainText('the organization is not aligned behind the strategy');
+    await expect(root.locator('[data-reading]').first()).toContainText('Weak fit. The organization is not aligned behind the strategy');
     await root.locator('[data-act="add-conflict"]').click();
     await expect(page.locator(':focus')).toHaveAttribute('data-k', 'conflicts.k4.a');
   });

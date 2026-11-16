@@ -271,11 +271,11 @@ export function verdict(s: FitState): string {
   if (!w) return 'Add at least one factor in the environment and one capability to judge the fit.';
   if (w.band === 'good') return 'Strong fit: the strategy answers its environment, the capabilities it needs are in place, and the organization is aligned behind it.';
   const what: Record<Level, string> = {
-    external: 'the strategy answers its environment poorly, so reconsider the strategy itself before investing in delivering it',
-    readiness: 'the capabilities the strategy needs are not ready, so close the largest gaps, by building, borrowing or buying them, before or while launching',
-    alignment: 'the organization is not aligned behind the strategy, so change the elements that pull against it before asking people to deliver it',
+    external: 'The strategy answers its environment poorly: reconsider the strategy itself before investing in delivering it.',
+    readiness: 'The capabilities the strategy needs are not ready: close the largest gaps, by building, borrowing or buying them, before or while launching.',
+    alignment: 'The organization is not aligned behind the strategy: change the elements that pull against it before asking people to deliver it.',
   };
-  return `${w.band === 'poor' ? 'Weak fit' : 'Partial fit'}: ${andList(w.levels.map((l) => what[l]))}.`;
+  return `${w.band === 'poor' ? 'Weak fit' : 'Partial fit'}. ${w.levels.map((l) => what[l]).join(' ')}`;
 }
 
 export function checks(s: FitState): Check[] {
