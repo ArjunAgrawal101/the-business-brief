@@ -1,5 +1,5 @@
 # The Boardroom Briefings, No. 6. Mãozinha is fictional; every figure is
-# simulated. Exhibit 1's revenue, contribution and results follow from the
+# simulated. Exhibit 2's revenue, contribution and results follow from the
 # booking value, the 18% commission and the 50% contribution margin; Exhibit
 # 2's acquisition costs from marketing and new customers; the plans' results
 # in Exhibit 3 from the stated assumptions below; Exhibit A1 works each city's
@@ -47,7 +47,7 @@ background:
   - >
     Growth has been fast and expensive. Bookings grew by 131.8% in 2024 and by 88.2% in 2025, but marketing, mostly
     online advertising to win new customers, cost R$14.4m last year, and the company's operating loss widened from
-    R$7.0m in 2023 to R$15.4m (Exhibit 1). It ended 2025 with R$31.0m in cash from its last funding round.
+    R$7.0m in 2023 to R$15.4m (Exhibit 2). It ended 2025 with R$31.0m in cash from its last funding round.
   - >
     Three proposals are on the table. A growth fund has offered R$60m for 35.1% of the company, on the condition that it
     opens in six more cities in 2026. The early investors would put in R$20m if the company first proved its numbers. And a
@@ -72,16 +72,16 @@ evidence:
     title: Faster growth, larger losses
     body: >-
       The value of bookings rose from R$22,000k in 2023 to R$96,000k in 2025, and the operating loss from R$7,020k to
-      R$15,360k (Exhibit 1). Each year the company spent more on marketing than it earned in contribution: R$14,400k against
+      R$15,360k (Exhibit 2). Each year the company spent more on marketing than it earned in contribution: R$14,400k against
       R$8,640k in 2025.
-    exhibits: [ex-1]
+    exhibits: [ex-2]
   - kind: company
     title: Two cities pay back, two do not
     body: >-
       Winning a customer cost R$90.00 in São Paulo but R$210.00 in Belo Horizonte, and 65% of São Paulo's customers booked
-      again the next year against 45% in Belo Horizonte (Exhibit 2). A customer contributes about R$72 a year, so the cities
+      again the next year against 45% in Belo Horizonte (Exhibit 1). A customer contributes about R$72 a year, so the cities
       differ greatly in how much each new customer is worth.
-    exhibits: [ex-2]
+    exhibits: [ex-1]
   - kind: company
     title: Three plans for 2026 and 2027
     body: >-
@@ -105,15 +105,15 @@ evidence:
 
 financials:
   summary: >-
-    Exhibit 1 gives three years of results, from the value of bookings to the operating result. Exhibit 2 shows, for each
+    Exhibit 2 gives three years of results, from the value of bookings to the operating result. Exhibit 1 shows, for each
     city, how many new customers were won in 2025, at what marketing cost, and how many customers book again. Exhibit 3 gives
     the finance team's forecasts for the three plans that involve keeping the company, with the cash each would leave at the
     end of 2027. A customer contributes about R$72 a year: 3.2 bookings of R$250, at 18% commission and a 50% contribution
     margin.
-  exhibits: [ex-1, ex-3]
+  exhibits: [ex-2, ex-3]
 
 exhibits:
-  - id: ex-1
+  - id: ex-2
     title: Mãozinha's growth and losses, 2023 to 2025 (R$000)
     kind: table
     provenance: simulated-data
@@ -136,7 +136,7 @@ exhibits:
     note: Contribution is revenue less payment fees, insurance for each job and customer support, which together take half of revenue. Fixed costs are salaries, technology and offices.
     source: Mãozinha's management accounts (simulated).
 
-  - id: ex-2
+  - id: ex-1
     title: Winning and keeping customers, city by city, 2025
     kind: table
     provenance: simulated-data
@@ -179,7 +179,7 @@ exhibits:
       - { column: Operating result 2027, rows: ['A. Raise R$60m and open six more cities'], is: '{Value of bookings 2027} * {@commission} / 100 * {@contribution-margin} / 100 - {@a-marketing-2027} - {@a-fixed-2027}' }
       - { column: Operating result 2026, rows: ['B. Focus on São Paulo and Campinas until profitable'], is: '{Value of bookings 2026} * {@commission} / 100 * {@contribution-margin} / 100 - {@b-marketing} - {@b-fixed}' }
       - { column: Operating result 2027, rows: ['B. Focus on São Paulo and Campinas until profitable'], is: '{Value of bookings 2027} * {@commission} / 100 * {@contribution-margin} / 100 - {@b-marketing} - {@b-fixed}' }
-      - { column: Operating result 2026, rows: ['C. Raise R$20m and fix the economics before growing'], is: '{Value of bookings 2026} * {@c-commission} / 100 * {@contribution-margin} / 100 - {@c-marketing-2026} - {ex-1|2025|Fixed costs}' }
+      - { column: Operating result 2026, rows: ['C. Raise R$20m and fix the economics before growing'], is: '{Value of bookings 2026} * {@c-commission} / 100 * {@contribution-margin} / 100 - {@c-marketing-2026} - {ex-2|2025|Fixed costs}' }
       - { column: Operating result 2027, rows: ['C. Raise R$20m and fix the economics before growing'], is: '{Value of bookings 2027} * {@c-commission} / 100 * {@contribution-margin} / 100 - {@c-marketing-2027} - {@c-fixed-2027}' }
     note: >-
       A spends R$24.0m on marketing and R$14.4m on fixed costs in 2026, rising to R$30.0m and R$18.0m. B cuts marketing to
@@ -197,9 +197,9 @@ figures:
   - { id: professionals, label: Professionals using the platform, value: 6200 }
   - { id: founders-stake, label: The founders' shareholding (%), value: 52 }
   - { id: investors-stake, label: The early investors' shareholding (%), value: 48 }
-  - { id: growth-2024, label: 'Growth in bookings, 2024 (%)', value: 131.8, is: '({ex-1|2024|Value of bookings} - {ex-1|2023|Value of bookings}) / {ex-1|2023|Value of bookings} * 100' }
-  - { id: growth-2025, label: 'Growth in bookings, 2025 (%)', value: 88.2, is: '({ex-1|2025|Value of bookings} - {ex-1|2024|Value of bookings}) / {ex-1|2024|Value of bookings} * 100' }
-  - { id: monthly-burn, label: Average monthly operating loss in 2025 (R$000), value: 1280, is: '-{ex-1|2025|Operating result} / 12' }
+  - { id: growth-2024, label: 'Growth in bookings, 2024 (%)', value: 131.8, is: '({ex-2|2024|Value of bookings} - {ex-2|2023|Value of bookings}) / {ex-2|2023|Value of bookings} * 100' }
+  - { id: growth-2025, label: 'Growth in bookings, 2025 (%)', value: 88.2, is: '({ex-2|2025|Value of bookings} - {ex-2|2024|Value of bookings}) / {ex-2|2024|Value of bookings} * 100' }
+  - { id: monthly-burn, label: Average monthly operating loss in 2025 (R$000), value: 1280, is: '-{ex-2|2025|Operating result} / 12' }
   - { id: runway, label: Months of cash at the 2025 rate of loss, value: 24.2, is: '{@cash-2025} / {@monthly-burn}' }
   - { id: bookings-per-year, label: Bookings a customer makes a year, value: 3.2 }
   - { id: average-booking, label: Average booking (R$), value: 250 }
@@ -215,11 +215,11 @@ figures:
   - { id: new-cities, label: New cities in option A, value: 6 }
   - { id: b-cut, label: 'Option B: cut in fixed costs (%)', value: 10 }
   - { id: b-marketing, label: 'Option B: marketing a year (R$000)', value: 3600 }
-  - { id: b-fixed, label: 'Option B: fixed costs a year after the cut (R$000)', value: 8640, is: '{ex-1|2025|Fixed costs} * (1 - {@b-cut} / 100)' }
-  - { id: b-growth, label: 'Option B: growth in bookings a year (%)', value: 20, is: '({ex-3|B. Focus on São Paulo and Campinas until profitable|Value of bookings 2026} - {ex-1|2025|Value of bookings}) / {ex-1|2025|Value of bookings} * 100' }
+  - { id: b-fixed, label: 'Option B: fixed costs a year after the cut (R$000)', value: 8640, is: '{ex-2|2025|Fixed costs} * (1 - {@b-cut} / 100)' }
+  - { id: b-growth, label: 'Option B: growth in bookings a year (%)', value: 20, is: '({ex-3|B. Focus on São Paulo and Campinas until profitable|Value of bookings 2026} - {ex-2|2025|Value of bookings}) / {ex-2|2025|Value of bookings} * 100' }
   - { id: c-commission, label: 'Option C: commission (%)', value: 20 }
-  - { id: sale-multiple, label: The sale price as a multiple of 2025 revenue, value: 8.1, is: '{@sale-offer} / {ex-1|2025|Revenue (18% commission)}' }
-  - { id: average-cac, label: Average cost to win a customer in 2025 (R$), value: 120, is: '({ex-2|São Paulo (since 2022)|Marketing (R$000)} + {ex-2|Campinas (since 2023)|Marketing (R$000)} + {ex-2|Rio de Janeiro (since 2024)|Marketing (R$000)} + {ex-2|Belo Horizonte (since 2025)|Marketing (R$000)}) * 1000 / ({ex-2|São Paulo (since 2022)|New customers} + {ex-2|Campinas (since 2023)|New customers} + {ex-2|Rio de Janeiro (since 2024)|New customers} + {ex-2|Belo Horizonte (since 2025)|New customers})' }
+  - { id: sale-multiple, label: The sale price as a multiple of 2025 revenue, value: 8.1, is: '{@sale-offer} / {ex-2|2025|Revenue (18% commission)}' }
+  - { id: average-cac, label: Average cost to win a customer in 2025 (R$), value: 120, is: '({ex-1|São Paulo (since 2022)|Marketing (R$000)} + {ex-1|Campinas (since 2023)|Marketing (R$000)} + {ex-1|Rio de Janeiro (since 2024)|Marketing (R$000)} + {ex-1|Belo Horizonte (since 2025)|Marketing (R$000)}) * 1000 / ({ex-1|São Paulo (since 2022)|New customers} + {ex-1|Campinas (since 2023)|New customers} + {ex-1|Rio de Janeiro (since 2024)|New customers} + {ex-1|Belo Horizonte (since 2025)|New customers})' }
   - { id: a-marketing-2026, label: 'Option A: marketing in 2026 (R$000)', value: 24000 }
   - { id: a-fixed-2026, label: 'Option A: fixed costs in 2026 (R$000)', value: 14400 }
   - { id: a-marketing-2027, label: 'Option A: marketing in 2027 (R$000)', value: 30000 }
@@ -290,7 +290,7 @@ options:
     risks: >-
       Losses of R$22,200k and then R$21,000k a year; new cities that may look like Belo Horizonte, not São Paulo; founders
       diluted to 33.8%; and a management team stretched across ten cities.
-    evidence: [ex-2, ex-3]
+    evidence: [ex-1, ex-3]
   - id: B
     label: Focus on São Paulo and Campinas until profitable
     summary: >-
@@ -299,7 +299,7 @@ options:
     requires: Cuts to marketing and to some jobs, and patience from investors.
     upside: Operating break-even in 2027 with the money the company has, and no dilution.
     risks: Growth slows to 20% a year; rivals take the cities Mãozinha leaves; the best staff may leave a company that has stopped growing.
-    evidence: [ex-1, ex-3]
+    evidence: [ex-2, ex-3]
   - id: C
     label: Raise R$20m and fix the economics before growing
     summary: >-
@@ -309,7 +309,7 @@ options:
     requires: The early investors' money, and the discipline to hold back growth for a year.
     upside: A business whose growth adds value, a loss cut to R$3,500k by 2027, and R$41,900k in cash at the end of 2027.
     risks: Professionals may resent the higher commission; rivals keep growing meanwhile; the improvements may take longer than a year.
-    evidence: [ex-2, ex-3]
+    evidence: [ex-1, ex-3]
   - id: D
     label: Sell to the delivery app
     summary: >-
@@ -317,7 +317,7 @@ options:
     requires: The founders' and investors' agreement, and terms for the staff and the professionals.
     upside: Certainty, with R$72.8m for the founders and a return for the investors, and the app's customers behind the business.
     risks: The end of independence; a price that may undervalue a business that could be fixed; and the professionals' terms set by a new owner.
-    evidence: [ex-1]
+    evidence: [ex-2]
 
 criteria:
   - id: value
@@ -347,7 +347,7 @@ questions:
       command: calculate
       marks: 3
       subtopics: ['3.7']
-      prompt: Using Exhibit 1 and the cash figure in the background, calculate how many months Mãozinha's cash would last at its 2025 rate of loss.
+      prompt: Using Exhibit 2 and the cash figure in the background, calculate how many months Mãozinha's cash would last at its 2025 rate of loss.
       notes: >-
         Monthly loss = 15,360 ÷ 12 = R$1,280k. Cash ÷ monthly loss = 31,000 ÷ 1,280 = 24.2 months. The answer assumes the loss
         stays at 2025's rate; under plan A it would grow.
@@ -355,7 +355,7 @@ questions:
       command: calculate
       marks: 2
       subtopics: ['4.1']
-      prompt: Using Exhibit 1, calculate the growth in the value of bookings in 2025.
+      prompt: Using Exhibit 2, calculate the growth in the value of bookings in 2025.
       notes: >-
         Growth = (96,000 − 51,000) ÷ 51,000 × 100 = 88.2%. One mark for the method, one for the answer.
     - id: finance
@@ -416,7 +416,7 @@ analysis:
       R$90.00 it costs to win them; in Belo Horizonte, R$130.9, only 0.62 times the R$210.00 it costs (Exhibit A1).
     - >-
       Each year's growth has cost more than it earned: R$14,400k of marketing against R$8,640k of contribution in 2025 (Exhibit
-      1). At the 2025 rate of loss the company has 24.2 months of cash.
+      2). At the 2025 rate of loss the company has 24.2 months of cash.
     - >-
       Plan A still loses R$21,000k in 2027 and depends on raising again; plan B breaks even in 2027 but grows only 20% a year;
       plan C loses R$3,500k in 2027 but leaves R$41,900k in cash, enough to grow from (Exhibit 3).
@@ -537,12 +537,12 @@ analysis:
         - ['Rio de Janeiro (since 2024)', 150.00, 144.0, 0.96, 25.0]
         - ['Belo Horizonte (since 2025)', 210.00, 130.9, 0.62, 35.0]
       checks:
-        - { column: Cost to win a customer, is: '{ex-2|*|Cost to win a customer (R$)}' }
-        - { column: Lifetime value of a customer, is: '{@customer-contribution} / (1 - {ex-2|*|Customers who book again the next year (%)} / 100)' }
+        - { column: Cost to win a customer, is: '{ex-1|*|Cost to win a customer (R$)}' }
+        - { column: Lifetime value of a customer, is: '{@customer-contribution} / (1 - {ex-1|*|Customers who book again the next year (%)} / 100)' }
         - { column: Lifetime value ÷ cost to win, is: '{Lifetime value of a customer} / {Cost to win a customer}' }
         - { column: Months to repay the cost to win, is: '{Cost to win a customer} / ({@customer-contribution} / 12)' }
       note: Lifetime value is the yearly contribution of R$72 times the expected number of years a customer stays, 1 ÷ (1 − the share who book again). It is not discounted. These are measures beyond the IB course, used by investors in start-ups.
-      source: The Business Brief's analysis of Exhibit 2 (simulated data).
+      source: The Business Brief's analysis of Exhibit 1 (simulated data).
 
 course:
   subtopics:
@@ -584,7 +584,7 @@ beyond:
 sources: [bbr-method, bbr-penrose-1959]
 method: >-
   Mãozinha, its founders, its investors and the delivery app are fictional, and every figure is simulated for teaching,
-  though the cities are real. Revenue, contribution and results in Exhibit 1 follow from the value of bookings, the 18%
-  commission and the 50% contribution margin; the costs of winning customers in Exhibit 2 from marketing and new
+  though the cities are real. Revenue, contribution and results in Exhibit 2 follow from the value of bookings, the 18%
+  commission and the 50% contribution margin; the costs of winning customers in Exhibit 1 from marketing and new
   customers; the plans in Exhibit 3 from the stated assumptions; and the lifetime values in Exhibit A1 from the yearly
   contribution and the repeat rates. The integrity check reworks every figure on every build.

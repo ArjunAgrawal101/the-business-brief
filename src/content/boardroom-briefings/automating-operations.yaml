@@ -1,5 +1,5 @@
 # The Boardroom Briefings, No. 4. Tasman Loaf Company is fictional; every
-# figure is simulated. Exhibit 1's revenue and profit, Exhibit 3's fixed costs
+# figure is simulated. Exhibit 2's revenue and profit, Exhibit 3's fixed costs
 # and Exhibit 4's savings are worked by their checks from the figures below;
 # the appraisal in Exhibit A1 uses the guide's discount factors at 8% over the
 # line's seven-year life, and Exhibit A2 works break-even for each way of
@@ -40,13 +40,13 @@ background:
   - >
     The Whitmore family opened its first bakery in Auckland in 1962. Today Tasman Loaf Company runs one large plant in
     South Auckland with 260 employees on two shifts. It baked 18.2 million loaves in 2025 and sold them for an average of
-    NZ$2.10 each, earning revenue of NZ$38.2m and a profit of NZ$2.7m (Exhibit 1). Anna Whitmore, the third generation of
+    NZ$2.10 each, earning revenue of NZ$38.2m and a profit of NZ$2.7m (Exhibit 2). Anna Whitmore, the third generation of
     the family, has been managing director since 2021.
   - >
     The bakery's ovens are modern, but the end of the line is not. Loaves leave the slicers and baggers on a conveyor,
     and 28 packers place them in crates while 10 palletisers stack the crates, each up to a tonne an hour, onto pallets for
     the delivery trucks. The 38 roles cost NZ$2,366k a year. In 2025, nine of the hall's staff left, and seven lost time
-    to injuries (Exhibit 2). Rejected and returned loaves, mostly crushed or badly sealed, came to 2.4% of output.
+    to injuries (Exhibit 1). Rejected and returned loaves, mostly crushed or badly sealed, came to 2.4% of output.
   - >
     An engineering firm has proposed a robotic packing and palletising line with camera inspection, for NZ$4,200k or for a
     yearly fee under a lease that the bakery could end after three years. The food workers' union, which represents most
@@ -70,16 +70,16 @@ evidence:
   - kind: company
     title: A profitable bakery with thin margins
     body: >-
-      The bakery made NZ$2,688k of profit on NZ$38,220k of revenue in 2025 (Exhibit 1). Each loaf sold for NZ$2.10 and cost
+      The bakery made NZ$2,688k of profit on NZ$38,220k of revenue in 2025 (Exhibit 2). Each loaf sold for NZ$2.10 and cost
       NZ$1.46 in materials and direct labour, a contribution of NZ$0.64 towards fixed costs of NZ$8,960k.
-    exhibits: [ex-1]
+    exhibits: [ex-2]
   - kind: company
     title: A hard place to work
     body: >-
-      Nine of the 38 packing hall staff left in 2025, and there were seven lost-time injuries in palletising (Exhibit 2).
+      Nine of the 38 packing hall staff left in 2025, and there were seven lost-time injuries in palletising (Exhibit 1).
       High labour turnover means constant recruitment and training, and the injuries carry costs beyond the bakery's
       accounts.
-    exhibits: [ex-2]
+    exhibits: [ex-1]
   - kind: company
     title: The cost of each way forward
     body: >-
@@ -103,15 +103,15 @@ evidence:
 
 financials:
   summary: >-
-    Exhibit 1 gives the bakery's results for 2025. Exhibit 3 gives the price, variable cost per loaf and fixed costs under
+    Exhibit 2 gives the bakery's results for 2025. Exhibit 3 gives the price, variable cost per loaf and fixed costs under
     each way of running the line, for break-even analysis; buying the line adds depreciation over its seven-year life, the
     new technicians and a maintenance contract, while leasing adds the fee and the technicians. Exhibit 4 gives each
     proposal's capital cost, its net saving each year and its one-off cost in the first year. The bakery appraises
     investments at 8% over seven years.
-  exhibits: [ex-1, ex-3, ex-4]
+  exhibits: [ex-2, ex-3, ex-4]
 
 exhibits:
-  - id: ex-1
+  - id: ex-2
     title: Tasman Loaf Company in 2025
     kind: table
     provenance: simulated-data
@@ -130,7 +130,7 @@ exhibits:
       - { row: 'Profit (NZ$000)', is: '{Loaves sold (000)} * ({Average price to retailers (NZ$ a loaf)} - {Variable cost: ingredients, packaging and direct labour (NZ$ a loaf)}) - {Fixed costs (NZ$000)}' }
     source: Tasman Loaf Company's management accounts (simulated).
 
-  - id: ex-2
+  - id: ex-1
     title: The packing hall in 2025
     kind: table
     provenance: simulated-data
@@ -164,7 +164,7 @@ exhibits:
       - ['Automated, bought', 2.10, 1.33, 10706]
       - ['Automated, leased', 2.10, 1.33, 10916]
     checks:
-      - { column: Price (NZ$ a loaf), is: '{ex-1|Average price to retailers (NZ$ a loaf)|2025}' }
+      - { column: Price (NZ$ a loaf), is: '{ex-2|Average price to retailers (NZ$ a loaf)|2025}' }
       - { column: Variable cost (NZ$ a loaf), rows: ['Automated, bought', 'Automated, leased'], is: '{ex-3|Manual, as now|Variable cost (NZ$ a loaf)} - {@packing-labour-per-loaf}' }
       - { column: Fixed costs (NZ$000 a year), rows: ['Automated, bought'], is: '{ex-3|Manual, as now|Fixed costs (NZ$000 a year)} + {@depreciation} + {@technicians} + {@maintenance}' }
       - { column: Fixed costs (NZ$000 a year), rows: ['Automated, leased'], is: '{ex-3|Manual, as now|Fixed costs (NZ$000 a year)} + {@lease-fee} + {@technicians}' }
@@ -190,10 +190,10 @@ exhibits:
       - ['C. Lease the full robotic line', 0, 730, 520, 26]
       - ['D. Improve the manual line', 150, 220, 0, 0]
     checks:
-      - { column: Net saving a year (NZ$000), rows: ['A. Buy the full robotic line'], is: '{ex-2|Cost of the 38 roles (NZ$000)|2025} - {@technicians} - {@maintenance} + {@waste-saving}' }
-      - { column: Net saving a year (NZ$000), rows: ['B. Automate palletising only'], is: '{ex-2|Cost of the 10 palletising roles (NZ$000)|2025} - {@pallet-technicians} - {@pallet-maintenance} + {@injury-saving}' }
-      - { column: Net saving a year (NZ$000), rows: ['C. Lease the full robotic line'], is: '{ex-2|Cost of the 38 roles (NZ$000)|2025} - {@technicians} - {@lease-fee} + {@waste-saving}' }
-      - { column: Roles removed, rows: ['A. Buy the full robotic line', 'C. Lease the full robotic line'], is: '{ex-2|Average number employed in the hall|2025} - {@roles-after}' }
+      - { column: Net saving a year (NZ$000), rows: ['A. Buy the full robotic line'], is: '{ex-1|Cost of the 38 roles (NZ$000)|2025} - {@technicians} - {@maintenance} + {@waste-saving}' }
+      - { column: Net saving a year (NZ$000), rows: ['B. Automate palletising only'], is: '{ex-1|Cost of the 10 palletising roles (NZ$000)|2025} - {@pallet-technicians} - {@pallet-maintenance} + {@injury-saving}' }
+      - { column: Net saving a year (NZ$000), rows: ['C. Lease the full robotic line'], is: '{ex-1|Cost of the 38 roles (NZ$000)|2025} - {@technicians} - {@lease-fee} + {@waste-saving}' }
+      - { column: Roles removed, rows: ['A. Buy the full robotic line', 'C. Lease the full robotic line'], is: '{ex-1|Average number employed in the hall|2025} - {@roles-after}' }
     note: >-
       Savings include fewer rejected loaves (NZ$320k a year from the camera inspection under A and C) and, under B, fewer
       injuries (NZ$90k a year). One-off costs are retraining, redeployment and any voluntary redundancy. B keeps two
@@ -209,25 +209,25 @@ figures:
   - { id: technicians, label: Cost of 12 operators and technicians (NZ$000), value: 936, is: '{@roles-after} * {@technician-pay}' }
   - { id: maintenance, label: Maintenance contract for the bought line (NZ$000), value: 210 }
   - { id: lease-fee, label: Lease fee a year (NZ$000), value: 1020 }
-  - { id: packing-labour-per-loaf, label: Packing hall labour per loaf (NZ$), value: 0.13, is: '{ex-2|Cost of the 38 roles (NZ$000)|2025} / {ex-1|Loaves sold (000)|2025}' }
+  - { id: packing-labour-per-loaf, label: Packing hall labour per loaf (NZ$), value: 0.13, is: '{ex-1|Cost of the 38 roles (NZ$000)|2025} / {ex-2|Loaves sold (000)|2025}' }
   - { id: reject-cost, label: Cost of each rejected loaf (NZ$), value: 1.10 , decimals: 2 }
   - { id: target-reject-rate, label: Rejected loaves with camera inspection (%), value: 0.8 }
-  - { id: waste-saving, label: Saving from fewer rejected loaves (NZ$000), value: 320, is: '({ex-2|Loaves rejected or returned (% of output)|2025} - {@target-reject-rate}) / 100 * {ex-1|Loaves sold (000)|2025} * {@reject-cost}' }
+  - { id: waste-saving, label: Saving from fewer rejected loaves (NZ$000), value: 320, is: '({ex-1|Loaves rejected or returned (% of output)|2025} - {@target-reject-rate}) / 100 * {ex-2|Loaves sold (000)|2025} * {@reject-cost}' }
   - { id: pallet-technicians, label: 'Option B: two technicians (NZ$000)', value: 156, is: '2 * {@technician-pay}' }
   - { id: pallet-maintenance, label: 'Option B: maintenance contract (NZ$000)', value: 60 }
   - { id: injury-saving, label: 'Option B: saving from fewer injuries (NZ$000)', value: 90 }
-  - { id: turnover, label: Labour turnover in the packing hall (%), value: 23.7, is: '{ex-2|Staff who left during the year|2025} / {ex-2|Average number employed in the hall|2025} * 100' }
+  - { id: turnover, label: Labour turnover in the packing hall (%), value: 23.7, is: '{ex-1|Staff who left during the year|2025} / {ex-1|Average number employed in the hall|2025} * 100' }
   - { id: redeployed, label: Staff who could move to the new sourdough line, value: 10 }
   - { id: to-leave, label: Roles still to go after redeployment, value: 16, is: '{ex-4|A. Buy the full robotic line|Roles removed} - {@redeployed}' }
   - { id: phase-months, label: Months over which the line would be installed in phases, value: 18 }
-  - { id: leavers-in-phase, label: Leavers expected over 18 months at the 2025 rate, value: 13.5, is: '{ex-2|Staff who left during the year|2025} * {@phase-months} / 12' }
+  - { id: leavers-in-phase, label: Leavers expected over 18 months at the 2025 rate, value: 13.5, is: '{ex-1|Staff who left during the year|2025} * {@phase-months} / 12' }
   - { id: line-life, label: Life of the line (years), value: 7 }
   - { id: discount-rate, label: The bakery's discount rate (%), value: 8 }
   - { id: lean-cost, label: 'Option D: cost of training and lifting aids (NZ$000)', value: 150 }
   - { id: pv-lease-fees, label: Present value of seven years of lease fees at 8% (NZ$000), value: 5310.4, is: '{@lease-fee} * (df(8, 1) + df(8, 2) + df(8, 3) + df(8, 4) + df(8, 5) + df(8, 6) + df(8, 7))' }
   - { id: pv-buying, label: Present value of buying and maintaining the line at 8% (NZ$000), value: 5293.3, is: '4200 + {@maintenance} * (df(8, 1) + df(8, 2) + df(8, 3) + df(8, 4) + df(8, 5) + df(8, 6) + df(8, 7))' }
-  - { id: productivity-now, label: Loaves packed a year per hall worker now (000), value: 478.9, is: '{ex-1|Loaves sold (000)|2025} / {ex-2|Average number employed in the hall|2025}' }
-  - { id: productivity-after, label: Loaves packed a year per worker on the automated line (000), value: 1516.7, is: '{ex-1|Loaves sold (000)|2025} / {@roles-after}' }
+  - { id: productivity-now, label: Loaves packed a year per hall worker now (000), value: 478.9, is: '{ex-2|Loaves sold (000)|2025} / {ex-1|Average number employed in the hall|2025}' }
+  - { id: productivity-after, label: Loaves packed a year per worker on the automated line (000), value: 1516.7, is: '{ex-2|Loaves sold (000)|2025} / {@roles-after}' }
 
 stakeholders:
   - name: Anna Whitmore and the family board
@@ -296,7 +296,7 @@ options:
     requires: NZ$1,300k and two technicians.
     upside: Most of the injuries removed, eight roles affected rather than 26, and a smaller bet.
     risks: A saving of only NZ$494k a year, no camera inspection, and the packing roles' turnover and costs unchanged.
-    evidence: [ex-2, ex-4]
+    evidence: [ex-1, ex-4]
   - id: C
     label: Lease the full robotic line
     summary: >-
@@ -316,7 +316,7 @@ options:
     requires: Training and the staff's ideas; no new technology.
     upside: Jobs kept, a better working environment, and the cheapest option.
     risks: A saving of only NZ$220k a year; turnover and repetitive work remain; rivals that automate gain a cost advantage.
-    evidence: [ex-2, ex-4]
+    evidence: [ex-1, ex-4]
 
 criteria:
   - id: return
@@ -356,7 +356,7 @@ questions:
       marks: 2
       level: HL
       subtopics: ['2.4']
-      prompt: Using Exhibit 2, calculate the labour turnover in the packing hall in 2025.
+      prompt: Using Exhibit 1, calculate the labour turnover in the packing hall in 2025.
       notes: >-
         Labour turnover = staff who left ÷ average number employed × 100 = 9 ÷ 38 × 100 = 23.7%. At that rate about 13.5 people
         would leave over 18 months, which is why a phased installation could avoid most compulsory redundancies.
@@ -570,10 +570,10 @@ analysis:
       checks:
         - { column: Contribution (NZ$ a loaf), is: '{ex-3|*|Price (NZ$ a loaf)} - {ex-3|*|Variable cost (NZ$ a loaf)}' }
         - { column: Break-even quantity (000 loaves), is: '{ex-3|*|Fixed costs (NZ$000 a year)} / {Contribution (NZ$ a loaf)}' }
-        - { column: Margin of safety at 18.2 million loaves (000), is: '{ex-1|Loaves sold (000)|2025} - {Break-even quantity (000 loaves)}' }
-        - { column: Profit at 18.2 million loaves (NZ$000), is: '{ex-1|Loaves sold (000)|2025} * {Contribution (NZ$ a loaf)} - {ex-3|*|Fixed costs (NZ$000 a year)}' }
+        - { column: Margin of safety at 18.2 million loaves (000), is: '{ex-2|Loaves sold (000)|2025} - {Break-even quantity (000 loaves)}' }
+        - { column: Profit at 18.2 million loaves (NZ$000), is: '{ex-2|Loaves sold (000)|2025} * {Contribution (NZ$ a loaf)} - {ex-3|*|Fixed costs (NZ$000 a year)}' }
       note: Profit here leaves out the saving from fewer rejected loaves, NZ$320k a year under either automated line.
-      source: The Business Brief's analysis of Exhibits 1 and 3 (simulated data).
+      source: The Business Brief's analysis of Exhibits 2 and 3 (simulated data).
 
 course:
   subtopics:
@@ -617,7 +617,7 @@ beyond:
 sources: [bbr-method, bbr-autor-2015]
 method: >-
   Tasman Loaf Company, its people and the engineering firm are fictional, and every figure is simulated for teaching.
-  Revenue and profit in Exhibit 1 follow from the loaves sold, the price and the costs; the fixed costs in Exhibit 3 and the
+  Revenue and profit in Exhibit 2 follow from the loaves sold, the price and the costs; the fixed costs in Exhibit 3 and the
   savings in Exhibit 4 are built from the stated costs of the roles, the technicians, maintenance, the lease and fewer
   rejects; the appraisal uses the guide's discount factors at 8% over seven years. The integrity check reworks every
   figure on every build.

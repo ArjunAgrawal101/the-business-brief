@@ -1,5 +1,5 @@
 # The Boardroom Briefings, No. 3. Kittiwake Air is fictional; every figure is
-# simulated. Exhibit 1's profits, margins and ROCE, Exhibit 2's load factors
+# simulated. Exhibit 2's profits, margins and ROCE, Exhibit 1's load factors
 # and revenue per passenger, Exhibit 3's changes and Exhibit 4's contributions
 # and totals are worked by their checks. The options' effects in Exhibit 5 are
 # built from Exhibit 4 and the figures below; Exhibit A1 adds them to the
@@ -46,7 +46,7 @@ background:
   - >
     For most of its history the airline made steady profits. Then its costs rose faster than its fares: between 2023 and
     2025 its operating costs grew by 16.4% while its revenue grew by 8.1%, and its profit margin fell from 8.0% to 1.0%
-    (Exhibits 1 and 3). In 2024 a low-cost airline began flying between Halifax and Toronto, Kittiwake's busiest route, and
+    (Exhibits 2 and 3). In 2024 a low-cost airline began flying between Halifax and Toronto, Kittiwake's busiest route, and
     Kittiwake cut its fares there to keep its passengers.
   - >
     The airline is owned 60% by a regional pension fund and 40% by the founders' families. Both want it back in good
@@ -73,9 +73,9 @@ evidence:
     title: More passengers, thinner margins
     body: >-
       Revenue rose from C$172.0m to C$186.0m between 2023 and 2025, but operating profit fell from C$13.8m to C$1.9m, and
-      the return on capital employed from 23.0% to 3.0% (Exhibit 1). Revenue per passenger rose only slowly, from C$165.38
-      to C$170.64, while the load factor slipped from 68.4% to 66.5% (Exhibit 2).
-    exhibits: [ex-1, ex-2]
+      the return on capital employed from 23.0% to 3.0% (Exhibit 2). Revenue per passenger rose only slowly, from C$165.38
+      to C$170.64, while the load factor slipped from 68.4% to 66.5% (Exhibit 1).
+    exhibits: [ex-2, ex-1]
   - kind: company
     title: Where the costs rose
     body: >-
@@ -106,14 +106,14 @@ evidence:
 
 financials:
   summary: >-
-    Exhibit 1 gives the airline's results and returns for three years, and Exhibit 3 its operating costs by type. Exhibit 4
+    Exhibit 2 gives the airline's results and returns for three years, and Exhibit 3 its operating costs by type. Exhibit 4
     shows the contribution each route made in 2025, before the costs that cannot be charged to a route. Exhibit 5 gives the
     finance team's estimates of what each response would add to operating profit each year from 2027, and what it would
     cost once in 2026. If nothing changes, the team forecasts an operating loss of C$4.2m in 2027.
-  exhibits: [ex-1, ex-3, ex-4, ex-5]
+  exhibits: [ex-2, ex-3, ex-4, ex-5]
 
 exhibits:
-  - id: ex-1
+  - id: ex-2
     title: Kittiwake Air's results, 2023 to 2025 (C$m)
     kind: table
     provenance: simulated-data
@@ -136,7 +136,7 @@ exhibits:
     note: Operating profit is profit before interest and tax. The profit margin and ROCE are worked as on the guide's formula sheet.
     source: Kittiwake Air's annual accounts (simulated).
 
-  - id: ex-2
+  - id: ex-1
     title: Passengers, seats and fares, 2023 to 2025
     kind: table
     provenance: simulated-data
@@ -152,7 +152,7 @@ exhibits:
       - ['2025', 1090, 1640, 66.5, 170.64]
     checks:
       - { column: Load factor (%), is: '{Passengers (000)} / {Seats flown (000)} * 100' }
-      - { column: Revenue per passenger (C$), is: '{ex-1|*|Revenue} * 1000 / {Passengers (000)}' }
+      - { column: Revenue per passenger (C$), is: '{ex-2|*|Revenue} * 1000 / {Passengers (000)}' }
     note: The load factor is the share of the seats flown that carried a passenger, the airline's capacity utilization rate.
     source: Kittiwake Air's traffic records (simulated).
 
@@ -177,8 +177,8 @@ exhibits:
     checks:
       - { column: Change (%), is: '({2025} - {2023}) / {2023} * 100' }
       - { row: All operating costs, columns: ['2023', '2025'], is: '{Fuel} + {Staff} + {Maintenance} + {Airport and navigation charges} + {Aircraft leases} + {Sales and other costs}' }
-      - { row: All operating costs, columns: ['2023'], is: '{ex-1|2023|Operating costs}' }
-      - { row: All operating costs, columns: ['2025'], is: '{ex-1|2025|Operating costs}' }
+      - { row: All operating costs, columns: ['2023'], is: '{ex-2|2023|Operating costs}' }
+      - { row: All operating costs, columns: ['2025'], is: '{ex-2|2025|Operating costs}' }
     source: Kittiwake Air's management accounts (simulated).
 
   - id: ex-4
@@ -205,7 +205,7 @@ exhibits:
     checks:
       - { column: Contribution (C$m), is: '{Revenue (C$m)} - {Direct costs (C$m)}' }
       - { row: All routes, columns: [Passengers (000), Revenue (C$m), Direct costs (C$m)], is: '{Halifax to Toronto} + {Halifax to Montréal} + {Halifax to St. John''s} + {Halifax to Charlottetown} + {Halifax to Sydney} + {Labrador coast service} + {Charters and cargo}' }
-      - { row: All routes, columns: [Load factor (%)], is: '{ex-2|2025|Load factor (%)}' }
+      - { row: All routes, columns: [Load factor (%)], is: '{ex-1|2025|Load factor (%)}' }
     note: Direct costs are the costs a route causes, such as fuel, crews on the route, landing fees and maintenance by flying hour. Costs that cannot be charged to a route, such as head office and standby aircraft, came to C$10.5m. The Labrador coast service is flown under a contract with the provincial government that runs to 2028.
     source: Kittiwake Air's route profitability report (simulated).
 
@@ -238,12 +238,12 @@ exhibits:
 figures:
   - { id: founded, label: Year founded, value: 1998 }
   - { id: aircraft, label: Aircraft in the fleet, value: 14 }
-  - { id: passengers-2025, label: Passengers carried in 2025, value: 1090000, is: '{ex-2|2025|Passengers (000)} * 1000' }
+  - { id: passengers-2025, label: Passengers carried in 2025, value: 1090000, is: '{ex-1|2025|Passengers (000)} * 1000' }
   - { id: employees, label: Employees, value: 1150 }
   - { id: pension-stake, label: The pension fund's shareholding (%), value: 60 }
   - { id: family-stake, label: The founders' families' shareholding (%), value: 40 }
   - { id: old-aircraft-age, label: Age of the oldest aircraft (years), value: 25 }
-  - { id: overheads, label: Costs not charged to routes in 2025 (C$m), value: 10.5, is: '{ex-4|All routes|Contribution (C$m)} - {ex-1|2025|Operating profit}' }
+  - { id: overheads, label: Costs not charged to routes in 2025 (C$m), value: 10.5, is: '{ex-4|All routes|Contribution (C$m)} - {ex-2|2025|Operating profit}' }
   - { id: base-2027, label: Operating profit forecast for 2027 if nothing changes (C$m), value: -4.2 }
   - { id: toronto-fare-2023, label: 'Toronto: revenue per passenger in 2023 (C$)', value: 214 }
   - { id: toronto-fare-2025, label: 'Toronto: revenue per passenger in 2025 (C$)', value: 200.00, decimals: 2, is: '{ex-4|Halifax to Toronto|Revenue (C$m)} * 1000 / {ex-4|Halifax to Toronto|Passengers (000)}' }
@@ -265,7 +265,7 @@ figures:
   - { id: profit-a, label: 'Option A: operating profit in 2027 (C$m)', value: -1.3, is: '{@base-2027} + {ex-5|A. Cut the Sydney and Labrador routes|Added to operating profit each year from 2027}' }
   - { id: margin-c-2027, label: 'Option C: profit margin in 2027 on revenue of C$190.0m (%)', value: 2.5, is: '{ex-A1|C. Cut costs with the workforce, suppliers and a newer fleet|Operating profit in 2027} / 190.0 * 100' }
   - { id: revenue-2027, label: Revenue forecast for 2027 (C$m), value: 190.0, decimals: 1 }
-  - { id: revenue-growth, label: 'Revenue growth, 2023 to 2025 (%)', value: 8.1, is: '({ex-1|2025|Revenue} - {ex-1|2023|Revenue}) / {ex-1|2023|Revenue} * 100' }
+  - { id: revenue-growth, label: 'Revenue growth, 2023 to 2025 (%)', value: 8.1, is: '({ex-2|2025|Revenue} - {ex-2|2023|Revenue}) / {ex-2|2023|Revenue} * 100' }
   - { id: losing-routes, label: 'What Sydney and Labrador lost between them in 2025 (C$m)', value: 4.0, decimals: 1, is: '-{ex-4|Halifax to Sydney|Contribution (C$m)} - {ex-4|Labrador coast service|Contribution (C$m)}' }
   - { id: saving-without-rosters, label: 'Option C without a roster agreement: saving a year (C$m)', value: 5.1, is: '{@maintenance-saving} + {@fleet-saving}' }
   - { id: profit-without-rosters, label: 'Option C without a roster agreement: operating profit in 2027 (C$m)', value: 0.9, is: '{@base-2027} + {@saving-without-rosters}' }
@@ -343,7 +343,7 @@ options:
     risks: >-
       Passengers and the government may see it as exploiting a captive market; the elasticity is an estimate; and higher
       fares invite a competitor onto the best of these routes.
-    evidence: [ex-2, ex-4, ex-5]
+    evidence: [ex-1, ex-4, ex-5]
   - id: C
     label: Cut costs with the workforce, suppliers and a newer fleet
     summary: >-
@@ -393,7 +393,7 @@ questions:
       command: calculate
       marks: 4
       subtopics: ['3.5']
-      prompt: Using Exhibit 1, calculate Kittiwake Air's profit margin and its return on capital employed (ROCE) for 2025.
+      prompt: Using Exhibit 2, calculate Kittiwake Air's profit margin and its return on capital employed (ROCE) for 2025.
       notes: >-
         Profit margin = profit before interest and tax ÷ revenue × 100 = 1.9 ÷ 186.0 × 100 = 1.0%. ROCE = profit before
         interest and tax ÷ capital employed × 100 = 1.9 ÷ 64.0 × 100 = 3.0%. Two marks for each, with the working.
@@ -402,7 +402,7 @@ questions:
       marks: 4
       level: HL
       subtopics: ['5.6']
-      prompt: Using Exhibit 2, calculate the airline's capacity utilization rate (its load factor) in 2023 and in 2025.
+      prompt: Using Exhibit 1, calculate the airline's capacity utilization rate (its load factor) in 2023 and in 2025.
       notes: >-
         Capacity utilization rate = actual output ÷ productive capacity × 100, here passengers ÷ seats flown. 2023: 1,040 ÷
         1,520 × 100 = 68.4%. 2025: 1,090 ÷ 1,640 × 100 = 66.5%. The airline flew more seats but filled a smaller share of
@@ -465,7 +465,7 @@ analysis:
   evidence:
     - >-
       The fall in profit is a cost problem more than a revenue problem. Revenue grew by 8.1% between 2023 and 2025, but
-      maintenance rose by 34.3% and staff costs by 20.2% (Exhibit 3), and the load factor fell from 68.4% to 66.5% (Exhibit 2),
+      maintenance rose by 34.3% and staff costs by 20.2% (Exhibit 3), and the load factor fell from 68.4% to 66.5% (Exhibit 1),
       so each passenger carried more cost.
     - >-
       The losing routes are a small part of the problem. Sydney and Labrador lost C$4.0m between them, but cutting them saves
@@ -620,7 +620,7 @@ frameworks:
     use: Track the recovery on more than profit, including the load factor, relations with the workforce and the communities served.
 
 tools:
-  - { kind: calculator, id: profit-margin, use: Rework the profit margin for each year in Exhibit 1. }
+  - { kind: calculator, id: profit-margin, use: Rework the profit margin for each year in Exhibit 2. }
   - { kind: calculator, id: roce, use: Rework the return on capital employed. }
   - { kind: calculator, id: contribution, use: Work a route's contribution from its revenue and direct costs (HL). }
   - { kind: studio, id: generic-strategies, use: Place Kittiwake against the low-cost airline and the national carrier. }
@@ -638,6 +638,6 @@ beyond:
 sources: [bbr-method, bbr-porter-1980]
 method: >-
   Kittiwake Air, its people and its competitors are fictional, and every figure is simulated for teaching, though the
-  cities it flies to are real. The profits, margins and ROCE in Exhibit 1, the load factors in Exhibit 2, the changes in
+  cities it flies to are real. The profits, margins and ROCE in Exhibit 2, the load factors in Exhibit 1, the changes in
   Exhibit 3 and the contributions in Exhibit 4 are worked from the figures beside them; the effects in Exhibit 5 are built
   from Exhibit 4 and the finance team's stated estimates. The integrity check reworks every figure on every build.

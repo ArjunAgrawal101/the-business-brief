@@ -1,6 +1,6 @@
 # The Boardroom Briefings, No. 7. Scholarline Learning Centres and Tutora are
-# fictional; every figure is simulated. Exhibit 1's totals, revenue per
-# student and margins, Exhibit 3's totals and Exhibit 4's effects are worked
+# fictional; every figure is simulated. Exhibit 3's totals, revenue per
+# student and margins, Exhibit 2's totals and Exhibit 4's effects are worked
 # by their checks; Exhibit A1 adds each effect to the forecast for 2027.
 
 number: 7
@@ -47,7 +47,7 @@ background:
     weak at first on essays and exam technique, but it has improved quickly, and it is popular with secondary students.
   - >
     Scholarline's secondary enrolments fell from 5,400 in 2023 to 4,100 in 2025, while primary enrolments held up (Exhibit
-    2). Revenue fell from S$33.3m to S$28.6m, and operating profit from S$6.0m to S$3.4m (Exhibit 1). In 2025 three centres
+    1). Revenue fell from S$33.3m to S$28.6m, and operating profit from S$6.0m to S$3.4m (Exhibit 3). In 2025 three centres
     tried a hybrid model, in which students practised on an AI platform between classes and tutors used its data to plan
     their lessons.
 
@@ -69,22 +69,22 @@ evidence:
   - kind: company
     title: The decline is in secondary tuition
     body: >-
-      Between 2023 and 2025 secondary enrolments fell by 24.1% while primary enrolments rose by 2.8% (Exhibit 2). The
-      operating profit margin fell from 18.0% to 12.0% as fixed costs were spread over fewer students (Exhibit 1).
-    exhibits: [ex-1, ex-2]
+      Between 2023 and 2025 secondary enrolments fell by 24.1% while primary enrolments rose by 2.8% (Exhibit 1). The
+      operating profit margin fell from 18.0% to 12.0% as fixed costs were spread over fewer students (Exhibit 3).
+    exhibits: [ex-3, ex-1]
   - kind: company
     title: Why families left
     body: >-
       Of 640 parents who left in 2025, 34% gave price as the main reason and 29% said their child had switched to an app;
-      only 18% moved to another tuition centre (Exhibit 3). Among 1,200 current parents, 46% already use an app alongside
+      only 18% moved to another tuition centre (Exhibit 2). Among 1,200 current parents, 46% already use an app alongside
       Scholarline, and 38% would pay more for exam-focused coaching in smaller groups.
-    exhibits: [ex-3]
+    exhibits: [ex-2]
   - kind: company
     title: The hybrid pilot
     body: >-
       In the three pilot centres, 91% of students stayed into the next term, against 82% elsewhere, and tutors spent 20% less
-      time marking (Exhibit 3). Parents said they valued the tutors more, not less, once the practice moved to the app.
-    exhibits: [ex-3]
+      time marking (Exhibit 2). Parents said they valued the tutors more, not less, once the practice moved to the app.
+    exhibits: [ex-2]
   - kind: research
     title: Disruption starts at the bottom of a market
     body: >-
@@ -102,13 +102,13 @@ evidence:
 
 financials:
   summary: >-
-    Exhibit 1 gives three years of enrolments, revenue and operating profit. Exhibit 4 gives the management team's estimates
+    Exhibit 3 gives three years of enrolments, revenue and operating profit. Exhibit 4 gives the management team's estimates
     of how each response would change revenue and costs in 2027. If nothing changes, the team forecasts an operating profit
     of S$1,200k in 2027, as secondary enrolments keep falling.
-  exhibits: [ex-1, ex-4]
+  exhibits: [ex-3, ex-4]
 
 exhibits:
-  - id: ex-1
+  - id: ex-3
     title: Scholarline's results, 2023 to 2025 (S$000)
     kind: table
     provenance: simulated-data
@@ -124,12 +124,12 @@ exhibits:
       - ['2024', 8400, 30900, 3678.6, 4635, 15.0]
       - ['2025', 7800, 28600, 3666.7, 3432, 12.0]
     checks:
-      - { column: Students, is: '{ex-2|*|All students}' }
+      - { column: Students, is: '{ex-1|*|All students}' }
       - { column: Revenue per student (S$), is: '{Revenue} * 1000 / {Students}' }
       - { column: Operating profit margin (%), is: '{Operating profit} / {Revenue} * 100' }
     source: Scholarline's management accounts (simulated).
 
-  - id: ex-2
+  - id: ex-1
     title: Students by level, 2023 to 2025
     kind: table
     provenance: simulated-data
@@ -148,7 +148,7 @@ exhibits:
     note: Students enrolled at the start of the school year. A student taking two subjects is counted once.
     source: Scholarline's enrolment records (simulated).
 
-  - id: ex-3
+  - id: ex-2
     title: What parents said, and what the pilot found, 2025
     kind: table
     provenance: simulated-data
@@ -189,8 +189,8 @@ exhibits:
     checks:
       - { column: Effect on operating profit, is: '{Revenue gained} - {Revenue lost} - {Costs added} + {Costs saved}' }
       - { column: Revenue gained, rows: ['A. Launch a cheap online tier'], is: '{@online-students} * {@online-fee} * 12 / 1000' }
-      - { column: Revenue lost, rows: ['A. Launch a cheap online tier'], is: '{@downgrades} * ({ex-1|2025|Revenue} * 1000 / {ex-1|2025|Students} - {@online-fee} * 12) / 1000' }
-      - { column: Revenue gained, rows: ['D. Rebuild the centres as hybrid learning'], is: '{@students-kept} * {ex-1|2025|Revenue per student (S$)} / 1000' }
+      - { column: Revenue lost, rows: ['A. Launch a cheap online tier'], is: '{@downgrades} * ({ex-3|2025|Revenue} * 1000 / {ex-3|2025|Students} - {@online-fee} * 12) / 1000' }
+      - { column: Revenue gained, rows: ['D. Rebuild the centres as hybrid learning'], is: '{@students-kept} * {ex-3|2025|Revenue per student (S$)} / 1000' }
     note: >-
       A wins 2,000 online students at S$49 a month but 400 existing students move down to it. B raises fees by 15% for
       smaller exam groups, loses students at the six centres it closes, and saves their rent and staff. C spends S$1,550k a year
@@ -205,10 +205,10 @@ figures:
   - { id: group-size, label: Largest group, value: 8 }
   - { id: fee, label: Monthly fee a subject (S$), value: 380 }
   - { id: app-price, label: Tutora's monthly price (S$), value: 29 }
-  - { id: secondary-2023, label: Secondary students in 2023, value: 5400, is: '{ex-2|2023|Lower secondary} + {ex-2|2023|Upper secondary}' }
-  - { id: secondary-2025, label: Secondary students in 2025, value: 4100, is: '{ex-2|2025|Lower secondary} + {ex-2|2025|Upper secondary}' }
+  - { id: secondary-2023, label: Secondary students in 2023, value: 5400, is: '{ex-1|2023|Lower secondary} + {ex-1|2023|Upper secondary}' }
+  - { id: secondary-2025, label: Secondary students in 2025, value: 4100, is: '{ex-1|2025|Lower secondary} + {ex-1|2025|Upper secondary}' }
   - { id: secondary-change, label: 'Change in secondary students, 2023 to 2025 (%)', value: -24.1, is: '({@secondary-2025} - {@secondary-2023}) / {@secondary-2023} * 100' }
-  - { id: primary-change, label: 'Change in primary students, 2023 to 2025 (%)', value: 2.8, is: '({ex-2|2025|Primary} - {ex-2|2023|Primary}) / {ex-2|2023|Primary} * 100' }
+  - { id: primary-change, label: 'Change in primary students, 2023 to 2025 (%)', value: 2.8, is: '({ex-1|2025|Primary} - {ex-1|2023|Primary}) / {ex-1|2023|Primary} * 100' }
   - { id: leavers-surveyed, label: Leavers surveyed, value: 640 }
   - { id: parents-surveyed, label: Current parents surveyed, value: 1200 }
   - { id: base-2027, label: Operating profit forecast for 2027 if nothing changes (S$000), value: 1200 }
@@ -221,7 +221,7 @@ figures:
   - { id: platform-licence, label: 'Option D: AI platform licence a year (S$000)', value: 1000 }
   - { id: tutor-training, label: 'Option D: tutor training (S$000)', value: 300 }
   - { id: c-budget, label: 'Option C: budget over two years (S$000)', value: 2500 }
-  - { id: retention-gain, label: Retention gain in the pilot (percentage points), value: 9, is: '{ex-3|Pilot centres: students staying into the next term|Per cent} - {ex-3|Other centres: students staying into the next term|Per cent}' }
+  - { id: retention-gain, label: Retention gain in the pilot (percentage points), value: 9, is: '{ex-2|Pilot centres: students staying into the next term|Per cent} - {ex-2|Other centres: students staying into the next term|Per cent}' }
   - { id: price-ratio, label: Scholarline's fee as a multiple of the app's price, value: 13.1, is: '{@fee} / {@app-price}' }
 
 stakeholders:
@@ -276,7 +276,7 @@ options:
     risks: >-
       It sells at a low price what the centres sell at a high one, so existing students move down to it; it competes with the
       app on the app's terms; and it is run by people whose skills and habits fit the centres.
-    evidence: [ex-3, ex-4]
+    evidence: [ex-2, ex-4]
   - id: B
     label: Move upmarket and close six centres
     summary: >-
@@ -287,7 +287,7 @@ options:
     risks: >-
       A smaller business serving a narrower market, while the app keeps improving at exactly the exam skills that justify
       the premium; six centres' staff and students lost.
-    evidence: [ex-3, ex-4]
+    evidence: [ex-2, ex-4]
   - id: C
     label: Set up a separate digital business
     summary: >-
@@ -307,7 +307,7 @@ options:
     risks: >-
       Dependence on a platform owned by others, possibly the disruptor itself; tutors who resist; and no answer for families
       who want only the cheapest option.
-    evidence: [ex-3, ex-4]
+    evidence: [ex-2, ex-4]
 
 criteria:
   - id: core
@@ -337,7 +337,7 @@ questions:
       command: calculate
       marks: 4
       subtopics: ['4.1']
-      prompt: Using Exhibit 2, calculate the percentage change in Scholarline's secondary students and in its primary students between 2023 and 2025.
+      prompt: Using Exhibit 1, calculate the percentage change in Scholarline's secondary students and in its primary students between 2023 and 2025.
       notes: >-
         Secondary: 5,400 in 2023 (2,500 + 2,900) and 4,100 in 2025 (1,900 + 2,200); (4,100 − 5,400) ÷ 5,400 × 100 = −24.1%.
         Primary: (3,700 − 3,600) ÷ 3,600 × 100 = 2.8%. Two marks for each.
@@ -345,7 +345,7 @@ questions:
       command: calculate
       marks: 2
       subtopics: ['3.5']
-      prompt: Using Exhibit 1, calculate Scholarline's operating profit margin in 2023 and in 2025.
+      prompt: Using Exhibit 3, calculate Scholarline's operating profit margin in 2023 and in 2025.
       notes: >-
         2023: 5,994 ÷ 33,300 × 100 = 18.0%. 2025: 3,432 ÷ 28,600 × 100 = 12.0%. One mark for each.
     - id: disruptive
@@ -406,10 +406,10 @@ analysis:
   evidence:
     - >-
       The decline is concentrated where the app is strongest: secondary students fell by 24.1% between 2023 and 2025, while
-      primary students rose by 2.8% (Exhibit 2).
+      primary students rose by 2.8% (Exhibit 1).
     - >-
       Families are not rejecting tuition so much as combining it with software: 46% of current parents already use an app
-      alongside Scholarline, and only 18% of leavers moved to another centre (Exhibit 3).
+      alongside Scholarline, and only 18% of leavers moved to another centre (Exhibit 2).
     - >-
       The pilot is the strongest evidence in the case: retention rose to 91% from 82%, a gain of 9 percentage points, and
       tutors' marking time fell by 20%. Applied to every centre, that keeps about 700 more students a year.
@@ -579,6 +579,6 @@ beyond:
 sources: [bbr-method, bbr-christensen-1997, bbr-porter-1980]
 method: >-
   Scholarline Learning Centres, Tutora and their people are fictional, and every figure is simulated for teaching. The
-  totals, revenue per student and margins in Exhibits 1 and 2, and each response's effect in Exhibit 4, are worked from the
+  totals, revenue per student and margins in Exhibits 3 and 1, and each response's effect in Exhibit 4, are worked from the
   figures beside them and the management team's stated estimates; Exhibit A1 adds each effect to the forecast for 2027. The
   integrity check reworks every figure on every build.

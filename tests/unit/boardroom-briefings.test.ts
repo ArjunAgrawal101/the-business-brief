@@ -255,10 +255,31 @@ describe('the integrity check catches', () => {
 
   it('a cell that its check does not rework', () => {
     const msgs = mutate((b) => {
-      const row = b.exhibits.find((e) => e.id === 'ex-1')!.rows![2]!;
+      const row = b.exhibits.find((e) => e.id === 'ex-3')!.rows![2]!;
       row[4] = 11.0; // 2025's operating margin, really 10.0
     });
     expect(msgs.some((m) => m.includes('row "2025", column "Operating profit margin (%)": printed 11'))).toBe(true);
+  });
+
+  it('exhibits numbered out of the order the page shows them', () => {
+    // No. 1 keeps its financial exhibit 3 first in the file, but the page
+    // shows the evidence exhibits (1 and 2) before the financial ones (3 and
+    // 4), so the order of the file alone is no fault.
+    expect(items[id]!.exhibits.map((e) => e.id)).toEqual(['ex-3', 'ex-1', 'ex-2', 'ex-4']);
+    const sorted = mutate((b) => {
+      b.exhibits.sort((x, y) => x.id.localeCompare(y.id));
+    });
+    expect(sorted.filter((m) => m.includes('numbered in the order'))).toEqual([]);
+    const swapped = mutate((b) => {
+      const one = b.exhibits.find((e) => e.id === 'ex-1')!;
+      const two = b.exhibits.find((e) => e.id === 'ex-2')!;
+      [one.id, two.id] = ['ex-2', 'ex-1'];
+    });
+    expect(swapped).toContain("the case's exhibits must be numbered in the order the page shows them, the evidence exhibits and then the financial ones; the page would show ex-2, ex-1, ex-3, ex-4");
+    const reversed = mutate((b) => {
+      b.analysis.exhibits.reverse();
+    });
+    expect(reversed).toContain("the analysis's exhibits must be numbered in the order the page shows them; the page would show ex-A2, ex-A1");
   });
 
   it('a declared figure that does not work out', () => {
@@ -391,8 +412,8 @@ describe('No. 1, international market entry', () => {
   it('keeps the margins, the orders and the survey consistent', () => {
     expect(r1(profitMargin(3860, 38600))).toBe(10);
     expect(r1(percentChange(520, 1140))).toBe(119.2);
-    expect(r2(cell(b, 'ex-2', 'Online orders shipped to Japan, full year', 'Revenue (£000)') * 1000 / 13400)).toBe(85.07);
-    const prefer = ['drugstore', 'department store', 'online'].map((w) => cell(b, 'ex-3', `Prefer to buy skincare ${w === 'online' ? 'online' : `in a ${w}`}`, 'Answering yes (%)'));
+    expect(r2(cell(b, 'ex-1', 'Online orders shipped to Japan, full year', 'Revenue (£000)') * 1000 / 13400)).toBe(85.07);
+    const prefer = ['drugstore', 'department store', 'online'].map((w) => cell(b, 'ex-2', `Prefer to buy skincare ${w === 'online' ? 'online' : `in a ${w}`}`, 'Answering yes (%)'));
     expect(prefer.reduce((s, x) => s + x, 0)).toBe(100);
   });
 });
@@ -402,8 +423,8 @@ describe('No. 2, acquiring a competitor', () => {
 
   it('gives each operator its market share and the market its growth', () => {
     const total = 600;
-    expect(r1(marketShare(cell(b, 'ex-2', 'Quarrystone Climbing (four Dublin centres)', '2025'), total))).toBe(38);
-    expect(r1(marketShare(cell(b, 'ex-2', 'Brackenhold Bouldering (three centres)', '2025'), total))).toBe(27);
+    expect(r1(marketShare(cell(b, 'ex-1', 'Quarrystone Climbing (four Dublin centres)', '2025'), total))).toBe(38);
+    expect(r1(marketShare(cell(b, 'ex-1', 'Brackenhold Bouldering (three centres)', '2025'), total))).toBe(27);
     expect(r1(growthRate(560, 600))).toBe(7.1);
   });
 
@@ -505,10 +526,10 @@ describe('No. 6, growth or profitability', () => {
 
   it('works each city\'s lifetime value with the Entrepreneurship Lab\'s model', () => {
     const city = (row: string) => {
-      const retention = cell(b, 'ex-2', row, 'Customers who book again the next year (%)');
+      const retention = cell(b, 'ex-1', row, 'Customers who book again the next year (%)');
       const u = unitEconomics({
-        spend: cell(b, 'ex-2', row, 'Marketing (R$000)') * 1000,
-        customers: cell(b, 'ex-2', row, 'New customers'),
+        spend: cell(b, 'ex-1', row, 'Marketing (R$000)') * 1000,
+        customers: cell(b, 'ex-1', row, 'New customers'),
         revenue: 72 / 12,
         variableCost: 0,
         churn: ((100 - retention) / 12),
@@ -584,8 +605,8 @@ describe('No. 10, reputational damage', () => {
 
   it('weights the recycled content by the units sold', () => {
     const rows = ['Fleeces', 'Jackets', 'T-shirts and tops', 'Trousers'];
-    const units = rows.map((r) => cell(b, 'ex-3', r, 'Units sold in 2025 (000)'));
-    const content = rows.map((r) => cell(b, 'ex-3', r, 'Recycled content (%)'));
+    const units = rows.map((r) => cell(b, 'ex-2', r, 'Units sold in 2025 (000)'));
+    const content = rows.map((r) => cell(b, 'ex-2', r, 'Recycled content (%)'));
     const weighted = units.reduce((s, u, i) => s + u * (content[i] ?? 0), 0) / units.reduce((s, u) => s + u, 0);
     expect(r1(weighted)).toBe(61.6);
     expect(r1(content.reduce((s, x) => s + x, 0) / content.length)).toBe(61);

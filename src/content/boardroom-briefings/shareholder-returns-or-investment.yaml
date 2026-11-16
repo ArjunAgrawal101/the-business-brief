@@ -1,6 +1,6 @@
 # The Boardroom Briefings, No. 9. Velmar Components AG and Granite Lake Capital
-# are fictional; every figure is simulated. Exhibit 1's margins, dividends and
-# retained profit, Exhibit 2's per-share figures and Exhibit 3's shares are
+# are fictional; every figure is simulated. Exhibit 2's margins, dividends and
+# retained profit, Exhibit 3's per-share figures and Exhibit 1's shares are
 # worked by their checks; Exhibit A1 gives the plant's NPV at 8% over ten
 # years in each case, with the guide's discount factors, and Exhibit A2 the
 # effect of each option on earnings per share and gearing.
@@ -41,12 +41,12 @@ background:
   - >
     Velmar Components was founded in Stuttgart in 1952 and listed on the stock exchange in 1998. It supplies five car makers
     in Europe, employs 9,400 people in four countries and earned revenue of €3,850m in 2025, with an EBIT margin of 9.0%
-    (Exhibit 1). It has paid 40% of its net profit as dividends for a decade, and ended 2025 with €780m of cash and €300m of
-    borrowing (Exhibit 2).
+    (Exhibit 2). It has paid 40% of its net profit as dividends for a decade, and ended 2025 with €780m of cash and €300m of
+    borrowing (Exhibit 3).
   - >
     Its products are changing under it. Exhaust systems and fuel pumps, which electric cars do not need, still brought 82.0% of
     revenue in 2025, but that revenue fell slightly between 2023 and 2025, while revenue from battery cooling systems rose by
-    59.7% (Exhibit 3). Three of Velmar's five largest customers have said they will stop developing new petrol and diesel
+    59.7% (Exhibit 1). Three of Velmar's five largest customers have said they will stop developing new petrol and diesel
     engines within the decade.
   - >
     In 2026 Granite Lake Capital, an activist fund, bought 6.0% of the shares and wrote to the board. It wants €400m returned
@@ -74,16 +74,16 @@ evidence:
   - kind: company
     title: Profits that rise, a market that shrinks
     body: >-
-      Revenue rose from €3,620m in 2023 to €3,850m in 2025 and the EBIT margin from 8.0% to 9.0% (Exhibit 1). But revenue
+      Revenue rose from €3,620m in 2023 to €3,850m in 2025 and the EBIT margin from 8.0% to 9.0% (Exhibit 2). But revenue
       from combustion products fell by 0.9% over the same years, and their share of revenue fell from 88.0% to 82.0% (Exhibit
-      3). Today's profits come from the products with the least future.
-    exhibits: [ex-1, ex-3]
+      1). Today's profits come from the products with the least future.
+    exhibits: [ex-2, ex-1]
   - kind: company
     title: Cash the company has not needed
     body: >-
-      Free cash flow reached €210m in 2025, and net cash stands at €480m (Exhibits 1 and 2). At a share price of €62.00 the
+      Free cash flow reached €210m in 2025, and net cash stands at €480m (Exhibits 2 and 3). At a share price of €62.00 the
       company is valued at €3,100m, 13.4 times its earnings per share of €4.62.
-    exhibits: [ex-1, ex-2]
+    exhibits: [ex-2, ex-3]
   - kind: company
     title: A plant that pays only if the contract comes
     body: >-
@@ -107,14 +107,14 @@ evidence:
 
 financials:
   summary: >-
-    Exhibit 1 gives three years of results: revenue, EBIT, net profit, dividends, retained profit and free cash flow.
-    Exhibit 2 gives the balance sheet figures and the share figures for 2025, and Exhibit 3 the revenue from each product
+    Exhibit 2 gives three years of results: revenue, EBIT, net profit, dividends, retained profit and free cash flow.
+    Exhibit 3 gives the balance sheet figures and the share figures for 2025, and Exhibit 1 the revenue from each product
     line. Exhibit 4 gives the forecast cash flows of the new plant over ten years, with and without the contract it depends
     on. Velmar appraises investments at 8%.
-  exhibits: [ex-1, ex-2, ex-4]
+  exhibits: [ex-2, ex-3, ex-4]
 
 exhibits:
-  - id: ex-1
+  - id: ex-2
     title: Velmar's results, 2023 to 2025 (€m)
     kind: table
     provenance: simulated-data
@@ -138,7 +138,7 @@ exhibits:
     note: EBIT is earnings before interest and tax. Free cash flow is the cash from operations left after the investment needed to keep the existing business running.
     source: Velmar's annual reports (simulated).
 
-  - id: ex-2
+  - id: ex-3
     title: Velmar's balance sheet and shares at the end of 2025
     kind: table
     provenance: simulated-data
@@ -157,13 +157,13 @@ exhibits:
       - ['Gearing ratio (%)', 12.3]
     checks:
       - { row: 'Net cash (€m)', is: '{Cash (€m)} - {Borrowings, due after more than a year (€m)}' }
-      - { row: 'Earnings per share (€)', is: '{ex-1|2025|Net profit} / {Shares in issue (millions)}' }
-      - { row: 'Dividend per share (€)', is: '{ex-1|2025|Dividends} / {Shares in issue (millions)}' }
+      - { row: 'Earnings per share (€)', is: '{ex-2|2025|Net profit} / {Shares in issue (millions)}' }
+      - { row: 'Dividend per share (€)', is: '{ex-2|2025|Dividends} / {Shares in issue (millions)}' }
       - { row: 'Gearing ratio (%)', is: '{Borrowings, due after more than a year (€m)} / ({Borrowings, due after more than a year (€m)} + {Equity (€m)}) * 100' }
     note: Earnings per share and the dividend per share are measures beyond the IB course; the gearing ratio is on the guide's formula sheet (HL).
     source: Velmar's annual report and the stock exchange price on 30 December 2025 (simulated).
 
-  - id: ex-3
+  - id: ex-1
     title: Revenue by product line, 2023 and 2025 (€m)
     kind: table
     provenance: simulated-data
@@ -180,8 +180,8 @@ exhibits:
       - ['All products', 3620, 100.0, 3850, 100.0, 6.4]
     totals: ['All products']
     checks:
-      - { column: Share in 2023 (%), is: '{2023} / {ex-3|All products|2023} * 100' }
-      - { column: Share in 2025 (%), is: '{2025} / {ex-3|All products|2025} * 100' }
+      - { column: Share in 2023 (%), is: '{2023} / {ex-1|All products|2023} * 100' }
+      - { column: Share in 2025 (%), is: '{2025} / {ex-1|All products|2025} * 100' }
       - { column: Change (%), is: '({2025} - {2023}) / {2023} * 100' }
       - { row: All products, columns: ['2023', '2025'], is: '{Exhaust systems and fuel pumps (petrol and diesel)} + {Battery cooling systems (electric vehicles)}' }
     source: Velmar's segment reporting (simulated).
@@ -224,8 +224,8 @@ figures:
   - { id: phase-two, label: Cost of the second phase (€m), value: 350 }
   - { id: early-sales, label: Cash from early sales in year 2 (€m), value: 60 }
   - { id: win-chance, label: Chance of winning the contract (%), value: 60 }
-  - { id: market-value, label: Market value of the company (€m), value: 3100, is: '{ex-2|Share price (€)|2025} * {ex-2|Shares in issue (millions)|2025}' }
-  - { id: pe-ratio, label: Share price as a multiple of earnings per share, value: 13.4, is: '{ex-2|Share price (€)|2025} / {ex-2|Earnings per share (€)|2025}' }
+  - { id: market-value, label: Market value of the company (€m), value: 3100, is: '{ex-3|Share price (€)|2025} * {ex-3|Shares in issue (millions)|2025}' }
+  - { id: pe-ratio, label: Share price as a multiple of earnings per share, value: 13.4, is: '{ex-3|Share price (€)|2025} / {ex-3|Earnings per share (€)|2025}' }
   - { id: c-buyback, label: 'Option C: buyback (€m)', value: 100 }
   - { id: bond, label: 'Option D: bonds issued (€m)', value: 400 }
   - { id: bond-rate, label: 'Option D: interest on the bonds (%)', value: 5 }
@@ -233,9 +233,9 @@ figures:
   - { id: cash-yield, label: Interest earned on cash (%), value: 3 }
   - { id: tax-rate, label: Tax rate on profit (%), value: 30 }
   - { id: lost-interest, label: Interest lost after tax if €400m of cash is spent (€m), value: 8.4, is: '{@buyback} * {@cash-yield} / 100 * (1 - {@tax-rate} / 100)' }
-  - { id: a-dividends, label: 'Option A: dividends at a 60% payout on 2025 profit (€m)', value: 138.6, is: '{ex-1|2025|Net profit} * {@activist-payout} / 100' }
-  - { id: d-borrowing, label: 'Option D: borrowing after the bonds are issued (€m)', value: 700, is: '{ex-2|Borrowings, due after more than a year (€m)|2025} + {@bond}' }
-  - { id: d-equity, label: 'Option D: equity after the buyback (€m)', value: 1740, is: '{ex-2|Equity (€m)|2025} - {@buyback}' }
+  - { id: a-dividends, label: 'Option A: dividends at a 60% payout on 2025 profit (€m)', value: 138.6, is: '{ex-2|2025|Net profit} * {@activist-payout} / 100' }
+  - { id: d-borrowing, label: 'Option D: borrowing after the bonds are issued (€m)', value: 700, is: '{ex-3|Borrowings, due after more than a year (€m)|2025} + {@bond}' }
+  - { id: d-equity, label: 'Option D: equity after the buyback (€m)', value: 1740, is: '{ex-3|Equity (€m)|2025} - {@buyback}' }
   - { id: combustion-customers, label: Largest customers planning to stop developing combustion engines, value: 3 }
 
 stakeholders:
@@ -295,7 +295,7 @@ options:
     requires: The supervisory board's agreement, and a decision not to build the new plant.
     upside: The activist satisfied, earnings per share up from €4.62 to €5.11, and no risk of an overrun.
     risks: A company that shrinks with its combustion products; the next generation of contracts lost; employees left without a future plan.
-    evidence: [ex-2, ex-3]
+    evidence: [ex-3, ex-1]
   - id: B
     label: Invest it all in the plant
     summary: >-
@@ -322,7 +322,7 @@ options:
     risks: >-
       Borrowing rises from €300m to €700m and gearing from 12.3% to 28.7%, while the plant's success is uncertain; €20m a year of
       interest; little room left if the business turns down.
-    evidence: [ex-2, ex-4]
+    evidence: [ex-3, ex-4]
 
 criteria:
   - id: value
@@ -352,7 +352,7 @@ questions:
       command: calculate
       marks: 4
       subtopics: ['3.4']
-      prompt: Using Exhibit 1, calculate Velmar's retained profit in 2025, and the dividends it would pay if it raised the payout to 60% of net profit.
+      prompt: Using Exhibit 2, calculate Velmar's retained profit in 2025, and the dividends it would pay if it raised the payout to 60% of net profit.
       notes: >-
         Retained profit = net profit − dividends = 231.0 − 92.4 = €138.6m. At a 60% payout, dividends would be 231.0 × 60 ÷ 100 =
         €138.6m, leaving €92.4m retained: the two figures swap. Two marks for each.
@@ -361,7 +361,7 @@ questions:
       marks: 4
       level: HL
       subtopics: ['3.6']
-      prompt: Using Exhibit 2, calculate Velmar's gearing ratio at the end of 2025, and what it would be under option D.
+      prompt: Using Exhibit 3, calculate Velmar's gearing ratio at the end of 2025, and what it would be under option D.
       notes: >-
         Now: 300 ÷ (300 + 2,140) × 100 = 12.3%. Under D, borrowing rises to €700m and the buyback cuts equity by €400m to
         €1,740m: 700 ÷ (700 + 1,740) × 100 = 28.7%. Two marks for each.
@@ -421,7 +421,7 @@ analysis:
   evidence:
     - >-
       Velmar's profits come from products with a shrinking future: combustion products are 82.0% of revenue, and revenue from
-      them fell by 0.9% between 2023 and 2025 while battery cooling systems grew by 59.7% (Exhibit 3).
+      them fell by 0.9% between 2023 and 2025 while battery cooling systems grew by 59.7% (Exhibit 1).
     - >-
       The plant has a positive expected value either way it is built, but staging is worth more: an expected NPV of €208.0m
       against €127.0m, and €50.5m rather than −€120.3m if the contract is lost (Exhibit A1).
@@ -430,7 +430,7 @@ analysis:
       A, but net profit would fall by €8.4m of lost interest, and nothing would replace the combustion business (Exhibit A2).
     - >-
       The company can afford to stage the plant and keep paying dividends. Net cash is €480m and free cash flow was €210m in
-      2025 (Exhibits 1 and 2).
+      2025 (Exhibits 2 and 3).
   assumptions:
     - assumption: The chance of winning the contract is 60%.
       test: It is the finance team's judgement. At what chance would building it all at once (B) be better than staging? Ask the car maker for its timetable and its shortlist.
@@ -565,20 +565,20 @@ analysis:
         - ['C. Buy back €100m', 1.61, 48.39, 4.73, 12.8]
         - ['D. Borrow €400m for the buyback', 6.45, 43.55, 4.98, 28.7]
       checks:
-        - { column: Shares left (millions), is: '{ex-2|Shares in issue (millions)|2025} - {Shares bought back (millions)}' }
-        - { column: Shares bought back (millions), rows: ['A. Buy back €400m', 'D. Borrow €400m for the buyback'], is: '{@buyback} / {ex-2|Share price (€)|2025}' }
-        - { column: Shares bought back (millions), rows: ['C. Buy back €100m'], is: '{@c-buyback} / {ex-2|Share price (€)|2025}' }
-        - { column: Earnings per share (€), rows: ['A. Buy back €400m'], is: '({ex-1|2025|Net profit} - {@lost-interest}) / ({ex-2|Shares in issue (millions)|2025} - {@buyback} / {ex-2|Share price (€)|2025})' }
-        - { column: Earnings per share (€), rows: ['C. Buy back €100m'], is: '({ex-1|2025|Net profit} - {@c-buyback} * {@cash-yield} / 100 * (1 - {@tax-rate} / 100)) / ({ex-2|Shares in issue (millions)|2025} - {@c-buyback} / {ex-2|Share price (€)|2025})' }
-        - { column: Earnings per share (€), rows: ['D. Borrow €400m for the buyback'], is: '({ex-1|2025|Net profit} - {@bond-interest} * (1 - {@tax-rate} / 100)) / ({ex-2|Shares in issue (millions)|2025} - {@buyback} / {ex-2|Share price (€)|2025})' }
-        - { column: Gearing ratio (%), rows: ['A. Buy back €400m'], is: '{ex-2|Borrowings, due after more than a year (€m)|2025} / ({ex-2|Borrowings, due after more than a year (€m)|2025} + {ex-2|Equity (€m)|2025} - {@buyback}) * 100' }
-        - { column: Gearing ratio (%), rows: ['C. Buy back €100m'], is: '{ex-2|Borrowings, due after more than a year (€m)|2025} / ({ex-2|Borrowings, due after more than a year (€m)|2025} + {ex-2|Equity (€m)|2025} - {@c-buyback}) * 100' }
-        - { column: Gearing ratio (%), rows: ['D. Borrow €400m for the buyback'], is: '({ex-2|Borrowings, due after more than a year (€m)|2025} + {@bond}) / ({ex-2|Borrowings, due after more than a year (€m)|2025} + {@bond} + {ex-2|Equity (€m)|2025} - {@buyback}) * 100' }
+        - { column: Shares left (millions), is: '{ex-3|Shares in issue (millions)|2025} - {Shares bought back (millions)}' }
+        - { column: Shares bought back (millions), rows: ['A. Buy back €400m', 'D. Borrow €400m for the buyback'], is: '{@buyback} / {ex-3|Share price (€)|2025}' }
+        - { column: Shares bought back (millions), rows: ['C. Buy back €100m'], is: '{@c-buyback} / {ex-3|Share price (€)|2025}' }
+        - { column: Earnings per share (€), rows: ['A. Buy back €400m'], is: '({ex-2|2025|Net profit} - {@lost-interest}) / ({ex-3|Shares in issue (millions)|2025} - {@buyback} / {ex-3|Share price (€)|2025})' }
+        - { column: Earnings per share (€), rows: ['C. Buy back €100m'], is: '({ex-2|2025|Net profit} - {@c-buyback} * {@cash-yield} / 100 * (1 - {@tax-rate} / 100)) / ({ex-3|Shares in issue (millions)|2025} - {@c-buyback} / {ex-3|Share price (€)|2025})' }
+        - { column: Earnings per share (€), rows: ['D. Borrow €400m for the buyback'], is: '({ex-2|2025|Net profit} - {@bond-interest} * (1 - {@tax-rate} / 100)) / ({ex-3|Shares in issue (millions)|2025} - {@buyback} / {ex-3|Share price (€)|2025})' }
+        - { column: Gearing ratio (%), rows: ['A. Buy back €400m'], is: '{ex-3|Borrowings, due after more than a year (€m)|2025} / ({ex-3|Borrowings, due after more than a year (€m)|2025} + {ex-3|Equity (€m)|2025} - {@buyback}) * 100' }
+        - { column: Gearing ratio (%), rows: ['C. Buy back €100m'], is: '{ex-3|Borrowings, due after more than a year (€m)|2025} / ({ex-3|Borrowings, due after more than a year (€m)|2025} + {ex-3|Equity (€m)|2025} - {@c-buyback}) * 100' }
+        - { column: Gearing ratio (%), rows: ['D. Borrow €400m for the buyback'], is: '({ex-3|Borrowings, due after more than a year (€m)|2025} + {@bond}) / ({ex-3|Borrowings, due after more than a year (€m)|2025} + {@bond} + {ex-3|Equity (€m)|2025} - {@buyback}) * 100' }
       note: >-
         Each buyback is at €62.00 a share and reduces equity by its cost. Spending cash loses the 3% it earns, and borrowing
         costs 5%, both after 30% tax; the figures use 2025's net profit and leave out the plant's own effects. Earnings per
         share is a measure beyond the IB course.
-      source: The Business Brief's analysis of Exhibits 1 and 2 (simulated data).
+      source: The Business Brief's analysis of Exhibits 2 and 3 (simulated data).
 
 course:
   subtopics:
@@ -628,7 +628,7 @@ beyond:
 sources: [bbr-method, bbr-lintner-1956, bbr-miller-modigliani-1961, bbr-jensen-1986]
 method: >-
   Velmar Components AG, Granite Lake Capital and their people are fictional, and every figure is simulated for teaching.
-  The margins, dividends and retained profit in Exhibit 1, the per-share figures and gearing in Exhibit 2 and the shares of
-  revenue in Exhibit 3 are worked from the figures beside them; the plant's NPVs in Exhibit A1 use the guide's discount
+  The margins, dividends and retained profit in Exhibit 2, the per-share figures and gearing in Exhibit 3 and the shares of
+  revenue in Exhibit 1 are worked from the figures beside them; the plant's NPVs in Exhibit A1 use the guide's discount
   factors at 8% over ten years; Exhibit A2 works each option's earnings per share and gearing from the stated assumptions.
   The integrity check reworks every figure on every build.

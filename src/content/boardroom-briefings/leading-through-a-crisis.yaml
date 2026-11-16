@@ -1,5 +1,5 @@
 # The Boardroom Briefings, No. 5. Velantra Cold Chain is fictional; every
-# figure is simulated. Exhibit 1's revenue by customer and margin, and Exhibit
+# figure is simulated. Exhibit 3's revenue by customer and margin, and Exhibit
 # 4's branch totals, are worked by their checks; the expected costs in
 # Exhibit A1 are each response's branches weighted by their probabilities.
 
@@ -41,14 +41,14 @@ background:
     Velantra Cold Chain stores and delivers food and medicines that must be kept cold: chilled and frozen food for two
     supermarket chains, medicines for independent pharmacies, and vaccines and other temperature-sensitive medicines for
     four hospital systems in Ohio. It runs three warehouses and 140 refrigerated trucks and employs 1,100 people. In 2025 it
-    earned revenue of US$214.0m and an operating profit of US$12.8m (Exhibit 1).
+    earned revenue of US$214.0m and an operating profit of US$12.8m (Exhibit 3).
   - >
     Dana Okafor became chief executive in 2023, after the company was bought by a private equity firm, which owns 70%; the
     managers own the rest. Under her the company tested its contingency plan every quarter: offline backups of its systems
     were kept apart from the network and restored in practice, and a crisis team was named. The plan did not say how to
     deliver without the warehouse system.
   - >
-    The attack came in the early hours of a Monday (Exhibit 2). By the time Dana convened the crisis team, the IT director
+    The attack came in the early hours of a Monday (Exhibit 1). By the time Dana convened the crisis team, the IT director
     had cut the network off from the internet, the temperature loggers in the cold stores, which run on their own, showed
     every store at the right temperature, and the attackers had demanded US$4.5m for a key to unlock the systems.
 
@@ -70,17 +70,17 @@ evidence:
   - kind: company
     title: A business that can afford any response
     body: >-
-      Velantra ended 2025 with US$9,600k in cash and an undrawn credit facility of US$15,000k (Exhibit 1). Even the costliest
+      Velantra ended 2025 with US$9,600k in cash and an undrawn credit facility of US$15,000k (Exhibit 3). Even the costliest
       outcome in the incident team's estimates, US$9,280k if a fast restore is reinfected, would not exhaust that. The choice
       is not about whether the company can pay, but about what it should do.
-    exhibits: [ex-1, ex-4]
+    exhibits: [ex-3, ex-4]
   - kind: company
     title: Who is waiting
     body: >-
       In the next 72 hours Velantra is due to make 46 deliveries to hospitals, 1,280 to pharmacies and 410 to supermarket
-      stores (Exhibit 3). Hospitals bring 18% of revenue and supermarkets 58%, but the hospitals' medicines are the
+      stores (Exhibit 2). Hospitals bring 18% of revenue and supermarkets 58%, but the hospitals' medicines are the
       deliveries that cannot wait.
-    exhibits: [ex-3]
+    exhibits: [ex-2]
   - kind: company
     title: Four responses, costed
     body: >-
@@ -104,14 +104,14 @@ evidence:
 
 financials:
   summary: >-
-    Exhibit 1 gives Velantra's results and liquidity at the end of 2025, with its revenue by kind of customer. Exhibit 4 sets
+    Exhibit 3 gives Velantra's results and liquidity at the end of 2025, with its revenue by kind of customer. Exhibit 4 sets
     out the incident team's estimates for each response: the days of reduced service, the loss for each of those days, the
     cost of the incident response, stock that would spoil, and the ransom or a lost contract where they apply. Where an
     outcome is uncertain, the response has two branches, each with its probability.
-  exhibits: [ex-1, ex-4]
+  exhibits: [ex-3, ex-4]
 
 exhibits:
-  - id: ex-1
+  - id: ex-3
     title: Velantra Cold Chain in 2025 (US$000)
     kind: table
     provenance: simulated-data
@@ -136,7 +136,7 @@ exhibits:
     note: A cyber insurance policy covers incident response costs up to US$5,000k after the first US$500k, but not lost business or a ransom.
     source: Velantra's management accounts and insurance schedule (simulated).
 
-  - id: ex-2
+  - id: ex-1
     title: The first six hours
     kind: list
     provenance: simulated-data
@@ -149,7 +149,7 @@ exhibits:
       - { label: Hour 6, value: 'The attackers'' note demands US$4.5m in cryptocurrency within 72 hours, and claims they have copied customer data.' }
     source: Crisis team's log (simulated).
 
-  - id: ex-3
+  - id: ex-2
     title: Deliveries due in the next 72 hours
     kind: table
     provenance: simulated-data
@@ -207,11 +207,11 @@ figures:
   - { id: ev-c-works, label: 'C: weighted cost if the key works (US$000)', value: 4224, is: '{ex-4|C. Pay the ransom: the key works|Probability} * {ex-4|C. Pay the ransom: the key works|Total cost}' }
   - { id: ev-c-fails, label: 'C: weighted cost if the key fails (US$000)', value: 3368, is: '{ex-4|C. Pay the ransom: the key fails|Probability} * {ex-4|C. Pay the ransom: the key fails|Total cost}' }
   - { id: window, label: Hours in the ransom deadline and the delivery window, value: 72 }
-  - { id: hospital-deliveries, label: Hospital deliveries due in the window, value: 46, is: '{ex-3|Hospitals (four systems)|Deliveries due}' }
+  - { id: hospital-deliveries, label: Hospital deliveries due in the window, value: 46, is: '{ex-2|Hospitals (four systems)|Deliveries due}' }
   - { id: insurance-limit, label: Cyber insurance limit (US$000), value: 5000 }
   - { id: insurance-excess, label: Cyber insurance excess (US$000), value: 500 }
-  - { id: liquidity, label: Cash and undrawn credit (US$000), value: 24600, is: '{ex-1|Cash at the year end|2025} + {ex-1|Undrawn credit facility|2025}' }
-  - { id: daily-revenue, label: Revenue a day in 2025 (US$000), value: 586.3, is: '{ex-1|Revenue|2025} / 365' }
+  - { id: liquidity, label: Cash and undrawn credit (US$000), value: 24600, is: '{ex-3|Cash at the year end|2025} + {ex-3|Undrawn credit facility|2025}' }
+  - { id: daily-revenue, label: Revenue a day in 2025 (US$000), value: 586.3, is: '{ex-3|Revenue|2025} / 365' }
   - { id: ev-b, label: 'Expected cost of B (US$000)', value: 4899, is: '{ex-4|B. Restore fast from last night''s backup: it works|Probability} * {ex-4|B. Restore fast from last night''s backup: it works|Total cost} + {ex-4|B. Restore fast from last night''s backup: reinfected|Probability} * {ex-4|B. Restore fast from last night''s backup: reinfected|Total cost}' }
   - { id: ev-c, label: 'Expected cost of C (US$000)', value: 7592, is: '{ex-4|C. Pay the ransom: the key works|Probability} * {ex-4|C. Pay the ransom: the key works|Total cost} + {ex-4|C. Pay the ransom: the key fails|Probability} * {ex-4|C. Pay the ransom: the key fails|Total cost}' }
   - { id: ev-d, label: 'Expected cost of D (US$000)', value: 5850, is: '{ex-4|D. Hand deliveries to competitors for three weeks: customers stay|Probability} * {ex-4|D. Hand deliveries to competitors for three weeks: customers stay|Total cost} + {ex-4|D. Hand deliveries to competitors for three weeks: a supermarket leaves|Probability} * {ex-4|D. Hand deliveries to competitors for three weeks: a supermarket leaves|Total cost}' }
@@ -278,7 +278,7 @@ options:
     requires: The crisis team working around the clock, staff willing to work by hand, and the discipline to say only what is known.
     upside: The safest recovery, the most urgent deliveries protected, and no money paid to criminals.
     risks: A week of reduced service, about US$3,920k of cost, and supermarket shelves short of some products.
-    evidence: [ex-3, ex-4]
+    evidence: [ex-2, ex-4]
   - id: B
     label: Restore fast from last night's backup
     summary: >-
@@ -593,6 +593,6 @@ beyond:
 sources: [bbr-method, bbr-coombs-2007]
 method: >-
   Velantra Cold Chain, its people and its customers are fictional, and every figure is simulated for teaching. The revenue
-  by customer and the margin in Exhibit 1, and the total cost of each branch in Exhibit 4, are worked by their checks; the
+  by customer and the margin in Exhibit 3, and the total cost of each branch in Exhibit 4, are worked by their checks; the
   probabilities are the fictional incident team's judgements; the expected costs in Exhibit A1 weight each branch by its
   probability. The integrity check reworks every figure on every build.

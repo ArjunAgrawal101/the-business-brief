@@ -1,5 +1,5 @@
 # The Boardroom Briefings, No. 10. Rowan & Rill and the campaign group are
-# fictional; every figure is simulated. Exhibit 1's margins, Exhibit 3's
+# fictional; every figure is simulated. Exhibit 3's margins, Exhibit 2's
 # weighted average and Exhibit 4's forecast profits are worked by their
 # checks; Exhibit A1 extends the forecasts to 2029 on the stated assumptions.
 
@@ -38,18 +38,18 @@ summary:
 background:
   - >
     Holly Mercer founded Rowan & Rill in Bristol in 2010, selling jackets and fleeces for walking and everyday wear. It grew
-    online and now has nine shops, 380 employees and revenue of £72.4m, about 70% of it from its website (Exhibit 1). Its
+    online and now has nine shops, 380 employees and revenue of £72.4m, about 70% of it from its website (Exhibit 3). Its
     customers are loyal and, by its own surveys, chose the brand above all for its values. Holly owns 55% of the company;
     private investors own the rest.
   - >
     In 2023 the company launched Recloth, a range it described as made from 100% recycled materials and carbon neutral. It
     became the brand's best-known line. In 2025 a campaign group, which tests clothing claims, sent Recloth garments to an
     independent laboratory and complained to the advertising regulator. The tests found recycled content averaging 61.6%
-    across the range, and as little as 48% in jackets (Exhibit 3).
+    across the range, and as little as 48% in jackets (Exhibit 2).
   - >
     The regulator's ruling, in May 2026, was reported by the national press and shared widely online. Recloth sales from
     June to September fell from £6,000k a year earlier to £3,720k; the brand's trust score fell from 71 to 48 out of 100
-    (Exhibit 2); three retailers that stock the brand paused their orders. The company had not checked its suppliers'
+    (Exhibit 1); three retailers that stock the brand paused their orders. The company had not checked its suppliers'
     claims for itself. The board meets next month to agree its response.
 
 context:
@@ -71,20 +71,20 @@ evidence:
     title: A sharp fall in a strong business
     body: >-
       Revenue rose from £64,200k in 2024 to £72,400k in 2025 at a steady operating margin of 9.0%. The forecast for 2026 is
-      £63,900k, down 11.7%, with the margin falling to 4.0% (Exhibit 1).
-    exhibits: [ex-1]
+      £63,900k, down 11.7%, with the margin falling to 4.0% (Exhibit 3).
+    exhibits: [ex-3]
   - kind: company
     title: Trust fell faster than sales
     body: >-
       Between January and September 2026 the brand's trust score fell from 71 to 48, the share of shoppers who would consider
-      buying from it from 44% to 29%, and its net promoter score from +42 to −6 (Exhibit 2).
-    exhibits: [ex-2]
+      buying from it from 44% to 29%, and its net promoter score from +42 to −6 (Exhibit 1).
+    exhibits: [ex-1]
   - kind: company
     title: What was actually in the range
     body: >-
       Weighted by the units sold in 2025, Recloth's recycled content was 61.6%, from 81% in fleeces to 48% in jackets
-      (Exhibit 3). The suppliers' certificates the company relied on covered the fibre, not the finished garments.
-    exhibits: [ex-3]
+      (Exhibit 2). The suppliers' certificates the company relied on covered the fibre, not the finished garments.
+    exhibits: [ex-2]
   - kind: research
     title: The response should match the responsibility
     body: >-
@@ -101,13 +101,13 @@ evidence:
 
 financials:
   summary: >-
-    Exhibit 1 gives the company's results for 2024 and 2025 and its forecast for 2026. Exhibit 4 gives the management team's
+    Exhibit 3 gives the company's results for 2024 and 2025 and its forecast for 2026. Exhibit 4 gives the management team's
     estimates for each response: its one-off cost, any cost that would recur each year, and the revenue and operating profit
     it would produce in 2027. The forecasts assume the operating margin before those recurring costs returns to 9.0%.
-  exhibits: [ex-1, ex-4]
+  exhibits: [ex-3, ex-4]
 
 exhibits:
-  - id: ex-1
+  - id: ex-3
     title: Rowan & Rill's results (£000)
     kind: table
     provenance: simulated-data
@@ -125,7 +125,7 @@ exhibits:
     note: The forecast for 2026 includes the costs of responding to the ruling so far, but none of the options in Exhibit 4.
     source: Rowan & Rill's management accounts and forecast (simulated).
 
-  - id: ex-2
+  - id: ex-1
     title: The brand tracker, 2026
     kind: table
     provenance: simulated-data
@@ -142,7 +142,7 @@ exhibits:
     note: A monthly online survey of 1,000 people who buy outdoor clothing. The net promoter score is the share who would recommend the brand less the share who would warn against it, and runs from −100 to +100.
     source: Brand tracking survey commissioned by Rowan & Rill (simulated).
 
-  - id: ex-3
+  - id: ex-2
     title: Recycled content of the Recloth range, as tested
     kind: table
     provenance: simulated-data
@@ -159,7 +159,7 @@ exhibits:
     totals: ['The whole range, weighted by units sold']
     checks:
       - { row: 'The whole range, weighted by units sold', columns: [Units sold in 2025 (000)], is: '{Fleeces} + {Jackets} + {T-shirts and tops} + {Trousers}' }
-      - { row: 'The whole range, weighted by units sold', columns: [Recycled content (%)], is: '({ex-3|Fleeces|Units sold in 2025 (000)} * {Fleeces} + {ex-3|Jackets|Units sold in 2025 (000)} * {Jackets} + {ex-3|T-shirts and tops|Units sold in 2025 (000)} * {T-shirts and tops} + {ex-3|Trousers|Units sold in 2025 (000)} * {Trousers}) / {ex-3|The whole range, weighted by units sold|Units sold in 2025 (000)}' }
+      - { row: 'The whole range, weighted by units sold', columns: [Recycled content (%)], is: '({ex-2|Fleeces|Units sold in 2025 (000)} * {Fleeces} + {ex-2|Jackets|Units sold in 2025 (000)} * {Jackets} + {ex-2|T-shirts and tops|Units sold in 2025 (000)} * {T-shirts and tops} + {ex-2|Trousers|Units sold in 2025 (000)} * {Trousers}) / {ex-2|The whole range, weighted by units sold|Units sold in 2025 (000)}' }
     note: Recycled content is the share of each garment's fibre by weight that came from recycled sources, from laboratory tests of samples from each family.
     source: Independent laboratory tests commissioned by the campaign group and confirmed by Rowan & Rill (simulated).
 
@@ -200,9 +200,9 @@ figures:
   - { id: recloth-summer-2025, label: 'Recloth sales, June to September 2025 (£000)', value: 6000 }
   - { id: recloth-summer-2026, label: 'Recloth sales, June to September 2026 (£000)', value: 3720 }
   - { id: recloth-fall, label: Fall in Recloth sales over the summer (%), value: -38.0, decimals: 1, is: '({@recloth-summer-2026} - {@recloth-summer-2025}) / {@recloth-summer-2025} * 100' }
-  - { id: revenue-change-2026, label: 'Change in revenue, 2025 to 2026 (%)', value: -11.7, is: '({ex-1|2026 (forecast)|Revenue} - {ex-1|2025|Revenue}) / {ex-1|2025|Revenue} * 100' }
-  - { id: weighted-total, label: 'Units times recycled content, summed across the range', value: 40040, is: '{ex-3|Fleeces|Units sold in 2025 (000)} * {ex-3|Fleeces|Recycled content (%)} + {ex-3|Jackets|Units sold in 2025 (000)} * {ex-3|Jackets|Recycled content (%)} + {ex-3|T-shirts and tops|Units sold in 2025 (000)} * {ex-3|T-shirts and tops|Recycled content (%)} + {ex-3|Trousers|Units sold in 2025 (000)} * {ex-3|Trousers|Recycled content (%)}' }
-  - { id: simple-average, label: Simple average of the four families' recycled content (%), value: 61.0, decimals: 1, is: '({ex-3|Fleeces|Recycled content (%)} + {ex-3|Jackets|Recycled content (%)} + {ex-3|T-shirts and tops|Recycled content (%)} + {ex-3|Trousers|Recycled content (%)}) / 4' }
+  - { id: revenue-change-2026, label: 'Change in revenue, 2025 to 2026 (%)', value: -11.7, is: '({ex-3|2026 (forecast)|Revenue} - {ex-3|2025|Revenue}) / {ex-3|2025|Revenue} * 100' }
+  - { id: weighted-total, label: 'Units times recycled content, summed across the range', value: 40040, is: '{ex-2|Fleeces|Units sold in 2025 (000)} * {ex-2|Fleeces|Recycled content (%)} + {ex-2|Jackets|Units sold in 2025 (000)} * {ex-2|Jackets|Recycled content (%)} + {ex-2|T-shirts and tops|Units sold in 2025 (000)} * {ex-2|T-shirts and tops|Recycled content (%)} + {ex-2|Trousers|Units sold in 2025 (000)} * {ex-2|Trousers|Recycled content (%)}' }
+  - { id: simple-average, label: Simple average of the four families' recycled content (%), value: 61.0, decimals: 1, is: '({ex-2|Fleeces|Recycled content (%)} + {ex-2|Jackets|Recycled content (%)} + {ex-2|T-shirts and tops|Recycled content (%)} + {ex-2|Trousers|Recycled content (%)}) / 4' }
   - { id: tracker-sample, label: People surveyed each month by the brand tracker, value: 1000 }
   - { id: tracing-platform, label: 'Option C: tracing platform (£000)', value: 350 }
   - { id: certification, label: 'Option C: certification and audits a year (£000)', value: 900 }
@@ -274,7 +274,7 @@ options:
     risks: >-
       It treats a preventable failure as an unfair attack; customers, retailers and the regulator are likely to read it as
       denial, and further tests could make things worse.
-    evidence: [ex-2, ex-3]
+    evidence: [ex-1, ex-2]
   - id: B
     label: Correct the claims and apologize
     summary: >-
@@ -283,7 +283,7 @@ options:
     requires: £2,150k, and a clear, unconditional apology from the founder.
     upside: The fastest recovery in the estimates, with the highest operating profit in 2027, £6,300k.
     risks: The range would no longer stand out, and nothing would change in the supply chain that let the claims go unchecked.
-    evidence: [ex-3, ex-4]
+    evidence: [ex-2, ex-4]
   - id: C
     label: Rebuild the range so every claim is verified
     summary: >-
@@ -292,7 +292,7 @@ options:
     requires: £2,500k at once, £1,500k a year after a 6% price rise, and suppliers willing to be traced and audited.
     upside: Claims that can be proved, the strongest basis for trust, and the highest revenue in 2027, £74,500k.
     risks: The lowest operating profit in 2027, a price rise customers may resist, and two years before the verified range is complete.
-    evidence: [ex-3, ex-4]
+    evidence: [ex-2, ex-4]
   - id: D
     label: Retire Recloth and relaunch under a new name
     summary: >-
@@ -331,7 +331,7 @@ questions:
       marks: 3
       level: HL
       subtopics: ['5.3']
-      prompt: Using Exhibit 3, calculate the recycled content of the Recloth range as a whole, weighted by the units sold in 2025.
+      prompt: Using Exhibit 2, calculate the recycled content of the Recloth range as a whole, weighted by the units sold in 2025.
       notes: >-
         Multiply each family's recycled content by its units, add them and divide by all the units: (180 × 81 + 120 × 48 + 260
         × 55 + 90 × 60) ÷ 650 = 40,040 ÷ 650 = 61.6%. A simple average of the four families, 61.0%, would give too much
@@ -340,7 +340,7 @@ questions:
       command: calculate
       marks: 2
       subtopics: ['3.3']
-      prompt: Using Exhibit 1, calculate the percentage change in Rowan & Rill's revenue between 2025 and the forecast for 2026.
+      prompt: Using Exhibit 3, calculate the percentage change in Rowan & Rill's revenue between 2025 and the forecast for 2026.
       notes: >-
         (63,900 − 72,400) ÷ 72,400 × 100 = −11.7%. One mark for the method, one for the answer.
     - id: csr
@@ -395,10 +395,10 @@ analysis:
   evidence:
     - >-
       The claims were wrong by a wide margin: 61.6% recycled across the range, against a claim of 100%, and 48% in jackets
-      (Exhibit 3). The company relied on certificates that covered the fibre, not the garments.
+      (Exhibit 2). The company relied on certificates that covered the fibre, not the garments.
     - >-
       The damage is to trust more than to sales so far: the trust score fell from 71 to 48 and the net promoter score from
-      +42 to −6, while revenue is forecast to fall by 11.7% (Exhibits 1 and 2).
+      +42 to −6, while revenue is forecast to fall by 11.7% (Exhibits 3 and 1).
     - >-
       In 2027, B leaves the most operating profit (£6,300k), then D (£5,940k), A (£5,760k) and C (£5,205k). By 2029, if the
       premium for verified fibre falls as the team expects, C leaves the most, £6,960k (Exhibit A1).
@@ -574,6 +574,6 @@ beyond:
 sources: [bbr-method, bbr-coombs-2007, bbr-fombrun-1996]
 method: >-
   Rowan & Rill, the campaign group and their people are fictional, and every figure is simulated for teaching; the ruling
-  is a fictional event. The margins in Exhibit 1, the weighted recycled content in Exhibit 3 and the forecast profits in
+  is a fictional event. The margins in Exhibit 3, the weighted recycled content in Exhibit 2 and the forecast profits in
   Exhibit 4 are worked from the figures beside them and the stated assumptions; Exhibit A1 extends the forecasts to 2029.
   The integrity check reworks every figure on every build.

@@ -1,6 +1,6 @@
 # The Boardroom Briefings, No. 8. Tallowood Cafés and Kiln & Copper Roasters are
-# fictional; every figure is simulated. Exhibit 1's coffee cost and margins,
-# Exhibit 2's roaster accounts and Exhibit 4's costs to buy and to make are
+# fictional; every figure is simulated. Exhibit 2's coffee cost and margins,
+# Exhibit 3's roaster accounts and Exhibit 4's costs to buy and to make are
 # worked by their checks; Exhibit A1 appraises each option at 8% over eight
 # years, and Exhibit A2 tests the purchase against the loss of the roaster's
 # other customers.
@@ -40,14 +40,14 @@ background:
   - >
     Priya Nair opened the first Tallowood café in Fitzroy in 2012, built a following for its house blend, and grew the chain
     to 42 cafés across Melbourne. In 2025 Tallowood earned revenue of A$61.2m and an operating profit of A$4.3m, a margin of
-    7.0% (Exhibit 1). The founders own 65% of the company; a hospitality investment group owns 35%.
+    7.0% (Exhibit 2). The founders own 65% of the company; a hospitality investment group owns 35%.
   - >
     From the start, Tallowood's coffee has been roasted by Kiln & Copper, an independent roastery in Brunswick, to a blend
     the two developed together. Tallowood bought 210 tonnes in 2025 at A$38.00 a kilogram, A$7,980k in all. Kiln & Copper
-    also roasts for other cafés, some of them Tallowood's competitors, and for two grocery chains (Exhibit 2).
+    also roasts for other cafés, some of them Tallowood's competitors, and for two grocery chains (Exhibit 3).
   - >
     The relationship has frayed. Kiln & Copper is near the end of its owner's working life and has invested little: nine of
-    its 104 deliveries to Tallowood in 2025 were late, and six of 52 batches failed Tallowood's taste test (Exhibit 3). Its
+    its 104 deliveries to Tallowood in 2025 were late, and six of 52 batches failed Tallowood's taste test (Exhibit 1). Its
     owner has now offered the business to Tallowood for A$9.0m. An engineer has also quoted Tallowood A$3.4m to fit out a
     roastery of its own, sized for its needs.
 
@@ -71,14 +71,14 @@ evidence:
     title: Coffee is a large and visible cost
     body: >-
       Tallowood spent A$7,980k on roasted coffee in 2025, 13.0% of its revenue, against an operating profit of A$4,284k (Exhibit
-      1). A saving of a few dollars a kilogram matters to the chain's margin.
-    exhibits: [ex-1]
+      2). A saving of a few dollars a kilogram matters to the chain's margin.
+    exhibits: [ex-2]
   - kind: company
     title: A supplier with spare capacity and slipping standards
     body: >-
       Kiln & Copper roasted 520 tonnes in 2025 in a roastery that can handle 700, a capacity utilization rate of 74.3%, and
-      earned a profit of A$3,300k (Exhibit 2). Late deliveries reached 8.7% and failed batches 11.5% (Exhibit 3).
-    exhibits: [ex-2, ex-3]
+      earned a profit of A$3,300k (Exhibit 3). Late deliveries reached 8.7% and failed batches 11.5% (Exhibit 1).
+    exhibits: [ex-3, ex-1]
   - kind: company
     title: The cost to buy against the cost to make
     body: >-
@@ -104,14 +104,14 @@ evidence:
 
 financials:
   summary: >-
-    Exhibit 1 gives Tallowood's results and what it pays for coffee. Exhibit 2 gives Kiln & Copper's accounts for 2025 and its
+    Exhibit 2 gives Tallowood's results and what it pays for coffee. Exhibit 3 gives Kiln & Copper's accounts for 2025 and its
     asking price. Exhibit 4 compares the cost of Tallowood's 210 tonnes under each option: buying as now, buying on the
     offered contract or by tender, and roasting it in a roastery of its own. Tallowood appraises investments at 8% over
     eight years.
-  exhibits: [ex-1, ex-2, ex-4]
+  exhibits: [ex-2, ex-3, ex-4]
 
 exhibits:
-  - id: ex-1
+  - id: ex-2
     title: Tallowood Cafés in 2025
     kind: table
     provenance: simulated-data
@@ -133,7 +133,7 @@ exhibits:
       - { row: 'Coffee as a share of revenue (%)', is: '{Cost of coffee (A$000)} / {Revenue (A$000)} * 100' }
     source: Tallowood's management accounts (simulated).
 
-  - id: ex-2
+  - id: ex-3
     title: Kiln & Copper Roasters in 2025
     kind: table
     provenance: simulated-data
@@ -156,14 +156,14 @@ exhibits:
     checks:
       - { row: 'Capacity utilization rate (%)', is: '{Coffee roasted (tonnes)} / {Roasting capacity (tonnes a year)} * 100' }
       - { row: 'Coffee roasted (tonnes)', is: '{Sold to Tallowood (tonnes)} + {Sold to other cafés and grocers (tonnes)}' }
-      - { row: 'Revenue from Tallowood (A$000)', is: '{ex-1|Cost of coffee (A$000)|2025}' }
+      - { row: 'Revenue from Tallowood (A$000)', is: '{ex-2|Cost of coffee (A$000)|2025}' }
       - { row: 'Revenue from other customers (A$000)', is: '{Sold to other cafés and grocers (tonnes)} * {Price to other customers (A$ a kilogram)}' }
       - { row: 'Variable costs at A$24.50 a kilogram (A$000)', is: '{Coffee roasted (tonnes)} * {@variable-cost}' }
       - { row: 'Profit (A$000)', is: '{Revenue from Tallowood (A$000)} + {Revenue from other customers (A$000)} - {Variable costs at A$24.50 a kilogram (A$000)} - {Fixed costs (A$000)}' }
     note: Variable costs are green beans, energy and packaging. The other customers include cafés that compete with Tallowood; those buying 124 of their 310 tonnes have said they would stop if a café chain owned the roastery.
     source: Kiln & Copper's accounts, shared with Tallowood under a confidentiality agreement (simulated).
 
-  - id: ex-3
+  - id: ex-1
     title: Kiln & Copper's service to Tallowood, 2025
     kind: table
     provenance: simulated-data
@@ -195,7 +195,7 @@ exhibits:
       - ['Buy on Kiln & Copper''s five-year contract', 0, 36.50, 7665]
       - ['Buy from several roasters chosen by tender', 0, 37.00, 7770]
     checks:
-      - { column: Total cost (A$000 a year), is: '{Fixed costs (A$000 a year)} + {Cost per kilogram (A$)} * {ex-1|Roasted coffee bought (tonnes)|2025}' }
+      - { column: Total cost (A$000 a year), is: '{Fixed costs (A$000 a year)} + {Cost per kilogram (A$)} * {ex-2|Roasted coffee bought (tonnes)|2025}' }
     note: The roastery's fixed costs are staff, the lease and maintenance; depreciation of the A$3,400k fit-out is not included, because the appraisal counts the fit-out as a cost when it is paid. The tender price is the average of three quotes.
     source: Engineer's quotation, Kiln & Copper's contract offer and three roasters' quotes (simulated).
 
@@ -208,16 +208,16 @@ figures:
   - { id: variable-cost, label: Roasting cost per kilogram (A$), value: 24.50, decimals: 2 }
   - { id: fit-out, label: Cost of fitting out Tallowood's own roastery (A$000), value: 3400 }
   - { id: leaving-tonnes, label: Tonnes bought by customers who say they would leave, value: 124 }
-  - { id: leaving-share, label: Share of the other customers' volume that would leave (%), value: 40, is: '{@leaving-tonnes} / {ex-2|Sold to other cafés and grocers (tonnes)|2025} * 100' }
+  - { id: leaving-share, label: Share of the other customers' volume that would leave (%), value: 40, is: '{@leaving-tonnes} / {ex-3|Sold to other cafés and grocers (tonnes)|2025} * 100' }
   - { id: severe-leaving, label: 'The severe case: share of the other customers'' volume that leaves (%)', value: 80 }
   - { id: contract-years, label: Length of the offered contract (years), value: 5 }
-  - { id: kc-margin, label: Kiln & Copper's profit margin (%), value: 17.2, is: '{ex-2|Profit (A$000)|2025} / ({ex-2|Revenue from Tallowood (A$000)|2025} + {ex-2|Revenue from other customers (A$000)|2025}) * 100' }
-  - { id: price-multiple, label: Asking price as a multiple of Kiln & Copper's profit, value: 2.7, is: '{ex-2|Asking price for the business (A$000)|2025} / {ex-2|Profit (A$000)|2025}' }
+  - { id: kc-margin, label: Kiln & Copper's profit margin (%), value: 17.2, is: '{ex-3|Profit (A$000)|2025} / ({ex-3|Revenue from Tallowood (A$000)|2025} + {ex-3|Revenue from other customers (A$000)|2025}) * 100' }
+  - { id: price-multiple, label: Asking price as a multiple of Kiln & Copper's profit, value: 2.7, is: '{ex-3|Asking price for the business (A$000)|2025} / {ex-3|Profit (A$000)|2025}' }
   - { id: make-saving, label: Saving a year from making rather than buying (A$000), value: 1385, is: '{ex-4|Buy from Kiln & Copper, as now (cost to buy)|Total cost (A$000 a year)} - {ex-4|Roast in a roastery of Tallowood''s own (cost to make)|Total cost (A$000 a year)}' }
   - { id: contract-saving, label: Saving a year on the contract (A$000), value: 315, is: '{ex-4|Buy from Kiln & Copper, as now (cost to buy)|Total cost (A$000 a year)} - {ex-4|Buy on Kiln & Copper''s five-year contract|Total cost (A$000 a year)}' }
   - { id: tender-saving, label: Saving a year by tender (A$000), value: 210, is: '{ex-4|Buy from Kiln & Copper, as now (cost to buy)|Total cost (A$000 a year)} - {ex-4|Buy from several roasters chosen by tender|Total cost (A$000 a year)}' }
   - { id: build-months, label: Months to fit out and commission a roastery, value: 12 }
-  - { id: spare-capacity, label: Kiln & Copper's spare capacity (tonnes), value: 180, is: '{ex-2|Roasting capacity (tonnes a year)|2025} - {ex-2|Coffee roasted (tonnes)|2025}' }
+  - { id: spare-capacity, label: Kiln & Copper's spare capacity (tonnes), value: 180, is: '{ex-3|Roasting capacity (tonnes a year)|2025} - {ex-3|Coffee roasted (tonnes)|2025}' }
 
 stakeholders:
   - name: Priya Nair and the founders
@@ -279,7 +279,7 @@ options:
     risks: >-
       Customers buying 124 tonnes say they would leave; the price pays for a profit that would shrink; and Tallowood would be
       selling coffee to its own competitors.
-    evidence: [ex-2, ex-3]
+    evidence: [ex-3, ex-1]
   - id: B
     label: Sign a five-year contract with Kiln & Copper
     summary: >-
@@ -288,7 +288,7 @@ options:
     requires: A supplier able to keep its promises, which depends on who buys Kiln & Copper when the owner retires.
     upside: A$315k a year saved, no capital tied up, and management attention kept on the cafés.
     risks: The contract cannot guarantee quality from a roaster that is not investing; a new owner may not honour its spirit.
-    evidence: [ex-3, ex-4]
+    evidence: [ex-1, ex-4]
   - id: C
     label: Build a roastery of its own
     summary: >-
@@ -347,7 +347,7 @@ questions:
       marks: 2
       level: HL
       subtopics: ['5.6']
-      prompt: Using Exhibit 2, calculate Kiln & Copper's capacity utilization rate in 2025.
+      prompt: Using Exhibit 3, calculate Kiln & Copper's capacity utilization rate in 2025.
       notes: >-
         Capacity utilization = actual output ÷ productive capacity × 100 = 520 ÷ 700 × 100 = 74.3%. The roastery has 180
         tonnes of spare capacity, which a buyer might fill.
@@ -413,7 +413,7 @@ analysis:
       it would lose A$6,425.5k (Exhibit A2). The asking price, 2.7 times this year's profit, pays for customers who say
       they will go.
     - >-
-      The supplier's problems are real: 8.7% of deliveries late and 11.5% of batches failed in 2025 (Exhibit 3). A contract
+      The supplier's problems are real: 8.7% of deliveries late and 11.5% of batches failed in 2025 (Exhibit 1). A contract
       with the same roaster, under an owner about to leave, would not fix them by itself.
   assumptions:
     - assumption: The roastery's costs will be as the engineer quoted, A$1,450k a year plus A$24.50 a kilogram.
@@ -530,7 +530,7 @@ analysis:
         - ['C. Build a roastery of its own', 3400, 1385, 2.5, 4559.0]
         - ['D. Buy from several roasters by tender', 0, 210, 'No capital', 1206.8]
       checks:
-        - { column: Saving a year, rows: ['A. Buy Kiln & Copper (40% of the other volume leaves)'], is: '{ex-2|Revenue from Tallowood (A$000)|2025} + ({ex-2|Sold to other cafés and grocers (tonnes)|2025} - {@leaving-tonnes}) * {ex-2|Price to other customers (A$ a kilogram)|2025} - ({ex-2|Sold to Tallowood (tonnes)|2025} + {ex-2|Sold to other cafés and grocers (tonnes)|2025} - {@leaving-tonnes}) * {@variable-cost} - {ex-2|Fixed costs (A$000)|2025}' }
+        - { column: Saving a year, rows: ['A. Buy Kiln & Copper (40% of the other volume leaves)'], is: '{ex-3|Revenue from Tallowood (A$000)|2025} + ({ex-3|Sold to other cafés and grocers (tonnes)|2025} - {@leaving-tonnes}) * {ex-3|Price to other customers (A$ a kilogram)|2025} - ({ex-3|Sold to Tallowood (tonnes)|2025} + {ex-3|Sold to other cafés and grocers (tonnes)|2025} - {@leaving-tonnes}) * {@variable-cost} - {ex-3|Fixed costs (A$000)|2025}' }
         - { column: Saving a year, rows: ['B. Sign a five-year contract with Kiln & Copper'], is: '{@contract-saving}' }
         - { column: Saving a year, rows: ['C. Build a roastery of its own'], is: '{@make-saving}' }
         - { column: Saving a year, rows: ['D. Buy from several roasters by tender'], is: '{@tender-saving}' }
@@ -538,7 +538,7 @@ analysis:
         - { column: NPV at 8%, rows: ['A. Buy Kiln & Copper (40% of the other volume leaves)', 'C. Build a roastery of its own'], is: 'npv(8, -{Capital cost}, {Saving a year}, {Saving a year}, {Saving a year}, {Saving a year}, {Saving a year}, {Saving a year}, {Saving a year}, {Saving a year})' }
         - { column: NPV at 8%, rows: ['B. Sign a five-year contract with Kiln & Copper', 'D. Buy from several roasters by tender'], is: '{Saving a year} * (df(8, 1) + df(8, 2) + df(8, 3) + df(8, 4) + df(8, 5) + df(8, 6) + df(8, 7) + df(8, 8))' }
       note: For A, the saving is the coffee Tallowood no longer buys plus the profit on the other customers who stay, less the roastery's costs. B and D need no capital, so their figure is the present value of the savings, assuming the contract is renewed on the same terms after five years.
-      source: The Business Brief's analysis of Exhibits 2 and 4 (simulated data).
+      source: The Business Brief's analysis of Exhibits 3 and 4 (simulated data).
     - id: ex-A2
       title: Buying Kiln & Copper if its other customers leave (A$000)
       kind: table
@@ -552,12 +552,12 @@ analysis:
         - ['40%, as the customers say', 1874, 1769.1]
         - ['80%', 448, -6425.5]
       checks:
-        - { column: Saving a year, rows: ['None'], is: '{ex-2|Profit (A$000)|2025}' }
+        - { column: Saving a year, rows: ['None'], is: '{ex-3|Profit (A$000)|2025}' }
         - { column: Saving a year, rows: ['40%, as the customers say'], is: '{ex-A1|A. Buy Kiln & Copper (40% of the other volume leaves)|Saving a year}' }
-        - { column: Saving a year, rows: ['80%'], is: '{ex-2|Revenue from Tallowood (A$000)|2025} + {ex-2|Sold to other cafés and grocers (tonnes)|2025} * (1 - {@severe-leaving} / 100) * {ex-2|Price to other customers (A$ a kilogram)|2025} - ({ex-2|Sold to Tallowood (tonnes)|2025} + {ex-2|Sold to other cafés and grocers (tonnes)|2025} * (1 - {@severe-leaving} / 100)) * {@variable-cost} - {ex-2|Fixed costs (A$000)|2025}' }
-        - { column: NPV at 8% over eight years, is: '{Saving a year} * (df(8, 1) + df(8, 2) + df(8, 3) + df(8, 4) + df(8, 5) + df(8, 6) + df(8, 7) + df(8, 8)) - {ex-2|Asking price for the business (A$000)|2025}' }
+        - { column: Saving a year, rows: ['80%'], is: '{ex-3|Revenue from Tallowood (A$000)|2025} + {ex-3|Sold to other cafés and grocers (tonnes)|2025} * (1 - {@severe-leaving} / 100) * {ex-3|Price to other customers (A$ a kilogram)|2025} - ({ex-3|Sold to Tallowood (tonnes)|2025} + {ex-3|Sold to other cafés and grocers (tonnes)|2025} * (1 - {@severe-leaving} / 100)) * {@variable-cost} - {ex-3|Fixed costs (A$000)|2025}' }
+        - { column: NPV at 8% over eight years, is: '{Saving a year} * (df(8, 1) + df(8, 2) + df(8, 3) + df(8, 4) + df(8, 5) + df(8, 6) + df(8, 7) + df(8, 8)) - {ex-3|Asking price for the business (A$000)|2025}' }
       note: If no customer left, Tallowood would keep the whole of Kiln & Copper's profit; each customer who leaves takes its contribution with it while the roastery's fixed costs stay.
-      source: The Business Brief's analysis of Exhibit 2 (simulated data).
+      source: The Business Brief's analysis of Exhibit 3 (simulated data).
 
 course:
   subtopics:
@@ -605,6 +605,6 @@ beyond:
 sources: [bbr-method, bbr-coase-1937, bbr-williamson-1975, bbr-porter-1985]
 method: >-
   Tallowood Cafés, Kiln & Copper Roasters and their people are fictional, and every figure is simulated for teaching. The
-  coffee costs and margins in Exhibit 1, the roaster's accounts in Exhibit 2, the service measures in Exhibit 3 and the costs
+  coffee costs and margins in Exhibit 2, the roaster's accounts in Exhibit 3, the service measures in Exhibit 1 and the costs
   to buy and to make in Exhibit 4 are worked from the figures beside them; the appraisals in Exhibits A1 and A2 use the
   guide's discount factors at 8% over eight years. The integrity check reworks every figure on every build.

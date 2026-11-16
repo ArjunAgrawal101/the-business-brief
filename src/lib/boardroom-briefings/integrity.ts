@@ -25,6 +25,8 @@
  *   scored on every criterion, the weights add up to 100, each stated weighted
  *   score is right, and the recommendation is the best-scored option unless it
  *   says why judgement departs from the scores;
+ * - the exhibits are numbered in the order the page shows them (the case's
+ *   evidence exhibits, then its financial ones, then the analysis's own);
  * - every exhibit an option, an evidence item or the financial information
  *   names exists, every exhibit's checks recompute its cells, every footer
  *   marked as a sum adds up, every declared figure works out, and every
@@ -75,6 +77,13 @@ export function checkBoardroomBriefings(items: Record<string, BoardroomBriefing>
     for (const d of dupes(exhibitIds)) add(`exhibit id "${d}" is used twice`);
     for (const e of b.exhibits) if (!/^ex-\d+$/.test(e.id)) add(`exhibit "${e.id}": the case's exhibits are numbered ex-1, ex-2 and so on`);
     for (const e of b.analysis.exhibits) if (!/^ex-A\d+$/.test(e.id)) add(`exhibit "${e.id}": the analysis's own exhibits are numbered ex-A1, ex-A2 and so on`);
+    // The numbers follow the page: the case shows its evidence exhibits first
+    // and its financial ones after them; the analysis shows its own in order.
+    const financialIds = new Set(b.financials.exhibits);
+    const shown = [...b.exhibits.filter((e) => !financialIds.has(e.id)), ...b.exhibits.filter((e) => financialIds.has(e.id))].map((e) => e.id);
+    if (shown.some((e, i) => e !== `ex-${i + 1}`)) add(`the case's exhibits must be numbered in the order the page shows them, the evidence exhibits and then the financial ones; the page would show ${shown.join(', ')}`);
+    const shownA = b.analysis.exhibits.map((e) => e.id);
+    if (shownA.some((e, i) => e !== `ex-A${i + 1}`)) add(`the analysis's exhibits must be numbered in the order the page shows them; the page would show ${shownA.join(', ')}`);
 
     /* ---------- Fictional or real: the labels must match the sourcing ---------- */
     const sources = b.sources.map((s) => ({ id: s, src: c.sources[s] }));

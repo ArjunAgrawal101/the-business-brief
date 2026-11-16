@@ -1,6 +1,6 @@
 # The Boardroom Briefings, No. 1. Hartwell & Rye, Kasumi Trading and Hinata
-# Drugstores are fictional; every figure is simulated. Exhibit 1's margins and
-# Exhibit 2's average orders are worked by their checks; the routes' payback,
+# Drugstores are fictional; every figure is simulated. Exhibit 3's margins and
+# Exhibit 1's average orders are worked by their checks; the routes' payback,
 # ARR and NPV (Exhibit A1) are worked from Exhibit 4's cash flows with the
 # guide's discount factors at 10%. The integrity check reworks every figure.
 
@@ -46,7 +46,7 @@ background:
   - >
     The company has grown steadily and profitably. Revenue rose from £29.4m in 2023 to £38.6m in 2025, with a gross
     profit margin of 61% and an operating profit margin of 10% last year, and the year ended with £6.2m in cash and no
-    borrowing (Exhibit 1). The founders own 70% of the shares. Larchfield Capital, a growth investor, bought the other
+    borrowing (Exhibit 3). The founders own 70% of the shares. Larchfield Capital, a growth investor, bought the other
     30% in 2021 and expects to sell its stake within four years.
   - >
     Japan arrived uninvited. A Japanese beauty writer praised the company's serum in 2023, and orders began to arrive
@@ -77,24 +77,24 @@ evidence:
     title: Customers in Japan found the brand first
     body: >-
       Orders shipped to Japan from the British website rose from £520k in 2024 to £1,140k in 2025, a rise of 119.2%,
-      with no marketing aimed at Japan (Exhibit 1). They are still small: 3.0% of the company's revenue. Online customers
-      in Japan are loyal, though: 38% bought again within the year (Exhibit 2).
-    exhibits: [ex-1, ex-2]
+      with no marketing aimed at Japan (Exhibit 3). They are still small: 3.0% of the company's revenue. Online customers
+      in Japan are loyal, though: 38% bought again within the year (Exhibit 1).
+    exhibits: [ex-3, ex-1]
   - kind: company
     title: The Tokyo pop-up
     body: >-
-      The six-week counter took 2,950 orders worth £186k (Exhibit 2), and two serums sold out in the fourth week. Pop-up
+      The six-week counter took 2,950 orders worth £186k (Exhibit 1), and two serums sold out in the fourth week. Pop-up
       customers spent less per order than online customers, £63.05 against £85.07, and fewer bought again within the six
       weeks: 22%. Many were trying the brand for the first time.
-    exhibits: [ex-2]
+    exhibits: [ex-1]
   - kind: company
     title: What 800 skincare buyers said
     body: >-
-      The company's survey of 800 skincare buyers aged 20 to 49 (Exhibit 3) found that 6% had heard of Hartwell & Rye.
+      The company's survey of 800 skincare buyers aged 20 to 49 (Exhibit 2) found that 6% had heard of Hartwell & Rye.
       After trying a sample, 41% said they would consider buying, but only 33% would pay the planned price for the
       serum. More than half prefer to buy skincare in a drugstore (52%), against 21% for department stores and 27%
       online.
-    exhibits: [ex-3]
+    exhibits: [ex-2]
   - kind: research
     title: Firms tend to enter foreign markets in stages
     body: >-
@@ -113,15 +113,15 @@ evidence:
 
 financials:
   summary: >-
-    Exhibit 1 gives the company's results for the last three years: revenue, profit and margins, the cash it holds, and
+    Exhibit 3 gives the company's results for the last three years: revenue, profit and margins, the cash it holds, and
     the part of its revenue that already comes from Japan. Exhibit 4 gives the board's forecasts of the net cash flow
     each route into Japan would bring Hartwell & Rye, year by year. For the joint venture and the subsidiary these are
     yen earnings translated into pounds at the board's planning rate; Kasumi Trading would pay in pounds. The board
     appraises the routes at a discount rate of 10%.
-  exhibits: [ex-1, ex-4]
+  exhibits: [ex-3, ex-4]
 
 exhibits:
-  - id: ex-1
+  - id: ex-3
     title: Hartwell & Rye's results, 2023 to 2025 (£000)
     kind: table
     provenance: simulated-data
@@ -142,7 +142,7 @@ exhibits:
     note: Online orders from Japan are part of revenue. The company has no borrowing.
     source: Hartwell & Rye management accounts (simulated).
 
-  - id: ex-2
+  - id: ex-1
     title: Two tests of demand in Japan, 2025
     kind: table
     provenance: simulated-data
@@ -160,7 +160,7 @@ exhibits:
     note: Online customers who bought again did so within the year; pop-up customers, within the six weeks of the counter.
     source: Hartwell & Rye sales records (simulated).
 
-  - id: ex-3
+  - id: ex-2
     title: Survey of 800 skincare buyers in Japan, aged 20 to 49, October 2025
     kind: table
     provenance: simulated-data
@@ -209,9 +209,9 @@ figures:
   - { id: survey-sample, label: People surveyed, value: 800 }
   - { id: survey-age-low, label: Youngest age surveyed, value: 20 }
   - { id: survey-age-high, label: Oldest age surveyed, value: 49 }
-  - { id: gross-margin-2025, label: 'Gross profit margin, 2025 (%)', value: 61, is: '{ex-1|2025|Gross profit} / {ex-1|2025|Revenue} * 100' }
-  - { id: japan-share-2025, label: 'Online orders from Japan as a share of revenue, 2025 (%)', value: 3.0, decimals: 1, is: '{ex-1|2025|Online orders from Japan} / {ex-1|2025|Revenue} * 100' }
-  - { id: japan-growth, label: 'Growth in online orders from Japan, 2024 to 2025 (%)', value: 119.2, is: '({ex-1|2025|Online orders from Japan} - {ex-1|2024|Online orders from Japan}) / {ex-1|2024|Online orders from Japan} * 100' }
+  - { id: gross-margin-2025, label: 'Gross profit margin, 2025 (%)', value: 61, is: '{ex-3|2025|Gross profit} / {ex-3|2025|Revenue} * 100' }
+  - { id: japan-share-2025, label: 'Online orders from Japan as a share of revenue, 2025 (%)', value: 3.0, decimals: 1, is: '{ex-3|2025|Online orders from Japan} / {ex-3|2025|Revenue} * 100' }
+  - { id: japan-growth, label: 'Growth in online orders from Japan, 2024 to 2025 (%)', value: 119.2, is: '({ex-3|2025|Online orders from Japan} - {ex-3|2024|Online orders from Japan}) / {ex-3|2024|Online orders from Japan} * 100' }
   - { id: b-net-return, label: 'Route B: returns less the capital cost (£000)', value: 1500, is: '{ex-4|B. Joint venture (Hinata Drugstores)|Total, years 1 to 5} + {ex-4|B. Joint venture (Hinata Drugstores)|Year 0}' }
   - { id: b-average-return, label: 'Route B: average annual return (£000)', value: 300, is: '{@b-net-return} / 5' }
   - { id: b-payback-months, label: 'Route B: months into the payback year', value: 6.3, is: '(payback({ex-4|B. Joint venture (Hinata Drugstores)|Year 0}, {ex-4|B. Joint venture (Hinata Drugstores)|Year 1}, {ex-4|B. Joint venture (Hinata Drugstores)|Year 2}, {ex-4|B. Joint venture (Hinata Drugstores)|Year 3}, {ex-4|B. Joint venture (Hinata Drugstores)|Year 4}, {ex-4|B. Joint venture (Hinata Drugstores)|Year 5}) - 3) * 12' }
@@ -288,7 +288,7 @@ options:
     requires: Agreement on control, pricing and how the venture would end; a manager sent to Tokyo; accounts kept in yen.
     upside: Shelf space in a large chain from the first day, local knowledge, shared costs and half the profits.
     risks: Disputes between partners; rival chains may shun the brand; the returns are in yen, so they rise and fall with the currency.
-    evidence: [ex-3, ex-4]
+    evidence: [ex-2, ex-4]
   - id: C
     label: A subsidiary of its own
     summary: >-
@@ -308,7 +308,7 @@ options:
     requires: Very little beyond a translated website and a delivery partner.
     upside: No capital at risk, full control of the brand, and managers who stay focused on the home market.
     risks: Leaves out of reach the shoppers who buy in stores, and leaves room for a competitor to take the place the brand has found.
-    evidence: [ex-1, ex-2]
+    evidence: [ex-3, ex-1]
 
 criteria:
   - id: return
@@ -414,8 +414,8 @@ analysis:
   evidence:
     - >-
       The demand is real but early. Online orders from Japan grew by 119.2% in 2025 without any marketing, and 38% of
-      online customers bought again (Exhibits 1 and 2). But Japan is 3.0% of revenue, and the survey suggests the wider
-      market barely knows the brand: 6% awareness (Exhibit 3).
+      online customers bought again (Exhibits 3 and 1). But Japan is 3.0% of revenue, and the survey suggests the wider
+      market barely knows the brand: 6% awareness (Exhibit 2).
     - >-
       The survey shrinks as it goes: 41% would consider the serum after a sample, but 33% would pay the planned price,
       and people say they will buy more often than they do. Most prefer drugstores (52%), so the routes that reach
@@ -634,6 +634,6 @@ beyond:
 sources: [bbr-method, bbr-johanson-vahlne-1977, bbr-ghemawat-2001]
 method: >-
   Hartwell & Rye, Kasumi Trading, Hinata Drugstores and Larchfield Capital are fictional, and every figure is simulated
-  for teaching. The results in Exhibit 1 follow from stated margins; the cash flows in Exhibit 4 are the board's
+  for teaching. The results in Exhibit 3 follow from stated margins; the cash flows in Exhibit 4 are the board's
   forecasts; the payback periods, ARRs and NPVs in the Analysis edition are worked from them, with the guide's discount
   factors at 10%. The integrity check reworks every figure on every build.

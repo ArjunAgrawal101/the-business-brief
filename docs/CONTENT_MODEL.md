@@ -97,6 +97,8 @@ The label column is what readers see on the page.
 | `course`, `frameworks`, `tools`, `beyond` | The IB course (subtopics with notes and HL marking, course glossary terms), frameworks from the library, the platform's tools (toolkit guides, Strategy Studio tools, Financial Laboratory calculators, Lab pages), and ideas beyond the course with enrichment terms and sources, shown apart and labelled |
 | `figures`, `sources`, `method` | The figures the text quotes that are not exhibit cells (worked from the exhibits by a formula in `is`, or stated inputs), the register sources (in `src/content/sources/boardroom-briefings.yaml`, ids starting `bbr-`) and how the briefing was made |
 
+The case's exhibits are numbered `ex-1` and on in the order the page shows them: the evidence exhibits first, then those `financials` names (the order of the file does not matter, only the numbers). The analysis's own are numbered `ex-A1` and on in file order. The integrity check fails on any other numbering.
+
 Every figure recomputes. An exhibit's `checks` work a row from other rows or a column from other columns, compared with the cell at the decimals its column shows; `{Revenue}` names a row (in a row check) or a column (in a column check), `{ex-2|Row|Column}` any cell, `*` the row or column being checked, and `{@id}` a figure; the functions include `sum`, `npv`, `payback`, `arr` and `df`, with the guide's discount factors. The text scan then fails on any figure in the prose that is not a cell, a declared figure or a score at the precision shown (years, small counts, exhibit references and table units such as £000 are not figures).
 
 ## Subtopic notes
