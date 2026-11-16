@@ -65,8 +65,6 @@ export function yearsText(rc: Recovery): string {
   return rc.fallsBack ? `${t}, then negative again` : t;
 }
 
-export const ACRONYM = { npv: 'NPV', irr: 'IRR', pi: 'PI' } as const;
-
 function irrNote(a: Appraisal, rate: number, currency: string): string {
   const r = a.irr;
   const name = a.project.name;

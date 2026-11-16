@@ -328,4 +328,3 @@ function coverWord(a: YearMeasures, b: YearMeasures): string {
   return `Profit could fall by ${fmtNumber((1 - 1 / b.interestCover) * 100, 0)}% before it no longer covered the interest: a wider cushion for lenders than in ${a.label}.`;
 }
 
-export { splitText };

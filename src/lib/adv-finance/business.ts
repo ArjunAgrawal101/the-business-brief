@@ -20,8 +20,6 @@ import type { Statement } from '../ratios';
 
 export { BUSINESS };
 
-/** Every page that uses the figures says so. */
-export const NOTE = `${BUSINESS.name} is fictional, and every figure is simulated for teaching.`;
 
 /* ------------------------------------------------------------------ */
 /* The integrated forecast                                             */

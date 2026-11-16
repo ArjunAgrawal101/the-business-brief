@@ -9,7 +9,7 @@ import { fmtMoney, fmtNumber, round, units as plural } from '../format';
 import { esc, inline } from '../markup';
 import { workingHtml } from '../render';
 import type { Settings, TableSpec } from '../finance-lab/types';
-import { COBALT, INK, profitVolumeSvg } from './charts';
+import { profitVolumeSvg } from './charts';
 import { compareStructures, type Comparison, type CostStructureInput, type StructureResult } from './cost-structure';
 import { bullets, chartFigureHtml, figuresHtml, headlineHtml, paras, readingHtml, STANDING_TAG, tableHtml, type Fig, type Standing } from './html';
 
@@ -228,4 +228,3 @@ export function buildCostReport(input: CostStructureInput, s: Settings, currency
   };
 }
 
-export const STRUCTURE_COLOURS = { a: INK, b: COBALT } as const;
