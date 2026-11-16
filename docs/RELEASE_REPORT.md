@@ -55,7 +55,7 @@ On the final 2.2 source and build (details in [TESTING.md](TESTING.md)):
 | Link check | 213,346 internal links and assets, none broken; 157 external links listed, not fetched |
 | Contrast | 56 colour pairs, all pass, including the two new rooms' text colours |
 | Persona walkthroughs | 8 routes passed: first-time visitor, IB student (phone), teacher, undergraduate (tablet), MBA student, entrepreneur (phone), MBA student reading advanced strategy, IB student finding a tutor (phone) |
-| Browser tests | 1,092 tests on the release candidate (`c233161`): 1,088 passed, 3 skipped by design (two wide-screen navigation tests on the phone, one drawer test on the desktop) and 1 failed, in 14.9 minutes, with no retries. The failure was the announcement race described below, fixed in `d7b472c`; that test then passed ten times in a row, and the full suite is being run again on the fixed code |
+| Browser tests | 1,092 tests on the release code (`d7b472c`): 1,089 passed and 3 skipped by design (two wide-screen navigation tests on the phone, one drawer test on the desktop), in 14.2 minutes, with no failures and no retries. The run before it, on the release candidate `c233161`, found one failure: the announcement race described below, fixed in `d7b472c` |
 | GitHub CI | The QA workflow (check, lint, unit tests, build, links, the full browser suite and contrast) passed on `720e6c7`, the first push of this release, and runs again on every push |
 
 Found and fixed during QA:
