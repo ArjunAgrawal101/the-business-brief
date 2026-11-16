@@ -48,6 +48,52 @@ exercise:
     - "The critical path is the longest path; its total is the minimum time."
     - "Total float is the difference between the critical path's length and the length of the longest path through the activity."
     - "Say which activity the organizers should watch most closely, and why."
+structure:
+  - name: Activities and dependencies
+    text: "Every task in the project, its estimated duration, and the tasks that must finish before it can start."
+  - name: The network
+    text: "Nodes joined by arrows for the activities, drawn from left to right so that every dependency is shown."
+  - name: Earliest start times
+    text: "Found by the forward pass: the earliest each activity can begin, taking the longest route into each node."
+  - name: Latest finish times
+    text: "Found by the backward pass from the end: the latest each activity can finish without delaying the project."
+  - name: The critical path
+    text: "The chain of activities with no total float. Its length is the shortest time in which the project can be finished."
+  - name: Total and free float
+    text: "Total float is how long an activity can slip without delaying the project; free float is how long it can slip without delaying the next activity."
+situations:
+  suits:
+    - "Projects with many tasks that depend on each other and a fixed deadline, such as a refit, a product launch or the move to a new site."
+    - "Deciding where to put extra people or money to shorten a project, which only helps on the critical path."
+    - "Explaining to a client or a board what a delay to one task would do to the finish date."
+  poorFit:
+    - "Small projects with a handful of tasks, where a simple list or a Gantt chart is clearer."
+    - "Work whose tasks and order are not known in advance, such as early research, where durations are little more than guesses."
+interpretation: |
+  The critical path tells a manager where delay is not allowed. Any activity on it that runs late moves the finish date by the same amount; an activity with float can slip by up to its float without consequence.
+
+  Read the float as room to manage resources, not as spare time to waste: an activity with plenty of total float can lend people to the critical path. Watch the near-critical paths too. When a critical activity is shortened, another path may become critical, so the project gains less than the time saved.
+implications:
+  justifies:
+    - "Monitoring the activities on the critical path most closely, and starting them on time."
+    - "Moving people or money from activities with float to critical ones, to protect or shorten the finish date."
+    - "Telling stakeholders the earliest realistic finish date, and what a delay to a named activity would cost."
+  doesNotJustify:
+    - "Treating the finish date as certain: it is only as good as the duration estimates."
+    - "Ignoring activities with float altogether; free float can be used up by one delay, and then they become critical."
+mistakes:
+  - mistake: "Taking the longest single activity to be the critical path."
+    fix: "Add the durations along each route through the network; the critical path is the longest route, not the longest task."
+  - mistake: "Confusing total float with free float."
+    fix: "Total float protects the project's end date; free float protects the start of the next activity. Calculate both from the earliest and latest times."
+  - mistake: "Drawing the network with dependencies that are convenient rather than real."
+    fix: "List what must truly finish before each activity can start, and check the list with the people doing the work."
+apply:
+  - href: /case-room/halden-diagnosis/
+    scope: part
+    use: "The case lab's planning stage asks you to order the activities of a change; it schedules them by critical path analysis against a deadline, and lets you test what a longer task does to the finish."
+decisions: [schedule]
+references: [kelley-walker-1959]
 terms: [critical-path-analysis, critical-path, total-float, free-float, gantt-chart]
 related: [gantt-chart, raci-matrix, decision-trees]
 sources: [ib-bm-guide-2024]

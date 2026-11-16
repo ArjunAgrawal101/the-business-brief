@@ -45,12 +45,13 @@ const studioFor = (toolkitId: string) => s.tools.find((x) => x.status.toolkit ==
 const decisionRooms = e.decisionRooms.map((d) => ({ ...d, room: c.decisions[d.id] })).filter((d) => d.room);
 const served = room.data.syllabus.map((code) => ({ code, title: title(code), href: subtopicHref(c, code), hl: level(code) === 'HL' }));
 const ibTools = s.tools.filter((t) => t.status.kind === 'ib-toolkit');
-const WORDS = ['None', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten'];
+const WORDS = ['None', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen'];
+const howMany = (WORDS[s.tools.length] ?? String(s.tools.length)).toLowerCase();
 ---
 
 <BaseLayout
   title="Strategy Studio"
-  description="A consulting-style strategy environment for IB Business Management and beyond: diagnose, generate options, decide and plan, with ten tools that produce structured analysis you can export."
+  description={`A consulting-style strategy environment for IB Business Management and beyond: diagnose, generate options, decide and plan, with ${howMany} tools that produce structured analysis you can export.`}
   section="strategy-studio"
   room="strategy"
 >
@@ -73,7 +74,7 @@ const WORDS = ['None', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'E
 
   <div class="wrap page-body">
     <section aria-labelledby="sx-eng-h">
-      <SectionHead no={1} title="The engagement" id="sx-eng-h" dek="Four stages, ten tools, one question. Work through them in order, or open the tool the question in front of you needs." />
+      <SectionHead no={1} title="The engagement" id="sx-eng-h" dek={`Four stages, ${howMany} tools, one question. Work through them in order, or open the tool the question in front of you needs.`} />
       <ol class="sx-rail" role="list">
         {
           STAGE_IDS.map((id) => {
@@ -156,7 +157,7 @@ const WORDS = ['None', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'E
         no={3}
         title="The tools and the IB course"
         id="sx-reg-h"
-        dek={`${WORDS[ibTools.length] ?? ibTools.length} of the ten are tools from the guide's toolkit, checked against the Business management guide (p. 14); the rest are enrichment, labelled as such on every page.`}
+        dek={`${WORDS[ibTools.length] ?? ibTools.length} of the ${howMany} are tools from the guide's toolkit, checked against the Business management guide (p. 14); the rest are enrichment, labelled as such on every page.`}
       />
       <div class="table-scroll sx-scroll" role="region" aria-label="The Strategy Studio's tools and their standing in the IB course" tabindex="0">
         <table class="table sx-register">
@@ -202,7 +203,7 @@ const WORDS = ['None', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'E
         </table>
       </div>
       <p class="small muted sx-note">
-        The guide lists fifteen toolkit tools, all taught at AO2 and AO4 alongside the syllabus content (Business management guide, pp. 13 to 14). Porter's five forces, the TOWS matrix, stakeholder mapping and weighted option appraisal are not among them; they are offered here as enrichment.
+        The guide lists fifteen toolkit tools, all taught at AO2 and AO4 alongside the syllabus content (Business management guide, pp. 13 to 14). Porter's five forces, the TOWS matrix, stakeholder mapping, weighted option appraisal, scenario planning, stakeholder salience and the strategic fit check are not among them; they are offered here as enrichment.
       </p>
     </section>
 

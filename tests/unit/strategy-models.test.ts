@@ -302,7 +302,7 @@ describe('Option appraisal', () => {
 });
 
 describe('every tool reads saved work safely', () => {
-  const files: Record<string, string> = { swot: 'swot', steeple: 'steeple', 'five-forces': 'five-forces', ansoff: 'ansoff', bcg: 'bcg-matrix', porter: 'generic-strategies', stakeholders: 'stakeholder-map', 'decision-tree': 'decision-tree', 'force-field': 'force-field', appraisal: 'option-appraisal' };
+  const files: Record<string, string> = { swot: 'swot', steeple: 'steeple', 'five-forces': 'five-forces', ansoff: 'ansoff', bcg: 'bcg-matrix', porter: 'generic-strategies', stakeholders: 'stakeholder-map', 'decision-tree': 'decision-tree', 'force-field': 'force-field', appraisal: 'option-appraisal', scenarios: 'scenarios', salience: 'stakeholder-salience', fit: 'strategic-fit' };
   for (const [kind, lib] of Object.entries(TOOL_LIBS)) {
     it(`${kind}: never throws on damaged input, and the example round-trips`, () => {
       for (const junk of [null, 7, 'x', [], { factors: 'no' }, { nodes: [{ id: 1 }] }, { criteria: [{}], options: [{ scores: 'x' }] }]) expect(() => lib.view(junk, 'u')).not.toThrow();

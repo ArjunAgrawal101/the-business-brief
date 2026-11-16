@@ -1,0 +1,68 @@
+# Strategic fit check. Strategic fit and the McKinsey 7S framework are not in
+# the Business management guide: enrichment. The parts draw on IB content:
+# SWOT and STEEPLE (toolkit, p. 14), objectives (1.3, p. 23), change (2.1,
+# p. 25), structure (2.2, p. 25) and culture (2.5, HL, p. 27). The worked
+# example is fictional and agrees with the other tools: the factors are the
+# STEEPLE and SWOT ones, the strategy is the option the memo recommends.
+# tests/unit/strategy-lab.test.ts works it by hand: external fit 23 of 38
+# (+61%), readiness 49 of 86 (57%), 7S support 16 of 30 (2.7 of 5).
+type: tool
+kind: fit
+slug: strategic-fit
+title: Strategic fit check
+short: Strategic fit
+order: 12
+stage: plan
+summary: Test a chosen strategy at three levels, its fit with the environment, the readiness of the capabilities it needs and a McKinsey 7S consistency check of the organization behind it, judged by the weakest of the three.
+purpose: To find out, before committing, whether the organization can deliver the strategy it has chosen, and what must change first, the strategy itself, the capabilities, or the structure, systems, people and culture.
+howTo:
+  - State the strategy being tested, as specifically as you can.
+  - List the factors in the environment that matter most, from your SWOT, STEEPLE or Five Forces. Weight each by importance and rate how well the strategy answers it, from −2 (works against it) to +2 (exploits it or defends against it).
+  - "List the capabilities the strategy needs, with the level the business has now and the level it needs, and choose how to close each gap: build, borrow or buy."
+  - Describe each of the six other 7S elements as it is and as the strategy needs it, rate how far it supports the strategy now, and record the pairs of elements that pull against each other.
+  - Read the verdict from the weakest level, then plan the changes it calls for, starting with the element at the centre of the most conflicts.
+limitations:
+  - Every rating is a judgement, and the three scores combine judgements; small differences mean little.
+  - The weighting by importance and the bands for each level are the platform's teaching convention, not a standard.
+  - It tests fit, not whether the strategy is right. A perfectly aligned organization can still pursue a poor strategy.
+  - Soft elements such as shared values and style are hard to observe, so their ratings need evidence from behaviour, not from documents.
+status:
+  kind: enrichment
+  subtopics: ['1.3', '2.1', '2.2', '2.5']
+  text: The strategic fit check and the McKinsey 7S framework are not in the guide, so this tool is enrichment. Its parts draw on IB content, the opportunities and threats of SWOT and STEEPLE, both toolkit tools for SL and HL (Business management guide, p. 14), strategic objectives in 1.3 (p. 23), strategies for change in 2.1 (p. 25), organizational structure in 2.2 (p. 25) and cultural clashes in 2.5, which is HL only (p. 27). The seven elements come from Robert Waterman, Thomas Peters and Julien Phillips (1980).
+read:
+  - { label: The McKinsey 7S model, href: /frameworks/mckinsey-7s/ }
+  - { label: 'SWOT analysis: the toolkit guide', href: /toolkit/swot-analysis/ }
+  - { label: The value chain, href: /frameworks/value-chain/ }
+  - { label: '2.5 Organizational (corporate) culture (HL)', href: /topics/organizational-corporate-culture/ }
+example:
+  title: Can Northvale deliver the fleet plan?
+  situation: The memo recommends fleet cargo bikes for delivery firms. Before the board commits, the fit check asks whether the plan suits the environment, whether Northvale has the capabilities it needs, and whether its structure, systems, people and culture point the same way. Fictional business; every figure is simulated.
+  data:
+    business: Northvale Cycles
+    strategy: Fleet cargo e-bikes for delivery firms in the low-emission cities, sold direct with service contracts and built on a second assembly shift
+    environment:
+      - { id: e1, factor: Low-emission zones restricting vans, kind: opportunity, importance: 5, fit: 2, note: 'The fleet bike is built for the delivery routes the van charges will push off the road.' }
+      - { id: e2, factor: Growth in city deliveries, kind: opportunity, importance: 4, fit: 2, note: 'More parcels need more vehicles, and fleets of bikes grow with them.' }
+      - { id: e3, factor: Rising prices for motors and batteries, kind: threat, importance: 4, fit: -1, note: 'Fleet contracts fix prices for years, so rising component costs squeeze the margin unless the contracts allow for them.' }
+      - { id: e4, factor: Direct-online brands with home delivery, kind: threat, importance: 3, fit: 1, note: 'Fleets need repairs within a day, which online-only brands cannot yet offer; the dealer network is the defence.' }
+      - { id: e5, factor: A possible grant for business cargo bikes, kind: opportunity, importance: 3, fit: 2, note: 'A grant would cut the price for fleet buyers; the plan does not depend on it.' }
+    capabilities:
+      - { id: c1, name: Designing and building cargo e-bikes, importance: 5, current: 4, required: 4, route: none, note: 'The cargo bike leads its segment; a fleet version needs heavier-duty parts but no new skills.' }
+      - { id: c2, name: 'Selling to businesses: tenders, contracts and account management', importance: 4, current: 1, required: 4, route: buy, note: 'Northvale has only ever sold through dealers and online; hire an experienced fleet sales manager.' }
+      - { id: c3, name: Servicing fleets within a day, importance: 5, current: 2, required: 5, route: borrow, note: 'A two-person service desk today; partner with dealers in each city for repairs, paid by the job.' }
+      - { id: c4, name: Finance for fleet leasing, importance: 3, current: 1, required: 3, route: borrow, note: 'Fleets prefer to lease; work with a leasing company rather than lend from Northvale''s own balance sheet.' }
+      - { id: c5, name: Assembly capacity for fleet volumes, importance: 4, current: 3, required: 4, route: build, note: 'A second shift would add the capacity, if the staff council agrees to it.' }
+    elements:
+      structure: { now: 'Sales organized by dealer regions, with no team for business customers.', needs: 'A fleet accounts team with authority over prices and service terms, working with the dealers.', support: 2 }
+      systems: { now: 'Sales bonuses paid on units shipped to dealers; orders planned in seasonal batches.', needs: 'Bonuses that count fleet contracts and service revenue, tracking of repair times, and monthly fleet invoicing.', support: 2 }
+      values: { now: 'Well-made bikes that last, and pride in the family''s craft.', needs: 'The same, with reliability as a promise kept every working day.', support: 4 }
+      style: { now: 'The managing director decides most things herself, after consulting the family.', needs: 'Fleet decisions delegated to an accountable fleet lead, within clear limits.', support: 3 }
+      staff: { now: '140 people, strong in assembly, with two people on the service desk.', needs: 'Field technicians, a fleet sales manager and enough assemblers for a second shift.', support: 2 }
+      skills: { now: 'Frame building and quality assembly.', needs: 'Fleet servicing, selling to businesses and managing contracts.', support: 3 }
+    conflicts:
+      - { id: k1, a: systems, b: strategy, note: 'Bonuses reward units shipped to dealers, so the sales team gains nothing from a fleet contract.' }
+      - { id: k2, a: structure, b: style, note: 'A fleet team needs authority to agree prices, but every price now goes to the managing director.' }
+      - { id: k3, a: staff, b: structure, note: 'Field technicians have no place in a structure built around dealer regions.' }
+inUse: 'The recommended use is to say what must change before the strategy can work, and in what order. For Northvale, the fleet strategy suits its environment (external fit +61%), but the business is not yet built to deliver it: readiness is 57%, with fleet servicing and selling to businesses the largest gaps, and the structure, the bonus system and the staff mix pull against it. The check does not overturn the recommendation; it sets its conditions, a servicing partnership with the dealers, a fleet sales manager and a new bonus scheme before the first contracts.'
+updated: '2026-11-16'

@@ -1,0 +1,143 @@
+# Scenario planner. Scenario planning is not in the Business management guide
+# and is not one of its toolkit tools: enrichment. It builds on STEEPLE
+# analysis (a toolkit tool, p. 14) and connects to strategic objectives (1.3,
+# p. 23) and contingency planning (5.7, HL, p. 35). The method follows Schwartz
+# (1991) and van der Heijden (1996). The worked example is fictional: its
+# forces agree with the STEEPLE and Five Forces examples, and its options are
+# the option appraisal's, with the staged fleet plan the memo recommends.
+type: tool
+kind: scenarios
+slug: scenarios
+title: Scenario planner
+short: Scenarios
+order: 11
+stage: options
+summary: Sort the forces behind a decision by impact and uncertainty, build four futures on the two critical uncertainties, each with a narrative, implications and early-warning signposts, and test your options in all four.
+purpose: To prepare a long-lived decision for a future that cannot be forecast, by finding the few uncertainties that would change the answer, picturing the futures they could produce, and choosing options that hold up in all of them, or knowing which signposts would justify a bet on one.
+howTo:
+  - State the focal question and the horizon. Scenarios are built for a decision, not for the world in general.
+  - List the driving forces, from a STEEPLE scan or your own, and rate each for its impact on the question and for how uncertain its outcome is. Give both ends of each one's range.
+  - "Read the classes: forces that are important and fairly predictable are predetermined elements, part of every future; those that are important and genuinely open are the critical uncertainties."
+  - Choose two critical uncertainties that can vary independently as the axes. Their ends make the four futures.
+  - Name each future, write how the world gets there and what doing business in it is like, what it would mean for the business, and two or more signposts that would show it arriving.
+  - Rate each option in every future. Commit to options that hold up in all four; keep contingent ones ready, with the signposts that would trigger them.
+limitations:
+  - Four futures drawn on two axes leave out every other combination. The forces not chosen still matter, and the real future may mix the scenarios.
+  - The ratings are judgements, and an option's verdict depends on how generous they are. The comparison matters more than the numbers.
+  - Scenarios are not forecasts and carry no probabilities, so they cannot say which future is likeliest. Where probabilities can honestly be estimated, a decision tree does that job.
+  - Good scenarios take research and discussion. A set written alone in an hour mostly shows what its author already believed.
+status:
+  kind: enrichment
+  subtopics: ['1.3', '5.7']
+  text: Scenario planning is not in the guide and is not one of its toolkit tools, so this tool is enrichment. It builds on STEEPLE analysis, a toolkit tool for SL and HL (Business management guide, p. 14), serves the strategic objectives of 1.3 (p. 23), and connects to contingency planning in 5.7, which is HL only (p. 35). The method follows the scenario planning of Peter Schwartz (1991) and Kees van der Heijden (1996).
+read:
+  - { label: 'STEEPLE analysis: the toolkit guide', href: /toolkit/steeple-analysis/ }
+  - { label: 'PESTLE against STEEPLE', href: /frameworks/pestle/ }
+  - { label: 'Decision trees, for risks that can be put in numbers', href: /frameworks/decision-trees/ }
+  - { label: '5.7 Crisis management and contingency planning (HL)', href: /topics/crisis-management-and-contingency-planning/ }
+example:
+  title: Four futures for the fleet plan
+  situation: The fleet plan depends on how far cities restrict vans and on the price of motors and batteries, and no one can forecast either to 2030. Northvale builds four futures on the two, and tests its options in each. Fictional business; every figure is simulated.
+  data:
+    business: Northvale Cycles
+    question: Which route to growth should Northvale Cycles commit to, if it must still pay off whatever happens by 2030?
+    horizon: '2030'
+    axisA: d1
+    axisB: d2
+    drivers:
+      - id: d1
+        name: How far cities restrict vans
+        category: political
+        impact: 5
+        uncertainty: 4
+        pole1: Van charges stay in the three cities already planned
+        pole2: Van-free centres spread to most large cities
+        evidence: 'Three nearby cities will charge vans to enter their low-emission zones from 2027; whether others follow, and how strictly, is open.'
+      - id: d2
+        name: The price of motors and batteries
+        category: economic
+        impact: 4
+        uncertainty: 4
+        pole1: Prices keep rising, as they did by 9% last year
+        pole2: Prices fall as battery costs drop and new suppliers enter
+        evidence: 'Motor and battery prices rose 9% in a year, while suppliers expect the battery cost of each kilometre of range to fall by about a quarter over three years.'
+      - id: d3
+        name: Growth in city deliveries
+        category: social
+        impact: 4
+        uncertainty: 2
+        pole1: Deliveries keep growing slowly
+        pole2: Deliveries keep growing fast
+        evidence: 'Parcel deliveries in the region''s cities have risen every year for a decade, and the delivery firms plan for more.'
+      - id: d4
+        name: Stricter battery safety and recycling rules
+        category: legal
+        impact: 3
+        uncertainty: 1
+        pole1: The rules start in 2027 as planned
+        pole2: The rules are delayed
+        evidence: 'From 2027 every e-bike battery model must pass new tests, and makers must pay towards recycling.'
+      - id: d5
+        name: Direct-online brands entering fleet sales
+        category: economic
+        impact: 3
+        uncertainty: 4
+        pole1: They stay with consumers
+        pole2: They sell to fleets, with partners doing the servicing
+        evidence: 'The two largest online brands deliver fitted bikes to the door within five days; neither sells to fleets yet.'
+      - id: d6
+        name: A national grant for business cargo bikes
+        category: political
+        impact: 3
+        uncertainty: 5
+        pole1: No grant
+        pole2: A grant towards a third of the price
+        evidence: 'The national government is consulting; no decision is due before next year.'
+    scenarios:
+      a1b1:
+        name: Slow lane
+        story: Only the three cities already planning van charges introduce them, and the others wait to see the effect. Motor and battery prices keep climbing as demand for batteries elsewhere outstrips supply. Delivery firms run their vans for longer and buy cargo bikes only for routes inside the charging zones, and cargo bike makers compete for a small fleet market while their costs rise.
+        implications: 'Fleet sales stay small and margins thin. Northvale should not build capacity ahead of orders: keep the fleet offer to the three cities, protect the margin with service contracts, and lean on family cargo bikes and the dealers.'
+        signposts: |-
+          No further city announces van charges by the end of 2027
+          Motor and battery prices rise again at the next price round
+          Delivery firms extend their van leases instead of ordering bikes
+      a1b2:
+        name: Price war
+        story: Van rules stay as planned, but battery prices fall quickly. E-bikes become cheaper for everyone, and the direct-online brands use the savings to cut their prices further. Fleet demand grows slowly, mainly where the van charges apply, and delivery firms ask for lower prices rather than longer service.
+        implications: 'Northvale cannot win on price against the online brands. Its edge is service: fleet contracts that bundle maintenance, and dealers who repair. Falling costs ease the margin, but only if prices are held.'
+        signposts: |-
+          Battery prices fall at two price rounds in a row
+          An online brand launches a cargo model below Northvale's price
+          Fleet tenders ask for price cuts rather than service terms
+      a2b1:
+        name: Squeezed boom
+        story: More large cities announce van-free centres, and delivery firms rush to replace their vans. Demand for cargo bikes soars, but motors and batteries are scarce and dear, lead times stretch and makers ration their supply. Whoever has secured components wins the contracts.
+        implications: The fleet strategy is right, but supply is the constraint. A second motor supplier, contracts that pass on component price rises and a clear rule for which customers are served first matter more than marketing.
+        signposts: |-
+          Two more large cities announce van-free centres
+          Motor lead times pass 20 weeks again
+          Fleet buyers accept price-adjustment clauses
+      a2b2:
+        name: Cargo boom
+        story: 'Van-free centres spread and component prices fall. Fleet demand grows fast and margins are healthy, which draws in rivals: van makers launch cargo bikes and online brands start selling to fleets. The early leaders lock in fleets with service contracts lasting several years.'
+        implications: The best case for the fleet plan, and a race. Northvale should add the second shift early, sign multi-year service contracts with the first fleets, and use its dealers as a servicing network rivals cannot match quickly.
+        signposts: |-
+          A van maker announces a cargo bike
+          Two more large cities announce van-free centres
+          Battery prices fall at successive price rounds
+    options:
+      - id: o1
+        name: Fleet cargo bikes for delivery firms, all in
+        ratings: { a1b1: 2, a1b2: 3, a2b1: 4, a2b2: 5 }
+      - id: o2
+        name: 'Fleet bikes, staged: a paid trial first and a second motor supplier'
+        ratings: { a1b1: 3, a1b2: 3, a2b1: 4, a2b2: 4 }
+      - id: o3
+        name: City bikes for dealers abroad
+        ratings: { a1b1: 3, a1b2: 3, a2b1: 3, a2b2: 3 }
+      - id: o4
+        name: Relaunch commuter e-bikes online
+        ratings: { a1b1: 2, a1b2: 2, a2b1: 2, a2b2: 3 }
+inUse: 'The recommended use is to let the futures change the plan, not just describe them. For Northvale, going all in on fleets does well only where van-free centres spread; the staged plan, a paid trial first and a second motor supplier, holds up in every future, and the signposts say when to scale it up. That is the plan the memo recommends, now with its conditions in view: a strong answer names the robust option, the bets it keeps ready, and the signposts that would trigger them.'
+updated: '2026-11-16'
