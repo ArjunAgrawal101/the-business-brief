@@ -7,7 +7,9 @@
 # 1.65 × √(L × 200² + 2,000² × σL²): L 4, σL 0.25 gives 1,057; L 6, σL 1
 # gives 3,398. Exposure 7 weeks × £1.5m = £10.5m. Lumen Home exhibit: stock
 # values at £18 a unit: 8,000 × 18 = 144,000; 12,000 × 18 = 216,000;
-# 1,057 × 18 = 19,026; 3,398 × 18 = 61,164.
+# 1,057 × 18 = 19,026; 3,398 × 18 = 61,164. Fenwick: 6 ÷ 52 × £4.2m =
+# £485,000 of stock × 25% = £121,000; 0.3 × 4.2m × 12% = £151,000; gap
+# (16 − 6) × £400,000 = £4m.
 domain: operations
 title: Supply chain resilience, global sourcing and risk
 order: 3
@@ -28,7 +30,7 @@ advanced:
   - id: bullwhip
     title: 'The bullwhip effect: why shocks grow upstream'
     body: |
-      Jay Forrester (1961) showed with simulation that delays and feedback make orders oscillate more than the demand behind them. Lee, Padmanabhan and Whang (1997) named the pattern the **bullwhip effect** and identified four causes, each rational for the firm that acts on it: **demand signal processing** (each stage updates its forecast and safety stock from the orders it receives, treating noise as signal); **order batching** (ordering in large, infrequent lots); **price fluctuation** (promotions that invite forward buying); and **rationing and shortage gaming** (when supply is allocated in proportion to orders, buyers inflate them, and the phantom demand vanishes when supply recovers).
+      Jay Forrester (1961) showed with simulation that delays and feedback make orders oscillate more than the demand behind them. Lee, Padmanabhan and Whang (1997) gave the pattern, known as the **bullwhip effect**, its standard analysis and identified four causes, each rational for the firm that acts on it: **demand signal processing** (each stage updates its forecast and safety stock from the orders it receives, treating noise as signal); **order batching** (ordering in large, infrequent lots); **price fluctuation** (promotions that invite forward buying); and **rationing and shortage gaming** (when supply is allocated in proportion to orders, buyers inflate them, and the phantom demand vanishes when supply recovers).
 
       Chen, Drezner, Ryan and Simchi-Levi (2000) quantified the first cause. A stage that uses an order-up-to policy, forecasting from a moving average of the last p periods, with a lead time of L periods, places orders whose variance is at least (1 + 2L/p + 2L²/p²) times the variance of demand. With a two-week lead time and a four-week average, orders vary 2.5 times as much as demand; with a four-week lead time, five times. If three stages each forecast from their own incoming orders, the amplification compounds to roughly 2.5³, or sixteen times.
 
@@ -48,13 +50,13 @@ advanced:
 
       Kraljic (1983) classified purchases by their profit impact and their supply risk. **Non-critical** items (low impact, low risk) call for efficient buying processes; **leverage** items (high impact, low risk) for competitive tendering; **bottleneck** items (low impact, high risk) for securing supply and developing alternatives; and **strategic** items (high on both) for deep partnerships. A cheap part can be a bottleneck item, and treating it as non-critical is a common source of disruption.
 
-      Fisher (1997) matched chains to products. **Functional** products, with stable demand and thin margins, need **physically efficient** chains that minimise cost; **innovative** products, with unpredictable demand, short lives and high margins, need **market-responsive** chains that buy speed and flexibility. His central finding was that many firms ran responsive products through efficient chains, losing far more in stockouts and markdowns than they saved in cost.
+      Fisher (1997) matched chains to products. **Functional** products, with stable demand and thin margins, need **physically efficient** chains that minimise cost; **innovative** products, with unpredictable demand, short lives and high margins, need **market-responsive** chains that buy speed and flexibility. His central observation was that many firms ran innovative products through efficient chains, losing far more in stockouts and markdowns than they saved in cost.
   - id: resilience-by-design
     title: 'Resilience by design: measuring and pricing it'
     body: |
       Sheffi and Rice (2005) distinguished two sources of resilience: **redundancy** (extra stock, capacity or suppliers) and **flexibility** (standardised parts, interchangeable plants, postponement and cross-trained staff). Redundancy is simple but costly to hold; flexibility is often cheaper and also improves normal operations.
 
-      Simchi-Levi, Schmidt and Wei (2014) offered a way to find where to spend. For each supplier site or node, estimate its **time to recover** (TTR) after a disruption; for the firm, estimate its **time to survive** (TTS) without that node, using stock and alternatives. The danger lies where TTR exceeds TTS, and it is often at low-spend suppliers. Suppose a sealant bought for £300,000 a year comes from one plant with a TTR of ten weeks, while the firm can survive three weeks on stock and rescheduling. Seven weeks of lost output at £1.5 million of weekly contribution is a £10.5 million exposure, from a part that procurement ranks as trivial.
+      Simchi-Levi, Schmidt and Wei (2014) offered a way to find where to spend: for each supplier site or other node, estimate its **time to recover** (TTR) after a disruption and the loss of performance while it is out. Compare TTR with how long the firm can keep operating without the node from stock and alternatives, often called its **time to survive** (TTS). The danger lies where TTR exceeds TTS, and it is often at low-spend suppliers. Suppose a sealant bought for £300,000 a year comes from one plant with a TTR of ten weeks, while the firm can survive three weeks on stock and rescheduling. Seven weeks of lost output at £1.5 million of weekly contribution is a £10.5 million exposure, from a part that procurement ranks as trivial.
 
       Pricing mitigation means comparing its cost, such as qualifying a second source or holding extra stock, with the exposure multiplied by the probability of disruption. That arithmetic understates the case when risks are correlated (one flood closes several suppliers) or when consequences fall on customers and regulators rather than on the firm's own profit. Probability-impact matrices rank such risks poorly, so stress tests that ask "what if this node is lost for its TTR?" are more useful.
 models:
@@ -86,10 +88,10 @@ models:
     limits: |
       The scores are judgements, and the matrix takes the buyer's view; a supplier's power and interests may not fit the strategy chosen. It also treats categories one at a time and misses shared risks across them.
     sources: [adv-oe-kraljic-1983, adv-oe-williamson-1985]
-  - name: Time to recover and time to survive
+  - name: Time to recover and risk exposure
     origin: Simchi-Levi, Schmidt and Wei (2014)
     summary: |
-      For each node in the supply network, compare the time it would take to recover from a disruption with the time the firm could keep operating without it. Exposure lies where recovery is slower than survival.
+      For each node in the supply network, estimate the time it would take to recover from a disruption and the performance lost meanwhile. Comparing that time with how long the firm can operate without the node shows where exposure lies.
     use: |
       Estimate TTR with suppliers, calculate TTS from stock and alternatives, and multiply any shortfall by weekly contribution. Spend on second sources, stock or redesign where the exposure is largest, regardless of how much is bought from that node.
     limits: |
@@ -150,11 +152,11 @@ decision:
   title: One source or two at Fenwick Mobility
   fictional: true
   brief: |
-    Fenwick Mobility (fictional) assembles electric wheelchairs in the UK. Its motor controller, 4% of material cost, comes from one supplier in Shenzhen with an eight-week lead time. A fire at that plant would take an estimated 16 weeks to recover from; Fenwick holds four weeks of controllers and could survive two more by rescheduling. Weekly contribution is £400,000, and many customers are health services that need repairs and replacements quickly.
+    Fenwick Mobility (fictional) assembles electric wheelchairs in the UK. Its motor controller, 4% of material cost (about £4.2 million a year), comes from one supplier in Shenzhen with an eight-week lead time; stock is carried at 25% of its value a year. A fire at that plant would take an estimated 16 weeks to recover from; Fenwick holds four weeks of controllers and could survive two more by rescheduling. Weekly contribution is £400,000, and many customers are health services that need repairs and replacements quickly.
   options:
     - label: A. Stay single-source, hold more stock
       text: |
-        Raise controller stock from four to ten weeks of demand. Carrying cost of about £180,000 a year; no qualification work, but stock cannot cover a disruption longer than ten weeks plus rescheduling.
+        Raise controller stock from four to ten weeks of demand: about £480,000 more stock, costing about £120,000 a year to carry. No qualification work, but stock cannot cover a disruption longer than ten weeks plus rescheduling.
     - label: B. Dual source
       text: |
         Qualify a Polish supplier for 30% of volume at 12% more per unit (about £150,000 a year extra) plus £250,000 of testing and certification over nine months. Shorter lead time for that share and a second plant.
@@ -175,11 +177,11 @@ decision:
     A strong answer combines them: raise stock now (A) as a bridge, start qualification of the second source (B), and evaluate C at the next product redesign. The weakest answer accepts the current position because the controller is only 4% of material cost.
 reading:
   - source: adv-oe-lee-1997
-    note: The paper that named the bullwhip effect and set out its four causes, with remedies still used today.
+    note: The standard analysis of the bullwhip effect, setting out its four causes and remedies still used today.
   - source: adv-oe-fisher-1997
     note: A short, influential argument that supply chains must be designed for the kind of product they carry.
   - source: adv-oe-simchi-levi-2014
-    note: The time-to-recover and time-to-survive method for finding hidden exposure in a supply network.
+    note: The time-to-recover method for finding hidden exposure in a supply network.
   - source: adv-oe-sheffi-2005
     note: A book-length treatment of resilience through redundancy and flexibility, built on case studies of disruptions.
   - source: adv-oe-kraljic-1983
