@@ -19,6 +19,7 @@ import { badTokens, fillTokens, narrateContext } from '../../src/lib/executive/n
 import { conditionsSchema, executiveSchema, leversSchema, modelSchema, startSchema, type Executive, type Levers } from '../../src/lib/executive/schema';
 import { ROLE_IDS } from '../../src/lib/executive/roles';
 import { answerRight, attribution, baselinePlan, checkLevers, derived, figureValue, goalsMet, runPlan, summarize } from '../../src/lib/executive/sim';
+import { familyOf, workLink } from '../../src/lib/dashboard';
 import { loadCorpus } from './helpers/corpus';
 
 const ROOT = new URL('../../src/content/executive/', import.meta.url).pathname;
@@ -661,4 +662,15 @@ describe('the integrity check', () => {
     expect(msgs.some((m) => m.includes('more than the budget'))).toBe(true);
     expect(msgs.some((m) => m.includes('not in the source register'))).toBe(true);
   }, 30_000);
+});
+
+/* ------------------------------------------------------------------ */
+/* The learner's dashboard files the saved simulation under the Boardroom */
+/* ------------------------------------------------------------------ */
+
+describe('the saved simulation on the dashboard', () => {
+  it('is room work, linked back to the simulation and filed under the Boardroom', () => {
+    expect(familyOf('bb:executive')).toBe('work');
+    expect(workLink('executive', '', [{ title: 'Boardroom', href: '/boardroom/' }], [])).toBe('/boardroom/');
+  });
 });

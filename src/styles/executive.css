@@ -62,6 +62,9 @@
 }
 
 .ex-hero__more {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
   color: var(--text-on-ink);
   font-weight: 600;
   text-decoration-color: var(--gold-500);
@@ -370,9 +373,15 @@
 
 .ex-stage__head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--sp-1) var(--sp-4);
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-2) var(--sp-4);
   align-items: end;
+}
+
+@media (min-width: 40rem) {
+  .ex-stage__head {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
 }
 
 .ex-stage__no {
@@ -390,15 +399,20 @@
   font-family: var(--font-display);
   font-size: var(--fs-h2);
   line-height: var(--lh-snug);
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .ex-stage__state {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-end;
   gap: var(--sp-2);
+}
+
+@media (min-width: 40rem) {
+  .ex-stage__state {
+    justify-content: flex-end;
+  }
 }
 
 .ex-done,
