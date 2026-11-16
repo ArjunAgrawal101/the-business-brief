@@ -1,0 +1,198 @@
+---
+/**
+ * The course and beyond: where a briefing meets the IB course (its subtopics,
+ * terms and the frameworks the syllabus or the toolkit names) and, kept apart
+ * and labelled, what it draws on from beyond the course. Then the tools to
+ * work it, its sources and how it was made. Shown under both editions.
+ */
+import SectionHead from '../layout/SectionHead.astro';
+import ProvenanceTag from '../ui/ProvenanceTag.astro';
+import { href } from '../../lib/content';
+import { allSubtopics, subtopicHref } from '../../lib/learning';
+import { rich } from '../../lib/markup';
+import { inlineLinked } from '../../lib/boardroom-briefings/render';
+import { TOOL_KIND_LABELS, toolHref, toolName, type ToolRegistry } from '../../lib/boardroom-briefings/series';
+import type { BoardroomBriefing } from '../../lib/boardroom-briefings/schema';
+import type { Framework } from '../../lib/framework-schema';
+import type { Corpus } from '../../lib/integrity';
+
+interface Props {
+  b: BoardroomBriefing;
+  c: Corpus;
+  frameworks: Record<string, Framework>;
+  registry: ToolRegistry;
+}
+const { b, c, frameworks, registry } = Astro.props;
+const ids = new Set([...b.exhibits, ...b.analysis.exhibits].map((e) => e.id));
+const ix = (t: string) => inlineLinked(t, ids);
+const subs = allSubtopics(c);
+const sub = (code: string) => subs.find((x) => x.s.code === code)?.s;
+const STANDING = { syllabus: 'IB syllabus', toolkit: 'IB toolkit', enrichment: 'Enrichment' } as const;
+const inCourse = b.frameworks.filter((f) => frameworks[f.id]?.status !== 'enrichment');
+const beyondCourse = b.frameworks.filter((f) => frameworks[f.id]?.status === 'enrichment');
+const sourceLine = (sid: string) => {
+  const s = c.sources[sid];
+  if (!s) return sid;
+  return [s.author, s.year && `(${s.year})`].filter(Boolean).join(' ');
+};
+const AVAIL: Record<string, string> = {
+  referenced: 'Cited as a reference; not opened for this release',
+  repository: 'The platform’s own method',
+  supplied: 'Supplied to the project',
+  'web-search': 'Found by web search',
+  'not-available': 'Not available',
+};
+---
+
+<div class="bbr-shared">
+<section id="course" aria-labelledby="course-h">
+  <SectionHead title="The course and beyond" id="course-h" dek="Where this briefing meets the IB course, and, kept apart and labelled, the ideas it draws on from beyond it." />
+  <div class="bbr-connections">
+    <div class="bbr-course">
+      <div class="tags"><span class="tag tag--ib">IB course</span></div>
+      <h3>Subtopics</h3>
+      <ul class="bbr-links" role="list">
+        {
+          b.course.subtopics.map((s) => (
+            <li>
+              <a href={subtopicHref(c, s.code)}>
+                {s.code} {sub(s.code)?.title}
+              </a>
+              {s.level === 'HL' && (
+                <>
+                  {' '}
+                  <span class="tag tag--hl">HL</span>
+                </>
+              )}
+              <span class="bbr-links__note" set:html={ix(s.note)} />
+            </li>
+          ))
+        }
+      </ul>
+      {
+        inCourse.length > 0 && (
+          <>
+            <h3>Frameworks in the course</h3>
+            <ul class="bbr-links" role="list">
+              {inCourse.map((f) => {
+                const fw = frameworks[f.id];
+                return (
+                  <li>
+                    <a href={`/frameworks/${f.id}/`}>{fw?.name}</a> <span class="tag tag--plain">{fw ? STANDING[fw.status] : ''}</span>
+                    {fw?.level === 'HL' && (
+                      <>
+                        {' '}
+                        <span class="tag tag--hl">HL</span>
+                      </>
+                    )}
+                    <span class="bbr-links__note" set:html={ix(f.use)} />
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )
+      }
+      {
+        b.course.terms.length > 0 && (
+          <>
+            <h3>Course terms</h3>
+            <ul class="bbr-chips" role="list">
+              {b.course.terms.map((t) => (
+                <li>
+                  <a href={href.glossary(t)}>
+                    {c.glossary[t]?.term}
+                    {c.glossary[t]?.level === 'HL' && <span class="sr-only"> (HL)</span>}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      }
+    </div>
+
+    <div class="bbr-beyond">
+      <div class="tags"><ProvenanceTag kind="enrichment" /><span class="tag tag--plain">Beyond the IB course</span></div>
+      <h3>Ideas beyond the course</h3>
+      <ul class="bbr-links" role="list">
+        {
+          b.beyond.map((x) => (
+            <li>
+              <strong>{x.idea}</strong>
+              <span class="bbr-links__note" set:html={ix(x.body)} />
+              {x.terms.length > 0 && (
+                <ul class="bbr-chips" role="list">
+                  {x.terms.map((t) => (
+                    <li>
+                      <a href={href.glossary(t)}>{c.glossary[t]?.term}</a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <span class="bbr-links__note">
+                Source: {x.sources.map((sid, k) => <>{k > 0 && '; '}<a href={href.source(sid)}>{sourceLine(sid)}, {c.sources[sid]?.title}</a></>)}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+      {
+        beyondCourse.length > 0 && (
+          <>
+            <h3>Frameworks beyond the course</h3>
+            <ul class="bbr-links" role="list">
+              {beyondCourse.map((f) => (
+                <li>
+                  <a href={`/frameworks/${f.id}/`}>{frameworks[f.id]?.name}</a> <span class="tag tag--plain">Enrichment</span>
+                  <span class="bbr-links__note" set:html={ix(f.use)} />
+                </li>
+              ))}
+            </ul>
+          </>
+        )
+      }
+    </div>
+  </div>
+</section>
+
+<section id="tools" aria-labelledby="tools-h">
+  <SectionHead title="Work it through" id="tools-h" dek="The platform's tools that apply the briefing's ideas to its figures, or to your own." />
+  <ul class="bbr-links" role="list" style="margin-top:var(--sp-4);max-width:52rem">
+    {
+      b.tools.map((t) => {
+        const link = toolHref(t.kind, t.id, registry);
+        return (
+          <li>
+            <span class="label">{TOOL_KIND_LABELS[t.kind]}</span>{' '}
+            {link ? <a href={link}>{toolName(t.kind, t.id, registry)}</a> : toolName(t.kind, t.id, registry)}
+            <span class="bbr-links__note" set:html={ix(t.use)} />
+          </li>
+        );
+      })
+    }
+  </ul>
+</section>
+
+<section id="sources" aria-labelledby="sources-h">
+  <SectionHead title="Sources and method" id="sources-h" />
+  <ul class="reading" role="list">
+    {
+      b.sources.map((sid) => {
+        const s = c.sources[sid];
+        return (
+          <li>
+            <span class="reading__kind">{s?.kind === 'method' ? 'Method' : s?.kind === 'academic' ? 'Research' : 'Source'}</span>
+            <a href={href.source(sid)}>{s?.title}</a>{[s?.author, s?.kind !== 'method' ? s?.publisher : undefined].filter(Boolean).map((x) => `, ${x}`).join('') + (s?.year ? ` (${s.year})` : '') + '. '}
+            <span class="small muted">{s ? AVAIL[s.availability] : ''}.</span>
+          </li>
+        );
+      })
+    }
+  </ul>
+  <aside class="callout callout--note" style="margin-top:var(--sp-5)">
+    <span class="callout__kicker">How this briefing was made</span>
+    <div class="prose small" set:html={rich(b.method)} />
+  </aside>
+</section>
+</div>

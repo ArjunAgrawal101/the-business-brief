@@ -1,0 +1,363 @@
+---
+/**
+ * The Student edition of a briefing: the case and the questions. The
+ * executive summary, the business, its context, the evidence and the
+ * figures, the people with a stake, the options, the board's criteria and
+ * the discussion questions, with the recommendation withheld.
+ */
+import SectionHead from '../layout/SectionHead.astro';
+import Exhibit from '../blocks/Exhibit.astro';
+import LevelSwitch from '../ui/LevelSwitch.astro';
+import ProvenanceTag from '../ui/ProvenanceTag.astro';
+import { href } from '../../lib/content';
+import { allSubtopics } from '../../lib/learning';
+import { inlineLinked, richLinked } from '../../lib/boardroom-briefings/render';
+import { EVIDENCE_KIND_LABELS, moneyUnit, STAKE_LABELS, STUDENT_SECTIONS } from '../../lib/boardroom-briefings/series';
+import type { BoardroomBriefing } from '../../lib/boardroom-briefings/schema';
+import type { Corpus } from '../../lib/integrity';
+
+interface Props {
+  b: BoardroomBriefing;
+  c: Corpus;
+  minutes: number;
+}
+const { b, c, minutes } = Astro.props;
+const ids = new Set([...b.exhibits, ...b.analysis.exhibits].map((e) => e.id));
+const rx = (t: string) => richLinked(t, ids);
+const ix = (t: string) => inlineLinked(t, ids);
+const no = (sid: string) => STUDENT_SECTIONS.findIndex((s) => s.id === sid) + 1;
+const title = (sid: string) => STUDENT_SECTIONS.find((s) => s.id === sid)?.title ?? '';
+const financial = new Set(b.financials.exhibits);
+const financialExhibits = b.exhibits.filter((e) => financial.has(e.id));
+const otherExhibits = b.exhibits.filter((e) => !financial.has(e.id));
+const subs = allSubtopics(c);
+const subtopicTitle = (code: string) => subs.find((x) => x.s.code === code)?.s.title ?? code;
+const hasHL = b.questions.course.some((q) => q.level === 'HL');
+const LEVEL = { high: 3, medium: 2, low: 1 } as const;
+const exhibitName = (e: string) => `Exhibit ${e.replace(/^ex-/, '')}`;
+const sourceLabel = (sid: string) => {
+  const s = c.sources[sid];
+  return s ? `${s.author ?? s.publisher ?? ''}${s.year ? ` (${s.year})` : ''}` : sid;
+};
+---
+
+<section class="bbr-edition" id="student" data-panel="student" aria-label="Student edition">
+  <div class="bbr-flag" tabindex="-1" data-edition-start>
+    <p class="bbr-flag__name">The Student <em>edition</em></p>
+    <p class="bbr-flag__meta">The case and the questions, with the recommendation withheld · about {minutes} minutes to read</p>
+  </div>
+
+  <nav class="bbr-contents" aria-label="In the Student edition">
+    <p class="label label--ink">In this edition</p>
+    <ol>
+      {
+        STUDENT_SECTIONS.map((s, i) => (
+          <li>
+            <span class="bbr-contents__no" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <a href={`#${s.id}`}>{s.title}</a>
+          </li>
+        ))
+      }
+    </ol>
+  </nav>
+
+  <section id="summary" aria-labelledby="summary-h">
+    <SectionHead no={no('summary')} title={title('summary')} id="summary-h" dek="The decision in brief. In this edition the summary stops short of a recommendation." />
+    <div class="bbr-summary">
+      <div>
+        <p class="label label--ink">The situation</p>
+        <Fragment set:html={rx(b.summary.situation)} />
+      </div>
+      <div class="bbr-summary__decision">
+        <p class="label">The decision</p>
+        <Fragment set:html={rx(b.summary.decision)} />
+      </div>
+      <div>
+        <p class="label label--ink">What is at stake</p>
+        <Fragment set:html={rx(b.summary.stakes)} />
+      </div>
+    </div>
+  </section>
+
+  <section id="background" aria-labelledby="background-h">
+    <SectionHead no={no('background')} title={title('background')} id="background-h" />
+    <div class="bbr-story">
+      <div class="prose narrative">
+        {b.background.map((p) => <Fragment set:html={rx(p)} />)}
+      </div>
+      <dl class="bbr-ledger" aria-label="The company in brief">
+        <div><dt>Company</dt><dd>{b.company.name}</dd></div>
+        <div><dt>Business</dt><dd>{b.company.sector}</dd></div>
+        <div><dt>Based in</dt><dd>{b.company.location}</dd></div>
+        <div><dt>Size</dt><dd>{b.company.size}</dd></div>
+        <div><dt>Ownership</dt><dd>{b.company.ownership}</dd></div>
+        <div><dt>Figures in</dt><dd>{moneyUnit(b.currency)}</dd></div>
+        <div>
+          <dt>Status</dt>
+          <dd>{b.company.fictional ? 'A fictional company. Every figure is simulated for teaching and checked for consistency.' : 'A real company, from the cited and dated sources below.'}</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section id="context" aria-labelledby="context-h">
+    <SectionHead
+      no={no('context')}
+      title={title('context')}
+      id="context-h"
+      dek="The industry and the forces on the decision, in general terms. The only figures in this briefing are the company's own."
+    />
+    <div class="bbr-context prose">
+      {b.context.map((p) => <Fragment set:html={rx(p)} />)}
+    </div>
+  </section>
+
+  <section id="evidence" aria-labelledby="evidence-h">
+    <SectionHead
+      no={no('evidence')}
+      title={title('evidence')}
+      id="evidence-h"
+      dek="The company's own evidence (simulated), established research (cited, and stated only as its central idea) and how the market works."
+    />
+    <ul class="bbr-evidence" role="list">
+      {
+        b.evidence.map((ev) => (
+          <li class="bbr-evidence__item" data-kind={ev.kind}>
+            <p class="bbr-evidence__kind">
+              <span class="label">{EVIDENCE_KIND_LABELS[ev.kind].label}</span>{' '}
+              {ev.kind === 'company' ? (
+                <ProvenanceTag kind={b.company.fictional ? 'simulated-data' : 'external-evidence'} />
+              ) : (
+                <span class="tag tag--plain">{EVIDENCE_KIND_LABELS[ev.kind].tag}</span>
+              )}
+            </p>
+            <h3>{ev.title}</h3>
+            <Fragment set:html={rx(ev.body)} />
+            {ev.exhibits.length > 0 && (
+              <p class="bbr-evidence__refs">
+                See {ev.exhibits.map((e, k) => <>{k > 0 && ', '}<a href={`#${e}`}>{exhibitName(e)}</a></>)}
+              </p>
+            )}
+            {ev.sources.length > 0 && (
+              <p class="bbr-evidence__refs">
+                Source: {ev.sources.map((sid, k) => <>{k > 0 && '; '}<a href={href.source(sid)}>{sourceLabel(sid)}, {c.sources[sid]?.title}</a></>)}
+              </p>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+    {
+      otherExhibits.length > 0 && (
+        <>
+          <h3 class="bbr-subhead">The exhibits</h3>
+          <div class="exhibit-stack" style="margin-top:var(--sp-4)">
+            {otherExhibits.map((e) => <Exhibit exhibit={e} />)}
+          </div>
+        </>
+      )
+    }
+  </section>
+
+  <section id="financials" aria-labelledby="financials-h">
+    <SectionHead no={no('financials')} title={title('financials')} id="financials-h" />
+    <div class="prose" style="margin-top:var(--sp-4)" set:html={rx(b.financials.summary)} />
+    <div class="exhibit-stack" style="margin-top:var(--sp-5)">
+      {financialExhibits.map((e) => <Exhibit exhibit={e} />)}
+    </div>
+  </section>
+
+  <section id="stakeholders" aria-labelledby="stakeholders-h">
+    <SectionHead
+      no={no('stakeholders')}
+      title={title('stakeholders')}
+      id="stakeholders-h"
+      dek="Who has a stake in the decision, how much they care and how much they can affect it, what they want, and what the decision would mean for them."
+    />
+    <ul class="bbr-stakeholders" role="list">
+      {
+        b.stakeholders.map((s) => (
+          <li class="bbr-stake" data-side={s.side}>
+            <h3>{s.name}</h3>
+            <dl class="bbr-stake__meta">
+              <div>
+                <dt>Stakeholder</dt>
+                <dd>{s.side === 'internal' ? 'Internal' : 'External'}</dd>
+              </div>
+              <div>
+                <dt>Interest</dt>
+                <dd>
+                  <span class="bbr-dots" aria-hidden="true">
+                    {[1, 2, 3].map((k) => (
+                      <i class={k <= LEVEL[s.interest] ? 'on' : undefined} />
+                    ))}
+                  </span>{' '}
+                  {STAKE_LABELS[s.interest]}
+                </dd>
+              </div>
+              <div>
+                <dt>Power</dt>
+                <dd>
+                  <span class="bbr-dots" aria-hidden="true">
+                    {[1, 2, 3].map((k) => (
+                      <i class={k <= LEVEL[s.power] ? 'on' : undefined} />
+                    ))}
+                  </span>{' '}
+                  {STAKE_LABELS[s.power]}
+                </dd>
+              </div>
+            </dl>
+            <dl class="bbr-stake__part">
+              <div>
+                <dt>What they want</dt>
+                <dd set:html={ix(s.wants)} />
+              </div>
+              <div>
+                <dt>What the decision means for them</dt>
+                <dd set:html={ix(s.implications)} />
+              </div>
+            </dl>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section id="options" aria-labelledby="options-h">
+    <SectionHead no={no('options')} title={title('options')} id="options-h" dek="The courses of action open to the board. Each is set out on its own terms; the Analysis edition judges them." />
+    <ol class="bbr-options" role="list">
+      {
+        b.options.map((o) => (
+          <li class="bbr-option" id={`option-${o.id}`}>
+            <div class="bbr-option__head">
+              <span class="bbr-letter" aria-hidden="true">
+                {o.id}
+              </span>
+              <h3>
+                <span class="sr-only">Option {o.id}: </span>
+                {o.label}
+              </h3>
+            </div>
+            <div class="small" set:html={rx(o.summary)} />
+            <dl>
+              <div>
+                <dt>What it needs</dt>
+                <dd set:html={ix(o.requires)} />
+              </div>
+              <div>
+                <dt>What it could gain</dt>
+                <dd set:html={ix(o.upside)} />
+              </div>
+              <div>
+                <dt>What could go wrong</dt>
+                <dd set:html={ix(o.risks)} />
+              </div>
+            </dl>
+            {o.evidence.length > 0 && (
+              <p class="bbr-evidence__refs">
+                Evidence: {o.evidence.map((e, k) => <>{k > 0 && ', '}<a href={`#${e}`}>{exhibitName(e)}</a></>)}
+              </p>
+            )}
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <section id="criteria" aria-labelledby="criteria-h">
+    <SectionHead
+      no={no('criteria')}
+      title={title('criteria')}
+      id="criteria-h"
+      dek="How the board has said it will judge the options, and how much each criterion counts. The weights add up to 100."
+    />
+    <div class="table-scroll" role="region" aria-labelledby="criteria-h" tabindex="0" style="margin-top:var(--sp-4)">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Criterion</th>
+            <th scope="col">How it is judged</th>
+            <th scope="col" class="n">Weight</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            b.criteria.map((k) => (
+              <tr>
+                <th scope="row">{k.criterion}</th>
+                <td set:html={ix(k.measure)} />
+                <td class="n">
+                  <span class="bbr-weight">
+                    <span>{k.weight}%</span>
+                    <span class="bbr-weight__bar" aria-hidden="true">
+                      <span style={`width:${k.weight}%`} />
+                    </span>
+                  </span>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="questions" aria-labelledby="questions-h">
+    <SectionHead no={no('questions')} title={title('questions')} id="questions-h" dek="Answer them before you open the Analysis edition, which has notes on each.">
+      <div class="tags">
+        <ProvenanceTag kind="original-practice" />
+        {hasHL && <LevelSwitch id={`lvl-bbr-${b.number}`} />}
+      </div>
+    </SectionHead>
+    <div class="bbr-q-group">
+      <h3>In the style of the IB course</h3>
+      <p class="small muted">The platform's own questions, written for this briefing; they are not IB examination questions. The marks are each question's own allocation.</p>
+      <ol class="case-questions">
+        {
+          b.questions.course.map((q, k) => (
+            <li class="case-question" id={`q-${q.id}`} data-level={q.level === 'HL' ? 'HL' : undefined}>
+              <span class="case-question__no" aria-hidden="true">
+                {k + 1}
+              </span>
+              <div class="case-question__body">
+                <div class="case-question__prompt prose" set:html={rx(q.prompt)} />
+                <p class="case-question__meta">
+                  <a href={href.commandTerm(c.commandTerms[q.command]?.term ?? q.command)}>{c.commandTerms[q.command]?.term ?? q.command}</a>
+                  <span>{c.commandTerms[q.command]?.ao}</span>
+                  <span>{q.subtopics.map((code) => `${code} ${subtopicTitle(code)}`).join('; ')}</span>
+                  {q.level === 'HL' && <span class="tag tag--hl">HL</span>}
+                </p>
+              </div>
+              <p class="case-question__marks">
+                [{q.marks} {q.marks === 1 ? 'mark' : 'marks'}]
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+      {hasHL && <p class="hl-notice">HL-only questions are hidden in the SL view. Choose HL above to see them.</p>}
+    </div>
+    <div class="bbr-q-group">
+      <h3>For seminars, beyond the course</h3>
+      <div class="tags"><ProvenanceTag kind="enrichment" /></div>
+      <p class="small muted">For undergraduate, MBA and professional readers. These questions go beyond the IB course and are labelled as enrichment.</p>
+      <ol class="bbr-seminar">
+        {b.questions.seminar.map((q) => <li id={`q-${q.id}`} set:html={ix(q.prompt)} />)}
+      </ol>
+    </div>
+  </section>
+
+  <aside class="bbr-withheld" aria-labelledby="withheld-h">
+    <h2 id="withheld-h">The recommendation is withheld in this edition</h2>
+    <p>
+      Decide first. Choose an option, write down why, and say what would change your mind. Then read the Analysis edition, which works through the evidence, the
+      assumptions, the trade-offs and every option, and makes a recommendation of its own.
+    </p>
+    <p class="bbr-back">
+      <button type="button" class="btn btn--primary js-only" data-go="analysis">Read the Analysis edition</button>
+      <span class="nojs-only small">The Analysis edition follows below, closed. Open it when you have decided.</span>
+    </p>
+  </aside>
+</section>
