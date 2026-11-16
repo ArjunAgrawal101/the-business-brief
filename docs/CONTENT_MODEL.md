@@ -80,6 +80,7 @@ The label column is what readers see on the page.
 | `sources`, `claims` | `sources/*.yaml` (one file per area; `register.yaml` holds the original entries), `data/claims.yaml` | The source register and the claims register |
 | `briefings` | `briefings/<id>.yaml` | A learning briefing of the Entrepreneurship and Innovation Lab: its `step` on the founder's route, question, introduction and `ibSummary`; `sections`, each with the IB codes it covers (`ib`), `enrichment` when it goes beyond the syllabus, the codes it only `connects` to, and optional points, a table, formulas, a fictional example and a callout; the register of `ideas` with their IB status (`ib`, `toolkit` or `enrichment`) and the guide's page; misconceptions, enrichment `terms`, course `glossary` terms, `questions`, `tools` and `basis` |
 | `labTools` | `lab/<id>.yaml` | The data behind one of the Lab's six tools, by `kind` (`canvas`, `costs`, `revenue`, `unit-economics`, `feasibility`, `plan`): the page's question, lead, IB status and links, steps, cautions, definitions, the briefing it pairs with, and the fictional example it opens with (Refill Round), whose figures are worked by hand in `tests/unit/lab-models.test.ts` |
+| `advanced` | `advanced/<id>.yaml` | An Advanced Management and Strategy module beyond the IB course, in eight parts (below) |
 | `resources` | `data/resources.yaml` | A curated resource for the library: type, audiences, level, units and subtopics, the assessment component, `access` (a `download` with its file, format, size and pages; a `page`; or a `print` page), `contents` and `updated`. A download must exist, or the build fails |
 | `studio` | `studio/<slug>.yaml` | A Strategy Studio tool (`type: tool`): its `kind`, `slug`, `stage` of the engagement, `purpose`, `howTo`, `limitations`, its IB `status` (an `ib-toolkit` tool names its `toolkit` entry and `level`; anything else is `enrichment`, with any `extensions` such as the TOWS matrix), the notes and guides to `read`, the worked `example` (the tool's state exactly as the tool saves it) and its recommended use (`inUse`). One entry is the `engagement` that frames the room: the fictional client, its question, facts, the four stages, principles, reading and Decision Rooms |
 
@@ -229,6 +230,25 @@ Each calculation's `id` matches a builder in `workings` (`src/lib/finance.ts`). 
 | `reading` | Reading pointers, limited to the sources register |
 
 `checkPathways` in `src/lib/integrity-pathways.ts` runs when the pathway pages build and in the unit tests: the secondary route uses SL material only and names no syllabus, a link is marked HL exactly when it leads to HL-only material, enrichment maps stay off the IB DP, secondary and teachers' routes, and every practice answer can be worked.
+
+## Advanced Management modules
+
+`advancedModuleSchema` in `src/lib/advanced-schema.ts`; rendered by `src/pages/advanced/[domain]/[id].astro`. The six domains and the thirty planned modules, with the topics each must cover, are in `MODULE_PLAN` in `src/lib/advanced.ts`; a file's name is its module's id. Nothing here is mapped to the IB course: a module may name IB subtopics only in its `bridge`, to say where the course stops and the module begins.
+
+| Field | What it holds |
+| --- | --- |
+| `domain`, `order`, `title`, `dek`, `audience`, `covers`, `minutes`, `updated` | Where the module sits, what it is called, who it is written for (undergraduate, MBA, professional), the planned topics it covers, reading time and the date it was last checked |
+| `bridge` | The IB subtopic codes it builds on and a sentence on how |
+| `foundation` | Part 1, the conceptual foundation |
+| `advanced` | Part 2, three or more sections of advanced explanation, each with an id for its anchor |
+| `models` | Part 3, two or more models or frameworks: name, origin, summary, how to use it and its limits, with sources; a link to the frameworks library (`framework`) or a working tool (`tool`) where one exists |
+| `applications` | Part 4, two or more applications, each `real` (with sources and the date its facts were read, `asOf`) or `illustrative` |
+| `cases` | Part 5, one or more cases, each marked `fictional` or real with sources, with a situation, an optional exhibit and two or more questions |
+| `evaluation` | Part 6, critical evaluation |
+| `decision` | Part 7, a fictional decision exercise: a brief, two or more options, the criteria and guidance |
+| `reading`, `basis` | Part 8, three or more pieces of further reading from the register (never IB documents), and the sources the module itself rests on |
+
+`checkAdvanced` in `src/lib/integrity-advanced.ts` runs before any module page is built and in `tests/unit/advanced.test.ts`, and fails the build on a module off the plan, an unknown source, framework or code, an unsourced real application or case, a misfit exhibit, IB material offered as reading, or a module under 1,500 words.
 
 ## Adding a topic brief
 
