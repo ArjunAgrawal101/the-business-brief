@@ -91,7 +91,7 @@ export const NAV: NavGroup[] = [
     links: [
       { label: 'MBA and Advanced Management', href: '/advanced/', text: 'Strategy, finance, leadership, marketing, operations and entrepreneurship at business school depth' },
       { label: 'Undergraduate learning', href: '/pathways/undergraduate/', text: 'A route through the platform for university business and management students' },
-      { label: 'Business Intelligence', href: '/intelligence/', text: 'Real developments from 2025 and 2026, dated, sourced and read through the course' },
+      { label: 'Business Intelligence', href: '/intelligence/', text: 'Real developments from 2024 to 2026 under twelve themes, each read through six questions, every fact dated and sourced' },
       { label: 'Enrichment maps', href: '/mindmaps/#enrichment', text: 'Nine maps of management beyond the IB course, labelled enrichment' },
       { label: 'Learning pathways', href: '/pathways/', text: 'Routes for IB students, teachers, universities, MBA students and founders' },
     ],
