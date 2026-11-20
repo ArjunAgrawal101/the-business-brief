@@ -444,7 +444,7 @@ export function progressChartSvg(units: readonly UnitProgress[], subtopics: read
       if (state === 'studied') body += `<rect class="pgc-half" x="${x}" y="${y + cell / 2}" width="${cell}" height="${cell / 2}"/>`;
       body += `<rect class="pgc-cell pgc-cell--${state}" x="${x + 0.5}" y="${y + 0.5}" width="${cell - 1}" height="${cell - 1}"/>`;
     });
-    body += `<text class="pgc-value" x="${labelW + subs.length * (cell + gap) + 4}" y="${y + 15.5}">${u.completed} of ${u.total}</text>`;
+    body += `<text class="pgc-value" x="${labelW + subs.length * (cell + gap) + 4}" y="${y + 15.5}">${u.studied} of ${u.total}</text>`;
   });
   return `<svg class="pgc" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-labelledby="pgc-title pgc-desc" focusable="false"><title id="pgc-title">${escXml(title)}</title><desc id="pgc-desc">${escXml(desc)}</desc>${body}</svg>`;
 }
@@ -612,6 +612,8 @@ export function revisionQueue(input: QueueInput): QueueItem[] {
   };
 
   for (const s of input.plan.slice(0, QUEUE_TAKE.plan)) {
+    // A subtopic the plan already sets today is not suggested again below.
+    if (s.code) taken.add(s.code);
     out.push({
       kind: 'plan',
       code: s.code,
@@ -624,7 +626,7 @@ export function revisionQueue(input: QueueInput): QueueItem[] {
     });
   }
 
-  const due = dueByCode(input.cards, input.today).filter((d) => byCode.has(d.code));
+  const due = dueByCode(input.cards, input.today).filter((d) => byCode.has(d.code) && !taken.has(d.code));
   for (const d of due.slice(0, QUEUE_TAKE.cards)) {
     taken.add(d.code);
     out.push({

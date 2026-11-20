@@ -368,6 +368,9 @@ const CFG: WorkspaceConfig = {
   roomOrder: ['Strategy Studio', 'Financial Laboratory', 'Market Studio', 'People and Culture', 'Operations Floor', 'Entrepreneurship and Innovation Lab', 'Boardroom'],
   labName: 'Financial Laboratory',
   boardroomName: 'Boardroom',
+  bank: [],
+  p2: {},
+  calc: [],
 };
 
 const UNIT = { currency: '$', cac: 20, contribution: 9, lifetime: 12.5, ltv: 112.5, ratio: 5.625, payback: 2.2 };

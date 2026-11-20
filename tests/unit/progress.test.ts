@@ -226,6 +226,7 @@ describe('studied, completed and progress by unit', () => {
     const svg = progressChartSvg(unitProgress(UNITS, SUBS, states, 'SL'), SUBS, states, 'SL');
     expect(svg).toContain('role="img"');
     expect(svg).toContain('<title id="pgc-title">Subtopics at SL: 2 of 4 studied, 1 completed</title>');
+    expect(svg).toContain('>1 of 2</text>');
     expect(svg).toContain('Unit 1: 1 of 2 studied, 1 completed. Unit 3: 1 of 2 studied, 0 completed.');
     expect(svg.match(/class="pgc-cell /g)).toHaveLength(4);
     expect(svg.match(/class="pgc-fill"/g)).toHaveLength(1);
@@ -262,23 +263,30 @@ describe('the revision queue', () => {
       { code: '3.5', title: 'Final accounts', url: '/topics/final-accounts/', n: 4, score: 0.4, by: {} },
     ];
     const plan = [
-      { date: '2026-11-19', title: 'Retrieve 1.1 What is a business?', href: '/revision/flashcards/?topic=1.1', minutes: 40, code: '1.1' },
+      { date: '2026-11-19', title: 'Retrieve 3.5 Final accounts', href: '/revision/flashcards/?topic=3.5', minutes: 40, code: '3.5' },
       { date: TODAY, title: 'Case practice in the style of Paper 1', href: '/assessment/paper-1/#p1-prac-h', minutes: 40 },
     ];
     const items = revisionQueue({ ...base, cards, weak, plan });
+    // 3.6 has cards due and is weak: one item. 3.5 is in today's plan: not suggested again. 1.2 has a card due.
     expect(items.map((i) => [i.kind, i.code ?? ''])).toEqual([
-      ['plan', '1.1'],
+      ['plan', '3.5'],
       ['plan', ''],
       ['cards', '3.6'],
       ['cards', '1.2'],
-      ['weak', '3.5'],
     ]);
     expect(items[0]?.why).toBe('In your plan for Thursday 19 November, not yet done (40 minutes)');
     expect(items[1]?.why).toBe('In your plan for today (40 minutes)');
     expect(items[2]).toMatchObject({ title: 'Review 2 flashcards on 3.6 Ratio analysis', links: [{ label: 'Review them', href: '/revision/flashcards/?topic=3.6' }] });
-    expect(items[4]?.links.map((l) => l.href)).toEqual(['/revision/final-accounts/', '/revision/flashcards/?topic=3.5']);
-    expect(items[4]?.why).toBe('A weak area: 4 results average 40%');
     expect(items.length).toBeLessThanOrEqual(QUEUE_MAX);
+    // Without the plan, the weak area 3.5 is offered with its revision sheet and flashcards.
+    const free = revisionQueue({ ...base, cards, weak, plan: [] });
+    const w = free.find((i) => i.kind === 'weak');
+    expect(w?.code).toBe('3.5');
+    expect(w?.links.map((l) => l.href)).toEqual(['/revision/final-accounts/', '/revision/flashcards/?topic=3.5']);
+    expect(w?.why).toBe('A weak area: 4 results average 40%');
+    // Cards due that name no subtopic are one item for all of them, when there is room.
+    const loose = revisionQueue({ ...base, cards: parseCards({ v: 1, cards: { d: card({ due: '2026-11-19', codes: [] }), e: card({ due: '2026-11-18', codes: [] }) } }) });
+    expect(loose[0]).toMatchObject({ kind: 'cards', title: 'Review 2 flashcards', links: [{ href: '/revision/flashcards/' }] });
   });
 
   it('links to the flashcards and revision sheets by the subtopic’s code and address', () => {

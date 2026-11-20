@@ -26,6 +26,8 @@
  * copy" reads it back and combines it with what is there.
  */
 import { dashboardView, type DashConfig, type DashboardView, type WorkItem } from './dashboard';
+import { resultsByCode, type EvidenceConfig } from './progress';
+import type { CalcFamily } from './planner';
 import {
   SAVED_KEY,
   SAVED_KIND_LABELS,
@@ -575,6 +577,11 @@ export interface WorkspaceConfig extends DashConfig {
   /** The Financial Laboratory's name, and the Boardroom's, as the rooms are named. */
   labName: string;
   boardroomName: string;
+  /** Every question in the question bank with its subtopics and paper style, and each kind of Paper 2 calculation with its subtopic (src/lib/progress.ts). */
+  bank: EvidenceConfig['bank'];
+  p2: EvidenceConfig['p2'];
+  /** The Paper 2 calculation families, to name the revision plan's sessions. */
+  calc: CalcFamily[];
 }
 
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
@@ -648,7 +655,7 @@ export interface WorkspaceView extends DashboardView {
 
 /** Everything the workspace shows, from the stored items and the build's configuration. */
 export function workspaceView(items: Readonly<Record<string, string>>, cfg: WorkspaceConfig): WorkspaceView {
-  const dash = dashboardView(items, cfg);
+  const dash = withResults(dashboardView(items, cfg), items, cfg);
   const listState = parseList(items[LIST_KEY]);
   const list = listView(dash.saved, listState);
   const notebook = parseNotebook(items[NOTES_KEY]);
@@ -668,6 +675,30 @@ export function workspaceView(items: Readonly<Record<string, string>>, cfg: Work
     snapshots,
     analyses,
     analysisGroups: groupAnalyses(analyses, cfg.roomOrder),
+  };
+}
+
+/**
+ * A subtopic with results in the question bank, Paper 2 calculation practice
+ * or the flashcards is practised too: those records are read by
+ * src/lib/progress.ts, so the course's rows, its units and the counts are
+ * brought into line with them.
+ */
+export function withResults(dash: DashboardView, items: Readonly<Record<string, string>>, cfg: WorkspaceConfig): DashboardView {
+  const results = resultsByCode(items, { bank: cfg.bank, questions: cfg.questions, exercises: cfg.exercises, retrieval: cfg.retrieval, p2: cfg.p2 }, dash.log);
+  if (!results.size) return dash;
+  const rows = dash.course.rows.map((r) => (results.get(r.code)?.n && r.status !== 'practised' ? { ...r, status: 'practised' as const } : r));
+  const status = new Map(rows.map((r) => [r.code, r.status]));
+  const units = dash.course.units.map((u) => {
+    const codes = cfg.subtopics.filter((s) => s.unit === u.number).map((s) => s.code);
+    return { ...u, explored: codes.filter((c) => status.get(c) !== 'none').length, practised: codes.filter((c) => status.get(c) === 'practised').length };
+  });
+  const complete = new Set(cfg.subtopics.filter((s) => s.state === 'complete').map((s) => s.code));
+  const explored = rows.filter((r) => r.status !== 'none');
+  return {
+    ...dash,
+    course: { rows, units },
+    figures: { ...dash.figures, explored: explored.length, practised: rows.filter((r) => r.status === 'practised').length, completeExplored: explored.filter((r) => complete.has(r.code)).length },
   };
 }
 
