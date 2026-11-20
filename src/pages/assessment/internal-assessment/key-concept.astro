@@ -13,11 +13,11 @@ import CentreHead from '../../../components/centre/CentreHead.astro';
 import GuideLabel from '../../../components/centre/GuideLabel.astro';
 import IaToolNav from '../../../components/centre/IaToolNav.astro';
 import IaIntegrity from '../../../components/centre/IaIntegrity.astro';
-import { CONCEPTS, CONCEPT_NAMES, ISSUE_SIGNS, LENS, QUESTION_TESTS } from '../../../lib/ia-tools';
+import { CONCEPTS, CONCEPT_NAMES, ISSUE_SIGNS, LENS, QUESTION_TESTS, toolPosition } from '../../../lib/ia-tools';
 import '../../../styles/centre.css';
 import '../../../styles/ia-tools.css';
 
-const RULES = [
+const RULES: Array<[string, string]> = [
   ['The project uses only one of the four key concepts, change, creativity, ethics or sustainability, as its lens.', 'Guide, p. 53'],
   ['The concept may or may not appear in the research question, but the title page must state which one was used.', 'Guide, p. 53'],
   ['Five marks, criterion A, are for identifying and using a relevant key concept; the lens must be made explicit.', 'Guide, p. 53'],
@@ -36,7 +36,7 @@ const RULES = [
   <CentreHead
     crumb="Key concept guide"
     parent={{ label: 'Internal assessment', href: '/assessment/internal-assessment/' }}
-    kicker="Internal assessment · Tool 1 of 5"
+    kicker={`Internal assessment · ${toolPosition('key-concept')}`}
     title="Choosing your key concept"
     lead="Describe your issue and your question. The guide shows which of the four concepts your issue points to, checks the question's form against the IB guide, and gives you the questions your lens asks. It does not choose for you: your teacher approves the question."
     stats={[
@@ -51,8 +51,8 @@ const RULES = [
 
     <section class="it-sec" aria-labelledby="kc-rules-h">
       <SectionHead no="01" title="What the guide requires" id="kc-rules-h" />
-      <p class="ce-labels"><GuideLabel kind="ib" /></p>
-      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s}</span></li>)}</ul>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <span class="ce-cite">Business management guide; the page follows each rule</span></p>
+      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s.replace(/^Guide, /, '')}</span></li>)}</ul>
     </section>
 
     <section class="it-sec" aria-labelledby="kc-tool-h">

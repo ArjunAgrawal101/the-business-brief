@@ -1,13 +1,17 @@
 /** Helpers shared by the IA tools' scripts: feedback lists, downloads and the two-step clear. */
 import { escapeHtml } from '../ix';
 import type { Check } from '../../lib/ia-tools';
+import { LABEL_TEXT } from '../../lib/guide-labels';
 
 export const WORD: Record<Check['status'], string> = { ok: 'Fine', advice: 'Advice', problem: 'Problem' };
 
-/** A feedback list: the word first, then the text and where the rule comes from. */
+/** A feedback list: the word first, then the text, its standing and where the rule comes from. */
 export function checksHtml(list: Check[]): string {
   return list
-    .map((c) => `<li><span class="it-word it-word--${c.status}">${WORD[c.status]}</span><span>${escapeHtml(c.text)}${c.source ? ` <span class="it-src">${escapeHtml(c.source)}</span>` : ''}</span></li>`)
+    .map(
+      (c) =>
+        `<li><span class="it-word it-word--${c.status}">${WORD[c.status]}</span><span>${escapeHtml(c.text)} <span class="it-src">${escapeHtml(LABEL_TEXT[c.standing])}${c.source ? `, ${escapeHtml(c.source)}` : ''}</span></span></li>`,
+    )
     .join('');
 }
 

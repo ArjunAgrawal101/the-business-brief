@@ -13,7 +13,7 @@ import GuideLabel from '../../../components/centre/GuideLabel.astro';
 import IaToolNav from '../../../components/centre/IaToolNav.astro';
 import IaIntegrity from '../../../components/centre/IaIntegrity.astro';
 import { corpus, href } from '../../../lib/content';
-import { DATA_KINDS, QUESTION_KINDS, TOOL_RULES } from '../../../lib/ia-tools';
+import { DATA_KINDS, QUESTION_KINDS, TOOL_RULES, toolPosition } from '../../../lib/ia-tools';
 import { jsonForScript } from '../../../lib/markup';
 import '../../../styles/centre.css';
 import '../../../styles/ia-tools.css';
@@ -37,12 +37,12 @@ const links: Record<string, { href: string; label: string }> = Object.fromEntrie
     return [r.id, { href: s ? `/topics/${slugOf(s.title)}/` : '/topics/', label: s ? `${r.code} ${s.title}` : 'The topic' }];
   }),
 );
-const RULES = [
+const RULES: Array<[string, string]> = [
   ['The project puts business management tools and theories that suit the issue to work on one real organization’s problem.', 'Guide, p. 53'],
   ['Criterion C, 4 marks: its top level asks for tools chosen well, applied properly and plainly relevant to the research question.', 'Guide, p. 57'],
-  ['Tools chosen with a purpose and applied in depth make better projects; many tools used superficially weaken them.', 'TSM, p. 70'],
   ['Force field analysis, Gantt charts, Hofstede’s cultural dimensions, Porter’s generic strategies, contribution, critical path analysis and simple linear regression are HL tools in the toolkit.', 'Guide, p. 14'],
 ];
+const TSM_ADVICE = ['Tools chosen with a purpose and applied in depth make better projects; many tools used superficially weaken them.', 'TSM, p. 70'];
 ---
 
 <BaseLayout
@@ -54,7 +54,7 @@ const RULES = [
   <CentreHead
     crumb="Tool selection"
     parent={{ label: 'Internal assessment', href: '/assessment/internal-assessment/' }}
-    kicker="Internal assessment · Tool 3 of 5"
+    kicker={`Internal assessment · ${toolPosition('tool-selection')}`}
     title="Choosing business management tools"
     lead="Say what your question asks and what data your documents hold. The assistant suggests the tools that fit, and why, from the toolkit and the syllabus. Criterion C rewards tools that are relevant and applied to your organization's figures, not many tools."
     stats={[
@@ -69,8 +69,10 @@ const RULES = [
 
     <section class="it-sec" aria-labelledby="ts-rules-h">
       <SectionHead no="01" title="What the guide asks of your tools" id="ts-rules-h" />
-      <p class="ce-labels"><GuideLabel kind="ib" /></p>
-      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s}</span></li>)}</ul>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <span class="ce-cite">Business management guide; the page follows each rule</span></p>
+      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s.replace(/^Guide, /, '')}</span></li>)}</ul>
+      <p class="ce-labels"><GuideLabel kind="tsm" /></p>
+      <ul class="it-rules"><li><span>{TSM_ADVICE[0]}</span><span class="it-src">{TSM_ADVICE[1]}</span></li></ul>
     </section>
 
     <section class="it-sec" aria-labelledby="ts-tool-h">

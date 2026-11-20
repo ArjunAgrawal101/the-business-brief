@@ -2,10 +2,13 @@
 /**
  * The supporting-document checker: the reader lists their three to five
  * documents and the checker tests the list against the guide's rules and the
- * recommended checks, each labelled. It cannot judge relevance or depth, and
+ * recommended checks, each labelled (src/lib/ia-docs.ts, on the same rules as
+ * the documents tool, to the month). It cannot judge relevance or depth, and
  * it approves nothing.
  */
 import GuideLabel from './GuideLabel.astro';
+
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 const VOICES = [
   ['org', 'The organization itself'],
@@ -29,8 +32,8 @@ const VOICES = [
       <label>
         <span>You will submit in</span>
         <select data-sub-month>
-          <option value="3">April</option>
-          <option value="9">October</option>
+          <option value="april">April</option>
+          <option value="october">October</option>
         </select>
       </label>
       <label>
@@ -43,7 +46,8 @@ const VOICES = [
         <fieldset class="sd__row" data-row>
           <legend class="sd__n"></legend>
           <label class="sd__f sd__f--title"><span>What it is</span><input type="text" data-k="title" placeholder="For example: council footfall survey" /></label>
-          <label class="sd__f"><span>Published (year)</span><input type="number" data-k="year" min="1990" max="2035" inputmode="numeric" /></label>
+          <label class="sd__f"><span>Month published</span><select data-k="month"><option value="">Not known yet</option>{MONTHS.map((m, i) => <option value={String(i + 1).padStart(2, '0')}>{m}</option>)}</select></label>
+          <label class="sd__f"><span>Year published</span><input type="number" data-k="year" min="1990" max="2035" inputmode="numeric" /></label>
           <label class="sd__f sd__f--voice"><span>Whose voice</span><select data-k="voice">{VOICES.map(([v, l]) => <option value={v}>{l}</option>)}</select></label>
           <div class="sd__flags">
             <label><input type="checkbox" data-k="data" /> Has data I can analyse with a tool</label>
@@ -62,8 +66,9 @@ const VOICES = [
       <p class="label">Your set against the guide</p>
       <ul class="sd__checks" data-checks></ul>
       <p class="small muted">
-        A checker can count, date and compare. It cannot tell whether a document is relevant to your question, deep enough, or credible: you and your teacher
-        judge that. Your list stays on this device.
+        Dates are checked to the month, by the same rule as the <a href="/assessment/internal-assessment/documents/">supporting documents tool</a> and the
+        planner. A checker can count, date and compare. It cannot tell whether a document is relevant to your question, deep enough, or credible: you and
+        your teacher judge that. Your list stays on this device.
       </p>
     </div>
   </div>
@@ -113,7 +118,7 @@ const VOICES = [
     padding: 0.35rem 0.6rem;
     border: 1px solid var(--rule-control);
     border-radius: var(--radius-2);
-    background: #fff;
+    background: var(--surface-sheet);
     color: var(--text-strong);
     font: 400 0.9375rem/1.3 var(--font-ui);
   }
@@ -131,7 +136,7 @@ const VOICES = [
   .sd__row {
     position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 2fr) 7rem minmax(0, 1.6fr);
+    grid-template-columns: minmax(0, 2fr) 9rem 6rem minmax(0, 1.6fr);
     gap: var(--sp-3);
     margin: 0;
     padding: var(--sp-4);
@@ -166,8 +171,8 @@ const VOICES = [
     right: var(--sp-3);
     padding: 0.1rem 0.6rem;
     border: 1px solid var(--rule);
-    border-radius: 999px;
-    background: #fff;
+    border-radius: var(--radius-1);
+    background: var(--surface-sheet);
     font: 600 0.75rem/1.4 var(--font-ui);
     color: var(--text-muted);
     cursor: pointer;

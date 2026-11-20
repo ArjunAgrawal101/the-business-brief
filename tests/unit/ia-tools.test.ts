@@ -177,7 +177,7 @@ describe('the research timeline', () => {
     expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(11);
     expect(ics).toContain('DTSTART;VALUE=DATE:20270301\r\nDTEND;VALUE=DATE:20270302');
     expect(ics.split('\r\n').every((l) => l.length <= 75)).toBe(true);
-    expect(timelineCsv(t.milestones).split('\n')[1]).toBe('2026-11-07,Read the requirements and the criteria,"With your teacher, from the guide. Note where projects most often lose marks.",Recommended,"TSM, p. 69"');
+    expect(timelineCsv(t.milestones).split('\n')[1]).toBe('2026-11-07,Read the requirements and the criteria,"With your teacher, from the guide. Note where projects most often lose marks.",IB teacher support material,"TSM, p. 69"');
     expect(submissionNote('may', 2027)).toContain('April 2027');
   });
 });
