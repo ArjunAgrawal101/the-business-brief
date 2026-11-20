@@ -37,6 +37,7 @@ import { boardroomBriefingSchema } from './lib/boardroom-briefings/schema';
 import { activitySchema } from './lib/teachers/schema';
 import { subtopicToolsSchema, topicConnectionSchema } from './lib/connections-schema';
 import { revisionSchema } from './lib/revision/schema';
+import { comparisonSchema } from './lib/compare/schema';
 
 /**
  * Loads every `.yaml` file in a folder, each holding a list of entries with an
@@ -125,4 +126,6 @@ export const collections = {
   activities: defineCollection({ loader: yamlFiles('./src/content/activities'), schema: activitySchema }),
   // Quick revision: a file per subtopic with its exercises, flashcards and anything else its sheet needs (src/lib/revision/).
   revision: defineCollection({ loader: yamlFiles('./src/content/revision'), schema: revisionSchema }),
+  // Curated framework comparisons: two or three ideas side by side, at /frameworks/compare/<a>-vs-<b>/ (src/lib/compare/).
+  comparisons: defineCollection({ loader: yamlFiles('./src/content/comparisons'), schema: comparisonSchema }),
 };

@@ -1,0 +1,69 @@
+title: Gantt chart against critical path analysis
+question: "Should the project be shown as bars against time, or as a network that finds what cannot slip?"
+summary: "Two HL toolkit tools for planning projects: a Gantt chart shows the schedule at a glance; critical path analysis works out the shortest duration and the float."
+order: 16
+sides:
+  - name: Gantt chart
+    framework: gantt-chart
+    tool: gantt-chart
+    subtopics: ['5.1', '4.5']
+    terms: [gantt-chart]
+    level: HL
+    purpose: "To show a project's tasks against time, so everyone can see when each happens and whether the project is on schedule."
+    structure: "A bar for each task along a time scale, placed after the tasks it depends on; milestones mark key dates, and progress can be shaded in."
+    context: "Communicating a schedule to a team, monitoring progress week by week, and projects with few tasks and simple dependencies, such as a product launch."
+    strengths:
+      - "Easy to read: the schedule is visible at a glance."
+      - "Good for monitoring progress against the plan."
+      - "Shows which tasks overlap and when resources are needed."
+    limitations:
+      - "Dependencies can be hard to see on a large chart."
+      - "Does not calculate float or identify the critical path directly."
+      - "Needs redrawing when the plan changes."
+    mistakes:
+      - "Drawing bars without respecting the dependencies between tasks."
+      - "Reading the chart's end as certain when the durations are estimates."
+      - "Using it alone on a complex project where the critical path matters."
+    application:
+      fictional: true
+      business: Wrenfold Audio
+      body: "A headphone maker plans the launch of its first wireless earbuds for a trade fair. The Gantt chart shows design, testing, packaging, advertising and the first production run across fourteen weeks, and the team shades in progress every Friday."
+    exam: "HL only, so it will not be needed in Paper 1 (guide, p. 43). Construct or read the chart from the task data, label the time scale, and say what it shows about the deadline and the risks; a strong answer can compare its usefulness with critical path analysis."
+  - name: Critical path analysis
+    framework: critical-path-analysis
+    tool: critical-path-analysis
+    subtopics: ['5.1', '5.6']
+    terms: [critical-path-analysis, critical-path, total-float, free-float]
+    level: HL
+    purpose: "To find the shortest time a project can take, the activities that cannot slip without delaying it, and the float in the others."
+    structure: "A network of activities and their dependencies; earliest start and latest finish times give each activity's total and free float, and the activities with no float form the critical path."
+    context: "Projects with many activities and complex dependencies, such as a refit or a construction project, especially when a deadline is tight and resources must be moved to where they matter."
+    strengths:
+      - "Identifies the activities that decide the finishing date."
+      - "Float shows where resources can be moved without delaying the project."
+      - "Shows the effect of a delay or of speeding up an activity."
+    limitations:
+      - "More complex to build and to read than a Gantt chart."
+      - "Rests on estimated durations, which may be wrong."
+      - "Shows timing, not cost or quality."
+    mistakes:
+      - "Speeding up an activity that has float, which does not shorten the project."
+      - "Confusing total float with free float."
+      - "Forgetting that the critical path can change when durations change."
+    application:
+      fictional: true
+      business: Wrenfold Audio
+      body: "The firm's new factory line has nineteen activities. The network shows a critical path of 46 days through the electrical work and the safety checks; adding a second electrical team saves four days, while speeding up the furniture delivery saves none."
+    exam: "HL only, so it will not be needed in Paper 1 (guide, p. 43). The guide expects a network to be completed and analysed rather than drawn, the critical path identified and total and free float calculated (pp. 14 to 15): show every earliest start and latest finish, then interpret the float for the decision in the case."
+difference: "Both plan the same project. The Gantt chart lays tasks against time, so the schedule is easy to see and to monitor. Critical path analysis works out the shortest possible duration and the float of each activity, so it shows which activities cannot slip and where effort would shorten the project. One communicates the plan; the other analyses it."
+choose:
+  - when: "A team needs to see and follow a simple schedule week by week."
+    use: 0
+    why: "The bars make the plan visible and progress easy to track."
+  - when: "A deadline is tight and the business must decide which activities to speed up."
+    use: 1
+    why: "Only the critical path and the float show which activities decide the finish."
+  - when: "A large project with many activities that depend on one another."
+    use: 1
+    why: "The network handles complex dependencies that a chart makes hard to see."
+together: "Use critical path analysis to find the critical path and the float, then draw the result as a Gantt chart to communicate and monitor it. The [scenario generator](/decision-room/scenarios/) has cases on a launch schedule and on a refit that practise each."

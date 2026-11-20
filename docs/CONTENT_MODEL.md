@@ -91,6 +91,7 @@ The label column is what readers see on the page.
 | `resources` | `data/resources.yaml` | A curated resource for the library: type, audiences, level, units and subtopics, the assessment component, `access` (a `download` with its file, format, size and pages; a `page`; or a `print` page), `contents` and `updated`. A download must exist, or the build fails |
 | `revision` | `revision/<subtopic slug>.yaml` | What a subtopic's revision sheet and flashcards need beyond the rest of the content (below) |
 | `studio` | `studio/<slug>.yaml` | A Strategy Studio tool (`type: tool`): its `kind`, `slug`, `stage` of the engagement, `purpose`, `howTo`, `limitations`, its IB `status` (an `ib-toolkit` tool names its `toolkit` entry and `level`; anything else is `enrichment`, with any `extensions` such as the TOWS matrix), the notes and guides to `read`, the worked `example` (the tool's state exactly as the tool saves it) and its recommended use (`inUse`). Three tools, scenario planning (`scenarios`), stakeholder salience (`salience`) and the strategic fit check (`fit`), were added with the Framework Application Lab, all enrichment. One entry is the `engagement` that frames the room: the fictional client, its question, facts, the four stages, principles, reading and Decision Rooms |
+| `comparisons` | `comparisons/<a>-vs-<b>.yaml` | A curated comparison of two or three frameworks or ideas, with a page at `/frameworks/compare/<a>-vs-<b>/` (below) |
 
 ## The Business Intelligence Briefing
 
@@ -325,6 +326,21 @@ Each calculation's `id` matches a builder in `workings` (`src/lib/finance.ts`). 
 | `hlRecall` | Recall cards that are HL only although their question does not say so (most say "(HL)" themselves) |
 
 Card ids are `<kind>:<id>`: `term:<glossary id>`, `formula:<id>` and `formula:<id>:use`, `framework:<id>` and `framework:<id>:structure`, `distinction:`, `scenario:` and `evaluation:` with the file's ids, and `recall:<code>-<start of the question>` (`recallIds()` in `src/lib/flashcards.ts`), so an id survives a rebuild and a new question elsewhere in its set. Every card carries its subtopic codes (or `toolkit`) and a level.
+
+## Framework comparisons
+
+`comparisonSchema` in `src/lib/compare/schema.ts` (strict: an unknown field fails the build); rendered by `src/pages/frameworks/compare/[slug].astro` with the grid in `src/lib/compare/grid.ts`, which the comparison tool also uses for any two frameworks in the library. A file's name is its address, the sides joined by `-vs-`.
+
+| Field | What it holds |
+| --- | --- |
+| `title`, `question`, `summary`, `order` | The page's title, the question the comparison settles, a sentence for the index and its place in the list |
+| `sides` | Two or three sides. Each is a framework in the library (`framework`), a toolkit tool (`tool`), a syllabus idea that is neither (`syllabus`: a subtopic `code` and words from its content statement exactly as the curriculum file has them), or a mix; with further `subtopics`, glossary `terms`, its `level` (`SL/HL` or `HL`), `purpose`, `structure`, the `context` it suits, two or more `strengths`, `limitations` and `mistakes`, a fictional business `application` (`fictional: true`, the `business` and the `body`) and the `exam` advice, which the page labels Recommended strategy |
+| `difference` | The essential difference, in a paragraph |
+| `choose` | Which to use when: two or more situations (`when`), the side each calls for (`use`, by position from 0) and why, calling for more than one side |
+| `together` | How the sides work together, where they do (Markdown links allowed) |
+| `sources` | Register sources for what the page says about the course (the guide by default) |
+
+A side's standing in the course (syllabus, IB toolkit or enrichment, its subtopic and the guide's page, SL and HL or HL only) is worked out from the curriculum file, the toolkit and the library, never typed. `checkComparisons` in `src/lib/compare/integrity.ts` runs before any comparison page is built and in `tests/unit/framework-compare.test.ts` (see [ARCHITECTURE.md](ARCHITECTURE.md#the-integrity-gate)). PESTLE against STEEPLE is not a comparison here: the PESTLE page already sets the two side by side, and the tool and the check point to it.
 
 ## Adding a topic brief
 

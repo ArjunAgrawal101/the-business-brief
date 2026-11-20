@@ -511,3 +511,42 @@ The revision planner at `/revision/planner/` (rules in `src/lib/planner.ts`, the
 Scheduling is a Leitner system of five boxes, due again after 1, 2, 4, 8 and 16 days: Again sends a card to box 1 and round once more in the session, Hard keeps it in its box, Good moves it up one and Easy two. Due days are the reader's local calendar days. Progress is one item, `bb:cards`, in the shape the dashboard reads: `{ "v": 1, "cards": { "<id>": { box, due, seen, last, rating, codes, title } } }`. The number keys act only while focus is inside the session, so a single key never acts elsewhere on the page (WCAG 2.1.4). Without JavaScript the page lists every revision sheet.
 
 The recall cards on the subtopic pages and the revision sheets (`src/components/assess/RetrievalCards.astro`) are the deck's recall cards, with the same ids (`recallIds()`): their three ratings also schedule the card, Not yet as Again, Partly as Hard and Got it as Good, and changing a rating on the page replaces the earlier one rather than counting twice.
+
+## 64. Business scenario generator
+
+`/decision-room/scenarios/`. Twenty-five families of scenario across the five units (`src/lib/scenario-generator/families/`), each a template that a seed fills with a fictional business: its name, place, currency, size, industry, figures and the order of the choices. A scenario's code, `<family>-<seed>`, is its address (`?s=`), so the same code always gives the same scenario and can be shared. Every scenario is labelled Fictional, and its exhibits Simulated data. The families are filtered by unit, subtopic and toolkit tool, kept in the address. Without JavaScript the page is one complete scenario with every answer explained.
+
+| | |
+| --- | --- |
+| **The learner does** | Works the scenario in six steps: names the real problem, chooses the relevant exhibits from an evidence pack that includes distractors, picks the toolkit tool that fits from four, carries out the analysis (a calculation that is checked, a sort, or both), chooses a recommendation and justifies it in their own words, and evaluates it: who is affected, the main risk and what would change the decision |
+| **Must understand** | A decision runs from the problem through the evidence and a fitting tool to a justified recommendation with its conditions; the question decides the tool, not the unit the case sits in |
+| **Decides or infers** | Which symptom points to the cause; which exhibits bear on the decision and which only look as if they do; which tool answers this question; what the worked figures mean; which option the evidence supports, at what cost and to whom |
+| **Feedback** | At every step, in words: each choice marked Best fit, Partly fits or Does not fit with the reason, including why each other tool does not fit; each exhibit marked relevant and chosen, relevant and missed, a distractor chosen, or a distractor rightly left out; the calculation marked right, a named slip (such as a ratio divided the wrong way up, or one outcome used without its probability) or wrong, with the working line by line; a justification under eight words returned with what it should name; at the end, the model answer outline and a summary of every step's verdict, kept in `bb:scenarios` |
+| **Misconception diagnosed** | Every exhibit in a case is evidence; the tool follows from the topic rather than the question; a figure is the answer rather than the start of a judgement; a recommendation needs no condition and no view of the stakeholders |
+| **Objective** | Practise the whole route of a business decision, from the problem to the evaluation, on businesses never seen before and as often as wanted, with the reason for every verdict |
+
+## 65. Stakeholder impact simulator
+
+`/decision-room/stakeholder-impact/`. Eight decisions at fictional businesses (`src/lib/stakeholder-impact/decisions.ts`), from automating a production line to accepting a takeover offer, read through six rules written in `src/lib/stakeholder-impact/model.ts` and printed on the page. The effects are the model's judgements about a fictional business, never measurements. Without JavaScript the page is the first decision as a worked example, with its rules.
+
+| | |
+| --- | --- |
+| **The learner does** | Chooses a decision, then its scale (small, moderate, large), speed (phased, standard, fast), compensation and mitigation (none, standard, generous) and communication (minimal, timely, early and open), and writes an evaluation against the decision's prompts |
+| **Must understand** | One decision affects employees, customers, owners, suppliers, government, the local community and wider society differently, in size and over time; how a decision is carried out changes who bears its cost |
+| **Decides or infers** | Which setting moves harm from one group to another (more mitigation helps employees and costs the owners; a faster closure gains the owners sooner and hurts the community more); which conflicts between groups are live; which groups to manage closely on the power and interest grid |
+| **Feedback** | For each of the seven groups: the direction (gains, loses, or one then the other), the size, the timescale (mainly the first year, mainly after, or both) and the reason, rewritten for the settings; the main gainers and losers, the trade-offs the settings create and the conflicts that are live; the grid with each group in its quadrant (the Strategy Studio's stakeholder map) and the same as a list; the evaluation prompts. The choice is kept in the address and the evaluation in `bb:stakeholder-impact` |
+| **Misconception diagnosed** | A decision is good or bad for "the stakeholders" as one group; compensation is free; the speed of a change only affects the owners; a group with little power can be left out of the evaluation |
+| **Objective** | Evaluate a decision's consequences for each stakeholder group, and how scale, speed, mitigation and communication change them |
+
+## 66. Framework comparison
+
+`/frameworks/compare/`. Any two frameworks in the library side by side under nine headings (their standing in the IB course, purpose, structure, the context each suits, strengths, limitations, common mistakes, a fictional business application and their use in an examination answer, labelled Recommended strategy), from each framework's own data (`/frameworks/compare/data/<id>.json`, written by the build). The pair is chosen from two lists or by searching, and kept in the address (`?a=&b=`); the tool points to a curated comparison when one exists and to the PESTLE against STEEPLE page for that pair. Sixteen curated comparisons (the `comparisons` collection) each have a page at `/frameworks/compare/<a>-vs-<b>/` with the essential difference, which to use when, and how they work together; a side's standing comes from the curriculum file and the toolkit. Side by side on a wide screen, stacked on a phone with each cell naming its side.
+
+| | |
+| --- | --- |
+| **The learner does** | Chooses or searches for two frameworks, swaps them, and reads them against each other; on a curated page, reads which to use in which situation |
+| **Must understand** | Frameworks that look alike answer different questions, and the situation decides which to use |
+| **Decides or infers** | Which framework suits the situation in front of them, and what each leaves out |
+| **Feedback** | The two sides under the same headings, with each framework's own Look elsewhere when section and links to both pages and their subtopics; a notice when a curated comparison exists; the same framework chosen twice is refused with a message |
+| **Misconception diagnosed** | Ansoff and BCG answer the same question; SWOT and STEEPLE are interchangeable; payback, ARR and NPV are three ways to the same answer; quality control and quality assurance are the same thing |
+| **Objective** | Choose the right framework for a question, and justify the choice against the alternative |

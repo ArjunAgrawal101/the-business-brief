@@ -1,0 +1,578 @@
+/*
+ * The Stakeholder Impact Simulator. The decision and its settings sit in a
+ * ruled column (first on a phone), the results beside them on wide screens:
+ * each stakeholder group as a ruled row with its verdict in words and two
+ * small bars, then the trade-offs and the power-interest grid.
+ */
+
+.si {
+  display: grid;
+  gap: var(--sp-6);
+  align-items: start;
+}
+
+@media (min-width: 64rem) {
+  .si {
+    grid-template-columns: minmax(18rem, 22rem) minmax(0, 1fr);
+    gap: var(--sp-7);
+  }
+
+  .si > [data-error],
+  .si > [data-status] {
+    grid-column: 1 / -1;
+  }
+}
+
+.si-h {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  margin: 0 0 var(--sp-3);
+  padding-top: var(--sp-3);
+  border-top: 2px solid var(--rule-ink);
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  line-height: 1.2;
+  color: var(--text-strong);
+}
+
+.si-h__no {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--brass-text);
+  font-variant-numeric: lining-nums;
+}
+
+.si-h--settings {
+  margin-top: var(--sp-5);
+}
+
+.si-sub {
+  margin: var(--sp-5) 0 var(--sp-2);
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  color: var(--text-strong);
+}
+
+.si-controls {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.si-select {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--rule-control);
+  border-radius: var(--radius-1);
+  background: var(--surface-sheet);
+  color: var(--text-strong);
+  font: 500 1rem/1.3 var(--font-ui);
+}
+
+.si-select:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.si-brief {
+  padding: var(--sp-3) var(--sp-4);
+  border-left: 3px solid var(--rule-ink);
+  background: var(--surface-sheet);
+}
+
+.si-brief p {
+  margin: 0;
+}
+
+.si-brief p + p {
+  margin-top: var(--sp-2);
+}
+
+.si-brief__where {
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.si-brief__where .tag {
+  margin-left: 0.35rem;
+  vertical-align: 0.1em;
+}
+
+.si-brief__text {
+  font-size: 0.9375rem;
+}
+
+.si-nojs {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+}
+
+.si-params {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.si-param {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.si-param__legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.15rem 0.5rem;
+  padding: 0;
+  margin-bottom: var(--sp-2);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.si-param__q {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.si-param__opts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--rule-control);
+  border-radius: var(--radius-1);
+  background: var(--surface-sheet);
+}
+
+.si-opt {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.4rem;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--text-strong);
+  cursor: pointer;
+}
+
+.si-opt + .si-opt {
+  border-left: 1px solid var(--rule);
+}
+
+.si-opt input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+
+.si-opt:has(input:checked) {
+  background: var(--surface-ink);
+  color: var(--text-on-ink);
+  font-weight: 600;
+}
+
+.si-opt:has(input:focus-visible) {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+  z-index: 1;
+}
+
+.si-scale {
+  margin: 0;
+  color: var(--text-body);
+}
+
+.si-scale__label {
+  font-weight: 600;
+}
+
+.si-out {
+  display: grid;
+  gap: var(--sp-6);
+  min-width: 0;
+}
+
+.si-headline {
+  margin: 0 0 var(--sp-2);
+  font-family: var(--font-serif);
+  font-size: 1.1875rem;
+  line-height: 1.4;
+  color: var(--text-strong);
+}
+
+.si-key {
+  margin: 0 0 var(--sp-3);
+}
+
+/* The groups */
+.si-groups {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.si-group {
+  display: grid;
+  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+  gap: var(--sp-1) var(--sp-5);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.si-group__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  line-height: 1.25;
+  color: var(--text-strong);
+}
+
+.si-group__kind {
+  display: block;
+  margin-top: 0.1rem;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.si-group__verdict {
+  grid-column: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.5rem;
+  margin: 0;
+  font-size: var(--fs-small);
+}
+
+.si-dir {
+  font-weight: 700;
+}
+
+.si-group--gain .si-dir {
+  color: var(--green-text);
+}
+
+.si-group--loss .si-dir {
+  color: var(--signal-text);
+}
+
+.si-group--mixed .si-dir,
+.si-group--none .si-dir {
+  color: var(--text-strong);
+}
+
+.si-group__size::before {
+  content: "\00b7";
+  margin-right: 0.5rem;
+  color: var(--text-muted);
+}
+
+.si-group__when {
+  flex-basis: 100%;
+  color: var(--text-muted);
+}
+
+.si-group__why {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.si-group__bars {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-5);
+  margin: var(--sp-1) 0 0;
+}
+
+.si-bar {
+  display: grid;
+  grid-template-columns: 5.5rem 8rem 2.75rem;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.si-bar__track {
+  position: relative;
+  height: 0.6rem;
+  background: var(--surface-sunk);
+}
+
+.si-bar__track::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -0.2rem;
+  bottom: -0.2rem;
+  border-left: 1px solid var(--rule-ink);
+}
+
+.si-bar__fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.si-bar__fill--gain {
+  background: var(--bb-green);
+}
+
+.si-bar__fill--loss {
+  background: var(--bb-signal);
+}
+
+.si-bar__value {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-body);
+  text-align: right;
+}
+
+/* Trade-offs */
+.si-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-5);
+}
+
+.si-columns .si-sub {
+  margin-top: 0;
+}
+
+.si-who {
+  margin: 0;
+  padding-left: 1.3em;
+}
+
+.si-who li + li {
+  margin-top: var(--sp-1);
+}
+
+.si-who__name {
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.si-who__how {
+  color: var(--text-muted);
+  font-size: var(--fs-small);
+}
+
+.si-conflicts,
+.si-trade {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.si-conflicts li + li,
+.si-trade li + li {
+  margin-top: var(--sp-2);
+}
+
+.si-conflicts__pair {
+  display: block;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.si-grid {
+  display: grid;
+  gap: var(--sp-4);
+  margin-top: var(--sp-3);
+}
+
+@media (min-width: 80rem) {
+  .si-grid {
+    grid-template-columns: minmax(0, 1.3fr) minmax(14rem, 1fr);
+    align-items: start;
+  }
+}
+
+.si-grid__chart {
+  margin: 0;
+  padding: var(--sp-3);
+  overflow-x: auto;
+  background: var(--surface-sheet);
+  border: 1px solid var(--rule-hair);
+}
+
+.si-grid__chart:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* The chart keeps its own size, so its labels never drop below 12 px; on a phone it scrolls sideways in its own region. */
+.si-grid__chart svg {
+  display: block;
+  width: 100%;
+  min-width: 35rem;
+  height: auto;
+}
+
+.si-quads {
+  margin: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.si-quads__q {
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.si-quads dt {
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.si-quads__where {
+  font-weight: 400;
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+}
+
+.si-quads dd {
+  margin: 0.15rem 0 0;
+}
+
+.si-quads__how {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+/* Evaluate */
+.si-prompts {
+  margin: 0 0 var(--sp-4);
+  padding-left: 1.3em;
+}
+
+.si-prompts li + li {
+  margin-top: var(--sp-2);
+}
+
+.si-note {
+  max-width: 48rem;
+}
+
+/* The explanation after the tool */
+.si-explain {
+  margin-top: var(--sp-8);
+}
+
+.si-rules {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  gap: 0 var(--sp-6);
+  margin: var(--sp-5) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: rule;
+  max-width: 72rem;
+}
+
+.si-rules li {
+  counter-increment: rule;
+  padding: var(--sp-4) 0;
+  border-top: 1px solid var(--rule);
+}
+
+.si-rules__name {
+  margin: 0 0 var(--sp-1);
+  font-size: 1.0625rem;
+}
+
+.si-rules__name::before {
+  content: counter(rule) ". ";
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.si-rules p {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.si-limits {
+  margin-top: var(--sp-4);
+  max-width: var(--text-max);
+}
+
+.si-decisions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 0 var(--sp-6);
+  margin: var(--sp-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.si-decisions li {
+  padding: var(--sp-4) 0;
+  border-top: 1px solid var(--rule);
+}
+
+.si-decisions__title {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.si-decisions__where {
+  margin: 0.15rem 0 var(--sp-2);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.si-decisions p:last-child {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.si-read {
+  margin-top: var(--sp-4);
+}
+
+.si-groups-note {
+  margin-top: var(--sp-4);
+}
+
+@media (max-width: 40rem) {
+  .si-group {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .si-group__why {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .si-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .si-bar {
+    grid-template-columns: 5rem minmax(4rem, 1fr) 2.75rem;
+  }
+
+  .si-group__bars {
+    display: grid;
+  }
+}

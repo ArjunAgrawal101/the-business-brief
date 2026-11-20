@@ -1,0 +1,183 @@
+---
+/**
+ * The Business Scenario Generator: original fictional scenarios, generated
+ * from templates and a seed (src/lib/scenario-generator/), worked in six steps with
+ * feedback at each, a model answer outline and a summary at the end. A
+ * scenario is shared by its code, ?s=<family>-<seed>; results are kept on
+ * this device in bb:scenarios; the families can be filtered by unit,
+ * subtopic and tool. The tool comes first; the explanation follows. Without
+ * JavaScript the page shows one scenario with every answer explained.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import { corpus } from '../../lib/content';
+import { allSubtopics, subtopicHref } from '../../lib/learning';
+import { jsonForScript } from '../../lib/markup';
+import { DEFAULT_CODE, FAMILIES, UNITS, facets, scenarioFor } from '../../lib/scenario-generator';
+import { TOOLKIT } from '../../lib/scenario-generator/kit';
+import { headHtml, scenarioHtml, type RenderContext } from '../../lib/scenario-generator/render';
+import { LIMIT } from '../../lib/scenario-generator/store';
+import { STEP_IDS, STEP_TITLES } from '../../lib/scenario-generator/types';
+import { count } from '../../lib/strategy/common';
+import '../../styles/scenario-generator.css';
+
+const c = await corpus();
+const subs = allSubtopics(c);
+const { subtopics: codes, tools } = facets();
+const ctx: RenderContext = {
+  subtopics: Object.fromEntries(
+    codes.map((code) => {
+      const s = subs.find((x) => x.s.code === code)?.s;
+      if (!s) throw new Error(`Scenario generator: no subtopic ${code}`);
+      return [code, { title: s.title, href: subtopicHref(c, code), hl: s.level === 'HL' }];
+    }),
+  ),
+  tools: Object.fromEntries(
+    Object.keys(TOOLKIT).map((id) => {
+      const t = c.tools[id];
+      if (!t) throw new Error(`Scenario generator: no toolkit tool ${id}`);
+      return [id, { name: t.name, href: t.status === 'complete' ? `/toolkit/${id}/` : `/toolkit/#tool-${id}` }];
+    }),
+  ),
+};
+const first = scenarioFor(DEFAULT_CODE);
+if (!first) throw new Error('Scenario generator: the default scenario does not generate');
+const units = [...new Set(FAMILIES.map((f) => f.unit))].sort();
+const config = { ctx, defaultCode: DEFAULT_CODE };
+/** The number of steps and of units, in words, for the sentences that name them. */
+const steps = count(STEP_IDS.length);
+const unitCount = count(Object.keys(UNITS).length);
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LearningResource',
+  name: 'Business scenario generator',
+  description: `Original fictional business scenarios, worked in ${steps} steps from the problem to the consequences, with feedback at every step.`,
+  learningResourceType: 'Case study',
+  isAccessibleForFree: true,
+};
+---
+
+<BaseLayout title="Business scenario generator" description={`Original fictional business scenarios from ${FAMILIES.length} families across the ${unitCount} units, worked in ${steps} steps from the problem to the consequences, with feedback at every step and a model answer.`} section="decision-room" jsonLd={jsonLd}>
+  <PageIntro
+    trail={[{ label: 'Decision Room', href: '/decision-room/' }, { label: 'Business scenario generator' }]}
+    kicker="Decision Room"
+    title="Business scenario generator"
+    lead={`A fresh fictional case each time, worked in ${steps} steps from the problem to its consequences.`}
+  >
+    <div class="tags">
+      <span class="tag tag--simulated">Fictional scenarios</span>
+      <span class="tag tag--simulated">Simulated exhibits</span>
+      <a class="tag tag--plain" href="#sg-how-h">How it works</a>
+    </div>
+  </PageIntro>
+
+  <div class="wrap page-body">
+    <div class="sg" data-ix="scenario-generator" id="sg">
+      <script type="application/json" data-config set:html={jsonForScript(config)} />
+      <p class="state state--error" data-error hidden>The generator could not start in this browser. The scenario below is complete, with every answer explained, but new scenarios cannot be made.</p>
+
+      <form class="sg-bar js-only" aria-label="Choose a scenario" data-bar>
+        <div class="sg-bar__filters">
+          <div class="field">
+            <label for="sg-unit">Unit</label>
+            <select id="sg-unit" class="select" data-filter="unit">
+              <option value="">Every unit</option>
+              {units.map((u) => <option value={String(u)}>{'Unit ' + u + ': ' + UNITS[u]}</option>)}
+            </select>
+          </div>
+          <div class="field">
+            <label for="sg-subtopic">Subtopic</label>
+            <select id="sg-subtopic" class="select" data-filter="subtopic">
+              <option value="">Every subtopic</option>
+              {codes.map((code) => <option value={code}>{code + ' ' + ctx.subtopics[code]!.title + (ctx.subtopics[code]!.hl ? ' (HL)' : '')}</option>)}
+            </select>
+          </div>
+          <div class="field">
+            <label for="sg-tool">Toolkit tool</label>
+            <select id="sg-tool" class="select" data-filter="tool">
+              <option value="">Every tool</option>
+              {tools.map((t) => <option value={t}>{TOOLKIT[t]!.name + (TOOLKIT[t]!.level === 'HL' ? ' (HL)' : '')}</option>)}
+            </select>
+          </div>
+        </div>
+        <div class="sg-bar__acts">
+          <button type="button" class="btn btn--primary" data-new>Generate a scenario</button>
+          <button type="button" class="btn btn--small" data-variant>Another version of this case</button>
+          <button type="button" class="btn btn--small" data-share>Copy the link to this scenario</button>
+          <p class="sg-bar__count" data-count>{FAMILIES.length} families of scenario</p>
+        </div>
+        <p class="sg-bar__msg" data-bar-msg></p>
+      </form>
+
+      <p class="nojs-only sg-nojs">Scripts are off, so this is one worked scenario with every answer explained under each step. Turn scripts on to generate new scenarios, check your answers and keep your results.</p>
+
+      <article class="sg-case" aria-labelledby="sg-title" data-case>
+        <div data-head set:html={headHtml(first, ctx)} />
+        <div data-scenario set:html={scenarioHtml(first, ctx)} />
+        <div class="sg-restart js-only">
+          <button type="button" class="btn btn--small" data-restart>Start this scenario again</button>
+        </div>
+      </article>
+      <p class="sr-only" aria-live="polite" data-status></p>
+    </div>
+
+    <section aria-labelledby="sg-how-h" class="sg-explain">
+      <SectionHead no={1} title="How it works" id="sg-how-h" dek={`${count(STEP_IDS.length, true)} steps, in the order a strong answer takes. Each step is checked before the next one opens, and every choice is explained, not only marked.`} />
+      <ol class="sg-how">
+        <li><h3>{STEP_TITLES.problem}</h3><p>Separate the decision from its symptoms. A symptom (falling sales) is evidence; the problem is what must be decided.</p></li>
+        <li><h3>{STEP_TITLES.evidence}</h3><p>Choose the exhibits that bear on the problem and leave out the distractors, as you will have to in a case study.</p></li>
+        <li><h3>{STEP_TITLES.tool}</h3><p>Pick the tool from the IB business management toolkit that fits the question, and see why the others fit less well.</p></li>
+        <li><h3>{STEP_TITLES.analysis}</h3><p>Follow the structured prompt; where the case has figures, your calculation is checked, and a slip is named.</p></li>
+        <li><h3>{STEP_TITLES.recommend}</h3><p>Choose a course of action and justify it in your own words, then compare with what a strong justification does.</p></li>
+        <li><h3>{STEP_TITLES.evaluate}</h3><p>Judge who is affected, the main risk, and the condition that would change your answer.</p></li>
+      </ol>
+      <aside class="callout callout--framework sg-standing">
+        <span class="callout__kicker">Recommended strategy</span>
+        <div class="prose">
+          <p>The {steps} steps are the platform's own method, not an IB requirement. They follow what the guide asks of answers: to use the stimulus and examples rather than restate them, and to apply business terms and tools to the case (Business management guide, p. 42). The toolkit tools are those the guide lists, all taught at AO2 and AO4 (pp. 13 to 15). The scenarios are original and fictional: they are not IB questions, and the verdicts are teaching feedback, not marks.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section aria-labelledby="sg-families-h" class="sg-explain">
+      <SectionHead no={2} title={`The ${FAMILIES.length} families`} id="sg-families-h" dek="Each family is a template: every version has its own business, place, size and figures. The filters above narrow this list too." />
+      <p class="sg-none" data-none hidden>No family matches these filters together. Choose another unit, subtopic or tool.</p>
+      <ol class="sg-families" data-families>
+        {
+          FAMILIES.map((f) => (
+            <li class="sg-family" data-family={f.id} data-unit={String(f.unit)} data-subtopics={f.subtopics.join(' ')} data-tool={f.tool}>
+              <p class="sg-family__meta">
+                Unit {f.unit} · {f.subtopics.join(', ')} · {TOOLKIT[f.tool]!.name}
+                {f.level === 'HL' && <span class="tag tag--hl">HL</span>}
+              </p>
+              <h3 class="sg-family__title">{f.title}</h3>
+              <p class="sg-family__sum">{f.summary}</p>
+              <a class="sg-family__go js-only" href={`?s=${f.id}-1`} data-start={f.id}>Work a version of this case</a>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section aria-labelledby="sg-record-h" class="sg-explain js-only" data-record-section>
+      <SectionHead no={3} title="Your scenarios" id="sg-record-h" dek={`Kept on this device only, in bb:scenarios: your answers and verdicts for your last ${LIMIT} scenarios.`} />
+      <div data-record><p class="small muted">You have not worked a scenario on this device yet.</p></div>
+    </section>
+
+    <section aria-labelledby="sg-read-h" class="sg-explain">
+      <SectionHead no={4} title="Read with" id="sg-read-h" />
+      <ul class="link-list sg-read">
+        <li><a href="/toolkit/">The IB business management toolkit</a> <span class="small muted">A guide to each tool the scenarios ask you to choose.</span></li>
+        <li><a href="/decision-room/stakeholder-impact/">Stakeholder impact simulator</a> <span class="small muted">See who gains and who loses from a decision, and how the way it is carried out changes that.</span></li>
+        <li><a href="/decision-room/">The Decision Rooms</a> <span class="small muted">Commit to a decision and follow its consequences round by round.</span></li>
+        <li><a href="/frameworks/compare/">Framework comparison</a> <span class="small muted">Put two frameworks side by side before you choose a tool.</span></li>
+      </ul>
+      <p class="small muted sg-steps-note">The steps, in order: {STEP_IDS.map((k) => STEP_TITLES[k].toLowerCase()).join('; ')}.</p>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../scripts/scenario-generator';
+</script>

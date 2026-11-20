@@ -1,0 +1,205 @@
+---
+/**
+ * The Stakeholder Impact Simulator: a reader picks a fictional business and a
+ * decision, sets how it is carried out (scale, speed, mitigation and
+ * communication), and sees the impact on seven stakeholder groups, the
+ * trade-offs, a power-interest grid and the questions that close the
+ * exercise. The rules are in src/lib/stakeholder-impact/model.ts and are
+ * written out on the page from the same source. The tool comes first; the
+ * explanation follows. Without JavaScript the page shows the worked example.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import { corpus } from '../../lib/content';
+import { allSubtopics, subtopicHref } from '../../lib/learning';
+import { esc, jsonForScript } from '../../lib/markup';
+import { DECISIONS } from '../../lib/stakeholder-impact/decisions';
+import { DEFAULT_SETTINGS, GROUPS, GROUP_INFO, NOTE_MAX, PARAMS, PARAM_IDS, RULES, simulate } from '../../lib/stakeholder-impact/model';
+import { gridListHtml, gridSvg, impactHtml, promptsHtml, settingsLine, tradeoffsHtml } from '../../lib/stakeholder-impact/render';
+import { count } from '../../lib/strategy/common';
+import '../../styles/stakeholder-impact.css';
+
+const c = await corpus();
+const subs = allSubtopics(c);
+const first = DECISIONS[0]!;
+const sim = simulate(first, DEFAULT_SETTINGS);
+const codes = [...new Set(['1.4', ...DECISIONS.flatMap((d) => d.subtopics)])];
+const subtopics = Object.fromEntries(
+  codes.map((code) => {
+    const s = subs.find((x) => x.s.code === code)?.s;
+    if (!s) throw new Error(`Stakeholder impact simulator: no subtopic ${code}`);
+    return [code, { title: s.title, href: subtopicHref(c, code), hl: s.level === 'HL' }];
+  }),
+);
+/** The same markup the script writes when the decision changes. */
+const servesHtml = (codesOf: string[]) =>
+  ['1.4', ...codesOf]
+    .map((code) => {
+      const s = subtopics[code]!;
+      return `<a href="${esc(s.href)}">${esc(`${code} ${s.title}`)}</a>${s.hl ? ' (HL)' : ''}`;
+    })
+    .join(', ');
+const config = { subtopics };
+/** Each setting's options, typed once here: a generic cast inside the template would read as a tag. */
+const optionsOf = (k: (typeof PARAM_IDS)[number]): ReadonlyArray<{ id: string; label: string }> => PARAMS[k].options;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LearningResource',
+  name: 'Stakeholder impact simulator',
+  description: `Choose a fictional business decision and how it is carried out, and see its impact on ${count(GROUPS.length)} stakeholder groups.`,
+  learningResourceType: 'Simulation',
+  isAccessibleForFree: true,
+};
+---
+
+<BaseLayout title="Stakeholder impact simulator" description="Choose a fictional business decision and how it is carried out, and see who gains, who loses, when and why, with the trade-offs and a power-interest grid." section="decision-room" jsonLd={jsonLd}>
+  <PageIntro
+    trail={[{ label: 'Decision Room', href: '/decision-room/' }, { label: 'Stakeholder impact simulator' }]}
+    kicker="Decision Room"
+    title="Stakeholder impact simulator"
+    lead="Choose a decision and how it is carried out. See who gains, who loses, when and why."
+  >
+    <div class="tags">
+      <span class="tag tag--simulated">Fictional businesses</span>
+      <span class="tag tag--simulated">Simulated model</span>
+      <a class="tag tag--plain" href="#si-how-h">How the model works</a>
+    </div>
+  </PageIntro>
+
+  <div class="wrap page-body">
+    <div class="si" data-ix="stakeholder-impact" id="si">
+      <script type="application/json" data-config set:html={jsonForScript(config)} />
+      <p class="state state--error" data-error hidden>The simulator could not start in this browser. The worked example below is complete, but other decisions and settings cannot be shown.</p>
+
+      <form class="si-controls" aria-labelledby="si-set-h" data-controls>
+        <h2 class="si-h" id="si-set-h"><span class="si-h__no" aria-hidden="true">1</span> The decision</h2>
+        <p class="nojs-only si-nojs">Scripts are off, so this is the worked example: {first.business} with the settings below. Turn scripts on to choose another decision or change the settings.</p>
+        <div class="field si-field js-only">
+          <label for="si-decision">Decision</label>
+          <select id="si-decision" class="si-select" data-decision>
+            {DECISIONS.map((d) => <option value={d.id}>{d.title}</option>)}
+          </select>
+        </div>
+        <div class="si-brief" data-brief>
+          <p class="si-brief__where"><span data-business>{first.business}</span>, <span data-place>{first.place}</span> <span class="tag tag--simulated">Fictional</span></p>
+          <p class="si-brief__text" data-brief-text>{first.brief}</p>
+          <p class="si-brief__serves small">
+            Draws on <span data-serves set:html={servesHtml(first.subtopics)} />
+          </p>
+        </div>
+
+        <h2 class="si-h si-h--settings"><span class="si-h__no" aria-hidden="true">2</span> How it is carried out</h2>
+        <p class="nojs-only si-nojs">{settingsLine(DEFAULT_SETTINGS)}.</p>
+        <div class="si-params js-only">
+          {
+            PARAM_IDS.map((k) => (
+              <fieldset class="si-param" data-param={k}>
+                <legend class="si-param__legend">
+                  {PARAMS[k].label}
+                  <span class="si-param__q">{PARAMS[k].question}</span>
+                </legend>
+                <div class="si-param__opts">
+                  {optionsOf(k).map((o) => (
+                    <label class="si-opt">
+                      <input type="radio" name={`si-${k}`} value={o.id} checked={DEFAULT_SETTINGS[k] === o.id} />
+                      <span>{o.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ))
+          }
+        </div>
+        <p class="si-scale small" data-scale-note><span class="si-scale__label">At this scale:</span> <span data-scale-text>{first.scales[DEFAULT_SETTINGS.scale]}</span></p>
+      </form>
+
+      <div class="si-out">
+        <section class="si-block" aria-labelledby="si-impact-h">
+          <h2 class="si-h" id="si-impact-h"><span class="si-h__no" aria-hidden="true">3</span> The impact on each group</h2>
+          <p class="si-headline" data-headline>{sim.headline}</p>
+          <p class="small muted si-key">Scores are the model's, on a scale of about −5 to +5: a teaching model, not a measurement.</p>
+          <div data-impact set:html={impactHtml(sim)} />
+        </section>
+
+        <section class="si-block" aria-labelledby="si-trade-h">
+          <h2 class="si-h" id="si-trade-h"><span class="si-h__no" aria-hidden="true">4</span> Trade-offs</h2>
+          <div data-tradeoffs set:html={tradeoffsHtml(sim)} />
+          <h3 class="si-sub">Power and interest</h3>
+          <p class="small muted">Each group placed by its power over the business and its interest in this decision. Squares are internal stakeholders, circles external; the sign shows whether the group gains (+), loses (−), both (±) or neither (0). Stakeholder mapping is <a href="/frameworks/mendelow-matrix/">enrichment</a>: the guide does not name it, but it supports 1.4.</p>
+          <div class="si-grid">
+            <div class="si-grid__chart" role="region" aria-label="The power-interest grid" tabindex="0" data-grid set:html={gridSvg(sim, 'si-grid')} />
+            <div data-quads set:html={gridListHtml(sim)} />
+          </div>
+        </section>
+
+        <section class="si-block" aria-labelledby="si-eval-h">
+          <h2 class="si-h" id="si-eval-h"><span class="si-h__no" aria-hidden="true">5</span> Evaluate</h2>
+          <p class="small">Answer one of these in a paragraph, as you would in an exam: a judgement, the evidence for it and the condition that would change it.</p>
+          <div data-prompts set:html={promptsHtml(sim)} />
+          <div class="field si-note js-only">
+            <label for="si-note">Your evaluation</label>
+            <p class="field__hint" id="si-note-hint">Kept on this device for this decision, and nowhere else.</p>
+            <textarea id="si-note" class="textarea" rows="6" maxlength={NOTE_MAX} aria-describedby="si-note-hint" data-note></textarea>
+          </div>
+        </section>
+      </div>
+      <p class="sr-only" aria-live="polite" data-status></p>
+    </div>
+
+    <section aria-labelledby="si-how-h" class="si-explain">
+      <SectionHead no={1} title="How the model works" id="si-how-h" dek="The same rules apply to every decision, so a change in a setting always moves the results the same way." />
+      <ol class="si-rules">
+        {
+          RULES.map((r) => (
+            <li>
+              <h3 class="si-rules__name">{r.name}</h3>
+              <p>{r.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section aria-labelledby="si-limits-h" class="si-explain">
+      <SectionHead no={2} title="What it cannot tell you" id="si-limits-h" />
+      <ul class="si-limits prose">
+        <li>The scores are judgements built into the model, chosen to show how stakeholder effects usually run. A real decision needs evidence: costs, surveys, the views of the people affected.</li>
+        <li>Each group is treated as one. In practice a group splits: the staff who keep their jobs and those who lose them, the suppliers who win the new contract and those who lose the old one.</li>
+        <li>Power and interest change as a decision unfolds. A group with little power can gain it through the media, a union or a regulator.</li>
+        <li>The model shows who gains and who loses. Whether the decision is right is still your judgement, and so is how much weight each group's claim deserves: a question of ethics, not arithmetic.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="si-list-h" class="si-explain">
+      <SectionHead no={3} title={`The ${DECISIONS.length} decisions`} id="si-list-h" dek="Every business is fictional; the decisions are the kind the course asks about." />
+      <ol class="si-decisions">
+        {
+          DECISIONS.map((d) => (
+            <li>
+              <h3 class="si-decisions__title">{d.title}</h3>
+              <p class="si-decisions__where">{d.business + ', ' + d.place}</p>
+              <p>{d.brief}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section aria-labelledby="si-read-h" class="si-explain">
+      <SectionHead no={4} title="Read with" id="si-read-h" />
+      <ul class="link-list si-read">
+        <li><a href={subtopics['1.4']!.href}>1.4 {subtopics['1.4']!.title}</a> <span class="small muted">Internal and external stakeholders, and conflict between them: the course content this tool practises.</span></li>
+        <li><a href="/strategy-studio/stakeholder-map/">Stakeholder map</a> <span class="small muted">Map the stakeholders of your own decision by power, interest and stance.</span></li>
+        <li><a href="/strategy-studio/stakeholder-salience/">Stakeholder salience</a> <span class="small muted">Power, legitimacy and urgency. Enrichment: not in the IB course.</span></li>
+        <li><a href="/decision-room/scenarios/">Business scenario generator</a> <span class="small muted">Work a fictional case from the problem to its consequences, step by step.</span></li>
+        <li><a href="/decision-room/">The Decision Rooms</a> <span class="small muted">Commit to a decision and follow its consequences round by round.</span></li>
+      </ul>
+      <p class="small muted si-groups-note">The {count(GROUPS.length)} groups are {GROUPS.map((g) => GROUP_INFO[g].name.toLowerCase()).join(', ')}.</p>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../scripts/stakeholder-impact';
+</script>
