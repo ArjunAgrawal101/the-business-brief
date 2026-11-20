@@ -188,11 +188,13 @@ export interface RqState {
 
 export const emptyRq = (): RqState => ({ org: '', issue: '', form: 'forward', decision: '', taken: '', aim: '', concept: 'change', q: '', tests: [] });
 
-const tidy = (s: string) => s.trim().replace(/\s+/g, ' ').replace(/[.?!]+$/, '');
+const squash = (s: string) => s.trim().replace(/\s+/g, ' ');
+/** The end of a phrase that goes inside the question: no full stop or question mark of its own. */
+const tidy = (s: string) => squash(s).replace(/[.?!]+$/, '');
 
-/** A draft question from the parts the reader gave: a starting point to refine, never a finished question. */
+/** A draft question from the parts the reader gave: a starting point to refine, never a finished question. A name keeps its own full stop ("Crumb & Co."). */
 export function draftQuestion(s: Pick<RqState, 'org' | 'form' | 'decision' | 'taken' | 'aim'>): string {
-  const org = tidy(s.org) || 'the organization';
+  const org = squash(s.org) || 'the organization';
   if (s.form === 'forward') return `Should ${org} ${tidy(s.decision) || 'make the decision'}?`;
   return `How effectively has ${org}'s ${tidy(s.taken) || 'decision'} ${tidy(s.aim) || 'met its aim'}?`;
 }
@@ -691,15 +693,15 @@ export function progressSummary(state: ProgressState, today: string, plan?: Time
 
 /** The IA tools, in the order a project uses them. Each is a page of its own; the count shown anywhere is this list's length. */
 export const IA_TOOL_PAGES = [
-  { id: 'research-question', href: '/assessment/internal-assessment/research-question/', name: 'Research question', line: 'A question built from your organization, issue, decision and lens, and checked against the guide' },
-  { id: 'key-concept', href: '/assessment/internal-assessment/key-concept/', name: 'Key concept guide', line: 'Which of the four concepts fits your issue as a lens, and checks of your question’s form' },
-  { id: 'methodology', href: '/assessment/internal-assessment/methodology/', name: 'Research methodology', line: 'Primary and secondary research planned against the guide: what to attach, and what to say in your introduction' },
-  { id: 'documents', href: '/assessment/internal-assessment/documents/', name: 'Supporting documents', line: 'The guide’s rules for the set, and each document’s origin, purpose, date, reliability and relevance' },
-  { id: 'tool-selection', href: '/assessment/internal-assessment/tool-selection/', name: 'Tool selection', line: 'The toolkit and syllabus tools that fit your question and the data in your documents' },
-  { id: 'evidence', href: '/assessment/internal-assessment/evidence/', name: 'Evidence analysis', line: 'Each piece of evidence from your documents: quoted, used with a tool, or integrated into the argument' },
-  { id: 'word-count', href: '/assessment/internal-assessment/word-count/', name: 'Word count planner', line: 'Your 1,800 words shared between the sections, against the guide’s limit and its list of what does not count' },
-  { id: 'timeline', href: '/assessment/internal-assessment/timeline/', name: 'Research timeline', line: 'Milestones counted back from your deadline, to print or add to your calendar' },
-  { id: 'progress', href: '/assessment/internal-assessment/progress/', name: 'Progress tracker', line: 'Each stage, the words that count and the checks before you submit' },
+  { id: 'research-question', href: '/assessment/internal-assessment/research-question/', name: 'Research question', key: 'bb:ia:rq', line: 'A question built from your organization, issue, decision and lens, and checked against the guide' },
+  { id: 'key-concept', href: '/assessment/internal-assessment/key-concept/', name: 'Key concept guide', key: 'bb:ia-concept', line: 'Which of the four concepts fits your issue as a lens, and checks of your question’s form' },
+  { id: 'methodology', href: '/assessment/internal-assessment/methodology/', name: 'Research methodology', key: 'bb:ia-method', line: 'Primary and secondary research planned against the guide: what to attach, and what to say in your introduction' },
+  { id: 'documents', href: '/assessment/internal-assessment/documents/', name: 'Supporting documents', key: 'bb:ia-documents', line: 'The guide’s rules for the set, and each document’s origin, purpose, date, reliability and relevance' },
+  { id: 'tool-selection', href: '/assessment/internal-assessment/tool-selection/', name: 'Tool selection', key: 'bb:ia-tools', line: 'The toolkit and syllabus tools that fit your question and the data in your documents' },
+  { id: 'evidence', href: '/assessment/internal-assessment/evidence/', name: 'Evidence analysis', key: 'bb:ia-evidence', line: 'Each piece of evidence from your documents: quoted, used with a tool, or integrated into the argument' },
+  { id: 'word-count', href: '/assessment/internal-assessment/word-count/', name: 'Word count planner', key: 'bb:ia-words', line: 'Your 1,800 words shared between the sections, against the guide’s limit and its list of what does not count' },
+  { id: 'timeline', href: '/assessment/internal-assessment/timeline/', name: 'Research timeline', key: 'bb:ia-timeline', line: 'Milestones counted back from your deadline, to print or add to your calendar' },
+  { id: 'progress', href: '/assessment/internal-assessment/progress/', name: 'Progress tracker', key: 'bb:ia-progress', line: 'Each stage, the words that count and the checks before you submit' },
 ] as const;
 export type IaToolId = (typeof IA_TOOL_PAGES)[number]['id'];
 

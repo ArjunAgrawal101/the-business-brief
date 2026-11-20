@@ -31,6 +31,7 @@ import { boardroomHref, boardroomScenarios } from '../../lib/boardroom/content';
 import { ROLE_IN_TEXT } from '../../lib/boardroom/roles';
 import { MARKET_TOOLS, toolHref as marketHref, toolKey as marketKey } from '../../lib/market-tools';
 import { ROOM_INFO, roomTools as roomToolsOf, toolHref as roomToolHref } from '../../lib/room-tools';
+import { IA_TOOL_PAGES } from '../../lib/ia-tools';
 import { LAB as FIN_LAB, labHref as finLabHref } from '../../lib/finance-lab/catalogue';
 import { library } from '../../lib/frameworks-content';
 import { frameworkHref, inLibraryOrder } from '../../lib/frameworks';
@@ -103,6 +104,8 @@ const peopleOps = (['people', 'operations'] as const).flatMap((room) =>
 );
 const roomTools: DashRoomTool[] = [
   ...strategy.sequence.map((t) => ({ key: `bb:strategy:${t.slug}`, title: t.title, url: studioHref(t.slug), room: roomName('strategy-studio', 'Strategy Studio') })),
+  // The internal assessment tools, by the key each keeps (the research question builder is listed with the Centre's tools above).
+  ...IA_TOOL_PAGES.filter((t) => t.key.startsWith('bb:ia-')).map((t) => ({ key: t.key, title: `IA: ${t.name}`, url: t.href, room: centre })),
   ...MARKET_TOOLS.map((t) => ({ key: `bb:${marketKey(t.slug)}`, title: t.name, url: marketHref(t.slug), room: roomName('market-studio', 'Market Studio') })),
   ...peopleOps,
   ...theLab.toolList.map(([id, t]) => ({
