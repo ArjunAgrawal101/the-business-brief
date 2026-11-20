@@ -428,7 +428,7 @@ each('[data-ix="p1-case"]', (root) => {
     renderCase();
   };
 
-  q<HTMLButtonElement>('[data-start]')?.addEventListener('click', () => {
+  q<HTMLButtonElement>('[data-start-paper]')?.addEventListener('click', () => {
     if (running) return;
     reveal(false);
     running = { since: performance.now(), banked: 0, timer: 0, said: new Set() };
@@ -477,7 +477,7 @@ each('[data-ix="p1-case"]', (root) => {
 
   q<HTMLButtonElement>('[data-clock-quit]')?.addEventListener('click', () => {
     stop();
-    q<HTMLButtonElement>('[data-start]')?.focus();
+    q<HTMLButtonElement>('[data-start-paper]')?.focus();
     announce(live, 'The timed paper was stopped. Nothing was recorded.');
   });
 
