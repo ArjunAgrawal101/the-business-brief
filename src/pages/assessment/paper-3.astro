@@ -17,11 +17,13 @@ import PlanBuilder from '../../components/centre/PlanBuilder.astro';
 import FactList from '../../components/assess/FactList.astro';
 import IbGuidance from '../../components/assess/IbGuidance.astro';
 import { corpus, href } from '../../lib/content';
-import { GUIDES } from '../../lib/guides';
+import { EVERY_PAPER, GUIDES, claimFacts } from '../../lib/guides';
+import { CREATOR_GUIDE } from '../../lib/guide-labels';
 import '../../styles/centre.css';
 
 const c = await corpus();
 const p3 = c.assessment['paper-3'];
+const G = CREATOR_GUIDE['paper-3'];
 const questions = Object.entries(c.questions).filter(([, q]) => q.paperStyle === 'paper-3');
 const RESOURCES = [
   { id: 'R1', title: 'Introduction', kind: 'Text' },
@@ -62,14 +64,14 @@ const R3 = [
   />
 
   <div class="wrap page-body ce">
-    <LabelKey />
+    <LabelKey compact />
 
     <section class="ce-sec" aria-labelledby="p3-how-h">
       <SectionHead no="01" title="How Paper 3 works" id="p3-how-h" dek="Three questions, one direction. Question 3 alone is 68% of the paper." />
       <p class="ce-labels"><GuideLabel kind="ib" /></p>
-      {p3 && <FactList facts={p3.facts} />}
+      {p3 && <FactList facts={[...p3.facts, ...claimFacts(c.claims, EVERY_PAPER)]} />}
       <h3 class="ce-h3">The 25 marks, drawn to scale</h3>
-      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="strategy" /></p>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="strategy" /> <span class="ce-cite">Guide, pp. 47 to 48; the times are a suggestion</span></p>
       <Scale
         caption="Suggested times, about three minutes a mark, are the platform's suggestion"
         total={25}
@@ -79,23 +81,26 @@ const R3 = [
           { label: 'Q3 · recommend a plan of action', marks: 17, note: 'about 50 minutes, with planning', tone: 'gold' },
         ]}
       />
-      <p class="small muted">Questions 1 and 2 are marked with an analytic markscheme, question 3 with four criteria. The guide's summary table speaks of one compulsory question; its detailed outline, and every paper so far, sets three.</p>
+      <p class="small muted">Questions 1 and 2 are marked with an analytic markscheme, question 3 against four criteria. The guide's outline (p. 40) speaks of one compulsory question; its details (p. 47) set three compulsory questions.</p>
+      <p class="small"><GuideLabel kind="examiner" /> The Paper 3 assessment guide adds that every paper so far has set three ({G}, p. 1).</p>
       <div class="ce-split">
         <div class="ce-card">
-          <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="examiner" /></p>
+          <p class="ce-labels"><GuideLabel kind="ib" /> <span class="ce-cite">Guide, p. 42</span></p>
           <h3>What the unseen stimulus contains</h3>
-          <p>A short introduction to the social enterprise and the need it meets; a visual of a product or service; then excerpts such as an email, a social media post, a newspaper article, a table or chart and another document, sometimes a sixth.</p>
-          <p class="small muted">The organization and its region are fictitious (teacher support material; November 2025 report), and the stimulus runs to no more than 750 words (May 2025 report).</p>
+          <p>A short introduction to the social enterprise and the need it meets; a visual of a product; then five or six excerpts from documents such as emails, social media posts and newspaper articles.</p>
+          <p class="small"><GuideLabel kind="tsm" /> The social enterprise is fictitious (TSM, p. 65).</p>
+          <p class="small"><GuideLabel kind="examiner" /> The Paper 3 assessment guide adds, from subject reports, that its region is fictitious too (November 2025) and that the stimulus runs to no more than 750 words (May 2025) ({G}, p. 1).</p>
         </div>
         <div class="ce-card">
-          <p class="ce-labels"><GuideLabel kind="ib" /></p>
+          <p class="ce-labels"><GuideLabel kind="tsm" /> <span class="ce-cite">TSM, pp. 62 to 63</span></p>
           <h3>Plan like a social enterprise</h3>
           <dl class="ce-dl">
             <div><dt>Mission first</dt><dd>Its impact on stakeholders drives its decisions.</dd></div>
             <div><dt>It trades</dt><dd>Most income comes from trading, not donations or grants.</dd></div>
             <div><dt>Surplus sustains it</dt><dd>Any profit is used to sustain the mission.</dd></div>
           </dl>
-          <p class="small muted">Features as described in the IB teacher support material. A plan that leans on donations or grants ignores the second, which is one reason reports discourage it.</p>
+          <p class="small muted">Features as the IB teacher support material describes them.</p>
+          <p class="small"><GuideLabel kind="examiner" /> A plan that leans on donations or grants ignores the second feature; the Paper 3 assessment guide reports that subject reports discourage it ({G}, p. 5).</p>
         </div>
       </div>
     </section>
@@ -166,17 +171,18 @@ const R3 = [
     <section class="ce-sec" aria-labelledby="p3-q12-h">
       <SectionHead no="03" title="Questions 1 and 2" id="p3-q12-h" dek="Describe the need, then explain the challenges." />
       <h3 class="ce-h3">Question 1: the human need, 2 marks</h3>
-      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="examiner" /> <GuideLabel kind="example" /></p>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="tsm" /> <GuideLabel kind="examiner" /> <GuideLabel kind="example" /> <span class="ce-cite">Guide, pp. 42 and 47; TSM, p. 65; {G}, p. 2</span></p>
+      <p class="ce-p">The guide asks question 1 to assess your ability to describe the human need in the stimulus (AO1). The teacher support material adds that the need should be linked to an appropriate business management theory, such as motivation.</p>
       <p class="ce-p"><strong>Describe the human need of the children that Haven meets. [2]</strong></p>
       <ol class="ce-flow">
         <li><span class="label">Start from</span><p>The stakeholder named: children from low-income families in Northvale.</p></li>
         <li><span class="label">Describe · 1 mark</span><p>Their particular need: they may not otherwise eat a regular, nutritious midday meal; Haven provides one free at school.</p></li>
         <li><span class="label">Identify · 1 mark</span><p>An appropriate theory: a physiological need in Maslow's hierarchy of needs.</p></li>
-        <li><span class="label">Examiner instructions (2026)</span><p>One mark for describing the particular human need, and one more for identifying an appropriate business management theory.</p></li>
+        <li><span class="label">How the marks divide</span><p>The Paper 3 assessment guide reports the examiner instructions (2026): one mark for describing the particular human need, and one more for identifying an appropriate business management theory.</p></li>
       </ol>
       <div class="ce-split">
         <div class="ce-card">
-          <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+          <p class="ce-labels"><GuideLabel kind="examiner" /> <span class="ce-cite">{G}, p. 2</span></p>
           <ul>
             <li>Write about the stakeholder the question names.</li>
             <li>Copying the stimulus earns at most one mark.</li>
@@ -184,7 +190,7 @@ const R3 = [
           </ul>
         </div>
         <div class="ce-card">
-          <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+          <p class="ce-labels"><GuideLabel kind="examiner" /> <span class="ce-cite">{G}, p. 2</span></p>
           <ul>
             <li>"Psychological" or "physical" needs are not credited as the theory.</li>
             <li>Herzberg's hygiene factors do not describe a human need; motivators can, where they fit.</li>
@@ -194,7 +200,8 @@ const R3 = [
       </div>
 
       <h3 class="ce-h3">Question 2: two challenges, 3 marks each</h3>
-      <p class="ce-labels"><GuideLabel kind="examiner" /> <GuideLabel kind="example" /></p>
+      <p class="ce-labels"><GuideLabel kind="tsm" /> <GuideLabel kind="examiner" /> <GuideLabel kind="example" /> <span class="ce-cite">TSM, p. 65; {G}, p. 2</span></p>
+      <p class="ce-p">Question 2 explains the key challenges facing the social entrepreneur or enterprise (guide, p. 42). The teacher support material says there will typically be two challenges, each worth 3 marks.</p>
       <p class="ce-p"><strong>Explain two challenges Haven faces: one financial and one in human resources. [6]</strong></p>
       <div class="table-scroll ce-scroll" role="region" aria-label="Table: Identify: the challenge, in the area named, Explain: why it is a challenge, with theory, Apply: with evidence from the stimulus" tabindex="0">
         <table class="ce-table">
@@ -205,9 +212,9 @@ const R3 = [
           </tbody>
         </table>
       </div>
-      <p class="small muted">The markscheme for each paper sets what earns the marks. Recent markschemes credited identification, explanation and application for each challenge; a lone copied figure, or a trend without figures, was not enough for application (subject reports, as cited in the Paper 3 guide).</p>
+      <p class="small muted">The markscheme for each paper sets what earns the marks. The Paper 3 assessment guide reports from subject reports that recent markschemes credited identification, explanation and application for each challenge, and that a lone copied figure, or a trend without figures, was not enough for application.</p>
       <div class="ce-warn">
-        <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+        <p class="ce-labels"><GuideLabel kind="examiner" /> <span class="ce-cite">{G}, p. 2</span></p>
         <h3>Where question 2 marks are lost</h3>
         <ul>
           <li><b>Overlap:</b> two challenges that are really one, such as "cash flow" and "liquidity": the second earns little.</li>
@@ -219,7 +226,7 @@ const R3 = [
 
     <section class="ce-sec" aria-labelledby="p3-q3-h">
       <SectionHead no="04" title="Understanding question 3" id="p3-q3-h" dek="Recommend: present an advisable course of action with supporting evidence. There is no single correct plan; a feasible plan that serves the whole organization is credited on its merits." />
-      <p class="ce-labels"><GuideLabel kind="ib" /></p>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="strategy" /> <span class="ce-cite">Criteria and maxima: guide, pp. 48 to 50. The plan in the middle, one direction across four functions, is the Paper 3 assessment guide's recommended framing ({G}, p. 3), not an IB rule</span></p>
       <div class="p3-crit">
         <div class="p3-crit__d"><span class="p3-crit__k">D</span><b>Sequencing of ideas and plan of action</b><span>3 marks · frames the whole response: a clear, coherent order</span></div>
         <div class="p3-crit__row">
@@ -228,13 +235,14 @@ const R3 = [
             <div><span class="p3-crit__k">B</span><b>Business management tools and theories</b><span>4 marks · tools applied to decide and shape the actions</span></div>
           </div>
           <div class="p3-crit__plan">
-            <p class="label">The plan of action</p>
+            <p class="label">The plan of action <span class="p3-crit__rec">(recommended framing)</span></p>
             <p>One forward-looking direction for the whole organization</p>
             <ul><li>Finance</li><li>Marketing</li><li>Human resources</li><li>Operations</li></ul>
           </div>
           <div class="p3-crit__out"><span class="p3-crit__k">C</span><b>Evaluation</b><span>6 marks · the expected impact on the relevant areas of the business, and the trade-offs between them</span></div>
         </div>
       </div>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="examiner" /> <span class="ce-cite">Top levels: guide, pp. 48 to 50, paraphrased; warnings: {G}, p. 3</span></p>
       <div class="table-scroll ce-scroll" role="region" aria-label="Table: Criterion, Top level, in the guide (paraphrased), What reports warn against" tabindex="0">
         <table class="ce-table">
           <thead><tr><th scope="col">Criterion</th><th scope="col">Top level, in the guide (paraphrased)</th><th scope="col">What reports warn against</th></tr></thead>
@@ -255,10 +263,11 @@ const R3 = [
             <div><dt>Force field analysis</dt><dd>Whether a change is likely to succeed: office demand (R4) against overtime (R6), with no invented weightings.</dd></div>
             <div><dt>Gantt chart</dt><dd>The order and timing of the actions: the pilot runs before any hiring; hiring before expansion.</dd></div>
           </dl>
-          <p class="small muted">All in the guide's toolkit, the last two HL only. Naming a tool earns at most 1 of the 4 marks for B (May 2026 report).</p>
+          <p class="small muted">All three are in the guide's toolkit, the last two HL only (guide, p. 14).</p>
+          <p class="small"><GuideLabel kind="examiner" /> Naming a tool earns at most 1 of the 4 marks for B, as the Paper 3 assessment guide reports from the May 2026 subject report ({G}, p. 3).</p>
         </div>
         <div class="ce-card">
-          <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+          <p class="ce-labels"><GuideLabel kind="examiner" /> <GuideLabel kind="example" /> <span class="ce-cite">{G}, pp. 3 and 4</span></p>
           <h3>A plan that only fixes the question 2 challenges</h3>
           <p>Question 2 explains why the enterprise struggles now; question 3 plans what it does next. Responses that analysed only the question 2 challenges reached at most 2 of 6 for C (May 2025 report).</p>
           <h3 class="p3-sub">Trade-off or disadvantage?</h3>
@@ -302,7 +311,7 @@ const R3 = [
       <SectionHead no="06" title="Examination readiness" id="p3-ready-h" dek="What examiners look for, and what you can leave out." />
       <div class="ce-split">
         <div class="ce-card">
-          <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+          <p class="ce-labels"><GuideLabel kind="examiner" /> <span class="ce-cite">{G}, p. 5</span></p>
           <h3>Rewarded</h3>
           <ul>
             <li>A plan for the whole organization, not only the question 2 challenges.</li>
@@ -313,7 +322,7 @@ const R3 = [
           </ul>
         </div>
         <div class="ce-card">
-          <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+          <p class="ce-labels"><GuideLabel kind="examiner" /> <span class="ce-cite">{G}, p. 5</span></p>
           <h3>Discouraged</h3>
           <ul>
             <li>Repeating the stimulus, or a SWOT that only restates it.</li>
@@ -325,14 +334,14 @@ const R3 = [
         </div>
       </div>
       <h3 class="ce-h3">What question 3 does not require</h3>
-      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="examiner" /></p>
-      <div class="table-scroll ce-scroll" role="region" aria-label="Table" tabindex="0">
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="examiner" /> <span class="ce-cite">Guide, pp. 48 to 50; {G}, p. 5</span></p>
+      <div class="table-scroll ce-scroll" role="region" aria-label="Table: what question 3 does not require" tabindex="0">
         <table class="ce-table">
           <tbody>
-            <tr><th scope="row">Limitations of the stimulus</th><td>Not required in Paper 3, unlike Papers 1 and 2: no criterion rewards it. Plan with what you are given. (The teacher support material's advice that higher marks acknowledge the further research a final judgement would need is listed below; it is guidance, not a criterion.)</td></tr>
-            <tr><th scope="row">A formal conclusion or summary</th><td>A clear, well-sequenced plan does not need to be repeated or summarized at the end (May 2026 report).</td></tr>
-            <tr><th scope="row">A fixed time horizon</th><td>Some papers have set five years, others none. Use the time frame the question gives; if none, set realistic timings yourself.</td></tr>
-            <tr><th scope="row">A set layout</th><td>The guide prescribes no layout for the plan. Planning notes are not marked, though reports encourage planning before writing.</td></tr>
+            <tr><th scope="row">Limitations of the stimulus</th><td>None of criteria A to D mentions them, unlike the top markband of Papers 1 and 2 (guide, pp. 48 to 50). Plan with what you are given. (The teacher support material's advice that higher marks acknowledge the further research a final judgement would need is listed below; it is guidance, not a criterion.)</td></tr>
+            <tr><th scope="row">A formal conclusion or summary</th><td>A clear, well-sequenced plan does not need to be repeated or summarized at the end, as the Paper 3 assessment guide reports from the May 2026 subject report.</td></tr>
+            <tr><th scope="row">A fixed time horizon</th><td>The Paper 3 assessment guide records that some papers have set five years and others none. Use the time frame the question gives; if none, set realistic timings yourself.</td></tr>
+            <tr><th scope="row">A set layout</th><td>The guide prescribes no layout for the plan. Planning notes are not marked (TSM, p. 66), though the Paper 3 assessment guide reports that subject reports encourage planning before writing.</td></tr>
           </tbody>
         </table>
       </div>
@@ -340,7 +349,6 @@ const R3 = [
         p3 && p3.ibGuidance.length > 0 && (
           <>
             <h3 class="ce-h3">Advice from the IB's teacher support material</h3>
-            <p class="ce-labels"><GuideLabel kind="ib" /></p>
             <IbGuidance items={p3.ibGuidance} />
           </>
         )
@@ -349,14 +357,16 @@ const R3 = [
         <Checklist
           id="p3-final"
           title="Final checklist"
+          standing="strategy"
+          note="The checklist is the Paper 3 assessment guide's recommended strategy. The theory in question 1 is the teacher support material's advice (TSM, p. 65), marked so."
           items={[
-            { id: 'q1-need', text: 'Question 1: the particular need, for the right stakeholder', label: 'examiner' },
-            { id: 'q1-theory', text: 'Question 1: an appropriate theory, named', label: 'ib' },
-            { id: 'q2-two', text: 'Question 2: two distinct challenges, in the areas asked', label: 'examiner' },
-            { id: 'q2-evidence', text: 'Question 2: theory and stimulus figures for each', label: 'examiner' },
-            { id: 'q3-res', text: 'Question 3: every resource used; tools applied', label: 'examiner' },
-            { id: 'q3-eval', text: 'Question 3: each action evaluated, with trade-offs', label: 'examiner' },
-            { id: 'q3-order', text: 'Question 3: actions in a clear, coherent order', label: 'ib' },
+            { id: 'q1-need', text: 'Question 1: the particular need, for the right stakeholder' },
+            { id: 'q1-theory', text: 'Question 1: an appropriate theory, named', label: 'tsm' },
+            { id: 'q2-two', text: 'Question 2: two distinct challenges, in the areas asked' },
+            { id: 'q2-evidence', text: 'Question 2: theory and stimulus figures for each' },
+            { id: 'q3-res', text: 'Question 3: every resource used; tools applied' },
+            { id: 'q3-eval', text: 'Question 3: each action evaluated, with trade-offs' },
+            { id: 'q3-order', text: 'Question 3: actions in a clear, coherent order' },
           ]}
         />
       </div>
@@ -535,6 +545,13 @@ const R3 = [
 
   .p3-crit__plan .label {
     color: var(--gold-400);
+  }
+
+  .p3-crit__rec {
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--text-on-ink-muted);
   }
 
   .p3-crit__plan ul {
