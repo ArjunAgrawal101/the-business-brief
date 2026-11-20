@@ -7,6 +7,16 @@
 # authors and explained from subject knowledge. No coursebook chapter for unit
 # 2 was supplied. Every business named is fictional, every figure simulated,
 # and every worked figure was checked by script.
+#
+# On 20 November 2026 two sections were added: communicating across cultures,
+# an HL section on Hofstede's dimensions, which the guide suggests for unit 2
+# (p. 25) and lists as an HL tool (p. 14), and judging whether communication
+# works, with the toolkit's descriptive statistics and the standard percentage
+# change formula, which the guide's formula list does not include. Two
+# diagrams from the library, two industries, a stakeholder group and four
+# exam-style questions (outline, suggest, compare and contrast, and an HL
+# suggest) came with them. Vellora Textiles is fictional, the second Kinloch
+# survey is simulated, and every figure was checked by script.
 code: '2.6'
 title: Communication
 level: SL/HL
@@ -20,6 +30,8 @@ objectives:
   - '**Compare** the main methods of communication, oral, written, visual and digital, and what each does well.'
   - '**Explain** the barriers to communication and how they can be reduced.'
   - '**Evaluate** which formal and informal methods suit an organization in a given situation, and **recommend** a choice.'
+  - '**Suggest** ways of reducing a particular barrier in a given organization, and **explain** how the success of communication can be judged.'
+  - '**Explain** how Hofstede''s cultural dimensions help to explain communication across cultures (HL only).'
 situation:
   title: Too big for Friday lunch
   fictional: true
@@ -58,6 +70,7 @@ sections:
   - id: formal-communication
     title: Formal communication
     kind: types
+    diagram: tall-flat-structures
     body: |
       **Formal communication** uses the official channels the organization sets up, usually following its structure and chain of command. It is how decisions, policies, instructions and results are passed on with the organization's authority behind them. Because it is planned and often recorded, it is accurate and can be checked later, which matters for anything with legal, safety or financial consequences.
 
@@ -256,6 +269,71 @@ sections:
       title: Kinloch's first changes
       fictional: true
       text: Kinloch replaced the Friday lunch with a monthly video briefing at a time that alternates between the sites, followed by a written summary and a question channel that the founder answers personally. It created a shared glossary of part names for designers and engineers, made the design-and-production meeting compulsory before any change reaches the factory, and set a rule that customer-facing staff are told of price changes at least two working days before they take effect. The next survey will show whether the share of staff who hear news first through the grapevine has fallen from 62%.
+  - id: communication-across-cultures
+    title: Communicating across cultures (HL toolkit)
+    kind: application
+    level: HL
+    diagram: hofstede-dimensions
+    body: |
+      At HL, the toolkit's Hofstede's cultural dimensions, which the guide suggests for unit 2 (p. 25), help to explain why the same message can be received differently in different countries. That matters for multinational companies, and for any organization with an international workforce, suppliers or customers. Three of the six dimensions bear most directly on communication inside an organization.
+
+      **Power distance** shapes how freely people communicate upwards: where it is high, employees expect instructions from above and may hesitate to question them or to report bad news; where it is low, staff expect to be consulted and to challenge their managers. **Individualism and collectivism** shape feedback: in more individualist cultures, direct feedback to one person is usual, while in more collectivist ones criticism in front of the group can cause a loss of face, so feedback is more often given privately or indirectly. **Uncertainty avoidance** shapes how much detail and formality people expect: where it is high, people prefer clear written rules, detailed instructions and formal channels; where it is low, they are more comfortable with informal, flexible arrangements.
+
+      The scores describe national averages, not individuals, and every organization also has a culture of its own ([2.5](/topics/organizational-corporate-culture/)), so the dimensions suggest questions to ask rather than answers. They are most useful in planning: who should deliver a message, in what form, and how feedback will be gathered.
+    points:
+      - term: Power distance
+        text: How far people accept that power is shared unequally. Where it is high, upward communication is weak unless managers actively ask for it.
+      - term: Individualism and collectivism
+        text: Whether people look after themselves or their group first, which shapes whether feedback is given directly to one person or more carefully, to protect the group's harmony.
+      - term: Uncertainty avoidance
+        text: How uneasy people are with ambiguity, which shapes how much detail, formality and written confirmation they expect.
+    example:
+      title: Two sites, one survey
+      fictional: true
+      text: |
+        Vellora Textiles, a fictional clothing maker, has its head office in one country and its factory in another. It ran the same staff survey at both sites. At head office, 46% of staff said they had raised a problem with a manager in the last month; at the factory, where power distance is much higher, 9% had.
+
+        Managers first concluded that the factory had fewer problems. A visit found the opposite: machine faults and safety concerns had gone unreported for weeks, because raising them felt like contradicting a superior. The factory now holds a ten-minute meeting at the start of each shift, in which supervisors ask each line what went wrong the day before, and has an anonymous suggestion box, so that reporting a problem no longer feels like a challenge to authority. The next survey will show whether the 9% rises.
+  - id: judging-communication
+    title: Judging whether communication works
+    kind: method
+    body: |
+      Because communication is two-way, the test of a method is not whether a message was sent but whether it was received, understood and acted on. Organizations can gather evidence of that in several ways, and a recommendation about methods is stronger when it says how its success would be judged.
+
+      - **Surveys** of staff, asking where they first heard important news and whether they understood it.
+      - **Reach and response:** how many people opened a message, attended a briefing or asked a question.
+      - **Errors and rework** traced back to misunderstood instructions.
+      - **Speed:** how long news takes to reach each site and level.
+      - **The grapevine:** which rumours are circulating, and how accurate they are.
+      - **Outcomes** that poor communication often feeds, such as absence, resignations and customers' complaints.
+
+      Numbers need interpreting. An email opened by 90% of staff says nothing about whether it was understood, and a fall in errors after a new briefing may have other causes. A comparison before and after a change, with the same questions asked of the same groups, is more convincing than a single survey, and the toolkit's [descriptive statistics](/toolkit/descriptive-statistics/) help to summarize the results.
+    points:
+      - term: Percentage points and per cent
+        text: A share that falls from 62% to 34% has fallen by 28 percentage points, which is a fall of about 45% of its original size. Say which you mean.
+    formulas:
+      - name: Percentage change
+        expression: Percentage change = (new value − old value) ÷ old value × 100
+        note: A standard form, not on the guide's formula list. For a share already measured in per cent, the simple difference is the change in percentage points.
+    advantages:
+      - Shows whether a change in communication has worked, rather than assuming it has.
+      - Reveals which sites, levels or groups the formal channels are missing.
+      - Gives managers evidence to act on and to report back to staff.
+    limitations:
+      - Surveys record what people say, and the people who answer may not be typical.
+      - Effects are hard to separate from other causes.
+      - Reach, such as messages opened and briefings attended, is easy to measure; understanding is not.
+    example:
+      title: Kinloch's next survey
+      fictional: true
+      text: |
+        Six months after the changes to Kinloch's communication, its survey asked the same question again. This time 150 of the 160 staff answered: 51 said they first heard important news from colleagues or the chat group, 75 from their line manager and 24 from the monthly briefing or its written summary.
+
+        - **From the grapevine first:** 51 ÷ 150 × 100 = **34%**, down from 62%, a fall of 28 percentage points.
+        - **From line managers first:** 75 ÷ 150 × 100 = **50%**, up from 26%.
+        - **From the briefing or its summary:** 24 ÷ 150 × 100 = **16%**.
+
+        The formal channels now reach half of the staff first through their managers, a real improvement. But one in three still hears important news informally first, and the survey shows only where news arrived, not whether it was understood, so Kinloch plans to add a question on understanding to the next one.
 applications:
   - industry: Hospitals and healthcare
     text: Communication is a matter of patient safety, so hospitals use structured, formal handovers between shifts, written records and checklists, and encourage staff to speak up about problems whatever their seniority. Jargon, fatigue, noise and steep hierarchies are recognized barriers.
@@ -269,6 +347,10 @@ applications:
     text: Teams spread across cities and time zones rely on written, digital channels that people can read when they choose, with video calls for discussion. Overload and the loss of informal contact are the main risks, so firms deliberately create informal ways for people to meet.
   - industry: Multinational companies
     text: Language, culture and time zones all act as barriers, and messages from head office can read very differently in each host country. At HL, Hofstede's dimensions help to explain why the same method of communication works in one country and fails in another.
+  - industry: Aviation
+    text: Crews and air traffic controllers rely on standard phrases, the reading back of instructions and checklists, so that a message cannot be misheard over radio noise or between people with different first languages. Crew training also stresses that junior members must speak up about a concern, because a hierarchy in which juniors hesitate to question seniors is a recognized risk to safety.
+  - industry: Charities and volunteer organizations
+    text: Volunteers give their time, often part-time and from home, so messages travel through group chats, newsletters and informal contact more than through a formal hierarchy. Keeping volunteers informed and heard matters because, unlike employees, they can simply stop coming, and donors expect clear, honest reports of how their money is used.
 stakeholders:
   - group: Employees
     text: Need timely, honest information about their work and their future, and a voice upwards. When formal communication fails they turn to the grapevine, and poor communication is a common cause of low morale and resistance to change.
@@ -282,6 +364,8 @@ stakeholders:
     text: Expect formal consultation before major changes. Communication with them that is late or one-sided can turn concern into conflict, which HL students study in [2.7](/topics/industrial-employee-relations/).
   - group: Suppliers
     text: Need accurate forecasts, specifications and changes in good time; a design change that is not communicated to a supplier causes waste and delay on both sides.
+  - group: The media and the public
+    text: Hear what the organization says in announcements, reports and responses to crises, and often what leaks from inside it. Internal communication that fails, such as staff learning of job cuts from the news, can quickly become a public story that damages the organization's reputation.
 evaluation:
   - There is no best method in general. The right choice depends on the purpose, urgency, sensitivity and complexity of the message, the need for a record and the audience, and most important messages need a rich, two-way method together with a written one.
   - Informal communication cannot be abolished, only managed. Strong, early and honest formal communication starves rumours of oxygen, while listening to the grapevine gives managers early warning of problems.
@@ -289,6 +373,7 @@ evaluation:
   - Structure and culture shape communication. Tall structures slow and filter messages; flatter ones speed them up but may overload managers. Organizational culture decides whether people feel safe to speak up, and at HL, national culture and Hofstede's power distance help to explain why.
   - Communication is two-way. A message is only effective if it is understood and acted on, so feedback and listening are as important as clear sending. Judging effectiveness needs evidence, such as surveys, errors, rumours and how fast news reaches each group.
   - Communication raises ethical questions. Timing, honesty and the choice of words can inform people or manipulate them; the guide's theory of knowledge questions for this unit ask how language can be used to influence, persuade or manipulate employees (p. 28). Trust, once lost through spin or silence, is slow to rebuild.
+  - Judge communication by evidence, not by effort. Messages sent, meetings held and emails opened measure activity; surveys, errors, rumours and outcomes such as resignations show whether people understood and acted, best compared before and after a change.
 decision:
   title: Telling Kinloch's staff about the investment
   fictional: true
@@ -383,6 +468,61 @@ exam:
       - **Recommendation with conditions:** for example, a small number of reliable formal channels, matched to each direction of communication, with informal contact deliberately encouraged; judged by whether the share hearing news first from the grapevine falls at the next survey.
 
       A recommendation that names methods without linking them to Kinloch's specific problems, or ignores informal communication altogether, will score low.
+  - q: Outline **two** advantages of two-way communication for Kinloch Bikes.
+    marks: 4
+    command: outline
+    level: SL/HL
+    paper: '1'
+    answer: |
+      A strong response states two distinct advantages and gives the key feature of each, applied to Kinloch, in a sentence or two.
+
+      - **Misunderstandings are caught:** feedback lets the sender check the message landed, which would have stopped the factory preparing for frame parts that did not exist.
+      - **Problems and ideas travel upwards:** designers and engineers can raise problems before parts fail to fit, rather than blaming each other afterwards.
+      - Other valid advantages include greater trust during the takeover rumours, because staff can ask questions and hear honest answers.
+  - q: Suggest **two** ways Kinloch Bikes could reduce the barrier of jargon between its designers and its factory engineers.
+    marks: 4
+    command: suggest
+    level: SL/HL
+    paper: '1'
+    answer: |
+      A strong response puts forward two plausible measures, each with a reason that fits the case.
+
+      - **A shared glossary of part names**, agreed by both teams, so that "next batch" and "revision B" mean the same thing on both sites.
+      - **Drawings and samples instead of words alone**, shown in the design-and-production meeting, because a visual message crosses the gap between the two teams' vocabularies.
+      - Other valid suggestions include short placements of designers on the factory floor, or a plain-language summary at the top of every design change.
+
+      A suggestion that does not address jargon, such as more email, earns little.
+  - q: Compare and contrast an all-staff email and face-to-face briefings as ways for Kinloch Bikes to announce the investment to its staff.
+    marks: 10
+    command: compare-and-contrast
+    level: SL/HL
+    paper: '1'
+    answer: |
+      A strong response sets out similarities and differences point by point, with both methods in every point and evidence from Kinloch throughout, then judges which differences matter most for this message.
+
+      - **Similarities:** both are formal, downward communication from the founder; both can give every site the same facts; both can be followed by a written question-and-answer page.
+      - **Richness and feedback:** a briefing carries tone and lets staff ask questions at once, which matters for news that touches their jobs; an email is lean and one-way, and invites people to read between the lines.
+      - **Speed and consistency:** an email reaches everyone at the same moment with identical words; briefings at three sites, one six hours ahead, cannot all happen at once, so some staff hear the news later.
+      - **Cost and confidentiality:** an email is cheap but easily forwarded to the local journalists; briefings take managers' time but are harder to leak word for word.
+      - **Judgement:** for example, that richness matters most here, because staff fear for their jobs and rumours already exist, so briefings should lead, with the email and written questions and answers sent as they start.
+
+      Two separate descriptions, one of each method, do not compare and contrast.
+  - q: |
+      Vellora Textiles, a fictional clothing maker, found that only 9% of staff at its factory had raised a problem with a manager in the last month, against 46% at its head office. The factory is in a country with much higher power distance.
+
+      Suggest **two** ways Vellora could improve upward communication at its factory.
+    marks: 4
+    command: suggest
+    level: HL
+    paper: '2'
+    answer: |
+      A strong response puts forward two measures that fit high power distance, each with a reason.
+
+      - **Supervisors ask, rather than wait:** a short meeting at the start of each shift in which supervisors ask each line what went wrong, because staff who will not volunteer bad news to a superior will often answer a direct question.
+      - **Anonymous channels:** a suggestion box or an anonymous survey, so that reporting a problem does not feel like challenging authority.
+      - Other valid suggestions include training supervisors to thank people who raise problems, or recognizing problems reported in team meetings.
+
+      Suggestions that assume staff will speak up freely, such as an open-door policy alone, ignore the case's evidence.
 summary:
   - '**Communication** passes a message from a sender, through a channel, to a receiver; **feedback** shows whether it was understood, and barriers can distort it at any stage.'
   - '**Formal communication** uses official channels set by the structure and flows downward, upward and horizontally; it is accurate, recorded and authoritative, but can be slow, filtered and one-way.'
@@ -393,6 +533,8 @@ summary:
   - Barriers include jargon, language and cultural differences, information overload, the wrong channel, too many levels in the hierarchy, distance and time zones, technology failure, attitudes and poor listening.
   - Barriers are reduced by knowing the receiver, matching the method to the message and closing the loop with feedback; trust built over time makes every message more credible.
   - At HL, high power distance can weaken upward communication, so managers must ask for feedback rather than wait for it.
+  - Judge communication by evidence of understanding and action, such as surveys before and after a change, errors and rumours, not by the number of messages sent; a share that falls from 62% to 34% has fallen by 28 percentage points.
+  - At HL, power distance, individualism and collectivism, and uncertainty avoidance help to explain how communication differs between cultures, as national tendencies rather than rules for individuals.
 connections:
   - code: '2.2'
     text: The structure sets the formal channels; tall structures with long chains of command slow and filter messages, and delayering shortens them.
@@ -406,6 +548,12 @@ connections:
     text: Multinational companies communicate across languages, cultures and time zones, where barriers multiply.
   - code: '5.7'
     text: At HL, transparency and communication are among the factors in effective crisis management.
+  - code: '2.5'
+    text: At HL, organizational culture decides whether people feel safe to speak up, and cultural clashes after a merger often begin as failures of communication.
+  - code: '2.7'
+    text: At HL, early, two-way communication with employee representatives is part of preventing and resolving conflict at work.
+  - code: '4.4'
+    text: The surveys that judge whether communication works are a method of primary research, with the same questions of sampling and bias.
 terms:
   - communication
   - formal-communication
@@ -423,6 +571,10 @@ terms:
   - democratic-leadership
   - hofstedes-cultural-dimensions
   - crisis-management
+  - descriptive-statistics
+  - survey
+  - organizational-culture
+  - multinational-company
 retrieval:
   - q: What are the five parts of the communication process?
     a: A sender, a message, a channel, a receiver and feedback.
@@ -448,13 +600,21 @@ retrieval:
     a: Messages pass through more levels, which slows them down and gives each level a chance to filter or distort them.
   - q: (HL) How can high power distance act as a barrier to communication?
     a: Employees may hesitate to question managers or report problems upwards, so upward communication is weak unless managers actively ask for feedback.
+  - q: How should a business judge whether a new method of communication has worked?
+    a: With evidence of understanding and action, such as a survey asking the same questions before and after the change, errors traced to misunderstandings, rumours, and outcomes such as resignations, not just the number of messages sent or opened.
+  - q: A share falls from 40% to 30%. By how many percentage points has it fallen, and by what percentage?
+    a: By 10 percentage points, which is a fall of 10 ÷ 40 × 100 = 25% of its original size.
+  - q: (HL) How can individualism and collectivism affect the way feedback is given?
+    a: In more individualist cultures, direct feedback to one person is usual; in more collectivist ones, criticism in front of the group can cause a loss of face, so feedback is more often given privately or indirectly.
 questions: []
 basis:
   - source: ib-bm-guide-2024
-    pages: 25, 27 to 28
-    note: The two content statements and their assessment objectives and the unit's inquiry statements (p. 27); its conceptual understandings and suggested tools (p. 25); its theory of knowledge question on language and persuasion (p. 28)
+    pages: 14, 25, 27 to 28
+    note: The two content statements and their assessment objectives and the unit's inquiry statements (p. 27); its conceptual understandings and suggested tools, including Hofstede's cultural dimensions at HL (p. 25); the toolkit's descriptive statistics and HL tools (p. 14); its theory of knowledge question on language and persuasion (p. 28)
   - source: ib-bm-tsm-2022
     pages: '56'
     note: The advice on applying AO2 answers to the case, read; nothing reproduced
+  - source: hofstede-2010
+    note: The six dimensions, of which three are applied to communication in the HL section; cited, not reproduced
 verification: primary
-updated: '2026-11-03'
+updated: '2026-11-20'
