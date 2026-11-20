@@ -5,6 +5,11 @@
  * branch, a revision view of the essentials, zoom and pan, and downloads.
  * The outline beneath carries the same content for keyboards, screen readers
  * and print.
+ *
+ * Two ways to read it: the drawn map, which opens at a zoom where every label
+ * is at least 12 pixels (Whole map shows it all), and the outline, which is
+ * how a phone opens it. On a phone the toolbar keeps the view, the revision
+ * switch and zoom, and puts the rest under More.
  */
 import MindOutline from './MindOutline.astro';
 import { BRANCH_COLOURS, BRANCH_LABELS, layout, mapCode, renderSvg, type AnyMap } from '../../lib/mindmap';
@@ -29,23 +34,23 @@ const kinds = [...new Set(map.branches.map((b) => b.kind))];
 const config = { id, map, code: codeLabel, glossary: '/glossary/' };
 ---
 
-<div class="mm" data-ix="mindmap" id={`map-${id}`}>
+<div class="mm" data-ix="mindmap" id={`map-${id}`} data-mode="map">
   <script type="application/json" data-config set:html={jsonForScript(config)} />
   <div class="mm-bar js-only" role="toolbar" aria-label="Mindmap controls">
-    <div class="mm-bar__group" role="group" aria-label="View">
-      <button type="button" class="mm-btn" data-view="full" aria-pressed="true">Full map</button>
-      <button type="button" class="mm-btn" data-view="revision" aria-pressed="false">Revision view</button>
+    <div class="mm-bar__group" role="group" aria-label="Read it as">
+      <button type="button" class="mm-btn" data-mode-btn="map" aria-pressed="true">Map</button>
+      <button type="button" class="mm-btn" data-mode-btn="outline" aria-pressed="false">Outline</button>
     </div>
-    <div class="mm-bar__group" role="group" aria-label="Branches">
-      <button type="button" class="mm-btn" data-expand>Expand all</button>
-      <button type="button" class="mm-btn" data-collapse>Branches only</button>
-    </div>
-    <div class="mm-bar__group" role="group" aria-label="Zoom">
+    <button type="button" class="mm-btn" data-revision aria-pressed="false">Revision view</button>
+    <div class="mm-bar__group mm-bar__zoom" role="group" aria-label="Zoom">
       <button type="button" class="mm-btn mm-btn--icon" data-zoom="out" aria-label="Zoom out">&minus;</button>
-      <button type="button" class="mm-btn" data-zoom="fit">Fit</button>
+      <button type="button" class="mm-btn" data-zoom="fit">Whole map</button>
       <button type="button" class="mm-btn mm-btn--icon" data-zoom="in" aria-label="Zoom in">+</button>
     </div>
-    <div class="mm-bar__group mm-bar__group--end" role="group" aria-label="Save">
+    <button type="button" class="mm-btn mm-bar__more" data-more aria-expanded="false" aria-controls={`mm-extra-${id}`}>More</button>
+    <div class="mm-bar__group mm-bar__extra" id={`mm-extra-${id}`} role="group" aria-label="Branches and saving">
+      <button type="button" class="mm-btn" data-expand>Expand all</button>
+      <button type="button" class="mm-btn" data-collapse>Branches only</button>
       <button type="button" class="mm-btn" data-download="svg">SVG</button>
       <button type="button" class="mm-btn" data-download="png">PNG</button>
       <button type="button" class="mm-btn" data-print>Print</button>
@@ -54,7 +59,7 @@ const config = { id, map, code: codeLabel, glossary: '/glossary/' };
   <div class="mm-viewport" data-viewport tabindex="0" aria-label={`Mindmap of ${map.title}. Drag to move, use the buttons to zoom; the outline below has the same content.`}>
     <Fragment set:html={svg} />
   </div>
-  <p class="mm-hint small muted js-only">Drag to move the map. Click a branch to fold it away. Zoom with the buttons, or with Ctrl and the scroll wheel.</p>
+  <p class="mm-hint small muted js-only">Drag to move the map, or use the arrow keys. Click a branch to fold it away. Whole map shows all of it; zoom with the buttons, or with Ctrl and the scroll wheel.</p>
   <p class="sr-only" aria-live="polite" data-status></p>
   <ul class="mm-legend" aria-label="Branch colours">
     {
@@ -69,18 +74,21 @@ const config = { id, map, code: codeLabel, glossary: '/glossary/' };
     <li><span class="mm-legend__mark mm-legend__mark--minus" aria-hidden="true">&minus;</span> Limitation</li>
     {map.scope !== 'enrichment' && <li><span class="tag tag--hl">HL</span> HL only</li>}
   </ul>
-  <details class="mm-outline" open>
+  <details class="mm-outline" open data-outline>
     <summary>The map as an outline</summary>
     <div class="mm-outline__body">
       {
         map.branches.map((b) => (
-          <section class="mo-branch" style={`--c:${BRANCH_COLOURS[b.kind]}`}>
-            <h3 class="mo-branch__h">
-              {b.label} {b.level === 'HL' && <span class="tag tag--hl">HL</span>}
-            </h3>
+          <details class="mo-branch" style={`--c:${BRANCH_COLOURS[b.kind]}`} open data-branch>
+            <summary>
+              <h3 class="mo-branch__h">
+                {b.label} {b.level === 'HL' && <span class="tag tag--hl">HL</span>}
+              </h3>
+              <span class="mo-branch__kind">{BRANCH_LABELS[b.kind]}</span>
+            </summary>
             {b.note && <p class="mo-note">{b.note}</p>}
             <MindOutline nodes={b.children} glossaryHref={href.glossary} />
-          </section>
+          </details>
         ))
       }
     </div>
@@ -89,7 +97,7 @@ const config = { id, map, code: codeLabel, glossary: '/glossary/' };
 
 <style>
   .mm {
-    --mm-h: clamp(26rem, 72vh, 48rem);
+    --mm-h: clamp(26rem, 76vh, 52rem);
   }
 
   .mm-bar {
@@ -106,18 +114,61 @@ const config = { id, map, code: codeLabel, glossary: '/glossary/' };
     gap: 0.25rem;
   }
 
-  .mm-bar__group--end {
+  .mm-bar__extra {
+    flex-wrap: wrap;
     margin-left: auto;
+  }
+
+  .mm-bar__more {
+    display: none;
+  }
+
+  /* On a phone: the view, the revision switch and zoom stay; the rest waits under More. */
+  @media (max-width: 40rem) {
+    .mm-bar__more {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .mm-bar__extra {
+      display: none;
+      flex-basis: 100%;
+      margin-left: 0;
+    }
+
+    .mm-bar__extra.is-open {
+      display: inline-flex;
+    }
+  }
+
+  /* Reading the outline: the canvas and its zoom step aside, and the outline comes up under the toolbar. */
+  .mm[data-mode='outline'] .mm-viewport,
+  .mm[data-mode='outline'] .mm-hint,
+  .mm[data-mode='outline'] .mm-bar__zoom {
+    display: none;
+  }
+
+  .mm[data-mode='outline'] .mm-outline {
+    margin-top: var(--sp-3);
+  }
+
+  .mm[data-mode='outline'] .mm-outline > summary {
+    display: none;
+  }
+
+  /* The revision view in the outline: only the essentials of each branch. */
+  .mm[data-revision] .mm-outline :global(.mo-item:not(.mo-item--core)) {
+    display: none;
   }
 
   .mm-btn {
     min-height: 2.25rem;
     padding: 0.3rem 0.8rem;
-    border: 1px solid var(--rule);
-    border-radius: 999px;
+    border: 1px solid var(--rule-control);
+    border-radius: var(--radius-1);
     background: var(--surface-sheet);
     color: var(--navy-900);
-    font: 560 0.8125rem/1 var(--font-ui);
+    font: 560 0.875rem/1 var(--font-ui);
     cursor: pointer;
     transition:
       border-color var(--dur-fast) var(--ease),
@@ -271,8 +322,44 @@ const config = { id, map, code: codeLabel, glossary: '/glossary/' };
     border-top: 3px solid var(--c);
   }
 
+  .mo-branch > summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.2rem 0.75rem;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .mo-branch > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Open or folded, shown by a sign as well as by the list itself. */
+  .mo-branch > summary::before {
+    content: '\2212';
+    width: 1ch;
+    font-weight: 700;
+    color: var(--c);
+  }
+
+  .mo-branch:not([open]) > summary::before {
+    content: '+';
+  }
+
+  .mo-branch > summary:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+  }
+
   .mo-branch__h {
+    margin: 0;
     font-size: 1.125rem;
+  }
+
+  .mo-branch__kind {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
   }
 
   .mm-outline :global(.mo-list) {

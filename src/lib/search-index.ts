@@ -315,7 +315,7 @@ export function buildSearchIndex(input: IndexInput): SearchEntry[] {
       hl: m.level === 'HL',
     });
   for (const [id, d] of Object.entries(input.diagrams ?? {}))
-    add({ kind: 'resources', type: 'Diagram', title: d.title, url: `/diagrams/#diagram-${id}`, text: d.caption ?? '', keys: '', units: d.group === 'toolkit' ? ['toolkit', ...unitsOf(d.syllabus)] : unitsOf(d.syllabus), codes: d.syllabus.filter((x) => x !== 'toolkit'), hl: d.level === 'HL' });
+    add({ kind: 'resources', type: 'Diagram', title: d.title, url: `/diagrams/${id}/`, text: d.caption ?? '', keys: '', units: d.group === 'toolkit' ? ['toolkit', ...unitsOf(d.syllabus)] : unitsOf(d.syllabus), codes: d.syllabus.filter((x) => x !== 'toolkit'), hl: d.level === 'HL' });
   // Quick revision: a sheet for every subtopic, at its topic page's slug, and the flashcards for the whole course.
   for (const { s } of subtopics)
     add({ kind: 'resources', type: 'Revision sheet', title: `Revision sheet: ${s.code} ${s.title}`, url: links.revision(slugify(s.title)), text: 'Key definitions, formulae, frameworks, common mistakes and short exercises, on one printable sheet.', keys: s.title, units: [unitOf(s.code)], codes: [s.code], hl: s.level === 'HL' });

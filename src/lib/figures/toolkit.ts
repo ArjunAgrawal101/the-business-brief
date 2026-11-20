@@ -3,9 +3,17 @@
  * 15). Worked numbers are computed here from fictional data.
  */
 import type { DiagramDef } from '../diagrams';
-import { C, TONES, arrowPath, axes, badge, box, circle, fictionNote, frame, legend, line, num, para, plot, poly, rect, sx, sy, text, type Axes, type Tone } from './kit';
+import { C, NW, TONES, arrowPath, axes, badge, box, circle, fictionNote, frame, legend, line, narrowFrame, num, para, plot, poly, rect, sx, sy, text, type Axes, type Tone } from './kit';
+import { block, grid2, stack } from './narrow';
 
 /* ---------- SWOT ---------- */
+const SWOT_CELLS: Array<[number, number, string, string, string, Tone]> = [
+  [0, 0, 'S', 'Strengths', 'What the business does well: skills, brand, finance, assets', 'green'],
+  [1, 0, 'W', 'Weaknesses', 'Where it falls short: costs, gaps in skills, cash, reputation', 'signal'],
+  [0, 1, 'O', 'Opportunities', 'Openings outside it: new markets, trends, technology, policy', 'cobalt'],
+  [1, 1, 'T', 'Threats', 'Dangers outside it: rivals, recession, regulation, changing tastes', 'gold'],
+];
+
 function swot(id: string): string {
   const W = 680;
   const H = 420;
@@ -20,13 +28,7 @@ function swot(id: string): string {
   p.push(text(gx - 16, gy + ch / 2 + 16, 'the business', { size: 11, fill: C.slate, anchor: 'end' }));
   p.push(text(gx - 16, gy + ch * 1.5, 'External', { size: 12, weight: 700, fill: C.ink, anchor: 'end', label: true }));
   p.push(text(gx - 16, gy + ch * 1.5 + 16, 'its environment', { size: 11, fill: C.slate, anchor: 'end' }));
-  const cells: Array<[number, number, string, string, string, Tone]> = [
-    [0, 0, 'S', 'Strengths', 'What the business does well: skills, brand, finance, assets', 'green'],
-    [1, 0, 'W', 'Weaknesses', 'Where it falls short: costs, gaps in skills, cash, reputation', 'signal'],
-    [0, 1, 'O', 'Opportunities', 'Openings outside it: new markets, trends, technology, policy', 'cobalt'],
-    [1, 1, 'T', 'Threats', 'Dangers outside it: rivals, recession, regulation, changing tastes', 'gold'],
-  ];
-  for (const [i, j, letter, name, sub, tone] of cells) {
+  for (const [i, j, letter, name, sub, tone] of SWOT_CELLS) {
     const t = TONES[tone];
     const x = gx + i * cw;
     const y = gy + j * ch;
@@ -49,21 +51,23 @@ function swot(id: string): string {
 }
 
 /* ---------- STEEPLE ---------- */
+const STEEPLE_ITEMS: Array<[string, string, string]> = [
+  ['S', 'Social', 'Demographics, lifestyles, attitudes'],
+  ['T', 'Technological', 'New products, processes, digital change'],
+  ['E', 'Economic', 'Growth, inflation, interest and exchange rates'],
+  ['E', 'Environmental', 'Climate, resources, pollution, waste'],
+  ['P', 'Political', 'Government policy, stability, trade'],
+  ['L', 'Legal', 'Employment, consumer and competition law'],
+  ['E', 'Ethical', 'What is right: fair pay, honest marketing'],
+];
+
 function steeple(id: string): string {
   const W = 700;
   const H = 430;
   const p: string[] = [];
   const cx = 350;
   const cy = 222;
-  const items: Array<[string, string, string]> = [
-    ['S', 'Social', 'Demographics, lifestyles, attitudes'],
-    ['T', 'Technological', 'New products, processes, digital change'],
-    ['E', 'Economic', 'Growth, inflation, interest and exchange rates'],
-    ['E', 'Environmental', 'Climate, resources, pollution, waste'],
-    ['P', 'Political', 'Government policy, stability, trade'],
-    ['L', 'Legal', 'Employment, consumer and competition law'],
-    ['E', 'Ethical', 'What is right: fair pay, honest marketing'],
-  ];
+  const items = STEEPLE_ITEMS;
   p.push(circle(cx, cy, 64, { fill: C.ink }));
   p.push(text(cx, cy - 6, 'The business', { size: 13, weight: 600, serif: true, fill: C.white, anchor: 'middle' }));
   p.push(text(cx, cy + 12, 'and its decision', { size: 11.5, fill: '#d9d3c4', anchor: 'middle' }));
@@ -90,6 +94,13 @@ function steeple(id: string): string {
 }
 
 /* ---------- Ansoff matrix ---------- */
+const ANSOFF_CELLS: Array<[number, number, string, string, Tone]> = [
+  [0, 0, 'Market penetration', 'Sell more of what it has to the customers it has: promotion, pricing, loyalty', 'green'],
+  [1, 0, 'Product development', 'New products for its existing customers', 'gold'],
+  [0, 1, 'Market development', 'Existing products in new markets: new regions, countries or segments', 'gold'],
+  [1, 1, 'Diversification', 'New products in new markets: the least familiar ground', 'signal'],
+];
+
 function ansoff(id: string): string {
   const W = 660;
   const H = 420;
@@ -104,13 +115,7 @@ function ansoff(id: string): string {
   p.push(text(34, gy + ch, 'Markets', { size: 12, weight: 700, fill: C.ink, anchor: 'middle', label: true, rotate: -90 }));
   p.push(text(gx - 14, gy + ch / 2 + 4, 'Existing', { size: 12.5, weight: 600, fill: C.slate, anchor: 'end' }));
   p.push(text(gx - 14, gy + ch * 1.5 + 4, 'New', { size: 12.5, weight: 600, fill: C.slate, anchor: 'end' }));
-  const cells: Array<[number, number, string, string, Tone]> = [
-    [0, 0, 'Market penetration', 'Sell more of what it has to the customers it has: promotion, pricing, loyalty', 'green'],
-    [1, 0, 'Product development', 'New products for its existing customers', 'gold'],
-    [0, 1, 'Market development', 'Existing products in new markets: new regions, countries or segments', 'gold'],
-    [1, 1, 'Diversification', 'New products in new markets: the least familiar ground', 'signal'],
-  ];
-  for (const [i, j, n, sub, tone] of cells) {
+  for (const [i, j, n, sub, tone] of ANSOFF_CELLS) {
     const t = TONES[tone];
     p.push(rect(gx + i * cw, gy + j * ch, cw - 8, ch - 8, { fill: t.wash, stroke: t.line, sw: 1, rx: 3 }));
     p.push(text(gx + i * cw + 16, gy + j * ch + 32, n, { size: 15, weight: 700, serif: true, fill: t.text }));
@@ -131,6 +136,13 @@ function ansoff(id: string): string {
 }
 
 /* ---------- BCG matrix ---------- */
+const BCG_CELLS: Array<[number, number, string, string, string, Tone]> = [
+  [0, 0, 'Stars', 'High share of a fast-growing market', 'Build: invest to keep the lead', 'gold'],
+  [1, 0, 'Question marks', 'Low share of a fast-growing market', 'Invest heavily, or withdraw', 'cobalt'],
+  [0, 1, 'Cash cows', 'High share of a slow-growing market', 'Hold or harvest: the cash funds the rest', 'green'],
+  [1, 1, 'Dogs', 'Low share of a slow-growing market', 'Divest, unless they serve a purpose', 'slate'],
+];
+
 function bcg(id: string): string {
   const W = 680;
   const H = 440;
@@ -139,13 +151,7 @@ function bcg(id: string): string {
   const gy = 60;
   const cw = 240;
   const ch = 150;
-  const cells: Array<[number, number, string, string, string, Tone]> = [
-    [0, 0, 'Stars', 'High share of a fast-growing market', 'Build: invest to keep the lead', 'gold'],
-    [1, 0, 'Question marks', 'Low share of a fast-growing market', 'Invest heavily, or withdraw', 'cobalt'],
-    [0, 1, 'Cash cows', 'High share of a slow-growing market', 'Hold or harvest: the cash funds the rest', 'green'],
-    [1, 1, 'Dogs', 'Low share of a slow-growing market', 'Divest, unless they serve a purpose', 'slate'],
-  ];
-  for (const [i, j, n, sub, act, tone] of cells) {
+  for (const [i, j, n, sub, act, tone] of BCG_CELLS) {
     const t = TONES[tone];
     p.push(rect(gx + i * cw, gy + j * ch, cw - 8, ch - 8, { fill: t.wash, stroke: t.line, sw: 1, rx: 3 }));
     p.push(text(gx + i * cw + 16, gy + j * ch + 32, n, { size: 16, weight: 700, serif: true, fill: t.text }));
@@ -428,6 +434,13 @@ function criticalPath(id: string): string {
 }
 
 /* ---------- Porter's generic strategies ---------- */
+const PORTER_CELLS: Array<[number, number, string, string, Tone]> = [
+  [0, 0, 'Cost leadership', 'The lowest costs in the industry, so it can win on price or earn more at the same price', 'ink'],
+  [1, 0, 'Differentiation', 'Something customers value and will pay more for: design, quality, brand, service', 'gold'],
+  [0, 1, 'Cost focus', 'The lowest costs in a niche', 'cobalt'],
+  [1, 1, 'Differentiation focus', 'A distinctive offer for a niche', 'green'],
+];
+
 function porter(id: string): string {
   const W = 660;
   const H = 410;
@@ -444,13 +457,7 @@ function porter(id: string): string {
   p.push(text(gx - 14, gy + ch / 2 + 15, 'whole market', { size: 11, fill: C.slate, anchor: 'end' }));
   p.push(text(gx - 14, gy + ch * 1.5, 'Narrow', { size: 12.5, weight: 600, fill: C.slate, anchor: 'end' }));
   p.push(text(gx - 14, gy + ch * 1.5 + 15, 'one segment', { size: 11, fill: C.slate, anchor: 'end' }));
-  const cells: Array<[number, number, string, string, Tone]> = [
-    [0, 0, 'Cost leadership', 'The lowest costs in the industry, so it can win on price or earn more at the same price', 'ink'],
-    [1, 0, 'Differentiation', 'Something customers value and will pay more for: design, quality, brand, service', 'gold'],
-    [0, 1, 'Cost focus', 'The lowest costs in a niche', 'cobalt'],
-    [1, 1, 'Differentiation focus', 'A distinctive offer for a niche', 'green'],
-  ];
-  for (const [i, j, n, sub, tone] of cells) {
+  for (const [i, j, n, sub, tone] of PORTER_CELLS) {
     const t = TONES[tone];
     p.push(rect(gx + i * cw, gy + j * ch, cw - 8, ch - 8, { fill: t.wash, stroke: t.line, sw: 1, rx: 3 }));
     p.push(text(gx + i * cw + 16, gy + j * ch + 32, n, { size: 15, weight: 700, serif: true, fill: t.text }));
@@ -471,18 +478,20 @@ function porter(id: string): string {
 }
 
 /* ---------- Hofstede's cultural dimensions ---------- */
+const HOFSTEDE_DIMS: Array<[string, string, string, string]> = [
+  ['Power distance', 'Low', 'High', 'Acceptance of unequal power'],
+  ['Individualism', 'Collectivism', 'Individualism', 'The group first, or the self first'],
+  ['Masculinity', 'Femininity', 'Masculinity', 'Care and quality of life, or achievement'],
+  ['Uncertainty avoidance', 'Low', 'High', 'Unease with ambiguity and risk'],
+  ['Long-term orientation', 'Short term', 'Long term', 'Quick results, or persistence and saving'],
+  ['Indulgence', 'Restraint', 'Indulgence', 'Holding back, or acting freely on wishes'],
+];
+
 function hofstede(id: string): string {
   const W = 720;
   const H = 400;
   const p: string[] = [];
-  const dims: Array<[string, string, string, string]> = [
-    ['Power distance', 'Low', 'High', 'Acceptance of unequal power'],
-    ['Individualism', 'Collectivism', 'Individualism', 'The group first, or the self first'],
-    ['Masculinity', 'Femininity', 'Masculinity', 'Care and quality of life, or achievement'],
-    ['Uncertainty avoidance', 'Low', 'High', 'Unease with ambiguity and risk'],
-    ['Long-term orientation', 'Short term', 'Long term', 'Quick results, or persistence and saving'],
-    ['Indulgence', 'Restraint', 'Indulgence', 'Holding back, or acting freely on wishes'],
-  ];
+  const dims = HOFSTEDE_DIMS;
   const lx = 232;
   const rx = 500;
   dims.forEach(([n, lo, hi, what], i) => {
@@ -510,6 +519,14 @@ function hofstede(id: string): string {
 }
 
 /* ---------- Circular business models ---------- */
+const CIRCULAR_MODELS: Array<[string, string]> = [
+  ['Circular supply', 'Inputs that can be regrown, composted or recycled'],
+  ['Resource recovery', 'Value captured from waste, scraps and by-products'],
+  ['Product life extension', 'Durable design, repair, upgrade and resale'],
+  ['Sharing', 'Many users share one item, often through an app'],
+  ['Product service system', 'Customers pay for use; the business keeps ownership'],
+];
+
 function circular(id: string): string {
   const W = 720;
   const H = 440;
@@ -530,14 +547,7 @@ function circular(id: string): string {
   [0, 1, 2].forEach((i) => p.push(arrowPath(id, arc(((-90 + i * 120 + 12) * Math.PI) / 180, ((-90 + (i + 1) * 120 - 12) * Math.PI) / 180), { tone: 'green', sw: 2.2 })));
   p.push(text(cx, cy - 4, 'Keep resources', { size: 12, weight: 700, fill: C.greenText, anchor: 'middle' }));
   p.push(text(cx, cy + 12, 'in use', { size: 12, weight: 700, fill: C.greenText, anchor: 'middle' }));
-  const models: Array<[string, string]> = [
-    ['Circular supply', 'Inputs that can be regrown, composted or recycled'],
-    ['Resource recovery', 'Value captured from waste, scraps and by-products'],
-    ['Product life extension', 'Durable design, repair, upgrade and resale'],
-    ['Sharing', 'Many users share one item, often through an app'],
-    ['Product service system', 'Customers pay for use; the business keeps ownership'],
-  ];
-  models.forEach(([n, s], i) => {
+  CIRCULAR_MODELS.forEach(([n, s], i) => {
     const a = ((-90 + i * 72) * Math.PI) / 180;
     const x = cx + 220 * Math.cos(a);
     const y = cy + 160 * Math.sin(a);
@@ -685,18 +695,322 @@ function descriptive(id: string): string {
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* Layouts for phones: the same content, 300 wide, text 14 or more     */
+/* ------------------------------------------------------------------ */
+
+const cellsOf = <T extends unknown[]>(cells: T[], pick: (c: T) => { title: string; text?: string; sub?: string; tone: Tone; letter?: string }) =>
+  cells.map(pick) as [ReturnType<typeof pick>, ReturnType<typeof pick>, ReturnType<typeof pick>, ReturnType<typeof pick>];
+
+function swotNarrow(id: string): string {
+  const g = grid2({
+    colLabels: ['Helpful', 'Harmful'],
+    rowLabels: ['Internal: the business', 'External: its environment'],
+    // The cells' initials are left out: at this width a long name such as Opportunities needs the room.
+    cells: cellsOf(SWOT_CELLS, ([, , , title, text, tone]) => ({ title, text, tone })),
+    note: 'A SWOT is a starting point: it lists factors, and analysis then weighs which matter most for the decision.',
+  });
+  return narrowFrame(id, swot(id), g.h, g.body);
+}
+
+function ansoffNarrow(id: string): string {
+  const g = grid2({
+    colAxis: 'Products',
+    colLabels: ['Existing', 'New'],
+    rowAxis: 'Markets',
+    rowLabels: ['existing', 'new'],
+    cells: cellsOf(ANSOFF_CELLS, ([, , title, text, tone]) => ({ title, text, tone })),
+    note: 'Risk rises with each step away from what the business knows.',
+    noteTone: 'signal',
+  });
+  return narrowFrame(id, ansoff(id), g.h, g.body);
+}
+
+function bcgNarrow(id: string): string {
+  const g = grid2({
+    colAxis: 'Relative market share',
+    colLabels: ['High', 'Low'],
+    rowAxis: 'Market growth',
+    rowLabels: ['high', 'low'],
+    cells: cellsOf(BCG_CELLS, ([, , title, text, sub, tone]) => ({ title, text, sub, tone })),
+    note: 'Cash from the cash cows pays for the question marks.',
+    noteTone: 'green',
+  });
+  return narrowFrame(id, bcg(id), g.h, g.body);
+}
+
+function porterNarrow(id: string): string {
+  const g = grid2({
+    colAxis: 'Source of advantage',
+    colLabels: ['Lower cost', 'Differentiation'],
+    rowAxis: 'Scope',
+    rowLabels: ['broad, the whole market', 'narrow, one segment'],
+    cells: cellsOf(PORTER_CELLS, ([, , title, text, tone]) => ({ title, text, tone })),
+    note: 'Focus applies one of the two strategies to a niche. A business that commits to none risks being “stuck in the middle”.',
+    noteTone: 'signal',
+  });
+  return narrowFrame(id, porter(id), g.h, g.body);
+}
+
+function steepleNarrow(id: string): string {
+  const head = stack(id, [{ title: 'The business and its decision', tone: 'ink', solid: true }]);
+  const list = stack(
+    id,
+    STEEPLE_ITEMS.map(([mark, title, text]) => ({ mark, title, text, tone: 'ink' as Tone })),
+    { top: head.h + 14, x: 14 },
+  );
+  const spine = line(id, 7, head.h, 7, head.h + 14 + list.h - 20, { stroke: C.rule, sw: 2 });
+  return narrowFrame(id, steeple(id), head.h + 14 + list.h, spine + head.body + list.body);
+}
+
+function circularNarrow(id: string): string {
+  const head = stack(id, [{ title: 'Keep resources in use', text: 'Make, use, recover, and make again', tone: 'green', solid: true }]);
+  const list = stack(
+    id,
+    CIRCULAR_MODELS.map(([title, text], i) => ({ mark: String(i + 1), title, text, tone: 'green' as Tone })),
+    { top: head.h + 14, x: 14 },
+  );
+  const spine = line(id, 7, head.h, 7, head.h + 14 + list.h - 20, { stroke: C.green, sw: 2 });
+  return narrowFrame(id, circular(id), head.h + 14 + list.h, spine + head.body + list.body);
+}
+
+function decisionTreeNarrow(id: string): string {
+  const evA = ev(TREE.a.outcomes);
+  const evB = ev(TREE.b.outcomes);
+  const best = evA - TREE.a.cost >= evB - TREE.b.cost ? 'a' : 'b';
+  const p: string[] = [];
+  p.push(rect(0, 0, 22, 22, { fill: C.ink }));
+  p.push(text(32, 17, `Decide: the higher net value, $${num(best === 'a' ? evA - TREE.a.cost : evB - TREE.b.cost)}k`, { size: 14, weight: 700, fill: C.ink }));
+  let y = 40;
+  const joins: number[] = [];
+  (['a', 'b'] as const).forEach((key) => {
+    const t = TREE[key];
+    const e = ev(t.outcomes);
+    const pruned = key !== best;
+    const col = pruned ? C.muted : C.ink;
+    joins.push(y + 10);
+    p.push(line(id, 11, y + 10, 30, y + 10, { stroke: col, sw: 1.8 }));
+    const name = block(34, y, `${t.name}${pruned ? ' (rejected)' : ''}`, NW - 34, { size: 14, weight: 700, fill: pruned ? C.slate : C.ink });
+    p.push(name.body);
+    y += name.h + 2;
+    p.push(text(34, y + 13, `Cost −$${t.cost}k`, { size: 14, fill: C.signalText }));
+    y += 24;
+    p.push(circle(48, y + 9, 9, { fill: C.gold }));
+    p.push(text(64, y + 14, `EV $${num(e)}k, net $${num(e - t.cost)}k`, { size: 14, weight: 700, fill: C.goldText }));
+    y += 26;
+    const branchTop = y;
+    t.outcomes.forEach((o) => {
+      p.push(line(id, 48, y + 9, 70, y + 9, { stroke: col, sw: 1.4 }));
+      p.push(text(76, y + 14, `${o.name}, ${o.p}: $${o.v}k`, { size: 14, weight: 600, fill: C.ink }));
+      p.push(text(76, y + 32, `${o.p} × ${o.v} = ${num(o.p * o.v)}`, { size: 14, fill: C.slate }));
+      y += 44;
+    });
+    p.push(line(id, 48, branchTop - 8, 48, y - 35, { stroke: col, sw: 1.4 }));
+    y += 10;
+  });
+  p.unshift(line(id, 11, 22, 11, joins[joins.length - 1]!, { stroke: C.ink, sw: 1.8 }));
+  const k = block(0, y + 4, 'Square: a decision. Circle: chance. Fictional figures, $000; probabilities are estimates.', NW, { italic: true, fill: C.slate });
+  p.push(k.body);
+  return narrowFrame(id, decisionTree(id), y + 8 + k.h, p.join(''));
+}
+
+function descriptiveNarrow(id: string): string {
+  const d = describeData(STATS_DATA);
+  const a: Axes = { x: 14, y: 54, w: 272, h: 46, x0: 10, x1: 45, y0: 0, y1: 4 };
+  const p: string[] = [];
+  const base = sy(a, 0);
+  p.push(line(id, a.x, base, a.x + a.w + 6, base, { sw: 1.4, arrow: 'end' }));
+  for (let v = 10; v <= 40; v += 10) {
+    p.push(line(id, sx(a, v), base, sx(a, v), base + 5, { sw: 1 }));
+    p.push(text(sx(a, v), base + 22, String(v), { size: 14, fill: C.slate, anchor: 'middle' }));
+  }
+  const by = 10;
+  p.push(rect(sx(a, d.q1), by, sx(a, d.q3) - sx(a, d.q1), 28, { fill: C.goldWash, stroke: C.gold, sw: 1.4 }));
+  p.push(line(id, sx(a, d.median), by, sx(a, d.median), by + 28, { stroke: C.ink, sw: 2.4 }));
+  p.push(line(id, sx(a, d.min), by + 14, sx(a, d.q1), by + 14, { stroke: C.slate, sw: 1.2 }));
+  p.push(line(id, sx(a, d.q3), by + 14, sx(a, d.max), by + 14, { stroke: C.slate, sw: 1.2 }));
+  const seen = new Map<number, number>();
+  for (const v of STATS_DATA) {
+    const k = seen.get(v) ?? 0;
+    seen.set(v, k + 1);
+    p.push(circle(sx(a, v), base - 9 - k * 14, 6, { fill: d.modes.includes(v) ? C.cobalt : C.ink, stroke: C.white, sw: 1.2 }));
+  }
+  p.push(poly([[sx(a, d.mean), base - 2], [sx(a, d.mean) - 7, base + 10], [sx(a, d.mean) + 7, base + 10]], { fill: C.signal }));
+  p.push(text(a.x + a.w, base + 44, 'Units sold a week', { size: 14, weight: 600, fill: C.ink, anchor: 'end' }));
+  let y = base + 64;
+  const facts = [
+    `Box: lower quartile ${d.q1} to upper quartile ${d.q3}, median ${d.median} (the line inside)`,
+    `Mean ${num(d.mean, 2)} (the red marker): the total divided by ${d.n}`,
+    `Mode ${d.modes.join(', ')}: the most frequent value (blue dots)`,
+    `Interquartile range ${d.q3} − ${d.q1} = ${d.q3 - d.q1}; range ${d.max} − ${d.min} = ${d.max - d.min}`,
+    `Standard deviation ${num(d.sd, 2)}: the typical distance from the mean`,
+  ];
+  for (const f of facts) {
+    const b = block(0, y, f, NW);
+    p.push(b.body);
+    y += b.h + 6;
+  }
+  const n = block(0, y + 2, 'Fictional data. Quartiles as medians of each half.', NW, { italic: true, fill: C.slate });
+  p.push(n.body);
+  return narrowFrame(id, descriptive(id), y + 6 + n.h, p.join(''));
+}
+
+function forceFieldNarrow(id: string): string {
+  const sum = (xs: Array<[string, number]>) => xs.reduce((t, [, v]) => t + v, 0);
+  const p: string[] = [];
+  const head = block(12, 10, FORCES.change, NW - 24, { size: 15, weight: 700, serif: true, fill: C.white, lh: 19 });
+  p.push(rect(0, 0, NW, head.h + 20, { fill: C.ink, rx: 3 }));
+  p.push(head.body);
+  let y = head.h + 36;
+  const group = (title: string, items: Array<[string, number]>, tone: 'green' | 'signal') => {
+    p.push(text(0, y, `${title}, total ${sum(items)}`, { size: 14, weight: 700, fill: TONES[tone].text, label: true }));
+    y += 12;
+    for (const [n, v] of items) {
+      p.push(text(0, y + 15, n, { size: 14, weight: 600, fill: C.ink }));
+      const len = v * 50;
+      p.push(line(id, tone === 'green' ? 4 : 4 + len, y + 30, tone === 'green' ? 4 + len : 4, y + 30, { tone, sw: 7, arrow: 'end' }));
+      p.push(text(len + 22, y + 35, String(v), { size: 15, weight: 700, fill: TONES[tone].text }));
+      y += 48;
+    }
+    y += 14;
+  };
+  group('Driving forces', FORCES.driving, 'green');
+  group('Restraining forces', FORCES.restraining, 'signal');
+  const n = block(0, y - 6, 'Scores run from 1 (weak) to 5 (strong) and are judgements. The plan would weaken the strongest restraint, client cover, before going ahead.', NW, { italic: true, fill: C.slate });
+  p.push(n.body);
+  return narrowFrame(id, forceField(id), y + n.h, p.join(''));
+}
+
+function ganttNarrow(id: string): string {
+  const p: string[] = [];
+  const cw = 25;
+  const top = 26;
+  for (let w = 1; w <= 12; w++) p.push(text((w - 0.5) * cw, 16, String(w), { size: 14, fill: C.slate, anchor: 'middle' }));
+  const rows = GANTT.length;
+  const rh = 46;
+  for (let w = 1; w <= 12; w++) p.push(rect((w - 1) * cw, top, cw, rows * rh + 44, { fill: w % 2 ? C.white : C.paper, stroke: C.hair, sw: 1 }));
+  GANTT.forEach((g, i) => {
+    const y = top + i * rh;
+    p.push(text(4, y + 18, g.task, { size: 14, weight: 600, fill: C.ink }));
+    p.push(rect((g.start - 1) * cw + 2, y + 25, g.weeks * cw - 4, 14, { fill: TONES[g.tone].line, rx: 2 }));
+  });
+  const my = top + rows * rh;
+  p.push(text(4, my + 18, 'Opening day', { size: 14, weight: 700, fill: C.signalText }));
+  const mx = 11.5 * cw;
+  p.push(poly([[mx, my + 22], [mx + 9, my + 31], [mx, my + 40], [mx - 9, my + 31]], { fill: C.signal }));
+  const n = block(0, my + 58, 'Weeks across the top. Overlapping bars run at the same time; fitting out cannot start until the finance is in place.', NW, { italic: true, fill: C.slate });
+  p.push(n.body);
+  return narrowFrame(id, gantt(id), my + 62 + n.h, p.join(''));
+}
+
+function criticalPathNarrow(id: string): string {
+  const { est, lft, floats, duration } = cpa(CPA_ACTS);
+  const pos: Record<number, [number, number]> = { 1: [150, 34], 2: [150, 140], 3: [64, 246], 4: [236, 246], 5: [150, 352], 6: [150, 458] };
+  const R = 30;
+  const p: string[] = [];
+  for (const a of floats) {
+    const [x1, y1] = pos[a.from]!;
+    const [x2, y2] = pos[a.to]!;
+    const ang = Math.atan2(y2 - y1, x2 - x1);
+    const crit = a.total === 0;
+    p.push(line(id, x1 + R * Math.cos(ang), y1 + R * Math.sin(ang), x2 - (R + 2) * Math.cos(ang), y2 - (R + 2) * Math.sin(ang), { tone: crit ? 'signal' : 'slate', sw: crit ? 2.6 : 1.5, arrow: 'end' }));
+    const mx = (x1 + x2) / 2;
+    const my = (y1 + y2) / 2;
+    // Each label on the outer side of its arrow, so the two arrows into node 5 keep their labels apart.
+    const side = ({ B: -1, D: -1 } as Record<string, number>)[a.id] ?? 1;
+    p.push(text(mx + side * 14, my + 5, `${a.id} (${a.d})`, { size: 15, weight: 700, fill: crit ? C.signalText : C.slate, anchor: side < 0 ? 'end' : 'start' }));
+  }
+  for (const n of Object.keys(pos).map(Number)) {
+    const [x, y] = pos[n]!;
+    p.push(circle(x, y, R, { fill: C.white, stroke: C.ink, sw: 1.6 }));
+    p.push(line(id, x, y - R, x, y + R, { sw: 1.2 }));
+    p.push(line(id, x, y, x + R, y, { sw: 1.2 }));
+    p.push(text(x - R / 2, y + 5, String(n), { size: 15, weight: 700, fill: C.ink, anchor: 'middle' }));
+    p.push(text(x + R / 2, y - 7, String(est[n]), { size: 14, weight: 700, fill: C.cobaltText, anchor: 'middle' }));
+    p.push(text(x + R / 2, y + 20, String(lft[n]), { size: 14, weight: 700, fill: C.goldText, anchor: 'middle' }));
+  }
+  let y = 508;
+  const crit = floats.filter((a) => a.total === 0).map((a) => a.id);
+  const c = floats.find((a) => a.id === 'C')!;
+  const e = floats.find((a) => a.id === 'E')!;
+  for (const [s, o] of [
+    [`Critical path: ${crit.join(' → ')}, ${duration} weeks`, { weight: 700, fill: C.signalText }],
+    [`C: total float ${c.total}, free float ${c.free}. E: total float ${e.total}, free float ${e.free}.`, {}],
+    ['In each node: its number, then the earliest start time (top) and the latest finish time (bottom). Durations in weeks.', { fill: C.slate, italic: true }],
+  ] as Array<[string, { weight?: number; fill?: string; italic?: boolean }]>) {
+    const b = block(0, y, s, NW, o);
+    p.push(b.body);
+    y += b.h + 6;
+  }
+  return narrowFrame(id, criticalPath(id), y + 4, p.join(''));
+}
+
+function hofstedeNarrow(id: string): string {
+  const p: string[] = [];
+  let y = 0;
+  for (const [n, lo, hi, what] of HOFSTEDE_DIMS) {
+    p.push(text(0, y + 15, n, { size: 15, weight: 700, fill: C.ink }));
+    const w = block(0, y + 22, what, NW, { fill: C.slate });
+    p.push(w.body);
+    y += 22 + w.h + 14;
+    p.push(line(id, 10, y, NW - 10, y, { stroke: C.rule, sw: 6 }));
+    p.push(circle(10, y, 6, { fill: C.cobalt }));
+    p.push(circle(NW - 10, y, 6, { fill: C.gold }));
+    p.push(text(0, y + 24, lo, { size: 14, weight: 600, fill: C.cobaltText }));
+    p.push(text(NW, y + 24, hi, { size: 14, weight: 600, fill: C.goldText, anchor: 'end' }));
+    y += 44;
+  }
+  const n = block(0, y, 'Countries are scored on each scale. The scores are national averages: they describe tendencies, not individuals.', NW, { italic: true, fill: C.slate });
+  p.push(n.body);
+  return narrowFrame(id, hofstede(id), y + n.h + 4, p.join(''));
+}
+
+function regressionNarrow(id: string): string {
+  const a: Axes = { x: 40, y: 30, w: 240, h: 200, x0: 0, x1: 12, y0: 0, y1: 50 };
+  const p: string[] = [];
+  const { a: c0, b, r: rr } = regression(REG.x, REG.y);
+  for (const v of [0, 25, 50]) {
+    p.push(line(id, a.x, sy(a, v), a.x + a.w, sy(a, v), { stroke: C.hair, sw: 1 }));
+    p.push(text(a.x - 8, sy(a, v) + 5, String(v), { size: 14, fill: C.slate, anchor: 'end' }));
+  }
+  for (const v of [0, 4, 8, 12]) p.push(text(sx(a, v), a.y + a.h + 22, String(v), { size: 14, fill: C.slate, anchor: 'middle' }));
+  p.push(line(id, a.x, a.y + a.h, a.x + a.w + 8, a.y + a.h, { sw: 1.4, arrow: 'end' }));
+  p.push(line(id, a.x, a.y + a.h, a.x, a.y - 8, { sw: 1.4, arrow: 'end' }));
+  p.push(text(0, 14, 'Sales revenue, $000 a month', { size: 14, weight: 600, fill: C.ink }));
+  p.push(text(a.x + a.w, a.y + a.h + 44, 'Advertising, $000 a month', { size: 14, weight: 600, fill: C.ink, anchor: 'end' }));
+  const xmin = Math.min(...REG.x);
+  const xmax = Math.max(...REG.x);
+  p.push(plot(a, [[xmin, c0 + b * xmin], [xmax, c0 + b * xmax]], { stroke: C.cobalt, sw: 2.2 }));
+  p.push(plot(a, [[xmax, c0 + b * xmax], [11, c0 + b * 11]], { stroke: C.cobalt, sw: 2, dash: '6 5' }));
+  REG.x.forEach((x, i) => p.push(circle(sx(a, x), sy(a, REG.y[i]!), 5, { fill: C.ink, stroke: C.white, sw: 1.5 })));
+  const ey = c0 + b * 11;
+  p.push(circle(sx(a, 11), sy(a, ey), 5, { fill: C.white, stroke: C.cobalt, sw: 2 }));
+  let y = a.y + a.h + 62;
+  for (const [s, o] of [
+    [`Line of best fit: y = ${num(c0, 2)} + ${num(b, 2)}x`, { weight: 700, fill: C.cobaltText }],
+    [`r = ${num(rr, 2)}: a strong positive correlation`, {}],
+    [`Extrapolated to 11: about ${num(ey, 1)} (the open circle)`, { fill: C.cobaltText }],
+    ['Correlation is not causation, and extrapolating assumes the pattern holds beyond the data. Fictional data.', { italic: true, fill: C.slate }],
+  ] as Array<[string, { weight?: number; fill?: string; italic?: boolean }]>) {
+    const bl = block(0, y, s, NW, o);
+    p.push(bl.body);
+    y += bl.h + 6;
+  }
+  return narrowFrame(id, linearRegression(id), y + 2, p.join(''));
+}
+
 export const TOOLKIT: Record<string, DiagramDef> = {
-  swot: { title: 'SWOT analysis', caption: 'Internal strengths and weaknesses, external opportunities and threats.', syllabus: ['1.3', '1.5', '4.2'], level: 'SL/HL', group: 'toolkit', render: swot },
-  steeple: { title: 'STEEPLE analysis', caption: 'Seven kinds of external factor that bear on a decision.', syllabus: ['1.5', '2.1', '4.6'], level: 'SL/HL', group: 'toolkit', render: steeple },
-  'ansoff-matrix': { title: 'The Ansoff matrix', caption: 'Four growth strategies, and the risk each carries.', syllabus: ['1.5', '4.2'], level: 'SL/HL', group: 'toolkit', render: ansoff },
-  'bcg-matrix': { title: 'The BCG matrix', caption: 'A product portfolio by market growth and relative market share.', syllabus: ['4.5', '3.7'], level: 'SL/HL', group: 'toolkit', render: bcg },
-  'decision-tree': { title: 'A decision tree', caption: 'Expected values for two options, with the rejected branch marked.', syllabus: ['1.5', '5.4'], level: 'SL/HL', group: 'toolkit', fictional: true, render: decisionTree },
-  'descriptive-statistics': { title: 'Descriptive statistics', caption: 'Mean, median, mode, quartiles and standard deviation on one data set.', syllabus: ['4.4', '2.4'], level: 'SL/HL', group: 'toolkit', fictional: true, render: descriptive },
-  'circular-business-models': { title: 'Circular business models', caption: 'The five models the guide names.', syllabus: ['1.1', '5.3'], level: 'SL/HL', group: 'toolkit', render: circular },
-  'force-field': { title: 'Force field analysis', caption: 'Driving and restraining forces, scored and weighed.', syllabus: ['2.1', '2.3', '1.5'], level: 'HL', group: 'toolkit', fictional: true, render: forceField },
-  'gantt-chart': { title: 'A Gantt chart', caption: 'Tasks against time, with overlaps, a dependency and a milestone.', syllabus: ['5.1', '4.2'], level: 'HL', group: 'toolkit', fictional: true, render: gantt },
-  'critical-path': { title: 'A critical path network', caption: 'Earliest start and latest finish times, the critical path, total and free float.', syllabus: ['5.1', '5.6'], level: 'HL', group: 'toolkit', fictional: true, render: criticalPath },
-  'porters-generic-strategies': { title: 'Porter’s generic strategies', caption: 'Cost leadership, differentiation and focus.', syllabus: ['1.3', '4.2'], level: 'HL', group: 'toolkit', render: porter },
-  'hofstede-dimensions': { title: 'Hofstede’s cultural dimensions', caption: 'Six scales for comparing national cultures.', syllabus: ['2.5', '4.6'], level: 'HL', group: 'toolkit', render: hofstede },
-  'linear-regression': { title: 'Simple linear regression', caption: 'A scatter diagram, the line of best fit, correlation and extrapolation.', syllabus: ['4.3'], level: 'HL', group: 'toolkit', fictional: true, render: linearRegression },
+  swot: { title: 'SWOT analysis', caption: 'Internal strengths and weaknesses, external opportunities and threats.', syllabus: ['1.3', '1.5', '4.2'], level: 'SL/HL', group: 'toolkit', render: swot, narrow: swotNarrow },
+  steeple: { title: 'STEEPLE analysis', caption: 'Seven kinds of external factor that bear on a decision.', syllabus: ['1.5', '2.1', '4.6'], level: 'SL/HL', group: 'toolkit', render: steeple, narrow: steepleNarrow },
+  'ansoff-matrix': { title: 'The Ansoff matrix', caption: 'Four growth strategies, and the risk each carries.', syllabus: ['1.5', '4.2'], level: 'SL/HL', group: 'toolkit', render: ansoff, narrow: ansoffNarrow },
+  'bcg-matrix': { title: 'The BCG matrix', caption: 'A product portfolio by market growth and relative market share.', syllabus: ['4.5', '3.7'], level: 'SL/HL', group: 'toolkit', render: bcg, narrow: bcgNarrow },
+  'decision-tree': { title: 'A decision tree', caption: 'Expected values for two options, with the rejected branch marked.', syllabus: ['1.5', '5.4'], level: 'SL/HL', group: 'toolkit', fictional: true, render: decisionTree, narrow: decisionTreeNarrow },
+  'descriptive-statistics': { title: 'Descriptive statistics', caption: 'Mean, median, mode, quartiles and standard deviation on one data set.', syllabus: ['4.4', '2.4'], level: 'SL/HL', group: 'toolkit', fictional: true, render: descriptive, narrow: descriptiveNarrow },
+  'circular-business-models': { title: 'Circular business models', caption: 'The five models the guide names.', syllabus: ['1.1', '5.3'], level: 'SL/HL', group: 'toolkit', render: circular, narrow: circularNarrow },
+  'force-field': { title: 'Force field analysis', caption: 'Driving and restraining forces, scored and weighed.', syllabus: ['2.1', '2.3', '1.5'], level: 'HL', group: 'toolkit', fictional: true, render: forceField, narrow: forceFieldNarrow },
+  'gantt-chart': { title: 'A Gantt chart', caption: 'Tasks against time, with overlaps, a dependency and a milestone.', syllabus: ['5.1', '4.2'], level: 'HL', group: 'toolkit', fictional: true, render: gantt, narrow: ganttNarrow },
+  'critical-path': { title: 'A critical path network', caption: 'Earliest start and latest finish times, the critical path, total and free float.', syllabus: ['5.1', '5.6'], level: 'HL', group: 'toolkit', fictional: true, render: criticalPath, narrow: criticalPathNarrow },
+  'porters-generic-strategies': { title: 'Porter’s generic strategies', caption: 'Cost leadership, differentiation and focus.', syllabus: ['1.3', '4.2'], level: 'HL', group: 'toolkit', render: porter, narrow: porterNarrow },
+  'hofstede-dimensions': { title: 'Hofstede’s cultural dimensions', caption: 'Six scales for comparing national cultures.', syllabus: ['2.5', '4.6'], level: 'HL', group: 'toolkit', render: hofstede, narrow: hofstedeNarrow },
+  'linear-regression': { title: 'Simple linear regression', caption: 'A scatter diagram, the line of best fit, correlation and extrapolation.', syllabus: ['4.3'], level: 'HL', group: 'toolkit', fictional: true, render: linearRegression, narrow: regressionNarrow },
 };

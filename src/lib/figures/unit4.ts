@@ -2,7 +2,8 @@
  * Unit 4 diagrams: marketing.
  */
 import type { DiagramDef } from '../diagrams';
-import { C, TONES, arrowPath, axes, box, circle, fictionNote, frame, line, num, para, rect, smooth, sx, sy, text, type Axes, type Tone } from './kit';
+import { C, NW, TONES, arrowPath, axes, box, circle, fictionNote, frame, line, narrowFrame, num, para, rect, smooth, sx, sy, text, type Axes, type Tone } from './kit';
+import { block } from './narrow';
 
 /* ---------- Market and product orientation ---------- */
 function orientation(id: string): string {
@@ -313,30 +314,31 @@ function sevenPs(id: string): string {
 }
 
 /* ---------- Product life cycle ---------- */
+const PLC_STAGES: Array<[number, number, string]> = [
+  [0, 1.4, 'Development'],
+  [1.4, 3, 'Introduction'],
+  [3, 5, 'Growth'],
+  [5, 7.4, 'Maturity'],
+  [7.4, 10, 'Decline'],
+];
+const PLC_SALES: Array<[number, number]> = [[1.4, 0], [2.2, 0.6], [3, 1.9], [3.9, 4.6], [5, 7.2], [6.2, 8], [7.4, 7.4], [8.6, 5], [9.8, 2.8]];
+const PLC_CASH: Array<[number, number]> = [[0, 0], [0.8, -1.6], [1.6, -2.4], [2.4, -1.6], [3.2, 0.2], [4.4, 2.6], [5.6, 4], [6.8, 4.2], [7.8, 3], [9, 1.2], [9.8, 0.4]];
+const PLC_EXT: Array<[number, number]> = [[6.6, 7.9], [7.4, 8.5], [8.2, 8.8], [9.2, 8.2], [9.9, 7.2]];
+
 function plc(id: string): string {
   const W = 720;
   const H = 440;
   const a: Axes = { x: 70, y: 40, w: 560, h: 300, x0: 0, x1: 10, y0: -3, y1: 10 };
   const p: string[] = [];
-  const stages: Array<[number, number, string]> = [
-    [0, 1.4, 'Development'],
-    [1.4, 3, 'Introduction'],
-    [3, 5, 'Growth'],
-    [5, 7.4, 'Maturity'],
-    [7.4, 10, 'Decline'],
-  ];
-  stages.forEach(([x0, x1, n], i) => {
+  PLC_STAGES.forEach(([x0, x1, n], i) => {
     if (i % 2) p.push(rect(sx(a, x0), a.y, sx(a, x1) - sx(a, x0), a.h, { fill: C.paper }));
     p.push(text((sx(a, x0) + sx(a, x1)) / 2, a.y + a.h - 8, n, { size: 11, weight: 700, fill: C.slate, anchor: 'middle' }));
   });
   p.push(axes(id, a, { xLabel: 'Time', yLabel: 'Sales and cash flow', xAxisAt: 0 }));
-  const sales: Array<[number, number]> = [[1.4, 0], [2.2, 0.6], [3, 1.9], [3.9, 4.6], [5, 7.2], [6.2, 8], [7.4, 7.4], [8.6, 5], [9.8, 2.8]];
-  p.push(`<path d="${smooth(sales.map(([x, y]) => [sx(a, x), sy(a, y)]))}" fill="none" stroke="${C.ink}" stroke-width="2.8"/>`);
-  const cash: Array<[number, number]> = [[0, 0], [0.8, -1.6], [1.6, -2.4], [2.4, -1.6], [3.2, 0.2], [4.4, 2.6], [5.6, 4], [6.8, 4.2], [7.8, 3], [9, 1.2], [9.8, 0.4]];
-  p.push(`<path d="${smooth(cash.map(([x, y]) => [sx(a, x), sy(a, y)]))}" fill="none" stroke="${C.cobalt}" stroke-width="2.2" stroke-dasharray="7 5"/>`);
+  p.push(`<path d="${smooth(PLC_SALES.map(([x, y]) => [sx(a, x), sy(a, y)]))}" fill="none" stroke="${C.ink}" stroke-width="2.8"/>`);
+  p.push(`<path d="${smooth(PLC_CASH.map(([x, y]) => [sx(a, x), sy(a, y)]))}" fill="none" stroke="${C.cobalt}" stroke-width="2.2" stroke-dasharray="7 5"/>`);
   // An extension strategy in maturity.
-  const ext: Array<[number, number]> = [[6.6, 7.9], [7.4, 8.5], [8.2, 8.8], [9.2, 8.2], [9.9, 7.2]];
-  p.push(`<path d="${smooth(ext.map(([x, y]) => [sx(a, x), sy(a, y)]))}" fill="none" stroke="${C.gold}" stroke-width="2.4"/>`);
+  p.push(`<path d="${smooth(PLC_EXT.map(([x, y]) => [sx(a, x), sy(a, y)]))}" fill="none" stroke="${C.gold}" stroke-width="2.4"/>`);
   p.push(circle(sx(a, 6.6), sy(a, 7.9), 5, { fill: C.gold, stroke: C.white, sw: 2 }));
   p.push(para(sx(a, 7.6), sy(a, 9.7), 'Extension strategy: new uses, markets, versions or promotion', 26, { size: 11, weight: 600, fill: C.goldText }));
   p.push(text(sx(a, 9.9), sy(a, 2.8) + 18, 'Sales', { size: 12, weight: 700, fill: C.ink, anchor: 'end' }));
@@ -353,6 +355,46 @@ function plc(id: string): string {
     },
     p.join(''),
   );
+}
+
+/** For a phone: the same curves, with the stages named underneath and the key in words. */
+function plcNarrow(id: string): string {
+  const a: Axes = { x: 8, y: 26, w: 284, h: 190, x0: 0, x1: 10, y0: -3, y1: 10 };
+  const p: string[] = [];
+  PLC_STAGES.forEach(([x0, x1], i) => {
+    if (i % 2) p.push(rect(sx(a, x0), a.y, sx(a, x1) - sx(a, x0), a.h, { fill: C.paper }));
+  });
+  p.push(line(id, a.x, sy(a, 0), a.x + a.w + 6, sy(a, 0), { sw: 1.4, arrow: 'end' }));
+  p.push(line(id, a.x, a.y + a.h, a.x, a.y - 8, { sw: 1.4, arrow: 'end' }));
+  p.push(text(a.x + 6, a.y - 10, 'Sales and cash flow', { size: 14, weight: 600, fill: C.ink }));
+  p.push(`<path d="${smooth(PLC_SALES.map(([x, y]) => [sx(a, x), sy(a, y)]))}" fill="none" stroke="${C.ink}" stroke-width="2.8"/>`);
+  p.push(`<path d="${smooth(PLC_CASH.map(([x, y]) => [sx(a, x), sy(a, y)]))}" fill="none" stroke="${C.cobalt}" stroke-width="2.2" stroke-dasharray="7 5"/>`);
+  p.push(`<path d="${smooth(PLC_EXT.map(([x, y]) => [sx(a, x), sy(a, y)]))}" fill="none" stroke="${C.gold}" stroke-width="2.4"/>`);
+  p.push(circle(sx(a, 6.6), sy(a, 7.9), 5, { fill: C.gold, stroke: C.white, sw: 2 }));
+  // The stages, in order under the chart: their names are too long to sit inside it at this size.
+  let y = a.y + a.h + 18;
+  PLC_STAGES.forEach(([x0, x1, n], i) => {
+    p.push(text((sx(a, x0) + sx(a, x1)) / 2, a.y + a.h + 18, String(i + 1), { size: 14, weight: 700, fill: C.slate, anchor: 'middle' }));
+    void n;
+  });
+  y += 10;
+  const stages = block(0, y, PLC_STAGES.map(([, , n], i) => `${i + 1} ${n}`).join(', '), NW, { weight: 600, fill: C.ink });
+  p.push(stages.body);
+  y += stages.h + 10;
+  const key: Array<[string, string, string | undefined]> = [
+    ['Sales', C.ink, undefined],
+    ['Cash flow: negative while the business invests', C.cobalt, '7 5'],
+    ['An extension strategy lifting sales in maturity', C.gold, undefined],
+  ];
+  for (const [label, stroke, dash] of key) {
+    p.push(`<line x1="0" y1="${y + 8}" x2="22" y2="${y + 8}" stroke="${stroke}" stroke-width="2.6"${dash ? ` stroke-dasharray="${dash}"` : ''}/>`);
+    const b = block(30, y, label, NW - 30);
+    p.push(b.body);
+    y += b.h + 6;
+  }
+  const n = block(0, y + 4, 'Not every product follows the curve, and its length cannot be known in advance.', NW, { italic: true, fill: C.slate });
+  p.push(n.body);
+  return narrowFrame(id, plc(id), y + 8 + n.h, p.join(''));
 }
 
 /* ---------- Promotion ---------- */
@@ -490,7 +532,7 @@ export const UNIT4: Record<string, DiagramDef> = {
   'market-research-methods': { title: 'Market research methods', caption: 'Primary and secondary, quantitative and qualitative.', syllabus: ['4.4'], level: 'SL/HL', group: 'unit-4', render: research },
   'sampling-methods': { title: 'Three sampling methods', caption: 'Random, quota and convenience samples from one population.', syllabus: ['4.4'], level: 'SL/HL', group: 'unit-4', render: sampling },
   'seven-ps': { title: 'The seven Ps of the marketing mix', caption: 'The four Ps of any product and three more for services.', syllabus: ['4.5'], level: 'SL/HL', group: 'unit-4', render: sevenPs },
-  'product-life-cycle': { title: 'The product life cycle, with cash flow', caption: 'Five stages, an extension strategy, and why cash flow lags sales.', syllabus: ['4.5'], level: 'SL/HL', group: 'unit-4', render: plc },
+  'product-life-cycle': { title: 'The product life cycle, with cash flow', caption: 'Five stages, an extension strategy, and why cash flow lags sales.', syllabus: ['4.5'], level: 'SL/HL', group: 'unit-4', render: plc, narrow: plcNarrow },
   'promotion-lines': { title: 'Above, below and through the line', caption: 'Mass media, targeted promotion, and campaigns that combine them.', syllabus: ['4.5'], level: 'SL/HL', group: 'unit-4', render: promotion },
   'distribution-channels': { title: 'Distribution channels', caption: 'From direct selling to chains of intermediaries.', syllabus: ['4.5'], level: 'SL/HL', group: 'unit-4', render: channels },
   'brand-development': { title: 'From brand awareness to brand value', caption: 'The four aspects of branding the guide names.', syllabus: ['4.5'], level: 'SL/HL', group: 'unit-4', render: branding },

@@ -107,7 +107,11 @@ describe('the diagram library', () => {
   it.each(Object.entries(DIAGRAMS))('%s renders, describes itself and names real subtopics', (id, d) => {
     const svg = d.render(`t-${id}`);
     expect(svg.startsWith('<svg')).toBe(true);
-    expect(svg).toContain(`aria-labelledby="t-${id}-t t-${id}-d"`);
+    // A diagram with a short text alternative is named by it and described by the full text; the others are named by both.
+    if (d.alt) {
+      expect(svg).toContain(`aria-labelledby="t-${id}-t"`);
+      expect(svg).toContain(`aria-describedby="t-${id}-d"`);
+    } else expect(svg).toContain(`aria-labelledby="t-${id}-t t-${id}-d"`);
     expect(descOf(svg).length).toBeGreaterThan(80);
     // An enrichment diagram is beyond the course: it names no subtopic, so it never counts as IB coverage.
     if (d.group === 'enrichment') expect(d.syllabus, `${id} is enrichment`).toEqual([]);

@@ -89,6 +89,42 @@ const STATUS_TEXT = {
           </tbody>
         </table>
       </div>
+      {/* On a phone the matrix would scroll sideways: the same index, purpose by purpose, takes its place. */}
+      <div class="fwi-mlist">
+        {
+          FRAMEWORK_GROUPS.map((g, n) => (
+            <section class="fwi-mlist__group" aria-labelledby={`fwi-m-${g}`}>
+              <h3 class="fwi-mlist__h" id={`fwi-m-${g}`}>
+                <span class="fwi-mlist__no" aria-hidden="true">
+                  {String(n + 1).padStart(2, '0')}
+                </span>
+                <a href={`#group-${g}`}>{FRAMEWORK_GROUP_INFO[g].title}</a>
+              </h3>
+              <dl class="fwi-mlist__rows">
+                {(['syllabus', 'toolkit', 'enrichment'] as const)
+                  .filter((st) => grid[st][g].length > 0)
+                  .map((st) => (
+                    <div>
+                      <dt>
+                        <span class={`tag ${st === 'enrichment' ? 'tag--enrichment' : 'tag--ib'}`}>{STATUS_LABELS[st]}</span>
+                      </dt>
+                      <dd>
+                        <ul>
+                          {grid[st][g].map(([id, f]) => (
+                            <li data-fw data-group={f.group} data-level={levelKey(f)}>
+                              <a href={frameworkHref(id)}>{f.name}</a>
+                              {f.level === 'HL' && f.status !== 'enrichment' && <span class="fwi-hl">HL</span>}
+                            </li>
+                          ))}
+                        </ul>
+                      </dd>
+                    </div>
+                  ))}
+              </dl>
+            </section>
+          ))
+        }
+      </div>
     </section>
 
     <div class="fwi-filters js-only" role="group" aria-labelledby="fwi-filter-h">
@@ -188,6 +224,80 @@ const STATUS_TEXT = {
 
   .fwi-map {
     margin-top: var(--sp-5);
+  }
+
+  .fwi-mlist {
+    display: none;
+  }
+
+  /* A phone gets the index as a list, purpose by purpose, instead of a matrix that scrolls sideways. */
+  @media (max-width: 48rem) {
+    .fwi-map,
+    .fwi-swipe {
+      display: none !important;
+    }
+
+    .fwi-mlist {
+      display: grid;
+      gap: var(--sp-5);
+      margin-top: var(--sp-5);
+    }
+  }
+
+  .fwi-mlist__group {
+    padding-top: var(--sp-3);
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .fwi-mlist__h {
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+    margin: 0;
+    font-size: 1.125rem;
+  }
+
+  .fwi-mlist__h a {
+    color: var(--navy-900);
+    text-decoration: none;
+  }
+
+  .fwi-mlist__h a:hover {
+    text-decoration: underline;
+  }
+
+  .fwi-mlist__no {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--brass-text);
+  }
+
+  .fwi-mlist__rows {
+    display: grid;
+    gap: var(--sp-3);
+    margin: var(--sp-3) 0 0;
+  }
+
+  .fwi-mlist__rows dd {
+    margin: var(--sp-2) 0 0;
+  }
+
+  .fwi-mlist__rows ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fwi-mlist__rows li {
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  .fwi-mlist__rows li[hidden] {
+    display: none;
   }
 
   .fwi-swipe {

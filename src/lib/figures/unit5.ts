@@ -3,7 +3,8 @@
  * value on a chart is computed here from the stated assumptions.
  */
 import type { DiagramDef } from '../diagrams';
-import { C, TONES, arrowPath, axes, box, circle, fictionNote, frame, legend, line, num, para, path, plot, poly, rect, smooth, span, sx, sy, text, type Axes } from './kit';
+import { C, NW, TONES, arrowPath, axes, box, circle, fictionNote, frame, legend, line, narrowFrame, num, para, path, plot, poly, rect, smooth, span, sx, sy, text, type Axes } from './kit';
+import { block } from './narrow';
 
 /* ---------- Break-even: one set of assumptions for both charts ---------- */
 const BE = { price: 25, vc: 15, fc: 20000, sales: 3000, cap: 4000 };
@@ -97,6 +98,64 @@ function breakEvenChart(id: string, opts: { price2?: number }): string {
     },
     p.join(''),
   );
+}
+
+/** For a phone: the same lines with short labels at their ends, and the results written underneath. */
+function breakEvenNarrow(id: string, opts: { price2?: number }): string {
+  const yMax = opts.price2 ? 120000 : 100000;
+  const a: Axes = { x: 46, y: 26, w: 216, h: 200, x0: 0, x1: BE.cap, y0: 0, y1: yMax };
+  const tc = (q: number) => BE.fc + BE.vc * q;
+  const q1 = beq(BE.price, BE.vc, BE.fc);
+  const p: string[] = [];
+  for (let v = 0; v <= yMax; v += yMax / 2) {
+    p.push(line(id, a.x, sy(a, v), a.x + a.w, sy(a, v), { stroke: C.hair, sw: 1 }));
+    p.push(text(a.x - 6, sy(a, v) + 5, v === 0 ? '0' : `$${num(v / 1000)}k`, { size: 14, fill: C.slate, anchor: 'end' }));
+  }
+  for (const v of [0, 2000, 4000]) p.push(text(sx(a, v), a.y + a.h + 20, num(v), { size: 14, fill: C.slate, anchor: 'middle' }));
+  p.push(line(id, a.x, a.y + a.h, a.x + a.w + 6, a.y + a.h, { sw: 1.4, arrow: 'end' }));
+  p.push(line(id, a.x, a.y + a.h, a.x, a.y - 8, { sw: 1.4, arrow: 'end' }));
+  p.push(text(0, 14, 'Costs and revenue', { size: 14, weight: 600, fill: C.ink }));
+  p.push(text(a.x + a.w, a.y + a.h + 40, 'Output (units)', { size: 14, weight: 600, fill: C.ink, anchor: 'end' }));
+  if (!opts.price2) {
+    p.push(poly([[sx(a, 0), sy(a, 0)], [sx(a, 0), sy(a, BE.fc)], [sx(a, q1), sy(a, tc(q1))]], { fill: C.signalWash }));
+    p.push(poly([[sx(a, q1), sy(a, tc(q1))], [sx(a, BE.cap), sy(a, BE.price * BE.cap)], [sx(a, BE.cap), sy(a, tc(BE.cap))]], { fill: C.greenWash }));
+  }
+  p.push(plot(a, [[0, BE.fc], [BE.cap, BE.fc]], { stroke: C.slate, sw: 2, dash: '7 5' }));
+  p.push(plot(a, [[0, BE.fc], [BE.cap, tc(BE.cap)]], { stroke: C.ink, sw: 2.4 }));
+  p.push(plot(a, [[0, 0], [BE.cap, BE.price * BE.cap]], { stroke: C.cobalt, sw: 2.4 }));
+  p.push(text(a.x + a.w + 6, sy(a, BE.fc) + 5, 'FC', { size: 14, weight: 700, fill: C.slate }));
+  p.push(text(a.x + a.w + 6, sy(a, tc(BE.cap)) + 5, 'TC', { size: 14, weight: 700, fill: C.ink }));
+  p.push(text(a.x + a.w + 6, sy(a, BE.price * BE.cap) + 5, opts.price2 ? `$${BE.price}` : 'TR', { size: 14, weight: 700, fill: C.cobaltText }));
+  const bx = sx(a, q1);
+  p.push(line(id, bx, sy(a, BE.price * q1), bx, sy(a, 0), { stroke: C.gold, sw: 1.3, dash: '4 4' }));
+  p.push(circle(bx, sy(a, BE.price * q1), 5.5, { fill: C.gold, stroke: C.white, sw: 2 }));
+  const lines: Array<[string, { weight?: number; fill?: string; italic?: boolean }]> = [];
+  if (opts.price2) {
+    const q2 = beq(opts.price2, BE.vc, BE.fc);
+    p.push(plot(a, [[0, 0], [BE.cap, opts.price2 * BE.cap]], { stroke: C.green, sw: 2.4 }));
+    p.push(text(a.x + a.w + 6, sy(a, opts.price2 * BE.cap) + 5, `$${opts.price2}`, { size: 14, weight: 700, fill: C.greenText }));
+    const bx2 = sx(a, q2);
+    p.push(line(id, bx2, sy(a, opts.price2 * q2), bx2, sy(a, 0), { stroke: C.green, sw: 1.3, dash: '4 4' }));
+    p.push(circle(bx2, sy(a, opts.price2 * q2), 5.5, { fill: C.green, stroke: C.white, sw: 2 }));
+    lines.push([`At $${BE.price}, total revenue (TR) meets total costs (TC) at ${num(q1)} units.`, { fill: C.cobaltText, weight: 600 }]);
+    lines.push([`At $${opts.price2}, it meets them at ${num(q2, 1)} units, rounded up to ${num(Math.ceil(q2))}: the break-even quantity falls.`, { fill: C.greenText, weight: 600 }]);
+    lines.push([`Fictional: fixed costs (FC) $${num(BE.fc)}, variable cost $${BE.vc} a unit. Sales may fall at the higher price.`, { italic: true, fill: C.slate }]);
+  } else {
+    const profit = BE.sales * (BE.price - BE.vc) - BE.fc;
+    const sxs = sx(a, BE.sales);
+    p.push(line(id, sxs, sy(a, BE.price * BE.sales), sxs, sy(a, 0), { stroke: C.ink, sw: 1.2, dash: '2 4' }));
+    lines.push([`Break-even: ${num(q1)} units, $${num(BE.price * q1)} of revenue, where total revenue (TR) meets total costs (TC).`, { weight: 600, fill: C.goldText }]);
+    lines.push([`At current sales of ${num(BE.sales)} units (dotted line): margin of safety ${num(BE.sales - q1)} units, profit $${num(profit)}.`, { weight: 600, fill: C.greenText }]);
+    lines.push(['Shaded: loss below break-even, profit above it. FC: fixed costs.', {}]);
+    lines.push([`Fictional: price $${BE.price}, variable cost $${BE.vc} a unit, fixed costs $${num(BE.fc)}.`, { italic: true, fill: C.slate }]);
+  }
+  let y = a.y + a.h + 58;
+  for (const [s, o] of lines) {
+    const b = block(0, y, s, NW, o);
+    p.push(b.body);
+    y += b.h + 8;
+  }
+  return narrowFrame(id, breakEvenChart(id, opts), y, p.join(''));
 }
 
 /* ---------- Stock control ---------- */
@@ -544,6 +603,7 @@ export const UNIT5: Record<string, DiagramDef> = {
     group: 'unit-5',
     fictional: true,
     render: (id) => breakEvenChart(id, {}),
+    narrow: (id) => breakEvenNarrow(id, {}),
   },
   'break-even-price-change': {
     title: 'A price rise on the break-even chart',
@@ -553,6 +613,7 @@ export const UNIT5: Record<string, DiagramDef> = {
     group: 'unit-5',
     fictional: true,
     render: (id) => breakEvenChart(id, { price2: 30 }),
+    narrow: (id) => breakEvenNarrow(id, { price2: 30 }),
   },
   'operations-methods': {
     title: 'Operations methods by volume and variety',

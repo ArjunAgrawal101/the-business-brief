@@ -1,41 +1,43 @@
 ---
 /**
  * The diagram library: every diagram on the platform, by unit and the
- * toolkit, each with its text description, the subtopics it serves and an
- * SVG download.
+ * toolkit, as a catalogue. Each row shows the drawing small, what it teaches,
+ * the subtopics it serves, its level and what a reader can do with it, and
+ * opens the diagram's own page. Each row keeps the address the rest of the
+ * platform links to (/diagrams/#diagram-<id>).
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
-import Diagram from '../../components/diagrams/Diagram.astro';
-import SaveButton from '../../components/ui/SaveButton.astro';
 import { DIAGRAMS, DIAGRAM_GROUPS } from '../../lib/diagrams';
+import { diagramHref, diagramSize, diagramsInOrder, interactionLabel } from '../../lib/diagram-library';
 import { corpus } from '../../lib/content';
-import { allSubtopics, codeKey, subtopicHref } from '../../lib/learning';
-import { library } from '../../lib/frameworks-content';
-import { frameworkHref } from '../../lib/frameworks';
+import { allSubtopics } from '../../lib/learning';
 
 const c = await corpus();
 const subs = allSubtopics(c);
 const titleOf = (code: string) => subs.find((x) => x.s.code === code)?.s.title ?? code;
-const all = Object.entries(DIAGRAMS);
-const groups = DIAGRAM_GROUPS.map((g) => ({
-  ...g,
-  items: all.filter(([, d]) => d.group === g.id).sort((a, b) => codeKey(a[1].syllabus[0] ?? '0') - codeKey(b[1].syllabus[0] ?? '0')),
-})).filter((g) => g.items.length);
-const hl = all.filter(([, d]) => d.level === 'HL').length;
-// The frameworks library page that explains each diagram, for diagrams beyond the course.
-const lib = await library();
-const frameworkOf = (did: string) => Object.entries(lib.frameworks).find(([, f]) => f.diagram === did);
-const beyond = all.filter(([, d]) => d.group === 'enrichment').length;
+const order = diagramsInOrder();
+const groups = DIAGRAM_GROUPS.map((g) => ({ ...g, items: order.filter(([, d]) => d.group === g.id) })).filter((g) => g.items.length);
+const all = Object.values(DIAGRAMS);
+const hl = all.filter((d) => d.level === 'HL').length;
+const beyond = all.filter((d) => d.group === 'enrichment').length;
+const interactive = all.filter((d) => interactionLabel(d)).length;
+// Drawn again for phones, or built of parts that already fit one: comparison panels and the expanding tree.
+const phone = all.filter((d) => d.narrow || d.ix?.kind === 'compare' || d.ix?.kind === 'tree').length;
+const thumb = (id: string) => {
+  const { w, h } = diagramSize(id);
+  // The downloadable file adds a margin and a credit line around the drawing (src/lib/diagrams.ts, standalone).
+  return { w: w + 48, h: h + 78 };
+};
 ---
 
-<BaseLayout title="Diagrams and infographics" description="Original diagrams for IB DP Business Management: models, processes, structures and charts, each drawn from data, with a text description and an SVG download." section="topics">
+<BaseLayout title="Diagrams and infographics" description="Original diagrams for IB DP Business Management: models, processes, structures and charts, each drawn from data, with a text description, an SVG download and print." section="topics">
   <PageIntro
     trail={[{ label: 'Topics', href: '/topics/' }, { label: 'Diagrams' }]}
     kicker="Diagrams and infographics"
     title="See how the ideas fit together"
-    lead={`${all.length} original diagrams: models, processes, structures and charts across the five units and the toolkit, ${hl} of them for HL${beyond ? `, and ${beyond} enrichment frameworks beyond the course` : ''}. Each is drawn from data, so every line and label is exact, and each has a text description and an SVG download. Charts use fictional figures, and say so.`}
+    lead={`${all.length} original diagrams: models, processes, structures and charts across the five units and the toolkit, ${hl} of them for HL${beyond ? `, and ${beyond} enrichment frameworks beyond the course` : ''}. ${interactive} of them do more than show: you can change their figures, compare two cases, switch views or explore each part. Each is drawn from data, with a text description, an SVG download and a print view; ${phone} are drawn again for phones, and the rest fit the screen and can be shown larger. Charts use fictional figures, and say so.`}
   />
 
   <div class="wrap page-body">
@@ -57,31 +59,31 @@ const beyond = all.filter(([, d]) => d.group === 'enrichment').length;
       groups.map((g, gi) => (
         <section class="dgl-group" id={g.id} aria-labelledby={`${g.id}-h`}>
           <SectionHead no={String(gi + 1).padStart(2, '0')} title={g.title} id={`${g.id}-h`} />
-          <ul class="dgl-grid">
-            {g.items.map(([id, d]) => (
-              <li>
-                <Diagram id={id} download />
-                {d.syllabus.length > 0 ? (
-                  <p class="dgl-uses">
-                    <span class="label">Used in</span>
-                    {d.syllabus.map((code, i) => (
-                      <>
-                        {i > 0 && ', '}
-                        <a href={subtopicHref(c, code)}>
-                          {code} {titleOf(code)}
-                        </a>
-                      </>
-                    ))}
-                  </p>
-                ) : (
-                  <p class="dgl-uses">
-                    <span class="tag tag--enrichment">Beyond the IB course</span>{' '}
-                    {frameworkOf(id) ? <a href={frameworkHref(frameworkOf(id)![0])}>{frameworkOf(id)![1].name}: the framework explained</a> : 'Enrichment'}
-                  </p>
-                )}
-                <SaveButton compact title={d.title} kind="diagram" url={`/diagrams/#diagram-${id}`} />
-              </li>
-            ))}
+          <ul class="dgl-list">
+            {g.items.map(([id, d]) => {
+              const size = thumb(id);
+              const how = interactionLabel(d);
+              return (
+                <li class="dgl-row" id={`diagram-${id}`}>
+                  <img class="dgl-row__img" src={`/downloads/diagrams/${id}.svg`} alt="" width={size.w} height={size.h} loading="lazy" decoding="async" />
+                  <div class="dgl-row__body">
+                    <h3 class="dgl-row__title">
+                      <a href={diagramHref(id)}>{d.title}</a>
+                    </h3>
+                    {d.caption && <p class="dgl-row__cap">{d.caption}</p>}
+                    <p class="dgl-row__meta">
+                      {d.syllabus.length > 0 ? (
+                        <span>{d.syllabus.map((code) => `${code} ${titleOf(code)}`).join('; ')}</span>
+                      ) : (
+                        <span>Beyond the IB course</span>
+                      )}
+                      <span>{d.group === 'enrichment' ? 'Enrichment' : d.level === 'HL' ? 'HL only' : 'SL and HL'}</span>
+                      {how && <span class="dgl-row__how">{how}</span>}
+                    </p>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         </section>
       ))
@@ -97,6 +99,10 @@ const beyond = all.filter(([, d]) => d.group === 'enrichment').length;
     display: flex;
     flex-wrap: wrap;
     gap: var(--sp-2);
+  }
+
+  .dgl-nav li {
+    margin: 0;
   }
 
   .dgl-nav a {
@@ -126,30 +132,101 @@ const beyond = all.filter(([, d]) => d.group === 'enrichment').length;
     margin-top: var(--sp-8);
   }
 
-  .dgl-grid {
+  .dgl-list {
     list-style: none;
     margin: var(--sp-5) 0 0;
     padding: 0;
     display: grid;
-    gap: var(--sp-6) var(--sp-5);
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 34rem), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 32rem), 1fr));
+    gap: 0 var(--sp-6);
+    border-top: 1px solid var(--rule-hair);
   }
 
-  .dgl-grid > li {
+  /* A row: the drawing small, then what it teaches. The title's link covers the row, so the whole row opens the diagram. */
+  .dgl-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 9.5rem minmax(0, 1fr);
+    gap: var(--sp-4);
+    align-items: start;
+    margin: 0;
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--rule-hair);
+    scroll-margin-top: calc(var(--header-h) + var(--sp-3));
+  }
+
+  .dgl-row:hover .dgl-row__img {
+    border-color: var(--navy-900);
+  }
+
+  .dgl-row__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 8rem;
+    object-fit: contain;
+    object-position: top left;
+    padding: 0.35rem;
+    background: var(--surface-sheet);
+    border: 1px solid var(--rule-hair);
+  }
+
+  .dgl-row__body {
+    display: grid;
+    gap: 0.3rem;
     min-width: 0;
   }
 
-  .dgl-uses {
-    margin: var(--sp-2) 0 0;
-    font-size: 0.875rem;
+  .dgl-row__title {
+    margin: 0;
+    font-size: 1.125rem;
+    line-height: 1.3;
+  }
+
+  .dgl-row__title a {
+    color: var(--navy-900);
+    text-decoration: none;
+  }
+
+  .dgl-row__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .dgl-row__title a:hover,
+  .dgl-row__title a:focus-visible {
+    text-decoration: underline;
+  }
+
+  .dgl-row__cap {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--text-body);
+  }
+
+  .dgl-row__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.9rem;
+    margin: 0;
+    font-size: 0.8125rem;
     color: var(--text-muted);
   }
 
-  .dgl-uses .label {
-    margin-right: 0.5rem;
+  .dgl-row__how {
+    font-weight: 700;
+    color: var(--text-strong);
   }
 
-  .dgl-grid :global(.save) {
-    margin-top: var(--sp-3);
+  @media (max-width: 30rem) {
+    .dgl-row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--sp-3);
+    }
+
+    .dgl-row__img {
+      max-height: 10rem;
+    }
   }
 </style>

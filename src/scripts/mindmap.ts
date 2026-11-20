@@ -4,6 +4,11 @@
  * the revision view; zoom and pan by changing the SVG's viewBox; downloads as
  * a branded SVG or PNG, with the fonts embedded so the file looks as it does
  * on the page.
+ *
+ * The map opens at a zoom where its smallest labels are at least 12 pixels
+ * (READABLE), centred, and Whole map fits all of it. A phone opens on the
+ * outline, which is real text; Map switches to the drawing, folded to its
+ * branches.
  */
 import { announce, each, readConfig } from './ix';
 import { brandedSvg } from '../lib/mindmap-export';
@@ -20,6 +25,9 @@ type Box = { x: number; y: number; w: number; h: number };
 const glossaryHref = (id: string) => `/glossary/${id}/`;
 const MIN_SCALE = 0.2;
 const MAX_SCALE = 3;
+/** The smallest text in a map is 13 units (src/lib/mindmap.ts), so at this scale nothing is under 12 pixels. */
+export const READABLE = 12 / 13;
+const PHONE = '(max-width: 40rem)';
 
 let fontCss: Promise<string> | null = null;
 /** The two faces the map uses, as data URIs, for downloads. */
@@ -78,6 +86,8 @@ each('[data-ix="mindmap"]', (root) => {
 
   const apply = () => svg?.setAttribute('viewBox', `${view.x} ${view.y} ${view.w} ${view.h}`);
   const scale = () => viewport.clientWidth / view.w;
+  /** Set once the reader moves or zooms the map, so a resize no longer resets the view. */
+  let touched = false;
 
   /** Fit the whole map, keeping the viewport's proportions. */
   const fit = () => {
@@ -94,6 +104,7 @@ each('[data-ix="mindmap"]', (root) => {
   };
 
   const zoom = (factor: number, cx = view.x + view.w / 2, cy = view.y + view.h / 2) => {
+    touched = true;
     const next = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale() * factor));
     const f = next / scale();
     if (!Number.isFinite(f) || f === 1) return;
@@ -115,11 +126,57 @@ each('[data-ix="mindmap"]', (root) => {
     apply();
   };
 
+  /** The first view: the whole map if it is readable that way, otherwise its centre at a readable zoom. */
+  const start = () => {
+    if (!viewport.clientWidth || !viewport.clientHeight) return;
+    fit();
+    if (scale() >= READABLE) return;
+    // Centred on the subject in the middle of the map, at (0, 0).
+    const w = viewport.clientWidth / READABLE;
+    const h = viewport.clientHeight / READABLE;
+    view = { x: -w / 2, y: -h / 2, w, h };
+    apply();
+  };
+
   // On a narrow screen the whole map is too small to read: open on the branches, and let the reader unfold them.
-  if (window.matchMedia('(max-width: 40rem)').matches) cfg.map.branches.forEach((_, i) => collapsed.add(`b${i}`));
+  const phone = window.matchMedia(PHONE).matches;
+  if (phone) cfg.map.branches.forEach((_, i) => collapsed.add(`b${i}`));
   draw();
-  fit();
-  new ResizeObserver(() => fit()).observe(viewport);
+  start();
+  new ResizeObserver(() => {
+    if (!touched) start();
+    else if (viewport.clientWidth && viewport.clientHeight) {
+      // Keep the zoom and the centre; only the shape of the window changes.
+      const k = scale();
+      const cx = view.x + view.w / 2;
+      const cy = view.y + view.h / 2;
+      const w = viewport.clientWidth / k;
+      const h = viewport.clientHeight / k;
+      view = { x: cx - w / 2, y: cy - h / 2, w, h };
+      apply();
+    }
+  }).observe(viewport);
+
+  /* ---------- Map or outline ---------- */
+  const outline = root.querySelector<HTMLDetailsElement>('[data-outline]');
+  const modeButtons = [...root.querySelectorAll<HTMLButtonElement>('[data-mode-btn]')];
+  const setMode = (mode: 'map' | 'outline', say: boolean) => {
+    root.dataset.mode = mode;
+    modeButtons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.modeBtn === mode)));
+    if (mode === 'outline' && outline) outline.open = true;
+    if (mode === 'map' && !touched) requestAnimationFrame(start);
+    if (say) announce(status, mode === 'outline' ? 'Showing the map as an outline.' : 'Showing the drawn map.');
+  };
+  modeButtons.forEach((b) => b.addEventListener('click', () => setMode(b.dataset.modeBtn === 'outline' ? 'outline' : 'map', true)));
+  setMode(phone ? 'outline' : 'map', false);
+
+  const more = root.querySelector<HTMLButtonElement>('[data-more]');
+  const extra = root.querySelector<HTMLElement>('.mm-bar__extra');
+  more?.addEventListener('click', () => {
+    const open = !extra?.classList.contains('is-open');
+    extra?.classList.toggle('is-open', open);
+    more.setAttribute('aria-expanded', String(open));
+  });
 
   /* ---------- Pointer: pan, pinch, and clicks on toggles ---------- */
   const pointers = new Map<number, { x: number; y: number }>();
@@ -161,6 +218,7 @@ each('[data-ix="mindmap"]', (root) => {
     const k = view.w / viewport.clientWidth;
     view.x -= dx * k;
     view.y -= dy * k;
+    if (moved > 6) touched = true;
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
     apply();
   });
@@ -200,10 +258,10 @@ each('[data-ix="mindmap"]', (root) => {
       '=': () => zoom(1.25),
       '-': () => zoom(0.8),
       '0': fit,
-      ArrowLeft: () => ((view.x -= step), apply()),
-      ArrowRight: () => ((view.x += step), apply()),
-      ArrowUp: () => ((view.y -= step), apply()),
-      ArrowDown: () => ((view.y += step), apply()),
+      ArrowLeft: () => ((touched = true), (view.x -= step), apply()),
+      ArrowRight: () => ((touched = true), (view.x += step), apply()),
+      ArrowUp: () => ((touched = true), (view.y -= step), apply()),
+      ArrowDown: () => ((touched = true), (view.y += step), apply()),
     };
     const run = keys[e.key];
     if (run) {
@@ -213,33 +271,44 @@ each('[data-ix="mindmap"]', (root) => {
   });
 
   /* ---------- Toolbar ---------- */
-  root.querySelectorAll<HTMLButtonElement>('[data-view]').forEach((b) =>
-    b.addEventListener('click', () => {
-      revision = b.dataset.view === 'revision';
-      root.querySelectorAll<HTMLButtonElement>('[data-view]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-      collapsed.clear();
-      draw();
-      fit();
-      announce(status, revision ? 'Revision view: the essentials of each branch.' : 'Full map: every node.');
-    }),
-  );
-  root.querySelector('[data-expand]')?.addEventListener('click', () => {
+  const branchesInOutline = [...root.querySelectorAll<HTMLDetailsElement>('[data-branch]')];
+  const revisionButton = root.querySelector<HTMLButtonElement>('[data-revision]');
+  revisionButton?.addEventListener('click', () => {
+    revision = !revision;
+    revisionButton.setAttribute('aria-pressed', String(revision));
+    // The outline follows: only the core nodes of each branch stay.
+    root.toggleAttribute('data-revision', revision);
     collapsed.clear();
     draw();
-    fit();
+    touched = false;
+    start();
+    announce(status, revision ? 'Revision view: the essentials of each branch.' : 'Full map: every node.');
+  });
+  root.querySelector('[data-expand]')?.addEventListener('click', () => {
+    collapsed.clear();
+    branchesInOutline.forEach((d) => (d.open = true));
+    draw();
+    touched = false;
+    start();
     announce(status, 'Every branch opened.');
   });
   root.querySelector('[data-collapse]')?.addEventListener('click', () => {
     cfg.map.branches.forEach((_, i) => collapsed.add(`b${i}`));
+    branchesInOutline.forEach((d) => (d.open = false));
     draw();
-    fit();
+    touched = false;
+    start();
     announce(status, 'Branches only.');
   });
   root.querySelectorAll<HTMLButtonElement>('[data-zoom]').forEach((b) =>
     b.addEventListener('click', () => {
       if (b.dataset.zoom === 'in') zoom(1.25);
       else if (b.dataset.zoom === 'out') zoom(0.8);
-      else fit();
+      else {
+        touched = true;
+        fit();
+        announce(status, 'The whole map is in view.');
+      }
     }),
   );
 

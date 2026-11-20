@@ -158,7 +158,7 @@ describe('the search index', () => {
     const sections = Object.values(c.notes).reduce((n, x) => n + x.sections.length, 0);
     expect(entries.filter((e) => e.kind === 'notes' && e.type === 'Notes')).toHaveLength(sections);
     expect(entries.filter((e) => e.type.startsWith('Practice question'))).toHaveLength(Object.keys(c.questions).length);
-    expect(entries.find((e) => e.title === 'A test diagram')).toMatchObject({ kind: 'resources', url: '/diagrams/#diagram-test-diagram', units: ['3'] });
+    expect(entries.find((e) => e.title === 'A test diagram')).toMatchObject({ kind: 'resources', url: '/diagrams/test-diagram/', units: ['3'] });
   });
 
   it('gives every entry a page on this site, a title, known units and short text', () => {

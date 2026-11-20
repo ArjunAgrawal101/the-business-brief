@@ -152,7 +152,20 @@ Notes are written one subtopic at a time and only when complete. Formulas on the
 
 ## Diagrams
 
-The diagram library is code, not content: `src/lib/figures/unit1.ts` to `unit5.ts`, `toolkit.ts` and `frameworks.ts` (the frameworks library's figures; those in the `enrichment` group name no subtopic, so they never count as IB coverage), each diagram a function that draws SVG from data with the primitives in `src/lib/figures/kit.ts`, registered with its title, caption, subtopics, level and group in `src/lib/diagrams.ts`. A note's section names a diagram by id. To add one: write the drawing function, register it, put any numbers it computes into an exported function with a test in `tests/unit/figures.test.ts`, build, and run `npm run qa:diagrams` against a preview.
+The diagram library is code, not content: `src/lib/figures/unit1.ts` to `unit5.ts`, `toolkit.ts` and `frameworks.ts` (the frameworks library's figures; those in the `enrichment` group name no subtopic, so they never count as IB coverage), and the `-more.ts` files beside them, each diagram a function that draws SVG from data with the primitives in `src/lib/figures/kit.ts`, registered with its title, caption, subtopics, level and group in `src/lib/diagrams.ts`. A note's section names a diagram by id; a subtopic page shows every diagram that names its code.
+
+A registered diagram can also have:
+
+| Field | What it holds |
+| --- | --- |
+| `alt` | One sentence that names the drawing, read before its full description |
+| `narrow` | A layout for phones: 300 units wide (`NW` in `kit.ts`) with no text under 14 units (`NARROW_MIN`), drawn with `narrowFrame()` so it shares the wide drawing's title and description; `stack()` and `grid2()` in `figures/narrow.ts` draw the common shapes |
+| `parts` | The parts a reader can explore, each with an `id` the drawing marks with `part()`, a `label`, the explanation (`text`), and optionally the subtopic `code` it is taught in or an `href` to open |
+| `ix` | An interaction: `switch` (states, each with a label and a note, every one drawn), `compare` (panels with their facts, two shown side by side), `live` (inputs, each with its range and step, for a model in `src/lib/figures/live.ts` whose arithmetic is in `src/lib/figure-models.ts`) or `tree` (questions and answers as nested disclosures) |
+| `howTo` | The sentence that tells a reader how to use it, which names the keyboard as well as the pointer |
+| `fictional` | True when its figures belong to a fictional business, which the page then says |
+
+To add one: write the drawing function and, where its labels would fall under 12 pixels on a 320 pixel phone, its narrow layout; register it; put any numbers it computes into an exported, pure function with a test in `tests/unit/figures.test.ts` or `figure-models.test.ts`; run `tests/unit/diagram-registry.test.ts`, build, and run `npm run qa:diagrams` against a preview.
 
 ## Topic briefs
 

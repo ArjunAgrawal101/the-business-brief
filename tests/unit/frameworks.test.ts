@@ -138,7 +138,7 @@ describe('framework labels and links', () => {
     const ctx = { frameworks: { 'swot-analysis': sample({ name: 'SWOT page' }) }, tools: c.tools, diagrams: DIAGRAMS };
     expect(resolveRef('swot-analysis', ctx)).toMatchObject({ kind: 'framework', href: '/frameworks/swot-analysis/', title: 'SWOT page' });
     expect(resolveRef('ansoff-matrix', ctx)).toMatchObject({ kind: 'tool', href: '/toolkit/ansoff-matrix/' });
-    expect(resolveRef('maslow-hierarchy', ctx)).toMatchObject({ kind: 'diagram', href: '/diagrams/#diagram-maslow-hierarchy' });
+    expect(resolveRef('maslow-hierarchy', ctx)).toMatchObject({ kind: 'diagram', href: '/diagrams/maslow-hierarchy/' });
     expect(resolveRef('no-such-thing', ctx)).toBeUndefined();
     const planned = Object.entries(c.tools).find(([, t]) => t.status === 'planned');
     if (planned) expect(resolveRef(planned[0], { ...ctx, frameworks: {} })?.href).toBe(`/toolkit/#tool-${planned[0]}`);

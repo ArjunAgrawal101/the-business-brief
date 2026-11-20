@@ -1,0 +1,177 @@
+---
+/**
+ * A decision tree as nested lists: each question is a native disclosure, so
+ * a reader opens and closes it with a click, a tap, Enter or Space, and it
+ * reads in full without JavaScript (every question starts open). Each source
+ * at the end of a branch links to its glossary entry.
+ */
+import type { TreeNode } from '../../lib/diagrams';
+
+interface Props {
+  node: TreeNode;
+}
+const { node } = Astro.props;
+const kids = node.children ?? [];
+---
+
+{
+  node.kind === 'question' && (
+    <li class="dgt__q">
+      <details open data-tree-q>
+        <summary>
+          <span class="dgt__qtext">{node.label}</span>
+        </summary>
+        <ul class="dgt__list">
+          {kids.map((k) => (
+            <Astro.self node={k} />
+          ))}
+        </ul>
+      </details>
+    </li>
+  )
+}
+{
+  node.kind === 'answer' && (
+    <li class="dgt__a">
+      <p class="dgt__alabel">{node.label}</p>
+      {node.note && <p class="dgt__anote">{node.note}</p>}
+      <ul class="dgt__list">
+        {kids.map((k) => (
+          <Astro.self node={k} />
+        ))}
+      </ul>
+    </li>
+  )
+}
+{
+  node.kind === 'option' && (
+    <li class="dgt__o">
+      {node.href ? <a class="dgt__oname" href={node.href}>{node.label}</a> : <span class="dgt__oname">{node.label}</span>}
+      {node.note && <span class="dgt__onote">{node.note}</span>}
+    </li>
+  )
+}
+
+<style>
+  li {
+    position: relative;
+    margin: var(--sp-2) 0 0;
+  }
+
+  .dgt__list {
+    list-style: none;
+    margin: 0 0 0 0.85rem;
+    padding: 0 0 0 1.15rem;
+    border-left: 1.5px solid var(--rule);
+  }
+
+  /* A short rule from the branch line to each item: the tree's connectors. */
+  .dgt__list > li::before {
+    content: '';
+    position: absolute;
+    left: -1.15rem;
+    top: 1.15rem;
+    width: 0.9rem;
+    border-top: 1.5px solid var(--rule);
+  }
+
+  /* What an answer leads to sits under it, without a further step in, so the tree stays narrow enough for a phone. */
+  .dgt__a > .dgt__list {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .dgt__a > .dgt__list > li::before {
+    display: none;
+  }
+
+  @media (max-width: 30rem) {
+    .dgt__list {
+      margin-left: 0.4rem;
+      padding-left: 0.75rem;
+    }
+
+    .dgt__list > li::before {
+      left: -0.75rem;
+      width: 0.6rem;
+    }
+  }
+
+  summary {
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-1);
+    background: var(--navy-900);
+    color: var(--text-on-ink);
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.3;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Open or closed, in a sign as well as in the content shown. */
+  summary::before {
+    content: '\2212';
+    flex: none;
+    width: 1ch;
+    font-family: var(--font-ui);
+    font-weight: 700;
+  }
+
+  details:not([open]) > summary::before {
+    content: '+';
+  }
+
+  summary:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .dgt__alabel {
+    display: inline-block;
+    margin: 0;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-1);
+    background: var(--surface-sunk);
+    color: var(--navy-900);
+    font-size: 0.9375rem;
+    font-weight: 700;
+  }
+
+  .dgt__anote {
+    margin: 0.3rem 0 0;
+    font-size: 0.875rem;
+    font-style: italic;
+    color: var(--text-muted);
+    max-width: var(--text-max);
+  }
+
+  .dgt__o {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid var(--navy-900);
+    border-radius: var(--radius-1);
+    background: var(--surface-sheet);
+    max-width: var(--text-max);
+  }
+
+  .dgt__oname {
+    font-weight: 700;
+  }
+
+  .dgt__onote {
+    font-size: 0.875rem;
+    color: var(--text-body);
+  }
+</style>

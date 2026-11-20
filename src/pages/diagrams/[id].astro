@@ -1,0 +1,144 @@
+---
+/**
+ * One diagram on a page of its own: drawn at a size its labels can be read
+ * at, with its interaction first, then where it is used (the subtopics that
+ * show it, the notes that teach with it, the frameworks it illustrates) and
+ * the diagrams either side of it in the library.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import Diagram from '../../components/diagrams/Diagram.astro';
+import SaveButton from '../../components/ui/SaveButton.astro';
+import { DIAGRAMS, DIAGRAM_GROUPS } from '../../lib/diagrams';
+import { diagramHref, diagramUses, diagramsInOrder, interactionLabel } from '../../lib/diagram-library';
+import { corpus } from '../../lib/content';
+import { library } from '../../lib/frameworks-content';
+import { allSubtopics, subtopicHref } from '../../lib/learning';
+
+export function getStaticPaths() {
+  return Object.keys(DIAGRAMS).map((id) => ({ params: { id }, props: { id } }));
+}
+
+interface Props {
+  id: string;
+}
+const { id } = Astro.props;
+const d = DIAGRAMS[id]!;
+const c = await corpus();
+const lib = await library();
+const subs = allSubtopics(c);
+const uses = diagramUses(id, {
+  notes: c.notes,
+  subtopicTitle: (code) => subs.find((x) => x.s.code === code)?.s.title ?? code,
+  subtopicHref: (code) => subtopicHref(c, code),
+  frameworks: lib.frameworks,
+});
+const order = diagramsInOrder();
+const i = order.findIndex(([x]) => x === id);
+const prev = i > 0 ? order[i - 1] : undefined;
+const next = i < order.length - 1 ? order[i + 1] : undefined;
+const group = DIAGRAM_GROUPS.find((g) => g.id === d.group)!;
+const how = interactionLabel(d);
+const wideFigure = Boolean(d.parts?.length);
+---
+
+<BaseLayout title={`${d.title}: diagram`} description={`${d.title}: ${d.caption ?? d.alt ?? 'an original diagram for IB DP Business Management'}`} section="topics">
+  <PageIntro trail={[{ label: 'Diagrams', href: '/diagrams/' }, { label: d.title }]} kicker={`Diagram · ${group.title.split(':')[0]}${d.syllabus.length ? ` · ${d.syllabus.join(', ')}` : ''}`} title={d.title}>
+    <div class="tags">
+      {d.group === 'enrichment' ? <span class="tag tag--enrichment">Beyond the IB course</span> : <span class="tag tag--plain">{d.level === 'HL' ? 'HL only' : 'SL and HL'}</span>}
+      {d.fictional && <span class="tag tag--simulated">Fictional figures</span>}
+      {how && <span class="tag tag--plain">{how}</span>}
+      <SaveButton title={d.title} kind="diagram" />
+    </div>
+  </PageIntro>
+
+  <div class="wrap page-body">
+    <div class:list={['dgp-main', { 'dgp-main--wide': wideFigure }]}>
+      <Diagram id={id} download />
+    </div>
+
+    {
+      (uses.subtopics.length > 0 || uses.notes.length > 0 || uses.frameworks.length > 0) && (
+        <section class="dgp-uses" aria-labelledby="dgp-uses-h">
+          <SectionHead no="01" title="Where it is used" id="dgp-uses-h" level={2} />
+          <ul class="dgp-uses__list">
+            {uses.notes.map((n) => (
+              <li>
+                <a href={n.href}>
+                  {n.code} {n.subtopic}: {n.section}
+                </a>
+                <span class="small muted">In the notes, where it is taught</span>
+              </li>
+            ))}
+            {uses.subtopics.map((s) => (
+              <li>
+                <a href={s.href}>
+                  {s.code} {s.title}
+                </a>
+                <span class="small muted">On the subtopic’s page{s.inNotes ? ', in its notes' : ', with its other diagrams'}</span>
+              </li>
+            ))}
+            {uses.frameworks.map((f) => (
+              <li>
+                <a href={f.href}>{f.name}</a>
+                <span class="small muted">The framework it draws, in the frameworks library</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <nav class="dgp-pager" aria-label="More diagrams">
+      {prev ? <a href={diagramHref(prev[0])}>&larr; {prev[1].title}</a> : <span />}
+      <a href="/diagrams/">All diagrams</a>
+      {next ? <a href={diagramHref(next[0])}>{next[1].title} &rarr;</a> : <span />}
+    </nav>
+  </div>
+</BaseLayout>
+
+<style>
+  .dgp-main {
+    max-width: 56rem;
+  }
+
+  /* A diagram with parts to explore keeps its explanation beside it, so it needs the room. */
+  .dgp-main--wide {
+    max-width: 72rem;
+  }
+
+  .dgp-uses {
+    margin-top: var(--sp-8);
+    max-width: var(--text-max);
+  }
+
+  .dgp-uses__list {
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .dgp-uses__list li {
+    display: grid;
+    gap: 0.15rem;
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .dgp-uses__list a {
+    font-weight: 600;
+  }
+
+  .dgp-pager {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-3);
+    margin-top: var(--sp-7);
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--rule-hair);
+  }
+</style>
