@@ -1,0 +1,285 @@
+/**
+ * The decisions the Stakeholder Impact Simulator offers. Every business is
+ * fictional and every effect is the model's judgement on a scale of -3 to +3
+ * (see the rules in model.ts); nothing here is data about a real organization.
+ * Each decision names the IB subtopics it draws on besides 1.4 Stakeholders.
+ */
+import type { Decision } from './model';
+
+export const DECISIONS: Decision[] = [
+  {
+    id: 'automate-line',
+    title: 'Automate a production line',
+    business: 'Corvane Cartons',
+    place: 'Monterrey, Mexico',
+    brief: 'Corvane Cartons, a family-owned maker of food cartons with 180 staff, plans to replace hand-fed folding and gluing machines with an automated line. The line now employs about forty people.',
+    scales: {
+      small: 'One of the three folding lines is automated.',
+      moderate: 'Two of the three folding lines are automated.',
+      large: 'All three folding lines and the packing area are automated.',
+    },
+    effects: {
+      employees: { short: -2.5, long: -1, power: 5, interest: 9, why: 'Jobs on the folding lines go, and the staff who stay must learn to run and maintain the new machines.', mitigation: 'redundancy pay, retraining for maintenance roles and help to find work' },
+      customers: { short: -0.5, long: 1.5, power: 6, interest: 4, why: 'Installation can delay orders for a few weeks; after that the line runs faster with fewer faulty cartons.' },
+      owners: { short: -1.5, long: 2.5, power: 9, interest: 9, why: 'The machines cost a large sum up front and pay back through a lower labour cost per carton and more output.' },
+      suppliers: { short: 0.5, long: 0.5, power: 3, interest: 4, why: 'The machine maker wins a contract, and more output means more board and glue bought.' },
+      government: { short: -0.5, long: 0.5, power: 6, interest: 3, why: 'Job losses cost the state income tax and support payments at first; a more productive firm pays more tax on its profit later.' },
+      community: { short: -1.5, long: -0.5, power: 3, interest: 6, why: 'Households lose a wage, and local shops lose some of their spending.', mitigation: 'a training fund run with the local college and priority hiring for local people' },
+      society: { short: 0, long: 0.5, power: 2, interest: 2, why: 'Higher productivity and less waste help the wider economy, though routine jobs give way to fewer, more skilled ones.' },
+    },
+    mitigationCost: 0.6,
+    earlyNoticeCost: 0.15,
+    earlyNotice: 'Announcing early lets some skilled staff leave before the machines are ready, which can leave gaps on the old lines.',
+    conflicts: [
+      { gains: 'owners', loses: 'employees', text: 'The owners’ lower labour cost is the employees’ lost wages: profit against job security, the classic conflict in 1.4.' },
+      { gains: 'customers', loses: 'community', text: 'Customers get faster, more reliable deliveries, while the town loses jobs and spending.' },
+    ],
+    prompts: [
+      'Is automation a decision about efficiency only, or also about the kind of employer Corvane wants to be?',
+      'Which group has the power to slow the change down, and what would win its support?',
+      'What evidence would you want before deciding how many lines to automate?',
+    ],
+    subtopics: ['2.1', '5.1'],
+  },
+  {
+    id: 'relocate-abroad',
+    title: 'Relocate production abroad',
+    business: 'Ferraby Knitwear',
+    place: 'Leicester, England',
+    brief: 'Ferraby Knitwear, a maker of jumpers and cardigans with 220 staff, plans to move its knitting and finishing to a new plant in a country where wages are much lower. Design and sales would stay at home.',
+    scales: {
+      small: 'Only the basic ranges move; the premium range is still made at home.',
+      moderate: 'All knitting moves; finishing stays at home for a year.',
+      large: 'All production moves and the home factory closes.',
+    },
+    effects: {
+      employees: { short: -3, long: -1.5, power: 5, interest: 10, why: 'Most production jobs at home go; a few staff are offered posts in design, sales or at the new plant.', mitigation: 'redundancy pay, retraining and offers of work at the new plant' },
+      customers: { short: -1, long: 0.5, power: 6, interest: 4, why: 'Deliveries are disrupted during the move and lead times lengthen with distance; lower costs may later allow lower prices.' },
+      owners: { short: -1, long: 2.5, power: 9, interest: 9, why: 'Moving costs money now; lower wage costs raise the margin on every jumper later.' },
+      suppliers: { short: -1.5, long: -1.5, power: 3, interest: 8, why: 'Local yarn, dye and packaging suppliers lose a large customer.', mitigation: 'long notice periods and help to find new buyers' },
+      government: { short: -1, long: -0.5, power: 7, interest: 5, why: 'The home government loses tax and pays support to those out of work, while another country gains the investment.' },
+      community: { short: -2.5, long: -1.5, power: 3, interest: 9, why: 'A large local employer leaves, with knock-on losses for shops, transport and schools.', mitigation: 'a fund for local retraining and selling the factory site for new uses' },
+      society: { short: 0, long: 0, power: 2, interest: 4, why: 'Gains and losses roughly balance: income moves to a poorer country, but longer shipping adds emissions and conditions at the new plant must be checked.' },
+    },
+    mitigationCost: 0.7,
+    earlyNoticeCost: 0.2,
+    earlyNotice: 'Announcing early means some staff leave before the move, and output at home falls sooner.',
+    conflicts: [
+      { gains: 'owners', loses: 'employees', text: 'The owners gain a lower cost base; the employees lose their jobs. Offshoring (5.4) puts the two in direct conflict.' },
+      { gains: 'owners', loses: 'community', text: 'What the owners save, the town loses in wages spent locally.' },
+      { gains: 'owners', loses: 'suppliers', text: 'Local suppliers built their business around Ferraby; the move ends that relationship.' },
+    ],
+    prompts: [
+      'Ferraby markets its jumpers as made in Leicester. How far would the move damage the brand, and would that change your recommendation?',
+      'Which costs of the move are hard to put a figure on, and who bears them?',
+      'Would reshoring later be possible if wages abroad rise? What would it cost?',
+    ],
+    subtopics: ['5.4', '1.6'],
+  },
+  {
+    id: 'raise-prices',
+    title: 'Raise prices',
+    business: 'Fennick Fitness',
+    place: 'Johannesburg, South Africa',
+    brief: 'Fennick Fitness, a chain of nine gyms, plans to raise its monthly membership fee to cover higher energy and equipment costs.',
+    scales: {
+      small: 'A small rise, about one twentieth.',
+      moderate: 'A rise of about one tenth.',
+      large: 'A rise of about one sixth.',
+    },
+    effects: {
+      employees: { short: -0.25, long: 0.5, power: 4, interest: 5, why: 'Front-desk staff take the complaints at first; higher revenue can later fund better pay, if members stay.' },
+      customers: { short: -2, long: -1, power: 5, interest: 8, why: 'Members pay more for the same service, and some will leave for cheaper gyms.', mitigation: 'a cheaper off-peak membership and the old fee for current members for six months' },
+      owners: { short: 2, long: 1, power: 9, interest: 9, why: 'Each member pays more, so revenue rises unless too many leave; the gain shrinks as some members go.' },
+      suppliers: { short: 0, long: 0, power: 3, interest: 2, why: 'Equipment and cleaning suppliers are barely affected unless membership falls a long way.' },
+      government: { short: 0.25, long: 0, power: 4, interest: 1, why: 'More sales tax is collected on higher fees; the government has no direct role in a gym’s prices.' },
+      community: { short: -0.5, long: -0.5, power: 2, interest: 4, why: 'Fewer local people can afford a gym, which matters for health in the areas the gyms serve.', mitigation: 'free community classes' },
+      society: { short: 0, long: -0.25, power: 1, interest: 2, why: 'A little less access to exercise across the city.' },
+    },
+    mitigationCost: 0.5,
+    earlyNoticeCost: 0.1,
+    earlyNotice: 'Announcing early gives members time to cancel before the new fee starts.',
+    conflicts: [
+      { gains: 'owners', loses: 'customers', text: 'The owners’ higher margin is paid by members: how far the price can rise depends on how many would leave (price elasticity of demand, 4.5 HL).' },
+      { gains: 'owners', loses: 'community', text: 'Part of the owners\u2019 gain comes from residents on lower incomes who can no longer afford a gym, a cost to local health that the business does not pay.' },
+    ],
+    prompts: [
+      'How would you find out how many members would leave at each price, before deciding?',
+      'Is the rise easier to justify because costs rose? How would you explain it to members?',
+      'Which members are most likely to leave, and does losing them matter more than the extra revenue?',
+    ],
+    subtopics: ['4.5', '1.3'],
+  },
+  {
+    id: 'expand-abroad',
+    title: 'Expand into a new country',
+    business: 'Teraka Sauces',
+    place: 'Penang, Malaysia',
+    brief: 'Teraka Sauces, a maker of cooking sauces with 90 staff, plans to open a sales office and warehouse in Australia, its first market outside Malaysia.',
+    scales: {
+      small: 'Selling through one importer, with a small office.',
+      moderate: 'Its own sales office and warehouse in one city.',
+      large: 'Offices in three cities and a national advertising campaign.',
+    },
+    effects: {
+      employees: { short: -0.5, long: 1.5, power: 5, interest: 7, why: 'The launch adds work and sends some managers abroad; growth brings new roles and promotion later.', mitigation: 'relocation packages and extra staff for the launch' },
+      customers: { short: 0, long: 0.5, power: 5, interest: 4, why: 'Australian shoppers gain choice; customers at home notice little unless management attention moves away from them.' },
+      owners: { short: -2, long: 2, power: 9, interest: 9, why: 'Set-up costs and early losses come first; a larger market and less dependence on one country come later, if the launch works.' },
+      suppliers: { short: 0.5, long: 1, power: 3, interest: 6, why: 'More output means more chillies, jars and transport bought.' },
+      government: { short: 0.25, long: 1, power: 5, interest: 4, why: 'Export earnings and, later, more tax on a larger business.' },
+      community: { short: 0, long: 0.5, power: 2, interest: 3, why: 'More production at home can mean more local jobs in time.' },
+      society: { short: 0, long: 0.25, power: 1, interest: 2, why: 'More trade and choice, against the emissions of shipping food further.' },
+    },
+    mitigationCost: 0.3,
+    earlyNoticeCost: 0,
+    conflicts: [
+      { gains: 'suppliers', loses: 'owners', text: 'Suppliers gain from the extra orders at once, while the owners carry the risk of a launch that may not pay.' },
+    ],
+    prompts: [
+      'Which external factors in the new country would you check first, and which tool would you use (STEEPLE, 4.6 HL)?',
+      'The owners carry most of the risk. What would make the risk acceptable to them?',
+      'How would the business know, a year in, whether the expansion is working?',
+    ],
+    subtopics: ['4.6', '1.5'],
+  },
+  {
+    id: 'sustainable-suppliers',
+    title: 'Switch to certified sustainable suppliers',
+    business: 'Kettlewood Coffee',
+    place: 'Toronto, Canada',
+    brief: 'Kettlewood Coffee, a chain of fourteen cafés, plans to buy only coffee and dairy certified to an independent sustainability standard, which costs more than its current supplies.',
+    scales: {
+      small: 'Coffee only, from next season.',
+      moderate: 'Coffee and milk.',
+      large: 'Coffee, milk, food and packaging.',
+    },
+    effects: {
+      employees: { short: 0, long: 0.5, power: 4, interest: 4, why: 'Staff gain a story they are proud to tell; their work changes little.' },
+      customers: { short: -0.5, long: 1, power: 6, interest: 6, why: 'Prices may rise a little at first; customers who care about sourcing gain a product they trust.' },
+      owners: { short: -1.5, long: 1, power: 9, interest: 8, why: 'Certified supplies cost more and squeeze the margin now; loyalty and a stronger brand may repay it later.' },
+      suppliers: { short: -1, long: 1.5, power: 4, interest: 8, why: 'Current suppliers lose the contract, while certified growers gain a buyer that pays a premium.', mitigation: 'notice and help for current suppliers to gain certification' },
+      government: { short: 0, long: 0.25, power: 3, interest: 2, why: 'Little direct effect; the change supports public aims on sustainable sourcing.' },
+      community: { short: 0, long: 0.5, power: 2, interest: 3, why: 'The growers’ communities gain fairer prices; the cafés’ neighbourhoods notice little.' },
+      society: { short: 0, long: 1.5, power: 2, interest: 5, why: 'Less damage to forests and soils, and fairer pay along the supply chain.' },
+    },
+    mitigationCost: 0.3,
+    earlyNoticeCost: 0,
+    conflicts: [
+      { gains: 'society', loses: 'owners', text: 'Society gains from the sustainable sourcing that the owners pay for: an ethical objective (1.3) against short-term profit.' },
+      { gains: 'customers', loses: 'owners', text: 'Customers who value sourcing gain a product they trust, at a cost the owners carry while the brand builds.' },
+    ],
+    prompts: [
+      'How would Kettlewood show customers that the claim is true, and avoid any charge of greenwashing?',
+      'Is the extra cost a cost of CSR, or an investment in the brand? Does the answer change the decision?',
+      'What should Kettlewood owe the suppliers it is leaving?',
+    ],
+    subtopics: ['1.3', '4.5'],
+  },
+  {
+    id: 'close-branch',
+    title: 'Close a branch',
+    business: 'Penhallow Hardware',
+    place: 'Canterbury, New Zealand',
+    brief: 'Penhallow Hardware, a chain of twelve hardware stores, plans to close its branch in a small rural town, where sales have fallen for three years and the branch now makes a loss.',
+    scales: {
+      small: 'The branch becomes a small counter for click-and-collect orders.',
+      moderate: 'The branch closes; its staff are offered posts in other branches.',
+      large: 'The branch and its delivery depot close together.',
+    },
+    effects: {
+      employees: { short: -2.5, long: -1, power: 4, interest: 10, why: 'Branch staff lose their jobs or must travel to another branch.', mitigation: 'redundancy pay and transfers to other branches' },
+      customers: { short: -1.5, long: -1, power: 3, interest: 6, why: 'Customers must travel further or order online, and lose advice from staff they know.', mitigation: 'a delivery service and a collection point in the town' },
+      owners: { short: -0.5, long: 2, power: 9, interest: 8, why: 'Closure costs money now, but stops the branch’s losses.' },
+      suppliers: { short: -0.5, long: -0.5, power: 2, interest: 4, why: 'Local tradespeople and delivery firms that served the branch lose work.' },
+      government: { short: -0.5, long: -0.25, power: 5, interest: 3, why: 'Support payments rise and local business taxes fall a little.' },
+      community: { short: -2, long: -1.5, power: 3, interest: 9, why: 'The town loses a shop, jobs and a place where people meet, and the main street gains an empty unit.', mitigation: 'help to find a new tenant for the building' },
+      society: { short: 0, long: 0, power: 1, interest: 2, why: 'Little effect beyond the town, though longer journeys add a little traffic.' },
+    },
+    mitigationCost: 0.5,
+    earlyNoticeCost: 0.2,
+    earlyNotice: 'Announcing early means some staff leave and sales fall before the branch closes.',
+    conflicts: [
+      { gains: 'owners', loses: 'community', text: 'Ending the branch’s losses helps the owners; the town loses a shop it relies on.' },
+      { gains: 'owners', loses: 'employees', text: 'The owners stop a loss; the branch’s staff lose their jobs or their short journey to work.' },
+    ],
+    prompts: [
+      'Could the branch be kept open in a smaller form? What would that cost, and who would gain?',
+      'How much should the business owe a town that supported it for years?',
+      'What would the owners need to see to reverse the decision?',
+    ],
+    subtopics: ['2.1', '5.4'],
+  },
+  {
+    id: 'accept-takeover',
+    title: 'Accept a takeover offer',
+    business: 'Corrib Lens Works',
+    place: 'Galway, Ireland',
+    brief: 'Corrib Lens Works, a family-owned maker of precision lenses with 150 staff, has an offer for the whole company from a larger rival based in another European country.',
+    scales: {
+      small: 'Corrib keeps its name, managers and site as part of the buyer’s group.',
+      moderate: 'Corrib’s sales and office work merge into the buyer’s.',
+      large: 'Production moves to the buyer’s plants over two years.',
+    },
+    effects: {
+      employees: { short: -1, long: -1, power: 5, interest: 9, why: 'Uncertainty first, then job cuts where roles overlap, though a larger group can offer wider careers.', mitigation: 'job guarantees written into the sale' },
+      customers: { short: 0, long: 0.25, power: 5, interest: 5, why: 'A wider range and more investment, but one fewer independent supplier in the market.' },
+      owners: { short: 3, long: 0.5, power: 10, interest: 10, why: 'The family receives a price above what the business would earn them, but gives up control and future profits.' },
+      suppliers: { short: -0.5, long: -1, power: 3, interest: 7, why: 'The buyer may move orders to its own suppliers.', mitigation: 'supply contracts honoured for an agreed period' },
+      government: { short: 0.5, long: -0.25, power: 7, interest: 5, why: 'Tax is due on the sale; the competition authority may need to approve the deal, and decisions move abroad.' },
+      community: { short: -0.5, long: -1, power: 3, interest: 7, why: 'Decisions about the site are now made elsewhere, so its future is less certain.', mitigation: 'a commitment to keep the site open' },
+      society: { short: 0, long: -0.25, power: 2, interest: 2, why: 'A little less competition in the market for precision lenses.' },
+    },
+    mitigationCost: 0.8,
+    earlyNoticeCost: 0.1,
+    earlyNotice: 'Announcing early unsettles staff and customers while the sale is still being agreed.',
+    conflicts: [
+      { gains: 'owners', loses: 'employees', text: 'The family’s price is the reward for building the business; the employees bear the risk of the cuts that follow.' },
+      { gains: 'owners', loses: 'community', text: 'The owners gain a price; the town loses control over one of its largest employers.' },
+    ],
+    prompts: [
+      'Job guarantees lower the price the buyer will pay. How would you weigh the family’s price against the staff’s security?',
+      'What is the difference between a takeover and a merger here, and does it matter to the stakeholders (1.5)?',
+      'Which stakeholder could block the deal, and on what grounds?',
+    ],
+    subtopics: ['1.5', '1.2'],
+  },
+  {
+    id: 'cut-marketing',
+    title: 'Cut the marketing budget',
+    business: 'Rivette Toys',
+    place: 'Lyon, France',
+    brief: 'Rivette Toys, a maker of wooden toys with 60 staff, plans to cut its marketing budget to protect this year’s profit after a fall in sales.',
+    scales: {
+      small: 'A cut of about a tenth, mainly print advertising.',
+      moderate: 'A cut of about a third, including the trade fair.',
+      large: 'A cut of about half, including social media and the catalogue.',
+    },
+    effects: {
+      employees: { short: -1, long: -0.5, power: 4, interest: 6, why: 'Marketing staff face cuts, and lower sales later mean less work for everyone.', mitigation: 'moving marketing staff into sales roles' },
+      customers: { short: -0.25, long: -0.5, power: 5, interest: 2, why: 'Fewer offers and less news of new toys; few customers notice at first.' },
+      owners: { short: 1.5, long: -1.5, power: 9, interest: 8, why: 'Lower costs lift this year’s profit, but brand awareness and sales fall later.' },
+      suppliers: { short: -1.5, long: -0.5, power: 2, interest: 6, why: 'The advertising agency and printers lose work at once; materials suppliers lose orders if sales fall.', mitigation: 'notice to the agency and a smaller retained contract' },
+      government: { short: 0, long: -0.25, power: 2, interest: 1, why: 'Little effect, unless lower sales later mean less tax.' },
+      community: { short: 0, long: 0, power: 1, interest: 1, why: 'No noticeable effect on the town.' },
+      society: { short: 0, long: 0, power: 1, interest: 1, why: 'No noticeable effect beyond the business.' },
+    },
+    mitigationCost: 0.3,
+    earlyNoticeCost: 0,
+    conflicts: [
+      { gains: 'owners', loses: 'suppliers', text: 'The owners’ saving is the agency’s lost revenue.' },
+      { gains: 'owners', loses: 'employees', text: 'Profit this year is protected partly through the jobs of the marketing team.' },
+    ],
+    prompts: [
+      'Is marketing a cost to be cut or an investment to be protected when sales fall? What evidence would settle it?',
+      'Which parts of the budget would you keep, and why (4.5)?',
+      'How would the owners know, in a year’s time, whether the cut had cost more than it saved?',
+    ],
+    subtopics: ['4.5', '1.3'],
+  },
+];
+
+export const DECISION_IDS = DECISIONS.map((d) => d.id);
+
+export function decisionById(id: string): Decision | undefined {
+  return DECISIONS.find((d) => d.id === id);
+}
