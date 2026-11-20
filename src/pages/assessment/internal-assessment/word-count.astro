@@ -115,12 +115,15 @@ const limit = IA_LIMITS.words.toLocaleString('en-GB');
             </tbody>
           </table>
         </div>
+        {/* The options are written out: an expression inside a select in a template row makes the compiler close the row early. */}
         <template data-row-template>
           <tr data-row>
             <td data-label="Section"><input class="input" type="text" data-f="name" /></td>
             <td data-label="Part">
               <select class="select" data-f="part">
-                {PARTS.map(([v, l]) => <option value={v}>{l}</option>)}
+                <option value="introduction">Introduction</option>
+                <option value="body">Main body</option>
+                <option value="conclusion">Conclusion</option>
               </select>
             </td>
             <td data-label="Planned"><input class="input input--num" type="number" min="0" max="5000" step="10" inputmode="numeric" data-f="planned" /></td>

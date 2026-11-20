@@ -60,14 +60,8 @@ const RULES: Array<[string, string]> = [
   <div class="wrap page-body it-page">
     <IaToolNav current="documents" />
 
-    <section class="it-sec" aria-labelledby="sd-rules-h">
-      <SectionHead no="01" title="What the guide requires" id="sd-rules-h" />
-      <p class="ce-labels"><GuideLabel kind="ib" /> <span class="ce-cite">Business management guide; the page follows each rule</span></p>
-      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s.replace(/^Guide, /, '')}</span></li>)}</ul>
-    </section>
-
     <section class="it-sec" aria-labelledby="sd-tool-h">
-      <SectionHead no="02" title="Your documents" id="sd-tool-h" dek="Find more than five candidates, then keep the strongest three to five (TSM, p. 71). Mark the ones you will submit as selected." />
+      <SectionHead no="01" title="Your documents" id="sd-tool-h" dek="Find more than five candidates, then keep the strongest three to five (TSM, p. 71). Mark the ones you will submit as selected." />
       <div class="it-tool" data-ix="ia-documents">
         <p class="state state--error" data-error hidden>The checks could not start. You can still fill in and print the list.</p>
         <p class="sr-only" aria-live="polite" data-live></p>
@@ -161,6 +155,7 @@ const RULES: Array<[string, string]> = [
         </div>
         <div class="it-out js-only">
           <p class="it-out__k">Each document, questioned</p>
+          <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="strategy" /> <span class="ce-cite">The date, textbook and primary research rules are the guide's (pp. 54 to 55); the other questions are the platform's</span></p>
           <div class="table-scroll" role="region" aria-label="Source evaluation of each document" tabindex="0">
             <table class="table sd-eval">
               <thead>
@@ -177,7 +172,6 @@ const RULES: Array<[string, string]> = [
             </table>
           </div>
           <div class="sd-notes" data-notes></div>
-          <p class="small muted">The three-year rule and the rules on textbooks and primary research are the guide's. The other questions are the platform's way of weighing a source: a recommended strategy.</p>
         </div>
 
         <div class="it-export js-only">
@@ -192,6 +186,12 @@ const RULES: Array<[string, string]> = [
         </div>
         <p class="nojs-only small muted">With JavaScript off you can fill in and print the list, but nothing is checked or saved.</p>
       </div>
+    </section>
+
+    <section class="it-sec" aria-labelledby="sd-rules-h">
+      <SectionHead no="02" title="What the guide requires" id="sd-rules-h" />
+      <p class="ce-labels"><GuideLabel kind="ib" /> <span class="ce-cite">Business management guide; the page follows each rule</span></p>
+      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s.replace(/^Guide, /, '')}</span></li>)}</ul>
     </section>
 
     <section class="it-sec" aria-labelledby="sd-ex-h">

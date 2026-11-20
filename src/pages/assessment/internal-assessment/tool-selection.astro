@@ -67,16 +67,8 @@ const TSM_ADVICE = ['Tools chosen with a purpose and applied in depth make bette
   <div class="wrap page-body it-page">
     <IaToolNav current="tool-selection" />
 
-    <section class="it-sec" aria-labelledby="ts-rules-h">
-      <SectionHead no="01" title="What the guide asks of your tools" id="ts-rules-h" />
-      <p class="ce-labels"><GuideLabel kind="ib" /> <span class="ce-cite">Business management guide; the page follows each rule</span></p>
-      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s.replace(/^Guide, /, '')}</span></li>)}</ul>
-      <p class="ce-labels"><GuideLabel kind="tsm" /></p>
-      <ul class="it-rules"><li><span>{TSM_ADVICE[0]}</span><span class="it-src">{TSM_ADVICE[1]}</span></li></ul>
-    </section>
-
     <section class="it-sec" aria-labelledby="ts-tool-h">
-      <SectionHead no="02" title="Your question and your data" id="ts-tool-h" dek="Suggestions, not instructions: any relevant tool can be used, and your teacher can advise on yours." />
+      <SectionHead no="01" title="Your question and your data" id="ts-tool-h" dek="Suggestions, not instructions: any relevant tool can be used, and your teacher can advise on yours." />
       <div class="it-tool" data-ix="ia-tools">
         <script type="application/json" data-config set:html={jsonForScript({ links })} />
         <p class="state state--error" data-error hidden>The assistant could not start. The table of tools below can still be read.</p>
@@ -125,6 +117,7 @@ const TSM_ADVICE = ['Tools chosen with a purpose and applied in depth make bette
 
         <div class="it-out js-only">
           <p class="it-out__k">Tools that fit</p>
+          <p class="ce-labels"><GuideLabel kind="strategy" /> <span class="ce-cite">Which tool fits which question is the platform's recommendation; the HL tools are the guide's (p. 14)</span></p>
           <p class="small" data-summary>Choose what your question asks and tick the data your documents hold.</p>
           <ol class="ts-list" data-list></ol>
           <div data-hl hidden>
@@ -145,6 +138,14 @@ const TSM_ADVICE = ['Tools chosen with a purpose and applied in depth make bette
           </span>
         </div>
       </div>
+    </section>
+
+    <section class="it-sec" aria-labelledby="ts-rules-h">
+      <SectionHead no="02" title="What the guide asks of your tools" id="ts-rules-h" />
+      <p class="ce-labels"><GuideLabel kind="ib" /> <span class="ce-cite">Business management guide; the page follows each rule</span></p>
+      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s.replace(/^Guide, /, '')}</span></li>)}</ul>
+      <p class="ce-labels"><GuideLabel kind="tsm" /></p>
+      <ul class="it-rules"><li><span>{TSM_ADVICE[0]}</span><span class="it-src">{TSM_ADVICE[1]}</span></li></ul>
     </section>
 
     <section class="it-sec" aria-labelledby="ts-ref-h">

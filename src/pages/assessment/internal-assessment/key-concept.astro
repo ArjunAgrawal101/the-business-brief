@@ -49,14 +49,8 @@ const RULES: Array<[string, string]> = [
   <div class="wrap page-body it-page">
     <IaToolNav current="key-concept" />
 
-    <section class="it-sec" aria-labelledby="kc-rules-h">
-      <SectionHead no="01" title="What the guide requires" id="kc-rules-h" />
-      <p class="ce-labels"><GuideLabel kind="ib" /> <span class="ce-cite">Business management guide; the page follows each rule</span></p>
-      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s.replace(/^Guide, /, '')}</span></li>)}</ul>
-    </section>
-
     <section class="it-sec" aria-labelledby="kc-tool-h">
-      <SectionHead no="02" title="Your issue, your question, your lens" id="kc-tool-h" dek="Everything you type stays on this device. Nothing here is sent anywhere or approves anything." />
+      <SectionHead no="01" title="Your issue, your question, your lens" id="kc-tool-h" dek="Everything you type stays on this device. Nothing here is sent anywhere or approves anything." />
       <div class="it-tool" data-ix="ia-concept">
         <p class="state state--error" data-error hidden>The checks could not start. You can still read the lenses below.</p>
         <p class="sr-only" aria-live="polite" data-live></p>
@@ -110,6 +104,7 @@ const RULES: Array<[string, string]> = [
             </div>
             <div class="it-out js-only">
               <p class="it-out__k" id="kc-fit-h">Where your issue points</p>
+              <p class="ce-labels"><GuideLabel kind="strategy" /></p>
               <ul class="it-fit" data-fit>
                 {
                   CONCEPTS.map((k) => (
@@ -143,6 +138,7 @@ const RULES: Array<[string, string]> = [
             </fieldset>
             <div class="it-out js-only" data-lens-out hidden>
               <p class="it-out__k" id="kc-lens-h">The questions your lens asks</p>
+              <p class="ce-labels"><GuideLabel kind="strategy" /></p>
               <div class="it-lens">
                 <p class="it-lens__asks" data-lens-asks></p>
                 <ol data-lens-prompts></ol>
@@ -180,6 +176,12 @@ const RULES: Array<[string, string]> = [
         </div>
         <p class="nojs-only small muted">With JavaScript off you can fill in and print this page, but nothing is checked or saved.</p>
       </div>
+    </section>
+
+    <section class="it-sec" aria-labelledby="kc-rules-h">
+      <SectionHead no="02" title="What the guide requires" id="kc-rules-h" />
+      <p class="ce-labels"><GuideLabel kind="ib" /> <span class="ce-cite">Business management guide; the page follows each rule</span></p>
+      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s.replace(/^Guide, /, '')}</span></li>)}</ul>
     </section>
 
     <section class="it-sec" aria-labelledby="kc-lens-ref-h">

@@ -236,6 +236,7 @@ const STEP_COUNT = 10;
             </tbody>
           </table>
         </div>
+        {/* The options are written out: an expression inside a select in a template row makes the compiler close the row early. */}
         <template data-doc-template>
           <tr data-doc>
             <td data-label="Use"><input type="checkbox" data-f="selected" /></td>
@@ -244,7 +245,10 @@ const STEP_COUNT = 10;
             <td data-label="Published"><input class="input" type="month" data-f="published" placeholder="YYYY-MM" /></td>
             <td data-label="Kind">
               <select class="select" data-f="kind">
-                {KINDS.map((k) => <option value={k.v}>{k.l}</option>)}
+                <option value="secondary">Secondary</option>
+                <option value="primary">Primary</option>
+                <option value="transcript">Transcript</option>
+                <option value="textbook">Textbook or notes</option>
               </select>
             </td>
             <td data-label="A4 pages"><input class="input input--num" type="number" min="0" step="1" inputmode="numeric" data-f="pages" /></td>
