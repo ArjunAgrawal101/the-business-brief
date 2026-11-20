@@ -142,6 +142,9 @@ export const UNITS: Record<Unit, string> = {
 };
 
 export const STEP_IDS = ['problem', 'evidence', 'tool', 'analysis', 'recommend', 'evaluate'] as const;
+
+/** The three judgements of the evaluation step, in order. */
+export const EVALUATE_KEYS = ['stakeholders', 'risk', 'change'] as const;
 export type StepId = (typeof STEP_IDS)[number];
 
 export const STEP_TITLES: Record<StepId, string> = {

@@ -17,7 +17,9 @@ import { jsonForScript } from '../../lib/markup';
 import { DEFAULT_CODE, FAMILIES, UNITS, facets, scenarioFor } from '../../lib/scenario-generator';
 import { TOOLKIT } from '../../lib/scenario-generator/kit';
 import { headHtml, scenarioHtml, type RenderContext } from '../../lib/scenario-generator/render';
+import { LIMIT } from '../../lib/scenario-generator/store';
 import { STEP_IDS, STEP_TITLES } from '../../lib/scenario-generator/types';
+import { count } from '../../lib/strategy/common';
 import '../../styles/scenario-generator.css';
 
 const c = await corpus();
@@ -43,22 +45,25 @@ const first = scenarioFor(DEFAULT_CODE);
 if (!first) throw new Error('Scenario generator: the default scenario does not generate');
 const units = [...new Set(FAMILIES.map((f) => f.unit))].sort();
 const config = { ctx, defaultCode: DEFAULT_CODE };
+/** The number of steps and of units, in words, for the sentences that name them. */
+const steps = count(STEP_IDS.length);
+const unitCount = count(Object.keys(UNITS).length);
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'LearningResource',
   name: 'Business scenario generator',
-  description: 'Original fictional business scenarios, worked in six steps from the problem to the consequences, with feedback at every step.',
+  description: `Original fictional business scenarios, worked in ${steps} steps from the problem to the consequences, with feedback at every step.`,
   learningResourceType: 'Case study',
   isAccessibleForFree: true,
 };
 ---
 
-<BaseLayout title="Business scenario generator" description={`Original fictional business scenarios from ${FAMILIES.length} families across the five units, worked in six steps from the problem to the consequences, with feedback at every step and a model answer.`} section="decision-room" jsonLd={jsonLd}>
+<BaseLayout title="Business scenario generator" description={`Original fictional business scenarios from ${FAMILIES.length} families across the ${unitCount} units, worked in ${steps} steps from the problem to the consequences, with feedback at every step and a model answer.`} section="decision-room" jsonLd={jsonLd}>
   <PageIntro
     trail={[{ label: 'Decision Room', href: '/decision-room/' }, { label: 'Business scenario generator' }]}
     kicker="Decision Room"
     title="Business scenario generator"
-    lead="A fresh fictional case each time, worked in six steps from the problem to its consequences."
+    lead={`A fresh fictional case each time, worked in ${steps} steps from the problem to its consequences.`}
   >
     <div class="tags">
       <span class="tag tag--simulated">Fictional scenarios</span>
@@ -118,7 +123,7 @@ const jsonLd = {
     </div>
 
     <section aria-labelledby="sg-how-h" class="sg-explain">
-      <SectionHead no={1} title="How it works" id="sg-how-h" dek="Six steps, in the order a strong answer takes. Each step is checked before the next one opens, and every choice is explained, not only marked." />
+      <SectionHead no={1} title="How it works" id="sg-how-h" dek={`${count(STEP_IDS.length, true)} steps, in the order a strong answer takes. Each step is checked before the next one opens, and every choice is explained, not only marked.`} />
       <ol class="sg-how">
         <li><h3>{STEP_TITLES.problem}</h3><p>Separate the decision from its symptoms. A symptom (falling sales) is evidence; the problem is what must be decided.</p></li>
         <li><h3>{STEP_TITLES.evidence}</h3><p>Choose the exhibits that bear on the problem and leave out the distractors, as you will have to in a case study.</p></li>
@@ -130,14 +135,14 @@ const jsonLd = {
       <aside class="callout callout--framework sg-standing">
         <span class="callout__kicker">Recommended strategy</span>
         <div class="prose">
-          <p>The six steps are the platform's own method, not an IB requirement. They follow what the guide asks of answers: to use the stimulus and examples rather than restate them, and to apply business terms and tools to the case (Business management guide, p. 42). The toolkit tools are those the guide lists, all taught at AO2 and AO4 (pp. 13 to 15). The scenarios are original and fictional: they are not IB questions, and the verdicts are teaching feedback, not marks.</p>
+          <p>The {steps} steps are the platform's own method, not an IB requirement. They follow what the guide asks of answers: to use the stimulus and examples rather than restate them, and to apply business terms and tools to the case (Business management guide, p. 42). The toolkit tools are those the guide lists, all taught at AO2 and AO4 (pp. 13 to 15). The scenarios are original and fictional: they are not IB questions, and the verdicts are teaching feedback, not marks.</p>
         </div>
       </aside>
     </section>
 
     <section aria-labelledby="sg-families-h" class="sg-explain">
       <SectionHead no={2} title={`The ${FAMILIES.length} families`} id="sg-families-h" dek="Each family is a template: every version has its own business, place, size and figures. The filters above narrow this list too." />
-      <p class="sg-none" data-none hidden>No family matches all three filters. Choose another unit, subtopic or tool.</p>
+      <p class="sg-none" data-none hidden>No family matches these filters together. Choose another unit, subtopic or tool.</p>
       <ol class="sg-families" data-families>
         {
           FAMILIES.map((f) => (
@@ -156,7 +161,7 @@ const jsonLd = {
     </section>
 
     <section aria-labelledby="sg-record-h" class="sg-explain js-only" data-record-section>
-      <SectionHead no={3} title="Your scenarios" id="sg-record-h" dek="Kept on this device only, in bb:scenarios: your answers and verdicts for your last 60 scenarios." />
+      <SectionHead no={3} title="Your scenarios" id="sg-record-h" dek={`Kept on this device only, in bb:scenarios: your answers and verdicts for your last ${LIMIT} scenarios.`} />
       <div data-record><p class="small muted">You have not worked a scenario on this device yet.</p></div>
     </section>
 

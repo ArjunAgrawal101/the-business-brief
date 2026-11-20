@@ -37,7 +37,7 @@
  * grid with the Strategy Studio's own rule (`quadrantOf`). The consistency
  * properties these rules promise are checked by tests/unit/stakeholder-impact.test.ts.
  */
-import { andList } from '../strategy/common';
+import { andList, count } from '../strategy/common';
 import { QUADRANTS, quadrantOf, type Quadrant } from '../strategy/stakeholders';
 
 export const GROUPS = ['employees', 'customers', 'owners', 'suppliers', 'government', 'community', 'society'] as const;
@@ -368,7 +368,7 @@ function promptsFor(d: Decision, st: Settings, results: GroupResult[]): string[]
     if (st.mitigation === 'none' && d.effects[worst.group].mitigation) out.push(`With no mitigation, ${who} lose most. What is the least the business could offer them that the owners would still accept?`);
     else out.push(`${who.charAt(0).toUpperCase()}${who.slice(1)} still lose most on these settings. Is the decision justified anyway? Weigh it against what the owners gain.`);
   }
-  out.push('Which of your four settings would you change first, and which stakeholder would notice the change most?');
+  out.push(`Which of your ${count(PARAM_IDS.length)} settings would you change first, and which stakeholder would notice the change most?`);
   return out;
 }
 

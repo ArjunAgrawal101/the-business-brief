@@ -4,7 +4,7 @@
  * right or wrong. Pure functions, used by the browser script and the tests.
  */
 import { fmtNumber } from '../format';
-import type { Calc, Choice, Exhibit, Question, Scenario, SortTask, StepId, Verdict } from './types';
+import { EVALUATE_KEYS, type Calc, type Choice, type Exhibit, type Question, type Scenario, type SortTask, type StepId, type Verdict } from './types';
 
 export const VERDICT_WORDS: Record<Verdict, string> = { best: 'Best fit', fair: 'Partly fits', weak: 'Does not fit' };
 
@@ -114,9 +114,9 @@ export function stepVerdicts(s: Scenario, a: Answers, checked: readonly StepId[]
   if (has('analysis')) out.analysis = analysisVerdict(s, a);
   if (has('recommend')) out.recommend = choiceResult(s.recommend, a.recommend).picked?.verdict ?? 'weak';
   if (has('evaluate')) {
-    const vs = (['stakeholders', 'risk', 'change'] as const).map((k) => choiceResult(s.evaluate[k], a[k]).picked?.verdict ?? 'weak');
+    const vs = EVALUATE_KEYS.map((k) => choiceResult(s.evaluate[k], a[k]).picked?.verdict ?? 'weak');
     const best = vs.filter((v) => v === 'best').length;
-    out.evaluate = best === 3 ? 'best' : best >= 1 || vs.every((v) => v !== 'weak') ? 'fair' : 'weak';
+    out.evaluate = best === vs.length ? 'best' : best >= 1 || vs.every((v) => v !== 'weak') ? 'fair' : 'weak';
   }
   return out;
 }
@@ -145,8 +145,8 @@ export function answerWords(s: Scenario, a: Answers, step: StepId): string {
     case 'recommend':
       return s.recommend.choices.find((c) => c.id === a.recommend)?.text ?? 'No answer';
     case 'evaluate': {
-      const best = (['stakeholders', 'risk', 'change'] as const).filter((k) => choiceResult(s.evaluate[k], a[k]).picked?.verdict === 'best').length;
-      return `${best} of 3 judgements on the best answer`;
+      const best = EVALUATE_KEYS.filter((k) => choiceResult(s.evaluate[k], a[k]).picked?.verdict === 'best').length;
+      return `${best} of ${EVALUATE_KEYS.length} judgements on the best answer`;
     }
   }
 }

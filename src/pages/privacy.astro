@@ -2,13 +2,16 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/layout/PageIntro.astro';
 import SectionHead from '../components/layout/SectionHead.astro';
+import { LIMIT as SCENARIO_LIMIT } from '../lib/scenario-generator/store';
+import { STEP_IDS } from '../lib/scenario-generator/types';
+import { count } from '../lib/strategy/common';
 
 const KEYS = [
   { key: 'bb:level', what: 'Whether you chose to see SL or HL content.' },
   { key: 'bb:quiz:…', what: 'Your answers in the classification exercises, so they are still there when you return.' },
   { key: 'bb:q:…', what: 'Your answers to practice questions, and your self-check against the mark scheme.' },
   { key: 'bb:dr:…', what: 'Your choices and notes in each Decision Room.' },
-  { key: 'bb:scenarios', what: 'Your results in the business scenario generator: for each scenario you worked (its code), your answer at each of the six steps, the verdict on it and the date, for your last 60 scenarios.' },
+  { key: 'bb:scenarios', what: `Your results in the business scenario generator: for each scenario you worked (its code), your answer at each of the ${count(STEP_IDS.length)} steps, the verdict on it and the date, for your last ${SCENARIO_LIMIT} scenarios.` },
   { key: 'bb:stakeholder-impact', what: 'The decision and the settings you last chose in the stakeholder impact simulator, a one-line summary of the result, and your written evaluation of each decision.' },
   { key: 'bb:boardroom:…', what: 'Your seat, decisions, reasoning and board memo in each Boardroom simulation.' },
   { key: 'bb:executive', what: 'Your role, your answers at each stage, your plan for each year, your reflections and a one-line summary of how far you have got, in the Boardroom’s executive simulation.' },

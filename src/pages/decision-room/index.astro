@@ -2,6 +2,8 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
 import { corpus, decisionsInOrder, href } from '../../lib/content';
+import { STEP_IDS } from '../../lib/scenario-generator/types';
+import { count } from '../../lib/strategy/common';
 
 const c = await corpus();
 const decisions = await decisionsInOrder();
@@ -16,11 +18,11 @@ const decisions = await decisionsInOrder();
   />
   <div class="wrap page-body">
     <section class="dr-more" aria-labelledby="dr-more-h">
-      <h2 class="label label--ink" id="dr-more-h">Two tools for practising the reasoning</h2>
+      <h2 class="label label--ink" id="dr-more-h">Practise the reasoning</h2>
       <ul class="dr-more__list" role="list">
         <li>
           <a class="dr-more__name" href="/decision-room/scenarios/">Business scenario generator</a>
-          <p>A fresh fictional case every time, worked in six steps: the problem, the evidence, the tool, the analysis, the recommendation and its consequences, with feedback at each step and a model answer at the end.</p>
+          <p>A fresh fictional case every time, worked in {count(STEP_IDS.length)} steps: the problem, the evidence, the tool, the analysis, the recommendation and its consequences, with feedback at each step and a model answer at the end.</p>
         </li>
         <li>
           <a class="dr-more__name" href="/decision-room/stakeholder-impact/">Stakeholder impact simulator</a>

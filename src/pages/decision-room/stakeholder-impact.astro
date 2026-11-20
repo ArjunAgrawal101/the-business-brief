@@ -17,6 +17,7 @@ import { esc, jsonForScript } from '../../lib/markup';
 import { DECISIONS } from '../../lib/stakeholder-impact/decisions';
 import { DEFAULT_SETTINGS, GROUPS, GROUP_INFO, NOTE_MAX, PARAMS, PARAM_IDS, RULES, simulate } from '../../lib/stakeholder-impact/model';
 import { gridListHtml, gridSvg, impactHtml, promptsHtml, settingsLine, tradeoffsHtml } from '../../lib/stakeholder-impact/render';
+import { count } from '../../lib/strategy/common';
 import '../../styles/stakeholder-impact.css';
 
 const c = await corpus();
@@ -46,7 +47,7 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'LearningResource',
   name: 'Stakeholder impact simulator',
-  description: 'Choose a fictional business decision and how it is carried out, and see its impact on seven stakeholder groups.',
+  description: `Choose a fictional business decision and how it is carried out, and see its impact on ${count(GROUPS.length)} stakeholder groups.`,
   learningResourceType: 'Simulation',
   isAccessibleForFree: true,
 };
@@ -194,7 +195,7 @@ const jsonLd = {
         <li><a href="/decision-room/scenarios/">Business scenario generator</a> <span class="small muted">Work a fictional case from the problem to its consequences, step by step.</span></li>
         <li><a href="/decision-room/">The Decision Rooms</a> <span class="small muted">Commit to a decision and follow its consequences round by round.</span></li>
       </ul>
-      <p class="small muted si-groups-note">The seven groups are {GROUPS.map((g) => GROUP_INFO[g].name.toLowerCase()).join(', ')}.</p>
+      <p class="small muted si-groups-note">The {count(GROUPS.length)} groups are {GROUPS.map((g) => GROUP_INFO[g].name.toLowerCase()).join(', ')}.</p>
     </section>
   </div>
 </BaseLayout>

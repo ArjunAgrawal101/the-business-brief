@@ -6,8 +6,9 @@
  * model answer is open; with one, the feedback appears as each step is checked.
  */
 import { esc } from '../markup';
-import { EXHIBIT_WORDS, VERDICT_WORDS, analysisVerdict, answerWords, calcResult, choiceResult, evidenceResult, fmtAnswer, sortResult, stepVerdicts, type Answers } from './check';
-import { STEP_IDS, STEP_TITLES, UNITS, type Choice, type Exhibit, type Question, type Scenario, type StepId, type Verdict } from './types';
+import { count } from '../strategy/common';
+import { EXHIBIT_WORDS, MIN_JUSTIFY_WORDS, VERDICT_WORDS, analysisVerdict, answerWords, calcResult, choiceResult, evidenceResult, fmtAnswer, sortResult, stepVerdicts, type Answers } from './check';
+import { EVALUATE_KEYS, STEP_IDS, STEP_TITLES, UNITS, type Choice, type Exhibit, type Question, type Scenario, type StepId, type Verdict } from './types';
 
 export interface RenderContext {
   subtopics: Record<string, { title: string; href: string; hl: boolean }>;
@@ -110,7 +111,7 @@ export function scenarioHtml(s: Scenario, _ctx: RenderContext): string {
   const recommend = stepShell(
     'recommend',
     5,
-    `${radios('recommend', s.recommend)}<div class="field sg-justify js-only"><label for="sg-justify">${esc(s.recommend.justify)}</label><span class="field__hint" id="sg-justify-hint">At least eight words. Kept on this device.</span><textarea id="sg-justify" class="textarea" rows="4" maxlength="4000" aria-describedby="sg-justify-hint sg-msg-recommend" data-justify></textarea></div>${actions('recommend')}${nojsWhy(
+    `${radios('recommend', s.recommend)}<div class="field sg-justify js-only"><label for="sg-justify">${esc(s.recommend.justify)}</label><span class="field__hint" id="sg-justify-hint">At least ${count(MIN_JUSTIFY_WORDS)} words. Kept on this device.</span><textarea id="sg-justify" class="textarea" rows="4" maxlength="4000" aria-describedby="sg-justify-hint sg-msg-recommend" data-justify></textarea></div>${actions('recommend')}${nojsWhy(
       'Why each recommendation fits or not',
       `${explained(s.recommend.choices)}<p class="sg-criteria__h">A strong justification:</p><ul class="sg-criteria">${s.recommend.criteria.map((c) => `<li>${esc(c)}</li>`).join('')}</ul>`,
     )}`,
@@ -119,13 +120,13 @@ export function scenarioHtml(s: Scenario, _ctx: RenderContext): string {
   const evaluate = stepShell(
     'evaluate',
     6,
-    `${(['stakeholders', 'risk', 'change'] as const).map((k) => radios(k, s.evaluate[k])).join('')}${actions('evaluate', 'Check the evaluation')}${nojsWhy(
+    `${EVALUATE_KEYS.map((k) => radios(k, s.evaluate[k])).join('')}${actions('evaluate', 'Check the evaluation')}${nojsWhy(
       'Why each judgement fits or not',
-      (['stakeholders', 'risk', 'change'] as const).map((k) => `<p class="sg-criteria__h">${esc(s.evaluate[k].prompt)}</p>${explained(s.evaluate[k].choices)}`).join(''),
+      EVALUATE_KEYS.map((k) => `<p class="sg-criteria__h">${esc(s.evaluate[k].prompt)}</p>${explained(s.evaluate[k].choices)}`).join(''),
     )}`,
   );
 
-  const model = `<section class="sg-end" data-end aria-labelledby="sg-model-h"><h3 class="sg-end__h" id="sg-model-h" tabindex="-1">The model answer, in outline</h3><p class="sg-locked js-only" data-end-locked hidden>The model answer opens when you have checked all six steps.</p><div data-end-body><dl class="sg-model">${modelRows(s)}</dl><div data-summary></div></div></section>`;
+  const model = `<section class="sg-end" data-end aria-labelledby="sg-model-h"><h3 class="sg-end__h" id="sg-model-h" tabindex="-1">The model answer, in outline</h3><p class="sg-locked js-only" data-end-locked hidden>The model answer opens when you have checked all ${count(STEP_IDS.length)} steps.</p><div data-end-body><dl class="sg-model">${modelRows(s)}</dl><div data-summary></div></div></section>`;
 
   return `${brief}${pack}<ol class="sg-steps" role="list">${problem}${evidence}${tool}${analysis}${recommend}${evaluate}</ol>${model}`;
 }
@@ -206,7 +207,7 @@ export function feedbackHtml(s: Scenario, step: StepId, a: Answers, ctx: RenderC
       return html.replace(/<\/div>$/, `<p class="sg-fb__sub">Check your justification. A strong one:</p><ul class="sg-criteria">${s.recommend.criteria.map((c) => `<li>${esc(c)}</li>`).join('')}</ul></div>`);
     }
     case 'evaluate':
-      return (['stakeholders', 'risk', 'change'] as const).map((k) => `<p class="sg-fb__q">${esc(s.evaluate[k].prompt)}</p>${choiceFeedback(s.evaluate[k], a[k])}`).join('');
+      return EVALUATE_KEYS.map((k) => `<p class="sg-fb__q">${esc(s.evaluate[k].prompt)}</p>${choiceFeedback(s.evaluate[k], a[k])}`).join('');
   }
 }
 

@@ -11,7 +11,8 @@ import { FAMILIES, DEFAULT_CODE, MAX_SEED, filtered, matches, parseCode, readFil
 import { MIN_JUSTIFY_WORDS, VERDICT_WORDS, readNumber, stepVerdicts, wordCount, type Answers } from '../lib/scenario-generator/check';
 import { feedbackHtml, headHtml, scenarioHtml, summaryHtml, type RenderContext } from '../lib/scenario-generator/render';
 import { STORAGE_KEY, find, readRecord, upsert, type Record_ } from '../lib/scenario-generator/store';
-import { STEP_IDS, STEP_TITLES, type Scenario, type StepId } from '../lib/scenario-generator/types';
+import { EVALUATE_KEYS, STEP_IDS, STEP_TITLES, type Scenario, type StepId } from '../lib/scenario-generator/types';
+import { count } from '../lib/strategy/common';
 import { announce, each, escapeHtml, readConfig } from './ix';
 import { readItem, writeItem } from './storage';
 
@@ -170,8 +171,8 @@ each('[data-ix="scenario-generator"]', (root) => {
         return '';
       }
       case 'evaluate': {
-        const vs = (['stakeholders', 'risk', 'change'] as const).map((n) => [n, radioValue(n)] as const);
-        if (vs.some(([, v]) => !v)) return 'Answer all three questions first.';
+        const vs = EVALUATE_KEYS.map((n) => [n, radioValue(n)] as const);
+        if (vs.some(([, v]) => !v)) return `Answer all ${count(EVALUATE_KEYS.length)} questions first.`;
         for (const [n, v] of vs) answers[n] = v;
         return '';
       }
@@ -245,7 +246,7 @@ each('[data-ix="scenario-generator"]', (root) => {
       .map((e) => {
         const best = Object.values(e.verdicts).filter((v) => v === 'best').length;
         const when = new Date(e.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
-        return `<li><a href="?s=${escapeHtml(e.code)}" data-open="${escapeHtml(e.code)}">${escapeHtml(e.title)}</a> <span class="sg-record__meta">${e.checked.length} of 6 steps checked, ${best} on the best answer · ${escapeHtml(when)}</span></li>`;
+        return `<li><a href="?s=${escapeHtml(e.code)}" data-open="${escapeHtml(e.code)}">${escapeHtml(e.title)}</a> <span class="sg-record__meta">${e.checked.length} of ${STEP_IDS.length} steps checked, ${best} on the best answer · ${escapeHtml(when)}</span></li>`;
       })
       .join('')}</ol>${record.items.length > 12 ? `<p class="small muted">And ${record.items.length - 12} more kept on this device.</p>` : ''}`;
   };
