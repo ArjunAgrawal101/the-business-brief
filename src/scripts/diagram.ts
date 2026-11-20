@@ -39,6 +39,8 @@ function setupExplore(root: HTMLElement): void {
   // The readout now carries the explanations; the full list stays one click away.
   if (list) list.open = false;
   let active = '';
+  /** The part a touch has explained, which the next touch on it opens. */
+  let armed = '';
   let pointer = 'mouse';
   const show = (pid: string) => {
     if (!readout || pid === active) return;
@@ -59,8 +61,9 @@ function setupExplore(root: HTMLElement): void {
     el.addEventListener('focus', () => show(pid));
     el.addEventListener('click', (e) => {
       // On a touch screen the first tap explains; the second, on the same part, opens it.
-      if (pointer !== 'mouse' && active !== pid) {
+      if (pointer !== 'mouse' && armed !== pid) {
         e.preventDefault();
+        armed = pid;
         show(pid);
       }
       pointer = 'mouse';
