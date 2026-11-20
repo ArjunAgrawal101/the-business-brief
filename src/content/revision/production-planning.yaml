@@ -1,0 +1,88 @@
+# Quick revision for 5.6 Production planning, an HL subtopic (statements at
+# AO2, AO3 and AO4). Critical path analysis is an HL toolkit tool. Written for
+# the platform; every business named is fictional.
+code: '5.6'
+exercises:
+  - id: brakewell-stock-levels
+    business: Brakewell Paints
+    stem: "Brakewell Paints uses 400 tins of base paint a week. Its supplier takes 2 weeks to deliver, it keeps a buffer stock of 300 tins, and it orders 1,600 tins at a time."
+    command: calculate
+    question: "**Calculate** Brakewell Paints' reorder level and maximum stock level."
+    level: HL
+    outline:
+      - "Reorder level = buffer stock + (usage × lead time) = 300 + (400 × 2) = **1,100 tins**."
+      - "Maximum stock level = buffer stock + reorder quantity = 300 + 1,600 = **1,900 tins**."
+      - "Shows the cycle on a stock control chart: from 1,900 tins the stock reaches 1,100 after two weeks, when the order is placed, and 300 two weeks later, when the delivery arrives."
+  - id: brakewell-make-or-buy
+    business: Brakewell Paints
+    stem: "Brakewell Paints needs 10,000 metal tins a year. It can buy them at $3.50 each, or make them itself with fixed costs of $12,000 a year and a variable cost of $2.00 a tin."
+    command: recommend
+    question: "**Recommend**, using the cost to make and the cost to buy, whether Brakewell Paints should make or buy its tins."
+    level: HL
+    outline:
+      - "Cost to buy = $3.50 × 10,000 = **$35,000**; cost to make = $12,000 + ($2.00 × 10,000) = **$32,000**: making saves $3,000 a year."
+      - "Notes how small the saving is: if Brakewell needed only 8,000 tins, making would cost $28,000 against $28,000 to buy."
+      - "Adds the qualitative factors: spare capacity and skills, quality, reliable supply, and focus on making paint."
+      - "Gives a justified recommendation, such as buying unless volumes are expected to grow."
+  - id: brakewell-capacity
+    business: Brakewell Paints
+    stem: "Brakewell Paints' mixing plant could make 5,000 litres of paint a day but makes 3,500. Its 14 mixing workers produce those 3,500 litres."
+    command: calculate
+    question: "**Calculate** the capacity utilization rate and the labour productivity of the mixing plant, and explain one way to raise each."
+    level: HL
+    outline:
+      - "Capacity utilization rate = (3,500 ÷ 5,000) × 100 = **70%**."
+      - "Labour productivity = 3,500 ÷ 14 = **250 litres a worker a day**."
+      - "Raising capacity utilization: win more orders, take on work for other firms, or reduce capacity (rationalization)."
+      - "Raising productivity: training, better equipment or improved methods; explains that spare capacity spreads fixed costs over fewer litres."
+formulas:
+  reorder-level:
+    situation: "A shop uses 50 boxes a day, deliveries take 4 days, and it keeps a buffer of 100 boxes. It wants to know the stock level at which to place each order."
+  maximum-stock-level:
+    situation: "A shop keeps a buffer stock and orders the same quantity each time, and wants to know the highest its stock should reach, just after a delivery."
+  labour-productivity:
+    situation: "A factory wants to compare how much each of its workers produces with the output per worker at a rival's factory."
+  capital-productivity:
+    situation: "A printer wants to know how many pages its machines produce for each hour they run."
+  productivity-rate:
+    situation: "A factory wants to express its total output as a percentage of its total input, to track its efficiency month by month."
+  degree-of-operating-leverage:
+    situation: "A business wants to know how sharply its operating profit will move if its sales change, given its total contribution and its operating profit."
+  cost-to-buy-ctb:
+    situation: "A manufacturer could buy 5,000 components from a supplier at $4 each, and wants the total cost of buying them."
+  cost-to-make-ctm:
+    situation: "A manufacturer could make 5,000 components itself, with fixed costs of $6,000 and a variable cost of $2.50 a unit, and wants the total cost of making them."
+  total-float:
+    situation: "A project manager wants to know how long one activity can be delayed without delaying the whole project."
+  free-float:
+    situation: "A project manager wants to know how long one activity can be delayed without delaying the start of the activity that follows it."
+mistakes:
+  - mistake: "Deciding to make or buy on cost alone."
+    fix: "Add quality, reliability of supply, spare capacity, expertise and how volumes might change; a small saving can vanish if the forecast is wrong."
+    level: HL
+distinctions:
+  - id: capacity-utilization-vs-productivity
+    pair: [Capacity utilization, Productivity]
+    level: HL
+    difference: "Capacity utilization compares actual output with the most the business could produce with its existing resources. Productivity compares output with the inputs used to make it, such as output per worker or per machine hour. A plant can be fully used but unproductive, or productive with spare capacity."
+  - id: buffer-stock-vs-reorder-level
+    pair: [Buffer stock, Reorder level]
+    level: HL
+    difference: "Buffer stock is the minimum stock kept in reserve against late deliveries or surges in demand. The reorder level is the stock level at which a new order is placed: the buffer plus the stock that will be used up during the lead time."
+  - id: total-vs-free-float
+    pair: [Total float, Free float]
+    codes: ['5.6', 'toolkit']
+    level: HL
+    difference: "Total float is how long an activity can be delayed without delaying the whole project. Free float is how long it can be delayed without delaying the earliest start of the next activity. Activities on the critical path have no float of either kind."
+scenarios:
+  - id: spindlecroft-capacity
+    business: Spindlecroft Cycles
+    stem: "Demand for Spindlecroft Cycles' bikes has fallen, its factory now runs at 55% of what it could produce, and the fixed cost carried by each bike is rising."
+    answer: "Low capacity utilization"
+    level: HL
+    why: "With the factory under-used, fixed costs are spread over fewer bikes, raising the unit cost. Spindlecroft Cycles can seek more orders, make for other firms, or cut capacity (rationalization), each with its own costs and risks."
+evaluations:
+  - id: make-if-cheaper
+    claim: "If making a component costs less than buying it, a business should make it."
+    counter: "Cost to make against cost to buy is only part of the decision. Quality, reliable supply, spare capacity, the skills needed, the investment at risk and the flexibility to change volumes can all outweigh a small saving."
+    level: HL

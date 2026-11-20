@@ -1,0 +1,72 @@
+# Quick revision for 3.5 Profitability and liquidity ratio analysis
+# (statements at AO2, AO4 and AO3). Written for the platform; every business
+# named is fictional.
+code: '3.5'
+exercises:
+  - id: copperlane-ratios
+    business: Copperlane Hardware
+    stem: "Copperlane Hardware's accounts for the year show sales revenue of $500,000, gross profit of $200,000, profit before interest and tax of $60,000, non-current liabilities of $100,000 and equity of $300,000. Its current assets are $90,000, of which stock is $50,000, and its current liabilities are $60,000."
+    command: calculate
+    question: "**Calculate** Copperlane Hardware's gross profit margin, profit margin, ROCE, current ratio and acid test ratio."
+    outline:
+      - "Gross profit margin = ($200,000 ÷ $500,000) × 100 = **40%**; profit margin = ($60,000 ÷ $500,000) × 100 = **12%**."
+      - "Capital employed = $100,000 + $300,000 = $400,000; ROCE = ($60,000 ÷ $400,000) × 100 = **15%**."
+      - "Current ratio = $90,000 ÷ $60,000 = **1.5:1**; acid test ratio = ($90,000 − $50,000) ÷ $60,000 = **0.67:1**."
+      - "Shows the formula and the substitution each time, and gives each answer its unit."
+  - id: copperlane-liquidity
+    business: Copperlane Hardware
+    stem: "Copperlane Hardware's current ratio is 1.5:1 and its acid test ratio is 0.67:1. Much of its stock is tools and fittings that sell slowly."
+    command: comment
+    question: "**Comment** on Copperlane Hardware's liquidity."
+    outline:
+      - "The current ratio suggests current assets cover current liabilities one and a half times."
+      - "The acid test ratio, below 1, shows that without selling stock Copperlane could not meet its short-term debts."
+      - "Because the stock sells slowly, the business depends on stock it cannot turn into cash quickly, a liquidity risk."
+      - "Notes that the ratios need comparing with earlier years and similar retailers before a firm conclusion."
+  - id: copperlane-improve-margin
+    business: Copperlane Hardware
+    stem: "Copperlane Hardware's profit margin has fallen from 15% to 12% over two years, while a large rival has opened nearby."
+    command: evaluate
+    question: "**Evaluate** two strategies Copperlane Hardware could use to improve its profit margin."
+    outline:
+      - "Raising prices lifts the margin on each sale, but with a large rival nearby customers may switch, so revenue could fall."
+      - "Cutting expenses, such as renegotiating rent or energy contracts, raises the margin without touching prices, but cuts in staff or opening hours may hurt service."
+      - "Other options include cheaper suppliers, which would also raise the gross margin, at a possible cost in quality."
+      - "Judges which suits a hardware shop facing a large rival, for example cost control and better service rather than higher prices."
+formulas:
+  gross-profit-margin:
+    situation: "A retailer wants to know how much of each dollar of sales is left after paying for the goods it sold, to compare with last year."
+  profit-margin:
+    situation: "A retailer wants to know how much of each dollar of sales is left after all its running costs, before interest and tax."
+  roce:
+    situation: "An investor wants to compare how much operating profit two companies of very different sizes earn on the long-term finance invested in them."
+  current-ratio:
+    situation: "A supplier asks whether a business could pay the debts due within a year from the assets that will turn into cash within a year."
+  acid-test-ratio:
+    situation: "A lender worries that a business's stock might not sell quickly, and wants to know whether it could meet its short-term debts without selling any stock."
+  capital-employed:
+    situation: "Before working out ROCE, an analyst needs the total long-term finance a company uses, from lenders and owners together."
+  working-capital:
+    situation: "A manager wants to know what the business would have left for its day-to-day running if it paid all its short-term debts from its current assets."
+distinctions:
+  - id: profitability-vs-liquidity
+    pair: [Profitability, Liquidity]
+    codes: ['3.5', '3.7']
+    difference: "Profitability is how well a business turns its sales or its capital into profit, measured by margins and ROCE. Liquidity is its ability to pay its short-term debts when they fall due, measured by the current and acid test ratios. A profitable business can be illiquid, and a liquid one unprofitable."
+    example: "A builder with healthy profits can still miss its payroll if its clients take four months to pay."
+  - id: gross-profit-margin-vs-profit-margin
+    pair: [Gross profit margin, Profit margin]
+    difference: "The gross profit margin compares gross profit, after the cost of sales only, with sales revenue. The profit margin compares profit before interest and tax, after all the running expenses too, with sales revenue. A gap between them shows how much of each sale the expenses take."
+  - id: current-ratio-vs-acid-test
+    pair: [Current ratio, Acid test ratio]
+    difference: "The current ratio compares all current assets with current liabilities. The acid test ratio leaves stock out of the current assets, because stock is the slowest current asset to turn into cash, so it is a stricter test of liquidity."
+scenarios:
+  - id: fellbrook-roce
+    business: Fellbrook Furniture
+    stem: "An investor is choosing between shares in Fellbrook Furniture, a large maker with $8m of profit, and a small rival with $1m of profit, and wants to know which earns more on the money invested in it."
+    answer: "Return on capital employed (ROCE)"
+    why: "ROCE compares profit before interest and tax with the long-term finance used to earn it, so businesses of different sizes can be compared. The larger profit may come from far more capital and be the poorer return."
+evaluations:
+  - id: higher-current-ratio-better
+    claim: "The higher the current ratio, the better."
+    counter: "A very high current ratio can mean cash lying idle, too much stock or customers paying slowly, all of which cost the business returns. Enough liquidity to pay debts on time is the aim, and what is enough depends on the industry and how quickly stock sells."

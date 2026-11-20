@@ -1,0 +1,82 @@
+# Quick revision for 5.5 Break-even analysis (statements at AO2, AO4 and AO3;
+# the special order is the HL toolkit's contribution analysis). Written for the
+# platform; every business named is fictional.
+code: '5.5'
+exercises:
+  - id: rowanlea-break-even
+    business: Rowanlea Candles
+    stem: "Rowanlea Candles sells candles at $20 each. Each candle's variable cost is $8, and fixed costs are $36,000 a year. It expects to sell 4,000 candles this year."
+    command: calculate
+    question: "**Calculate** Rowanlea Candles' break-even quantity, its margin of safety and its expected profit."
+    outline:
+      - "Contribution per unit = $20 − $8 = $12; break-even quantity = $36,000 ÷ $12 = **3,000 candles** (break-even revenue $60,000)."
+      - "Margin of safety = 4,000 − 3,000 = **1,000 candles**, a quarter of expected sales."
+      - "Profit = ($12 × 4,000) − $36,000 = **$12,000**."
+  - id: rowanlea-cost-rise
+    business: Rowanlea Candles
+    stem: "Rowanlea Candles' wax supplier raises its prices, so the variable cost of a candle rises from $8 to $10. The price stays at $20, fixed costs at $36,000 and expected sales at 4,000 candles."
+    command: explain
+    question: "**Explain**, using calculations, how the cost rise affects Rowanlea Candles' break-even quantity and margin of safety."
+    outline:
+      - "Contribution per unit falls to $20 − $10 = $10, so the break-even quantity rises to $36,000 ÷ $10 = **3,600 candles**."
+      - "The margin of safety falls to 4,000 − 3,600 = **400 candles**, a tenth of sales, and profit falls to $4,000."
+      - "On the chart, the total cost line becomes steeper and crosses total revenue further to the right."
+      - "Concludes that Rowanlea Candles is now much more exposed to a fall in sales."
+  - id: rowanlea-usefulness
+    business: Rowanlea Candles
+    stem: "Rowanlea Candles' owner uses break-even analysis to set prices and sales targets for the coming year."
+    command: evaluate
+    question: "**Evaluate** the usefulness of break-even analysis for Rowanlea Candles' planning."
+    outline:
+      - "Useful: it shows the sales needed to cover costs, the effect of a change in price or cost, and the margin of safety as a measure of risk, quickly and simply."
+      - "Limitations: it assumes a constant price and variable cost per unit, that every candle made is sold, a single product and fixed costs that never step up."
+      - "It rests on forecasts and says nothing about cash flow or whether 4,000 candles can be sold."
+      - "Judges it useful as a first check, alongside market research and a cash flow forecast."
+  - id: rowanlea-special-order
+    business: Rowanlea Candles
+    stem: "At the original variable cost of $8 a candle, a hotel chain offers to buy 500 candles at $14 each. Rowanlea Candles has spare capacity, the order would not affect its regular sales, and it would need $1,000 of extra packaging equipment."
+    command: calculate
+    question: "**Calculate** the effect of the order on Rowanlea Candles' profit, and comment on whether to accept it."
+    level: HL
+    outline:
+      - "Contribution per candle = $14 − $8 = $6; total contribution = $6 × 500 = $3,000."
+      - "Change in profit = $3,000 − $1,000 = **+$2,000**, so on the figures the order is worth taking."
+      - "Comments on the conditions: spare capacity, no lost regular sales, and regular customers not learning of the lower price and asking for it."
+formulas:
+  total-contribution:
+    situation: "A business knows the contribution each unit makes and how many units it sold this month, and wants the total left over to cover its fixed costs."
+  break-even-quantity:
+    situation: "A new gym wants to know how many memberships it must sell to cover its fixed costs exactly."
+  break-even-revenue:
+    situation: "A bakery knows how many loaves it must sell to break even and its price per loaf, and wants the value of sales it needs."
+  margin-of-safety:
+    situation: "A business expects to sell 4,000 units, and wants to know how far sales could fall before it makes a loss."
+  margin-of-safety-as-a-percentage:
+    situation: "A business wants to show how far its sales could fall before it makes a loss as a share of the sales it expects."
+  target-profit-output:
+    situation: "A furniture maker wants to know how many chairs it must sell this year to make a profit of $20,000."
+  target-price:
+    situation: "A business expects to sell 2,000 units and wants to know what price it must charge to make a profit of $10,000."
+  special-order:
+    situation: "A business with spare capacity is offered a one-off order below its usual price, and wants to know what the order would add to its profit."
+distinctions:
+  - id: contribution-vs-profit
+    pair: [Contribution, Profit]
+    codes: ['5.5', '3.3']
+    difference: "Contribution is revenue less variable costs: what sales add towards paying the fixed costs. Profit is what is left once the fixed costs are paid too. Below the break-even quantity, contribution is positive while the business still makes a loss."
+  - id: contribution-per-unit-vs-total-contribution
+    pair: [Contribution per unit, Total contribution]
+    difference: "Contribution per unit is the selling price less the variable cost of one unit. Total contribution is contribution per unit times the number of units sold, or total revenue less total variable costs; profit is total contribution less fixed costs."
+  - id: break-even-quantity-vs-revenue
+    pair: [Break-even quantity, Break-even revenue]
+    difference: "The break-even quantity is the number of units at which total revenue equals total cost, rounded up to a whole unit. Break-even revenue is the value of those sales: the break-even quantity times the price."
+scenarios:
+  - id: saltrigg-break-even
+    business: Saltrigg Café
+    stem: "Saltrigg Café's owner wants to know how many coffees she must sell each month to cover the rent, the wages and her other fixed costs."
+    answer: "Break-even analysis"
+    why: "Dividing the fixed costs by the contribution each coffee makes gives the number she must sell to break even. The margin of safety then shows how far sales can fall from her forecast before she makes a loss."
+evaluations:
+  - id: above-break-even-safe
+    claim: "A business selling more than its break-even quantity is safe."
+    counter: "The margin of safety may be small, the sales forecast may be wrong, and prices or costs may change, as a rise in variable costs shows. A business above break-even can also run short of cash, and the analysis assumes every unit made is sold."

@@ -162,7 +162,7 @@ Every practice question.
 
 ## 13. Retrieval cards
 
-Every topic and revision brief.
+Every topic and revision sheet. A rating here also schedules the same card in the flashcards (52).
 
 | | |
 | --- | --- |
@@ -494,3 +494,20 @@ The revision planner at `/revision/planner/` (rules in `src/lib/planner.ts`, the
 | --- | --- | --- | --- |
 | **61. Revision planner** | Enters the date of the first paper, the start, SL or HL, the hours a week and the study days, chooses the subtopics and puts the hardest first (the weak areas their own results show are offered), then marks each session done and makes the plan again as the weeks go by | A plan for each week, day by day: each subtopic learnt or reviewed and then retrieved a gap later (a third time where there is room), weakest first, with case practice, Paper 2 calculations and, at HL, Paper 3 in turn, timed practice in the final fortnight and free days before the examination; the subtopics that do not fit, named; progress in sessions, minutes and subtopics met twice; a calendar file and a printed plan | Rereading each topic once is revising; the plan has to be followed to the day; everything can be left to the last week |
 | **62. Study mode** | Chooses the text size, low light, marks the subtopic complete, saves it, follows the On this page list and prints the page | The article in the chosen size and light, kept on this device; the section in view marked in the list and the reading progress shown; the subtopic counted as completed on the dashboard | Reading a page to the end is the same as knowing it: completion is the reader's own judgement, and the dashboard keeps it apart from the results |
+
+## 63. Flashcards with spaced repetition
+
+`/revision/flashcards/`. The deck is built from the content at build time (`src/lib/revision/deck.ts`, written to `/revision/flashcards/deck.json`); the rules are in `src/lib/flashcards.ts` and the page's script in `src/scripts/flashcards.ts`.
+
+| | |
+| --- | --- |
+| **The learner does** | Chooses cards by unit, subtopic, kind (terms, formulae, frameworks, key distinctions, application scenarios, evaluation prompts, recall questions) and level, or arrives on one subtopic from its revision sheet (`?topic=3.5`); starts a session of the cards due today, of up to twenty new cards, or of every card chosen, in course order or shuffled; answers each card from memory, turns it (the button, Space or Enter) and rates it 1 Again, 2 Hard, 3 Good or 4 Easy |
+| **Must understand** | The term, formula, framework, distinction or argument on the card well enough to produce it unprompted, which is what an examination asks |
+| **Decides or infers** | The answer, before turning the card; then, honestly, how well it came back |
+| **Feedback** | The answer, with where it comes from; on each rating button, the day the card will next be due; for the selection, the cards due today, new and waiting, and how many sit in each box; at the end, the ratings, the cards still due today and when the next cards fall due, with the cards missed offered again |
+| **Misconception diagnosed** | That rereading is revising (each card asks for recall first); that a card known once is known for good (it comes back after a gap that grows only while it is recalled) |
+| **Objective** | Revise the whole course by retrieval, spending the time on the cards not yet known |
+
+Scheduling is a Leitner system of five boxes, due again after 1, 2, 4, 8 and 16 days: Again sends a card to box 1 and round once more in the session, Hard keeps it in its box, Good moves it up one and Easy two. Due days are the reader's local calendar days. Progress is one item, `bb:cards`, in the shape the dashboard reads: `{ "v": 1, "cards": { "<id>": { box, due, seen, last, rating, codes, title } } }`. The number keys act only while focus is inside the session, so a single key never acts elsewhere on the page (WCAG 2.1.4). Without JavaScript the page lists every revision sheet.
+
+The recall cards on the subtopic pages and the revision sheets (`src/components/assess/RetrievalCards.astro`) are the deck's recall cards, with the same ids (`recallIds()`): their three ratings also schedule the card, Not yet as Again, Partly as Hard and Got it as Good, and changing a rating on the page replaces the earlier one rather than counting twice.

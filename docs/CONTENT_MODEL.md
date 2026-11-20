@@ -89,6 +89,7 @@ The label column is what readers see on the page.
 | `topicConnections` | `data/topic-connections.yaml` | A worked connection between two subtopics (`between`), for the map at `/ib/connections/` and every subtopic page: a `title`, a one-paragraph `explanation`, an original exam-style `question` (command term, marks, prompt, and for a calculation its worked `answer`, reworked in the tests), `featured` for the five the platform leads with, and `level` (HL whenever an end is HL only). Checked by `src/lib/connections.ts` |
 | `subtopicTools` | `data/subtopic-tools.yaml` | For a subtopic (the id is its code), existing tools that serve it although their own data does not name it, each with one sentence on what to use it for; every address must be a tool page and must not already name the subtopic |
 | `resources` | `data/resources.yaml` | A curated resource for the library: type, audiences, level, units and subtopics, the assessment component, `access` (a `download` with its file, format, size and pages; a `page`; or a `print` page), `contents` and `updated`. A download must exist, or the build fails |
+| `revision` | `revision/<subtopic slug>.yaml` | What a subtopic's revision sheet and flashcards need beyond the rest of the content (below) |
 | `studio` | `studio/<slug>.yaml` | A Strategy Studio tool (`type: tool`): its `kind`, `slug`, `stage` of the engagement, `purpose`, `howTo`, `limitations`, its IB `status` (an `ib-toolkit` tool names its `toolkit` entry and `level`; anything else is `enrichment`, with any `extensions` such as the TOWS matrix), the notes and guides to `read`, the worked `example` (the tool's state exactly as the tool saves it) and its recommended use (`inUse`). Three tools, scenario planning (`scenarios`), stakeholder salience (`salience`) and the strategic fit check (`fit`), were added with the Framework Application Lab, all enrichment. One entry is the `engagement` that frames the room: the fictional client, its question, facts, the four stages, principles, reading and Decision Rooms |
 
 ## The Business Intelligence Briefing
@@ -307,6 +308,23 @@ Each calculation's `id` matches a builder in `workings` (`src/lib/finance.ts`). 
 | `reading`, `basis` | Part 8, three or more pieces of further reading from the register (never IB documents), and the sources the module itself rests on |
 
 `checkAdvanced` in `src/lib/integrity-advanced.ts` runs before any module page is built and in `tests/unit/advanced.test.ts`, and fails the build on a module off the plan, an unknown source, framework or code, an unsourced real application or case, a misfit exhibit, IB material offered as reading, or a module under 1,500 words.
+
+## Quick revision
+
+`revisionSchema` in `src/lib/revision/schema.ts` (strict); one file per subtopic, named after its slug; checked by `src/lib/revision/integrity.ts`. A revision sheet (`/revision/<slug>/`) and the flashcard deck are built by `src/lib/revision/` from the notes or brief (key points, recall questions), the glossary (IB terms only), the formula register (`src/lib/revision/formulae.ts`: the calculation register, the notes' formulas and the glossary's, each formula once) and the frameworks library. A revision file adds only what those lack:
+
+| Field | What it holds |
+| --- | --- |
+| `code` | The subtopic |
+| `exercises` | Three to five: a fictional `business`, named in its `stem`, a `command` term at or below the AO level of the statements the exercise is set on, the `question` and an `outline` of what a strong answer does (never a markscheme), with its `level` |
+| `mistakes` | Common examination mistakes with their `fix`, written only where the content holds too few; shown as Recommended strategy. Those the content holds come first, each linked to its source: a brief's traps and misconceptions, the notes' sentences that state a common error, the glossary's misconceptions, the calculation register's errors and the mistakes of the frameworks the subtopic serves first |
+| `formulas` | By formula id: the `situation` in which it is the formula to use (the situation-to-formula card), and what it `measures` where the glossary and the calculation register say nothing usable |
+| `distinctions` | Pairs students confuse (`pair`), the `difference` and an optional `example`, with their `codes` and `level` |
+| `scenarios` | A fictional `business` and `stem`, the concept or tool that applies (`answer`) and `why` |
+| `evaluations` | A `claim` and the `counter`: the counter-argument, or the condition under which it fails |
+| `hlRecall` | Recall cards that are HL only although their question does not say so (most say "(HL)" themselves) |
+
+Card ids are `<kind>:<id>`: `term:<glossary id>`, `formula:<id>` and `formula:<id>:use`, `framework:<id>` and `framework:<id>:structure`, `distinction:`, `scenario:` and `evaluation:` with the file's ids, and `recall:<code>-<start of the question>` (`recallIds()` in `src/lib/flashcards.ts`), so an id survives a rebuild and a new question elsewhere in its set. Every card carries its subtopic codes (or `toolkit`) and a level.
 
 ## Adding a topic brief
 

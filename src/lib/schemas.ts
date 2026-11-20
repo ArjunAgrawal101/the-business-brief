@@ -1978,7 +1978,7 @@ export const RESOURCE_TYPES = [
 export const RESOURCE_TYPE_LABELS: Record<(typeof RESOURCE_TYPES)[number], string> = {
   'assessment-guide': 'Assessment guide',
   'topic-notes': 'Topic notes',
-  'revision-brief': 'Revision brief',
+  'revision-brief': 'Revision sheet',
   mindmap: 'Mindmap',
   diagram: 'Diagrams',
   framework: 'Business framework',

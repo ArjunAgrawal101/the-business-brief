@@ -45,6 +45,7 @@ import {
   type SavedItem,
   type SavedList,
 } from './learner';
+import { CARDS_KEY, mergeCards, parseCards } from './flashcards';
 
 export const LIST_KEY = 'bb:workspace:list';
 export const NOTES_KEY = 'bb:workspace:notes';
@@ -834,6 +835,8 @@ export function checkImport(text: string): ImportCheck {
       if (key === LIST_KEY) return { key, value: JSON.stringify(parseList(value)) };
       if (key === NOTES_KEY) return { key, value: JSON.stringify(parseNotebook(value)) };
       if (key === SNAPSHOTS_KEY) return { key, value: JSON.stringify(parseSnapshots(value)) };
+      // The flashcards' progress (src/lib/flashcards.ts): cleaned like the stored item.
+      if (key === CARDS_KEY) return { key, value: JSON.stringify(parseCards(value)) };
       return { key, value };
     }),
   };
@@ -852,6 +855,8 @@ export function planWorkspaceImport(current: Readonly<Record<string, string | nu
       [LIST_KEY]: () => mergeLists(parseList(had), parseList(w.value)),
       [NOTES_KEY]: () => mergeNotebooks(parseNotebook(had), parseNotebook(w.value)),
       [SNAPSHOTS_KEY]: () => mergeSnapshots(parseSnapshots(had), parseSnapshots(w.value)),
+      // Card by card, the record rated more recently wins.
+      [CARDS_KEY]: () => mergeCards(parseCards(had), parseCards(w.value)),
     };
     const combine = merge[w.key];
     if (!combine) return w;

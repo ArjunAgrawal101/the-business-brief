@@ -1,0 +1,71 @@
+# Quick revision for 3.8 Investment appraisal (payback and ARR at AO3 and AO4;
+# NPV is HL). The discount factors are the guide's printed table at 10% (p. 66).
+# Written for the platform; every business named is fictional.
+code: '3.8'
+exercises:
+  - id: tarnbrook-payback-arr
+    business: Tarnbrook Cider
+    stem: "Tarnbrook Cider is considering a bottling machine costing $80,000. It expects net cash flows of $30,000, $30,000, $24,000 and $16,000 in years 1 to 4, after which the machine will have no value."
+    command: calculate
+    question: "**Calculate** the payback period and the average rate of return (ARR) for the machine."
+    outline:
+      - "After two years $60,000 is recovered and $20,000 remains; ($20,000 ÷ $24,000) × 12 = 10 months, so payback is **2 years and 10 months**."
+      - "Total returns = $100,000; net return = $100,000 − $80,000 = $20,000, or $5,000 a year over four years."
+      - "ARR = ($5,000 ÷ $80,000) × 100 = **6.25%**."
+      - "States the assumption that each year's cash arrives evenly through the year."
+  - id: tarnbrook-recommend
+    business: Tarnbrook Cider
+    stem: "Tarnbrook Cider's bottling machine pays back in 2 years and 10 months, with an ARR of 6.25%. The business could borrow at 7% a year, and its owners want to double output within five years."
+    command: recommend
+    question: "**Recommend** whether Tarnbrook Cider should buy the bottling machine."
+    outline:
+      - "Sets the ARR of 6.25% against the 7% cost of borrowing: on this measure the machine looks weak, though ARR ignores when the cash arrives."
+      - "Considers payback: under three years, so the cash risk is limited."
+      - "Adds what the figures leave out: the reliability of the forecasts, capacity for the owners' growth objective, quality and the effect on staff."
+      - "Gives a justified recommendation, for example to buy only if the machine is needed for the planned growth or can be financed without borrowing at 7%."
+  - id: tarnbrook-npv
+    business: Tarnbrook Cider
+    stem: "Tarnbrook Cider's bottling machine costs $80,000 and returns $30,000, $30,000, $24,000 and $16,000 in years 1 to 4. At a discount rate of 10%, the guide's discount factors for those years are 0.9091, 0.8264, 0.7513 and 0.6830."
+    command: calculate
+    question: "**Calculate** the net present value of the bottling machine at 10%, and explain what it shows."
+    level: HL
+    outline:
+      - "Present values: $30,000 × 0.9091 = $27,273; $30,000 × 0.8264 = $24,792; $24,000 × 0.7513 = $18,031; $16,000 × 0.6830 = $10,928."
+      - "Total present value = $81,024; NPV = $81,024 − $80,000 = **$1,024**."
+      - "A positive NPV means the returns, discounted to today's money at 10%, are worth more than the cost, so on this measure the machine earns more than 10% a year."
+      - "Notes how small the margin is, and that NPV and ARR can disagree because ARR ignores timing: most of these returns come early."
+formulas:
+  payback-period:
+    situation: "A business short of cash wants to know how long a new machine will take to earn back what it cost."
+  average-rate-of-return:
+    situation: "A board wants a project's average yearly profit as a percentage of what it costs, to compare with the interest it could earn instead."
+  net-present-value:
+    situation: "A business wants to know whether a project's future returns, valued in today's money at a 10% discount rate, are worth more than it costs now."
+  present-value:
+    situation: "An analyst wants to know what $20,000 received in three years' time is worth today, at a 6% discount rate."
+  discount-factor:
+    situation: "With no discount table to hand, an analyst needs the number that turns a sum due in n years into today's money at a rate r."
+mistakes:
+  - mistake: "Discounting the original cost when working out NPV."
+    fix: "The cost is paid now, so it is already in today's money: discount only the future returns, then subtract the cost."
+    level: HL
+  - mistake: "Judging an investment on one method alone."
+    fix: "Use payback and ARR together (and NPV at HL), since each leaves something out, then weigh the qualitative factors before recommending."
+distinctions:
+  - id: payback-vs-arr
+    pair: [Payback period, Average rate of return]
+    difference: "The payback period measures how long a project takes to recover its cost in cash; it favours quick returns but ignores everything after payback. The ARR measures the average yearly profit as a percentage of the cost over the whole life; it shows profitability but ignores when the money arrives."
+  - id: arr-vs-npv
+    pair: [Average rate of return, Net present value]
+    level: HL
+    difference: "The ARR averages returns over the project's life without regard to timing, so a dollar in year five counts as much as a dollar in year one. NPV discounts each year's return to its value today, so it accounts for the time value of money, at the price of choosing a discount rate."
+scenarios:
+  - id: byrewell-payback
+    business: Byrewell Repairs
+    stem: "Byrewell Repairs, a phone-repair start-up, is short of cash, and the technology it works with changes every two or three years. It must choose between two diagnostic machines."
+    answer: "The payback period"
+    why: "When cash is short and the future is uncertain, how quickly a machine recovers its cost matters most, and returns several years away are the least reliable. Payback ranks the machines on exactly that, though it ignores everything after payback."
+evaluations:
+  - id: highest-arr-wins
+    claim: "A business should always choose the project with the highest ARR."
+    counter: "ARR ignores when returns arrive and rests on forecasts, so a project with a higher ARR may take longer to pay back and carry more risk. A business short of cash may prefer the faster payback, NPV (at HL) accounts for timing, and qualitative factors such as fit with objectives can outweigh the figures."

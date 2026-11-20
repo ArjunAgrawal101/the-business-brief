@@ -1,0 +1,280 @@
+---
+/**
+ * Flashcards with active recall and spaced repetition, for the whole course.
+ * The deck is a static JSON file built from the content
+ * (/revision/flashcards/deck.json); the page carries only the controls, so it
+ * stays light. The script (src/scripts/flashcards.ts) filters the deck by
+ * unit, subtopic, kind and level, runs a session (turn a card, rate it Again,
+ * Hard, Good or Easy) and schedules each card in five Leitner boxes, kept in
+ * this browser as bb:cards. ?topic=3.5 opens on a subtopic. Without
+ * JavaScript the page points to the revision sheets.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/layout/Breadcrumbs.astro';
+import { revisionData } from '../../../lib/revision/content';
+import { BOXES, BOX_DAYS, CARD_KINDS, KIND_LABELS, NEW_PER_SESSION, RATINGS, RATING_HINTS, RATING_LABELS, CARDS_KEY } from '../../../lib/flashcards';
+import { jsonForScript } from '../../../lib/markup';
+import '../../../styles/revision.css';
+import '../../../styles/flashcards.css';
+
+const { deck, sheets } = await revisionData();
+const fmt = (n: number) => n.toLocaleString('en-GB');
+const ib = deck.cards.filter((x) => !x.enrichment);
+const enrichment = deck.cards.length - ib.length;
+const kinds = CARD_KINDS.map((k) => ({ k, label: KIND_LABELS[k], n: ib.filter((x) => x.kind === k).length }));
+const units = deck.units;
+const byUnit = units.map((u) => ({ ...u, subtopics: deck.subtopics.filter((s) => s.unit === u.id) }));
+const hlOnly = deck.subtopics.filter((s) => s.level === 'HL').map((s) => s.code);
+const sheetUnits = [...new Set(sheets.map((s) => s.unit))].map((n) => ({ n, title: sheets.find((s) => s.unit === n)?.unitTitle ?? '', sheets: sheets.filter((s) => s.unit === n) }));
+const config = { deck: '/revision/flashcards/deck.json', hlOnly, newPerSession: NEW_PER_SESSION };
+const dayWords = (n: number) => (n === 1 ? '1 day' : `${n} days`);
+---
+
+<BaseLayout
+  title="Flashcards"
+  description={`${fmt(ib.length)} flashcards for IB DP Business Management: terms, formulae, frameworks, distinctions, scenarios, evaluation prompts and recall questions, with spaced repetition kept on your device.`}
+  section="revision"
+>
+  <div class="wrap fc-page">
+    <header class="fc-head">
+      <Breadcrumbs trail={[{ label: 'Quick revision', href: '/revision/' }, { label: 'Flashcards' }]} />
+      <h1 class="fc-head__title">Flashcards</h1>
+      <p class="fc-head__lead">
+        {fmt(ib.length)} cards from across the course. Choose what to revise, then turn each card and say how well you knew it: it comes back when it is due.
+      </p>
+    </header>
+
+    <div class="fc" data-ix="flashcards">
+      <script type="application/json" data-config set:html={jsonForScript(config)} />
+      <p class="sr-only" aria-live="polite" data-live></p>
+      <p class="state js-only fc-loading" data-loading>Loading the cards…</p>
+      <div class="state state--error" data-error hidden>
+        <p class="state__title">The flashcards could not start.</p>
+        <p>Every subtopic's revision sheet still works: they are listed below.</p>
+      </div>
+
+      <div class="fc-setup js-only" data-setup hidden>
+        <form class="fc-filters" data-filters aria-label="Choose the cards">
+          <div class="field">
+            <label for="fc-unit">Unit</label>
+            <select class="select" id="fc-unit" name="unit">
+              <option value="">All units</option>
+              {units.map((u) => <option value={u.id}>{u.id === 'toolkit' ? u.title : `Unit ${u.id}: ${u.title}`}</option>)}
+            </select>
+          </div>
+          <div class="field fc-filters__wide">
+            <label for="fc-code">Subtopic</label>
+            <select class="select" id="fc-code" name="code">
+              <option value="">All subtopics</option>
+              {
+                byUnit.map((u) =>
+                  u.id === 'toolkit' ? (
+                    u.subtopics.map((s) => <option value={s.code} data-unit={u.id}>{s.title}</option>)
+                  ) : (
+                    <optgroup label={`Unit ${u.id}: ${u.title}`}>
+                      {u.subtopics.map((s) => (
+                        <option value={s.code} data-unit={u.id}>
+                          {s.code} {s.title}
+                          {s.level === 'HL' ? ' (HL)' : ''}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ),
+                )
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label for="fc-kind">Kind of card</label>
+            <select class="select" id="fc-kind" name="kind">
+              <option value="">Every kind</option>
+              {kinds.map((k) => <option value={k.k}>{k.label}</option>)}
+            </select>
+          </div>
+          <div class="field">
+            <label for="fc-level">Level</label>
+            <select class="select" id="fc-level" name="level">
+              <option value="all">SL and HL</option>
+              <option value="sl">SL: leave out HL-only cards</option>
+              <option value="hl">HL-only cards</option>
+            </select>
+          </div>
+          <div class="fc-filters__foot">
+            <label class="fc-check"><input type="checkbox" name="enrichment" /> Include enrichment beyond the course</label>
+            <button type="button" class="btn btn--small" data-clear-filters>Clear the choices</button>
+          </div>
+        </form>
+
+        <div class="fc-status" data-status-box>
+          <p class="fc-status__line" data-status>…</p>
+          <ol class="fc-boxes" data-boxes aria-label="Your cards in this selection, by box">
+            {
+              BOXES.map((b) => (
+                <li>
+                  <span class="fc-boxes__n" data-box={b}>0</span>
+                  <span class="fc-boxes__label">
+                    Box {b} <span class="fc-boxes__gap">every {dayWords(BOX_DAYS[b])}</span>
+                  </span>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+
+        <div class="fc-start" role="group" aria-label="Start a session">
+          <button type="button" class="btn btn--primary" data-mode="due">Review the cards due today</button>
+          <button type="button" class="btn" data-mode="new">Learn new cards</button>
+          <button type="button" class="btn" data-mode="all">Study every card here</button>
+          <label class="fc-check"><input type="checkbox" data-shuffle /> Shuffle</label>
+        </div>
+        <p class="fc-store small muted" data-store-note hidden></p>
+      </div>
+
+      <section class="fc-study js-only" data-study hidden aria-labelledby="fc-study-h">
+        <h2 class="sr-only" id="fc-study-h">Session</h2>
+        <div class="fc-study__bar">
+          <p class="fc-progress" data-progress></p>
+          <button type="button" class="btn btn--small" data-end>End the session</button>
+        </div>
+        <div class="fc-card" data-card tabindex="0" role="group" aria-roledescription="flashcard" aria-label="Flashcard">
+          <div class="fc-card__inner" data-inner>
+            <div class="fc-face fc-face--front" data-front></div>
+            <div class="fc-face fc-face--back" data-back hidden></div>
+          </div>
+        </div>
+        <div class="fc-controls">
+          <button type="button" class="btn btn--primary fc-flip" data-flip aria-keyshortcuts="Space Enter">Turn the card</button>
+          <div class="fc-rate" role="group" aria-label="How well did you recall it?" data-rate hidden>
+            {
+              RATINGS.map((r, i) => (
+                <button type="button" class:list={['fc-rate__btn', `fc-rate__btn--${r}`]} data-rating={r} aria-keyshortcuts={String(i + 1)} title={RATING_HINTS[r]}>
+                  <span class="fc-rate__key" aria-hidden="true">
+                    {i + 1}
+                  </span>
+                  <span class="fc-rate__label">{RATING_LABELS[r]}</span>
+                  <span class="fc-rate__when" data-when={r} />
+                </button>
+              ))
+            }
+          </div>
+        </div>
+        <p class="fc-keys small muted">While the card or a button has focus: Space or Enter turns the card, and 1 to 4 rate it Again, Hard, Good or Easy.</p>
+      </section>
+
+      <section class="fc-summary js-only" data-summary hidden aria-labelledby="fc-sum-h">
+        <h2 class="fc-summary__h" id="fc-sum-h" tabindex="-1">Session summary</h2>
+        <p class="fc-summary__text" data-summary-text></p>
+        <p class="fc-summary__label">Your ratings</p>
+        <dl class="fc-summary__tally" data-summary-tally></dl>
+        <p class="fc-summary__label">These cards by box, now</p>
+        <dl class="fc-summary__tally" data-summary-boxes></dl>
+        <div class="cluster">
+          <button type="button" class="btn btn--primary" data-again-missed hidden>Review the cards you missed</button>
+          <button type="button" class="btn" data-to-setup>Back to your cards</button>
+        </div>
+      </section>
+
+      <details class="fc-reset js-only" data-reset-box hidden>
+        <summary>Reset your progress</summary>
+        <div class="fc-reset__body">
+          <p class="small">Resetting forgets when you last saw each card and how well you knew it. It cannot be undone.</p>
+          <div class="cluster">
+            <button type="button" class="btn btn--small" data-reset="selection">Reset the cards in this selection</button>
+            <button type="button" class="btn btn--small" data-reset="all">Reset all flashcard progress</button>
+          </div>
+        </div>
+      </details>
+
+      <div class="fc-fallback nojs-only" data-fallback>
+        <p class="fc-fallback__lead">
+          The flashcards need JavaScript to turn cards and remember your ratings. Without it, revise from the sheets: each has the subtopic's key definitions, formulae, frameworks, common mistakes, exercises and recall questions.
+        </p>
+        <div class="fc-fallback__units">
+          {
+            sheetUnits.map((u) => (
+              <div>
+                <h2 class="fc-fallback__h">
+                  Unit {u.n}: {u.title}
+                </h2>
+                <ul>
+                  {u.sheets.map((s) => (
+                    <li>
+                      <a href={`/revision/${s.slug}/`}>
+                        {s.code} {s.title}
+                      </a>
+                      {s.level === 'HL' && <span class="tag tag--hl">HL</span>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <section class="fc-how" aria-labelledby="fc-how-h">
+      <h2 id="fc-how-h" class="fc-how__h">How the cards come back</h2>
+      <div class="fc-how__grid">
+        <div>
+          <p>
+            Each card sits in one of five boxes. A new card starts in box 1. When you rate it, it moves, and the box sets how long it waits before it is due again:
+          </p>
+          <div class="table-scroll" role="region" aria-labelledby="fc-how-h" tabindex="0">
+            <table class="fc-how__table">
+              <thead>
+                <tr>
+                  <th scope="col">Rating</th>
+                  <th scope="col">The card</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">1 Again</th>
+                  <td>goes back to box 1 and comes round again in this session</td>
+                </tr>
+                <tr>
+                  <th scope="row">2 Hard</th>
+                  <td>stays in its box</td>
+                </tr>
+                <tr>
+                  <th scope="row">3 Good</th>
+                  <td>moves up one box</td>
+                </tr>
+                <tr>
+                  <th scope="row">4 Easy</th>
+                  <td>moves up two boxes</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="small muted">
+            {BOXES.map((b, i) => `${i ? '; ' : ''}box ${b}: ${dayWords(BOX_DAYS[b])}`).join('').replace(/^b/, 'B')}. A card in box 5 stays there while you keep knowing it. Days are counted on your own calendar, so a card due tomorrow is due from midnight where you are.
+          </p>
+        </div>
+        <div>
+          <h3 class="fc-how__h3">What is in the deck</h3>
+          <ul class="fc-how__kinds">
+            {
+              kinds.map((k) => (
+                <li>
+                  <span class="fc-how__n">{fmt(k.n)}</span> {k.label.toLowerCase()}
+                </li>
+              ))
+            }
+          </ul>
+          <p class="small muted">
+            Built from the glossary, the formula register, the frameworks library and the notes. Distinctions, scenarios and evaluation prompts were written for revision; every scenario is about a fictional business. {fmt(enrichment)} cards on frameworks beyond the course appear only when you include enrichment, and the glossary's terms beyond the course are left out.
+          </p>
+          <p class="small muted">
+            Your ratings stay in this browser, under <code>{CARDS_KEY}</code>, and nowhere else; see <a href="/privacy/">privacy</a>. A day's session works best short: the cards due today, then up to {NEW_PER_SESSION} new ones.
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../../scripts/flashcards';
+</script>

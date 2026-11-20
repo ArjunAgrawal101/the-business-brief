@@ -3,20 +3,37 @@
  * Retrieval practice: say or write the answer, then reveal it and rate your
  * recall. Ratings stay on this device, so the cards you found hard come first
  * next time. Without JavaScript each answer is a disclosure.
+ *
+ * The questions are also cards in the flashcard deck (/revision/flashcards/),
+ * with the same ids (src/lib/flashcards.ts recallIds), so a rating here also
+ * schedules the card there: Not yet as Again, Partly as Hard, Got it as Good.
  */
-import { jsonForScript, rich } from '../../lib/markup';
+import { jsonForScript, plain, rich } from '../../lib/markup';
+import { corpus } from '../../lib/content';
+import { recallIds, withoutHLMark } from '../../lib/flashcards';
+import { recallSetCode } from '../../lib/revision/build';
 
 interface Props {
   id: string;
   items: Array<{ q: string; a: string }>;
 }
 const { id, items } = Astro.props;
-const config = { id, count: items.length };
+const code = recallSetCode(await corpus(), id);
+const ids = code ? recallIds(code, items.map((it) => it.q)) : [];
+const config = {
+  id,
+  count: items.length,
+  code,
+  cards: ids.map((cardId, k) => ({ id: cardId, title: plain(withoutHLMark(items[k]?.q ?? '')).slice(0, 120) })),
+};
 ---
 
 <div class="rcards" data-ix="retrieval" id={`rc-${id}`}>
   <script type="application/json" data-config set:html={jsonForScript(config)} />
-  <p class="small muted rcards__how">Answer each question from memory, out loud or on paper, before you reveal the answer.</p>
+  <p class="small muted rcards__how">
+    Answer each question from memory, out loud or on paper, before you reveal the answer.
+    {code && <span class="js-only">Your ratings also schedule these questions in your <a href={`/revision/flashcards/?topic=${code}`}>flashcards</a>.</span>}
+  </p>
   <ol class="rcards__list" data-list role="list">
     {
       items.map((it, k) => (

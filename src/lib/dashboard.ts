@@ -183,6 +183,8 @@ const FAMILIES: Array<[RegExp, Family]> = [
   [/^bb:quiz:.+$/, 'quiz'],
   [/^bb:dr:.+$/, 'decision'],
   [/^bb:rc:.+$/, 'retrieval'],
+  // The flashcards' Leitner boxes and due days (src/lib/flashcards.ts), read by quick revision, not a room tool's work.
+  [/^bb:cards$/, 'retrieval'],
   [/^bb:case-lab:.+$/, 'lab'],
   [/^bb:boardroom:.+$/, 'simulation'],
   [/^bb:case:.+$/, 'case-decision'],

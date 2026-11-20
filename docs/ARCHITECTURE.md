@@ -37,6 +37,7 @@ The platform has no accounts and stores nothing on a server. A static site is th
 | studio | one YAML file per Strategy Studio tool, and one for its engagement, in `src/content/studio/` (schema in `src/lib/schemas-strategy.ts`) | Astro `glob` |
 | briefings, labTools | one YAML file per entry in `src/content/briefings/` and `src/content/lab/`, with their schemas in `src/lib/lab/schemas.ts` | Astro `glob` |
 | boardroomBriefings | one YAML file per briefing in `src/content/boardroom-briefings/`, with its schema in `src/lib/boardroom-briefings/schema.ts` | Astro `glob` |
+| revision | one YAML file per subtopic in `src/content/revision/`, named after its slug, with its schema in `src/lib/revision/schema.ts`: only what the revision sheet and the flashcards need beyond the rest of the content | Astro `glob` |
 
 Two kinds of material are code rather than content, because they are drawn or computed: the diagram library (`src/lib/diagrams.ts`, with the drawings in `src/lib/figures/`) and the Resources Library catalogue (`src/lib/library/catalogue.ts`, built once per build by `src/lib/resources.ts`), which joins the curated `resources.yaml` with entries generated from the content (notes and briefs, revision, every mindmap and diagram, frameworks, cases, Decision Rooms and simulations, practice, the teacher area and the enrichment material) and files them under the library's twelve categories.
 
@@ -69,7 +70,9 @@ Schemas live in `src/lib/schemas.ts`. Every content block, exhibit and interacti
 - for the Entrepreneurship and Innovation Lab (`src/lib/integrity-lab.ts`, run by `src/lib/lab/content.ts` before any Lab page is built): every briefing section is mapped to an IB subtopic, marked as enrichment, or both; every idea in a briefing's register says whether it is IB content, a toolkit tool or enrichment, with the guide's page for the first two; every code, glossary term, tool and source resolves; each tool's example is a valid input to its own model; briefings and tools pair one to one by order; and the room's entry in `modules.yaml` lists exactly the Lab's pages and only the subtopics its material maps to.
 - for Advanced Management (`src/lib/integrity-advanced.ts`, run by `src/lib/advanced-content.ts` before any of its pages is built): every module is on the plan in `src/lib/advanced.ts` and covers each topic planned for it; orders and titles are unique within a domain; every source, framework and IB bridge code exists; a real application carries sources and the date its facts were read, and a real case carries sources; exhibit rows fit their columns; IB documents are never offered as further reading; and every module reaches 1,500 words, so no thin page is published.
 
-The same checks run in the unit tests (`tests/unit/integrity.test.ts`), which load the YAML directly without Astro.
+- for quick revision (`src/lib/revision/integrity.ts`, run by `src/lib/revision/content.ts` before any revision page or the flashcard deck is built): every subtopic has a revision file named after its slug; every exercise's command term exists and sits at or below the AO level of the statements it is set on (AO4 terms only where a statement carries AO4), and every exercise, card and mistake on an HL-only subtopic is marked HL; every stem names its fictional business; card ids are unique; every formula and recall card a file names exists, and no formula is described twice.
+
+The same checks run in the unit tests (`tests/unit/integrity.test.ts`, and `tests/unit/revision.test.ts` for quick revision), which load the YAML directly without Astro.
 
 ## The shell: opening, navigation, rooms and home
 
@@ -159,6 +162,8 @@ The workspace's saved analyses are read from each tool's own items (`bb:strategy
 
 Controls that need a script outside an interaction carry `needs-js`; an inline script in the head adds the class `js` to `<html>` before the first paint, and the controls stay hidden without it. A browser test checks that no page shows a button it cannot run.
 
+Quick revision keeps one item, `bb:cards`: the flashcards' Leitner boxes, due days and last ratings, card by card, written by the flashcards page and by the recall cards on the subtopic pages, whose ratings schedule the same cards (`src/lib/flashcards.ts` holds every rule, from parsing to merging on import).
+
 The quiz engine (`src/scripts/quiz.ts`) dispatches a bubbling `quiz:progress` event whenever an item is checked, so a component around it, such as a case lab, can follow the learner without knowing the quiz's internals.
 
 ## Motion
@@ -203,6 +208,8 @@ The quiz engine (`src/scripts/quiz.ts`) dispatches a bubbling `quiz:progress` ev
 | `/examiner-lens/`, `/ia-studio/` | Command terms; the IA planner |
 | `/revision/`, `/revision/[id]/` | Printable revision briefs |
 | `/revision/planner/` | The revision planner: a week-by-week plan from the examination date, level, subtopics, hours and study days, kept on this device, printed or added to a calendar |
+| `/revision/`, `/revision/[slug]/` | Quick revision: the index of all 37 subtopics by unit, and a printable revision sheet for each at its topic page's slug (key points, definitions, formulae, frameworks, common mistakes, exercises, recall questions), built by `src/lib/revision/` |
+| `/revision/flashcards/`, `/revision/flashcards/deck.json` | The flashcards, with spaced repetition kept as `bb:cards`; `?topic=3.5` opens on a subtopic; the deck is a static JSON file the build writes from the content |
 | `/ib/`, `/ib/map/`, `/ib/coverage/`, `/ib/concepts/` | The IB course, the course map, the coverage matrix, concepts |
 | `/search/`, `/sources/` | Search across everything, built from the content and every navigation link by `src/lib/search-index.ts` (assembled once in `src/lib/search-entries.ts`), with filters by kind, unit and level kept in the address; the sources and claims register |
 | `/search.json` | The same entries in a compact form (`src/lib/suggest.ts`), loaded by the header's search panel the first time it opens: suggestions as the reader types, every kind ranked together, a slip forgiven, and the pages this browser opened most recently (`src/scripts/header-search.ts`) |
