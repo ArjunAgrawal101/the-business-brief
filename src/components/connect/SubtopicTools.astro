@@ -145,6 +145,13 @@ const count = rooms.reduce((s, r) => s + r.tools.length, 0);
     font-size: 0.75rem;
   }
 
+  /* Each link is a target of at least 24 px on a phone (WCAG 2.5.8). */
+  .stt__list li > a {
+    display: inline-block;
+    min-height: 1.5rem;
+    padding-block: 0.125rem;
+  }
+
   .stt__use {
     flex-basis: 100%;
     font-size: 0.875rem;
