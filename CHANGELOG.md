@@ -21,7 +21,7 @@ Built to the owner's brief "The Business Brief 2.0": the platform made significa
 ### Learning
 
 - **Quick revision** (`/revision/`): a printable sheet for each of the 37 subtopics: key definitions, formulae with what each measures, frameworks, common mistakes (sourced first), and short fictional exercises with model outlines.
-- **Flashcards** (`/revision/flashcards/`): 1,416 cards built from the content (terms, formulae both ways, frameworks, distinctions, scenarios, evaluation prompts and the existing recall cards), with Leitner spaced repetition kept in this browser (`bb:cards`).
+- **Flashcards** (`/revision/flashcards/`): 1,416 cards built from the content (terms, formulae both ways, frameworks, distinctions, scenarios, evaluation prompts and the existing recall cards): 1,394 on the course, and 22 on frameworks beyond it that appear only when enrichment is included, with Leitner spaced repetition kept in this browser (`bb:cards`).
 - **Topic connections** (`/ib/connections/`): 50 worked connections between subtopics on an interactive map, each with an exam-style question; every subtopic page gains its connections, a tools section and Connected learning.
 - **The ten weakest subtopics** (1.4, 2.3, 2.6, 3.1, 3.3, 4.3, 4.6, 5.1, 5.2, 5.4) are deepened to the eleven elements, with 35 new exam questions using little-used command terms.
 - **The glossary** separates the IB terms from those beyond the course, adds a subtopic filter, formula links and tolerant search; 41 more full entries and ten new terms.

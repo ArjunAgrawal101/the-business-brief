@@ -89,6 +89,19 @@ describe('generation', () => {
     expect(html).toContain('Simulated data');
     for (const f of FAMILIES) for (const s of all(f).slice(0, 10)) for (const e of s.evidence.exhibits.filter((x) => x.relevant && x.note)) expect(e.note).toMatch(/Simulated/);
   });
+
+  it('names each growth idea in its costs exhibit in words the brief uses for that business', () => {
+    // The exhibit once called the first idea "Discount and tastings" for every business, a bicycle maker's included.
+    const STOP = new Set(['the', 'and', 'for', 'its', 'new', 'existing', 'range']);
+    const words = (t: string) => (t.toLowerCase().match(/[a-z]{3,}/g) ?? []).filter((w) => !STOP.has(w));
+    const family = FAMILIES.find((f) => f.id === 'growth-route')!;
+    for (const s of all(family)) {
+      const brief = new Set(words(s.brief.join(' ')));
+      const costs = s.evidence.exhibits.find((e) => e.title === 'What each idea would take');
+      expect(costs?.rows, s.code).toHaveLength(4);
+      for (const [label] of costs!.rows!) expect(words(label!).some((w) => brief.has(w)), `${s.code}: "${label}"`).toBe(true);
+    }
+  });
 });
 
 describe('the families', () => {

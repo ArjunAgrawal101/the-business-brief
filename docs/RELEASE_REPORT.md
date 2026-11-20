@@ -17,7 +17,7 @@ The source is on `main` at https://github.com/ArjunAgrawal101/the-business-brief
 | Search had no type-ahead, ranked only within each kind ("Liquidity" came eighth) and found nothing for a slip | Suggestions as you type in the header, every kind ranked together, slips forgiven, recently viewed pages; best matches first on the search page |
 | The opening played for five seconds on every reload and on every page reached from a search result | It plays only when the home page is freshly opened, in about 2.75 seconds |
 | The home page was 17 screens long, three times repeated the full menu, and its counters understated questions (24 against 269) and overstated IB terms (701, including 135 beyond the course) | The brief's sections in varied compositions, 11,600 px at 1440 wide; every count computed from the content (now 315 questions, 576 IB terms) |
-| Revision briefs existed for 3 of 37 subtopics; no spaced repetition, planner, weak areas or revision queue | Quick revision sheets for all 37, 1,416 flashcards with spaced repetition, the revision planner, and a dashboard with a queue and weak areas |
+| Revision briefs existed for 3 of 37 subtopics; no spaced repetition, planner, weak areas or revision queue | Quick revision sheets for all 37, 1,416 flashcards with spaced repetition (1,394 on the course, 22 on frameworks beyond it), the revision planner, and a dashboard with a queue and weak areas |
 | Subtopic pages barely linked to the rest of the platform; 16 had no tools section | Connected learning, a tools section and the subtopic's worked connections on every subtopic page; back links on every tool |
 | Assessment pages mixed the guide's rules with the site's advice in 13 places; "examiner emphasis" was unattributed | Every fact checked against the guide; labels corrected; every examiner-emphasis point attributed to the creator's guide and page |
 | Business Intelligence held 11 items, all from software, cloud and AI firms | 25 items across twelve sectors and five regions |
@@ -47,7 +47,7 @@ The home page does not lead with a portrait: the brief asks that it remain about
 | Feature | Address |
 | --- | --- |
 | Quick revision: a printable sheet for every subtopic | `/revision/` and `/revision/<slug>/` |
-| Flashcards with spaced repetition (1,416 cards) | `/revision/flashcards/` |
+| Flashcards with spaced repetition: 1,394 cards on the course, and 22 on frameworks beyond it shown only on request | `/revision/flashcards/` |
 | Revision planner | `/revision/planner/` |
 | My dashboard: today's queue, progress, weak areas, practice by source | `/dashboard/`, with the full record at `/progress/` |
 | Study mode on every subtopic page: text size, low light, reading progress, contents, Mark as complete, print | every `/topics/<slug>/` |
