@@ -33,18 +33,8 @@ const sources = [...new Set(facts.flatMap((f) => f.sources))];
   </ul>
   <p class="facts__src">
     <VerifyTag status={common} />
-    <span>
-      Sources:{' '}
-      {
-        sources.map((s, k) => (
-          <>
-            {k > 0 && '; '}
-            <a href={href.source(s)}>{c.sources[s]?.title ?? s}</a>
-          </>
-        ))
-      }
-      . The page follows each statement.
-    </span>
+    {/* One line, so no space falls before the semicolons or the full stop. */}
+    <span>Sources: {sources.map((s, k) => <>{k > 0 ? '; ' : ''}<a href={href.source(s)}>{c.sources[s]?.title ?? s}</a></>)}. The page follows each statement.</span>
   </p>
 </div>
 
