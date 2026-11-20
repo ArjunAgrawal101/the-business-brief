@@ -34,6 +34,9 @@ const lettersOf = (list: typeof entries) => {
 };
 const ALPHABET = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
 const ibLetters = lettersOf(ib);
+// A letter that only terms beyond the course start with (such as Z) takes its A to Z anchor in that part, so that every letter with a term has one.
+const beyondOnly = lettersOf(beyond).filter((l) => !ibLetters.includes(l));
+const allLetters = [...ibLetters, ...beyondOnly];
 const key = (l: string) => (l === '#' ? 'num' : l);
 const units = c.curricula['ib-dp-bm']?.units ?? [];
 const unitOf = (code: string) => (code === 'toolkit' ? 'toolkit' : code.split('.')[0]);
@@ -128,8 +131,8 @@ const partOf = (list: typeof entries, letter: string) => list.filter(([, g]) => 
     <nav class="gl-az" aria-label="Browse from A to Z">
       <ul>
         {
-          (ibLetters.includes('#') ? ['#', ...ALPHABET] : ALPHABET).map((l) => (
-            <li>{ibLetters.includes(l) ? <a href={`#letter-${key(l)}`} data-letter={key(l)}>{l === '#' ? '0-9' : l}</a> : <span aria-hidden="true">{l}</span>}</li>
+          (allLetters.includes('#') ? ['#', ...ALPHABET] : ALPHABET).map((l) => (
+            <li>{allLetters.includes(l) ? <a href={`#letter-${key(l)}`} data-letter={key(l)}>{l === '#' ? '0-9' : l}</a> : <span aria-hidden="true">{l}</span>}</li>
           ))
         }
         {
@@ -165,47 +168,51 @@ const partOf = (list: typeof entries, letter: string) => list.filter(([, g]) => 
               </p>
               <p class="gl-part__note">{p.note}</p>
             </header>
-            {lettersOf(p.list).map((l) => (
-              <section class="gl-letter" aria-labelledby={`${p.prefix}-${key(l)}`} data-letter-section={p.part === 'ib' ? key(l) : undefined}>
-                <h3 class="gl-letter__h" id={`${p.prefix}-${key(l)}`}>
-                  {l === '#' ? '0 to 9' : l}
-                </h3>
-                <ul class="gl-list" role="list">
-                  {partOf(p.list, l).map(([id, g]) => {
-                    const calc = formulaLink(id, formulaCtx);
-                    return (
-                      <li
-                        class={`gl-entry${isEnrichment(g) ? ' gl-entry--beyond' : ''}`}
-                        id={`term-${id}`}
-                        data-entry
-                        data-names={fold([g.term, ...g.aliases].join(' '))}
-                        data-text={fold(g.simple ?? '')}
-                        data-units={unitsOf(g)}
-                        data-codes={g.subtopics.join(' ')}
-                        data-level={g.level === 'HL' && !isEnrichment(g) ? 'hl' : 'sl'}
-                        data-category={g.category ?? ''}
-                        data-qualification={qualificationsOf(g).join(' ')}
-                      >
-                        <h4 class="gl-entry__term">
-                          <a href={href.glossary(id)}>{g.term}</a>
-                        </h4>
-                        {g.level === 'HL' && !isEnrichment(g) && <span class="tag tag--hl">HL</span>}
-                        {isEnrichment(g) && <span class="tag tag--enrichment">Enrichment</span>}
-                        {g.subtopics.length > 0 && <span class="gl-entry__codes">{g.subtopics.map((s) => (s === 'toolkit' ? 'Toolkit' : s)).join(' · ')}</span>}
-                        <p class="gl-entry__def" set:html={inline(g.definition)} />
-                        {g.formula && <p class="gl-entry__formula">{g.formula}</p>}
-                        {calc && (
-                          <a class="gl-entry__calc" href={calc.href}>
-                            {calc.label}
-                            {calc.beyond && ' (beyond the course)'}
-                          </a>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </section>
-            ))}
+            {lettersOf(p.list).map((l) => {
+              const own = p.part === 'ib' || beyondOnly.includes(l);
+              const anchor = own ? `letter-${key(l)}` : `${p.prefix}-${key(l)}`;
+              return (
+                <section class="gl-letter" aria-labelledby={anchor} data-letter-section={own ? key(l) : undefined}>
+                  <h3 class="gl-letter__h" id={anchor}>
+                    {l === '#' ? '0 to 9' : l}
+                  </h3>
+                  <ul class="gl-list" role="list">
+                    {partOf(p.list, l).map(([id, g]) => {
+                      const calc = formulaLink(id, formulaCtx);
+                      return (
+                        <li
+                          class={`gl-entry${isEnrichment(g) ? ' gl-entry--beyond' : ''}`}
+                          id={`term-${id}`}
+                          data-entry
+                          data-names={fold([g.term, ...g.aliases].join(' '))}
+                          data-text={fold(g.simple ?? '')}
+                          data-units={unitsOf(g)}
+                          data-codes={g.subtopics.join(' ')}
+                          data-level={g.level === 'HL' && !isEnrichment(g) ? 'hl' : 'sl'}
+                          data-category={g.category ?? ''}
+                          data-qualification={qualificationsOf(g).join(' ')}
+                        >
+                          <h4 class="gl-entry__term">
+                            <a href={href.glossary(id)}>{g.term}</a>
+                          </h4>
+                          {g.level === 'HL' && !isEnrichment(g) && <span class="tag tag--hl">HL</span>}
+                          {isEnrichment(g) && <span class="tag tag--enrichment">Enrichment</span>}
+                          {g.subtopics.length > 0 && <span class="gl-entry__codes">{g.subtopics.map((s) => (s === 'toolkit' ? 'Toolkit' : s)).join(' · ')}</span>}
+                          <p class="gl-entry__def" set:html={inline(g.definition)} />
+                          {g.formula && <p class="gl-entry__formula">{g.formula}</p>}
+                          {calc && (
+                            <a class="gl-entry__calc" href={calc.href}>
+                              {calc.label}
+                              {calc.beyond && ' (beyond the course)'}
+                            </a>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </section>
+              );
+            })}
           </section>
         ))
     }
