@@ -430,7 +430,7 @@ describe('the registry, the record and the scores', () => {
       const q = generateAny(kind, 24680);
       const html = questionHtml(q, 'u1') + answerHtml(q, 'u1') + workingAnyHtml(q, 'u1') + answerStaticHtml(q, 'u1');
       expect(html, kind).not.toMatch(/undefined|NaN|\[object/);
-      expect(html, kind).not.toMatch(/[–—]/);
+      expect(html, kind).not.toMatch(/[\u2013\u2014]/);
     }
     const f = num('read-break-even-chart', 24680).figure;
     if (!f) throw new Error('no figure');

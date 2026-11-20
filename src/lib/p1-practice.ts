@@ -306,15 +306,23 @@ const KEY_WORDS = (s: string) =>
     .split(/[^a-z]+/)
     .filter((w) => w.length > 3 && !['the', 'and', 'staff', 'group', 'their'].includes(w));
 
-/** Which of the model's stakeholders the reader's rows name, matched by their key words; and which are missing. */
+/**
+ * Which of the model's stakeholders the reader's rows name, matched by their
+ * key words; and which are missing. A word two stakeholders share, such as
+ * the surname of two founders, does not pick out either of them.
+ */
 export function compareStakeholders(model: P1Stakeholder[], rows: StakeRow[]): { found: P1Stakeholder[]; missing: P1Stakeholder[] } {
   const named = rows.map((r) => r.name.toLowerCase()).filter(Boolean);
+  const keysOf = model.map((m) => KEY_WORDS(m.name));
+  const shared = (w: string) => keysOf.filter((ks) => ks.includes(w)).length > 1;
   const found: P1Stakeholder[] = [];
   const missing: P1Stakeholder[] = [];
-  for (const m of model) {
-    const keys = KEY_WORDS(m.name);
+  model.forEach((m, i) => {
+    const all = keysOf[i] ?? [];
+    const own = all.filter((w) => !shared(w));
+    const keys = own.length ? own : all;
     (named.some((n) => keys.some((k) => n.includes(k))) ? found : missing).push(m);
-  }
+  });
   return { found, missing };
 }
 

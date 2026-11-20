@@ -137,7 +137,7 @@ describe('the practice cases follow the guide’s format for Paper 1', () => {
   });
 
   it('writes no dashes, and leaves the illustrative case unchanged', () => {
-    for (const c of P1_CASES) expect(JSON.stringify(c), c.id).not.toMatch(/[–—]|undefined|NaN/);
+    for (const c of P1_CASES) expect(JSON.stringify(c), c.id).not.toMatch(/[\u2013\u2014]|undefined|NaN/);
     expect(ILLUSTRATIVE_CASE.title).toBe('Juniper Juice: the supermarket offer');
   });
 });
@@ -232,6 +232,9 @@ describe('working on a practice case', () => {
     ]);
     expect(found.map((s) => s.name)).toEqual(['Kojo Mensah (founder, shareholder)', 'Tsala Hills Growers’ Cooperative', 'Norrvik Confectionery Group']);
     expect(missing.length).toBe(c.stakeholders.length - 3);
+    // A shared surname names neither founder; a first name names one.
+    expect(compareStakeholders(c.stakeholders, [{ name: 'Efua Mensah', interest: '', power: '', stance: '' }]).found.map((s) => s.name)).toEqual(['Efua Mensah (founder, shareholder)']);
+    expect(compareStakeholders(c.stakeholders, [{ name: 'the Mensahs', interest: '', power: '', stance: '' }]).found).toEqual([]);
   });
 
   it('adds evidence once, up to the cap, and exports the answers as text', () => {
