@@ -73,10 +73,10 @@ The multi-round business strategy simulation the brief asks for already existed 
 | Content lint (no dashes, leaks or placeholders, source and built pages) | No problems |
 | Link check | No broken links |
 | Colour contrast (`qa:contrast`) | Every pair meets its minimum |
-| Browser tests (Playwright, Chromium), every page at desktop and phone size with an axe-core WCAG 2.2 AA scan, plus every interaction spec | 1,694 tests in 21.6 minutes: 1,688 passed and 3 were skipped by design (desktop-only or phone-only). Three failed because the test counted the header's hidden Search button as a visible one; the test was corrected and they pass. The specs covering the later fixes (61 tests) were run again on the final build, and all pass |
+| Browser tests (Playwright, Chromium), every page at desktop and phone size with an axe-core WCAG 2.2 AA scan, plus every interaction spec | 1,694 tests, run as CI runs them (a trace kept on failure, one retry) on the final build: 1,691 passed and 3 were skipped by design (desktop-only or phone-only), with no failures and no retries, in 27.9 minutes |
 | Tablets: every page (1,314, redirects aside) at 768 by 1,024 and 1,024 by 768 pixels | 2,628 page loads: none scrolls sideways, logs a console error, fails a request or shows a broken image |
 
-Each engineer also ran their own specs and page checks on a private build. A shared content cache was found to let one branch's build read another's content during the parallel work; the cache now lives in each checkout's own `.astro` folder, and every result above comes from the integrated branch.
+The first runs of GitHub's QA workflow on this release did not finish. Recording a trace, as CI does, makes the browser style every element, and that started the header search panel's entrance animation inside the closed panel, where it can never run; the page check waited on it until its time limit, on every page. Local runs with tracing off had passed. The panel now animates only while open, as the menus do; the page check names any animation still running after ten seconds instead of waiting; and a test that counted the header's hidden Search button as a visible one was corrected. Each engineer also ran their own specs and page checks on a private build. A shared content cache was found to let one branch's build read another's content during the parallel work; the cache now lives in each checkout's own `.astro` folder, and every result above comes from the integrated branch.
 
 ## Remaining limitations
 
