@@ -1,0 +1,272 @@
+---
+/**
+ * The course connections map: the 37 subtopics on a ring, unit by unit, with
+ * every worked connection between two of them drawn as a curve, as SVG at
+ * build time with no library. Choose a unit to narrow the map, or a subtopic
+ * to see its connections beside it; the arrow keys move round the ring. Below
+ * the map, the same content as two readable lists (every worked connection
+ * with its paragraph and question; and each subtopic with its connections and
+ * the links its notes name), which is also the page without JavaScript.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import ConnectionQuestion from '../../components/connect/ConnectionQuestion.astro';
+import { connected } from '../../lib/connected-content';
+import { connectionLevel, connectionsInOrder, connectionsOf, layoutMap, linkAnchor, nodeAnchor, noteLinksOf, pairKey } from '../../lib/connections';
+import { inline, jsonForScript } from '../../lib/markup';
+import '../../styles/connections.css';
+
+const d = await connected();
+const subs = d.subtopics;
+const byCode = new Map(subs.map((s) => [s.code, s]));
+const title = (code: string) => byCode.get(code)?.title ?? code;
+const href = (code: string) => byCode.get(code)?.href ?? '/topics/';
+const ordered = connectionsInOrder(d.connections);
+const featured = ordered.filter(([, x]) => x.featured);
+const rest = ordered.filter(([, x]) => !x.featured);
+const worked = new Set(Object.values(d.connections).map((x) => pairKey(x.between[0], x.between[1])));
+const noteOnly = [...d.notes.entries()].filter(([key]) => !worked.has(key));
+const units = [...new Set(subs.map((s) => s.unit))].map((n) => {
+  const inUnit = subs.filter((s) => s.unit === n);
+  return { number: n, title: inUnit[0]?.unitTitle ?? '', subtopics: inUnit.map((s) => ({ code: s.code, title: s.title, hl: s.level === 'HL' })) };
+});
+const lay = layoutMap(units, [
+  ...noteOnly.map(([key, p]) => ({ id: `notes-${key.replace('|', '-').replace(/\./g, '-')}`, a: p.a, b: p.b, kind: 'notes' as const })),
+  ...ordered.map(([id, x]) => ({ id, a: x.between[0], b: x.between[1], kind: 'worked' as const })),
+]);
+const across = Object.values(d.connections).filter((x) => x.between[0].split('.')[0] !== x.between[1].split('.')[0]).length;
+const unitOf = (code: string) => code.split('.')[0] ?? '';
+const firstDy = (lines: number) => -((lines - 1) / 2) * lay.lineHeight + lay.fontSize * 0.35;
+const nodeLabel = (code: string) => {
+  const s = byCode.get(code);
+  const n = connectionsOf(code, d.connections).length;
+  return `${code} ${s?.title ?? ''}${s?.level === 'HL' ? ', HL only' : ''}, unit ${s?.unit}: ${n} worked ${n === 1 ? 'connection' : 'connections'}`;
+};
+const config = {
+  nodes: subs.map((s) => ({ code: s.code, title: s.title, unit: s.unit, worked: connectionsOf(s.code, d.connections).length, notes: noteLinksOf(s.code, d.notes, d.connections).length })),
+  units: units.map((u) => ({ number: u.number, title: u.title })),
+};
+---
+
+<BaseLayout
+  title="Topic connections"
+  description="How the 37 subtopics of IB DP Business Management connect: a map of worked connections across the five units, each with an explanation and an exam-style question."
+  section="pathways"
+>
+  <PageIntro
+    trail={[{ label: 'IB course', href: '/ib/' }, { label: 'Topic connections' }]}
+    kicker="IB Diploma Programme"
+    title="How the course connects"
+    lead={`${Object.keys(d.connections).length} worked connections between the ${subs.length} subtopics, ${across} of them across units, each explained, with an exam-style question on the link. Choose a unit, or a subtopic to see its connections.`}
+  />
+
+  <div class="wrap page-body tcm" data-ix="connections">
+    <script type="application/json" data-config set:html={jsonForScript(config)} />
+
+    <section class="tcm-tool" aria-labelledby="tcm-map-h">
+      <h2 class="sr-only" id="tcm-map-h">The map</h2>
+      <div class="tcm-controls js-only">
+        <fieldset class="tcm-units">
+          <legend class="tcm-label">Show</legend>
+          <div class="tcm-units__opts">
+            <label class="tcm-unit"><input type="radio" name="tcm-unit" value="" checked /><span>All units</span></label>
+            {
+              units.map((u) => (
+                <label class="tcm-unit">
+                  <input type="radio" name="tcm-unit" value={String(u.number)} />
+                  <span>
+                    Unit {u.number}
+                    <span class="sr-only">: {u.title}</span>
+                  </span>
+                </label>
+              ))
+            }
+          </div>
+        </fieldset>
+        <label class="tcm-notes-toggle"><input type="checkbox" data-notes-toggle /> Also draw the {noteOnly.length} links the notes name</label>
+        <p class="tcm-status" role="status" aria-live="polite" data-status></p>
+      </div>
+
+      <div class="tcm-stage">
+        <div class="tcm-map" data-map>
+          <svg viewBox={`0 0 ${lay.size} ${lay.size}`} role="group" aria-labelledby="tcm-svg-title tcm-svg-desc" class="tcm-svg">
+            <title id="tcm-svg-title">Map of the course connections</title>
+            <desc id="tcm-svg-desc">
+              The {subs.length} subtopics sit on a ring in course order, unit by unit, clockwise from the top. A solid curve joins two subtopics with a worked connection; a dashed curve, drawn on request, joins two that their notes link. Each subtopic is a link; the list below the map gives the same connections in words.
+            </desc>
+            <g class="tcm-arcs" aria-hidden="true">
+              {
+                lay.units.map((u) => (
+                  <g class="tcm-arc" data-unit={u.number}>
+                    <path d={u.d} />
+                    <text x={u.lx} y={u.ly} text-anchor="middle" dominant-baseline="central">
+                      Unit {u.number}
+                    </text>
+                  </g>
+                ))
+              }
+            </g>
+            <g class="tcm-edges" aria-hidden="true">
+              {lay.edges.map((e) => <path class={`tcm-edge tcm-edge--${e.kind}`} d={e.d} data-a={e.a} data-b={e.b} data-id={e.id} />)}
+            </g>
+            <g class="tcm-nodes">
+              {
+                lay.nodes.map((n) => (
+                  <a class:list={['tcm-node', { 'tcm-node--hl': n.hl }]} href={`#${nodeAnchor(n.code)}`} data-code={n.code} data-unit={n.unit} aria-label={nodeLabel(n.code)}>
+                    <circle class="tcm-node__ring" cx={n.x} cy={n.y} r={lay.nodeRadius + 6} />
+                    <circle class="tcm-node__dot" cx={n.x} cy={n.y} r={lay.nodeRadius} />
+                    <text class="tcm-node__code" x={n.x} y={n.y} text-anchor="middle" dominant-baseline="central">
+                      {n.code}
+                    </text>
+                    <text class="tcm-node__label" transform={`translate(${n.lx} ${n.ly}) rotate(${n.rotate})`} text-anchor={n.anchor}>
+                      {n.lines.map((l, i) => (
+                        <tspan x="0" dy={i === 0 ? firstDy(n.lines.length) : lay.lineHeight}>
+                          {l}
+                        </tspan>
+                      ))}
+                    </text>
+                  </a>
+                ))
+              }
+            </g>
+          </svg>
+        </div>
+
+        <aside class="tcm-panel js-only" aria-labelledby="tcm-panel-h" data-panel>
+          <h2 class="tcm-panel__kicker" id="tcm-panel-h">Selected subtopic</h2>
+          <div class="tcm-panel__body" data-panel-body>
+            <p class="tcm-panel__empty">
+              Choose a subtopic on the map to see its connections here. With the keyboard, move round the ring with the arrow keys and press Enter.
+            </p>
+          </div>
+          <p class="tcm-panel__actions" data-panel-actions hidden>
+            <button type="button" class="btn btn--small" data-clear>Clear the selection</button>
+          </p>
+        </aside>
+      </div>
+
+      <ul class="tcm-key" aria-label="Key to the map">
+        <li><svg width="36" height="12" aria-hidden="true"><path class="tcm-key__worked" d="M 2 6 H 34" /></svg> A worked connection, explained below</li>
+        <li><svg width="36" height="12" aria-hidden="true"><path class="tcm-key__notes" d="M 2 6 H 34" /></svg> A link the notes name</li>
+        <li><svg width="22" height="22" aria-hidden="true"><circle class="tcm-key__hl" cx="11" cy="11" r="8" /></svg> HL only, also marked (HL) in its name</li>
+      </ul>
+      <p class="tcm-scroll-hint small muted">On a narrow screen, the map scrolls sideways; the lists below give every connection in words.</p>
+    </section>
+
+    <section class="tcm-list-sec" aria-labelledby="tcm-all-h">
+      <SectionHead no="01" title="Every worked connection" id="tcm-all-h" dek="How each pair of subtopics meets, and an original exam-style question that tests the link. The questions are written for this platform; they are not IB questions." />
+      <p class="tcm-shown small muted js-only" data-links-count aria-live="polite"></p>
+      <h3 class="tcm-sub-h">Five to start with</h3>
+      <ol class="tcm-links" role="list">
+        {
+          featured.map(([id, x]) => (
+            <li class="tcm-link" id={linkAnchor(id)} data-units={[...new Set(x.between.map(unitOf))].join(' ')} data-codes={x.between.join(' ')}>
+              <p class="tcm-link__ends">
+                <a href={href(x.between[0])}>
+                  <span class="tcm-code">{x.between[0]}</span> {title(x.between[0])}
+                </a>
+                <span class="tcm-link__and">and</span>
+                <a href={href(x.between[1])}>
+                  <span class="tcm-code">{x.between[1]}</span> {title(x.between[1])}
+                </a>
+              </p>
+              <h4 class="tcm-link__title">
+                {x.title} {connectionLevel(x, byCode) === 'HL' && <span class="tag tag--hl">HL</span>}
+              </h4>
+              <p class="tcm-link__text" set:html={inline(x.explanation)} />
+              <ConnectionQuestion id={id} question={x.question} />
+            </li>
+          ))
+        }
+      </ol>
+      <h3 class="tcm-sub-h">The rest, in course order</h3>
+      <ol class="tcm-links" role="list">
+        {
+          rest.map(([id, x]) => (
+            <li class="tcm-link" id={linkAnchor(id)} data-units={[...new Set(x.between.map(unitOf))].join(' ')} data-codes={x.between.join(' ')}>
+              <p class="tcm-link__ends">
+                <a href={href(x.between[0])}>
+                  <span class="tcm-code">{x.between[0]}</span> {title(x.between[0])}
+                </a>
+                <span class="tcm-link__and">and</span>
+                <a href={href(x.between[1])}>
+                  <span class="tcm-code">{x.between[1]}</span> {title(x.between[1])}
+                </a>
+              </p>
+              <h4 class="tcm-link__title">
+                {x.title} {connectionLevel(x, byCode) === 'HL' && <span class="tag tag--hl">HL</span>}
+              </h4>
+              <p class="tcm-link__text" set:html={inline(x.explanation)} />
+              <ConnectionQuestion id={id} question={x.question} />
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="tcm-list-sec" aria-labelledby="tcm-by-h">
+      <SectionHead no="02" title="Subtopic by subtopic" id="tcm-by-h" dek="Each subtopic's worked connections, and the further links its own notes name, with the reason the notes give." />
+      {
+        units.map((u) => (
+          <div class="tcm-unit-block" data-unit-block={u.number}>
+            <h3 class="tcm-unit-block__h">
+              Unit {u.number}: {u.title}
+            </h3>
+            <ul class="tcm-topics" role="list">
+              {u.subtopics.map((s) => {
+                const mine = connectionsOf(s.code, d.connections);
+                const notes = noteLinksOf(s.code, d.notes, d.connections);
+                return (
+                  <li class="tcm-topic" id={nodeAnchor(s.code)} data-unit={u.number} data-code={s.code}>
+                    <h4 class="tcm-topic__h">
+                      <a href={href(s.code)}>
+                        <span class="tcm-code">{s.code}</span> {s.title}
+                      </a>
+                      {s.hl && <span class="tag tag--hl">HL</span>}
+                    </h4>
+                    <p class="tcm-topic__label">Worked connections</p>
+                    <ul class="tcm-topic__list" role="list">
+                      {mine.map((m) => (
+                        <li>
+                          <a href={`#${linkAnchor(m.id)}`}>{m.conn.title}</a>
+                          <span class="tcm-topic__with">
+                            with <a href={href(m.other)}>{m.other} {title(m.other)}</a>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                    {notes.length > 0 && (
+                      <>
+                        <p class="tcm-topic__label">Also linked in the notes</p>
+                        <ul class="tcm-topic__list tcm-topic__list--notes" role="list">
+                          {notes.map((x) => (
+                            <li>
+                              <a href={href(x.other)}>
+                                {x.other} {title(x.other)}
+                              </a>
+                              <span class="tcm-topic__why" set:html={inline(x.text)} />
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+                    <p class="tcm-topic__map js-only">
+                      <button type="button" class="tcm-linkbtn" data-show-on-map={s.code}>
+                        Show {s.code} on the map
+                      </button>
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))
+      }
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../scripts/connections';
+</script>

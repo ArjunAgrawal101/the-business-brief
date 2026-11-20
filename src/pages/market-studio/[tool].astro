@@ -13,6 +13,7 @@ import Interactive from '../../components/interactive/Interactive.astro';
 import ToolBrief from '../../components/market/ToolBrief.astro';
 import LevelSwitch from '../../components/ui/LevelSwitch.astro';
 import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import BackToTopic from '../../components/connect/BackToTopic.astro';
 import { corpus } from '../../lib/content';
 import { rich, plain, inline } from '../../lib/markup';
 import { subtopicHref } from '../../lib/learning';
@@ -62,6 +63,7 @@ const no = () => ++n;
       </p>
       <h1 class="mk-head__title">{it.title}</h1>
       <div class="lead mk-head__lead" set:html={rich(it.guide.lead)} />
+      <BackToTopic />
       <p class="tags mk-head__tags">
         <ProvenanceTag kind={it.provenance} />
         {subtopics.map((s) => <a class="tag tag--plain" href={s.href}>{s.code} {s.title}</a>)}

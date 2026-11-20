@@ -11,6 +11,7 @@ import Breadcrumbs from '../layout/Breadcrumbs.astro';
 import SectionHead from '../layout/SectionHead.astro';
 import LevelSwitch from '../ui/LevelSwitch.astro';
 import LabInputs from './LabInputs.astro';
+import BackToTopic from '../connect/BackToTopic.astro';
 import BreakEvenScript from './scripts/BreakEvenScript.astro';
 import RatiosScript from './scripts/RatiosScript.astro';
 import StatementScript from './scripts/StatementScript.astro';
@@ -69,6 +70,7 @@ const EXTRA_TITLE: Record<string, string> = { statement: 'The statement', cash: 
     <p class="label label--ink fl-head__kicker">Financial Laboratory · {group?.name}</p>
     <h1>{e.name}</h1>
     <p class="lead fl-head__q">{e.question}</p>
+    <BackToTopic path={labHref(id)} />
     <ul class="fl-scope" role="list">
       <li>
         <span class="tag tag--ib">IB {e.subtopic}</span>

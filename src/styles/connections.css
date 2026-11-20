@@ -1,0 +1,535 @@
+/*
+ * The course connections map (/ib/connections/): the controls, the ring
+ * drawn as SVG at build time, the panel beside it and the two lists under
+ * it. Colours come from the tokens, so the palette reaches the drawing too.
+ */
+
+.tcm-label {
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-strong);
+}
+
+.tcm-code {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums lining-nums;
+  color: var(--brass-text);
+}
+
+/* ---------- Controls ---------- */
+
+.tcm-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--sp-3) var(--sp-6);
+  margin-bottom: var(--sp-4);
+}
+
+.tcm-units {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.tcm-units legend {
+  margin-bottom: var(--sp-2);
+  padding: 0;
+}
+
+.tcm-units__opts {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid var(--rule-control);
+  border-radius: var(--radius-2);
+  background: var(--surface-sheet);
+}
+
+.tcm-unit {
+  position: relative;
+  margin: 0;
+}
+
+.tcm-unit + .tcm-unit {
+  border-left: 1px solid var(--rule-hair);
+}
+
+.tcm-unit input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.tcm-unit span:first-of-type {
+  display: block;
+  min-height: 2.5rem;
+  padding: 0.55rem 0.85rem;
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text-strong);
+}
+
+.tcm-unit input:checked + span {
+  background: var(--navy-900);
+  color: var(--text-on-ink);
+}
+
+.tcm-unit input:focus-visible + span {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.tcm-notes-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  min-height: 2.5rem;
+  font-size: 0.9375rem;
+  color: var(--text-strong);
+}
+
+.tcm-notes-toggle input {
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  accent-color: var(--cobalt-text);
+}
+
+.tcm-status {
+  flex-basis: 100%;
+  margin: 0;
+  min-height: 1.5em;
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+}
+
+/* ---------- The map and its panel ---------- */
+
+.tcm-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-5);
+}
+
+.tcm-map {
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: var(--surface-sheet);
+  border-top: 2px solid var(--rule-ink);
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+/* The drawing never shrinks below 54rem, where its 15-unit type still reads at 12 pixels; a narrower screen scrolls the map, not the page. */
+.tcm-svg {
+  display: block;
+  width: 100%;
+  min-width: 54rem;
+  max-width: 64rem;
+  height: auto;
+  margin: 0 auto;
+}
+
+.tcm-arc path {
+  fill: none;
+  stroke: var(--rule-hair);
+  stroke-width: 10;
+  stroke-linecap: round;
+}
+
+.tcm-arc text {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  fill: var(--text-muted);
+  stroke: var(--surface-sheet);
+  stroke-width: 5px;
+  paint-order: stroke;
+}
+
+.tcm-edge {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.tcm-edge--worked {
+  stroke: var(--navy-700);
+  stroke-width: 1.6;
+  stroke-opacity: 0.42;
+}
+
+.tcm-edge--notes {
+  display: none;
+  stroke: var(--slate-500);
+  stroke-width: 1.2;
+  stroke-dasharray: 4 5;
+  stroke-opacity: 0.55;
+}
+
+.tcm.show-notes .tcm-edge--notes,
+.tcm-edge--notes.is-on {
+  display: inline;
+}
+
+.tcm-edge.is-dim {
+  stroke-opacity: 0.06;
+}
+
+.tcm-edge--worked.is-on {
+  stroke: var(--cobalt-text);
+  stroke-width: 3;
+  stroke-opacity: 1;
+}
+
+.tcm-edge--notes.is-on {
+  stroke: var(--slate-600);
+  stroke-width: 2;
+  stroke-opacity: 1;
+}
+
+.tcm-node {
+  cursor: pointer;
+  outline: none;
+  text-decoration: none;
+}
+
+.tcm-node__ring {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 3;
+}
+
+.tcm-node__dot {
+  fill: var(--surface-sheet);
+  stroke: var(--navy-900);
+  stroke-width: 1.5;
+}
+
+.tcm-node--hl .tcm-node__dot {
+  stroke-dasharray: 4 3;
+}
+
+.tcm-node__code {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  fill: var(--navy-900);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.tcm-node__label {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 560;
+  fill: var(--text-strong);
+}
+
+.tcm-node:hover .tcm-node__dot,
+.tcm-node.is-near .tcm-node__dot {
+  stroke: var(--cobalt-text);
+  stroke-width: 3;
+}
+
+.tcm-node:hover .tcm-node__label {
+  fill: var(--cobalt-text);
+  text-decoration: underline;
+}
+
+.tcm-node:focus-visible .tcm-node__ring {
+  stroke: var(--bb-cobalt);
+}
+
+.tcm-node.is-selected .tcm-node__dot {
+  fill: var(--navy-900);
+  stroke: var(--navy-900);
+}
+
+.tcm-node.is-selected .tcm-node__code {
+  fill: var(--text-on-ink);
+}
+
+.tcm-node.is-selected .tcm-node__label {
+  font-weight: 700;
+}
+
+.tcm-node.is-dim .tcm-node__dot {
+  stroke: var(--rule);
+}
+
+.tcm-node.is-dim .tcm-node__code,
+.tcm-node.is-dim .tcm-node__label {
+  fill: var(--text-muted);
+  font-weight: 400;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tcm-edge,
+  .tcm-node__dot {
+    transition:
+      stroke-opacity var(--dur-fast) var(--ease),
+      stroke var(--dur-fast) var(--ease);
+  }
+}
+
+.tcm-panel {
+  align-self: start;
+  padding: var(--sp-4) var(--sp-5) var(--sp-5);
+  background: var(--surface-sheet);
+  border-top: 3px solid var(--navy-900);
+}
+
+.tcm-panel__kicker {
+  margin: 0 0 var(--sp-3);
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.tcm-panel__empty {
+  color: var(--text-muted);
+}
+
+.tcm-panel__actions {
+  margin-top: var(--sp-4);
+}
+
+.tcm-panel .tcm-topic {
+  display: block;
+  padding: 0;
+  border: 0;
+  list-style: none;
+}
+
+.tcm-panel .tcm-topic__map {
+  display: none;
+}
+
+@media (min-width: 80rem) {
+  .tcm-stage {
+    grid-template-columns: minmax(54rem, 1fr) 19rem;
+    gap: var(--sp-5);
+  }
+
+  .tcm-panel {
+    position: sticky;
+    top: calc(var(--header-h) + var(--sp-4));
+    max-height: calc(100vh - var(--header-h) - var(--sp-6));
+    overflow-y: auto;
+  }
+}
+
+.tcm-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-5);
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.875rem;
+  color: var(--text-body);
+}
+
+.tcm-key li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0;
+}
+
+.tcm-key__worked {
+  stroke: var(--navy-700);
+  stroke-width: 2;
+}
+
+.tcm-key__notes {
+  stroke: var(--slate-500);
+  stroke-width: 2;
+  stroke-dasharray: 4 4;
+}
+
+.tcm-key__hl {
+  fill: var(--surface-sheet);
+  stroke: var(--navy-900);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+}
+
+.tcm-scroll-hint {
+  margin-top: var(--sp-2);
+}
+
+@media (min-width: 56rem) {
+  .tcm-scroll-hint {
+    display: none;
+  }
+}
+
+/* ---------- The lists ---------- */
+
+.tcm-list-sec {
+  margin-top: var(--sp-8);
+}
+
+.tcm-shown {
+  margin-top: var(--sp-3);
+}
+
+.tcm-sub-h {
+  margin-top: var(--sp-6);
+  font-size: 1.25rem;
+}
+
+.tcm-links {
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  list-style: none;
+  max-width: 48rem;
+}
+
+.tcm-link {
+  margin: 0;
+  padding: var(--sp-5) 0;
+  border-top: 1px solid var(--rule-hair);
+  scroll-margin-top: calc(var(--header-h) + var(--sp-4));
+}
+
+.tcm-link[hidden],
+.tcm-topic[hidden],
+.tcm-unit-block[hidden] {
+  display: none;
+}
+
+.tcm-link__ends {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.5rem;
+  font-size: 0.9375rem;
+}
+
+.tcm-link__and {
+  color: var(--text-muted);
+}
+
+.tcm-link__title {
+  margin-top: var(--sp-2);
+  font-size: 1.375rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-2);
+}
+
+.tcm-link__title .tag,
+.tcm-topic__h .tag {
+  font-size: 0.75rem;
+}
+
+.tcm-link__text {
+  margin-top: var(--sp-2);
+  color: var(--text-body);
+}
+
+.tcm-unit-block {
+  margin-top: var(--sp-6);
+}
+
+.tcm-unit-block__h {
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--navy-900);
+  font-size: 1.25rem;
+}
+
+.tcm-topics {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 0 var(--sp-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tcm-topic {
+  margin: 0;
+  padding: var(--sp-4) 0;
+  border-bottom: 1px solid var(--rule-hair);
+  scroll-margin-top: calc(var(--header-h) + var(--sp-4));
+}
+
+.tcm-topic:target {
+  background: var(--surface-gold-wash);
+  box-shadow: 0 0 0 var(--sp-2) var(--surface-gold-wash);
+}
+
+.tcm-topic__h {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-2);
+  font-size: 1.125rem;
+}
+
+.tcm-topic__label {
+  margin-top: var(--sp-3);
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.tcm-topic__list {
+  margin: var(--sp-1) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9375rem;
+}
+
+.tcm-topic__list li {
+  margin: 0;
+  padding: 0.3rem 0;
+}
+
+/* WCAG 2.2 target size: every link at least 24 pixels tall, with the line under it clear of it. */
+.tcm-topic__list a {
+  display: inline-block;
+  min-height: 24px;
+  line-height: 1.6;
+}
+
+.tcm-topic__with,
+.tcm-topic__why {
+  display: block;
+  padding-top: 0.15rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.tcm-topic__map {
+  margin-top: var(--sp-2);
+}
+
+.tcm-linkbtn {
+  padding: 0.3rem 0;
+  min-height: 24px;
+  border: 0;
+  background: none;
+  font: 600 0.875rem/1.4 var(--font-ui);
+  color: var(--cobalt-text);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}

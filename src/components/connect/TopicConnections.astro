@@ -1,0 +1,131 @@
+---
+/**
+ * How a subtopic connects to the rest of the course, on its own page: its
+ * worked connections from the connections map, each with the paragraph on
+ * how the two subtopics meet and the exam-style question on the link, then
+ * the further links the notes name, with their reasons, and a way to see it
+ * all on the map.
+ */
+import SectionHead from '../layout/SectionHead.astro';
+import ConnectionQuestion from './ConnectionQuestion.astro';
+import { connected } from '../../lib/connected-content';
+import { connectionLevel, connectionsHref, connectionsOf, noteLinksOf } from '../../lib/connections';
+import { inline } from '../../lib/markup';
+
+interface Props {
+  code: string;
+  no: string;
+}
+const { code, no } = Astro.props;
+const d = await connected();
+const byCode = new Map(d.subtopics.map((s) => [s.code, s]));
+const mine = connectionsOf(code, d.connections);
+const notes = noteLinksOf(code, d.notes, d.connections);
+const name = (x: string) => `${x} ${byCode.get(x)?.title ?? ''}`;
+const href = (x: string) => byCode.get(x)?.href ?? '/topics/';
+---
+
+<section id="how-it-connects" aria-labelledby="tc-h" class="sh-sec tcs">
+  <SectionHead no={no} title="How it connects" id="tc-h" dek={`Where ${code} meets the rest of the course: worked connections with an exam-style question on each, then the further links the notes name.`} />
+  <ol class="tcs__list" role="list">
+    {
+      mine.map((m) => (
+        <li class="tcs__item">
+          <p class="tcs__with">
+            With <a href={href(m.other)}>{name(m.other)}</a>
+          </p>
+          <h3 class="tcs__title">
+            {m.conn.title} {connectionLevel(m.conn, byCode) === 'HL' && <span class="tag tag--hl">HL</span>}
+          </h3>
+          <p class="tcs__text" set:html={inline(m.conn.explanation)} />
+          <ConnectionQuestion id={m.id} question={m.conn.question} />
+        </li>
+      ))
+    }
+  </ol>
+  {
+    notes.length > 0 && (
+      <>
+        <h3 class="tcs__sub">Also linked in the notes</h3>
+        <ul class="tcs__notes" role="list">
+          {notes.map((x) => (
+            <li>
+              <a href={href(x.other)}>{name(x.other)}</a>
+              <span set:html={inline(x.text)} />
+            </li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+  <p class="tcs__map">
+    <a href={connectionsHref(code)}>See {code} on the course connections map</a>, with every link drawn across the five units.
+  </p>
+</section>
+
+<style>
+  .tcs__list {
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    list-style: none;
+    max-width: 48rem;
+  }
+
+  .tcs__item {
+    margin: 0;
+    padding: var(--sp-5) 0;
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .tcs__with {
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+  }
+
+  .tcs__title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--sp-2);
+    margin-top: var(--sp-1);
+    font-size: 1.3125rem;
+  }
+
+  .tcs__title .tag {
+    font-size: 0.75rem;
+  }
+
+  .tcs__text {
+    margin-top: var(--sp-2);
+  }
+
+  .tcs__sub {
+    margin-top: var(--sp-5);
+    font-size: 1.125rem;
+  }
+
+  .tcs__notes {
+    margin: var(--sp-3) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-hair);
+    max-width: 48rem;
+  }
+
+  .tcs__notes li {
+    display: grid;
+    gap: 0.15rem;
+    margin: 0;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .tcs__notes span {
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+  }
+
+  .tcs__map {
+    margin-top: var(--sp-4);
+  }
+</style>

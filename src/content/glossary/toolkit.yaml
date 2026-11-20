@@ -220,7 +220,7 @@
   context: "A decision is drawn as a square (decision node) and each uncertain event as a circle (chance node), and the probabilities on the branches from each circle add up to 1. Working from right to left, the expected value at each chance node is calculated, each option's cost is subtracted, and the option with the highest net expected value is preferred on financial grounds. Its weaknesses are that probabilities and pay-offs are estimates, qualitative factors are left out, and an expected value is an average that will not occur in any single decision."
   example: "A publisher choosing between launching a magazine, launching a website or doing neither estimates the chance of high and low demand for each, and the pay-off in each case, and compares the net expected values."
   topics: [growth-and-evolution]
-  subtopics: ['toolkit', '1.5']
+  subtopics: ['toolkit', '1.5', '5.4']
   level: SL/HL
   category: tool
   simple: "A diagram that maps out the choices a business could make and what might happen after each, with the chances and money involved, to see which choice is likely to pay off best."
@@ -291,6 +291,11 @@
   subtopics: ['toolkit']
   level: SL/HL
   category: measure
+  simple: "The ordinary average: add up all the values and divide by how many there are."
+  technical: "Mean = Σx ÷ n. It uses every value, so one extreme value (an outlier) can pull it well away from the rest; in skewed data, such as pay in a firm with a few very high earners, the median describes the typical value better. With the standard deviation it summarizes data that are roughly symmetrical."
+  misconceptions:
+    - claim: "The mean is always the most typical value."
+      correction: "One extreme value can pull the mean away from most of the data, so the median or the mode may describe the typical case better."
   provenance: subject-knowledge
   related: [median, mode, descriptive-statistics, standard-deviation]
 
@@ -304,6 +309,11 @@
   subtopics: ['toolkit']
   level: SL/HL
   category: measure
+  simple: "The middle value once the data are put in order, so half the values lie below it and half above."
+  technical: "For n ordered values, the median is the ((n + 1) ÷ 2)th value; with an even number of values it is the mean of the two middle ones. It is not affected by extreme values, which makes it the better measure of the centre for skewed data such as pay or house prices, but it takes no account of the size of the other values."
+  misconceptions:
+    - claim: "The median is the middle value of the data as they are listed."
+      correction: "The values must be put in order first; the median is the middle of the ordered list."
   provenance: subject-knowledge
   related: [mean, mode, quartiles, descriptive-statistics]
 
@@ -330,6 +340,11 @@
   subtopics: ['toolkit']
   level: SL/HL
   category: measure
+  simple: "The values that split an ordered data set into four equal parts; the middle half of the data lies between the lower and the upper quartile."
+  technical: "The lower quartile (Q1) has a quarter of the ordered values below it and the upper quartile (Q3) has a quarter above it. The interquartile range, Q3 − Q1, measures the spread of the middle 50% of the values and, unlike the range, is not distorted by outliers. On small data sets, different methods of locating the quartiles can give slightly different answers, so the method should be stated."
+  misconceptions:
+    - claim: "The interquartile range covers the whole spread of the data."
+      correction: "It covers only the middle half of the values; the range, from the smallest value to the largest, covers all of them."
   provenance: subject-knowledge
   related: [median, standard-deviation, descriptive-statistics]
 
@@ -343,6 +358,11 @@
   subtopics: ['toolkit']
   level: SL/HL
   category: measure
+  simple: "A measure of how far the values typically lie from their mean: the bigger it is, the more spread out the data are."
+  technical: "Standard deviation = √(Σ(x − mean)² ÷ n), in the same units as the data. It uses every value, so outliers enlarge it. In business it measures variability or risk, such as how much weekly sales or delivery times vary; software estimating it from a sample divides by n − 1, which gives a slightly larger figure."
+  misconceptions:
+    - claim: "A large standard deviation means the values themselves are large."
+      correction: "It measures spread around the mean, not the size of the mean: two data sets with the same mean can have very different standard deviations."
   provenance: subject-knowledge
   related: [mean, quartiles, descriptive-statistics]
 
@@ -507,7 +527,7 @@
   context: "Each dimension describes a tendency in a society: high power distance means people accept large differences in status and authority, for example, and high uncertainty avoidance means a preference for rules and clear instructions. Businesses use the framework to anticipate differences in management style, motivation, communication and marketing when they work across countries, merge with foreign firms or lead diverse teams. It describes national averages, not individuals, and critics argue that it oversimplifies cultures that change over time."
   example: "A company opening an office in a country with high power distance expects staff to look to senior managers for decisions, so it introduces team-based decision-making gradually."
   topics: []
-  subtopics: ['toolkit']
+  subtopics: ['toolkit', '2.6']
   level: HL
   category: tool
   simple: "Hofstede's way of comparing national cultures on six scales, such as how much people accept that power is shared unequally, to help businesses work across countries."
@@ -549,7 +569,7 @@
   example: "A bakery needs 10,000 boxes a month: buying them costs $0.30 each ($3,000), while making them needs a $1,200 machine lease plus $0.20 of materials a box ($3,200), so on cost alone it should buy them."
   formula: "Cost to buy = price per unit × quantity; cost to make = fixed costs + (variable cost per unit × quantity)"
   topics: []
-  subtopics: ['toolkit']
+  subtopics: ['toolkit', '5.4']
   level: HL
   category: tool
   simple: "Deciding whether it is cheaper and better for a business to make something itself or buy it from another business."
@@ -633,6 +653,11 @@
   subtopics: ['toolkit']
   level: HL
   category: measure
+  simple: "How long an activity in a project can be delayed without delaying the whole project."
+  technical: "Total float = latest finish time − duration − earliest start time. Activities on the critical path have no total float, so any delay to them delays completion. Total float can be shared by a chain of activities, so using it up on one can leave none for the activities after it."
+  misconceptions:
+    - claim: "An activity with total float can be delayed by that much without any effect."
+      correction: "The project still finishes on time, but the delay may use up float that the later activities in the same chain were relying on."
   provenance: subject-knowledge
   related: [free-float, critical-path, critical-path-analysis]
 
@@ -646,6 +671,11 @@
   subtopics: ['toolkit']
   level: HL
   category: measure
+  simple: "How long an activity can be delayed without delaying the earliest start of the activity after it."
+  technical: "Free float = earliest start time of the next activity − duration − earliest start time of this activity. It is never more than total float. Because using it affects no other activity, it is the float a manager can use first."
+  misconceptions:
+    - claim: "Free float and total float are the same thing."
+      correction: "Total float is the delay the whole project can absorb; free float is the delay the next activity can absorb, and it can be smaller."
   provenance: subject-knowledge
   related: [total-float, critical-path, critical-path-analysis]
 
@@ -659,7 +689,7 @@
   example: "A café plots daily iced-drink sales against the day's temperature over a summer, fits a line of best fit and uses it to estimate sales, and staffing, for a day forecast to be very hot."
   formula: "y = a + bx, where a is the intercept and b is the gradient, the change in y for each one-unit change in x"
   topics: []
-  subtopics: ['toolkit']
+  subtopics: ['toolkit', '4.3']
   level: HL
   category: tool
   simple: "Drawing the straight line that best fits a set of data points, to see how two things are linked and to estimate future values."
@@ -679,7 +709,7 @@
   context: "The pattern of the points shows the direction and strength of any correlation, and reveals outliers that a single summary number would hide. It is the first step in simple linear regression. Points that follow a pattern suggest a relationship but do not prove that one variable causes the other."
   example: "A sales manager plots each salesperson's number of client visits against the sales they made, to see whether more visits go with more sales."
   topics: []
-  subtopics: ['toolkit']
+  subtopics: ['toolkit', '4.3']
   level: HL
   category: tool
   provenance: subject-knowledge
@@ -691,7 +721,7 @@
   context: "It can be drawn by eye or calculated by regression, and a well-placed line passes through the point given by the mean of x and the mean of y. Reading values from the line within the range of the data gives estimates; extending the line beyond that range is extrapolation. The closer the points lie to the line, the stronger the correlation and the more reliable the estimates."
   example: "On a scatter diagram of monthly advertising spending against sales, a line of best fit rising from left to right summarizes the positive relationship."
   topics: []
-  subtopics: ['toolkit']
+  subtopics: ['toolkit', '4.3']
   level: HL
   category: tool
   provenance: subject-knowledge
@@ -703,7 +733,7 @@
   context: "Correlation is described by its direction (positive or negative) and its strength (strong when the points lie close to a line, weak when they are widely scattered), and can be measured by a correlation coefficient between −1 and +1. Correlation does not prove causation: two variables may move together by coincidence or because a third factor drives both. A strong correlation makes forecasts from a line of best fit more reliable, but never certain."
   example: "Sales of umbrellas show a strong positive correlation with rainfall, while sales of ice cream show a negative correlation with it."
   topics: []
-  subtopics: ['toolkit']
+  subtopics: ['toolkit', '4.3']
   level: HL
   category: measure
   provenance: subject-knowledge

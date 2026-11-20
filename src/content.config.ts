@@ -35,6 +35,7 @@ import { briefingSchema, labToolSchema } from './lib/lab/schemas';
 import { advancedModuleSchema } from './lib/advanced-schema';
 import { boardroomBriefingSchema } from './lib/boardroom-briefings/schema';
 import { activitySchema } from './lib/teachers/schema';
+import { subtopicToolsSchema, topicConnectionSchema } from './lib/connections-schema';
 
 /**
  * Loads every `.yaml` file in a folder, each holding a list of entries with an
@@ -100,6 +101,9 @@ export const collections = {
   concepts: defineCollection({ loader: file('./src/content/data/concepts.yaml'), schema: conceptSchema }),
   pathways: defineCollection({ loader: file('./src/content/data/pathways.yaml'), schema: pathwaySchema }),
   modules: defineCollection({ loader: file('./src/content/data/modules.yaml'), schema: moduleSchema }),
+  // The course connections: worked connections between two subtopics, and tools a subtopic can use that do not name it (src/lib/connections.ts).
+  topicConnections: defineCollection({ loader: file('./src/content/data/topic-connections.yaml'), schema: topicConnectionSchema }),
+  subtopicTools: defineCollection({ loader: file('./src/content/data/subtopic-tools.yaml'), schema: subtopicToolsSchema }),
   // The source register, one file per area (register.yaml holds the original entries), so that new material adds its own file.
   sources: defineCollection({ loader: yamlList('./src/content/sources'), schema: sourceSchema }),
   claims: defineCollection({ loader: file('./src/content/data/claims.yaml'), schema: claimSchema }),

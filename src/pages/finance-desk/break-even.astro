@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
+import BackToTopic from '../../components/connect/BackToTopic.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import Interactive from '../../components/interactive/Interactive.astro';
 import CalcCard from '../../components/finance/CalcCard.astro';
@@ -19,7 +20,9 @@ const calcs = Object.entries(c.calculations)
     kicker="Finance Desk"
     title="Break-even"
     lead="Change the price, the costs or the forecast and watch the break-even point, the margin of safety and profit move together. Then check the method against the worked calculations, and find the error in five flawed solutions."
-  />
+  >
+    <BackToTopic />
+  </PageIntro>
   <div class="wrap page-body">
     <section aria-labelledby="ws-h">
       <SectionHead no={1} title="The workspace" id="ws-h" />

@@ -8,6 +8,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../layout/Breadcrumbs.astro';
 import LabNav from './LabNav.astro';
+import BackToTopic from '../connect/BackToTopic.astro';
 import { rich } from '../../lib/markup';
 import '../../styles/lab.css';
 
@@ -39,6 +40,7 @@ const { id, title, metaTitle, description, kicker, crumb, lead, block } = Astro.
           <p class="lab-hero__kicker"><span>Entrepreneurship and Innovation Lab</span><span>{kicker}</span></p>
           <h1>{title}</h1>
           <div class="lab-hero__lead" set:html={rich(lead)} />
+          <BackToTopic path={`/entrepreneurship-lab/${id}/`} />
         </div>
         <dl class="lab-titleblock">
           {

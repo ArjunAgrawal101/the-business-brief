@@ -12,14 +12,18 @@ import VerifyTag from '../../components/ui/VerifyTag.astro';
 import { corpus, href } from '../../lib/content';
 import { STATE_LABEL, coverageSummary, subtopicCoverage } from '../../lib/coverage';
 import { mindmapFor, subtopicHref } from '../../lib/learning';
+import { connected } from '../../lib/connected-content';
+import { countsFor } from '../../lib/connected';
+import { bankTopicHref } from '../../lib/bank-address';
 
 const c = await corpus();
+const d = await connected();
 const rows = subtopicCoverage(c).map((r) => {
   const s = r.subtopic;
-  const ixs = Object.entries(c.interactives).filter(([, it]) => it.syllabus.includes(s.code) && it.page);
-  const calcs = Object.entries(c.calculations).filter(([, k]) => k.syllabus.some((x) => x.code === s.code));
   const map = mindmapFor(c, s.code);
-  return { ...r, ixs, calcs, map, page: r.brief && s.topic ? href.topic(s.topic) : subtopicHref(c, s.code) };
+  // Tools, practice, cases and briefings counted from everything that names the subtopic (src/lib/connected.ts).
+  const n = countsFor(s.code, d.inputs);
+  return { ...r, n, map, page: r.brief && s.topic ? href.topic(s.topic) : subtopicHref(c, s.code) };
 });
 // The same headline figures the home page and the topic library quote.
 const sum = coverageSummary(c);
@@ -50,8 +54,10 @@ const sum = coverageSummary(c);
             <th scope="col">Mindmap</th>
             <th scope="col" class="n">Terms</th>
             <th scope="col" class="n">Diagrams</th>
-            <th scope="col">Tools and calculations</th>
-            <th scope="col" class="n">Practice</th>
+            <th scope="col" class="n">Tools</th>
+            <th scope="col" class="n">Practice questions</th>
+            <th scope="col" class="n">Cases</th>
+            <th scope="col" class="n">Boardroom Briefings</th>
           </tr>
         </thead>
         <tbody>
@@ -86,39 +92,19 @@ const sum = coverageSummary(c);
                 <td>{r.map ? <a href={href.mindmap(r.map[0])}>Mindmap</a> : <span class="muted">None yet</span>}</td>
                 <td class="n">{r.terms || <span class="muted">0</span>}</td>
                 <td class="n">{r.diagrams || <span class="muted">0</span>}</td>
-                <td>
-                  {r.ixs.length || r.calcs.length ? (
-                    <ul class="plain-list">
-                      {r.ixs.map(([id, it]) => (
-                        <li>
-                          <a href={`${it.page}#ix-${id}`}>{it.title}</a>
-                        </li>
-                      ))}
-                      {r.calcs.map(([id, k]) => (
-                        <li>
-                          <a href={href.calculation(id, k.page)}>{k.name}</a>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <span class="muted">None yet</span>
-                  )}
-                </td>
-                <td class="n">{r.questions || <span class="muted">0</span>}</td>
+                <td class="n">{r.n.tools ? <a href={`${r.page}#${r.brief ? 'connected-learning' : 'tools'}`}>{r.n.tools}</a> : <span class="muted">0</span>}</td>
+                <td class="n">{r.n.questions ? <a href={bankTopicHref(r.subtopic.code)}>{r.n.questions}</a> : <span class="muted">0</span>}</td>
+                <td class="n">{r.n.cases || <span class="muted">0</span>}</td>
+                <td class="n">{r.n.briefings || <span class="muted">0</span>}</td>
               </tr>
             ))
           }
         </tbody>
       </table>
     </div>
-    <aside class="callout callout--note">
-      <span class="callout__kicker">Why the notes come one at a time</span>
-      <div class="prose">
-        <p>
-          Every subtopic already has a page with what the course asks, its mindmap, its key terms and the diagrams and tools that serve it. Full notes are written one subtopic at a time, each complete, with sections, worked examples, evaluation and retrieval questions, rather than all at once and thin. This table updates itself as each set of notes is added.
-        </p>
-      </div>
-    </aside>
+    <p class="small muted cov-note">
+      Tools are the tool and desk pages that serve the subtopic, each linked from its page; practice questions are every question on it in the question bank, from the practice sets, the notes and the case files; cases are the Case Vault's cases and the Case Room's labs. The <a href="/ib/connections/">connections map</a> shows how the subtopics link to one another.
+    </p>
   </div>
 </BaseLayout>
 
@@ -168,20 +154,15 @@ const sum = coverageSummary(c);
     border-style: dashed;
   }
 
-  .plain-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    font-size: 0.875rem;
-  }
-
-  .plain-list li + li {
-    margin-top: 0.25rem;
+  .cov-note {
+    margin-top: var(--sp-4);
+    max-width: 48rem;
   }
 
   /* WCAG 2.2 target size: at least 24 by 24 pixels for each link. */
-  .plain-list a {
+  td.n a {
     display: inline-block;
+    min-width: 24px;
     min-height: 24px;
     line-height: 24px;
   }

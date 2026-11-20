@@ -31,7 +31,7 @@ The platform has no accounts and stores nothing on a server. A static site is th
 | --- | --- | --- |
 | topics, cases, decisions, tools, interactives, curricula, mindmaps, notes, boardroom, intelligence, executive | one YAML file per entry | Astro `glob` |
 | questions, glossary | several YAML files, each a list of entries with ids | custom `yamlList` loader (checks for duplicate ids) |
-| calculations, assessment, commandTerms, concepts, pathways, modules, claims, resources | one YAML file of entries in `src/content/data/` | Astro `file` |
+| calculations, assessment, commandTerms, concepts, pathways, modules, claims, resources, topicConnections, subtopicTools | one YAML file of entries in `src/content/data/` | Astro `file` |
 | sources | the register, one YAML file per area in `src/content/sources/`, each a list of entries with ids | `yamlList` (checks for duplicate ids across the files) |
 | advanced | one YAML file per Advanced Management module in `src/content/advanced/`, with its schema in `src/lib/advanced-schema.ts` and its checks in `src/lib/integrity-advanced.ts` | `yamlFiles` |
 | studio | one YAML file per Strategy Studio tool, and one for its engagement, in `src/content/studio/` (schema in `src/lib/schemas-strategy.ts`) | Astro `glob` |
@@ -126,6 +126,14 @@ The same checks run in the unit tests (`tests/unit/integrity.test.ts`), which lo
 | `src/lib/library/previews.ts` | The first-page images of the PDF guides, from the manifest `scripts/brand/guide-covers.mjs` writes |
 | `src/lib/library/formula-sheet.ts` | The IB formulae sheet as the guide prints it, and every other formula the platform uses with its place in the course |
 | `src/lib/teachers/` | Topic checklists and their CSV (`checklists.ts`), classroom activities (`schema.ts`, `integrity.ts`), discussion prompts for every subtopic (`prompts.ts`) and the lesson sequences across the course, worked by the lesson library's own functions (`sequences.ts`) |
+## Connections and connected learning
+
+| Module | Responsibility |
+| --- | --- |
+| `src/lib/connections.ts` | The worked connections between subtopics (`topic-connections.yaml`) and the links the notes name: their checks (codes exist and differ, no pair twice, a command term no deeper than the statements allow, every subtopic joined, curated tool links that name real tool pages), the lists for one subtopic, and the ring layout of the map at `/ib/connections/` |
+| `src/lib/connected.ts` | The tool index: every tool and desk page with the subtopics its own data names (Finance Desk interactions and calculations, the Financial Laboratory's catalogue, the Studio's and the Lab's status, the rooms' interactions, advanced financial analysis), which gives each subtopic page its Tools and practice and each tool page its link back (`BackToTopic.astro`); and Connected learning, the groups each subtopic page shows, labelled by standing |
+| `src/lib/connected-content.ts` | Gathers what the two read once per build and throws on any broken connection or tool link; the revision sheet and flashcard links appear once a revision route of their own exists |
+| `src/lib/bank-address.ts` | The question bank's address for one subtopic (`?topic=3.5`), read by the bank's script |
 
 ## Progressive enhancement
 
@@ -198,6 +206,8 @@ The quiz engine (`src/scripts/quiz.ts`) dispatches a bubbling `quiz:progress` ev
 | `/ib/`, `/ib/map/`, `/ib/coverage/`, `/ib/concepts/` | The IB course, the course map, the coverage matrix, concepts |
 | `/search/`, `/sources/` | Search across everything, built from the content and every navigation link by `src/lib/search-index.ts` (assembled once in `src/lib/search-entries.ts`), with filters by kind, unit and level kept in the address; the sources and claims register |
 | `/search.json` | The same entries in a compact form (`src/lib/suggest.ts`), loaded by the header's search panel the first time it opens: suggestions as the reader types, every kind ranked together, a slip forgiven, and the pages this browser opened most recently (`src/scripts/header-search.ts`) |
+| `/ib/`, `/ib/map/`, `/ib/coverage/`, `/ib/concepts/`, `/ib/connections/` | The IB course, the course map, the coverage matrix, concepts, and the connections map (the subtopics on a ring with their worked connections, drawn at build time, with the same content as readable lists) |
+| `/search/`, `/sources/` | Search across everything, built from the content and every navigation link by `src/lib/search-index.ts`, with filters by kind, unit and level kept in the address; the sources and claims register |
 | `/pathways/`, `/pathways/[id]/` | Audience pathways |
 | `/entrepreneurship-lab/`, `/entrepreneurship-lab/[slug]/` | The Entrepreneurship and Innovation Lab: its home, six briefings and six tools, from the `briefings` and `labTools` collections |
 | `/tutorials/` | One-to-one tutoring with Arjun Agrawal: what it covers, how a session works, the five pathways and their fees, and the enquiry by email |

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
+import BackToTopic from '../../components/connect/BackToTopic.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import Interactive from '../../components/interactive/Interactive.astro';
 import CalcCard from '../../components/finance/CalcCard.astro';
@@ -21,7 +22,9 @@ const sub = c.curricula['ib-dp-bm']?.units.flatMap((u) => u.subtopics).find((s) 
     kicker="Finance Desk"
     title="Will the cash last the winter?"
     lead="A profitable business can still run out of cash. Read a six-month forecast laid out as the IB lays it out, find the month the money runs short, explain why the profit does not help, then change the plan and watch the forecast change with it."
-  />
+  >
+    <BackToTopic />
+  </PageIntro>
   <div class="wrap page-body">
     <section aria-labelledby="sit-h">
       <SectionHead no={1} title="The situation" id="sit-h" />

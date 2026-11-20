@@ -987,6 +987,11 @@
   subtopics: ['5.6']
   level: HL
   category: measure
+  simple: "The stock level at which the next order is placed, so that the delivery arrives before stock falls too low."
+  technical: "Reorder level = buffer stock + (usage per period × lead time in periods), a standard form the guide's formula list does not include. It rises with a longer lead time or faster usage; on a stock control chart it is the level at which each order is placed."
+  misconceptions:
+    - claim: "The reorder level is how much stock is ordered each time."
+      correction: "That is the reorder quantity; the reorder level is the point at which to order."
   provenance: subject-knowledge
   related: [reorder-quantity, buffer-stock, lead-time, stock-control-chart]
 
@@ -1025,6 +1030,11 @@
   subtopics: ['5.6']
   level: HL
   category: measure
+  simple: "The most stock a business plans to hold, reached just after a delivery arrives."
+  technical: "Maximum stock level = buffer stock + reorder quantity, when each delivery arrives just as stock reaches the buffer level. It is limited by storage space, the shelf life of the stock and the cash a business is willing to tie up in it."
+  misconceptions:
+    - claim: "A higher maximum stock level is always safer."
+      correction: "More stock protects against running out, but it ties up cash and space and risks waste, damage and goods going out of date."
   provenance: subject-knowledge
   related: [reorder-quantity, buffer-stock, stock-control-chart]
 
@@ -1088,6 +1098,11 @@
   subtopics: ['5.6']
   level: HL
   category: measure
+  simple: "How much of what a business could produce it is actually producing, as a percentage."
+  technical: "Capacity utilization rate = (actual output ÷ productive capacity) × 100, as on the guide's formula sheet. A high rate spreads fixed costs over more units and lowers the cost of each, but close to 100% there is no slack for maintenance, breakdowns or a rush order; a low rate means idle resources and a high fixed cost per unit."
+  misconceptions:
+    - claim: "A business should always aim for 100% capacity utilization."
+      correction: "Running flat out leaves no time for maintenance and no room for an extra order, and can overstretch staff, so many businesses aim for a high rate below full capacity."
   provenance: subject-knowledge
   related: [productive-capacity, spare-capacity, fixed-cost, productivity-rate]
 
@@ -1148,6 +1163,11 @@
   subtopics: ['5.6']
   level: HL
   category: measure
+  simple: "The share of the units made that fail the quality standard, as a percentage."
+  technical: "Defect rate = (units that fail to meet the quality standard ÷ units made) × 100. Defects waste materials and labour, add the cost of rework or replacement and, when they reach customers, damage the brand. Quality assurance and total quality management aim to lower it by preventing defects rather than finding them."
+  misconceptions:
+    - claim: "A low defect rate at inspection means customers receive no faulty products."
+      correction: "Inspection finds only some faults, and products can be damaged afterwards; the rate counts the defects found, not every fault."
   provenance: subject-knowledge
   related: [quality-control, quality-assurance, total-quality-management, productivity-rate]
 
@@ -1176,6 +1196,11 @@
   subtopics: ['5.6']
   level: HL
   category: measure
+  simple: "How much output a business gets from its inputs, as a percentage."
+  technical: "Productivity rate = (total output ÷ total input) × 100, as on the guide's formula sheet. Output and input must be measured in comparable units, often money, and the figure is most useful compared over time or with rivals. Raising it lowers the cost of each unit, provided quality holds."
+  misconceptions:
+    - claim: "Higher productivity means people are working longer hours."
+      correction: "Productivity is output per unit of input; longer hours add to input as well as output, while better methods, equipment, training and motivation raise the output from the same input."
   provenance: subject-knowledge
   related: [labour-productivity, capital-productivity, efficiency, capacity-utilization-rate]
 
@@ -1198,6 +1223,11 @@
   subtopics: ['5.6']
   level: HL
   category: measure
+  simple: "How much each worker, or each hour of work, produces."
+  technical: "Labour productivity = total output ÷ number of workers (or labour hours). It rises with training, better equipment, better methods and motivation, and higher labour productivity lowers the labour cost of each unit. Pushed too hard, it can raise the defect rate, stress and labour turnover."
+  misconceptions:
+    - claim: "Low labour productivity means the workers are not trying."
+      correction: "Output per worker also depends on the equipment, methods, training and management the workers are given, which they do not control."
   provenance: subject-knowledge
   related: [productivity-rate, capital-productivity, labour-intensive-production, labour-turnover]
 
@@ -1219,6 +1249,11 @@
   subtopics: ['5.6']
   level: HL
   category: measure
+  simple: "How much output a business gets from its machines and equipment."
+  technical: "Capital productivity = total output ÷ capital input, such as machine hours, a standard form the guide's formula list does not include. It rises with better maintenance, less downtime, extra shifts and newer technology, which lower the capital cost of each unit."
+  misconceptions:
+    - claim: "Buying more machines raises capital productivity."
+      correction: "More machines raise output only if they are used; if they stand idle, output per machine hour falls."
   provenance: subject-knowledge
   related: [productivity-rate, labour-productivity, capital-intensive-production, capacity-utilization-rate]
 
@@ -1277,6 +1312,11 @@
   subtopics: ['5.6']
   level: HL
   category: measure
+  simple: "What it would cost to buy a product or a part from a supplier instead of making it."
+  technical: "Cost to buy = supplier price per unit × quantity. It is compared with the cost to make: on cost alone, the business buys if the cost to buy is lower. The decision also weighs quality, the supplier's reliability, any spare capacity, control over skills and know-how, and how the supplier treats its workers and the environment."
+  misconceptions:
+    - claim: "If buying is cheaper, the business should always buy."
+      correction: "Cost is one factor; quality, reliability, control and the use of spare capacity can make making in-house the better choice."
   provenance: subject-knowledge
   related: [cost-to-make, outsourcing, insourcing, spare-capacity]
 
@@ -1306,6 +1346,11 @@
   subtopics: ['5.6']
   level: HL
   category: measure
+  simple: "What it would cost a business to produce a product or a part itself."
+  technical: "Cost to make = total fixed costs + (variable cost per unit × quantity), where the fixed costs are those of making the item, such as the tooling it needs. If the cost to make is below the cost to buy, making is the cheaper option on financial grounds; the decision then weighs the same qualitative factors as buying."
+  misconceptions:
+    - claim: "The cost to make is just the cost of the materials."
+      correction: "It includes the fixed costs of making the item, such as tooling and equipment, as well as the variable cost of every unit."
   provenance: subject-knowledge
   related: [cost-to-buy, insourcing, fixed-cost, variable-cost, expected-value]
 
@@ -2021,3 +2066,73 @@
   category: stakeholder
   provenance: subject-knowledge
   related: [artificial-intelligence, artificial-neural-network, data-privacy, customer-loyalty-programme]
+
+- id: changeover-time
+  term: Changeover time
+  level: SL/HL
+  definition: "The time taken to switch equipment or a production line from making one product or batch to making another, during which nothing is produced."
+  context: "Changeover time is a cost of batch production: the longer it is, the larger each batch must be to keep machines busy, which adds stock and reduces flexibility. Lean production (HL) sets out to cut changeover times, so that smaller batches, and mass customization, become affordable."
+  example: "A fictional juice bottler needs 90 minutes to clean its line between orange and apple juice, so it bottles each flavour in long runs."
+  topics: []
+  subtopics: ['5.2']
+  category: operations
+  simple: "The time a machine or production line stands idle while it is switched from one product to the next."
+  technical: "Every changeover is downtime that uses up capacity and raises the cost of each unit. Shortening changeovers, for example by preparing tools in advance and standardizing parts, lets a business make smaller batches, hold less stock and respond faster to orders."
+  misconceptions:
+    - claim: "A changeover costs nothing because no materials are used."
+      correction: "Equipment and workers stand idle during a changeover, so it uses up capacity that could have made output, and that cost falls on every unit."
+  provenance: subject-knowledge
+  related: [batch-production, lean-production, mass-customization]
+
+- id: landed-cost
+  term: Landed cost
+  level: SL/HL
+  definition: "The total cost of a product once it has arrived where the buyer needs it, including the purchase price, transport, insurance, customs duties and handling."
+  context: "Landed cost is the fair basis for comparing a cheap supplier far away with a dearer one nearby, and for deciding whether to offshore production: a low price can be outweighed by shipping, tariffs and the extra stock needed to cover long lead times."
+  example: "A fictional furniture retailer can buy chairs abroad for $40 each, but freight, insurance and import duty add $14, a landed cost of $54 against $50 from a local maker."
+  topics: []
+  subtopics: ['5.4']
+  category: operations
+  simple: "The full cost of getting a product to where it is needed: its price plus the costs of shipping, insurance and import duties."
+  technical: "Comparing landed costs rather than prices makes location and outsourcing decisions honest: transport, tariffs, exchange-rate changes and stock held in transit can turn a cheaper overseas price into the dearer option, which is one reason some businesses reshore."
+  misconceptions:
+    - claim: "The supplier with the lowest price is always the cheapest."
+      correction: "Once transport, insurance, duties and handling are added, a supplier with a higher price but a shorter journey can have the lower landed cost."
+  provenance: subject-knowledge
+  related: [offshoring, outsourcing, location-factors, trade-barriers]
+
+- id: bulk-increasing-industry
+  term: Bulk-increasing industry
+  aliases: [Weight-gaining industry]
+  level: SL/HL
+  definition: "An industry whose finished products are bulkier or heavier than the materials used to make them, so it usually locates near its customers to keep transport costs down."
+  context: "When the product costs more to move than its inputs, being close to the market saves the most. Bottled drinks, assembled furniture and building materials such as concrete blocks are common examples."
+  example: "A fictional soft drinks maker builds its bottling plant beside a large city, because moving full bottles costs far more than moving the concentrate it starts from."
+  topics: []
+  subtopics: ['5.4']
+  category: operations
+  simple: "A business whose products are heavier or bulkier than its raw materials, so it is cheaper to produce close to its customers."
+  technical: "In a bulk-increasing process, the cost of transport per unit rises after production, so the cheapest location is near the market. The pull weakens when transport becomes cheaper or when other location factors, such as labour costs or skills, matter more."
+  misconceptions:
+    - claim: "A bulk-increasing industry should locate near its raw materials."
+      correction: "It is the other way round: its products cost more to transport than its materials, so it gains most by locating near its customers."
+  provenance: subject-knowledge
+  related: [bulk-reducing-industry, location-factors, landed-cost]
+
+- id: bulk-reducing-industry
+  term: Bulk-reducing industry
+  aliases: [Weight-losing industry]
+  level: SL/HL
+  definition: "An industry whose raw materials are bulkier or heavier than its finished products, so it usually locates near the source of those materials."
+  context: "When a process loses weight or volume, as in smelting ore, sawing timber or refining sugar cane, it is cheaper to process the materials where they are found and to move the smaller finished product."
+  example: "A fictional sugar refinery is built among the cane fields, because a tonne of cane yields only a small fraction of its weight in sugar."
+  topics: []
+  subtopics: ['5.4']
+  category: operations
+  simple: "A business whose raw materials are heavier or bulkier than its products, so it is cheaper to produce close to where the materials come from."
+  technical: "In a bulk-reducing process, the cost of transport per unit is highest before production, so the cheapest location is near the raw materials. Industrial inertia can keep a plant there long after the original materials have run out."
+  misconceptions:
+    - claim: "A bulk-reducing industry should locate near its customers."
+      correction: "Its raw materials cost more to move than its products, so it usually locates near the materials and ships the lighter finished goods."
+  provenance: subject-knowledge
+  related: [bulk-increasing-industry, location-factors, industrial-inertia]

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
+import BackToTopic from '../../components/connect/BackToTopic.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import Interactive from '../../components/interactive/Interactive.astro';
 import CalcCard from '../../components/finance/CalcCard.astro';
@@ -23,6 +24,7 @@ const years = Array.from({ length: MAX_YEARS }, (_, i) => i + 1);
     title="Investment appraisal"
     lead="Two projects, three methods, and not always the same answer. Appraise Halden Distribution's two projects by payback, average rate of return and, at HL, net present value; change the estimates and the rate, and see when the methods agree, when they disagree and what none of them can tell you."
   >
+    <BackToTopic />
     <div class="tags"><span class="tag tag--plain">IB 3.8</span><span class="tag tag--hl">NPV: HL only</span></div>
   </PageIntro>
   <div class="wrap page-body">
