@@ -12,12 +12,14 @@ import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import Diagram from '../../components/diagrams/Diagram.astro';
 import { DIAGRAMS } from '../../lib/diagrams';
-import { LAB, labHref } from '../../lib/finance-lab/catalogue';
 import MindmapView from '../../components/mindmap/MindmapView.astro';
 import NoteView from '../../components/learn/NoteView.astro';
 import RetrievalCards from '../../components/assess/RetrievalCards.astro';
 import LevelSwitch from '../../components/ui/LevelSwitch.astro';
 import SaveButton from '../../components/ui/SaveButton.astro';
+import SubtopicTools from '../../components/connect/SubtopicTools.astro';
+import TopicConnections from '../../components/connect/TopicConnections.astro';
+import ConnectedLearning from '../../components/connect/ConnectedLearning.astro';
 import { corpus, href } from '../../lib/content';
 import { inline } from '../../lib/markup';
 import { allSubtopics, hubSubtopics, mindmapFor, noteFor, noteParts, subtopicHref, subtopicSlug } from '../../lib/learning';
@@ -43,15 +45,9 @@ const brief = s.topic ? { id: s.topic, t: c.topics[s.topic] } : undefined;
 const terms = Object.entries(c.glossary)
   .filter(([, g]) => g.subtopics.includes(code))
   .sort((a, b) => a[1].term.localeCompare(b[1].term));
-const ixs = Object.entries(c.interactives).filter(([, it]) => it.page && it.syllabus.includes(code));
-const calcs = Object.entries(c.calculations).filter(([, k]) => k.syllabus.some((x) => x.code === code));
-const questions = Object.entries(c.questions).filter(([, q]) => q.syllabus.includes(code));
-// The Financial Laboratory's calculators for the subtopic, where the reader enters their own figures.
-const labCalcs = LAB.filter((e) => e.subtopic === code);
 const hasHL = s.level !== 'SL/HL';
 const levelText = s.level === 'HL' ? 'HL only' : s.level === 'SL/HL' ? 'SL and HL' : 'SL and HL, with HL-only content';
 const status = note ? 'Full notes' : brief ? 'Taught in a brief' : 'Notes planned';
-const connections = note?.[1].connections ?? map?.[1].connections.map((x) => ({ code: x.code, text: x.label })) ?? [];
 // Diagrams for the subtopic that its notes do not already show.
 const inNotes = new Set(note ? note[1].sections.map((x) => x.diagram).filter(Boolean) : []);
 const diagrams = Object.entries(DIAGRAMS).filter(([did, d]) => d.syllabus.includes(code) && !inNotes.has(did));
@@ -59,7 +55,6 @@ const diagrams = Object.entries(DIAGRAMS).filter(([did, d]) => d.syllabus.includ
 // question, an HL diagram or term); the page then needs the switch too, or its "switch to HL" notices point nowhere.
 const notesHL = note ? note[1].sections.some((x) => x.level === 'HL' || x.points.some((p) => p.level === 'HL')) || note[1].exam.some((q) => q.level === 'HL') : false;
 const showSwitch = hasHL || notesHL || diagrams.some(([, d]) => d.level === 'HL') || terms.some(([, g]) => g.level === 'HL');
-const titleOf = (cd: string) => list.find((x) => x.s.code === cd)?.s.title ?? cd;
 // One numbering for the whole page: "What the IB course asks" is 01, the notes take the numbers after it
 // (introduction, each section, evaluation), and the page's later sections carry on from there.
 const notesStart = 2;
@@ -192,63 +187,7 @@ const num = () => {
       )
     }
 
-    {
-      (ixs.length > 0 || labCalcs.length > 0 || calcs.length > 0 || questions.length > 0) && (
-        <section aria-labelledby="sh-tools-h" class="sh-sec">
-          <SectionHead no={num()} title="Tools and practice" id="sh-tools-h" />
-          <div class="sh-tools">
-            {ixs.length > 0 && (
-              <div>
-                <p class="label">Interactive</p>
-                <ul>
-                  {ixs.map(([id, it]) => (
-                    <li>
-                      <a href={`${it.page}#ix-${id}`}>{it.title}</a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {labCalcs.length > 0 && (
-              <div>
-                <p class="label">Financial Laboratory</p>
-                <ul>
-                  {labCalcs.map((e) => (
-                    <li>
-                      <a href={labHref(e.id)}>{e.name}</a> {e.level === 'HL' && s.level !== 'HL' && <span class="tag tag--hl">HL</span>}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {calcs.length > 0 && (
-              <div>
-                <p class="label">Worked calculations</p>
-                <ul>
-                  {calcs.map(([id, k]) => (
-                    <li>
-                      <a href={href.calculation(id, k.page)}>{k.name}</a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {questions.length > 0 && (
-              <div>
-                <p class="label">Practice questions</p>
-                <ul>
-                  {questions.map(([id, q]) => (
-                    <li>
-                      <a href={href.question(id)}>{q.title}</a> <span class="small muted">{q.marks} marks</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </section>
-      )
-    }
+    <div class="sh-part"><SubtopicTools code={code} no={num()} page={subtopicHref(c, code)} hlOnly={s.level === 'HL'} /></div>
 
     {
       note && (
@@ -259,23 +198,9 @@ const num = () => {
       )
     }
 
-    {
-      connections.length > 0 && (
-        <section aria-labelledby="sh-conn-h" class="sh-sec">
-          <SectionHead no={num()} title="Connections" id="sh-conn-h" dek="Where this subtopic meets the rest of the course." />
-          <ul class="sh-conn">
-            {connections.map((x) => (
-              <li>
-                <a href={subtopicHref(c, x.code)}>
-                  <span class="sh-conn__code">{x.code}</span> {titleOf(x.code)}
-                </a>
-                <span class="small muted" set:html={inline(x.text)} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      )
-    }
+    <div class="sh-part"><TopicConnections code={code} no={num()} /></div>
+
+    <div class="sh-part"><ConnectedLearning code={code} no={num()} toolsAnchor="tools" /></div>
 
     {
       note && (
@@ -433,47 +358,6 @@ const num = () => {
     margin: 0.25rem 0 0;
     font-size: 0.9375rem;
     color: var(--text-muted);
-  }
-
-  .sh-tools {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
-    gap: var(--sp-5);
-    margin-top: var(--sp-5);
-  }
-
-  .sh-tools ul {
-    margin: var(--sp-2) 0 0;
-    padding: 0;
-    list-style: none;
-    border-top: 1px solid var(--navy-900);
-  }
-
-  .sh-tools li {
-    margin: 0;
-    padding: var(--sp-2) 0;
-    border-bottom: 1px solid var(--rule-hair);
-  }
-
-  .sh-conn {
-    margin: var(--sp-5) 0 0;
-    padding: 0;
-    list-style: none;
-    border-top: 1px solid var(--rule-hair);
-    max-width: 52rem;
-  }
-
-  .sh-conn li {
-    display: grid;
-    gap: 0.15rem;
-    margin: 0;
-    padding: var(--sp-3) 0;
-    border-bottom: 1px solid var(--rule-hair);
-  }
-
-  .sh-conn__code {
-    color: var(--brass-text);
-    font-weight: 600;
   }
 
   .sh-pager {

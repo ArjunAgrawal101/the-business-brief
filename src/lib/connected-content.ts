@@ -118,7 +118,7 @@ export function connected(): Promise<Connected> {
     if (problems.length) throw new Error(`Course connections: ${problems.length} integrity problem(s):\n${problems.map((p) => `  ${p.where}: ${p.message}`).join('\n')}`);
 
     const topicCode = (id: string) => c.topics[id]?.code;
-    const execCodes = executive.flatMap((e) => e.data.stages.flatMap((s) => s.ib));
+    const execCodes = executive.flatMap((e) => Object.values(e.data.stages).flatMap((s) => s.ib));
     const inputs: ConnectedInputs = {
       subtopics: subtopics.map((s) => ({ code: s.code, title: s.title, slug: s.slug })),
       tools,

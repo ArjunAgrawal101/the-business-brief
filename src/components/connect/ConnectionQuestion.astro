@@ -1,0 +1,111 @@
+---
+/**
+ * The exam-style question on a worked connection: its command term (linked to
+ * its entry in the Examiner Lens), the question and its marks, labelled as
+ * the platform's own practice; a calculation also has its worked answer in a
+ * disclosure. Used on the connections map and on every subtopic page.
+ */
+import ProvenanceTag from '../ui/ProvenanceTag.astro';
+import { corpus, href } from '../../lib/content';
+import { inline } from '../../lib/markup';
+import type { TopicConnection } from '../../lib/connections-schema';
+
+interface Props {
+  id: string;
+  question: TopicConnection['question'];
+}
+const { id, question: q } = Astro.props;
+const c = await corpus();
+const term = c.commandTerms[q.command];
+---
+
+<div class="tcq">
+  <p class="tcq__head">
+    <span class="tcq__label">Exam-style question</span>
+    <ProvenanceTag kind="original-practice" />
+    {
+      term && (
+        <a class="tcq__term" href={href.commandTerm(term.term)}>
+          Command term: {term.term} ({term.ao})
+        </a>
+      )
+    }
+  </p>
+  <p class="tcq__prompt">
+    <span set:html={inline(q.prompt)} />
+    <span class="tcq__marks">[{q.marks} {q.marks === 1 ? 'mark' : 'marks'}]</span>
+  </p>
+  {
+    q.answer && (
+      <details class="tcq__answer" id={`tcq-${id}`}>
+        <summary>The worked answer</summary>
+        <p set:html={inline(q.answer)} />
+      </details>
+    )
+  }
+</div>
+
+<style>
+  .tcq {
+    margin-top: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    border-left: 2px solid var(--rule-ink);
+    background: var(--surface-sheet);
+  }
+
+  .tcq__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+  }
+
+  .tcq__label {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-strong);
+  }
+
+  .tcq__head :global(.tag) {
+    font-size: 0.75rem;
+  }
+
+  .tcq__prompt {
+    margin-top: var(--sp-2);
+    font-family: var(--font-serif);
+    font-size: 1.0625rem;
+    color: var(--text-strong);
+  }
+
+  .tcq__term {
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  .tcq__marks {
+    white-space: nowrap;
+    font-family: var(--font-ui);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .tcq__answer {
+    margin-top: var(--sp-2);
+    font-size: 0.9375rem;
+  }
+
+  .tcq__answer summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--cobalt-text);
+  }
+
+  .tcq__answer p {
+    margin-top: var(--sp-2);
+  }
+</style>

@@ -31,6 +31,7 @@ import {
   type Rating,
   type SetRecord,
 } from '../../lib/bank';
+import { topicFromSearch, withTopic } from '../../lib/bank-address';
 
 interface Config {
   /** How many matching questions the list shows at a time. */
@@ -580,6 +581,17 @@ each('[data-ix="bank"]', (root) => {
     form.reset();
     const lv = field('level');
     if (lv) lv.value = level;
+  }
+
+  // A subtopic in the address (?topic=3.5), as every subtopic page links here, opens the bank filtered to it;
+  // choosing a subtopic keeps the address in step, so the filtered bank can be shared or bookmarked.
+  const codeField = field('code');
+  if (codeField instanceof HTMLSelectElement) {
+    const asked = topicFromSearch(location.search);
+    if (asked && [...codeField.options].some((o) => o.value === asked)) codeField.value = asked;
+    const keep = () => history.replaceState(history.state, '', withTopic(location.href, codeField.value));
+    codeField.addEventListener('change', keep);
+    clear?.addEventListener('click', keep);
   }
   applyFilters();
   paintProgress();

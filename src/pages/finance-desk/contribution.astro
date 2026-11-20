@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
+import BackToTopic from '../../components/connect/BackToTopic.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import Interactive from '../../components/interactive/Interactive.astro';
 import CalcCard from '../../components/finance/CalcCard.astro';
@@ -21,6 +22,7 @@ const calcs = Object.entries(c.calculations)
     title="Contribution decisions"
     lead="An order priced below the average cost of a unit can still add profit, when the business has spare capacity and its fixed costs are already covered. This desk shows why, and shows the conditions under which the order loses money after all."
   >
+    <BackToTopic />
     <div class="tags"><span class="tag tag--hl">HL only</span></div>
   </PageIntro>
   <div class="wrap page-body">

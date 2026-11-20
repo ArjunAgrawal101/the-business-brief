@@ -1,0 +1,78 @@
+---
+/**
+ * The way back from a tool or desk page to the subtopic it serves, near the
+ * top of the page: "Back to 3.5 Profitability and liquidity ratio analysis",
+ * and the other subtopics it serves after it. The subtopics come from the
+ * tool's own data through the tool index (src/lib/connected.ts), so nothing
+ * here is typed by hand; a page that serves no subtopic shows nothing.
+ */
+import { connected } from '../../lib/connected-content';
+import { topicsForPage } from '../../lib/connected';
+
+interface Props {
+  /** The page's address; the current page's by default. */
+  path?: string;
+  /** On a navy band. */
+  onInk?: boolean;
+}
+const { path = Astro.url.pathname, onInk = false } = Astro.props;
+const d = await connected();
+const byCode = new Map(d.subtopics.map((s) => [s.code, s]));
+const subs = topicsForPage(path, d.tools)
+  .map((code) => byCode.get(code))
+  .filter((s): s is NonNullable<typeof s> => Boolean(s));
+const [first, ...others] = subs;
+---
+
+{
+  first && (
+    <p class:list={['btt', { 'btt--ink': onInk }]} data-back-to-topic>
+      <a class="btt__link" href={first.href}>
+        <span aria-hidden="true">&larr;</span> Back to <span class="btt__code">{first.code}</span>{' '}
+        {first.title}
+      </a>
+      {others.length > 0 && (
+        <span class="btt__also">
+          Also for{' '}
+          {others.map((s, i) => (
+            <>
+              {i > 0 && (i === others.length - 1 ? ' and ' : ', ')}
+              <a href={s.href}>{`${s.code} ${s.title}`}</a>
+              {s.level === 'HL' && ' (HL)'}
+            </>
+          ))}
+        </span>
+      )}
+    </p>
+  )
+}
+
+<style>
+  .btt {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem var(--sp-4);
+    margin: var(--sp-3) 0 0;
+    font-family: var(--font-ui);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  .btt__link {
+    font-weight: 600;
+  }
+
+  .btt__code {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .btt__also {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .btt--ink .btt__also {
+    color: var(--text-on-ink-muted);
+  }
+</style>

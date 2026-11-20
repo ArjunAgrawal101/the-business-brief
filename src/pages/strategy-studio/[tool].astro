@@ -7,6 +7,7 @@
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
+import BackToTopic from '../../components/connect/BackToTopic.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import StudioTool from '../../components/strategy/StudioTool.astro';
 import SwotScript from '../../components/strategy/scripts/Swot.astro';
@@ -65,6 +66,7 @@ const extra = t.kind === 'appraisal' ? { tools: s.sequence.filter((x) => x.slug 
     title={t.title}
     lead={t.summary}
   >
+    <BackToTopic />
     <div class="tags sx-intro-tags">
       <span class={`tag ${t.status.kind === 'ib-toolkit' ? 'tag--ib' : 'tag--enrichment'}`}>{label.text}</span>
       <span class={`tag ${t.status.kind === 'ib-toolkit' ? label.css : 'tag--plain'}`}>{label.level}</span>

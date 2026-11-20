@@ -9,6 +9,7 @@
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../layout/PageIntro.astro';
+import BackToTopic from '../connect/BackToTopic.astro';
 import SectionHead from '../layout/SectionHead.astro';
 import ProvenanceTag from '../ui/ProvenanceTag.astro';
 import LevelSwitch from '../ui/LevelSwitch.astro';
@@ -58,6 +59,7 @@ const statusClass = g.status === 'HL' ? 'tag--hl' : g.status === 'enrichment' ? 
 
 <BaseLayout title={`${t.title}: ${room.name}`} description={g.summary} section="tools" room={g.room}>
   <PageIntro trail={[{ label: 'All rooms', href: '/rooms/' }, { label: room.name, href: room.href }, { label: t.title }]} kicker={`${room.name}: ${g.kind}`} title={t.title} lead={g.lead}>
+    <BackToTopic />
     <dl class="tool-facts">
       <div class="tool-facts__item">
         <dt>Syllabus</dt>

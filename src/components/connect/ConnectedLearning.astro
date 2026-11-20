@@ -1,0 +1,116 @@
+---
+/**
+ * Connected learning on a subtopic page: everything else on the platform
+ * that serves the subtopic, found from each item's own course links by
+ * src/lib/connected.ts and labelled by its standing (fictional cases and
+ * briefings, real-world intelligence with its date, enrichment beyond the
+ * course). A ruled index: each group's name beside its links.
+ */
+import SectionHead from '../layout/SectionHead.astro';
+import { connected } from '../../lib/connected-content';
+import { connectedLearning } from '../../lib/connected';
+
+interface Props {
+  code: string;
+  no: string;
+  /** List the tools here: for the topic briefs, which have no tools section of their own. */
+  withTools?: boolean;
+  /** The anchor of the page's own tools section, which the tools group points to. */
+  toolsAnchor?: string;
+}
+const { code, no, withTools = false, toolsAnchor } = Astro.props;
+const d = await connected();
+const groups = connectedLearning(code, d.inputs, { withTools, toolsAnchor });
+---
+
+<section id="connected-learning" aria-labelledby="cl-h" class="sh-sec cl">
+  <SectionHead no={no} title="Connected learning" id="cl-h" dek={`Everything else on the platform that teaches, applies or tests ${code}, each labelled by its standing.`} />
+  <dl class="cl__index">
+    {
+      groups.map((g) => (
+        <div class="cl__row" data-group={g.id}>
+          <dt class="cl__label">{g.label}</dt>
+          <dd class="cl__items">
+            <ul role="list">
+              {g.items.map((it) => (
+                <li>
+                  <a href={it.href}>{it.title}</a>
+                  {it.tags.map((t) => (
+                    <span class={`tag ${t.css}`}>{t.text}</span>
+                  ))}
+                  {it.note && <span class="cl__note">{it.note}</span>}
+                </li>
+              ))}
+            </ul>
+          </dd>
+        </div>
+      ))
+    }
+  </dl>
+</section>
+
+<style>
+  .cl__index {
+    margin: var(--sp-5) 0 0;
+    border-top: 2px solid var(--rule-ink);
+  }
+
+  .cl__row {
+    display: grid;
+    grid-template-columns: minmax(9rem, 13rem) minmax(0, 1fr);
+    gap: var(--sp-2) var(--sp-6);
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .cl__label {
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-strong);
+    padding-top: 0.15rem;
+  }
+
+  .cl__items {
+    margin: 0;
+  }
+
+  .cl__items ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+    gap: var(--sp-3) var(--sp-6);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cl__items li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.5rem;
+    margin: 0;
+  }
+
+  .cl__items a {
+    font-weight: 600;
+  }
+
+  .cl__items .tag {
+    font-size: 0.75rem;
+  }
+
+  .cl__note {
+    flex-basis: 100%;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 40rem) {
+    .cl__row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

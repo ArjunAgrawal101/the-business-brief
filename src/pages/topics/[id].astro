@@ -17,6 +17,8 @@ import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
 import VerifyTag from '../../components/ui/VerifyTag.astro';
 import LevelTag from '../../components/ui/LevelTag.astro';
 import Diagram from '../../components/diagrams/Diagram.astro';
+import TopicConnections from '../../components/connect/TopicConnections.astro';
+import ConnectedLearning from '../../components/connect/ConnectedLearning.astro';
 import { DIAGRAMS } from '../../lib/diagrams';
 import { corpus, href, longDate, pathwaysInOrder, topicsInOrder } from '../../lib/content';
 import { CONCEPT_NAMES } from '../../lib/labels';
@@ -65,7 +67,9 @@ const nav = [
   { id: 'practice', label: 'Practice questions', no: String(n + 1 + dOff).padStart(2, '0') },
   { id: 'concepts', label: 'The concept lens', no: String(n + 2 + dOff).padStart(2, '0') },
   { id: 'revision', label: 'Revision', no: String(n + 3 + dOff).padStart(2, '0') },
-  { id: 'connections', label: 'Connections and sources', no: String(n + 4 + dOff).padStart(2, '0') },
+  { id: 'how-it-connects', label: 'How it connects', no: String(n + 4 + dOff).padStart(2, '0') },
+  { id: 'connected-learning', label: 'Connected learning', no: String(n + 5 + dOff).padStart(2, '0') },
+  { id: 'connections', label: 'Connections and sources', no: String(n + 6 + dOff).padStart(2, '0') },
 ];
 ---
 
@@ -257,8 +261,12 @@ const nav = [
         <RetrievalCards id={id} items={t.revision.retrieval} />
       </section>
 
+      <div class="brief-section brief-section--connect"><TopicConnections code={t.code} no={String(n + 4 + dOff).padStart(2, '0')} /></div>
+
+      <div class="brief-section brief-section--connect"><ConnectedLearning code={t.code} no={String(n + 5 + dOff).padStart(2, '0')} withTools /></div>
+
       <section class="brief-section" id="connections" aria-labelledby="connections-h">
-        <SectionHead no={n + 4 + dOff} title="Connections and sources" id="connections-h" />
+        <SectionHead no={n + 6 + dOff} title="Connections and sources" id="connections-h" />
         <div class="connections">
           {
             relatedCases.length > 0 && (

@@ -1,0 +1,158 @@
+---
+/**
+ * Tools and practice on a subtopic page: every tool and desk page that serves
+ * the subtopic, by room (from src/lib/connected.ts, which reads each tool's
+ * own data), with any curated use where the tool does not name the subtopic
+ * itself; the exercises on other pages; the worked calculations; and the
+ * practice questions with mark schemes. Every subtopic has at least one
+ * existing tool, so every page shows this section.
+ */
+import SectionHead from '../layout/SectionHead.astro';
+import { corpus, href } from '../../lib/content';
+import { connected } from '../../lib/connected-content';
+import { toolTags, toolsByRoom, toolsFor } from '../../lib/connected';
+
+interface Props {
+  code: string;
+  no: string;
+  /** The page the section is on, so its own exercises are not listed as elsewhere. */
+  page: string;
+  /** The subtopic is HL only, so its HL items need no HL label. */
+  hlOnly?: boolean;
+}
+const { code, no, page, hlOnly = false } = Astro.props;
+const c = await corpus();
+const d = await connected();
+const rooms = toolsByRoom(toolsFor(code, d.tools, d.extraTools));
+const exercises = Object.entries(c.interactives).filter(([, it]) => it.page && it.syllabus.includes(code) && !d.tools.has(it.page.split('#')[0] ?? '') && it.page !== page);
+const calcs = Object.entries(c.calculations).filter(([, k]) => k.syllabus.some((x) => x.code === code));
+const questions = Object.entries(c.questions).filter(([, q]) => q.syllabus.includes(code));
+const count = rooms.reduce((s, r) => s + r.tools.length, 0);
+---
+
+<section id="tools" aria-labelledby="sh-tools-h" class="sh-sec stt">
+  <SectionHead no={no} title="Tools and practice" id="sh-tools-h" dek={`${count} ${count === 1 ? 'tool' : 'tools'} on the platform for ${code}, by room, with exercises, worked calculations and practice questions.`} />
+  <div class="stt__grid">
+    {
+      rooms.map((r) => (
+        <div class="stt__group">
+          <h3 class="stt__room">
+            <a href={r.roomHref}>{r.room}</a>
+          </h3>
+          <ul class="stt__list" role="list">
+            {r.tools.map((t) => (
+              <li>
+                <a href={t.href}>{t.title}</a>
+                {toolTags({ standing: t.standing, level: hlOnly ? 'SL/HL' : t.level }).map((x) => (
+                  <span class={`tag ${x.css}`}>{x.text}</span>
+                ))}
+                {t.use && <span class="stt__use">{t.use}</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+    {
+      exercises.length > 0 && (
+        <div class="stt__group">
+          <h3 class="stt__room">Exercises</h3>
+          <ul class="stt__list" role="list">
+            {exercises.map(([id, it]) => (
+              <li>
+                <a href={`${it.page}#ix-${id}`}>{it.title}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+    {
+      calcs.length > 0 && (
+        <div class="stt__group">
+          <h3 class="stt__room">Worked calculations</h3>
+          <ul class="stt__list" role="list">
+            {calcs.map(([id, k]) => (
+              <li>
+                <a href={href.calculation(id, k.page)}>{k.name}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+    {
+      questions.length > 0 && (
+        <div class="stt__group">
+          <h3 class="stt__room">Practice questions with mark schemes</h3>
+          <ul class="stt__list" role="list">
+            {questions.map(([id, q]) => (
+              <li>
+                <a href={href.question(id)}>{q.title}</a> <span class="stt__marks">{q.marks} marks</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .stt__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    gap: var(--sp-5) var(--sp-6);
+    margin-top: var(--sp-5);
+  }
+
+  .stt__room {
+    padding-bottom: var(--sp-2);
+    border-bottom: 1px solid var(--navy-900);
+    font-family: var(--font-ui);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .stt__room a {
+    color: var(--text-strong);
+    text-decoration: none;
+  }
+
+  .stt__room a:hover {
+    text-decoration: underline;
+  }
+
+  .stt__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .stt__list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem 0.5rem;
+    margin: 0;
+    padding: var(--sp-2) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .stt__list .tag {
+    font-size: 0.75rem;
+  }
+
+  .stt__use {
+    flex-basis: 100%;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .stt__marks {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+</style>
