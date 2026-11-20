@@ -71,12 +71,22 @@ const extra = t.kind === 'appraisal' ? { tools: s.sequence.filter((x) => x.slug 
       {t.status.extensions.map((x) => <span class="tag tag--enrichment">{x.name}: enrichment</span>)}
       <span class="tag tag--simulated">Worked example: fictional</span>
     </div>
-    <p class="sx-jump no-print"><a href="#tool">Go to the tool</a></p>
+    <p class="sx-jump no-print"><a href="#sx-about-h">What the tool is for, and its limits</a></p>
   </PageIntro>
 
   <div class="wrap page-body">
+    <section aria-labelledby="sx-build-h" id="tool" class="sx-build">
+      <SectionHead no={1} title="Build your analysis" id="sx-build-h" dek="The tool opens on a worked example. Change anything: the analysis follows, and your work is kept on this device." />
+      <aside class="sx-example no-print" aria-label="The worked example">
+        <p class="sx-example__kicker"><span class="tag tag--simulated">Simulated data</span> Worked example: {s.engagement.client} (fictional)</p>
+        <p class="sx-example__title">{t.example.title}</p>
+        <p class="sx-example__text" set:html={inline(t.example.situation)} />
+      </aside>
+      <StudioTool kind={t.kind} slug={t.slug} title={t.title} state={t.example.data} split={SPLIT.has(t.kind)} client={s.engagement.client} extra={extra} />
+    </section>
+
     <section aria-labelledby="sx-about-h" class="no-print">
-      <SectionHead no={1} title="About this tool" id="sx-about-h" dek="What it is for, how to use it, what it cannot do, and where it stands in the IB course." />
+      <SectionHead no={2} title="About this tool" id="sx-about-h" dek="What it is for, how to use it, what it cannot do, and where it stands in the IB course." />
       <div class="sx-method">
         <div class="sx-method__part sx-method__part--purpose">
           <h3 class="sx-method__h">Purpose</h3>
@@ -120,16 +130,6 @@ const extra = t.kind === 'appraisal' ? { tools: s.sequence.filter((x) => x.slug 
           <p class="sx-judgement">A model is an aid to judgement, not a universal answer. Use what it shows, then decide, and say why.</p>
         </div>
       </div>
-    </section>
-
-    <section aria-labelledby="sx-build-h" id="tool" class="sx-build">
-      <SectionHead no={2} title="Build your analysis" id="sx-build-h" dek="The tool opens on a worked example. Change anything: the analysis follows, and your work is kept on this device." />
-      <aside class="sx-example no-print" aria-label="The worked example">
-        <p class="sx-example__kicker"><span class="tag tag--simulated">Simulated data</span> Worked example: {s.engagement.client} (fictional)</p>
-        <p class="sx-example__title">{t.example.title}</p>
-        <p class="sx-example__text" set:html={inline(t.example.situation)} />
-      </aside>
-      <StudioTool kind={t.kind} slug={t.slug} title={t.title} state={t.example.data} split={SPLIT.has(t.kind)} client={s.engagement.client} extra={extra} />
     </section>
 
     <section aria-labelledby="sx-use-h" class="no-print">
