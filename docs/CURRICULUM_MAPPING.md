@@ -9,12 +9,12 @@ How each document was used is recorded in [audit/RESOURCE_INVENTORY.md](audit/RE
 | Document | Role |
 | --- | --- |
 | Business management guide (2024) | The controlling authority. Every statement about the course is checked against it |
-| Business management teacher support material (2022) | Official IB guidance for teachers. Paraphrased, attributed with its page, and shown as "From IB guidance". It is not treated as a subject report |
+| Business management teacher support material (2022) | Official IB guidance for teachers. Paraphrased, attributed with its page, and shown under its own label, "IB teacher support material". It is not treated as a requirement or as a subject report |
 | Hodder coursebook extracts (2022) | Used only to check conventions where the guide is silent. Not a curriculum authority; nothing reproduced |
 | *Assessment procedures 2027*, as recorded in the creator's repository | Recorded; consistent with the guide where they overlap |
 | Secondary sources found by web search for 0.1.0 | Superseded by the guide; kept in the source register for the record |
 
-The guide's notice says commercial use of IB publications by curriculum mapping or teacher resource platforms needs a written licence from the IB. The platform therefore states facts with page references, in its own words, and does **not** reproduce the guide's text, its markbands, its criteria descriptors or its command term definitions. If the platform becomes commercial, the creator should ask the IB about a licence.
+The guide's notice says commercial use of IB publications by curriculum mapping or teacher resource platforms needs a written licence from the IB. The platform therefore states facts with page references, in its own words, and does **not** reproduce the wording of the guide's text, its markbands, its criteria descriptors or its command term definitions. The assessment pages give brief paraphrases of the markband strands and of each criterion's top level, with their pages, and say that they are paraphrases. If the platform becomes commercial, the creator should ask the IB about a licence, which would cover these paraphrases too.
 
 ## What changed when the guide arrived
 
@@ -129,12 +129,12 @@ The toolkit pages group the tools as the teacher support material does (situatio
 
 | Component | SL | HL | Sections |
 | --- | --- | --- | --- |
-| Paper 1 | 1 h 30, 30 marks, 35% | 1 h 30, 30 marks, 25% | A: structured questions, 20 marks. B: one of two extended responses, 10 marks. Pre-released statement three months before; excludes HL-only content |
+| Paper 1 | 1 h 30, 30 marks, 35% | 1 h 30, 30 marks, 25% | A: structured questions, 20 marks. B: one of two extended responses, 10 marks. A statement released three months before (context topics and about the first 200 words of the case); excludes the HL extension material and topics studied at HL only (p. 43) |
 | Paper 2 | 1 h 30, 40 marks, 35% | 1 h 45, 50 marks, 30% | A: structured, quantitative, 20 marks (SL) or 30 (HL). B: one of two questions, structured parts (10) and an extended response (10) |
-| Paper 3 | Not taken | 1 h 15, 25 marks, 25% | A social enterprise. Question 1 (2 marks), question 2 (6), question 3 (17, marked on criteria A to D: 4, 4, 6, 3) |
+| Paper 3 | Not taken | 1 h 15, 25 marks, 25% | A social enterprise. Question 1 (2 marks, AO1), question 2 (6, AO1 and AO2 by the table on p. 47; p. 42 calls it the AO2 tier), question 3 (17, AO1 to AO4, marked on criteria A to D: 4, 4, 6, 3) |
 | Internal assessment | 25 marks, 30% | 25 marks, 20% | A business research project, at most 1,800 words, three to five supporting documents, one key concept; criteria A to G (5, 4, 4, 5, 3, 2, 2) |
 
-Guide, pp. 39 to 58. The platform gives criteria and markbands by name, level range and maximum mark only.
+Guide, pp. 39 to 58. Every paper has five minutes' reading time (p. 41); a four-function calculator is enough and graphic display calculators are allowed (p. 43); a copy of the formulae is provided for the examination (pp. 64 to 66). The platform gives criteria and markbands by name, level range and maximum mark, with brief paraphrases of the markband strands and the criteria's top levels, each with its page; it does not reproduce their wording.
 
 ## Command terms
 

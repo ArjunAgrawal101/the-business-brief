@@ -6,12 +6,13 @@ The platform's credibility rests on one rule: **every statement says where it co
 
 When sources disagree, the higher one wins. When only a lower one is available, the statement carries a weaker status.
 
-1. **The IB's own documents for this subject**: the Business management guide (first assessment 2024), which controls; specimen papers, markschemes and subject reports when they are supplied. Status: Verified (`primary`), with a page reference. The *teacher support material* (2022) is official IB guidance for teachers: it is paraphrased, attributed with its page and shown as "From IB guidance". It is not a subject report, so nothing from it is presented as an examiner observation.
+1. **The IB's own documents for this subject**: the Business management guide (first assessment 2024), which controls and decides every requirement; specimen papers, markschemes and subject reports when they are supplied. Status: Verified (`primary`), with a page reference. The edition supplied, and checked against, is the one published in February 2022 and updated in May 2022. The *teacher support material* (2022) is official IB guidance for teachers: it is paraphrased, attributed with its page and shown under a label of its own, "IB teacher support material". It is neither a requirement of the guide nor a subject report, so nothing from it is presented as either.
 2. **Other IB documents**: *Assessment procedures*, as recorded in the creator's files; the guides of other IB subjects for shared elements such as command terms. Status: Recorded.
-3. **Primary documents of real organizations**: annual reports and filings (for example a 10-K on the SEC's EDGAR system), official announcements, with dates.
-4. **Academic sources**: the original statement of a model or theory (Ansoff 1957, Lewin 1951, Fayol 1916).
-5. **Reputable press**, for dated events, cited by title, date and address.
-6. **Secondary education providers**: course books, school department pages, revision sites. A course book, such as the Hodder extracts supplied with the guide, may be used to check a convention the guide does not settle (how float is calculated, how a decision tree is drawn); it is never the authority on the course. Revision sites were used for 0.1.0, before the guide was supplied, and are kept in the register for the record only.
+3. **The creator's four assessment guides** (IA, Paper 1, Paper 2, Paper 3), five pages each, supplied on 2 November 2026 and published unchanged as downloads. They are the primary basis for the Assessment Centre's explanations. They cite the guide (as "updated July 2024"), the teacher support material and IB subject reports from May 2024 to May 2026, which were not supplied. What they say the IB requires is checked against the guide itself; what they report from subject reports is shown as examiner emphasis, attributed to them (see below).
+4. **Primary documents of real organizations**: annual reports and filings (for example a 10-K on the SEC's EDGAR system), official announcements, with dates.
+5. **Academic sources**: the original statement of a model or theory (Ansoff 1957, Lewin 1951, Fayol 1916).
+6. **Reputable press**, for dated events, cited by title, date and address.
+7. **Secondary education providers**: course books, school department pages, revision sites. A course book, such as the Hodder extracts supplied with the guide, may be used to check a convention the guide does not settle (how float is calculated, how a decision tree is drawn); it is never the authority on the course. Revision sites were used for 0.1.0, before the guide was supplied, and are kept in the register for the record only.
 
 Not used as sources: memory, unattributed web pages, or the platform's own earlier statements.
 
@@ -20,10 +21,24 @@ Not used as sources: memory, unattributed web pages, or the platform's own earli
 Every block, exhibit and interaction carries one label, shown on the page. See [CONTENT_MODEL.md](CONTENT_MODEL.md) for the full list. The ones that most need care:
 
 - **IB requirement** only for something the guide states, with its page.
-- **Examiner observation** only for something an examiner wrote in a subject report, cited to the report. None in this release, and the Examiner Lens says so.
+- **Examiner observation** (`examiner-observation`, the content model's label) only for something an examiner wrote in a subject report the platform has read, cited to the report. There is none: no subject report has been supplied, and the Examiner Lens says so.
 - **External evidence** for a fact about a real organization: dated, cited, and separated from interpretation.
 - **Simulated data** for everything in a fictional case.
 - **Original practice question** and **Assessment explanation** for the platform's own questions and mark schemes, which are never presented as IB material.
+
+## The Assessment Centre's labels
+
+The Assessment Centre and the IA tools label every block, check and checklist with one of five standings, from one list (`src/lib/guide-labels.ts`):
+
+| Label | Use |
+| --- | --- |
+| IB requirement | Stated in the guide, with its page. The guide decides every requirement: a point from examiner instructions or a markscheme is never given this label. Where the guide says "should" or "recommended" rather than "must", the text says so, and the internal assessment's list of what the project must do holds only the guide's musts |
+| Examiner emphasis | Only what one of the creator's four assessment guides reports from IB subject reports or past papers (May 2024 to May 2026), given as that guide states it and attributed to it, with its page, beside the label. The platform has not seen the reports and does not present these points as verified. A point no assessment guide states is a recommended strategy, if it is sound advice, or it is not made; a prediction about a future session (such as a change from May 2027) appears only where an assessment guide states it, attributed to it. `tests/unit/assessment-content.test.ts` fails if an examiner emphasis label on the Centre's pages has no attribution |
+| Recommended strategy | The platform's own technique or advice, including the assessment guides' own recommendations, such as their checklists |
+| Illustrative example | Invented for teaching: the businesses, figures and answers are fictional |
+| IB teacher support material | The IB's advice to teachers, paraphrased with its page: official guidance, not a requirement |
+
+Citations are given once per block or section: a verification badge and the source beneath a list of facts, a short citation beside a block's labels, and the page after each line of a rule list.
 
 ## The registers
 
@@ -71,7 +86,7 @@ The three cases are fictional. Their names, people and figures are invented, and
 ## Copyright
 
 - No text is reproduced from the Business management guide, the teacher support material, examination papers, markschemes, subject reports or course books. Course structure, requirements and advice are described in the platform's own words, with page references.
-- The guide's markbands, its criteria level descriptors and its command term definitions are not reproduced. The platform names a criterion, gives its maximum mark and points to the page.
+- The guide's markbands, its criteria level descriptors and its command term definitions are never reproduced in its wording. The platform names each criterion and gives its maximum mark, and the assessment pages add brief paraphrases with the page: a few words for each strand of the Papers 1 and 2 markbands (Paper 1 page), the top level of each Paper 3 and IA criterion, and what each IA criterion asks (IA page and its self-review). These are paraphrases, not copies, and the licence note below applies to them as to the rest. The assessment data's `notStated` entries say the same.
 - Command terms are explained in the platform's own words; the Examiner Lens gives the page of each official definition. (In 0.1.0 they were quoted from the IB Economics guide's glossary; that has been withdrawn.)
 - The IB's copyright notice on the guide and the teacher support material says commercial use by operators of curriculum mapping or teacher resource platforms needs a written licence from the IB. The platform states facts with page references rather than reproducing the documents; if it becomes commercial, the creator should ask the IB about a licence (copyright@ibo.org).
 - The supplied PDFs are never committed to the repository.
