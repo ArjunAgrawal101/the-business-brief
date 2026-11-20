@@ -17,7 +17,7 @@ import SectionHead from '../../components/layout/SectionHead.astro';
 import { corpus } from '../../lib/content';
 import { jsonForScript } from '../../lib/markup';
 import { evidenceOf, plannerContext, progressSubtopics } from '../../lib/progress-build';
-import { KIND_LABELS, RULES, WEEKDAYS, buildPlan, fmtMinutes, gapFor, kindCounts, sessionHref, sessionTitle, shortDay, topicsAt, type Session } from '../../lib/planner';
+import { KIND_LABELS, RULES, WEEKDAYS, buildPlan, fmtMinutes, gapFor, kindCounts, sessionTitle, shortDay, topicsAt, type Session } from '../../lib/planner';
 import '../../styles/planner.css';
 
 const c = await corpus();
@@ -41,6 +41,7 @@ const exampleWeeks = (() => {
   return [...byWeek.entries()].slice(0, 2);
 })();
 const exampleKinds = kindCounts(example.sessions);
+// The example is an illustration: its sessions are named, not linked, since a reader's own plan links each to where it is done.
 
 const config = { ctx, evidence: evidenceOf(c), subtopics, units };
 const p = ctx.papers;
@@ -187,9 +188,7 @@ const TITLE = 'Revision planner';
                       <li class={`pl-s pl-s--${s.kind}`}>
                         <span class="pl-s__day">{shortDay(s.date)}</span>
                         <span class="pl-s__kind">{KIND_LABELS[s.kind]}</span>
-                        <a class="pl-s__t" href={sessionHref(s, ctx)}>
-                          {sessionTitle(s, ctx)}
-                        </a>
+                        <span class="pl-s__t">{sessionTitle(s, ctx)}</span>
                         <span class="pl-s__min">{fmtMinutes(s.minutes)}</span>
                       </li>
                     ))}
