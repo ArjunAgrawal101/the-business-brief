@@ -116,7 +116,7 @@ describe('the checklists CSV', () => {
   });
 
   it('has no dash or leaked value', () => {
-    expect(csv).not.toMatch(/[–—]|undefined|NaN|\[object Object\]/);
+    expect(csv).not.toMatch(/[\u2013\u2014]|undefined|NaN|\[object Object\]/);
   });
 });
 
@@ -134,7 +134,7 @@ describe('the discussion prompts', () => {
     const all = Object.values(sets).flatMap((s) => s.prompts);
     for (const p of all) expect(p, p).toMatch(/\?$/);
     expect(new Set(all).size).toBe(all.length);
-    for (const p of all) expect(p, p).not.toMatch(/[–—]/);
+    for (const p of all) expect(p, p).not.toMatch(/[\u2013\u2014]/);
   });
 });
 

@@ -111,7 +111,7 @@ describe('also used on this site', () => {
       }
       if (p.kind === 'toolkit') expect([14, 15], f.name).toContain(p.page);
       expect(placementLabel(p)).not.toBe('');
-      expect(placementText(p, (code) => subs.get(code)?.title ?? '')).not.toMatch(/undefined|NaN|[–—]/);
+      expect(placementText(p, (code) => subs.get(code)?.title ?? '')).not.toMatch(/undefined|NaN|[\u2013\u2014]/);
     }
   });
 

@@ -155,7 +155,7 @@ each('[data-ix="library"]', (root) => {
     updateCounts();
     const active = activeCount(filters);
     const badge = root.querySelector<HTMLElement>('[data-active]');
-    if (badge) badge.textContent = active ? ` (${active} in use)` : '';
+    if (badge) badge.textContent = active ? `(${active} in use)` : '';
     const text = countText(shownTotal, total);
     if (count) {
       if (speak) announce(count, text);
