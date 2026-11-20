@@ -74,6 +74,7 @@ The multi-round business strategy simulation the brief asks for already existed 
 | Link check | No broken links |
 | Colour contrast (`qa:contrast`) | Every pair meets its minimum |
 | Browser tests (Playwright, Chromium), every page at desktop and phone size with an axe-core WCAG 2.2 AA scan, plus every interaction spec | 1,694 tests in 21.6 minutes: 1,688 passed and 3 were skipped by design (desktop-only or phone-only). Three failed because the test counted the header's hidden Search button as a visible one; the test was corrected and they pass. The specs covering the later fixes (61 tests) were run again on the final build, and all pass |
+| Tablets: every page (1,314, redirects aside) at 768 by 1,024 and 1,024 by 768 pixels | 2,628 page loads: none scrolls sideways, logs a console error, fails a request or shows a broken image |
 
 Each engineer also ran their own specs and page checks on a private build. A shared content cache was found to let one branch's build read another's content during the parallel work; the cache now lives in each checkout's own `.astro` folder, and every result above comes from the integrated branch.
 
@@ -100,4 +101,4 @@ Stated plainly, as the brief asks:
 
 ## Delivery
 
-The work was integrated on `claude/business-brief-2`, merged into `main` and pushed; Vercel builds `main`. The live site was checked after the deployment (see the completion report in the conversation for the result).
+The work was integrated on `claude/business-brief-2`. Most of it reached `main` through pull request #1, merged on 20 November at `ccc2f83`; the rest, from the diagram pages to this report, followed as a fast-forward of the same branch. Vercel builds and serves `main`.
