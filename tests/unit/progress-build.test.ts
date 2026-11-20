@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { calcFamilies, evidenceOf, exercisesOf, p2Codes, plannerContext, practiceQuestions, progressSubtopics, retrievalSets } from '../../src/lib/progress-build';
+import { calcFamilies, evidenceOf, exercisesOf, groupCodes, p2Codes, plannerContext, practiceQuestions, progressSubtopics, retrievalSets } from '../../src/lib/progress-build';
 import { buildBank, subtopicsOf } from '../../src/lib/bank-build';
-import { KIND_IDS } from '../../src/lib/p2-practice';
+import { KINDS, KIND_IDS } from '../../src/lib/p2-practice';
 import { CODE_RE } from '../../src/lib/learner';
 import { buildPlan } from '../../src/lib/planner';
 import { asCorpus, loadCorpus } from './helpers/corpus';
@@ -36,10 +36,15 @@ describe('what the dashboard and the planner are told about the course', () => {
 
   it('names a subtopic for every kind of Paper 2 calculation, and families at the right level', () => {
     const map = p2Codes();
-    expect(Object.keys(map).sort()).toEqual([...KIND_IDS].sort());
+    // Every kind whose group names a subtopic counts towards it; the toolkit's calculations belong to none.
+    const placed = KIND_IDS.filter((id) => groupCodes(KINDS[id]!.group).length > 0);
+    expect(Object.keys(map).sort()).toEqual([...placed].sort());
+    expect(placed.length).toBeGreaterThan(KIND_IDS.length / 2);
     for (const code of Object.values(map)) expect(codes.has(code), code).toBe(true);
+    expect(groupCodes('marketing')).toEqual(['4.1', '4.5']);
+    expect(groupCodes('toolkit')).toEqual([]);
     const fams = calcFamilies();
-    expect(fams.filter((f) => f.hl).map((f) => f.id)).toEqual(['efficiency']);
+    expect(fams.filter((f) => f.hl).map((f) => f.id)).toEqual(['efficiency', 'budgets', 'people', 'operations']);
     for (const f of fams) expect(codes.has(f.code)).toBe(true);
   });
 

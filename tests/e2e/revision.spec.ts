@@ -117,7 +117,8 @@ test.describe('Quick revision: a sheet', () => {
   });
 
   test('labels the mistakes written for the sheet Recommended strategy, and links the rest to their source', async ({ page }) => {
-    await page.goto('/revision/communication/');
+    // 3.2's content holds too few sourced mistakes, so its sheet writes three of its own (src/content/revision/sources-of-finance.yaml).
+    await page.goto('/revision/sources-of-finance/');
     await expect(page.locator('.rs__mistakes .gl-label--strategy')).toHaveCount(3);
     await page.goto('/revision/profitability-and-liquidity-ratio-analysis/');
     await expect(page.locator('.rs__mistakes .gl-label--strategy')).toHaveCount(0);

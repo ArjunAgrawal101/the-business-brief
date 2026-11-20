@@ -85,8 +85,22 @@ export function retrievalSets(c: Corpus): DashRetrieval[] {
 }
 
 /** Paper 2 calculation practice: each kind of calculation and the subtopic its family practises. */
+/** The subtopic codes a calculation group names: "4.1 and 4.5" gives both; a toolkit group gives none. */
+export function groupCodes(id: GroupId): string[] {
+  return GROUPS[id].syllabus.match(/\d\.\d+/g) ?? [];
+}
+
+/**
+ * The subtopic each kind of Paper 2 calculation counts towards: its group's
+ * first code. Toolkit calculations belong to no subtopic, so they are left out.
+ */
 export function p2Codes(): Record<string, string> {
-  return Object.fromEntries(KIND_IDS.map((id) => [id, GROUPS[KINDS[id]!.group].syllabus]));
+  return Object.fromEntries(
+    KIND_IDS.flatMap((id) => {
+      const codes = groupCodes(KINDS[id]!.group);
+      return codes.length ? [[id, codes[0]!] as const] : [];
+    }),
+  );
 }
 
 /** Everything the browser needs to place a result under its subtopics. */
@@ -102,7 +116,10 @@ export function evidenceOf(c: Corpus): EvidenceConfig {
 
 /** The families of Paper 2 calculations, as calculation practice groups them. */
 export function calcFamilies(): CalcFamily[] {
-  return (Object.keys(GROUPS) as GroupId[]).map((id) => ({ id, label: GROUPS[id].label, code: GROUPS[id].syllabus, hl: GROUPS[id].level === 'HL' }));
+  return (Object.keys(GROUPS) as GroupId[]).flatMap((id) => {
+    const codes = groupCodes(id);
+    return codes.length ? [{ id, label: GROUPS[id].label, code: codes[0]!, hl: GROUPS[id].level === 'HL' }] : [];
+  });
 }
 
 /** What the revision planner needs: the subtopics, each paper's time from the guide's outlines, and the calculation families. */
