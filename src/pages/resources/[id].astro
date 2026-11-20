@@ -1,15 +1,18 @@
 ---
-/** A curated resource's details page: its cover, what it contains, who it is for, and how to get it. */
+/**
+ * A curated resource's details page: what it is, what it contains, who it is
+ * for, its format and size, how to get it, and related resources. A guide
+ * shows the first page of the PDF itself (rendered once from the file).
+ */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
-import ResourceCover from '../../components/resources/ResourceCover.astro';
-import { library, type LibraryItem } from '../../lib/resources';
+import { catalogue, type LibraryItem } from '../../lib/resources';
 import { corpus } from '../../lib/content';
+import { CATEGORY_DEFS, FORMAT_LABELS, LEVEL_LABELS, STANDING_LABELS, linkFacts } from '../../lib/library/catalogue';
 
 export async function getStaticPaths() {
-  const items = await library();
-  // A resource whose own page is in /resources/ (the formula sheet) needs no separate details page.
-  return items.filter((i) => i.curated && !i.primary.href.startsWith('/resources/')).map((item) => ({ params: { id: item.id }, props: { item } }));
+  const cat = await catalogue();
+  return cat.items.filter((i) => i.details === `/resources/${i.id}/`).map((item) => ({ params: { id: item.id }, props: { item } }));
 }
 
 interface Props {
@@ -17,27 +20,47 @@ interface Props {
 }
 const { item } = Astro.props;
 const c = await corpus();
-const all = await library();
-const related = all.filter((x) => x.id !== item.id && ((item.component && x.component === item.component) || x.type === item.type)).slice(0, 4);
+const cat = await catalogue();
+const related = cat.items
+  .filter((x) => x.id !== item.id && ((item.component && x.component === item.component) || x.category === item.category))
+  .sort((a, b) => Number(Boolean(b.component && b.component === item.component)) - Number(Boolean(a.component && a.component === item.component)))
+  .slice(0, 6);
 const subs = c.curricula['ib-dp-bm']?.units.flatMap((u) => u.subtopics) ?? [];
 const AUD: Record<string, string> = { students: 'Students', teachers: 'Teachers', independent: 'Independent learners' };
 const COMP: Record<string, string> = { 'internal-assessment': 'Internal assessment', 'paper-1': 'Paper 1', 'paper-2': 'Paper 2', 'paper-3': 'Paper 3 (HL)' };
+const image = item.preview.kind === 'image' ? item.preview : null;
+const category = CATEGORY_DEFS[item.category];
 ---
 
 <BaseLayout title={item.title} description={item.summary} section="resources">
   <div class="wrap rd">
-    <Breadcrumbs trail={[{ label: 'Resources', href: '/resources/' }, { label: item.title }]} />
-    <div class="rd__grid">
-      <div class="rd__cover"><ResourceCover item={item} size="large" /></div>
+    <Breadcrumbs trail={[{ label: 'Resources Library', href: '/resources/' }, { label: category.title, href: `/resources/?category=${item.category}#cat-${item.category}` }, { label: item.title }]} />
+    <div class:list={['rd__grid', { 'rd__grid--text': !image }]}>
+      {
+        image && (
+          <div class="rd__preview">
+            {image.webp ? (
+              <picture>
+                {image.avif && <source type="image/avif" srcset={image.avif} sizes="(max-width: 52rem) 80vw, 22rem" />}
+                <source type="image/webp" srcset={image.webp} sizes="(max-width: 52rem) 80vw, 22rem" />
+                <img src={image.src} alt={`The first page of ${item.title}`} width={image.width} height={image.height} />
+              </picture>
+            ) : (
+              <img src={image.src} alt="" width={image.width} height={image.height} />
+            )}
+            {image.webp && <p class="rd__caption">The first page, as printed.</p>}
+          </div>
+        )
+      }
       <div class="rd__body">
-        <p class="label label--ink">{item.typeLabel}{item.level === 'HL' ? ' · HL only' : ''}</p>
+        <p class="label label--ink">{item.kind}{item.level === 'HL' ? ' · HL only' : ''}</p>
         <h1 class="rd__title">{item.title}</h1>
         <p class="rd__sum">{item.summary}</p>
         <p class="rd__act">
           {
-            item.primary.kind === 'download' ? (
+            item.primary.file ? (
               <a class="btn btn--primary" href={item.primary.href} download>
-                {[item.primary.label, item.primary.pages ? `${item.primary.pages} pages` : '', item.primary.size ?? ''].filter(Boolean).join(', ')}
+                Download {linkFacts(item.primary)}
               </a>
             ) : (
               <a class="btn btn--primary" href={item.primary.href}>
@@ -47,20 +70,37 @@ const COMP: Record<string, string> = { 'internal-assessment': 'Internal assessme
           }
         </p>
         <dl class="rd__meta">
-          <div><dt>Qualification</dt><dd>{item.qualification === 'ib-dp-bm' ? 'IB Diploma Programme Business Management' : 'General'}</dd></div>
+          <div><dt>Category</dt><dd><a href={`/resources/?category=${item.category}#cat-${item.category}`}>{category.title}</a></dd></div>
           <div><dt>For</dt><dd>{item.audiences.map((a) => AUD[a]).join(', ')}</dd></div>
-          <div><dt>Level</dt><dd>{item.level === 'HL' ? 'HL only' : 'SL and HL'}</dd></div>
+          <div><dt>Level</dt><dd>{LEVEL_LABELS[item.level]}</dd></div>
+          {item.standing && <div><dt>Standing</dt><dd>{STANDING_LABELS[item.standing]}</dd></div>}
           {item.component && <div><dt>Assessment</dt><dd>{COMP[item.component]}</dd></div>}
           {item.units.length > 0 && <div><dt>Units</dt><dd>{item.units.map((u) => `Unit ${u}`).join(', ')}</dd></div>}
           {item.subtopics.length > 0 && <div><dt>Subtopics</dt><dd>{item.subtopics.map((s) => `${s} ${subs.find((x) => x.code === s)?.title ?? ''}`).join('; ')}</dd></div>}
-          <div><dt>Format</dt><dd>{item.primary.format ?? (item.primary.kind === 'page' ? 'A page on this site' : 'A printable page')}</dd></div>
-          <div><dt>Updated</dt><dd>{item.updated}</dd></div>
+          <div><dt>Format</dt><dd>{item.primary.file ? linkFacts(item.primary) : FORMAT_LABELS[item.primary.format]}</dd></div>
+          {item.updated && <div><dt>Updated</dt><dd>{item.updated}</dd></div>}
         </dl>
         {
-          item.contents.length > 0 && (
+          item.preview.kind === 'contents' && item.preview.items.length > 0 && (
             <div class="rd__contents">
-              <p class="label">What it contains</p>
-              <ol>{item.contents.map((x) => <li>{x}</li>)}</ol>
+              <h2 class="rd__h">What it contains</h2>
+              <ol>
+                {item.preview.items.map((x) => (
+                  <li>{x}</li>
+                ))}
+              </ol>
+            </div>
+          )
+        }
+        {
+          item.keywords.length > 0 && item.preview.kind !== 'contents' && (
+            <div class="rd__contents">
+              <h2 class="rd__h">What it contains</h2>
+              <ol>
+                {item.keywords.map((x) => (
+                  <li>{x}</li>
+                ))}
+              </ol>
             </div>
           )
         }
@@ -69,12 +109,12 @@ const COMP: Record<string, string> = { 'internal-assessment': 'Internal assessme
     {
       related.length > 0 && (
         <section class="rd__related" aria-labelledby="rd-rel-h">
-          <h2 id="rd-rel-h">Related resources</h2>
-          <ul>
+          <h2 id="rd-rel-h" class="rd__h">Related resources</h2>
+          <ul role="list">
             {related.map((r) => (
               <li>
                 <a href={r.details ?? r.primary.href}>{r.title}</a>
-                <span class="small muted">{r.typeLabel}</span>
+                <span class="small muted">{r.kind}</span>
               </li>
             ))}
           </ul>
@@ -86,7 +126,7 @@ const COMP: Record<string, string> = { 'internal-assessment': 'Internal assessme
 
 <style>
   .rd {
-    padding-top: var(--sp-6);
+    padding-block: var(--sp-6) var(--sp-8);
   }
 
   .rd__grid {
@@ -97,8 +137,27 @@ const COMP: Record<string, string> = { 'internal-assessment': 'Internal assessme
     align-items: start;
   }
 
-  .rd__cover {
+  .rd__grid--text {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 48rem;
+  }
+
+  .rd__preview {
     max-width: 22rem;
+  }
+
+  .rd__preview img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--rule);
+    background: var(--surface-sheet);
+  }
+
+  .rd__caption {
+    margin-top: var(--sp-2);
+    color: var(--text-muted);
+    font-size: var(--fs-small);
   }
 
   .rd__body {
@@ -111,18 +170,17 @@ const COMP: Record<string, string> = { 'internal-assessment': 'Internal assessme
   }
 
   .rd__sum {
+    max-width: 40rem;
+    color: var(--text-strong);
     font-family: var(--font-serif);
     font-size: var(--fs-lead);
-    color: var(--navy-900);
-    max-width: 40rem;
   }
 
   .rd__meta {
     display: grid;
-    gap: 0;
-    margin: var(--sp-2) 0 0;
-    border-top: 1px solid var(--navy-900);
     max-width: 40rem;
+    margin: var(--sp-2) 0 0;
+    border-top: 1px solid var(--rule-ink);
   }
 
   .rd__meta > div {
@@ -134,16 +192,19 @@ const COMP: Record<string, string> = { 'internal-assessment': 'Internal assessme
   }
 
   .rd__meta dt {
-    font-size: var(--fs-label);
-    font-weight: 600;
-    letter-spacing: var(--track-label);
-    text-transform: uppercase;
+    padding-top: 0.1rem;
     color: var(--text-muted);
-    padding-top: 0.15rem;
+    font: 600 0.8125rem/1.4 var(--font-ui);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
 
   .rd__meta dd {
     margin: 0;
+  }
+
+  .rd__h {
+    font-size: 1.375rem;
   }
 
   .rd__contents ol {
@@ -154,11 +215,7 @@ const COMP: Record<string, string> = { 'internal-assessment': 'Internal assessme
   .rd__related {
     margin-top: var(--sp-8);
     padding-top: var(--sp-5);
-    border-top: 1px solid var(--navy-900);
-  }
-
-  .rd__related h2 {
-    font-size: 1.5rem;
+    border-top: 1px solid var(--rule-ink);
   }
 
   .rd__related ul {
@@ -179,6 +236,10 @@ const COMP: Record<string, string> = { 'internal-assessment': 'Internal assessme
   @media (max-width: 52rem) {
     .rd__grid {
       grid-template-columns: minmax(0, 1fr);
+    }
+
+    .rd__preview {
+      max-width: 16rem;
     }
 
     .rd__meta > div {

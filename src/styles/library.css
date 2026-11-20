@@ -1,0 +1,870 @@
+/*
+  The Resources Library (/resources/): the search and filters first, a
+  category list beside the results on wide screens and behind one Filter
+  button on phones, and each category set out for what it holds: contents
+  for notes, the real drawing for maps, diagrams and frameworks, the first
+  page for a PDF. The list view is one ruled table of rows for everything.
+  Semantic tokens only (src/styles/tokens.css); corners 0 to 4 px; rules, not
+  shadows, separate things.
+*/
+
+.lib {
+  --lib-thumb: 4.5rem;
+}
+
+/* ---------- The head: what the library holds, and the search ---------- */
+
+.lib-head {
+  padding-block: var(--sp-5) var(--sp-5);
+}
+
+.lib-head__grid {
+  display: grid;
+  gap: var(--sp-5);
+  margin-top: var(--sp-4);
+}
+
+.lib-head__kicker {
+  margin: 0;
+}
+
+.lib-head h1 {
+  margin-top: var(--sp-2);
+}
+
+.lib-head__lead {
+  max-width: 40rem;
+  margin-top: var(--sp-3);
+  font-size: var(--fs-lead);
+  line-height: 1.5;
+  color: var(--text-body);
+}
+
+.lib-glance {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  border-top: 2px solid var(--rule-ink);
+}
+
+.lib-glance > div {
+  padding: var(--sp-3) var(--sp-3) 0 0;
+}
+
+.lib-glance > div + div {
+  padding-left: var(--sp-3);
+  border-left: 1px solid var(--rule-hair);
+}
+
+.lib-glance dt {
+  font: 600 0.75rem/1.3 var(--font-ui);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.lib-glance dd {
+  margin: var(--sp-1) 0 0;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  line-height: 1.1;
+  color: var(--text-strong);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.lib-glance__sub {
+  display: block;
+  margin-top: var(--sp-1);
+  font: 400 0.8125rem/1.35 var(--font-ui);
+  color: var(--text-muted);
+}
+
+.lib-glance dd.lib-glance__words {
+  font: 600 0.9375rem/1.35 var(--font-ui);
+}
+
+.lib-search {
+  max-width: 50rem;
+  margin-top: var(--sp-5);
+}
+
+.lib-search__label {
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.lib-search__row {
+  display: flex;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+
+.lib-search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 3rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--rule-control);
+  border-radius: var(--radius-2);
+  background: var(--surface-sheet);
+  color: var(--text-strong);
+  font: 400 1.0625rem/1.3 var(--font-ui);
+}
+
+.lib-search input:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.lib-filter-btn {
+  display: none;
+  flex: none;
+  align-items: center;
+  min-height: 3rem;
+  padding: 0 1rem;
+  border: 1px solid var(--rule-ink);
+  border-radius: var(--radius-2);
+  background: var(--surface-sheet);
+  color: var(--text-strong);
+  font: 600 0.9375rem/1 var(--font-ui);
+  cursor: pointer;
+}
+
+.lib-filter-btn[aria-expanded="true"] {
+  background: var(--surface-ink);
+  color: var(--text-on-ink);
+}
+
+/* ---------- The body: the panel beside the results ---------- */
+
+.lib-body {
+  display: grid;
+  gap: var(--sp-6);
+  padding-block: var(--sp-5) var(--sp-8);
+  border-top: 1px solid var(--rule-hair);
+}
+
+.lib-panel__h {
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--rule-ink);
+  font: 600 0.8125rem/1.3 var(--font-ui);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-strong);
+}
+
+.lib-cats ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lib-cats li {
+  margin: 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.lib-cats a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  min-height: 2.75rem;
+  padding: 0.35rem 0.25rem;
+  color: var(--text-body);
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
+
+.lib-cats a:hover {
+  color: var(--cobalt-text);
+  text-decoration: underline;
+}
+
+.lib-cats a[aria-current="true"] {
+  padding-left: 0.75rem;
+  box-shadow: inset 3px 0 0 var(--cobalt-text);
+  color: var(--text-strong);
+  font-weight: 650;
+}
+
+.lib-cats__n {
+  flex: none;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.lib-cats__none {
+  flex: none;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-style: italic;
+  text-align: right;
+}
+
+.lib-refine {
+  display: grid;
+  gap: var(--sp-4);
+  margin-top: var(--sp-6);
+}
+
+.lib-field {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.lib-field > label,
+.lib-field > legend {
+  color: var(--text-strong);
+  font-size: var(--fs-small);
+  font-weight: 600;
+}
+
+.lib-level {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.lib-level label {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.25rem;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.lib-level input {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--cobalt-text);
+}
+
+.lib-refine__acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.lib-panel__done {
+  display: none;
+}
+
+/* ---------- The results ---------- */
+
+.lib-main {
+  min-width: 0;
+}
+
+.lib-main:focus {
+  outline: none;
+}
+
+.lib-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3) var(--sp-5);
+  padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--rule-ink);
+}
+
+.lib-count {
+  margin-right: auto;
+  color: var(--text-strong);
+  font-weight: 600;
+}
+
+.lib-view {
+  display: inline-flex;
+  border: 1px solid var(--rule-control);
+  border-radius: var(--radius-2);
+  overflow: hidden;
+}
+
+.lib-view__btn {
+  min-height: 2.5rem;
+  padding: 0 0.9rem;
+  border: 0;
+  background: var(--surface-sheet);
+  color: var(--text-body);
+  font: 600 0.875rem/1 var(--font-ui);
+  cursor: pointer;
+}
+
+.lib-view__btn + .lib-view__btn {
+  border-left: 1px solid var(--rule-control);
+}
+
+.lib-view__btn[aria-pressed="true"] {
+  background: var(--surface-ink);
+  color: var(--text-on-ink);
+}
+
+.lib-sort {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--fs-small);
+}
+
+.lib-sort .select {
+  width: auto;
+  min-height: 2.5rem;
+  padding-block: 0.3rem;
+}
+
+.lib-print {
+  min-height: 2.5rem;
+  padding: 0 0.25rem;
+  border: 0;
+  background: none;
+  color: var(--cobalt-text);
+  font: 600 0.875rem/1 var(--font-ui);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
+
+.lib-empty {
+  margin-top: var(--sp-5);
+  padding: var(--sp-5);
+  border: 1px solid var(--rule);
+  background: var(--surface-sheet);
+}
+
+.lib-empty__h {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  color: var(--text-strong);
+}
+
+/* ---------- A category ---------- */
+
+.lib-cat {
+  margin-top: var(--sp-7);
+}
+
+.lib-cat:first-of-type,
+.lib-empty + .lib-cat {
+  margin-top: var(--sp-5);
+}
+
+.lib-cat[hidden] {
+  display: none;
+}
+
+.lib-cat__head {
+  display: grid;
+  gap: var(--sp-1);
+  padding-top: var(--sp-3);
+  border-top: 2px solid var(--rule-ink);
+  scroll-margin-top: calc(var(--header-h) + var(--sp-4));
+}
+
+.lib-cat__head h2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-2) var(--sp-3);
+  font-size: var(--fs-h3);
+}
+
+.lib-cat__head h2:focus {
+  outline: none;
+}
+
+.lib-cat__head h2:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 4px;
+}
+
+.lib-cat__n {
+  color: var(--text-muted);
+  font: 600 0.9375rem/1 var(--font-ui);
+  font-variant-numeric: tabular-nums;
+}
+
+.lib-cat__dek {
+  max-width: 46rem;
+  color: var(--text-muted);
+  font-size: var(--fs-small);
+}
+
+.lib-missing {
+  max-width: 46rem;
+  margin-top: var(--sp-4);
+  padding: var(--sp-4) var(--sp-5);
+  border: 1px dashed var(--rule-control);
+}
+
+.lib-missing__h {
+  color: var(--text-strong);
+  font-weight: 650;
+}
+
+.lib-more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+.lib-more[hidden] {
+  display: none;
+}
+
+.lib-more__shown {
+  color: var(--text-muted);
+  font-size: var(--fs-small);
+}
+
+.lib-note {
+  max-width: 46rem;
+  margin-top: var(--sp-8);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--rule-hair);
+  color: var(--text-muted);
+  font-size: var(--fs-small);
+}
+
+/* ---------- An item ---------- */
+
+.lib-items {
+  display: grid;
+  gap: var(--sp-5);
+  margin: var(--sp-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lib-items > li {
+  margin: 0;
+}
+
+.lib-item {
+  display: grid;
+  align-content: start;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.lib-item[hidden] {
+  display: none;
+}
+
+.lib-item__preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4 / 3;
+  padding: var(--sp-2);
+  overflow: hidden;
+  border: 1px solid var(--rule-hair);
+  background: var(--surface-sheet);
+}
+
+.lib-item__preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.lib-item--page .lib-item__preview {
+  aspect-ratio: 240 / 339;
+  padding: 0;
+}
+
+.lib-item--page .lib-item__preview img {
+  object-fit: cover;
+}
+
+.lib-item__body {
+  display: grid;
+  align-content: start;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.lib-item__kind {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.6rem;
+  color: var(--text-muted);
+  font: 600 0.8125rem/1.3 var(--font-ui);
+}
+
+.lib-item__code {
+  color: var(--text-strong);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.lib-item__title {
+  font-size: 1.125rem;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.lib-item__title a {
+  color: var(--text-strong);
+  text-decoration: none;
+}
+
+.lib-item__title a:hover {
+  color: var(--cobalt-text);
+  text-decoration: underline;
+}
+
+.lib-item__sum {
+  color: var(--text-body);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.lib-item__contents {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.lib-item__contents-h {
+  color: var(--text-strong);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.lib-item__contents ol {
+  margin: 0.25rem 0 0;
+  padding-left: 1.3rem;
+}
+
+.lib-item__contents li + li {
+  margin-top: 0.1rem;
+}
+
+.lib-item__contents-more {
+  margin-top: 0.15rem;
+  font-style: italic;
+}
+
+.lib-item__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.9rem;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+}
+
+.lib-lvl--hl {
+  color: var(--text-strong);
+  font-weight: 700;
+}
+
+.lib-std {
+  color: var(--text-strong);
+  font-weight: 600;
+}
+
+.lib-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.lib-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  min-width: 1.75rem;
+  justify-content: center;
+  padding: 0 0.45rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-1);
+  color: var(--cobalt-text);
+  font: 600 0.8125rem/1 var(--font-ui);
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+}
+
+a.lib-tag:hover {
+  border-color: var(--cobalt-text);
+  text-decoration: underline;
+}
+
+.lib-tag--more {
+  border-style: dashed;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.lib-item__acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+}
+
+.lib-act {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.75rem;
+  font: 600 0.875rem/1.3 var(--font-ui);
+}
+
+/* ---------- Cards: each category set out for what it holds ---------- */
+
+.lib[data-view="cards"] .lib-items {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: var(--sp-5) var(--sp-6);
+}
+
+.lib[data-view="cards"] .lib-item__sum {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.lib[data-view="cards"] .lib-item:not(.lib-item--image) {
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--rule-hair);
+}
+
+/* Notes and checklists lead with the subtopic's number, as a contents page does. */
+.lib[data-view="cards"] .lib-item--notes .lib-item__code,
+.lib[data-view="cards"] .lib-item--revision .lib-item__code {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* Drawings: tiles that show the real map or diagram. */
+.lib[data-view="cards"] .lib-cat--mindmaps .lib-items,
+.lib[data-view="cards"] .lib-cat--diagrams .lib-items,
+.lib[data-view="cards"] .lib-cat--frameworks .lib-items {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+}
+
+.lib[data-view="cards"] .lib-cat--mindmaps .lib-item__sum,
+.lib[data-view="cards"] .lib-cat--diagrams .lib-item__sum,
+.lib[data-view="cards"] .lib-cat--frameworks .lib-item__sum {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Guides: the first page of each PDF, side by side; pages about them below in rows. */
+.lib[data-view="cards"] .lib-cat--assessment .lib-items {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 10.5rem), 1fr));
+}
+
+.lib[data-view="cards"] .lib-cat--frameworks .lib-item:not(.lib-item--image),
+.lib[data-view="cards"] .lib-cat--assessment .lib-item:not(.lib-item--image) {
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* The formula sheet: one entry across the column, its formulae beside its description. */
+.lib[data-view="cards"] .lib-cat--formulas .lib-items {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 48rem) {
+  .lib[data-view="cards"] .lib-cat--formulas .lib-item__body {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    column-gap: var(--sp-6);
+  }
+
+  .lib[data-view="cards"] .lib-cat--formulas .lib-item__contents {
+    grid-column: 2;
+    grid-row: 1 / span 5;
+    padding-left: var(--sp-5);
+    border-left: 1px solid var(--rule-hair);
+  }
+}
+
+/* ---------- The list: one ruled row for every resource ---------- */
+
+.lib[data-view="list"] .lib-items {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--rule-hair);
+}
+
+.lib[data-view="list"] .lib-item {
+  grid-template-columns: var(--lib-thumb) minmax(0, 1fr);
+  gap: var(--sp-4);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.lib[data-view="list"] .lib-item:not(.lib-item--image) .lib-item__body {
+  grid-column: 2;
+}
+
+.lib[data-view="list"] .lib-item__preview {
+  aspect-ratio: 4 / 3;
+  padding: 2px;
+}
+
+.lib[data-view="list"] .lib-item--page .lib-item__preview {
+  aspect-ratio: 240 / 339;
+}
+
+.lib[data-view="list"] .lib-item__body {
+  gap: var(--sp-1);
+}
+
+.lib[data-view="list"] .lib-item__title {
+  font-size: 1.0625rem;
+}
+
+.lib[data-view="list"] .lib-item__sum {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.lib[data-view="list"] .lib-item__contents {
+  display: none;
+}
+
+/* ---------- Wide screens: the panel beside the results ---------- */
+
+@media (min-width: 40rem) {
+  .lib-head__grid {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    align-items: end;
+  }
+}
+
+@media (min-width: 64rem) {
+  .lib-body {
+    grid-template-columns: 15.5rem minmax(0, 1fr);
+    gap: var(--sp-7);
+    align-items: start;
+  }
+}
+
+/* ---------- Phones and narrow windows: the filters behind one button ---------- */
+
+@media (max-width: 63.99rem) {
+  .lib-filter-btn {
+    display: inline-flex;
+  }
+
+  .lib.is-enhanced .lib-panel:not(.is-open) {
+    display: none;
+  }
+
+  .lib.is-enhanced .lib-panel.is-open {
+    padding: var(--sp-4);
+    border: 1px solid var(--rule);
+    background: var(--surface-sheet);
+  }
+
+  .lib.is-enhanced .lib-panel__done {
+    display: inline-flex;
+  }
+
+  .lib-cats ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    column-gap: var(--sp-5);
+  }
+}
+
+@media (max-width: 39.99rem) {
+  .lib {
+    --lib-thumb: 3.5rem;
+  }
+
+  .lib-glance {
+    display: none;
+  }
+
+  .lib-head__lead {
+    font-size: 1.0625rem;
+  }
+
+  .lib-bar {
+    gap: var(--sp-2) var(--sp-3);
+  }
+
+  .lib-count {
+    flex-basis: 100%;
+  }
+
+  .lib-print {
+    display: none;
+  }
+
+  .lib[data-view="list"] .lib-item__sum {
+    display: none;
+  }
+}
+
+/* ---------- Print: the list in view, as rows, with each address ---------- */
+
+@media print {
+  .lib-search,
+  .lib-panel,
+  .lib-bar,
+  .lib-more,
+  .lib-empty,
+  .lib-glance,
+  .lib-note {
+    display: none !important;
+  }
+
+  .lib-body {
+    display: block;
+    padding: 0;
+    border: 0;
+  }
+
+  .lib-item__preview,
+  .lib-item__contents,
+  .lib-item__acts,
+  .lib-tags {
+    display: none !important;
+  }
+
+  .lib .lib-items {
+    display: block;
+    border-top: 0.5pt solid #999;
+  }
+
+  .lib .lib-item {
+    display: block;
+    padding: 1.5mm 0;
+    border: 0;
+    border-bottom: 0.5pt solid #999;
+    break-inside: avoid;
+  }
+
+  .lib-item__title a::after {
+    content: " (" attr(href) ")";
+    font: 400 8pt var(--font-ui);
+    color: #444;
+  }
+
+  .lib-item__sum {
+    display: none;
+  }
+
+  .lib-cat {
+    margin-top: 6mm;
+    break-inside: auto;
+  }
+}
