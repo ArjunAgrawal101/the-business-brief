@@ -2,7 +2,8 @@
  * Unit 2 diagrams: human resource management.
  */
 import type { DiagramDef } from '../diagrams';
-import { C, TONES, arrowPath, box, circle, frame, line, para, path, rect, text, type Tone } from './kit';
+import { C, NW, TONES, arrowPath, box, circle, frame, line, narrowFrame, para, path, rect, text, type Tone } from './kit';
+import { block, stack } from './narrow';
 
 /* ---------- Human resource planning ---------- */
 function hrPlanning(id: string): string {
@@ -199,6 +200,13 @@ function shamrock(id: string): string {
 }
 
 /* ---------- Leadership styles ---------- */
+const LEAD_STYLES: Array<[number, string, string]> = [
+  [0.06, 'Autocratic', 'Decides alone and gives instructions. Fast and clear in a crisis; little say for staff.'],
+  [0.36, 'Paternalistic', 'Decides, but in what they see as staff’s best interests, explaining and caring for them.'],
+  [0.64, 'Democratic', 'Consults and lets staff share decisions. Builds commitment; slower.'],
+  [0.92, 'Laissez-faire', 'Sets the goal and leaves staff to decide how. Suits experts; risks drift.'],
+];
+
 function leadership(id: string): string {
   const W = 720;
   const H = 380;
@@ -210,13 +218,7 @@ function leadership(id: string): string {
   p.push(rect(x0, y - 7, x1 - x0, 14, { fill: `url(#${id}-g)`, rx: 7 }));
   p.push(text(x0, y - 22, 'The leader decides', { size: 12, weight: 700, fill: C.ink }));
   p.push(text(x1, y - 22, 'The team decides', { size: 12, weight: 700, fill: C.goldText, anchor: 'end' }));
-  const styles: Array<[number, string, string]> = [
-    [0.06, 'Autocratic', 'Decides alone and gives instructions. Fast and clear in a crisis; little say for staff.'],
-    [0.36, 'Paternalistic', 'Decides, but in what they see as staff’s best interests, explaining and caring for them.'],
-    [0.64, 'Democratic', 'Consults and lets staff share decisions. Builds commitment; slower.'],
-    [0.92, 'Laissez-faire', 'Sets the goal and leaves staff to decide how. Suits experts; risks drift.'],
-  ];
-  styles.forEach(([t, n, s], i) => {
+  LEAD_STYLES.forEach(([t, n, s], i) => {
     const x = x0 + t * (x1 - x0);
     p.push(circle(x, y, 9, { fill: C.white, stroke: C.ink, sw: 2 }));
     const bx = Math.min(Math.max(x - 80, 16), W - 176);
@@ -241,17 +243,19 @@ function leadership(id: string): string {
 }
 
 /* ---------- Maslow ---------- */
+const MASLOW_LEVELS: Array<[string, string]> = [
+  ['Self-actualization', 'Challenging work, growth, reaching potential'],
+  ['Esteem', 'Recognition, status, responsibility'],
+  ['Social', 'Belonging, teamwork, friendly colleagues'],
+  ['Safety', 'Job security, safe conditions, a pension'],
+  ['Physiological', 'Pay enough for food, shelter and warmth'],
+];
+
 function maslow(id: string): string {
   const W = 720;
   const H = 400;
   const p: string[] = [];
-  const lv: Array<[string, string]> = [
-    ['Self-actualization', 'Challenging work, growth, reaching potential'],
-    ['Esteem', 'Recognition, status, responsibility'],
-    ['Social', 'Belonging, teamwork, friendly colleagues'],
-    ['Safety', 'Job security, safe conditions, a pension'],
-    ['Physiological', 'Pay enough for food, shelter and warmth'],
-  ];
+  const lv = MASLOW_LEVELS;
   const cx = 240;
   const top = 26;
   const h = 64;
@@ -281,6 +285,11 @@ function maslow(id: string): string {
 }
 
 /* ---------- Herzberg ---------- */
+const HERZBERG: Record<'hygiene' | 'motivators', [string, string, Tone, string[], string, string]> = {
+  hygiene: ['Hygiene factors', 'Prevent dissatisfaction when they are right', 'slate', ['Pay', 'Working conditions', 'Company policy and administration', 'Supervision', 'Relationships at work', 'Job security'], 'Dissatisfied', 'Not dissatisfied'],
+  motivators: ['Motivators', 'Create satisfaction and effort', 'green', ['Achievement', 'Recognition', 'The work itself', 'Responsibility', 'Advancement', 'Personal growth'], 'Not satisfied', 'Satisfied'],
+};
+
 function herzberg(id: string): string {
   const W = 720;
   const H = 400;
@@ -299,8 +308,8 @@ function herzberg(id: string): string {
     p.push(text(x + 20, 292, from, { size: 11, fill: C.slate }));
     p.push(text(x + 310, 292, to, { size: 11, weight: 600, fill: t.text, anchor: 'end' }));
   };
-  col(20, 'Hygiene factors', 'Prevent dissatisfaction when they are right', 'slate', ['Pay', 'Working conditions', 'Company policy and administration', 'Supervision', 'Relationships at work', 'Job security'], 'Dissatisfied', 'Not dissatisfied');
-  col(370, 'Motivators', 'Create satisfaction and effort', 'green', ['Achievement', 'Recognition', 'The work itself', 'Responsibility', 'Advancement', 'Personal growth'], 'Not satisfied', 'Satisfied');
+  col(20, ...HERZBERG.hygiene);
+  col(370, ...HERZBERG.motivators);
   p.push(para(20, 348, 'Improving hygiene factors removes dissatisfaction but does not motivate; motivation comes from the job itself, as in job enrichment.', 112, { size: 11.5, fill: C.slate }));
   return frame(
     {
@@ -315,11 +324,14 @@ function herzberg(id: string): string {
 }
 
 /* ---------- Taylor ---------- */
+const TAYLOR_STEPS = ['Study the task: time and motion', 'Find the one best way', 'Select and train workers for it', 'Pay by output: piece rates', 'Higher productivity'];
+const TAYLOR_LIMITS = 'It treats money as the main motivator and work as a set of simple, repeated tasks. Work can become dull and controlled, quality may suffer under piece rates, and staff ideas are not used. Its methods live on in digital Taylorism, the close monitoring of work by data.';
+
 function taylor(id: string): string {
   const W = 720;
   const H = 280;
   const p: string[] = [];
-  const steps = ['Study the task: time and motion', 'Find the one best way', 'Select and train workers for it', 'Pay by output: piece rates', 'Higher productivity'];
+  const steps = TAYLOR_STEPS;
   const bw = 124;
   const gap = 18;
   steps.forEach((s, i) => {
@@ -330,7 +342,7 @@ function taylor(id: string): string {
   p.push(text(8, 30, 'Scientific management (Frederick Taylor)', { size: 14, weight: 700, serif: true, fill: C.ink }));
   p.push(rect(8, 156, 704, 104, { fill: C.signalWash, rx: 3 }));
   p.push(text(24, 180, 'Limits', { size: 12, weight: 700, fill: C.signalText, label: true }));
-  p.push(para(24, 200, 'It treats money as the main motivator and work as a set of simple, repeated tasks. Work can become dull and controlled, quality may suffer under piece rates, and staff ideas are not used. Its methods live on in digital Taylorism, the close monitoring of work by data.', 110, { size: 12, fill: C.body }));
+  p.push(para(24, 200, TAYLOR_LIMITS, 110, { size: 12, fill: C.body }));
   return frame(
     {
       id,
@@ -344,6 +356,12 @@ function taylor(id: string): string {
 }
 
 /* ---------- McClelland ---------- */
+const MCCLELLAND: Array<[number, string, Tone]> = [
+  [40, 'Achievement: seeks challenging goals and feedback. Motivate with stretching targets.', 'gold'],
+  [160, 'Affiliation: seeks belonging and good relationships. Motivate with teamwork.', 'green'],
+  [280, 'Power: seeks influence over others. Motivate with responsibility and status.', 'cobalt'],
+];
+
 function mcclelland(id: string): string {
   const W = 700;
   const H = 400;
@@ -358,12 +376,7 @@ function mcclelland(id: string): string {
   p.push(text(444, 120, 'Affiliation', { size: 14, weight: 700, serif: true, fill: C.greenText, anchor: 'middle' }));
   p.push(text(320, 312, 'Power', { size: 14, weight: 700, serif: true, fill: C.cobaltText, anchor: 'middle' }));
   p.push(para(320, 186, 'Everyone has all three; one usually dominates', 18, { size: 11, weight: 600, fill: C.ink, anchor: 'middle', middle: true }));
-  const notes: Array<[number, string, Tone]> = [
-    [40, 'Achievement: seeks challenging goals and feedback. Motivate with stretching targets.', 'gold'],
-    [160, 'Affiliation: seeks belonging and good relationships. Motivate with teamwork.', 'green'],
-    [280, 'Power: seeks influence over others. Motivate with responsibility and status.', 'cobalt'],
-  ];
-  notes.forEach(([y, s, tone]) => {
+  MCCLELLAND.forEach(([y, s, tone]) => {
     p.push(rect(520, y, 4, 70, { fill: TONES[tone].line }));
     p.push(para(532, y + 16, s, 24, { size: 11.5, fill: C.body }));
   });
@@ -380,16 +393,17 @@ function mcclelland(id: string): string {
 }
 
 /* ---------- Self-determination theory ---------- */
+const SDT_NEEDS: Array<[string, string]> = [
+  ['Autonomy', 'Some control over how and when the work is done'],
+  ['Competence', 'Feeling able, and getting better, at the work'],
+  ['Relatedness', 'Feeling connected to and valued by others'],
+];
+
 function sdt(id: string): string {
   const W = 720;
   const H = 320;
   const p: string[] = [];
-  const needs: Array<[string, string]> = [
-    ['Autonomy', 'Some control over how and when the work is done'],
-    ['Competence', 'Feeling able, and getting better, at the work'],
-    ['Relatedness', 'Feeling connected to and valued by others'],
-  ];
-  needs.forEach(([n, s], i) => {
+  SDT_NEEDS.forEach(([n, s], i) => {
     const y = 26 + i * 92;
     p.push(box(20, y, 260, 76, n, { tone: 'cobalt', size: 14, sub: s }));
     p.push(line(id, 282, y + 38, 440, 150, { tone: 'cobalt', sw: 1.4, arrow: 'end' }));
@@ -444,6 +458,12 @@ function equity(id: string): string {
 const poly3 = (cx: number, y: number) => `<polygon points="${cx - 40},${y + 30} ${cx + 40},${y + 30} ${cx},${y - 6}" fill="${C.ink}"/>`;
 
 /* ---------- Expectancy theory ---------- */
+const EXPECTANCY_LINKS: Array<[string, string, Tone]> = [
+  ['Expectancy (E)', 'Will my effort lead to the performance?', 'cobalt'],
+  ['Instrumentality (I)', 'Will the performance bring the reward?', 'green'],
+  ['Valence (V)', 'Do I value the reward?', 'gold'],
+];
+
 function expectancy(id: string): string {
   const W = 720;
   const H = 300;
@@ -451,12 +471,7 @@ function expectancy(id: string): string {
   const nodes = ['Effort', 'Performance', 'Reward', 'Valued goal'];
   const xs = [20, 200, 380, 560];
   nodes.forEach((n, i) => p.push(box(xs[i]!, 60, 140, 56, n, { tone: i === 3 ? 'gold' : 'ink', style: i === 0 ? 'solid' : 'wash', size: 14 })));
-  const links: Array<[string, string, Tone]> = [
-    ['Expectancy (E)', 'Will my effort lead to the performance?', 'cobalt'],
-    ['Instrumentality (I)', 'Will the performance bring the reward?', 'green'],
-    ['Valence (V)', 'Do I value the reward?', 'gold'],
-  ];
-  links.forEach(([n, q, tone], i) => {
+  EXPECTANCY_LINKS.forEach(([n, q, tone], i) => {
     const x1 = xs[i]! + 142;
     const x2 = xs[i + 1]! - 2;
     p.push(line(id, x1, 88, x2, 88, { tone, sw: 2, arrow: 'end' }));
@@ -700,20 +715,169 @@ function conflict(id: string): string {
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* Layouts for phones: the same content, 300 wide, text 14 or more     */
+/* ------------------------------------------------------------------ */
+
+const note = (y: number, s: string) => block(0, y, s, NW, { italic: true, fill: C.slate });
+
+function leadershipNarrow(id: string): string {
+  const p: string[] = [];
+  p.push(text(26, 15, 'The leader decides', { size: 14, weight: 700, fill: C.ink }));
+  const g = stack(
+    id,
+    LEAD_STYLES.map(([, title, t]) => ({ title, text: t })),
+    { top: 28, x: 26 },
+  );
+  p.push(g.body);
+  const end = 28 + g.h;
+  p.push(text(26, end + 22, 'The team decides', { size: 14, weight: 700, fill: C.goldText }));
+  p.push(line(id, 10, 10, 10, end + 16, { sw: 2.2, arrow: 'end' }));
+  const sit = stack(id, [{ title: 'Situational leadership', text: 'Moving along the line to suit the task, the team and the situation', tone: 'cobalt' }], { top: end + 38 });
+  p.push(sit.body);
+  let y = end + 38 + sit.h + 10;
+  const n = note(y, 'The five styles named in the guide. Paternalistic leaders decide much as autocratic ones do, but with care for the people affected.');
+  p.push(n.body);
+  y += n.h + 4;
+  return narrowFrame(id, leadership(id), y, p.join(''));
+}
+
+function maslowNarrow(id: string): string {
+  const p: string[] = [];
+  let y = 0;
+  const fills = [C.gold, '#c9a866', '#dcc28d', '#ece5d4', '#f3ead6'];
+  MASLOW_LEVELS.forEach(([n, ex], i) => {
+    const w = 170 + i * 32.5;
+    const x = (NW - w) / 2;
+    const body = block(NW / 2, 0, ex, w - 20, { anchor: 'middle' });
+    const h = 12 + 19 + body.h + 10;
+    p.push(rect(x, y, w, h, { fill: fills[i]!, stroke: C.gold, sw: 1, rx: 2 }));
+    p.push(text(NW / 2, y + 26, n, { size: 15, weight: 700, fill: C.ink, anchor: 'middle' }));
+    p.push(block(NW / 2, y + 33, ex, w - 20, { anchor: 'middle', fill: C.ink }).body);
+    y += h + 4;
+  });
+  const n = note(y + 8, 'Read from the base up: each need motivates once the one below is broadly met.');
+  p.push(n.body);
+  return narrowFrame(id, maslow(id), y + 12 + n.h, p.join(''));
+}
+
+function herzbergNarrow(id: string): string {
+  const p: string[] = [];
+  let y = 0;
+  for (const k of ['motivators', 'hygiene'] as const) {
+    const [title, role, tone, items, from, to] = HERZBERG[k];
+    const t = TONES[tone];
+    const list = block(14, 0, items.join(', '), NW - 28);
+    const h = 14 + 19 + 4 + 18 + 8 + list.h + 46;
+    p.push(rect(0, y, NW, h, { fill: C.white, stroke: t.line, sw: 1.2, rx: 3 }));
+    p.push(text(14, y + 28, title, { size: 16, weight: 700, serif: true, fill: t.text }));
+    p.push(text(14, y + 50, role, { size: 14, fill: C.body }));
+    p.push(block(14, y + 60, items.join(', '), NW - 28, { weight: 600, fill: C.ink }).body);
+    const ay = y + 60 + list.h + 30;
+    p.push(line(id, 14, ay, NW - 14, ay, { tone, sw: 1.6, arrow: 'end' }));
+    p.push(text(14, ay - 8, from, { size: 14, fill: C.slate }));
+    p.push(text(NW - 14, ay - 8, to, { size: 14, weight: 600, fill: t.text, anchor: 'end' }));
+    y += h + 12;
+  }
+  const n = note(y, 'Improving hygiene factors removes dissatisfaction but does not motivate; motivation comes from the job itself, as in job enrichment.');
+  p.push(n.body);
+  return narrowFrame(id, herzberg(id), y + n.h + 4, p.join(''));
+}
+
+function taylorNarrow(id: string): string {
+  const g = stack(
+    id,
+    TAYLOR_STEPS.map((title, i) => ({ title, mark: String(i + 1), tone: (i === TAYLOR_STEPS.length - 1 ? 'green' : 'ink') as Tone })),
+    { arrows: true, gap: 16 },
+  );
+  const lim = stack(id, [{ title: 'Limits', text: TAYLOR_LIMITS, tone: 'signal' }], { top: g.h + 18 });
+  return narrowFrame(id, taylor(id), g.h + 18 + lim.h, g.body + lim.body);
+}
+
+function mcclellandNarrow(id: string): string {
+  const g = stack(
+    id,
+    MCCLELLAND.map(([, s, tone]) => {
+      const [title, rest] = s.split(': ');
+      return { title: title!, text: rest!, tone };
+    }),
+  );
+  const n = note(g.h + 10, 'Everyone has all three needs, acquired through experience; one usually dominates.');
+  return narrowFrame(id, mcclelland(id), g.h + 14 + n.h, g.body + n.body);
+}
+
+function sdtNarrow(id: string): string {
+  const needs = stack(
+    id,
+    SDT_NEEDS.map(([title, t]) => ({ title, text: t, tone: 'cobalt' as Tone })),
+  );
+  const y = needs.h + 8;
+  const arrow = line(id, NW / 2, y, NW / 2, y + 22, { tone: 'green', sw: 2, arrow: 'end' });
+  const goal = stack(id, [{ title: 'Self-determined (intrinsic) motivation', text: 'Doing the work because it is interesting or meaningful', tone: 'green', solid: true }], { top: y + 28 });
+  const n = note(y + 28 + goal.h + 10, 'Rewards and pressure can crowd out intrinsic motivation if they take away the sense of choice.');
+  return narrowFrame(id, sdt(id), y + 32 + goal.h + n.h + 6, needs.body + arrow + goal.body + n.body);
+}
+
+function equityNarrow(id: string): string {
+  const p: string[] = [];
+  const a = block(0, 0, 'Inputs: effort, skill, time, experience, loyalty.', NW, { weight: 600, fill: C.ink });
+  const b = block(0, a.h + 4, 'Outputs: pay, benefits, recognition, promotion.', NW, { weight: 600, fill: C.ink });
+  p.push(a.body, b.body);
+  let y = a.h + b.h + 18;
+  const pans = stack(
+    id,
+    [
+      { title: 'Me', text: 'Outputs ÷ inputs', tone: 'gold' },
+      { title: 'A colleague I compare with', text: 'Outputs ÷ inputs', tone: 'cobalt' },
+    ],
+    { top: y, gap: 34 },
+  );
+  p.push(pans.body);
+  // The balance between the two ratios.
+  const mid = y + pans.h / 2 + 3;
+  p.push(text(NW / 2, mid + 5, 'compared with', { size: 14, italic: true, fill: C.slate, anchor: 'middle' }));
+  y += pans.h + 12;
+  const n = note(y, 'When the ratios feel equal, people are content. When they do not, people act to restore the balance: they cut their effort, ask for more, change who they compare themselves with, or leave.');
+  p.push(n.body);
+  return narrowFrame(id, equity(id), y + n.h + 4, p.join(''));
+}
+
+function expectancyNarrow(id: string): string {
+  const p: string[] = [];
+  const nodes = ['Effort', 'Performance', 'Reward', 'Valued goal'];
+  let y = 0;
+  nodes.forEach((n, i) => {
+    p.push(rect(0, y, NW, 36, { fill: i === 0 ? C.ink : i === 3 ? C.goldWash : C.paper, stroke: i === 3 ? C.gold : C.ink, sw: 1.2, rx: 3 }));
+    p.push(text(NW / 2, y + 23, n, { size: 15, weight: 700, fill: i === 0 ? C.white : C.ink, anchor: 'middle' }));
+    y += 36;
+    if (i < EXPECTANCY_LINKS.length) {
+      const [name, q, tone] = EXPECTANCY_LINKS[i]!;
+      const qb = block(44, y + 30, q, NW - 44);
+      p.push(line(id, 20, y + 4, 20, y + 30 + qb.h + 8, { tone, sw: 2, arrow: 'end' }));
+      p.push(text(44, y + 22, name, { size: 14, weight: 700, fill: TONES[tone].text }));
+      p.push(qb.body);
+      y += 30 + qb.h + 14;
+    }
+  });
+  const f = stack(id, [{ title: 'Motivation = E × I × V', text: 'Each is judged by the worker. If any one is close to zero, so is motivation.' }], { top: y + 14 });
+  p.push(f.body);
+  return narrowFrame(id, expectancy(id), y + 14 + f.h, p.join(''));
+}
+
 export const UNIT2: Record<string, DiagramDef> = {
   'hr-planning-factors': { title: 'Factors in human resource planning', caption: 'The internal and external factors that shape how many people a business needs.', syllabus: ['2.1'], level: 'SL/HL', group: 'unit-2', render: hrPlanning },
   'tall-flat-structures': { title: 'Tall and flat structures', caption: 'Levels of hierarchy, span of control and chain of command compared.', syllabus: ['2.2'], level: 'SL/HL', group: 'unit-2', render: tallFlat },
   'org-charts-by-type': { title: 'Organization by function, product and region', caption: 'Three ways to group the same business.', syllabus: ['2.2'], level: 'SL/HL', group: 'unit-2', render: chartsByType },
   'matrix-structure': { title: 'A matrix structure', caption: 'Project teams that draw on every function, each member with two managers.', syllabus: ['2.2'], level: 'SL/HL', group: 'unit-2', render: matrix },
   'shamrock-organization': { title: 'Handy’s Shamrock Organization', caption: 'A professional core, a contractual fringe and a flexible labour force.', syllabus: ['2.2'], level: 'HL', group: 'unit-2', render: shamrock },
-  'leadership-styles': { title: 'Leadership styles', caption: 'The five styles in the guide, from the leader deciding to the team deciding.', syllabus: ['2.3'], level: 'SL/HL', group: 'unit-2', render: leadership },
-  'taylor-scientific-management': { title: 'Taylor’s scientific management', caption: 'The one best way, piece rates, and the limits of both.', syllabus: ['2.4'], level: 'SL/HL', group: 'unit-2', render: taylor },
-  'maslow-hierarchy': { title: 'Maslow’s hierarchy of needs', caption: 'Five levels of need, with workplace examples.', syllabus: ['2.4'], level: 'SL/HL', group: 'unit-2', render: maslow },
-  'herzberg-two-factor': { title: 'Herzberg’s motivation-hygiene theory', caption: 'What prevents dissatisfaction is not what motivates.', syllabus: ['2.4'], level: 'SL/HL', group: 'unit-2', render: herzberg },
-  'mcclelland-needs': { title: 'McClelland’s acquired needs', caption: 'Achievement, affiliation and power.', syllabus: ['2.4'], level: 'HL', group: 'unit-2', render: mcclelland },
-  'self-determination-theory': { title: 'Self-determination theory', caption: 'Autonomy, competence and relatedness feed intrinsic motivation.', syllabus: ['2.4'], level: 'HL', group: 'unit-2', render: sdt },
-  'equity-theory': { title: 'Equity theory', caption: 'Comparing what we put in and get out with someone else.', syllabus: ['2.4'], level: 'HL', group: 'unit-2', render: equity },
-  'expectancy-theory': { title: 'Expectancy theory', caption: 'Expectancy, instrumentality and valence, multiplied.', syllabus: ['2.4'], level: 'HL', group: 'unit-2', render: expectancy },
+  'leadership-styles': { title: 'Leadership styles', caption: 'The five styles in the guide, from the leader deciding to the team deciding.', syllabus: ['2.3'], level: 'SL/HL', group: 'unit-2', render: leadership, narrow: leadershipNarrow },
+  'taylor-scientific-management': { title: 'Taylor’s scientific management', caption: 'The one best way, piece rates, and the limits of both.', syllabus: ['2.4'], level: 'SL/HL', group: 'unit-2', render: taylor, narrow: taylorNarrow },
+  'maslow-hierarchy': { title: 'Maslow’s hierarchy of needs', caption: 'Five levels of need, with workplace examples.', syllabus: ['2.4'], level: 'SL/HL', group: 'unit-2', render: maslow, narrow: maslowNarrow },
+  'herzberg-two-factor': { title: 'Herzberg’s motivation-hygiene theory', caption: 'What prevents dissatisfaction is not what motivates.', syllabus: ['2.4'], level: 'SL/HL', group: 'unit-2', render: herzberg, narrow: herzbergNarrow },
+  'mcclelland-needs': { title: 'McClelland’s acquired needs', caption: 'Achievement, affiliation and power.', syllabus: ['2.4'], level: 'HL', group: 'unit-2', render: mcclelland, narrow: mcclellandNarrow },
+  'self-determination-theory': { title: 'Self-determination theory', caption: 'Autonomy, competence and relatedness feed intrinsic motivation.', syllabus: ['2.4'], level: 'HL', group: 'unit-2', render: sdt, narrow: sdtNarrow },
+  'equity-theory': { title: 'Equity theory', caption: 'Comparing what we put in and get out with someone else.', syllabus: ['2.4'], level: 'HL', group: 'unit-2', render: equity, narrow: equityNarrow },
+  'expectancy-theory': { title: 'Expectancy theory', caption: 'Expectancy, instrumentality and valence, multiplied.', syllabus: ['2.4'], level: 'HL', group: 'unit-2', render: expectancy, narrow: expectancyNarrow },
   'appraisal-types': { title: 'Appraisal and 360-degree feedback', caption: 'The four types of appraisal in the guide.', syllabus: ['2.4'], level: 'HL', group: 'unit-2', render: appraisal },
   'rewards-financial-non-financial': { title: 'Financial and non-financial rewards', caption: 'Every reward the guide names, with a line on each.', syllabus: ['2.4'], level: 'SL/HL', group: 'unit-2', render: rewards },
   'handy-gods-of-management': { title: 'Handy’s Gods of management', caption: 'Power, role, task and person cultures, with their images.', syllabus: ['2.5'], level: 'HL', group: 'unit-2', render: handy },

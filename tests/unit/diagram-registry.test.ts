@@ -8,7 +8,7 @@
  * each diagram is used.
  */
 import { describe, expect, it } from 'vitest';
-import { readdirSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { DIAGRAMS, describe as descOf, standalone, type DiagramDef } from '../../src/lib/diagrams';
 import { UNIT1_MORE } from '../../src/lib/figures/unit1-more';
 import { UNIT2_MORE } from '../../src/lib/figures/unit2-more';
@@ -112,6 +112,26 @@ describe('the new diagrams', () => {
       expect(/[–—]/.test(s), `${id}: a dash in "${s.slice(0, 80)}"`).toBe(false);
       expect(/undefined|NaN|\[object Object\]/.test(s), `${id}: "${s.slice(0, 80)}"`).toBe(false);
     }
+  });
+});
+
+describe('the framework diagrams on phones', () => {
+  const pages = readdirSync(new URL('../../src/content/frameworks/', import.meta.url)).filter((f) => f.endsWith('.yaml'));
+  const drawn = pages.map((f) => {
+    const src = readFileSync(new URL(`../../src/content/frameworks/${f}`, import.meta.url), 'utf8');
+    return [f.replace(/\.yaml$/, ''), /^diagram: (\S+)/m.exec(src)?.[1] ?? ''] as const;
+  });
+
+  it.each(drawn)('the framework %s draws its diagram again for a phone, with no text under 14 units', (fw, id) => {
+    const d = DIAGRAMS[id];
+    expect(d, `${fw}: ${id}`).toBeDefined();
+    expect(d!.narrow, `${fw}: ${id} has no layout for phones`).toBeDefined();
+    const svg = d!.narrow!(`f-${id}`);
+    expect(/viewBox="0 0 300 /.test(svg)).toBe(true);
+    expect(textSizes(svg).filter((x) => x < 14), `${id}: text under 14 units`).toEqual([]);
+    // It says what the wide drawing says.
+    expect(descOf(svg)).toBe(descOf(d!.render(`w-${id}`)));
+    expect(/[–—]|undefined|NaN/.test(svg)).toBe(false);
   });
 });
 

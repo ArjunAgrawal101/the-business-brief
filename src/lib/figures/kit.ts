@@ -131,6 +131,23 @@ export function part(o: RenderOpts | undefined, pid: string, label: string, hit:
 export const NW = 300;
 export const NARROW_MIN = 14;
 
+/**
+ * A drawing for phones that says what the wide drawing says: it takes the
+ * wide drawing's title and description (and its way of naming itself), so
+ * the two can never disagree, and sets its own size and body.
+ */
+export function narrowFrame(id: string, wide: string, h: number, body: string): string {
+  const title = /<title[^>]*>([\s\S]*?)<\/title>/.exec(wide)?.[1] ?? '';
+  const desc = /<desc[^>]*>([\s\S]*?)<\/desc>/.exec(wide)?.[1] ?? '';
+  const names = /aria-describedby=/.test(wide) ? `aria-labelledby="${id}-t" aria-describedby="${id}-d"` : `aria-labelledby="${id}-t ${id}-d"`;
+  const role = /role="group"/.test(wide) ? 'group' : 'img';
+  return (
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${NW} ${r(h)}" width="${NW}" height="${r(h)}" role="${role}" ${names} font-family="${esc(SANS)}" font-size="14" fill="${C.body}">` +
+    `<title id="${id}-t">${title}</title><desc id="${id}-d">${desc}</desc>` +
+    `<defs>${markers(id)}</defs>${body}</svg>`
+  );
+}
+
 /** Characters per line for wrapped text of a given size in a given width (Inter, mixed case). */
 export const charsFor = (width: number, size: number) => Math.max(6, Math.floor(width / (size * 0.56)));
 

@@ -60,6 +60,7 @@ const panels = ix?.kind === 'compare' ? ix.panels.map((p) => ({ ...p, svg: ix.dr
 <figure class:list={['dg', `dg--${kind}`]} id={`diagram-${id}`} data-ix="diagram" data-kind={kind} data-dg={id} aria-labelledby={`${uid}-cap`}>
   {kind === 'live' && <script type="application/json" data-config set:html={jsonForScript(config)} />}
   {kind === 'compare' && <script type="application/json" data-config set:html={jsonForScript(config)} />}
+  {d.howTo && kind !== 'explore' && kind !== 'static' && <p class="dg__how js-only">{d.howTo}</p>}
 
   {
     ix?.kind === 'live' && (
@@ -216,8 +217,8 @@ const panels = ix?.kind === 'compare' ? ix.panels.map((p) => ({ ...p, svg: ix.dr
         {kind === 'explore' && (
           <div class="dg__readout js-only" data-readout>
             <p class="dg__readout-hint">
-              Point to a part, or tab to it, to read what it means here; select it to open where it is taught. On a touch screen, the first tap explains and the
-              second opens.
+              {d.howTo ?? 'Point to a part, or tab to it, to read what it means here; select it to open where it is taught.'} On a touch screen, the first tap explains and
+              the second opens.
             </p>
           </div>
         )}
@@ -239,7 +240,6 @@ const panels = ix?.kind === 'compare' ? ix.panels.map((p) => ({ ...p, svg: ix.dr
       {d.level === 'HL' && <span class="dg__hl">HL</span>}
     </span>
     {(caption ?? d.caption) && <span class="dg__text">{caption ?? d.caption}</span>}
-    {d.howTo && <span class="dg__how js-only">{d.howTo}</span>}
     {
       parts.length > 0 && (
         <details class="dg__parts" open data-parts>
@@ -465,13 +465,14 @@ const panels = ix?.kind === 'compare' ? ix.panels.map((p) => ({ ...p, svg: ix.dr
     border-radius: 2px;
   }
 
-  .dg__text,
-  .dg__how {
+  .dg__text {
     font-size: 0.875rem;
     color: var(--text-muted);
   }
 
   .dg__how {
+    margin: 0 0 var(--sp-3);
+    font-size: 0.875rem;
     color: var(--text-body);
   }
 

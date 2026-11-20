@@ -2,7 +2,8 @@
  * Unit 1 diagrams: introduction to business management.
  */
 import type { DiagramDef } from '../diagrams';
-import { C, TONES, arrowPath, axes, box, circle, frame, line, para, rect, smooth, sx, sy, text, type Axes, type Tone } from './kit';
+import { C, TONES, arrowPath, axes, box, circle, frame, line, narrowFrame, para, rect, smooth, sx, sy, text, type Axes, type Tone } from './kit';
+import { grid2 } from './narrow';
 
 /* ---------- The four sectors ---------- */
 function sectors(id: string): string {
@@ -213,6 +214,13 @@ function stakeholders(id: string): string {
 }
 
 /* ---------- Stakeholder mapping ---------- */
+const STAKE_CELLS: Array<[number, number, string, string, Tone]> = [
+  [0, 0, 'Keep satisfied', 'High power, low interest', 'gold'],
+  [1, 0, 'Manage closely', 'High power, high interest: key players', 'signal'],
+  [0, 1, 'Monitor', 'Low power, low interest', 'slate'],
+  [1, 1, 'Keep informed', 'Low power, high interest', 'cobalt'],
+];
+
 function stakeholderGrid(id: string): string {
   const W = 640;
   const H = 420;
@@ -221,13 +229,7 @@ function stakeholderGrid(id: string): string {
   const gy = 40;
   const cw = 250;
   const ch = 150;
-  const cells: Array<[number, number, string, string, Tone]> = [
-    [0, 0, 'Keep satisfied', 'High power, low interest', 'gold'],
-    [1, 0, 'Manage closely', 'High power, high interest: key players', 'signal'],
-    [0, 1, 'Monitor', 'Low power, low interest', 'slate'],
-    [1, 1, 'Keep informed', 'Low power, high interest', 'cobalt'],
-  ];
-  for (const [i, j, name, sub, tone] of cells) {
+  for (const [i, j, name, sub, tone] of STAKE_CELLS) {
     const t = TONES[tone];
     p.push(rect(gx + i * cw, gy + j * ch, cw - 6, ch - 6, { fill: t.wash, stroke: t.line, sw: 1, rx: 3 }));
     p.push(text(gx + i * cw + 16, gy + j * ch + 34, name, { size: 15, weight: 700, serif: true, fill: t.text }));
@@ -398,13 +400,27 @@ function mnc(id: string): string {
   );
 }
 
+/** For a phone: the same grid, rows labelled across their two cells. */
+function stakeholderGridNarrow(id: string): string {
+  const cells = STAKE_CELLS.map(([, , title, text, tone]) => ({ title, text, tone }));
+  const g = grid2({
+    colAxis: 'Interest in the decision',
+    colLabels: ['Low', 'High'],
+    rowAxis: 'Power',
+    rowLabels: ['high', 'low'],
+    cells: [cells[0]!, cells[1]!, cells[2]!, cells[3]!],
+    note: 'A widely used planning tool, not one the guide names. Positions change from one decision to the next.',
+  });
+  return narrowFrame(id, stakeholderGrid(id), g.h, g.body);
+}
+
 export const UNIT1: Record<string, DiagramDef> = {
   'business-sectors': { title: 'The four sectors of economic activity', caption: 'From extracting resources to selling knowledge, with one chain of production.', syllabus: ['1.1'], level: 'SL/HL', group: 'unit-1', render: sectors },
   'inputs-outputs': { title: 'Inputs, transformation and outputs', caption: 'The factors of production, the four business functions and added value.', syllabus: ['1.1'], level: 'SL/HL', group: 'unit-1', render: transformation },
   'business-entities': { title: 'Types of business entity', caption: 'Private and public sectors, liability, and the social enterprises the guide names.', syllabus: ['1.2'], level: 'SL/HL', group: 'unit-1', render: entities },
   'objectives-hierarchy': { title: 'From vision to tactical objectives', caption: 'How vision, mission, strategic and tactical objectives fit together.', syllabus: ['1.3'], level: 'SL/HL', group: 'unit-1', render: objectives },
   'stakeholder-map': { title: 'Internal and external stakeholders', caption: 'Who has a stake in the business, from the inside out.', syllabus: ['1.4'], level: 'SL/HL', group: 'unit-1', render: stakeholders },
-  'stakeholder-mapping': { title: 'Stakeholder mapping by power and interest', caption: 'A planning tool for deciding how to treat each group in a decision.', syllabus: ['1.4'], level: 'SL/HL', group: 'unit-1', render: stakeholderGrid },
+  'stakeholder-mapping': { title: 'Stakeholder mapping by power and interest', caption: 'A planning tool for deciding how to treat each group in a decision.', syllabus: ['1.4'], level: 'SL/HL', group: 'unit-1', render: stakeholderGrid, narrow: stakeholderGridNarrow },
   'economies-of-scale': { title: 'Economies and diseconomies of scale', caption: 'Average cost falls, bottoms out and rises as a business grows.', syllabus: ['1.5'], level: 'SL/HL', group: 'unit-1', render: scale },
   'growth-methods': { title: 'Methods of business growth', caption: 'Internal growth and the five external methods the guide names.', syllabus: ['1.5'], level: 'SL/HL', group: 'unit-1', render: growthMethods },
   'integration-types': { title: 'Directions of integration', caption: 'Horizontal, backward and forward vertical, and conglomerate, for one fictional business.', syllabus: ['1.5'], level: 'SL/HL', group: 'unit-1', fictional: true, render: integration },
