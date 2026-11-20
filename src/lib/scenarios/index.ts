@@ -8,9 +8,10 @@ import { TOOLKIT } from './kit';
 import { UNIT1 } from './families/unit1';
 import { UNIT2 } from './families/unit2';
 import { UNIT3 } from './families/unit3';
+import { UNIT4 } from './families/unit4';
 import type { Family, Scenario } from './types';
 
-export const FAMILIES: Family[] = [...UNIT1, ...UNIT2, ...UNIT3];
+export const FAMILIES: Family[] = [...UNIT1, ...UNIT2, ...UNIT3, ...UNIT4];
 
 export { UNITS } from './types';
 
