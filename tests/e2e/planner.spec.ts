@@ -171,7 +171,7 @@ test.describe('The revision planner', () => {
     await page.getByRole('button', { name: 'Clear the plan' }).click();
     await expect(page.getByRole('button', { name: 'Keep it' })).toBeFocused();
     await page.getByRole('button', { name: 'Keep it' }).click();
-    await expect((await stored(page)).sessions.length).toBeGreaterThan(0);
+    expect((await stored(page)).sessions.length).toBeGreaterThan(0);
     await page.getByRole('button', { name: 'Clear the plan' }).click();
     await page.getByRole('button', { name: 'Clear it' }).click();
     await expect(page.locator('[data-ix="planner"] [data-live]')).toHaveText('The plan is cleared. Your choices in the form are kept.');
