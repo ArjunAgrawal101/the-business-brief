@@ -1,214 +1,266 @@
 ---
 /**
- * The home page. After the opening (on every fresh entry), a hero that says
- * who made the platform and what it is for, with five ways in; then the
- * ecosystem drawn as an institution, the weekly briefing, the three chains
- * of reasoning, the course unit by unit, a working preview of a tool, the
- * mindmaps, diagrams and glossary, learning objectives, pathways, the
- * Assessment Centre, the latest additions, the creator, the Arjun Agrawal
- * Academic Ecosystem (the three platforms by the same educator) and a
- * closing invitation. Every figure on the page is counted from the content.
+ * The home page, in the order the 2.0 brief sets out:
+ *  1. the platform and what it is for, with this week's brief beside it;
+ *  2. the way of thinking every page practises;
+ *  3. the whole IB course, unit by unit, one click from any subtopic;
+ *  4. the case of the week;
+ *  5. the strategic decision of the week;
+ *  6. the financial analysis laboratory, live, with the week's challenge;
+ *  7. frameworks and management tools, by the question each answers;
+ *  8. the Assessment Centre;
+ *  9. the interactive learning environments;
+ * 10. mindmaps, diagrams and the glossary;
+ * 11. business intelligence: the newest sourced items;
+ * 12. the creator, and tutoring;
+ * 13. routes through the platform and the other two platforms;
+ * then the footer.
+ *
+ * Every figure is counted from the content. The weekly features are the
+ * platform's own material: the build week's shows by default and the
+ * reader's own ISO week chooses in the browser (src/scripts/home.ts). The
+ * cases, decisions and figures are fictional and labelled; the intelligence
+ * items are real, dated and sourced.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
-import SectionHead from '../components/layout/SectionHead.astro';
-import Monogram from '../components/brand/Monogram.astro';
 import CreatorPhoto from '../components/brand/CreatorPhoto.astro';
-import HeroBlueprint from '../components/home/HeroBlueprint.astro';
-import StatusTag from '../components/ui/StatusTag.astro';
-import Icon from '../components/ui/Icon.astro';
-import { corpus, href, pathwaysInOrder } from '../lib/content';
+import Monogram from '../components/brand/Monogram.astro';
+import BreakEvenPreview from '../components/home/BreakEvenPreview.astro';
+import { corpus, href, modulesInOrder, pathwaysInOrder } from '../lib/content';
 import { curriculumOf, subtopicCoverage } from '../lib/coverage';
+import { subtopicHref } from '../lib/learning';
 import { DIAGRAMS } from '../lib/diagrams';
 import { renderThumb } from '../lib/mindmap';
-import Ecosystem from '../components/home/Ecosystem.astro';
-import AcademicEcosystem from '../components/home/AcademicEcosystem.astro';
-import { SESSION as TUTOR_SESSION, enquiryMailto } from '../lib/tutorials';
-import Featured from '../components/home/Featured.astro';
-import BreakEvenPreview from '../components/home/BreakEvenPreview.astro';
-import { ADDITIONS, OBJECTIVES } from '../lib/home';
-import { subtopicHref } from '../lib/learning';
+import { CHALLENGES, FRAMEWORKS, INSIGHTS, isoWeek } from '../lib/home';
+import { calendarDate, caseOfTheWeek, rotationOrder } from '../lib/case-vault';
+import { buildBank } from '../lib/bank-build';
+import { isEnrichment } from '../lib/glossary';
+import { library as frameworkLibrary } from '../lib/frameworks-content';
+import { frameworkHref, grouped } from '../lib/frameworks';
+import { briefing, briefingHref } from '../lib/briefing-content';
+import { formatDate } from '../lib/briefing';
+import { ECOSYSTEM } from '../lib/ecosystem';
+import { SESSION as TUTOR_SESSION } from '../lib/tutorials';
 
 const c = await corpus();
 const cur = curriculumOf(c);
 const coverage = subtopicCoverage(c);
-const pathways = await pathwaysInOrder();
-
-const complete = coverage.filter((s) => s.state === 'complete').length;
-const partial = coverage.filter((s) => s.state === 'partial').length;
-const interactions = Object.values(c.interactives).filter((it) => it.page).length;
-const questions = Object.keys(c.questions).length;
-const terms = Object.keys(c.glossary).length;
+const bankSize = buildBank(c).items.length;
+const ibTerms = Object.values(c.glossary).filter((g) => !isEnrichment(g)).length;
 const maps = Object.entries(c.mindmaps).sort((a, b) => a[1].order - b[1].order);
-const HOME_DIAGRAMS = ['break-even-chart', 'bcg-matrix', 'maslow-hierarchy'];
-const LETTERS = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].filter((l) => Object.values(c.glossary).some((g) => g.term.toUpperCase().startsWith(l)));
+const fw = (await frameworkLibrary()).frameworks;
+const fwGroups = grouped(fw).filter((g) => g.items.length);
+const fwCount = Object.keys(fw).length;
+const news = (await briefing()).slice(0, 3);
+const pathways = await pathwaysInOrder();
+const modules = (await modulesInOrder()).map((m) => ({ id: m.id, ...m.data }));
+const comps = Object.entries(c.assessment).sort((a, b) => a[1].order - b[1].order);
 
-const INDEX = [
-  { value: String(coverage.length), label: 'subtopics', note: 'the whole IB course, mapped' },
-  { value: String(complete), label: complete === 1 ? 'subtopic complete' : 'subtopics complete', note: `full notes or a brief; ${partial} more partly built` },
-  { value: String(interactions), label: 'interactive tools', note: 'labs, desks and simulations' },
-  { value: String(questions), label: 'practice questions', note: 'original, with mark schemes' },
-  { value: String(terms), label: 'glossary terms', note: 'defined, connected, searchable' },
-  { value: String(maps.length), label: 'mindmaps', note: 'interactive, printable, downloadable' },
-];
+/* ---------- The weekly features: the platform's own material, rotating by week ---------- */
+const week = isoWeek(new Date());
+const pick = (n: number) => (n ? week % n : 0);
+// The case of the week is the Case Vault's own, from the same rotation, so the two pages always agree.
+const caseOrder = rotationOrder(Object.keys(c.cases));
+const cases = caseOrder.map((id) => [id, c.cases[id]!] as const);
+const casePick = caseOfTheWeek(caseOrder, calendarDate(new Date()))?.position ?? 0;
+const decisions = Object.entries(c.decisions).sort((a, b) => a[0].localeCompare(b[0]));
+const featuredFw = FRAMEWORKS.filter((f) => c.tools[f.tool]?.status === 'complete' && DIAGRAMS[f.diagram]);
 
+/* ---------- The three chains of reasoning ---------- */
 const METHODS = [
   {
-    no: 'A',
     name: 'Decide',
     steps: ['Situation', 'Decision', 'Consequence'],
-    text: 'Commit to a choice, then live with what it does to the business and the people in it.',
-    where: { label: 'In every Decision Room', href: '/decision-room/' },
+    text: 'Commit to a choice, then follow what it does to the business and to the people in it.',
+    where: { label: 'The Decision Room', href: '/decision-room/' },
   },
   {
-    no: 'B',
     name: 'Analyse',
     steps: ['Data', 'Insight', 'Option', 'Recommendation'],
     text: 'From the evidence to a recommendation you can defend, one supported step at a time.',
-    where: { label: 'In every case file', href: '/case-vault/' },
+    where: { label: 'The Case Vault', href: '/case-vault/' },
   },
   {
-    no: 'C',
     name: 'Diagnose',
     steps: ['Problem', 'Cause', 'Strategy', 'Implementation', 'Evaluation'],
     text: 'Find the cause before choosing the cure, then say how you would know it worked.',
-    where: { label: 'In the Case Room lab', href: '/case-room/halden-diagnosis/' },
+    where: { label: 'The Case Room lab', href: '/case-room/halden-diagnosis/' },
   },
 ];
 
-
-const components = Object.entries(c.assessment).sort((a, b) => a[1].order - b[1].order);
-
-/** Curated additions, with each set of notes added from its own date; newest first, eight at most. */
-const noteAdditions = Object.values(c.notes).map((n) => ({
-  date: n.updated,
-  kind: 'Notes',
-  title: `${n.code} ${n.title}`,
-  text: `Full notes, with examples, evaluation and original exam-style practice.`,
-  href: subtopicHref(c, n.code),
-}));
-const additions = [...ADDITIONS, ...noteAdditions].sort((a, b) => b.date.localeCompare(a.date) || a.title.localeCompare(b.title)).slice(0, 8);
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-const dayMonth = (iso: string) => {
-  const [y, m, d] = iso.split('-').map(Number);
-  return `${d} ${MONTHS[(m ?? 1) - 1]} ${y}`;
+/* ---------- The learning environments, in the order a learner meets them ---------- */
+const ENV_IDS = ['case-room', 'decision-room', 'boardroom', 'finance-desk', 'strategy-studio', 'market-studio', 'people-and-culture', 'operations-floor', 'entrepreneurship-lab'];
+const ENV_LINE: Record<string, string> = {
+  'case-room': 'Diagnose a business stage by stage, against its evidence.',
+  'decision-room': 'Commit to a decision and live with its consequences.',
+  boardroom: 'Board simulations over several rounds, and a company to run for three years.',
+  'finance-desk': 'Costs, break-even, cash flow, ratios and investment appraisal, with the working.',
+  'strategy-studio': 'SWOT, STEEPLE, five forces, Ansoff, BCG, decision trees and scenarios.',
+  'market-studio': 'Segments, personas, positioning, the marketing mix and campaigns.',
+  'people-and-culture': 'Motivation, leadership, structure, workforce and change.',
+  'operations-floor': 'Production methods, location, capacity and stock control.',
+  'entrepreneurship-lab': 'From an idea to a tested business model and a plan.',
 };
+const envs = ENV_IDS.map((id) => modules.find((m) => m.id === id)).filter((m): m is NonNullable<typeof m> => Boolean(m && m.href));
+
+/* ---------- Visual learning: three maps from different units ---------- */
+const MAP_PICK = ['2.4', '3.7', '4.5'];
+const showMaps = MAP_PICK.map((code) => maps.find(([, m]) => m.code === code)).filter((x): x is (typeof maps)[number] => Boolean(x));
+const HOME_DIAGRAMS = ['break-even-chart', 'bcg-matrix', 'maslow-hierarchy'].filter((d) => DIAGRAMS[d]);
+
 const ASSESS_HREF: Record<string, string> = {
   'internal-assessment': '/assessment/internal-assessment/',
   'paper-1': '/assessment/paper-1/',
   'paper-2': '/assessment/paper-2/',
   'paper-3': '/assessment/paper-3/',
 };
-const tutorMail = enquiryMailto();
-const fmtOutline = (o: { duration: string; marks: number; weight: number } | undefined) => (o ? `${o.marks} marks, ${o.weight}%` : '');
+/** "SL and HL; SL 1 hour 30 minutes, 30 marks; HL 1 hour 30 minutes, 30 marks". */
+const metaOf = (a: (typeof comps)[number][1]) =>
+  [a.levels, a.outline?.sl && `SL ${a.outline.sl.duration}, ${a.outline.sl.marks} marks`, a.outline?.hl && `HL ${a.outline.hl.duration}, ${a.outline.hl.marks} marks`]
+    .filter(Boolean)
+    .join('; ');
+const weights = (level: 'sl' | 'hl') => comps.map(([id, a]) => ({ id, name: a.short, w: a.outline?.[level]?.weight ?? 0 })).filter((x) => x.w > 0);
+
+const sisters = ECOSYSTEM.filter((p) => !p.current);
+const plural = (n: number, one: string, many: string) => `${n.toLocaleString('en-GB')} ${n === 1 ? one : many}`;
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: 'Arjun Agrawal | The Business Brief',
-  description: 'Understand business. Think strategically. Make better decisions. A Business Management learning platform by Arjun Agrawal.',
+  alternateName: 'The Business Brief',
+  description: 'Strategy. Leadership. Decisions. An IB Diploma Programme Business Management learning platform by Arjun Agrawal.',
   inLanguage: 'en-GB',
   author: { '@type': 'Person', name: 'Arjun Agrawal' },
+  ...(Astro.site ? { url: Astro.site.href, potentialAction: { '@type': 'SearchAction', target: `${new URL('/search/', Astro.site).href}?q={query}`, 'query-input': 'required name=query' } } : {}),
 };
 ---
 
 <BaseLayout
   title="home"
-  description="The Business Brief by Arjun Agrawal: a Business Management learning platform with topic notes, mindmaps, case studies, interactive tools and an Assessment Centre for IB Diploma Programme Business Management."
+  description="The Business Brief by Arjun Agrawal: IB Diploma Programme Business Management for SL and HL, learned through evidence, strategic judgement and decisions, with notes for every subtopic, cases, live financial tools and an Assessment Centre."
   jsonLd={jsonLd}
 >
-  <section class="hh band--grain" aria-labelledby="hero-h">
-    <div class="wrap hh__grid">
-      <div class="hh__copy enter">
-        <p class="hh__eyebrow">
-          <Monogram height={22} />
-          <span class="hh__brand">Arjun Agrawal</span>
-          <span class="hh__sep" aria-hidden="true"></span>
-          <span class="hh__brand hh__brand--product">The Business Brief</span>
+  <!-- 1. The platform, and this week's brief -->
+  <section class="hx" aria-labelledby="hx-h" data-rotate-root data-build-week={week}>
+    <div class="wrap hx__grid">
+      <div class="hx__copy enter">
+        <p class="hx__kicker">IB Diploma Programme Business Management <span aria-hidden="true">·</span> SL and HL</p>
+        <h1 id="hx-h" class="hx__title">The Business Brief</h1>
+        <p class="hx__tagline">Strategy. Leadership. Decisions.</p>
+        <p class="hx__lead">
+          Business is learned here the way it is practised: read the evidence, weigh the options, make a decision you can defend, and follow its
+          consequences through.
         </p>
-        <h1 id="hero-h" class="hh__title">
-          Understand business. <em>Think strategically.</em> Make better decisions.
-        </h1>
-        <p class="hh__lead">
-          A Business Management learning platform by Arjun Agrawal: the IB course mapped topic by topic, with notes, mindmaps, case studies, live
-          financial tools and an Assessment Centre, all built around one habit. Read the situation, weigh the evidence, decide, and own the
-          consequence.
+        <form class="hx__search" action="/search/" method="get" role="search">
+          <label class="sr-only" for="hx-q">Search the platform</label>
+          <input id="hx-q" name="q" type="search" autocomplete="off" placeholder="Search topics, frameworks, terms" />
+          <button class="btn btn--primary" type="submit">Search</button>
+        </form>
+        <p class="hx__actions">
+          <a class="btn btn--primary" href="/topics/">Explore the topic library <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+          <a class="btn" href="/assessment/">Enter the Assessment Centre</a>
         </p>
-        <p class="hh__actions">
-          <a class="btn btn--primary" href="/topics/">Explore Business Management <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
-          <a class="btn" href="/assessment/">Open the Assessment Centre</a>
-        </p>
-        <nav class="hh__doors" aria-label="Ways in">
-          <ul role="list">
-            <li><a href="/case-room/"><span class="hh__door-k">Practise</span> Enter the Case Room</a></li>
-            <li><a href="/decision-room/"><span class="hh__door-k">Decide</span> Explore the Decision Room</a></li>
-            <li><a href="/pathways/"><span class="hh__door-k">Choose</span> Discover learning pathways</a></li>
-          </ul>
-        </nav>
       </div>
 
-      <figure class="hh__figure enter">
-        <HeroBlueprint />
-        <div class="hh__frame">
-          <CreatorPhoto name="portrait-awards" alt="Arjun Agrawal in a light grey blazer and black shirt, smiling, in front of a cabinet of awards and trophies" priority sizes="(min-width: 64rem) 30vw, 70vw" />
-        </div>
-        <span class="hh__seal" aria-hidden="true"><Monogram height={30} reversed /></span>
-        <figcaption class="hh__caption">
-          <span class="hh__caption-name">Arjun Agrawal</span>
-          <span class="hh__caption-role">IB Diploma Programme educator in Economics, Business Management and Global Politics</span>
-        </figcaption>
-      </figure>
+      <aside class="hx__issue enter" aria-labelledby="hx-issue-h">
+        <p class="hx__issue-head">
+          <span id="hx-issue-h" class="hx__issue-k">In this week's brief</span>
+          <span class="hx__issue-week" data-week-label>Week {week}</span>
+        </p>
+        <ol class="hx__issue-list" role="list">
+          <li data-rotate={cases.length} data-rotate-by="vault">
+            {
+              cases.map(([id, cs], i) => (
+                <a class="hx__item" href="#case-of-the-week" data-variant={i} data-id={id} hidden={i !== casePick}>
+                  <span class="hx__item-k">Case of the week</span>
+                  <span class="hx__item-t">{cs.title}</span>
+                </a>
+              ))
+            }
+          </li>
+          <li data-rotate={decisions.length}>
+            {
+              decisions.map(([, d], i) => (
+                <a class="hx__item" href="#decision-of-the-week" data-variant={i} hidden={i !== pick(decisions.length)}>
+                  <span class="hx__item-k">Strategic decision</span>
+                  <span class="hx__item-t">{d.title}</span>
+                </a>
+              ))
+            }
+          </li>
+          <li data-rotate={CHALLENGES.length}>
+            {
+              CHALLENGES.map((ch, i) => (
+                <a class="hx__item" href="#financial-laboratory" data-variant={i} hidden={i !== pick(CHALLENGES.length)}>
+                  <span class="hx__item-k">Financial challenge</span>
+                  <span class="hx__item-t">{ch.title}</span>
+                </a>
+              ))
+            }
+          </li>
+          <li data-rotate={INSIGHTS.length}>
+            {
+              INSIGHTS.map((ins, i) => (
+                <a class="hx__item" href={ins.href} data-variant={i} hidden={i !== pick(INSIGHTS.length)}>
+                  <span class="hx__item-k">Management concept, {ins.code}</span>
+                  <span class="hx__item-t">{ins.title}</span>
+                </a>
+              ))
+            }
+          </li>
+          {
+            news[0] && (
+              <li>
+                <a class="hx__item" href={briefingHref(news[0][0])}>
+                  <span class="hx__item-k">
+                    Business in the news, <time datetime={news[0][1].date}>{formatDate(news[0][1].date)}</time>
+                  </span>
+                  <span class="hx__item-t">{news[0][1].title}</span>
+                </a>
+              </li>
+            )
+          }
+        </ol>
+        <p class="hx__issue-note">The cases, decisions and figures are fictional, written for learning. The news is real, dated and sourced.</p>
+      </aside>
     </div>
 
     <div class="wrap">
-      <dl class="hh__index" data-reveal="group">
-        {
-          INDEX.map((f) => (
-            <div>
-              <dt>
-                <span class="hh__index-v">{f.value}</span> {f.label}
-              </dt>
-              <dd>{f.note}</dd>
-            </div>
-          ))
-        }
-      </dl>
+      <ul class="hx__facts" role="list" aria-label="What the platform holds">
+        <li><a href="/topics/"><b>{coverage.length}</b> subtopics in five units</a></li>
+        <li><a href="/assessment/question-bank/"><b>{bankSize.toLocaleString('en-GB')}</b> original practice questions</a></li>
+        <li><a href="/glossary/"><b>{ibTerms.toLocaleString('en-GB')}</b> IB terms defined</a></li>
+        <li><a href="/frameworks/"><b>{fwCount}</b> frameworks</a></li>
+        <li><a href="/mindmaps/"><b>{maps.length}</b> mindmaps</a></li>
+      </ul>
     </div>
   </section>
 
-  <section class="band" aria-labelledby="eco-h">
-    <div class="wrap">
-      <SectionHead no="01" title="One institution, six wings" id="eco-h" dek="The platform is built like a school of business: a library to learn in, case rooms to practise in, laboratories to work the numbers, an examination hall to prepare in, an executive wing for study beyond the IB course, and an entrance hall where you meet the educator." />
-      <Ecosystem complete={complete} total={coverage.length} />
-    </div>
-  </section>
-
-  <section class="band band--white" aria-labelledby="brief-h">
-    <div class="wrap">
-      <SectionHead no="02" title="This week's briefing" id="brief-h" dek="A case to read, a decision to make, a calculation to try, an idea to think with and a framework to use. It changes every week." />
-      <Featured />
-    </div>
-  </section>
-
-  <section class="band band--ink" aria-labelledby="method-h">
-    <div class="wrap">
-      <SectionHead no="03" title="Three chains of reasoning, everywhere" id="method-h" dek="The same habits of mind run through every topic, case and Decision Room until they become second nature." />
-      <ol class="hm" role="list" data-reveal="group">
+  <!-- 2. The way of thinking -->
+  <section class="hp" aria-labelledby="hp-h">
+    <div class="wrap hp__grid">
+      <div class="hp__intro">
+        <p class="hk hk--ink">The Business Brief philosophy</p>
+        <h2 id="hp-h" class="hp__title">Every page ends in a decision.</h2>
+        <p class="hp__lead">
+          Definitions matter, but they are where the work starts. Three chains of reasoning run through every topic, case and tool, until weighing
+          evidence and judging a course of action become habits.
+        </p>
+      </div>
+      <ol class="hp__chains" role="list">
         {
           METHODS.map((m) => (
-            <li class="hm__item">
-              <p class="hm__head">
-                <span class="hm__no" aria-hidden="true">{m.no}</span>
-                <span class="hm__name">{m.name}</span>
-              </p>
-              <ol class="hm__steps" aria-label={`${m.name}: ${m.steps.join(', ')}`}>
-                {m.steps.map((st) => (
-                  <li>{st}</li>
+            <li class="hp__chain">
+              <p class="hp__name">{m.name}</p>
+              <ol class="hp__steps" aria-label={`${m.name}: ${m.steps.join(', then ')}`}>
+                {m.steps.map((s) => (
+                  <li>{s}</li>
                 ))}
               </ol>
-              <p class="hm__text">{m.text}</p>
-              <a class="hm__where" href={m.where.href}>
-                {m.where.label} <Icon id="arrow" size={16} />
-              </a>
+              <p class="hp__text">
+                {m.text} <a href={m.where.href}>{m.where.label}</a>
+              </p>
             </li>
           ))
         }
@@ -216,275 +268,499 @@ const jsonLd = {
     </div>
   </section>
 
-  <section class="band" aria-labelledby="course-h">
+  <!-- 3. The course -->
+  <section class="hc band band--white" aria-labelledby="hc-h">
     <div class="wrap">
-      <SectionHead no="04" title="The course, unit by unit" id="course-h" dek={`All ${coverage.length} subtopics of IB DP Business Management in their five units. Each square is a subtopic: filled where its full notes or a complete brief exist, outlined in gold where its page has a mindmap, key terms and diagrams but the notes are still to come, ruled where it is planned.`} />
-      <ol class="hc" role="list" data-reveal="group">
+      <div class="hhead">
+        <p class="hk">The IB Business Management course</p>
+        <h2 id="hc-h" class="hhead__title">Every subtopic, one click away</h2>
+        <p class="hhead__dek">
+          All {coverage.length} subtopics of the course in its five units, each with full notes, a mindmap, key terms and practice. HL-only subtopics are
+          marked.
+        </p>
+      </div>
+      <ol class="hc__units" role="list">
         {
           cur.units.map((u) => {
             const subs = coverage.filter((s) => s.unit.id === u.id);
             return (
               <li class="hc__unit">
-                <span class="hc__no" aria-hidden="true">{u.number}</span>
-                <div class="hc__body">
-                  <h3 class="hc__title">
-                    <a href={`/topics/#unit-${u.number}`}>{u.title}</a>
+                <div class="hc__head">
+                  <span class="hc__no" aria-hidden="true">
+                    {u.number}
+                  </span>
+                  <h3 class="hc__name">
+                    <a href={`/topics/#unit-${u.number}`}>
+                      <span class="sr-only">Unit {u.number}: </span>
+                      {u.title}
+                    </a>
                   </h3>
-                  <p class="hc__meta">
-                    {subs.length} subtopics
-                    {u.hours && <span> · {u.hours.sl === u.hours.hl ? `${u.hours.sl} hours` : `${u.hours.sl} hours SL, ${u.hours.hl} HL`}</span>}
-                  </p>
-                  <ul class="hc__ticks" aria-label={`Unit ${u.number} subtopics`}>
-                    {subs.map((s) => (
-                      <li class:list={['hc__tick', `hc__tick--${s.state}`]} title={`${s.subtopic.code} ${s.subtopic.title}`}>
-                        <span class="sr-only">
-                          {s.subtopic.code} {s.subtopic.title}: {s.state === 'complete' ? 'complete' : s.state === 'partial' ? 'partly built' : 'planned'}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                  {u.hours && <p class="hc__hours">{u.hours.sl === u.hours.hl ? `${u.hours.sl} teaching hours` : `${u.hours.sl} hours SL, ${u.hours.hl} HL`}</p>}
                 </div>
+                <ul class="hc__subs" role="list">
+                  {subs.map((s) => (
+                    <li>
+                      <a href={subtopicHref(c, s.subtopic.code)}>
+                        <span class="hc__code">{s.subtopic.code}</span>
+                        <span class="hc__t">
+                          {s.subtopic.title}
+                          {s.subtopic.level === 'HL' && <span class="tag tag--hl">HL</span>}
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </li>
             );
           })
         }
       </ol>
-      <p class="hc__more">
-        <a class="btn" href="/topics/">Open the topic library <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
-        <a href="/ib/map/">See the course map</a>
-        <a href="/ib/coverage/">Read the coverage tracker</a>
+      <p class="hmore">
+        <a class="btn" href="/topics/">The topic library <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+        <a href="/ib/map/">The course map, statement by statement</a>
+        <a href="/ib/concepts/">The four key concepts</a>
       </p>
     </div>
   </section>
 
-  <section class="band" aria-labelledby="try-h">
+  <!-- 4. Case of the week -->
+  <section class="hcase band" id="case-of-the-week" aria-label="Case of the week" data-rotate-root>
     <div class="wrap">
-      <SectionHead no="05" title="Try it now: where does the loss stop?" id="try-h" dek="A working piece of the Finance Desk. Enter the figures for any business and the break-even point, the margin of safety and the chart answer as you type, with the working shown." />
-      <BreakEvenPreview />
-    </div>
-  </section>
-
-  <section class="band band--white" aria-labelledby="see-h">
-    <div class="wrap">
-      <SectionHead no="06" title="See the structure, know the words" id="see-h" dek="Every subtopic as a mindmap you can fold, zoom, print and download, original diagrams for every unit, and a glossary of the whole course in plain language." />
-      <div class="hv">
-        <a class="hv__maps" href="/mindmaps/">
-          <span class="hv__thumbs" aria-hidden="true">
-            {maps.slice(0, 6).map(([, m]) => <span class="hv__thumb" set:html={renderThumb(m)} />)}
-          </span>
-          <span class="hv__label">Mindmaps</span>
-          <span class="hv__title">{maps.length} {maps.length === 1 ? 'map' : 'maps'} of the course, subtopic by subtopic</span>
-          <span class="hv__text">A full map for study and a revision view of the essentials; colour-coded branches for ideas, types, theories, tools, calculations and evaluation.</span>
-        </a>
-        <div class="hv__gloss">
-          <p class="hv__label">Glossary</p>
-          <p class="hv__title">{terms} terms, defined in the platform's own words</p>
-          <form class="hv__search" action="/glossary/" method="get" role="search">
-            <label class="sr-only" for="hv-q">Search the glossary</label>
-            <input id="hv-q" name="q" type="search" placeholder="Look up a term" autocomplete="off" />
-            <button class="btn btn--primary" type="submit">Look up</button>
-          </form>
-          <ul class="hv__az" aria-label="Browse the glossary from A to Z">
-            {LETTERS.map((l) => <li><a href={`/glossary/#letter-${l}`}>{l}</a></li>)}
-          </ul>
-        </div>
-        <a class="hv__dg" href="/diagrams/">
-          <span class="hv__dgthumbs" aria-hidden="true">
-            {HOME_DIAGRAMS.map((did) => <span class="hv__dgthumb" set:html={DIAGRAMS[did]!.render(`home-${did}`)} />)}
-          </span>
-          <span class="hv__dgtext">
-            <span class="hv__label">Diagrams and infographics</span>
-            <span class="hv__title">{Object.keys(DIAGRAMS).length} original diagrams, drawn from data</span>
-            <span class="hv__text">Models, processes, structures and charts for all five units and the toolkit, each with a text description and an SVG download.</span>
-          </span>
-        </a>
+      <div data-rotate={cases.length} data-rotate-by="vault">
+        {
+          cases.map(([id, cs], i) => (
+            <article class="hcase__grid" data-variant={i} data-id={id} hidden={i !== casePick}>
+              <div class="hcase__text">
+                <p class="hk">
+                  Case of the week <span class="tag tag--simulated">Fictional</span>
+                </p>
+                <h2 class="hcase__title">
+                  {cs.title}
+                </h2>
+                <p class="hcase__q">{cs.decision}</p>
+                <p class="hcase__dek">{cs.dek}</p>
+                <p class="hcase__actions">
+                  <a class="btn btn--primary" href={href.case(id)}>
+                    Open the case file <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+                  </a>
+                  <a href="/case-vault/">Every case in the Case Vault</a>
+                </p>
+              </div>
+              <dl class="hcase__file">
+                <div>
+                  <dt>Organization</dt>
+                  <dd>{cs.organization.name}</dd>
+                </div>
+                <div>
+                  <dt>Sector</dt>
+                  <dd>{cs.organization.sector}</dd>
+                </div>
+                <div>
+                  <dt>Location</dt>
+                  <dd>{cs.organization.location}</dd>
+                </div>
+                <div>
+                  <dt>Size</dt>
+                  <dd>{cs.organization.size}</dd>
+                </div>
+                <div>
+                  <dt>In the file</dt>
+                  <dd>
+                    {plural(cs.exhibits.length, 'exhibit', 'exhibits')}, {plural(cs.stakeholders.length, 'stakeholder', 'stakeholders')},{' '}
+                    {plural(cs.options.length, 'option', 'options')}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Data</dt>
+                  <dd>{cs.dataStatus === 'simulated' ? 'Simulated figures that add up' : cs.dataStatus === 'real' ? 'Real, sourced figures' : 'Real and simulated figures, each marked'}</dd>
+                </div>
+              </dl>
+            </article>
+          ))
+        }
       </div>
     </div>
   </section>
 
-  <section class="band band--white" aria-labelledby="obj-h">
+  <!-- 5. Strategic decision challenge -->
+  <section class="hdec band band--white" id="decision-of-the-week" aria-label="Strategic decision challenge" data-rotate-root>
+    <div class="wrap hdec__wrap" data-rotate={decisions.length}>
+      {
+        decisions.map(([id, d], i) => (
+          <article class="hdec__item" data-variant={i} hidden={i !== pick(decisions.length)}>
+            <p class="hk">
+              Strategic decision challenge <span class="tag tag--simulated">Fictional</span>
+            </p>
+            <h2 class="hdec__title">
+              {d.title}
+            </h2>
+            <p class="hdec__dek">{d.dek}</p>
+            <ol class="hdec__flow" role="list" aria-label="How a Decision Room works">
+              <li>
+                <b>Situation.</b> Read the brief and the evidence.
+              </li>
+              <li>
+                <b>Decision.</b> Commit to one option and give your reason.
+              </li>
+              <li>
+                <b>Consequence.</b> See what it does to each stakeholder, then weigh it.
+              </li>
+            </ol>
+            <p class="hdec__actions">
+              <a class="btn btn--primary" href={href.decision(id)}>
+                Make the decision <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+              </a>
+              <a href="/decision-room/">Every Decision Room</a>
+            </p>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- 6. Financial analysis laboratory -->
+  <section class="hfin band band--sunk" id="financial-laboratory" aria-labelledby="hfin-h" data-rotate-root>
     <div class="wrap">
-      <SectionHead no="07" title="Start from what you want to do" id="obj-h" dek="Seven things learners come here to do, and where on the platform to do each one." />
-      <ol class="hob" role="list" data-reveal="group">
+      <div class="hhead">
+        <p class="hk">Financial analysis laboratory</p>
+        <h2 id="hfin-h" class="hhead__title">Where does the loss stop?</h2>
+        <p class="hhead__dek">A working piece of the Finance Desk. Change any figure and the break-even point, the margin of safety and the chart answer at once, with the working shown.</p>
+      </div>
+      <div class="hfin__grid">
+        <div class="hfin__tool">
+          <BreakEvenPreview />
+        </div>
+        <aside class="hfin__side" aria-label="This week's financial challenge">
+          <div data-rotate={CHALLENGES.length}>
+            {
+              CHALLENGES.map((ch, i) => (
+                <div class="hfin__ch" data-variant={i} hidden={i !== pick(CHALLENGES.length)}>
+                  <p class="hfin__k">
+                    This week's challenge <span class="tag tag--simulated">Fictional figures</span>
+                  </p>
+                  <h3 class="hfin__t">{ch.title}</h3>
+                  <p>{ch.question}</p>
+                  <details class="hfin__answer">
+                    <summary>Show the answer and the working</summary>
+                    <p class="hfin__result">{ch.answer}</p>
+                    <ol>
+                      {ch.working.map((w) => (
+                        <li>{w}</li>
+                      ))}
+                    </ol>
+                    <a href={ch.href}>{ch.linkLabel}</a>
+                  </details>
+                </div>
+              ))
+            }
+          </div>
+          <p class="hfin__more">
+            <a href="/finance-desk/lab/">Twenty calculators in the Financial Laboratory</a>
+            <a href="/assessment/paper-2/practice/">Paper 2 calculation practice</a>
+            <a href="/resources/formula-sheet/">The formula sheet</a>
+          </p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Frameworks and management tools -->
+  <section class="hfw band band--white" aria-labelledby="hfw-h" data-rotate-root>
+    <div class="wrap">
+      <div class="hhead">
+        <p class="hk">Business frameworks and management tools</p>
+        <h2 id="hfw-h" class="hhead__title">Choose the tool by the question you face</h2>
+        <p class="hhead__dek">{fwCount} frameworks, each with a diagram, a method, a worked example and an exercise, labelled as syllabus, toolkit or enrichment.</p>
+      </div>
+      <div class="hfw__grid">
+        <dl class="hfw__index">
+          {
+            fwGroups.map((g) => (
+              <div class="hfw__row">
+                <dt>{g.question}</dt>
+                <dd>
+                  <ul class="hfw__names" role="list">
+                    {g.items.map(([id, f]) => (
+                      <li>
+                        <a href={frameworkHref(id)}>{f.name}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+        <div class="hfw__feature" data-rotate={featuredFw.length}>
+          {
+            featuredFw.map((f, i) => (
+              <figure class="hfw__fig" data-variant={i} hidden={i !== pick(featuredFw.length)}>
+                <figcaption>
+                  <span class="hfw__fk">Framework of the week</span>
+                  <a class="hfw__ft" href={`/toolkit/${f.tool}/`}>
+                    {c.tools[f.tool]!.name}
+                  </a>
+                  <span class="hfw__fn">{f.note}</span>
+                </figcaption>
+                <div class="hfw__dg" aria-hidden="true" set:html={DIAGRAMS[f.diagram]!.render(`home-fw-${f.diagram}`)} />
+              </figure>
+            ))
+          }
+        </div>
+      </div>
+      <p class="hmore">
+        <a class="btn" href="/frameworks/">The frameworks library <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+        <a href="/frameworks/lab/">Apply one in the Framework Application Lab</a>
+        <a href="/strategy-studio/">Work one through in the Strategy Studio</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- 8. Assessment Centre -->
+  <section class="has" aria-labelledby="has-h">
+    <div class="wrap has__grid">
+      <div class="has__intro">
+        <p class="hk hk--ink">The Assessment Centre</p>
+        <h2 id="has-h" class="has__title">Know exactly what is asked. Then practise it.</h2>
+        <p class="has__lead">
+          Every component of the IB assessment explained from the guide, with each statement labelled: an IB requirement, examiner emphasis, a recommended
+          strategy or an illustrative example.
+        </p>
+        <div class="has__weights">
+          {
+            (['sl', 'hl'] as const).map((lv) => (
+              <figure class="has__w">
+                <figcaption>{lv === 'sl' ? 'Standard Level' : 'Higher Level'}</figcaption>
+                <div
+                  class="has__bar"
+                  role="img"
+                  aria-label={`${lv === 'sl' ? 'Standard' : 'Higher'} Level weighting: ${weights(lv)
+                    .map((x) => `${x.name} ${x.w}%`)
+                    .join(', ')}`}
+                >
+                  {weights(lv).map((x) => (
+                    <span class={`has__part has__part--${x.id}`} style={`flex:${x.w}`}>
+                      <b>{x.name}</b> {x.w}%
+                    </span>
+                  ))}
+                </div>
+              </figure>
+            ))
+          }
+          <p class="has__note">Weightings from the guide's assessment outlines.</p>
+        </div>
+      </div>
+      <ol class="has__list" role="list">
         {
-          OBJECTIVES.map((o, i) => (
-            <li class="hob__item">
-              <span class="hob__no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-              <h3 class="hob__verb">{o.verb}</h3>
-              <p class="hob__text">{o.text}</p>
-              <ul class="hob__links" role="list">
-                {o.links.map((l) => (
-                  <li>
-                    <a href={l.href}>{l.label}</a>
-                  </li>
-                ))}
-              </ul>
+          comps.map(([id, a]) => (
+            <li>
+              <a href={ASSESS_HREF[id] ?? '/assessment/'}>
+                <span class="has__short">{a.short}</span>
+                <span class="has__name">{a.name}</span>
+                <span class="has__meta">{metaOf(a)}</span>
+              </a>
             </li>
           ))
         }
+        <li>
+          <a href="/assessment/question-bank/">
+            <span class="has__short">Bank</span>
+            <span class="has__name">The question bank</span>
+            <span class="has__meta">{bankSize.toLocaleString('en-GB')} original questions, by topic, paper, level and command term, with timed sets</span>
+          </a>
+        </li>
       </ol>
     </div>
   </section>
 
-  <section class="band" aria-labelledby="paths-h">
+  <!-- 9. Interactive learning environments -->
+  <section class="henv band" aria-labelledby="henv-h">
     <div class="wrap">
-      <SectionHead no="08" title="A way in for every learner" id="paths-h" dek="One foundation and seven routes through it, each with its own depth and its own starting points. Qualifications are kept apart: nothing outside the IB course is presented as IB material." />
-      <ul class="hpw" role="list" data-reveal="group">
+      <div class="hhead">
+        <p class="hk">Interactive learning environments</p>
+        <h2 id="henv-h" class="hhead__title">Rooms to work in, not pages to read</h2>
+        <p class="hhead__dek">Each environment takes your own figures and choices, shows the working, and ends in a judgement you have to make.</p>
+      </div>
+      <ul class="henv__board" role="list">
         {
-          pathways.map((p, i) => (
-            <li>
-              <a href={href.pathway(p.id)}>
-                <span class="hpw__no" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-                <strong>{p.data.name}</strong>
-                <span class="hpw__who">{p.data.audience}</span>
-                <span class="hpw__promise">{p.data.promise}</span>
-                <StatusTag status={p.data.status} />
+          envs.map((m) => (
+            <li class="henv__room">
+              <a href={m.href}>
+                <span class="henv__name">{m.name}</span>
+                <span class="henv__line">{ENV_LINE[m.id] ?? m.purpose}</span>
               </a>
             </li>
           ))
         }
       </ul>
-    </div>
-  </section>
-
-  <section class="band band--ink" aria-labelledby="assess-h">
-    <div class="wrap">
-      <SectionHead no="09" title="The Assessment Centre" id="assess-h" dek="Every component of the IB assessment, explained from the guide, with practice built for it: the research project, Paper 1, Paper 2 and the HL Paper 3." />
-      <ul class="ha" role="list" data-reveal="group">
-        {
-          components.map(([id, a]) => (
-            <li class="ha__item">
-              <p class="ha__short" aria-hidden="true">{a.short}</p>
-              <h3 class="ha__name">
-                <a href={ASSESS_HREF[id] ?? '/assessment/'}>{a.name}</a>
-              </h3>
-              <p class="ha__levels">{a.levels}</p>
-              <dl class="ha__facts">
-                {a.outline?.sl && (
-                  <div>
-                    <dt>SL</dt>
-                    <dd>{fmtOutline(a.outline.sl)}</dd>
-                  </div>
-                )}
-                {a.outline?.hl && (
-                  <div>
-                    <dt>HL</dt>
-                    <dd>{fmtOutline(a.outline.hl)}</dd>
-                  </div>
-                )}
-              </dl>
-            </li>
-          ))
-        }
-      </ul>
-      <p class="ha__more">
-        <a class="btn btn--gold" href="/assessment/">Enter the Assessment Centre <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+      <p class="hmore">
+        <a href="/rooms/">Every room and tool, with what each serves <span aria-hidden="true">&rarr;</span></a>
       </p>
     </div>
   </section>
 
-  <section class="band htu" aria-labelledby="tutor-h">
-    <div class="wrap htu__grid">
-      <div class="htu__text">
-        <SectionHead no="10" title="Take your Business Management learning further" id="tutor-h" dek="Combine the platform with personalised one-to-one mentoring: the same method, applied to your own work, your own questions and your own examinations." />
-        <ul class="htu__list" role="list">
-          <li><strong>Complete syllabus support</strong> for SL and HL, all five units</li>
-          <li><strong>Paper 1, Paper 2 and Paper 3</strong> preparation, with examination practice</li>
-          <li><strong>Internal assessment guidance</strong> that keeps the work entirely yours</li>
-          <li><strong>Topic-specific revision</strong>, from one concept to the whole course</li>
-          <li><strong>Online one-to-one sessions</strong> with Arjun Agrawal</li>
-        </ul>
+  <!-- 10. Mindmaps and visual learning -->
+  <section class="hv band band--white" aria-labelledby="hv-h">
+    <div class="wrap">
+      <div class="hhead">
+        <p class="hk">Mindmaps and visual learning</p>
+        <h2 id="hv-h" class="hhead__title">See the structure, then know the words</h2>
+        <p class="hhead__dek">Every subtopic as a map to fold, zoom and print, original diagrams for every unit, and the course's terms in plain language.</p>
       </div>
-      <aside class="htu__card" aria-label="Tutorials: price and enquiry">
-        <p class="htu__kicker">IB DP Business Management tutoring</p>
-        <p class="htu__price"><span class="htu__cur">{TUTOR_SESSION.currency}</span><span class="htu__amt">{TUTOR_SESSION.price}</span><span class="htu__per">one-hour session<br />one-to-one, online</span></p>
-        <p class="htu__note">Packages for the IA, the EE, Marathon Revision and Exam Practice are on the Tutorials page.</p>
-        <p class="htu__actions">
-          <a class="btn btn--primary" href="/tutorials/">See the tutorials <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
-          <a class="btn" href={tutorMail}>Enquire by email</a>
-        </p>
-      </aside>
+      <div class="hv__grid">
+        <div class="hv__maps">
+          <p class="hv__k">Mindmaps</p>
+          <ul class="hv__maplist" role="list">
+            {
+              showMaps.map(([id, m]) => (
+                <li>
+                  <a href={href.mindmap(id)}>
+                    <span class="hv__thumb" aria-hidden="true" set:html={renderThumb(m)} />
+                    <span class="hv__mt">
+                      {m.code} {m.title}
+                    </span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+          <a class="hv__all" href="/mindmaps/">All {maps.length} mindmaps <span aria-hidden="true">&rarr;</span></a>
+        </div>
+        <div class="hv__dgs">
+          <p class="hv__k">Diagrams</p>
+          <ul class="hv__dglist" role="list">
+            {
+              HOME_DIAGRAMS.map((d) => (
+                <li>
+                  <a href={`/diagrams/#${d}`}>
+                    <span class="hv__dg" aria-hidden="true" set:html={DIAGRAMS[d]!.render(`home-dg-${d}`)} />
+                    <span class="hv__mt">{DIAGRAMS[d]!.title}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+          <a class="hv__all" href="/diagrams/">All {Object.keys(DIAGRAMS).length} diagrams <span aria-hidden="true">&rarr;</span></a>
+        </div>
+        <div class="hv__gloss">
+          <p class="hv__k">Glossary</p>
+          <p class="hv__gt">{ibTerms.toLocaleString('en-GB')} IB terms, in plain language and in the syllabus's own sense</p>
+          <form class="hv__search" action="/glossary/" method="get" role="search">
+            <label class="sr-only" for="hv-q">Look up a term</label>
+            <input id="hv-q" name="q" type="search" placeholder="Look up a term" autocomplete="off" />
+            <button class="btn" type="submit">Look up</button>
+          </form>
+          <a class="hv__all" href="/glossary/">Browse the glossary from A to Z <span aria-hidden="true">&rarr;</span></a>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section class="band band--white" aria-labelledby="new-h">
-    <div class="wrap">
-      <SectionHead no="11" title="Latest additions" id="new-h" dek="What has been added or updated most recently, newest first; notes are dated by their last revision. Only what is finished and working is listed." />
-      <ol class="hnew" role="list">
-        {
-          additions.map((a) => (
-            <li class="hnew__item">
-              <time class="hnew__date" datetime={a.date}>{dayMonth(a.date)}</time>
-              <span class="hnew__kind">{a.kind}</span>
-              <span class="hnew__body">
-                <a class="hnew__title" href={a.href}>{a.title}</a>
-                <span class="hnew__text">{a.text}</span>
-              </span>
-            </li>
-          ))
-        }
-      </ol>
-      <p class="hc__more">
-        <a class="btn" href="/resources/">Open the Resources Library <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
-        <a href="/ib/coverage/">See what is complete, partly built and planned</a>
-      </p>
-    </div>
-  </section>
+  {
+    news.length > 0 && (
+      <section class="hn band" aria-labelledby="hn-h">
+        <div class="wrap">
+          <div class="hhead">
+            <p class="hk">Business intelligence</p>
+            <h2 id="hn-h" class="hhead__title">The course, in this year's business news</h2>
+            <p class="hhead__dek">Real developments read through the syllabus: what happened, the decision behind it and what it teaches. Every fact is dated and sourced; the analysis is marked as analysis.</p>
+          </div>
+          <ol class="hn__list" role="list">
+            {news.map(([id, it], i) => (
+              <li class:list={['hn__item', { 'hn__item--lead': i === 0 }]}>
+                <p class="hn__meta">
+                  <time datetime={it.date}>{formatDate(it.date)}</time>
+                  <span aria-hidden="true"> · </span>
+                  {it.industry}
+                </p>
+                <h3 class="hn__title">
+                  <a href={briefingHref(id)}>{it.title}</a>
+                </h3>
+                {i === 0 && <p class="hn__dek">{it.dek}</p>}
+                <p class="hn__codes">Syllabus: {it.concepts.subtopics.map((s) => s.code).join(', ')}</p>
+              </li>
+            ))}
+          </ol>
+          <p class="hmore">
+            <a class="btn" href="/intelligence/">Business Intelligence <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+          </p>
+        </div>
+      </section>
+    )
+  }
 
-  <section class="band band--white" aria-labelledby="creator-h">
-    <div class="wrap hcr">
-      <figure class="hcr__figure">
-        <CreatorPhoto name="audience-portrait" alt="Arjun Agrawal speaking to a class, gesturing towards a budget table on the screen behind him" sizes="(min-width: 64rem) 32vw, 90vw" />
+  <!-- 12. The creator -->
+  <section class="hcr band band--white" aria-labelledby="hcr-h">
+    <div class="wrap hcr__grid">
+      <figure class="hcr__fig">
+        <CreatorPhoto name="portrait-awards-square" alt="Arjun Agrawal in a light grey blazer, smiling, in front of an awards cabinet" sizes="(min-width: 48rem) 15rem, 60vw" />
       </figure>
       <div class="hcr__text">
-        <p class="label">12 · About the creator</p>
-        <h2 id="creator-h" class="hcr__title">Arjun Agrawal</h2>
+        <p class="hk">About the creator</p>
+        <h2 id="hcr-h" class="hcr__title">Arjun Agrawal</h2>
         <p class="hcr__lead">
-          An IB Diploma Programme educator in Economics, Business Management and Global Politics, with an academic background in Economics at St.
-          Stephen's College, University of Delhi, undergraduate teaching at Fergusson College, Pune, and Diploma Programme teaching and academic work in
-          Pune. He also mentors UPSC Civil Services aspirants in Economics.
-        </p>
-        <p>
-          The Business Brief, Arjun Agrawal Economics and Political Studies &amp; Global Affairs are the three platforms of the Arjun Agrawal Academic
-          Ecosystem: the resources a classroom needs, built to be used by anyone.
+          An IB Diploma Programme educator in Economics, Business Management and Global Politics. He studied Economics at St. Stephen's College, University of
+          Delhi, has taught undergraduate Economics at Fergusson College, Pune, and mentors UPSC Civil Services aspirants in Economics. The Business Brief is
+          one of the resources his own classroom needed, built to be used by anyone.
         </p>
         <p class="hcr__actions">
-          <a class="btn" href="/about/">Read the full profile <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+          <a class="btn" href="/about/">The full profile <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+          <a href="/tutorials/">One-to-one tutoring, {TUTOR_SESSION.currency}{TUTOR_SESSION.price} for a one-hour online session</a>
         </p>
       </div>
     </div>
   </section>
 
-  <section class="band" aria-labelledby="aae-h">
-    <div class="wrap">
-      <SectionHead
-        no="13"
-        title="Explore the Arjun Agrawal Academic Ecosystem"
-        id="aae-h"
-        dek="Three independent academic platforms by the same educator, each with its own subject, examinations and design. Arjun Agrawal: Knowledge. Insight. Impact."
-      />
-      <AcademicEcosystem />
-    </div>
-  </section>
-
-  <section class="hclose" aria-labelledby="close-h">
-    <div class="wrap hclose__inner">
-      <p class="hclose__kicker">
-        <Monogram height={26} reversed />
-        <span>Strategy. Leadership. Decisions.</span>
-      </p>
-      <h2 id="close-h" class="hclose__title">Read the situation. Weigh the evidence. <em>Make the decision.</em></h2>
-      <p class="hclose__lead">Every topic, case and tool here ends the same way: with a choice you make, defend, and see the consequences of. Start anywhere.</p>
-      <p class="hclose__actions">
-        <a class="btn btn--gold" href="/topics/">Explore Business Management <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
-        <a class="btn btn--ghost-ink" href="/decision-room/">Make a decision</a>
-        <a class="btn btn--ghost-ink" href="/assessment/">Prepare for the examination</a>
-      </p>
-      <ul class="hclose__trust" role="list">
-        <li><strong>Every claim is sourced.</strong> Statements about the IB course give their page in the guide, in a public <a href="/sources/">claims register</a>.</li>
-        <li><strong>Fiction is labelled.</strong> The cases are fictional, with simulated data that adds up; real organizations appear only as cited, dated facts.</li>
-        <li><strong>Practice is practice.</strong> Every question is original and labelled; nothing is presented as an IB question or markscheme.</li>
-      </ul>
+  <!-- 13. Routes through the platform, and the other platforms -->
+  <section class="hr band band--sunk" aria-labelledby="hr-h">
+    <div class="wrap hr__grid">
+      <div class="hr__paths">
+        <p class="hk">Learning pathways</p>
+        <h2 id="hr-h" class="hhead__title">A route for every learner</h2>
+        <p class="hr__dek">The IB course is the foundation. Each route says where to start and how deep to go; nothing beyond the course is presented as IB material.</p>
+        <ul class="hr__list" role="list">
+          {
+            pathways.map((p) => (
+              <li>
+                <a href={href.pathway(p.id)}>
+                  <span class="hr__name">{p.data.name}</span>
+                  <span class="hr__who">{p.data.audience}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <div class="hr__eco">
+        <p class="hk">The Arjun Agrawal Academic Ecosystem</p>
+        <p class="hr__eco-lead">Two more platforms by the same educator, each with its own subject and examinations.</p>
+        <ul class="hr__sisters" role="list">
+          {
+            sisters.map((p) => (
+              <li>
+                <a href={p.url} target="_blank" rel="noopener noreferrer">
+                  <span class="hr__name">
+                    {p.name} <span aria-hidden="true">&nearr;</span>
+                  </span>
+                  <span class="hr__who">{p.line}</span>
+                  <span class="sr-only"> (opens in a new tab)</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <ul class="hr__trust" role="list">
+          <li>
+            <b>Every claim is sourced.</b> Statements about the IB course give their page in the guide, in a public <a href="/sources/">claims register</a>.
+          </li>
+          <li>
+            <b>Fiction is labelled.</b> Cases and figures written for learning say so; real organizations appear only as cited, dated facts.
+          </li>
+          <li>
+            <b>Your work stays with you.</b> Progress and notes are kept in this browser only. There are no accounts and no tracking.
+          </li>
+        </ul>
+      </div>
     </div>
   </section>
 </BaseLayout>
@@ -494,415 +770,46 @@ const jsonLd = {
 </script>
 
 <style>
-  /* ---------- Hero ---------- */
-  .hh {
-    position: relative;
-    padding-block: clamp(2.5rem, 5vw, 5rem) var(--sp-7);
-    overflow: hidden;
-  }
-
-  .hh__grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-    gap: clamp(2rem, 4vw, 4.5rem);
-    align-items: center;
-  }
-
-  .hh__eyebrow {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.6rem 0.75rem;
-  }
-
-  .hh__brand {
-    font-family: var(--font-brand);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.22em;
-    color: var(--navy-900);
-  }
-
-  .hh__brand--product {
-    color: var(--brass-text);
-  }
-
-  .hh__sep {
-    width: 1.75rem;
-    height: 1px;
-    background: var(--gold-500);
-  }
-
-  .hh__title {
-    margin-top: var(--sp-5);
-    font-size: clamp(2.75rem, 1.45rem + 4.4vw, 5.375rem);
-    font-weight: 500;
-    line-height: 1.02;
-    letter-spacing: -0.024em;
-    color: var(--navy-900);
-    text-wrap: balance;
-  }
-
-  .hh__title em {
-    font-style: italic;
-    font-weight: 400;
-    color: var(--brass-text);
-  }
-
-  .hh__lead {
-    margin-top: var(--sp-5);
-    max-width: 38rem;
-    font-size: var(--fs-lead);
-    line-height: 1.55;
-    color: var(--text-body);
-  }
-
-  .hh__actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-3);
-    margin-top: var(--sp-6);
-  }
-
-  .hh__doors {
-    margin-top: var(--sp-6);
-    max-width: 38rem;
-    border-top: 1px solid var(--rule);
-  }
-
-  .hh__doors ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .hh__doors li {
-    border-bottom: 1px solid var(--rule-hair);
-  }
-
-  .hh__doors a {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-4);
-    min-height: 3rem;
-    color: var(--navy-900);
-    font-weight: 600;
-    text-decoration: none;
-  }
-
-  .hh__doors a::after {
-    content: "\2192";
-    margin-left: auto;
-    color: var(--gold-600);
-    transition: transform var(--dur-base) var(--ease-out);
-  }
-
-  .hh__doors a:hover {
-    color: var(--cobalt-text);
-  }
-
-  .hh__doors a:hover::after {
-    transform: translateX(4px);
-  }
-
-  .hh__door-k {
-    min-width: 5rem;
+  /* ---------- Shared on this page ---------- */
+  .hk {
+    margin: 0 0 var(--sp-3);
+    color: var(--text-muted);
     font-size: var(--fs-label);
     font-weight: 650;
     letter-spacing: var(--track-label);
     text-transform: uppercase;
-    color: var(--brass-text);
-  }
-
-  /* The figure: portrait in a frame, the line drawing around it */
-  .hh__figure {
-    position: relative;
-    aspect-ratio: 560 / 680;
-    width: 100%;
-    max-width: 34rem;
-    margin: 0 0 0 auto;
-  }
-
-  .hh__frame {
-    position: absolute;
-    left: 21.43%;
-    top: 5.88%;
-    width: 64.29%;
-    height: 66.18%;
-    z-index: 1;
-  }
-
-  .hh__frame::before {
-    content: '';
-    position: absolute;
-    inset: 1.1rem -1.1rem -1.1rem 1.1rem;
-    background: var(--navy-900);
-    z-index: -1;
-  }
-
-  .hh__frame :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    box-shadow: var(--shadow-lift);
-  }
-
-  .hh__frame::after {
-    content: '';
-    position: absolute;
-    inset: 0.6rem;
-    border: 1px solid rgba(201, 168, 102, 0.85);
-    pointer-events: none;
-  }
-
-  .hh__seal {
-    position: absolute;
-    left: calc(21.43% - 1.6rem);
-    top: calc(5.88% - 1.6rem);
-    z-index: 2;
-    display: grid;
-    place-items: center;
-    width: 3.75rem;
-    height: 3.75rem;
-    border-radius: 50%;
-    background: var(--navy-900);
-    box-shadow:
-      0 0 0 3px var(--ivory-100),
-      0 0 0 4px var(--gold-500);
-  }
-
-  .hh__caption {
-    position: absolute;
-    left: 4%;
-    top: 63%;
-    z-index: 2;
-    display: grid;
-    gap: 0.3rem;
-    max-width: 17rem;
-    padding: 0.9rem 1.1rem;
-    background: var(--ivory-50);
-    border-left: 3px solid var(--gold-500);
-    box-shadow: var(--shadow-sheet);
-  }
-
-  .hh__caption-name {
-    font-family: var(--font-brand);
-    font-size: 0.9375rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    color: var(--navy-900);
-  }
-
-  .hh__caption-role {
-    font-size: 0.8125rem;
-    line-height: 1.4;
-    color: var(--text-muted);
-  }
-
-  /* The index strip: counted, never typed */
-  .hh__index {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    margin-top: clamp(2rem, 4vw, 3.5rem);
-    border-top: 1px solid var(--navy-900);
-  }
-
-  .hh__index > div {
-    padding: var(--sp-4) var(--sp-4) 0 0;
-  }
-
-  .hh__index > div + div {
-    padding-left: var(--sp-4);
-    border-left: 1px solid var(--rule-hair);
-  }
-
-  .hh__index dt {
-    color: var(--navy-900);
-    font-weight: 560;
-    line-height: 1.25;
-  }
-
-  .hh__index-v {
-    display: block;
-    margin-bottom: 0.2rem;
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 1.6rem + 1.4vw, 2.875rem);
-    font-weight: 500;
-    line-height: 1;
-    letter-spacing: -0.02em;
-    color: var(--navy-900);
-  }
-
-  .hh__index dd {
-    margin: 0.3rem 0 0;
-    font-size: 0.8125rem;
-    color: var(--text-muted);
-  }
-
-  /* ---------- Method ---------- */
-  .hm {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--sp-6);
-    margin: var(--sp-7) 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .hm__item {
-    margin: 0;
-    padding-top: var(--sp-4);
-    border-top: 1px solid var(--rule-on-ink);
-    display: grid;
-    align-content: start;
-    gap: var(--sp-3);
-  }
-
-  .hm__head {
-    display: flex;
-    align-items: baseline;
-    gap: var(--sp-3);
-  }
-
-  .hm__no {
-    font-family: var(--font-display);
-    font-size: 2.75rem;
-    font-style: italic;
-    line-height: 1;
-    color: var(--gold-400);
-  }
-
-  .hm__name {
-    font-family: var(--font-display);
-    font-size: 1.625rem;
-    font-weight: 560;
-    color: var(--text-on-ink);
-  }
-
-  .hm__steps {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.35rem 0;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    counter-reset: none;
-  }
-
-  .hm__steps li {
-    margin: 0;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--gold-400);
-  }
-
-  .hm__steps li:not(:last-child)::after {
-    content: '\2192';
-    margin: 0 0.5rem;
-    color: var(--text-on-ink-muted);
-  }
-
-  .hm__text {
-    color: var(--text-on-ink-muted);
-  }
-
-  .hm__where {
-    display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    width: fit-content;
-    color: var(--text-on-ink);
-    font-weight: 560;
+    gap: var(--sp-2);
   }
 
-  /* ---------- Course ---------- */
-  .hc {
-    display: grid;
-    gap: 0;
-    margin: var(--sp-6) 0 0;
-    padding: 0;
-    list-style: none;
-    border-bottom: 1px solid var(--rule-hair);
+  .hk--ink {
+    color: var(--text-gold-on-ink);
   }
 
-  .hc__unit {
+  .hhead {
     display: grid;
-    grid-template-columns: 4.5rem minmax(0, 1fr);
-    gap: var(--sp-5);
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 52rem;
+    margin-bottom: var(--sp-6);
+  }
+
+  .hhead__title {
     margin: 0;
-    padding-block: var(--sp-5);
-    border-top: 1px solid var(--rule-hair);
+    font-size: var(--fs-h2);
+    line-height: var(--lh-snug);
+    letter-spacing: -0.01em;
   }
 
-  .hc__no {
-    font-family: var(--font-display);
-    font-size: 3.5rem;
-    font-style: italic;
-    font-weight: 400;
-    line-height: 0.9;
-    color: var(--gold-600);
-  }
-
-  .hc__body {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--sp-2) var(--sp-6);
-    align-items: center;
-  }
-
-  .hc__title {
-    font-size: var(--fs-h3);
-  }
-
-  .hc__title a {
-    color: var(--navy-900);
-    text-decoration: none;
-  }
-
-  .hc__title a:hover {
-    text-decoration: underline;
-    text-decoration-color: var(--gold-500);
-  }
-
-  .hc__meta {
-    grid-column: 1;
+  .hhead__dek {
+    margin-top: var(--sp-3);
     color: var(--text-muted);
-    font-size: 0.875rem;
+    font-size: 1.0625rem;
+    max-width: 44rem;
   }
 
-  .hc__ticks {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    max-width: 14rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    justify-content: flex-end;
-  }
-
-  .hc__tick {
-    width: 18px;
-    height: 18px;
-    margin: 0;
-    border: 1px solid var(--rule);
-  }
-
-  .hc__tick--complete {
-    background: var(--navy-900);
-    border-color: var(--navy-900);
-  }
-
-  .hc__tick--partial {
-    border-color: var(--gold-600);
-    box-shadow: inset 0 0 0 2px var(--ivory-100), inset 0 0 0 20px rgba(179, 147, 80, 0.35);
-  }
-
-  .hc__more {
+  .hmore {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -910,771 +817,1272 @@ const jsonLd = {
     margin-top: var(--sp-6);
   }
 
-  /* ---------- Mindmaps and glossary ---------- */
-  .hv {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-    gap: var(--sp-5);
-    margin-top: var(--sp-6);
+  .hmore a:not(.btn) {
+    color: var(--cobalt-text);
+    font-weight: 560;
   }
 
-  .hv__maps,
-  .hv__gloss {
+  .band--sunk {
+    background: var(--surface-sunk);
+  }
+
+  /* ---------- 1. Hero ---------- */
+  .hx {
+    padding-block: clamp(2.5rem, 5vw, 4.75rem) var(--sp-6);
+    background: var(--surface-page);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .hx__grid {
     display: grid;
-    align-content: start;
-    gap: var(--sp-2);
-    padding: var(--sp-5);
-    background: var(--ivory-50);
-    border: 1px solid var(--rule-hair);
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.85fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+
+  .hx__kicker {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--fs-label);
+    font-weight: 650;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+  }
+
+  .hx__title {
+    margin: var(--sp-4) 0 0;
+    font-size: clamp(2.875rem, 1.6rem + 5.2vw, 6rem);
+    font-weight: 600;
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    color: var(--text-strong);
+  }
+
+  .hx__tagline {
+    display: inline-block;
+    margin-top: var(--sp-4);
+    padding-top: var(--sp-3);
+    border-top: 2px solid var(--gold-500);
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 1.1rem + 0.7vw, 1.75rem);
+    font-style: italic;
+    letter-spacing: 0.01em;
+  }
+
+  .hx__lead {
+    max-width: 34rem;
+    margin-top: var(--sp-5);
     color: var(--text-body);
-    text-decoration: none;
+    font-size: var(--fs-lead);
+    line-height: 1.55;
   }
 
-  .hv__maps {
-    border-top: 3px solid var(--navy-900);
-    transition: border-color var(--dur-fast) var(--ease);
+  .hx__search {
+    display: flex;
+    max-width: 34rem;
+    margin-top: var(--sp-5);
+    border: 1px solid var(--navy-900);
+    border-radius: var(--radius-1);
+    background: var(--white);
   }
 
-  .hv__maps:hover {
-    border-color: var(--gold-500);
+  .hx__search:focus-within {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
   }
 
-  .hv__gloss {
+  .hx__search input {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 3rem;
+    padding: 0 var(--sp-4);
+    border: 0;
+    background: transparent;
+    color: var(--text-strong);
+    font: inherit;
+    font-size: 1.0625rem;
+  }
+
+  .hx__search input:focus-visible {
+    outline: none;
+  }
+
+  .hx__search .btn {
+    border-radius: 0;
+    min-height: 3rem;
+  }
+
+  .hx__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    margin-top: var(--sp-4);
+  }
+
+  /* This week's brief: a contents box, as in a journal */
+  .hx__issue {
+    margin-top: var(--sp-3);
+    padding: var(--sp-5) var(--sp-5) var(--sp-4);
+    background: var(--surface-ink);
+    color: var(--text-on-ink);
     border-top: 3px solid var(--gold-500);
   }
 
-  .hv__dg {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-    gap: var(--sp-5);
-    align-items: center;
-    padding: var(--sp-5);
-    background: var(--ivory-50);
-    border: 1px solid var(--rule-hair);
-    border-top: 3px solid var(--cobalt-text);
-    color: var(--text-body);
-    text-decoration: none;
-    transition: border-color var(--dur-fast) var(--ease);
-  }
-
-  .hv__dg:hover {
-    border-top-color: var(--gold-500);
-  }
-
-  .hv__dgthumbs {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--sp-2);
-  }
-
-  .hv__dgthumb {
-    display: block;
-    padding: 0.4rem;
-    background: #fff;
-    border: 1px solid var(--rule-hair);
-  }
-
-  .hv__dgthumb :global(svg) {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
-  .hv__dgtext {
-    display: grid;
-    gap: var(--sp-2);
-  }
-
-  .hv__thumbs {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--sp-2);
-    margin-bottom: var(--sp-3);
-  }
-
-  .hv__thumb {
-    display: block;
-    aspect-ratio: 16 / 10;
-    padding: 0.35rem;
-    background: #fff;
-    border: 1px solid var(--rule-hair);
-  }
-
-  .hv__thumb :global(svg) {
-    width: 100%;
-    height: 100%;
-  }
-
-  .hv__label {
-    font-size: var(--fs-label);
-    font-weight: 600;
-    letter-spacing: var(--track-label);
-    text-transform: uppercase;
-    color: var(--brass-text);
-  }
-
-  .hv__title {
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    font-weight: 600;
-    line-height: 1.2;
-    color: var(--navy-900);
-  }
-
-  .hv__text {
-    color: var(--text-muted);
-  }
-
-  .hv__search {
+  .hx__issue-head {
     display: flex;
-    gap: var(--sp-2);
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--sp-3);
+    margin: 0 0 var(--sp-3);
+    padding-bottom: var(--sp-3);
+    border-bottom: 1px solid var(--rule-on-ink);
+  }
+
+  .hx__issue-k {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 560;
+  }
+
+  .hx__issue-week {
+    color: var(--text-on-ink-muted);
+    font-size: var(--fs-small);
+    white-space: nowrap;
+  }
+
+  .hx__issue-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: issue;
+  }
+
+  .hx__issue-list > li {
+    counter-increment: issue;
+    border-bottom: 1px solid var(--rule-on-ink);
+  }
+
+  .hx__item {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.15rem 0;
+    padding: var(--sp-3) 0;
+    color: var(--text-on-ink);
+    text-decoration: none;
+  }
+
+  .hx__item::before {
+    content: counter(issue, decimal-leading-zero);
+    grid-row: span 2;
+    color: var(--text-gold-on-ink);
+    font-family: var(--font-display);
+    font-style: italic;
+  }
+
+  .hx__item[hidden] {
+    display: none;
+  }
+
+  .hx__item-k {
+    color: var(--text-on-ink-muted);
+    font-size: 0.8125rem;
+  }
+
+  .hx__item-t {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    line-height: 1.3;
+  }
+
+  .hx__item:hover .hx__item-t {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .hx__issue-note {
     margin-top: var(--sp-3);
+    color: var(--text-on-ink-muted);
+    font-size: 0.8125rem;
+    line-height: 1.5;
   }
 
-  .hv__search input {
-    flex: 1;
-    min-width: 0;
-    min-height: 2.875rem;
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--rule-control);
-    border-radius: 999px;
-    background: #fff;
-    font: 400 1rem/1.3 var(--font-ui);
-  }
-
-  .hv__az {
+  .hx__facts {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.2rem;
-    margin: var(--sp-3) 0 0;
-    padding: 0;
+    gap: var(--sp-2) var(--sp-6);
+    margin: var(--sp-7) 0 0;
+    padding: var(--sp-4) 0 0;
+    border-top: 1px solid var(--rule-ink);
     list-style: none;
   }
 
-  .hv__az li {
-    margin: 0;
-  }
-
-  .hv__az a {
-    display: inline-grid;
-    place-items: center;
-    width: 1.9rem;
-    height: 1.9rem;
-    border: 1px solid var(--rule-hair);
-    background: #fff;
-    font-family: var(--font-display);
-    font-weight: 600;
-    color: var(--navy-900);
+  .hx__facts a {
+    color: var(--text-body);
     text-decoration: none;
+    font-size: 0.9375rem;
   }
 
-  .hv__az a:hover {
-    background: var(--navy-900);
-    color: var(--text-on-ink);
-  }
-
-  /* ---------- Assessment ---------- */
-  .ha {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--sp-5);
-    margin: var(--sp-6) 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .ha__item {
-    display: grid;
-    align-content: start;
-    gap: var(--sp-2);
-    margin: 0;
-    padding: var(--sp-5);
-    border: 1px solid var(--rule-on-ink);
-    background: rgba(255, 255, 255, 0.03);
-  }
-
-  .ha__short {
+  .hx__facts b {
+    color: var(--text-strong);
     font-family: var(--font-display);
-    font-size: 2.5rem;
-    font-style: italic;
-    line-height: 1;
-    color: var(--gold-400);
-  }
-
-  .ha__name {
     font-size: 1.375rem;
-  }
-
-  .ha__name a {
-    color: var(--text-on-ink);
-    text-decoration: none;
-  }
-
-  .ha__name a:hover {
-    text-decoration: underline;
-    text-decoration-color: var(--gold-400);
-  }
-
-  .ha__levels {
-    font-size: 0.75rem;
     font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--gold-400);
+    margin-right: 0.3rem;
   }
 
-  .ha__facts {
-    display: grid;
-    gap: 0.25rem;
-    margin-top: var(--sp-2);
-    padding-top: var(--sp-3);
-    border-top: 1px solid var(--rule-on-ink);
+  .hx__facts a:hover {
+    color: var(--cobalt-text);
   }
 
-  .ha__facts div {
-    display: flex;
-    gap: var(--sp-3);
-  }
-
-  .ha__facts dt {
-    min-width: 1.75rem;
-    font-weight: 600;
+  /* ---------- 2. Philosophy ---------- */
+  .hp {
+    padding-block: clamp(3rem, 6vw, 5.5rem);
+    background: var(--surface-ink);
     color: var(--text-on-ink);
   }
 
-  .ha__facts dd {
-    margin: 0;
-    color: var(--text-on-ink-muted);
-  }
-
-  .ha__more {
-    margin-top: var(--sp-6);
-  }
-
-  /* ---------- Creator ---------- */
-  .hcr {
+  .hp__grid {
     display: grid;
     grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
     gap: clamp(2rem, 5vw, 5rem);
-    align-items: center;
+    align-items: start;
   }
 
-  .hcr__figure {
-    position: relative;
+  .hp__title {
     margin: 0;
+    color: var(--text-on-ink);
+    font-size: clamp(2rem, 1.5rem + 2vw, 3.25rem);
+    line-height: 1.08;
   }
 
-  .hcr__figure::before {
-    content: '';
-    position: absolute;
-    inset: -1rem 1rem 1rem -1rem;
-    border: 1px solid var(--gold-500);
+  .hp__lead {
+    margin-top: var(--sp-4);
+    color: var(--text-on-ink-muted);
+    font-size: 1.0625rem;
   }
 
-  .hcr__figure :global(img) {
-    position: relative;
-    width: 100%;
-    height: auto;
-    box-shadow: var(--shadow-lift);
+  .hp__chains {
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
-  .hcr__text {
+  .hp__chain {
+    padding: var(--sp-5) 0;
+    border-top: 1px solid var(--rule-on-ink);
+  }
+
+  .hp__chain:last-child {
+    border-bottom: 1px solid var(--rule-on-ink);
+  }
+
+  .hp__name {
+    margin: 0 0 var(--sp-3);
+    color: var(--text-gold-on-ink);
+    font-size: var(--fs-label);
+    font-weight: 650;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+  }
+
+  .hp__steps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .hp__steps li {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 1.1rem + 0.8vw, 1.75rem);
+    line-height: 1.2;
+  }
+
+  .hp__steps li:not(:last-child)::after {
+    content: "";
+    display: inline-block;
+    width: 1.75rem;
+    height: 1px;
+    margin: 0 0.6rem 0.35rem;
+    background: var(--gold-400);
+    vertical-align: middle;
+  }
+
+  .hp__text {
+    margin-top: var(--sp-3);
+    color: var(--text-on-ink-muted);
+  }
+
+  .hp__text a {
+    color: var(--cobalt-on-ink);
+    font-weight: 560;
+    white-space: nowrap;
+  }
+
+  /* ---------- 3. The course ---------- */
+  .hc__units {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--navy-900);
+  }
+
+  .hc__unit {
     display: grid;
-    gap: var(--sp-4);
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 2fr);
+    gap: var(--sp-3) var(--sp-6);
+    padding: var(--sp-5) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .hc__head {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    align-content: start;
+    gap: 0 var(--sp-3);
+  }
+
+  .hc__no {
+    grid-row: span 2;
+    color: var(--text-muted);
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-style: italic;
+    line-height: 1;
+  }
+
+  .hc__name {
+    margin: 0;
+    font-size: var(--fs-h4);
+    line-height: 1.25;
+  }
+
+  .hc__name a {
+    color: var(--text-strong);
+    text-decoration: none;
+  }
+
+  .hc__name a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .hc__hours {
+    margin-top: var(--sp-1);
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+  }
+
+  .hc__subs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 var(--sp-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .hc__subs a {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: 0 0.45rem;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--rule-hair);
+    color: var(--text-body);
+    text-decoration: none;
+    line-height: 1.35;
+  }
+
+  .hc__subs a:hover {
+    color: var(--cobalt-text);
+  }
+
+  .hc__t .tag {
+    margin-left: 0.4rem;
+    vertical-align: 0.1em;
+  }
+
+  .hc__code {
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.9375rem;
+  }
+
+  /* ---------- 4. Case of the week ---------- */
+  .hcase__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+
+  .hcase__grid[hidden] {
+    display: none;
+  }
+
+  .hcase__title {
+    margin: 0;
+    font-size: var(--fs-h2);
+    line-height: var(--lh-snug);
+  }
+
+  .hcase__q {
+    margin-top: var(--sp-4);
+    padding-left: var(--sp-4);
+    border-left: 3px solid var(--gold-500);
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem);
+    font-style: italic;
+    line-height: 1.35;
+  }
+
+  .hcase__dek {
+    margin-top: var(--sp-4);
+    color: var(--text-body);
     max-width: 38rem;
   }
 
-  .hcr__title {
-    font-family: var(--font-brand);
-    font-size: clamp(2rem, 1.5rem + 2vw, 3.25rem);
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    line-height: 1.05;
+  .hcase__actions,
+  .hdec__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-3) var(--sp-5);
+    margin-top: var(--sp-5);
   }
 
-  .hcr__lead {
-    font-size: var(--fs-lead);
-    line-height: 1.55;
-    color: var(--text-body);
+  .hcase__actions a:not(.btn),
+  .hdec__actions a:not(.btn) {
+    color: var(--cobalt-text);
+    font-weight: 560;
   }
 
-  /* ---------- Objectives ---------- */
-  .hob {
+  .hcase__file {
+    margin: 0;
+    padding: var(--sp-5);
+    background: var(--surface-sheet);
+    border: 1px solid var(--rule);
+    border-top: 3px solid var(--navy-900);
+  }
+
+  .hcase__file > div {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0 var(--sp-7);
-    margin: var(--sp-6) 0 0;
-    padding: 0;
-    list-style: none;
-    border-top: 1px solid var(--navy-900);
-  }
-
-  .hob__item {
-    display: grid;
-    grid-template-columns: 3rem minmax(0, 1fr);
-    column-gap: var(--sp-4);
-    align-content: start;
-    padding: var(--sp-4) 0;
+    grid-template-columns: 7rem minmax(0, 1fr);
+    gap: var(--sp-3);
+    padding: var(--sp-2) 0;
     border-bottom: 1px solid var(--rule-hair);
   }
 
-  .hob__no {
-    grid-row: span 3;
-    font: italic 400 1.75rem/1 var(--font-display);
-    color: var(--gold-600);
+  .hcase__file > div:last-child {
+    border-bottom: 0;
   }
 
-  .hob__verb {
-    margin: 0;
-    font-size: 1.375rem;
-  }
-
-  .hob__text {
-    margin: var(--sp-1) 0 0;
-    font-size: 0.9375rem;
+  .hcase__file dt {
     color: var(--text-muted);
+    font-size: var(--fs-small);
   }
 
-  .hob__links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 var(--sp-4);
-    margin: var(--sp-2) 0 0;
-    padding: 0;
-    list-style: none;
+  .hcase__file dd {
+    margin: 0;
+    color: var(--text-strong);
   }
 
-  .hob__links a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 2rem;
-    font-weight: 600;
-    font-size: 0.9375rem;
+  /* ---------- 5. Decision ---------- */
+  .hdec__item {
+    max-width: 50rem;
+    margin-inline: auto;
+    text-align: center;
   }
 
-  /* ---------- Pathways ---------- */
-  .hpw {
+  .hdec__item[hidden] {
+    display: none;
+  }
+
+  .hdec__item .hk {
+    justify-content: center;
+  }
+
+  .hdec__title {
+    margin: 0;
+    font-size: clamp(1.875rem, 1.4rem + 2vw, 3rem);
+    line-height: 1.1;
+  }
+
+  .hdec__dek {
+    margin: var(--sp-4) auto 0;
+    max-width: 40rem;
+    color: var(--text-body);
+    font-size: 1.0625rem;
+  }
+
+  .hdec__flow {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0;
     margin: var(--sp-6) 0 0;
     padding: 0;
     list-style: none;
-    border-top: 1px solid var(--navy-900);
-    border-left: 1px solid var(--rule-hair);
+    text-align: left;
+    border-top: 1px solid var(--rule-ink);
   }
 
-  .hpw li {
-    margin: 0;
-    border-right: 1px solid var(--rule-hair);
-    border-bottom: 1px solid var(--rule-hair);
+  .hdec__flow li {
+    padding: var(--sp-4) var(--sp-4) 0 0;
+    color: var(--text-body);
+    font-size: 0.9375rem;
   }
 
-  .hpw a {
+  .hdec__flow li + li {
+    padding-left: var(--sp-4);
+    border-left: 1px solid var(--rule);
+  }
+
+  .hdec__flow b {
+    display: block;
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+
+  .hdec__actions {
+    justify-content: center;
+  }
+
+  /* ---------- 6. Financial laboratory ---------- */
+  .hfin__grid {
     display: grid;
-    gap: 0.35rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sp-6);
+  }
+
+  .hfin__side {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: var(--sp-6);
+    align-items: start;
+  }
+
+  .hfin__ch[hidden] {
+    display: none;
+  }
+
+  .hfin__k {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2);
+    margin: 0 0 var(--sp-2);
+    color: var(--text-muted);
+    font-size: var(--fs-label);
+    font-weight: 650;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+  }
+
+  .hfin__t {
+    margin: 0 0 var(--sp-2);
+    font-size: var(--fs-h4);
+  }
+
+  .hfin__answer {
+    margin-top: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    background: var(--surface-sheet);
+    border: 1px solid var(--rule);
+  }
+
+  .hfin__answer summary {
+    color: var(--cobalt-text);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .hfin__result {
+    margin-top: var(--sp-3);
+    color: var(--text-strong);
+    font-weight: 600;
+  }
+
+  .hfin__answer ol {
+    margin: var(--sp-2) 0 var(--sp-3);
+    font-size: 0.9375rem;
+  }
+
+  .hfin__answer a,
+  .hfin__more a {
+    color: var(--cobalt-text);
+    font-weight: 560;
+  }
+
+  .hfin__more {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding-top: var(--sp-4);
+    border-top: 2px solid var(--navy-900);
+  }
+
+  /* ---------- 7. Frameworks ---------- */
+  .hfw__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: clamp(2rem, 4vw, 4rem);
+    align-items: start;
+  }
+
+  .hfw__index {
+    margin: 0;
+    border-top: 2px solid var(--navy-900);
+  }
+
+  .hfw__row {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
+    gap: var(--sp-2) var(--sp-5);
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .hfw__row dt {
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    line-height: 1.35;
+  }
+
+  .hfw__row dd {
+    margin: 0;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .hfw__names {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .hfw__names li:not(:last-child)::after {
+    content: ",";
+    margin-right: 0.4em;
+    color: var(--text-muted);
+  }
+
+  .hfw__row dd a {
+    color: var(--cobalt-text);
+    text-decoration: none;
+  }
+
+  .hfw__row dd a:hover,
+  .hfw__row dd a:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .hfw__fig {
+    margin: 0;
+    padding: var(--sp-5);
+    background: var(--surface-page);
+    border: 1px solid var(--rule);
+  }
+
+  .hfw__fig[hidden] {
+    display: none;
+  }
+
+  .hfw__fig figcaption {
+    display: grid;
+    gap: var(--sp-1);
+    margin-bottom: var(--sp-4);
+  }
+
+  .hfw__fk {
+    color: var(--text-muted);
+    font-size: var(--fs-label);
+    font-weight: 650;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+  }
+
+  .hfw__ft {
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 600;
+  }
+
+  .hfw__fn {
+    color: var(--text-body);
+    font-size: 0.9375rem;
+  }
+
+  .hfw__dg :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* ---------- 8. Assessment ---------- */
+  .has {
+    padding-block: clamp(3rem, 6vw, 5.5rem);
+    background: var(--surface-ink);
+    color: var(--text-on-ink);
+  }
+
+  .has__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+
+  .has__title {
+    margin: 0;
+    color: var(--text-on-ink);
+    font-size: var(--fs-h2);
+    line-height: var(--lh-snug);
+  }
+
+  .has__lead {
+    margin-top: var(--sp-4);
+    color: var(--text-on-ink-muted);
+  }
+
+  .has__weights {
+    margin-top: var(--sp-6);
+  }
+
+  .has__w {
+    margin: 0 0 var(--sp-4);
+  }
+
+  .has__w figcaption {
+    margin-bottom: var(--sp-2);
+    color: var(--text-on-ink-muted);
+    font-size: var(--fs-small);
+  }
+
+  .has__bar {
+    display: flex;
+    min-height: 2.75rem;
+    border: 1px solid var(--rule-on-ink);
+  }
+
+  .has__part {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    min-width: 0;
+    padding: 0 0.6rem;
+    color: var(--navy-950);
+    font-size: 0.8125rem;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .has__part b {
+    font-weight: 700;
+  }
+
+  .has__part + .has__part {
+    border-left: 1px solid var(--navy-900);
+  }
+
+  .has__part--internal-assessment {
+    background: var(--ivory-100);
+  }
+
+  .has__part--paper-1 {
+    background: var(--gold-300);
+  }
+
+  .has__part--paper-2 {
+    background: var(--ivory-300);
+  }
+
+  .has__part--paper-3 {
+    background: var(--slate-300);
+  }
+
+  .has__note {
+    color: var(--text-on-ink-muted);
+    font-size: 0.8125rem;
+  }
+
+  .has__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule-on-ink);
+  }
+
+  .has__list a {
+    display: grid;
+    grid-template-columns: 3.25rem minmax(0, 1fr);
+    gap: 0.15rem var(--sp-4);
+    padding: var(--sp-4) 0;
+    border-bottom: 1px solid var(--rule-on-ink);
+    color: var(--text-on-ink);
+    text-decoration: none;
+  }
+
+  .has__short {
+    grid-row: span 2;
+    color: var(--text-gold-on-ink);
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-style: italic;
+  }
+
+  .has__name {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+  }
+
+  .has__list a:hover .has__name {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .has__meta {
+    color: var(--text-on-ink-muted);
+    font-size: 0.875rem;
+  }
+
+  /* ---------- 9. Environments: a directory board ---------- */
+  .henv__board {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--navy-900);
+    border-left: 1px solid var(--rule);
+  }
+
+  .henv__room {
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .henv__room a {
+    display: grid;
+    gap: var(--sp-2);
     height: 100%;
-    padding: var(--sp-5) var(--sp-4);
+    padding: var(--sp-5);
     color: var(--text-body);
     text-decoration: none;
     transition: background-color var(--dur-fast) var(--ease);
   }
 
-  .hpw a:hover {
-    background: rgba(255, 255, 255, 0.7);
+  .henv__room a:hover {
+    background: var(--surface-sheet);
   }
 
-  .hpw__no {
-    font: italic 400 1.25rem/1 var(--font-display);
-    color: var(--brass-text);
-  }
-
-  .hpw strong {
+  .henv__name {
+    color: var(--text-strong);
     font-family: var(--font-display);
     font-size: 1.25rem;
     font-weight: 600;
-    line-height: 1.2;
-    color: var(--navy-900);
   }
 
-  .hpw a:hover strong {
-    color: var(--cobalt-text);
+  .henv__room a:hover .henv__name {
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
-  .hpw__who {
+  .henv__line {
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+  }
+
+  /* ---------- 10. Visual learning ---------- */
+  .hv__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: var(--sp-6);
+    align-items: start;
+  }
+
+  .hv__k {
+    margin: 0 0 var(--sp-3);
+    padding-bottom: var(--sp-2);
+    border-bottom: 1px solid var(--rule-ink);
+    color: var(--text-strong);
     font-size: var(--fs-label);
     font-weight: 650;
     letter-spacing: var(--track-label);
     text-transform: uppercase;
-    color: var(--text-muted);
   }
 
-  .hpw__promise {
-    font-size: 0.9375rem;
-  }
-
-  .hpw :global(.tag) {
-    width: fit-content;
-    margin-top: var(--sp-1);
-  }
-
-  /* ---------- Latest additions ---------- */
-  .hnew {
-    margin: var(--sp-6) 0 0;
+  .hv__maplist,
+  .hv__dglist {
+    display: grid;
+    gap: var(--sp-3);
+    margin: 0;
     padding: 0;
     list-style: none;
-    border-top: 1px solid var(--navy-900);
   }
 
-  .hnew__item {
+  .hv__maplist a,
+  .hv__dglist a {
     display: grid;
-    grid-template-columns: 9.5rem 7rem minmax(0, 1fr);
-    gap: var(--sp-4);
-    align-items: baseline;
-    padding: var(--sp-3) 0;
-    border-bottom: 1px solid var(--rule-hair);
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    gap: var(--sp-3);
+    align-items: center;
+    color: var(--text-strong);
+    text-decoration: none;
   }
 
-  .hnew__date {
-    font: italic 400 1rem var(--font-display);
-    color: var(--text-muted);
-  }
-
-  .hnew__kind {
-    font-size: var(--fs-label);
-    font-weight: 650;
-    letter-spacing: var(--track-label);
-    text-transform: uppercase;
-    color: var(--brass-text);
-  }
-
-  .hnew__body {
-    display: grid;
-    gap: 0.15rem;
-  }
-
-  .hnew__title {
-    font-weight: 650;
-  }
-
-  .hnew__text {
-    font-size: 0.9375rem;
-    color: var(--text-muted);
-  }
-
-  /* ---------- Closing ---------- */
-  .hclose {
-    position: relative;
-    padding-block: clamp(3.5rem, 8vw, 6.5rem);
-    color: var(--text-on-ink);
-    background:
-      radial-gradient(ellipse 60% 70% at 85% 10%, rgba(201, 168, 102, 0.16), transparent 60%),
-      linear-gradient(rgba(244, 239, 228, 0.035) 1px, transparent 1px) 0 0 / 100% 40px,
-      var(--surface-ink-deep);
+  .hv__thumb,
+  .hv__dg {
+    display: block;
+    aspect-ratio: 4 / 3;
+    padding: 0.25rem;
+    background: var(--surface-page);
+    border: 1px solid var(--rule);
     overflow: hidden;
   }
 
-  .hclose::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 auto;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold-400) 20%, var(--gold-400) 80%, transparent);
+  .hv__thumb :global(svg),
+  .hv__dg :global(svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
 
-  .hclose__inner > * {
-    max-width: 62rem;
+  .hv__mt {
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    line-height: 1.3;
   }
 
-  /* The closing band runs straight into the footer. */
-  :global(main:has(.hclose) + .site-footer) {
-    margin-top: 0;
+  .hv__maplist a:hover .hv__mt,
+  .hv__dglist a:hover .hv__mt {
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
-  .hclose__kicker {
+  .hv__all {
+    display: inline-block;
+    margin-top: var(--sp-4);
+    color: var(--cobalt-text);
+    font-weight: 600;
+  }
+
+  .hv__gt {
+    margin: 0 0 var(--sp-4);
+    color: var(--text-strong);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    line-height: 1.3;
+  }
+
+  .hv__search {
     display: flex;
-    align-items: center;
-    gap: var(--sp-3);
+    gap: var(--sp-2);
+  }
+
+  .hv__search .btn {
+    white-space: nowrap;
+  }
+
+  .hv__search input {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 2.875rem;
+    padding: 0 var(--sp-3);
+    border: 1px solid var(--rule-control);
+    border-radius: var(--radius-1);
+    background: var(--white);
+    color: var(--text-strong);
+    font: inherit;
+  }
+
+  /* ---------- 11. Business intelligence ---------- */
+  .hn__list {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0;
     margin: 0;
-    font: 600 var(--fs-label) var(--font-ui);
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: var(--text-gold-on-ink);
+    padding: 0;
+    list-style: none;
+    border-top: 2px solid var(--navy-900);
   }
 
-  .hclose__title {
-    margin: var(--sp-4) 0 0;
-    font-size: clamp(2.25rem, 1.4rem + 3.6vw, 4.5rem);
-    line-height: 1.04;
-    letter-spacing: -0.02em;
-    color: var(--text-on-ink);
+  .hn__item {
+    padding: var(--sp-4) var(--sp-5) var(--sp-4) 0;
   }
 
-  .hclose__title em {
-    color: var(--gold-400);
+  .hn__item + .hn__item {
+    padding-left: var(--sp-5);
+    border-left: 1px solid var(--rule);
   }
 
-  .hclose__lead {
-    max-width: 40rem;
-    margin: var(--sp-4) 0 0;
-    font-size: var(--fs-lead);
-    color: var(--text-on-ink-muted);
+  .hn__meta {
+    margin: 0 0 var(--sp-2);
+    color: var(--text-muted);
+    font-size: var(--fs-small);
   }
 
-  .hclose__actions {
+  .hn__title {
+    margin: 0;
+    font-size: 1.1875rem;
+    line-height: 1.3;
+  }
+
+  .hn__item--lead .hn__title {
+    font-size: clamp(1.375rem, 1.2rem + 0.8vw, 1.875rem);
+    line-height: 1.2;
+  }
+
+  .hn__title a {
+    color: var(--text-strong);
+    text-decoration: none;
+  }
+
+  .hn__title a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .hn__dek {
+    margin-top: var(--sp-3);
+    color: var(--text-body);
+  }
+
+  .hn__codes {
+    margin-top: var(--sp-3);
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+  }
+
+  /* ---------- 12. Creator ---------- */
+  .hcr__grid {
+    display: grid;
+    grid-template-columns: 15rem minmax(0, 44rem);
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: center;
+  }
+
+  .hcr__fig {
+    margin: 0;
+  }
+
+  .hcr__fig :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--rule);
+  }
+
+  .hcr__title {
+    margin: 0;
+    font-size: var(--fs-h2);
+  }
+
+  .hcr__lead {
+    margin-top: var(--sp-3);
+    color: var(--text-body);
+  }
+
+  .hcr__actions {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--sp-3);
-    margin: var(--sp-6) 0 0;
-  }
-
-  .hclose a.btn--gold,
-  .hclose a.btn--gold:hover {
-    color: var(--navy-950);
-  }
-
-  .hclose .btn--ghost-ink {
-    background: transparent;
-    border-color: rgba(244, 239, 228, 0.45);
-    color: var(--text-on-ink);
-  }
-
-  .hclose .btn--ghost-ink:hover {
-    background: rgba(244, 239, 228, 0.08);
-    border-color: var(--text-on-ink);
-  }
-
-  .hclose__trust {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--sp-5);
-    margin: var(--sp-7) 0 0;
-    padding: var(--sp-5) 0 0;
-    list-style: none;
-    border-top: 1px solid var(--rule-on-ink);
-    font-size: var(--fs-small);
-    color: var(--text-on-ink-muted);
-  }
-
-  .hclose__trust strong {
-    display: block;
-    margin-bottom: 0.25rem;
-    color: var(--text-on-ink);
-  }
-
-  .hclose__trust a {
-    color: var(--cobalt-on-ink);
-  }
-
-  /* ---------- Responsive ---------- */
-  @media (max-width: 64rem) {
-    .hh__grid,
-    .hcr {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .hh__figure {
-      max-width: 30rem;
-      margin: 0 auto;
-    }
-
-    .hh__index {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .hv {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .hv__dg {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-
-    .hh__index > div:nth-child(4) {
-      border-left: 0;
-      padding-left: 0;
-    }
-
-    .hm,
-    .ha {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .hob {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .hclose__trust {
-      grid-template-columns: minmax(0, 1fr);
-      gap: var(--sp-3);
-    }
-
-    .hcr__figure {
-      max-width: 26rem;
-    }
-  }
-
-  @media (max-width: 40rem) {
-    .hh__index {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      column-gap: var(--sp-5);
-    }
-
-    .hh__index > div:nth-child(n) {
-      padding: var(--sp-3) 0 var(--sp-3);
-      border-left: 0;
-      border-bottom: 1px solid var(--rule-hair);
-    }
-
-    .hm,
-    .ha {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .hnew__item {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 0.2rem;
-    }
-
-    .hc__unit {
-      grid-template-columns: 2.75rem minmax(0, 1fr);
-      gap: var(--sp-3);
-    }
-
-    .hc__no {
-      font-size: 2.5rem;
-    }
-
-    .hc__body {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .hc__ticks {
-      grid-column: 1;
-      grid-row: auto;
-      justify-content: flex-start;
-      max-width: none;
-    }
-
-    .hh__caption {
-      left: 0;
-      top: auto;
-      bottom: 4%;
-      max-width: 14rem;
-      padding: 0.7rem 0.85rem;
-    }
-  }
-
-  /* ---------- Tutorials ---------- */
-
-  .htu__grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
-    gap: var(--sp-7);
     align-items: center;
+    gap: var(--sp-3) var(--sp-5);
+    margin-top: var(--sp-4);
   }
 
-  .htu__list {
-    margin: var(--sp-5) 0 0;
+  .hcr__actions a:not(.btn) {
+    color: var(--cobalt-text);
+    font-weight: 560;
+  }
+
+  /* ---------- 13. Routes ---------- */
+  .hr__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+
+  .hr__dek,
+  .hr__eco-lead {
+    margin: var(--sp-3) 0 var(--sp-4);
+    color: var(--text-muted);
+  }
+
+  .hr__list,
+  .hr__sisters,
+  .hr__trust {
+    margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  .htu__list li {
-    position: relative;
-    padding: var(--sp-3) 0 var(--sp-3) var(--sp-6);
-    border-bottom: 1px solid var(--rule-hair);
+  .hr__list {
+    columns: 2;
+    column-gap: var(--sp-5);
+    border-top: 1px solid var(--rule-ink);
   }
 
-  .htu__list li::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 1.2rem;
-    width: 1.1rem;
-    height: 2px;
-    background: var(--gold-500);
+  .hr__list li,
+  .hr__sisters li {
+    break-inside: avoid;
   }
 
-  .htu__card {
-    padding: var(--sp-6);
-    background: var(--surface-ink);
-    color: var(--text-on-ink);
-    border-top: 3px solid var(--gold-500);
-    box-shadow: var(--shadow-sheet);
+  .hr__list a,
+  .hr__sisters a {
+    display: grid;
+    gap: 0.1rem;
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--rule);
+    color: var(--text-body);
+    text-decoration: none;
   }
 
-  .htu__kicker {
-    font-family: var(--font-ui);
-    font-size: var(--fs-label);
-    font-weight: 600;
-    letter-spacing: var(--track-label);
-    text-transform: uppercase;
-    color: var(--text-gold-on-ink);
-  }
-
-  .htu__price {
-    display: flex;
-    align-items: flex-end;
-    gap: var(--sp-3);
-    margin-top: var(--sp-4);
-  }
-
-  .htu__cur {
-    padding-bottom: 0.4rem;
+  .hr__name {
+    color: var(--text-strong);
     font-family: var(--font-display);
-    font-size: 1.25rem;
-    color: var(--text-on-ink-muted);
+    font-size: 1.125rem;
+    font-weight: 560;
   }
 
-  .htu__amt {
-    font-family: var(--font-display);
-    font-size: 4rem;
-    line-height: 0.9;
-    color: var(--white);
+  .hr__list a:hover .hr__name,
+  .hr__sisters a:hover .hr__name {
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
-  .htu__per {
-    padding-bottom: 0.3rem;
-    font-family: var(--font-ui);
-    font-size: var(--fs-small);
-    color: var(--text-on-ink-muted);
+  .hr__who {
+    color: var(--text-muted);
+    font-size: 0.875rem;
   }
 
-  .htu__note {
-    margin-top: var(--sp-4);
-    font-size: var(--fs-small);
-    color: var(--text-on-ink-muted);
+  .hr__sisters {
+    border-top: 1px solid var(--rule-ink);
   }
 
-  .htu__actions {
-    display: flex;
-    flex-wrap: wrap;
+  .hr__trust {
+    display: grid;
     gap: var(--sp-3);
-    margin-top: var(--sp-5);
+    margin-top: var(--sp-6);
+    padding-top: var(--sp-4);
+    border-top: 1px solid var(--rule);
+    color: var(--text-body);
+    font-size: 0.9375rem;
   }
 
-  .htu__card .btn--primary {
-    background: var(--gold-400);
-    border-color: var(--gold-400);
-    color: var(--navy-950);
+  .hr__trust b {
+    color: var(--text-strong);
   }
 
-  .htu__card .btn:not(.btn--primary) {
-    border-color: rgba(244, 239, 228, 0.6);
-    color: var(--text-on-ink);
+  .hr__trust a {
+    color: var(--cobalt-text);
   }
 
-  .htu__card .btn:not(.btn--primary):hover {
-    background: var(--ivory-50);
-    color: var(--navy-950);
-  }
-
-  @media (max-width: 56rem) {
-    .htu__grid {
+  /* ---------- Narrower screens ---------- */
+  @media (max-width: 63.99rem) {
+    .hx__grid,
+    .hp__grid,
+    .hcase__grid,
+    .hfw__grid,
+    .has__grid,
+    .hr__grid,
+    .hfin__grid {
       grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hfin__side {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hv__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .hv__gloss {
+      grid-column: 1 / -1;
+    }
+
+    .henv__board {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .hn__list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hn__item,
+    .hn__item + .hn__item {
+      padding: var(--sp-4) 0;
+      border-left: 0;
+      border-bottom: 1px solid var(--rule);
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .hc__unit {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hc__subs {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hdec__flow {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hdec__flow li + li {
+      padding-left: 0;
+      border-left: 0;
+      border-top: 1px solid var(--rule);
+    }
+
+    .hv__grid,
+    .henv__board,
+    .hfw__row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hr__list {
+      columns: 1;
+    }
+
+    .hcr__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .hcr__fig {
+      max-width: 13rem;
+    }
+
+    .hx__facts {
+      gap: var(--sp-2) var(--sp-4);
+    }
+
+    .hcase__file > div {
+      grid-template-columns: 6rem minmax(0, 1fr);
+    }
+  }
+
+  @media print {
+    .hx__search,
+    .hx__issue,
+    .hv__search {
+      display: none;
     }
   }
 </style>

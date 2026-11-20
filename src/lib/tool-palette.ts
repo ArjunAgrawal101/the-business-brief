@@ -11,8 +11,8 @@ import { esc } from './markup';
 export const P = {
   navy: '#0b1a33',
   navy700: '#1e355f',
-  cobalt: '#2f55e4',
-  cobaltText: '#2448d0',
+  cobalt: '#3a6797',
+  cobaltText: '#2d5b8c',
   green: '#2f6f5e',
   greenText: '#2b6a59',
   signal: '#a8463f',

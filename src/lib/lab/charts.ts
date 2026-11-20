@@ -14,7 +14,7 @@ import type { RevenueModel } from './revenue';
 import type { UnitModel } from './unit-economics';
 
 const INK = '#0B1A33';
-const COBALT = '#2448D0';
+const COBALT = '#2D5B8C';
 const GOLD = '#8A6B2A';
 const SIGNAL = '#9E3F38';
 const GREEN = '#2B6A59';

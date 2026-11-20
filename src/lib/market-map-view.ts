@@ -78,9 +78,9 @@ export function miniMapSvg(s: MapState, id: string): string {
     const focus = b.id === s.focus;
     const px = x(b.x);
     const py = y(b.y);
-    p.push(`<circle cx="${r1(px)}" cy="${r1(py)}" r="${focus ? 6 : 4.5}" fill="${focus ? '#2F55E4' : '#fff'}" stroke="${focus ? '#fff' : '#0B1A33'}" stroke-width="1.75"/>`);
+    p.push(`<circle cx="${r1(px)}" cy="${r1(py)}" r="${focus ? 6 : 4.5}" fill="${focus ? '#3A6797' : '#fff'}" stroke="${focus ? '#fff' : '#0B1A33'}" stroke-width="1.75"/>`);
     const right = px < W - 110;
-    p.push(`<text x="${r1(right ? px + 9 : px - 9)}" y="${r1(py + 4)}" text-anchor="${right ? 'start' : 'end'}" class="ch-note" fill="${focus ? '#2448D0' : '#0B1A33'}"${focus ? ' font-weight="700"' : ''}>${esc(b.name)}</text>`);
+    p.push(`<text x="${r1(right ? px + 9 : px - 9)}" y="${r1(py + 4)}" text-anchor="${right ? 'start' : 'end'}" class="ch-note" fill="${focus ? '#2D5B8C' : '#0B1A33'}"${focus ? ' font-weight="700"' : ''}>${esc(b.name)}</text>`);
   }
   p.push(`<text x="${(L + W - R) / 2}" y="${H - 12}" text-anchor="middle" class="ch-note" fill="#566173">${esc(`${xa.label}: low to high`)}</text>`);
   p.push(`<text x="14" y="${(T + H - B) / 2}" text-anchor="middle" class="ch-note" fill="#566173" transform="rotate(-90 14 ${(T + H - B) / 2})">${esc(`${ya.label}: low to high`)}</text>`);

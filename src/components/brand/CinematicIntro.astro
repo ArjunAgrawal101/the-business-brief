@@ -146,9 +146,11 @@ const MOUNT = `(function () {
       timers.push(setTimeout(release, 900));
       timers.push(setTimeout(finish, 1650));
     } else {
-      timers.push(setTimeout(fly, 3950));
-      timers.push(setTimeout(release, 4100));
-      timers.push(setTimeout(finish, 5000));
+      // The same clock as the styles' --cx-k: the full opening runs at 0.55 of its drawn length.
+      var k = 0.55;
+      timers.push(setTimeout(fly, 3950 * k));
+      timers.push(setTimeout(release, 4100 * k));
+      timers.push(setTimeout(finish, 5000 * k));
     }
   }
   function onKey(e) {
@@ -283,6 +285,17 @@ const MOUNT = `(function () {
 <script is:inline set:html={MOUNT} />
 
 <style is:global>
+  /* The whole sequence runs on one clock: --cx-k scales every time below.
+     The full opening runs at 0.55 of its drawn length (about 2.75 s);
+     the still card under reduced motion keeps its own timing. */
+  :root {
+    --cx-k: 1;
+  }
+
+  :root.cx-full {
+    --cx-k: 0.55;
+  }
+
   .cx,
   .cx-skip {
     display: none;
@@ -298,11 +311,11 @@ const MOUNT = `(function () {
     cursor: pointer;
     contain: strict;
     /* A failsafe: whatever the script does, the layer is gone at 5 s. */
-    animation: cx-gone 0s linear 5.05s forwards;
+    animation: cx-gone calc(0s * var(--cx-k)) linear calc(5.05s * var(--cx-k)) forwards;
   }
 
   html.cx-still .cx {
-    animation: cx-out 0.4s ease 1.2s forwards;
+    animation: cx-out calc(0.4s * var(--cx-k)) ease calc(1.2s * var(--cx-k)) forwards;
   }
 
   html.cx-on .cx-skip {
@@ -324,7 +337,7 @@ const MOUNT = `(function () {
     text-transform: uppercase;
     cursor: pointer;
     backdrop-filter: blur(6px);
-    animation: cx-out 0.3s ease 4.55s forwards;
+    animation: cx-out calc(0.3s * var(--cx-k)) ease calc(4.55s * var(--cx-k)) forwards;
   }
 
   html.cx-on .cx-skip::after {
@@ -337,7 +350,7 @@ const MOUNT = `(function () {
   }
 
   html.cx-still .cx-skip {
-    animation-delay: 1.25s;
+    animation-delay: calc(1.25s * var(--cx-k));
   }
 
   html.cx-on .cx-skip:hover {
@@ -653,44 +666,44 @@ const MOUNT = `(function () {
   /* ---------- The full sequence: timings ---------- */
 
   html.cx-full .cx__ground {
-    animation: cx-out 0.7s cubic-bezier(0.4, 0, 0.2, 1) 4.2s forwards;
+    animation: cx-out calc(0.7s * var(--cx-k)) cubic-bezier(0.4, 0, 0.2, 1) calc(4.2s * var(--cx-k)) forwards;
   }
 
   html.cx-full .cx__ground::after {
     opacity: 0;
-    animation: cx-glow 1.4s ease-out forwards;
+    animation: cx-glow calc(1.4s * var(--cx-k)) ease-out forwards;
   }
 
   html.cx-full .cx-d {
     stroke-dasharray: 1;
     stroke-dashoffset: 1;
-    animation: cx-draw var(--t, 0.6s) cubic-bezier(0.65, 0, 0.35, 1) var(--d, 1s) forwards;
+    animation: cx-draw calc(var(--t, 0.6s) * var(--cx-k)) cubic-bezier(0.65, 0, 0.35, 1) calc(var(--d, 1s) * var(--cx-k)) forwards;
   }
 
   html.cx-full .cx__arch .cx-row {
     transform: scaleX(0);
-    animation: cx-extend 1s cubic-bezier(0.22, 1, 0.36, 1) var(--d) forwards;
+    animation: cx-extend calc(1s * var(--cx-k)) cubic-bezier(0.22, 1, 0.36, 1) calc(var(--d) * var(--cx-k)) forwards;
   }
 
   html.cx-full .cx__arch {
     animation:
-      cx-dim 0.6s ease 2.1s forwards,
-      cx-converge 0.8s cubic-bezier(0.55, 0, 0.45, 1) 3.55s forwards;
+      cx-dim calc(0.6s * var(--cx-k)) ease calc(2.1s * var(--cx-k)) forwards,
+      cx-converge calc(0.8s * var(--cx-k)) cubic-bezier(0.55, 0, 0.45, 1) calc(3.55s * var(--cx-k)) forwards;
   }
 
   html.cx-full .cx__dust span {
     opacity: 0;
-    animation: cx-float var(--t) ease-in-out var(--d) 2 both;
+    animation: cx-float calc(var(--t) * var(--cx-k)) ease-in-out calc(var(--d) * var(--cx-k)) 2 both;
   }
 
   html.cx-full .cx__dust {
-    animation: cx-converge 0.8s cubic-bezier(0.55, 0, 0.45, 1) 3.55s forwards;
+    animation: cx-converge calc(0.8s * var(--cx-k)) cubic-bezier(0.55, 0, 0.45, 1) calc(3.55s * var(--cx-k)) forwards;
   }
 
   html.cx-full .cx__world {
     animation:
-      cx-dim 0.5s ease 2.1s forwards,
-      cx-converge 0.8s cubic-bezier(0.55, 0, 0.45, 1) 3.55s forwards;
+      cx-dim calc(0.5s * var(--cx-k)) ease calc(2.1s * var(--cx-k)) forwards,
+      cx-converge calc(0.8s * var(--cx-k)) cubic-bezier(0.55, 0, 0.45, 1) calc(3.55s * var(--cx-k)) forwards;
   }
 
   html.cx-full .cx-box,
@@ -699,7 +712,7 @@ const MOUNT = `(function () {
   html.cx-full .cx-area,
   html.cx-full .cx-pulse {
     opacity: 0;
-    animation: cx-in 0.45s ease var(--d, 1s) forwards;
+    animation: cx-in calc(0.45s * var(--cx-k)) ease calc(var(--d, 1s) * var(--cx-k)) forwards;
   }
 
   html.cx-full .cx-box,
@@ -713,53 +726,53 @@ const MOUNT = `(function () {
     transform-box: fill-box;
     transform-origin: center;
     animation:
-      cx-in 0.3s ease 1.9s forwards,
-      cx-beat 1.1s ease-in-out 2.2s 2;
+      cx-in calc(0.3s * var(--cx-k)) ease calc(1.9s * var(--cx-k)) forwards,
+      cx-beat calc(1.1s * var(--cx-k)) ease-in-out calc(2.2s * var(--cx-k)) 2;
   }
 
   html.cx-full .cx-run {
-    animation: cx-run 1.3s cubic-bezier(0.45, 0, 0.55, 1) 2s 2;
+    animation: cx-run calc(1.3s * var(--cx-k)) cubic-bezier(0.45, 0, 0.55, 1) calc(2s * var(--cx-k)) 2;
   }
 
   html.cx-full .cx-mono__a,
   html.cx-full .cx-mono__b {
     clip-path: inset(100% 0 0 0);
-    animation: cx-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) 2s forwards;
+    animation: cx-rise calc(0.8s * var(--cx-k)) cubic-bezier(0.16, 1, 0.3, 1) calc(2s * var(--cx-k)) forwards;
   }
 
   html.cx-full .cx-mono__b {
-    animation-delay: 2.14s;
+    animation-delay: calc(2.14s * var(--cx-k));
   }
 
   html.cx-full .cx-sheen {
-    animation: cx-sheen 0.9s cubic-bezier(0.45, 0, 0.2, 1) 2.62s forwards;
+    animation: cx-sheen calc(0.9s * var(--cx-k)) cubic-bezier(0.45, 0, 0.2, 1) calc(2.62s * var(--cx-k)) forwards;
     transform: skewX(-18deg) translateX(-260px);
   }
 
   html.cx-full .cx-name__name {
     clip-path: inset(0 50% 0 50%);
     opacity: 0;
-    animation: cx-open 0.7s cubic-bezier(0.16, 1, 0.3, 1) 2.55s forwards;
+    animation: cx-open calc(0.7s * var(--cx-k)) cubic-bezier(0.16, 1, 0.3, 1) calc(2.55s * var(--cx-k)) forwards;
   }
 
   html.cx-full .cx-name__rule {
     transform: scaleX(0);
-    animation: cx-extend 0.55s cubic-bezier(0.16, 1, 0.3, 1) 2.8s forwards;
+    animation: cx-extend calc(0.55s * var(--cx-k)) cubic-bezier(0.16, 1, 0.3, 1) calc(2.8s * var(--cx-k)) forwards;
   }
 
   html.cx-full .cx-product {
     opacity: 0;
     animation:
-      cx-track 0.75s cubic-bezier(0.16, 1, 0.3, 1) 2.95s forwards,
-      cx-leave 0.35s ease 3.95s forwards;
+      cx-track calc(0.75s * var(--cx-k)) cubic-bezier(0.16, 1, 0.3, 1) calc(2.95s * var(--cx-k)) forwards,
+      cx-leave calc(0.35s * var(--cx-k)) ease calc(3.95s * var(--cx-k)) forwards;
   }
 
   html.cx-full .cx-tagline span {
     display: inline-block;
     opacity: 0;
     animation:
-      cx-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) calc(3.15s + var(--i) * 0.15s) forwards,
-      cx-leave 0.3s ease 4s forwards;
+      cx-up calc(0.5s * var(--cx-k)) cubic-bezier(0.16, 1, 0.3, 1) calc((3.15s + var(--i) * 0.15s) * var(--cx-k)) forwards,
+      cx-leave calc(0.3s * var(--cx-k)) ease calc(4s * var(--cx-k)) forwards;
   }
 
   html.cx-full .cx-tagline span:nth-child(1) { --i: 0; }
@@ -767,12 +780,12 @@ const MOUNT = `(function () {
   html.cx-full .cx-tagline span:nth-child(3) { --i: 2; }
 
   html.cx-full .cx-name {
-    animation: cx-leave 0.35s ease 3.95s forwards;
+    animation: cx-leave calc(0.35s * var(--cx-k)) ease calc(3.95s * var(--cx-k)) forwards;
   }
 
   /* Without the script's flight, the monogram simply settles and fades. */
   html.cx-full .cx-mono {
-    animation: cx-settle 0.6s cubic-bezier(0.55, 0, 0.45, 1) 4.05s forwards;
+    animation: cx-settle calc(0.6s * var(--cx-k)) cubic-bezier(0.55, 0, 0.45, 1) calc(4.05s * var(--cx-k)) forwards;
   }
 
   /* With it, the monogram flies to its place in the header and takes the
@@ -797,11 +810,11 @@ const MOUNT = `(function () {
   }
 
   html.cx-full .cx__progress span {
-    animation: cx-progress 5s linear forwards;
+    animation: cx-progress calc(5s * var(--cx-k)) linear forwards;
   }
 
   html.cx-full .cx__progress {
-    animation: cx-out 0.3s ease 4.7s forwards;
+    animation: cx-out calc(0.3s * var(--cx-k)) ease calc(4.7s * var(--cx-k)) forwards;
   }
 
   /* ---------- The still card (reduced motion) ---------- */

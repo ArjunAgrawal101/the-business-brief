@@ -7,9 +7,9 @@
  * opening in a new tab.
  */
 import { NAV } from '../../lib/navigation';
-import { ECOSYSTEM, ECOSYSTEM_MOTTO, ECOSYSTEM_NAME, hostOf } from '../../lib/ecosystem';
+import { ECOSYSTEM, ECOSYSTEM_MOTTO, ECOSYSTEM_NAME } from '../../lib/ecosystem';
 
-/** The footer's columns are the six groups of the header, from one list. */
+/** The footer's columns are the five groups of the header, from one list. */
 const COLUMNS = NAV.map((g) => ({ title: g.label, links: g.links.map((l) => [l.label, l.href] as const) }));
 const year = new Date().getFullYear();
 ---
@@ -72,7 +72,6 @@ const year = new Date().getFullYear();
                     {p.name} <span aria-hidden="true">&nearr;</span>
                   </span>
                   <span class="site-footer__eco-line">{p.line}</span>
-                  <span class="site-footer__eco-url">{hostOf(p.url)}</span>
                   <span class="sr-only"> (opens in a new tab)</span>
                 </a>
               )}
@@ -93,7 +92,7 @@ const year = new Date().getFullYear();
         <a href="/privacy/">No account, no tracking: your saved work stays on this device.</a>
         <a href="/accessibility/">Accessibility</a>
         <a href="/search/">Search</a>
-        <a href="/rooms/">All rooms</a>
+        <a href="/rooms/">Every room and tool</a>
         <a href="/?intro" data-replay-intro>Replay the opening</a>
       </p>
     </div>
@@ -188,7 +187,7 @@ const year = new Date().getFullYear();
 
   .site-footer__h {
     font-family: var(--font-ui);
-    font-size: 0.6875rem;
+    font-size: var(--fs-label);
     font-weight: 600;
     letter-spacing: var(--track-label);
     text-transform: uppercase;
@@ -280,7 +279,7 @@ const year = new Date().getFullYear();
 
   .site-footer__eco-here {
     margin-top: var(--sp-1);
-    font-size: 0.6875rem;
+    font-size: var(--fs-label);
     font-weight: 650;
     letter-spacing: 0.14em;
     text-transform: uppercase;

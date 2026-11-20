@@ -1,9 +1,10 @@
 /**
- * The opening: it plays on every fresh entry to the site (a new tab, a new
- * browser, a link from elsewhere, a reload), never between the site's own
- * pages, finishes by itself in about five seconds, can be skipped by button,
- * key, click or tap, never traps the keyboard or hides the page from screen
- * readers, and becomes a still card under reduced motion.
+ * The opening: it plays when the home page is freshly opened (a new tab, a
+ * link from elsewhere, a bookmark), never on other pages, on a reload or
+ * between the site's own pages, finishes by itself in under three seconds,
+ * can be skipped by button, key, click or tap, never traps the keyboard or
+ * hides the page from screen readers, and becomes a still card under reduced
+ * motion.
  *
  * Browsers under automation skip it (navigator.webdriver), so the rest of the
  * suite sees pages as readers do once it has gone. These tests present the
@@ -21,7 +22,7 @@ test.beforeEach(async ({ page }) => {
 const playing = (page: Page) => expect(page.locator('html')).toHaveClass(/\bcx-on\b/);
 const notPlaying = (page: Page) => expect(page.locator('html')).not.toHaveClass(/\bcx-on\b/);
 
-test('plays on a fresh entry and again on the next one, with nothing stored', async ({ page }) => {
+test('plays on a fresh entry to the home page and again on the next one, with nothing stored', async ({ page }) => {
   await page.goto('/');
   await playing(page);
   await expect(page.locator('html')).toHaveClass(/\bcx-full\b/);
@@ -29,8 +30,17 @@ test('plays on a fresh entry and again on the next one, with nothing stored', as
   await expect(page.getByRole('button', { name: 'Skip intro' })).toBeVisible();
   // An old "seen" flag from an earlier version changes nothing.
   await page.evaluate(() => localStorage.setItem('bb:intro-seen', '2026-11-02'));
-  await page.goto('/glossary/');
+  await page.goto('about:blank');
+  await page.goto('/');
   await playing(page);
+});
+
+test('it never plays on a page reached directly, such as a topic from a search result', async ({ page }) => {
+  await page.goto('/glossary/');
+  await notPlaying(page);
+  await page.goto('/topics/');
+  await notPlaying(page);
+  await expect(page.locator('.cx')).toHaveCount(0);
 });
 
 test('the Skip intro button ends it at once and the page is usable', async ({ page }) => {
@@ -54,7 +64,8 @@ test('Escape and a click anywhere end it', async ({ page }) => {
   await page.goto('/');
   await page.keyboard.press('Escape');
   await expect(page.locator('.cx')).toHaveCount(0, { timeout: 1500 });
-  await page.goto('/topics/');
+  await page.goto('about:blank');
+  await page.goto('/');
   await playing(page);
   await page.mouse.click(400, 300);
   await expect(page.locator('.cx')).toHaveCount(0, { timeout: 1500 });
@@ -70,18 +81,20 @@ test('it does not play when moving between the site\'s own pages', async ({ page
   await expect(page.locator('.cx')).toHaveCount(0);
 });
 
-test('it plays again on a reload', async ({ page }) => {
-  await page.goto('/about/');
+test('it does not play again on a reload', async ({ page }) => {
+  await page.goto('/');
   await page.getByRole('button', { name: 'Skip intro' }).click();
   await expect(page.locator('.cx')).toHaveCount(0, { timeout: 1500 });
   await page.reload();
-  await playing(page);
+  await notPlaying(page);
 });
 
-test('it finishes by itself in about five seconds, settling the monogram into the header', async ({ page }) => {
+test('it finishes by itself in under three seconds, settling the monogram into the header', async ({ page }) => {
+  const t0 = Date.now();
   await page.goto('/');
-  await expect(page.locator('.cx.cx-fly')).toHaveCount(1, { timeout: 4800 });
-  await expect(page.locator('.cx')).toHaveCount(0, { timeout: 2500 });
+  await expect(page.locator('.cx.cx-fly')).toHaveCount(1, { timeout: 2800 });
+  await expect(page.locator('.cx')).toHaveCount(0, { timeout: 1500 });
+  expect(Date.now() - t0).toBeLessThan(4500);
   await notPlaying(page);
   await expect(page.locator('main h1')).toBeVisible();
 });

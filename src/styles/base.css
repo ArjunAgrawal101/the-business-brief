@@ -104,7 +104,9 @@ ol {
   padding-left: 1.25em;
 }
 
-li + li {
+/* Space the items of a plain list. Lists that carry a class or role="list" are
+   laid out by their component (often in a row), so they set their own gaps. */
+:where(ul, ol):not([class], [role="list"]) > li + li {
   margin-top: 0.35em;
 }
 
@@ -388,7 +390,7 @@ main:has(> .band + .print-attribution:last-child) + .site-footer {
 
 .sec-head__no {
   min-width: 2.5rem;
-  color: var(--brass-text);
+  color: var(--text-muted);
   font-family: var(--font-display);
   font-size: clamp(1.75rem, 1.4rem + 1.2vw, 2.5rem);
   font-style: italic;
@@ -417,7 +419,18 @@ main:has(> .band + .print-attribution:last-child) + .site-footer {
 }
 
 .band--ink .sec-head__no {
-  color: var(--gold-400);
+  color: var(--text-on-ink-muted);
+}
+
+/* On phones the numeral sits above the heading, so headings and deks use the full width. */
+@media (max-width: 40rem) {
+  .sec-head {
+    grid-template-columns: 1fr;
+  }
+
+  .sec-head__no {
+    font-size: 1.25rem;
+  }
 }
 
 .band--ink .sec-head__dek {
