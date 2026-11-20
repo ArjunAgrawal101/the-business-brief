@@ -1,0 +1,476 @@
+/*
+ * The Paper 3 plan builder: five numbered steps down a ruled spine, each with
+ * its guidance beside the work and its checks underneath; then the plan in
+ * three columns (First, Then, Later) and the checks by criterion.
+ */
+
+.pb {
+  padding: var(--sp-5);
+  background: var(--surface-sheet);
+  border-top: 3px solid var(--rule-ink);
+  box-shadow: var(--shadow-sheet);
+}
+
+.pb__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-4);
+}
+
+.pb__title {
+  font-size: 1.375rem;
+}
+
+.pb__lede {
+  max-width: 48rem;
+  margin-top: var(--sp-3);
+  color: var(--text-body);
+}
+
+.pb__status {
+  margin-top: var(--sp-3);
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.pb__status:empty {
+  display: none;
+}
+
+.pb__steps {
+  display: grid;
+  gap: var(--sp-6);
+  margin: var(--sp-5) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.pb__step {
+  margin: 0;
+  padding-left: var(--sp-5);
+  border-left: 2px solid var(--rule-ink);
+  min-width: 0;
+}
+
+.pb__step-head {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+}
+
+.pb__no {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  margin-left: calc(-1 * var(--sp-5) - 1rem - 1px);
+  background: var(--surface-ink);
+  color: var(--text-on-ink);
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+.pb__step-title {
+  font-size: 1.25rem;
+  line-height: 1.3;
+}
+
+.pb__ask {
+  margin-top: 0.15rem;
+  color: var(--text-muted);
+}
+
+.pb__guide {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+}
+
+.pb__guide > div {
+  padding: var(--sp-3);
+  background: var(--surface-page);
+  border: 1px solid var(--rule-hair);
+  font-size: 0.9375rem;
+}
+
+.pb__guide .ce-labels {
+  margin-bottom: var(--sp-1);
+}
+
+/* Step 1 */
+
+.pb__needs,
+.pb__own,
+.pb__reviews,
+.pb__ticks {
+  min-width: 0;
+  margin: var(--sp-4) 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.pb__needs > legend,
+.pb__own > legend,
+.pb__reviews > legend {
+  margin-bottom: var(--sp-2);
+  padding: 0;
+}
+
+.pb__need {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--sp-2);
+  align-items: start;
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--rule-hair);
+  border-top-width: 0;
+  background: var(--surface-sheet);
+  cursor: pointer;
+}
+
+.pb__need:first-of-type {
+  border-top-width: 1px;
+}
+
+.pb__need:has(input:checked) {
+  background: var(--surface-cobalt-wash);
+}
+
+.pb__need input,
+.pb__tick input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0.2rem 0 0;
+  accent-color: var(--cobalt-text);
+}
+
+.pb__kind {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.pb__refs {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.pb__needlist {
+  margin-top: var(--sp-3);
+}
+
+.pb__ownrow,
+.pb__review-row,
+.pb__dir {
+  display: grid;
+  grid-template-columns: minmax(9rem, 0.35fr) minmax(0, 1fr);
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+}
+
+.pb__dir {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+  margin-top: var(--sp-4);
+}
+
+.pb__review-row {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
+}
+
+/* Steps 3, 4 and 5: one card a recommendation */
+
+.pb__recs {
+  display: grid;
+  gap: var(--sp-4);
+  margin-top: var(--sp-4);
+}
+
+.pb__rec {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+  min-width: 0;
+  margin: 0;
+  padding: var(--sp-4);
+  border: 1px solid var(--rule);
+  background: var(--surface-page);
+}
+
+.pb__rec-legend {
+  padding: 0 var(--sp-1);
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.pb__rec-title {
+  font-weight: 400;
+}
+
+.pb__wide {
+  grid-column: 1 / -1;
+}
+
+.pb__ticks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-4);
+  margin-top: 0;
+}
+
+.pb__ticks > legend {
+  width: 100%;
+  margin-bottom: var(--sp-1);
+  padding: 0;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.pb__ticks--r {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+}
+
+.pb__tick {
+  display: inline-grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--sp-2);
+  align-items: start;
+  min-height: 2.75rem;
+  padding: 0.3rem 0;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+
+.pb__short {
+  min-height: 4.5rem;
+}
+
+.pb__remove-row {
+  margin: 0;
+}
+
+.pb__undo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-3);
+  align-items: center;
+  margin-top: var(--sp-2);
+  font-weight: 600;
+}
+
+.pb__whole {
+  margin-top: var(--sp-5);
+}
+
+/* The checks */
+
+.pb__stepcheck {
+  margin-top: var(--sp-4);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--rule-hair);
+}
+
+.pb__checks {
+  display: grid;
+  gap: var(--sp-2);
+  margin: var(--sp-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pb__checks:empty {
+  display: none;
+}
+
+.pb__checks li {
+  display: grid;
+  grid-template-columns: 4.5rem 2.25rem minmax(0, 1fr);
+  gap: var(--sp-2);
+  align-items: start;
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.pb__st {
+  padding: 0.1rem 0.35rem;
+  border: 1px solid currentColor;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pb__checks .is-met .pb__st {
+  color: var(--green-text);
+  background: var(--surface-right);
+}
+
+.pb__checks .is-open .pb__st {
+  color: var(--text-muted);
+  background: var(--surface-sheet);
+}
+
+.pb__checks .is-warn .pb__st {
+  color: var(--signal-text);
+  background: var(--surface-wrong);
+}
+
+.pb__crit {
+  display: inline-grid;
+  place-items: center;
+  min-height: 1.5rem;
+  background: var(--surface-ink);
+  color: var(--text-on-ink);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* The plan, in order, and the checks by criterion */
+
+.pb__out {
+  margin-top: var(--sp-6);
+  padding-top: var(--sp-5);
+  border-top: 2px solid var(--rule-ink);
+}
+
+.pb__out-title {
+  font-size: 1.25rem;
+}
+
+.pb__out-title + * {
+  margin-top: var(--sp-3);
+}
+
+.pb__view,
+.pb__review {
+  margin-bottom: var(--sp-5);
+}
+
+.pb__view > p + p {
+  margin-top: var(--sp-1);
+}
+
+.pb__cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+}
+
+.pb__col {
+  min-width: 0;
+  padding: var(--sp-3);
+  background: var(--surface-page);
+  border-top: 3px solid var(--rule-ink);
+}
+
+.pb__col-list {
+  display: grid;
+  gap: var(--sp-3);
+  margin: var(--sp-2) 0 0;
+  padding-left: 1.4rem;
+}
+
+.pb__col-list li {
+  margin: 0;
+}
+
+.pb__vt {
+  display: block;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.pb__vm {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.pb__group + .pb__group {
+  margin-top: var(--sp-4);
+}
+
+.pb__group-title {
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.pb__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  align-items: center;
+  margin-top: var(--sp-4);
+}
+
+.pb__confirm {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  align-items: center;
+}
+
+.pb__confirm[hidden] {
+  display: none;
+}
+
+@media (max-width: 48rem) {
+  .pb {
+    padding: var(--sp-4);
+  }
+
+  .pb__step {
+    padding-left: var(--sp-4);
+  }
+
+  .pb__no {
+    margin-left: calc(-1 * var(--sp-4) - 1rem - 1px);
+  }
+
+  .pb__rec,
+  .pb__dir,
+  .pb__ownrow,
+  .pb__review-row,
+  .pb__cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pb__checks li {
+    grid-template-columns: 4.5rem 2.25rem minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 26rem) {
+  .pb__checks li {
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+  }
+
+  .pb__checks .pb__txt {
+    grid-column: 1 / -1;
+  }
+}
+
+@media print {
+  .pb {
+    box-shadow: none;
+  }
+
+  .pb__bar,
+  .pb__remove-row,
+  .pb__undo,
+  .pb [data-add] {
+    display: none !important;
+  }
+}

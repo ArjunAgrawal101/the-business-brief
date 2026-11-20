@@ -1,0 +1,254 @@
+/*
+ * Paper 3 practice stimuli: the resources set as a paper's documents (an
+ * email with its sender, a post, a newspaper column, a ruled table), the
+ * questions with their guidance, and the list of stimuli.
+ */
+
+.p3p > * + * {
+  margin-top: var(--sp-6);
+}
+
+.p3p-standing {
+  display: grid;
+  gap: var(--sp-2);
+  max-width: 52rem;
+  padding: var(--sp-4);
+  background: var(--surface-sheet);
+  border-left: 3px solid var(--rule-ink);
+}
+
+.p3p-standing__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  align-items: center;
+}
+
+.p3p-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-5);
+  padding-block: var(--sp-3);
+  border-block: 1px solid var(--rule-hair);
+  font-weight: 600;
+}
+
+.p3p-res {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-4);
+  align-items: start;
+  margin-top: var(--sp-4);
+}
+
+.p3p-r {
+  display: grid;
+  align-content: start;
+  gap: var(--sp-2);
+  min-width: 0;
+  padding: var(--sp-4);
+  background: var(--surface-sheet);
+  border: 1px solid var(--rule-hair);
+  font-size: 0.9375rem;
+  scroll-margin-top: calc(var(--header-h) + var(--sp-4));
+}
+
+.p3p-r--text,
+.p3p-r--visual {
+  grid-column: 1 / -1;
+}
+
+.p3p-r__id {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-3);
+  align-items: baseline;
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brass-text);
+}
+
+.p3p-r__kind {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.p3p-r__from {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.p3p-r__head {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-strong);
+}
+
+.p3p-r--email {
+  border-left: 3px solid var(--slate-500);
+}
+
+.p3p-r--social-media {
+  border-left: 3px solid var(--cobalt-text);
+  font-style: italic;
+}
+
+.p3p-r--newspaper {
+  border-top: 3px double var(--rule-ink);
+}
+
+.p3p-r--document {
+  background: var(--surface-page);
+}
+
+.p3p-t {
+  margin-top: 0;
+  font-size: 0.875rem;
+}
+
+.p3p-t caption {
+  padding-bottom: var(--sp-2);
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.p3p-q {
+  max-width: 52rem;
+  margin-top: var(--sp-4);
+  padding: var(--sp-4);
+  background: var(--surface-sheet);
+  border: 1px solid var(--rule-hair);
+}
+
+.p3p-q__n {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.p3p-q__prompt {
+  margin-top: var(--sp-1);
+  font-size: 1.0625rem;
+}
+
+.p3p-q__marks {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+.p3p-guide {
+  margin-top: var(--sp-3);
+  border-top: 1px solid var(--rule-hair);
+}
+
+.p3p-guide > summary,
+.p3p-model > summary {
+  padding: var(--sp-3) 0;
+  font-weight: 600;
+  color: var(--text-strong);
+  cursor: pointer;
+}
+
+.p3p-guide__body > * + * {
+  margin-top: var(--sp-2);
+}
+
+.p3p-q3 {
+  margin-top: var(--sp-3);
+}
+
+.p3p-crit {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+  margin: var(--sp-4) 0 var(--sp-2);
+}
+
+.p3p-crit > div {
+  padding: var(--sp-3);
+  background: var(--surface-page);
+  border-top: 2px solid var(--rule-ink);
+}
+
+.p3p-crit dt {
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.p3p-crit dd {
+  margin: var(--sp-1) 0 0;
+  font-size: 0.9375rem;
+}
+
+.p3p-q + .pb,
+.p3p-q ~ .pb {
+  margin-top: var(--sp-5);
+}
+
+.p3p-model {
+  margin-top: var(--sp-5);
+  border-top: 1px solid var(--rule-ink);
+}
+
+.p3p-model > summary {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+}
+
+.p3p-model__body > * + * {
+  margin-top: var(--sp-4);
+}
+
+.p3p-others,
+.p3p-list {
+  margin: var(--sp-4) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule-ink);
+  max-width: 52rem;
+}
+
+.p3p-others li {
+  display: grid;
+  gap: var(--sp-1);
+  margin: 0;
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.p3p-list > li {
+  display: grid;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: var(--sp-4) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.p3p-list__title {
+  font-size: 1.25rem;
+}
+
+.p3p-list__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-4);
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 48rem) {
+  .p3p-res,
+  .p3p-crit {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,255 +1,288 @@
 ---
 /**
- * The Paper 3 plan builder: build a plan of action for the stimulus's social
- * enterprise across marketing, operations, HR and finance, tie each action to
- * the resources and tools behind it, sequence it, and review it against the
- * four criteria of question 3. Prompts, never marks. Saved on this device.
+ * The Paper 3 plan builder, in five steps: the human need and the challenges
+ * the plan answers, one direction for the whole organization, the
+ * recommendations (each tied to a need or challenge, to evidence and to the
+ * tool that shaped it), how each will work (what it uses, how it is paid for,
+ * when, after what, and its first step), and the evaluation (impact on the
+ * other areas, trade-offs, a judgement and review points). Each step carries
+ * its guidance and checks what is written so far; the plan in order and every
+ * check against the four criteria come last. Prompts, never marks.
+ *
+ * Saved on this device: bb:p3:plan for Haven Lunchbox, bb:p3:plan:<stimulus>
+ * for a practice stimulus. Without JavaScript the steps and their guidance
+ * read as a method for planning on paper.
  */
 import GuideLabel from './GuideLabel.astro';
-import { FUNCTIONS, FN_LABEL, STAGES, STAGE_LABEL, TOOLS, TOOL_LABEL } from '../../lib/p3-plan';
+import { CUSTOM_IDS, DIRECTIONS, DIRECTION_LABEL, FN_LABEL, KIND_LABEL, MAX_REVIEWS } from '../../lib/p3-plan';
+import { stimulusById } from '../../lib/p3-stimuli';
 import { jsonForScript } from '../../lib/markup';
+import '../../styles/p3-plan.css';
 
 interface Props {
+  /** The stimulus's resources, as the page shows them. */
   resources: Array<{ id: string; title: string }>;
+  /** The stimulus the plan is for: Haven Lunchbox, on the Paper 3 page, when none is given. */
+  stimulus?: string;
 }
-const { resources } = Astro.props;
-const DIRECTIONS = [
-  ['', 'Choose a direction'],
-  ['market-penetration', 'Market penetration: existing products, existing market'],
-  ['product-development', 'Product development: new products, existing market'],
-  ['market-development', 'Market development: existing products, new market'],
-  ['diversification', 'Diversification: new products, new market'],
-];
+const { resources, stimulus = 'haven' } = Astro.props;
+const s = stimulusById(stimulus);
+if (!s) throw new Error(`PlanBuilder: no stimulus "${stimulus}"`);
+const pfx = `pb-${s.id}`;
+const page = s.href.split('#')[0] ?? '/assessment/paper-3/';
+const config = {
+  key: s.id === 'haven' ? 'p3:plan' : `p3:plan:${s.id}`,
+  prefix: pfx,
+  organization: s.organization,
+  title: `Paper 3 plan: ${s.organization}`,
+  href: `${page}#${pfx}`,
+  file: `business-brief-paper-3-plan-${s.id}.txt`,
+  resources: resources.map((r) => ({ id: r.id, title: r.title })),
+  needs: s.needs,
+};
+const STEPS = [
+  { n: 1, title: 'The need and the challenges', ask: 'What is the plan for?' },
+  { n: 2, title: 'The direction', ask: 'Where does the whole organization go next?' },
+  { n: 3, title: 'The recommendations', ask: 'What will it do, for what, and on what evidence?' },
+  { n: 4, title: 'Making it work', ask: 'What does each use, how is it paid for, and in what order?' },
+  { n: 5, title: 'The evaluation', ask: 'What will each achieve, at what cost to the other areas, and how will you know?' },
+] as const;
 ---
 
-<div class="pb" data-ix="plan-builder">
-  <script type="application/json" data-config set:html={jsonForScript({ resources: resources.map((r) => r.id) })} />
+<div class="pb" data-ix="plan-builder" id={pfx}>
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
   <div class="pb__head">
     <h3 class="pb__title">Build your plan of action</h3>
-    <GuideLabel kind="strategy" />
-    <GuideLabel kind="example" />
+    <p class="ce-labels"><GuideLabel kind="strategy" /> <GuideLabel kind="example" /></p>
   </div>
-  <p class="nojs-only state">The plan builder needs JavaScript. On paper: one direction, then actions in each of the four functions, each tied to resources, evaluated with a trade-off, and placed First, Then or Later.</p>
-  <div class="js-only">
-    <div class="pb__dir">
-      <label>
-        <span>Direction for the whole organization</span>
-        <select data-direction>{DIRECTIONS.map(([v, l]) => <option value={v}>{l}</option>)}</select>
-      </label>
-      <label>
-        <span>Why this direction, from the resources</span>
-        <input type="text" data-why placeholder="For example: offices already ask for catering (R4), and the kitchens are quiet after 2 pm (R2)" />
-      </label>
-    </div>
-    <template data-action-template>
-      <fieldset class="pb__act" data-action>
-        <legend class="pb__n"></legend>
-        <label class="pb__wide"><span>The action</span><input type="text" data-k="text" placeholder="What Haven will do" /></label>
-        <label><span>Function</span><select data-k="fn">{FUNCTIONS.map((f) => <option value={f}>{FN_LABEL[f]}</option>)}</select></label>
-        <label><span>When</span><select data-k="stage">{STAGES.map((s) => <option value={s}>{STAGE_LABEL[s]}</option>)}</select></label>
-        <label><span>Tool that shaped it</span><select data-k="tool">{TOOLS.map((t) => <option value={t}>{TOOL_LABEL[t]}</option>)}</select></label>
-        <fieldset class="pb__res">
-          <legend>Resources it uses</legend>
-          {resources.map((r) => <label title={r.title}><input type="checkbox" data-r={r.id} /> {r.id}</label>)}
-        </fieldset>
-        <label class="pb__wide"><span>Expected impact</span><input type="text" data-k="gain" placeholder="What it gains, and for whom" /></label>
-        <label class="pb__wide"><span>Trade-off</span><input type="text" data-k="tradeoff" placeholder="What is gained in one area, given up in another, and why it is worth it" /></label>
-        <button type="button" class="pb__remove" data-remove aria-label="Remove this action">Remove</button>
-      </fieldset>
-    </template>
-    <div class="pb__acts" data-actions></div>
+  <p class="pb__lede">
+    Five steps, from the need to the evaluation. Each step gives its guidance and checks what you have written so far; your plan in order, with every check
+    against the four criteria, comes at the end. Your plan is kept on this device only.
+  </p>
+  <p class="state state--error" data-error hidden>The plan builder could not start. The five steps and their guidance below still work as a method on paper.</p>
+  <p class="state nojs-only">The builder needs JavaScript to keep and check a plan. On paper, the five steps below work the same way: write each answer down in order.</p>
+  <p class="pb__status js-only" data-status aria-live="polite"></p>
+
+  <ol class="pb__steps">
+    {
+      STEPS.map((st) => (
+        <li class="pb__step" data-step={st.n}>
+          <div class="pb__step-head">
+            <span class="pb__no" aria-hidden="true">{st.n}</span>
+            <div>
+              <h4 class="pb__step-title" id={`${pfx}-s${st.n}-h`}>
+                <span class="sr-only">Step {st.n}: </span>
+                {st.title}
+              </h4>
+              <p class="pb__ask">{st.ask}</p>
+            </div>
+          </div>
+
+          {st.n === 1 && (
+            <>
+              <div class="pb__guide">
+                <div>
+                  <p class="ce-labels"><GuideLabel kind="ib" /></p>
+                  <p>Question 3 asks for a plan for the organization in meeting the human need described in the stimulus (guide, p. 42).</p>
+                </div>
+                <div>
+                  <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+                  <p>The challenges from question 2 belong in the plan, but they are not the plan: responses that analysed only those challenges reached at most 2 of 6 for criterion C (May 2025 report).</p>
+                </div>
+                <div>
+                  <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+                  <p>Tick the human need first, then the challenges that stand in its way and any opportunity the resources show.</p>
+                </div>
+              </div>
+              <fieldset class="pb__needs js-only">
+                <legend class="label">What the plan answers, from the stimulus</legend>
+                {s.needs.map((n) => (
+                  <label class="pb__need">
+                    <input type="checkbox" data-need={n.id} />
+                    <span>
+                      <span class="pb__kind">{`${KIND_LABEL[n.kind]}${n.fn ? `, ${FN_LABEL[n.fn].toLowerCase()}` : ''}`}</span>
+                      {n.text} <span class="pb__refs">({n.resources.join(', ')})</span>
+                    </span>
+                  </label>
+                ))}
+              </fieldset>
+              <ul class="pb__needlist nojs-only">
+                {s.needs.map((n) => (
+                  <li>
+                    <b>{KIND_LABEL[n.kind]}:</b> {n.text} ({n.resources.join(', ')})
+                  </li>
+                ))}
+              </ul>
+              <fieldset class="pb__own js-only">
+                <legend class="label">Or write your own</legend>
+                {CUSTOM_IDS.map((id, i) => (
+                  <div class="pb__ownrow">
+                    <div class="field">
+                      <label for={`${pfx}-${id}-kind`}>Kind {i + 1}</label>
+                      <select class="select" id={`${pfx}-${id}-kind`} data-custom-kind={id}>
+                        <option value="need">Human need</option>
+                        <option value="challenge">Challenge</option>
+                        <option value="opportunity">Opportunity</option>
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label for={`${pfx}-${id}-text`}>In your words {i + 1}</label>
+                      <input class="input" type="text" id={`${pfx}-${id}-text`} data-custom-text={id} maxlength="200" />
+                    </div>
+                  </div>
+                ))}
+              </fieldset>
+            </>
+          )}
+
+          {st.n === 2 && (
+            <>
+              <div class="pb__guide">
+                <div>
+                  <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+                  <p>Under criterion D, reports warn against repeating question 2 and against actions that clash (as the Paper 3 guide cites them).</p>
+                </div>
+                <div>
+                  <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+                  <p>Choose one forward-looking direction for the whole organization, not a list of fixes: the Ansoff matrix shows the direction and how risky it is. Name the resources that point to it.</p>
+                </div>
+              </div>
+              <div class="pb__dir js-only">
+                <div class="field">
+                  <label for={`${pfx}-direction`}>Direction for the whole organization</label>
+                  <select class="select" id={`${pfx}-direction`} data-direction>
+                    {DIRECTIONS.map((d) => (
+                      <option value={d}>{DIRECTION_LABEL[d]}</option>
+                    ))}
+                  </select>
+                </div>
+                <div class="field">
+                  <label for={`${pfx}-why`}>Why this direction, from the resources</label>
+                  <input class="input" type="text" id={`${pfx}-why`} data-why maxlength="600" aria-describedby={`${pfx}-why-hint`} />
+                  <p class="field__hint" id={`${pfx}-why-hint`}>Name the resources in brackets, for example (R3).</p>
+                </div>
+              </div>
+            </>
+          )}
+
+          {st.n === 3 && (
+            <>
+              <div class="pb__guide">
+                <div>
+                  <p class="ce-labels"><GuideLabel kind="ib" /></p>
+                  <p>Criterion A's top level asks for every resource to be used to support the plan; criterion B's, for tools and theories applied effectively (guide, pp. 48-49, paraphrased).</p>
+                </div>
+                <div>
+                  <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+                  <p>Naming a tool without using it earns at most 1 of the 4 marks for B (May 2026 report). A SWOT that only restates the stimulus is warned against.</p>
+                </div>
+                <div>
+                  <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+                  <p>Give each recommendation a reason to exist: the need or challenge it answers, the evidence for it, and the tool that decided it.</p>
+                </div>
+              </div>
+              <div class="pb__recs js-only" data-recs="3" />
+              <p class="js-only">
+                <button type="button" class="btn btn--small" data-add>Add a recommendation</button>
+              </p>
+            </>
+          )}
+
+          {st.n === 4 && (
+            <>
+              <div class="pb__guide">
+                <div>
+                  <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+                  <p>Rewarded: a feasible plan the enterprise could afford and staff. Discouraged: relying on donations or grants, since a social enterprise earns most of its income by trading.</p>
+                </div>
+                <div>
+                  <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+                  <p>
+                    Place each recommendation First, Then or Later, say what must come before it, and give it a first step: who does what first. First, Then, Later is the platform's technique for criterion D, not an IB structure; any clear, coherent order can earn the marks.
+                  </p>
+                </div>
+              </div>
+              <div class="pb__recs js-only" data-recs="4" />
+            </>
+          )}
+
+          {st.n === 5 && (
+            <>
+              <div class="pb__guide">
+                <div>
+                  <p class="ce-labels"><GuideLabel kind="ib" /></p>
+                  <p>Criterion C's top level: the expected impact of the plan on the relevant areas of the business, and the trade-offs between those areas (guide, p. 49, paraphrased).</p>
+                </div>
+                <div>
+                  <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+                  <p>Generic points, and disadvantages relabelled as trade-offs, are what reports warn against. A clear plan needs no summary at the end (May 2026 report).</p>
+                </div>
+                <div>
+                  <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+                  <p>A trade-off names what is gained in one area, what is given up in another, and why the choice is still worth making. End with how the organization will know the plan is working.</p>
+                </div>
+              </div>
+              <div class="pb__recs js-only" data-recs="5" />
+              <div class="pb__whole js-only">
+                <div class="field">
+                  <label for={`${pfx}-judgement`}>The plan as a whole: why it meets the need better than the alternative, and what its success depends on</label>
+                  <textarea class="textarea" id={`${pfx}-judgement`} rows="3" maxlength="1200" data-judgement />
+                </div>
+                <fieldset class="pb__reviews">
+                  <legend class="label">How the organization will know it is working</legend>
+                  {Array.from({ length: MAX_REVIEWS }, (_, i) => (
+                    <div class="pb__review-row">
+                      <div class="field">
+                        <label for={`${pfx}-rv${i}-measure`}>Measure {i + 1}</label>
+                        <input class="input" type="text" id={`${pfx}-rv${i}-measure`} data-review-i={i} data-review-k="measure" maxlength="200" />
+                      </div>
+                      <div class="field">
+                        <label for={`${pfx}-rv${i}-target`}>Target</label>
+                        <input class="input" type="text" id={`${pfx}-rv${i}-target`} data-review-i={i} data-review-k="target" maxlength="200" />
+                      </div>
+                      <div class="field">
+                        <label for={`${pfx}-rv${i}-when`}>Checked when</label>
+                        <input class="input" type="text" id={`${pfx}-rv${i}-when`} data-review-i={i} data-review-k="when" maxlength="200" />
+                      </div>
+                    </div>
+                  ))}
+                </fieldset>
+              </div>
+            </>
+          )}
+
+          <div class="pb__stepcheck js-only">
+            <p class="label">Checks for this step</p>
+            <ul class="pb__checks" data-checks={st.n} />
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+
+  <section class="pb__out js-only" aria-labelledby={`${pfx}-out-h`}>
+    <h4 class="pb__out-title" id={`${pfx}-out-h`}>Your plan, in order</h4>
+    <div class="pb__view" data-view />
+    <h4 class="pb__out-title">Your plan against the four criteria</h4>
+    <div class="pb__review" data-review />
+    <p class="small muted">
+      Counting what a plan uses and connects is not marking it: the quality of the reasoning is what earns the marks. No plan is the single right answer; a
+      feasible plan that serves the whole organization is credited on its merits.
+    </p>
     <div class="pb__bar">
-      <button type="button" class="btn btn--small" data-add>Add an action</button>
-      <button type="button" class="btn btn--small" data-print>Print my plan</button>
-      <button type="button" class="btn btn--small" data-clear>Start again</button>
+      <button type="button" class="btn btn--small btn--primary" data-txt>Download the plan (text)</button>
+      <button type="button" class="btn btn--small" data-copy>Copy the plan</button>
+      <button type="button" class="btn btn--small" data-print>Print</button>
+      <button type="button" class="btn btn--small" data-reset>Start again</button>
+      <span class="pb__confirm" data-reset-confirm hidden>
+        <span>This clears every step of this plan.</span>
+        <button type="button" class="btn btn--small btn--primary" data-reset-yes>Clear it</button>
+        <button type="button" class="btn btn--small" data-reset-no>Keep it</button>
+      </span>
     </div>
-    <div class="pb__review" aria-live="polite">
-      <p class="label">Your plan against the four criteria</p>
-      <ul class="pb__prompts" data-review></ul>
-      <p class="small muted">Counting what a plan uses and covers is not marking it: the quality of the reasoning is what earns the marks. No plan is the single right answer; a feasible plan that serves the whole organization is credited on its merits.</p>
-    </div>
-  </div>
+    <p class="sr-only" aria-live="polite" data-live></p>
+  </section>
 </div>
-
-<style>
-  .pb {
-    padding: var(--sp-5);
-    background: var(--surface-sheet);
-    border-top: 3px solid var(--gold-500);
-    box-shadow: var(--shadow-sheet);
-  }
-
-  .pb__head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--sp-2) var(--sp-3);
-  }
-
-  .pb__title {
-    font-size: 1.375rem;
-    margin-right: var(--sp-2);
-  }
-
-  .pb label,
-  .pb :global(.pb__act label) {
-    display: grid;
-    gap: 0.25rem;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: var(--navy-900);
-  }
-
-  .pb input[type='text'],
-  .pb select,
-  .pb :global(.pb__act input[type='text']),
-  .pb :global(.pb__act select) {
-    min-height: 2.4rem;
-    padding: 0.35rem 0.6rem;
-    border: 1px solid var(--rule-control);
-    border-radius: var(--radius-2);
-    background: #fff;
-    color: var(--text-strong);
-    font: 400 0.9375rem/1.3 var(--font-ui);
-  }
-
-  .pb__dir {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
-    gap: var(--sp-4);
-    margin-top: var(--sp-4);
-  }
-
-  .pb__acts {
-    display: grid;
-    gap: var(--sp-4);
-    margin-top: var(--sp-5);
-  }
-
-  .pb :global(.pb__act) {
-    position: relative;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--sp-3);
-    margin: 0;
-    padding: var(--sp-4);
-    border: 1px solid var(--rule-hair);
-    background: var(--ivory-50);
-  }
-
-  .pb :global(.pb__n) {
-    padding: 0 0.3rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    color: var(--brass-text);
-  }
-
-  .pb :global(.pb__wide) {
-    grid-column: 1 / -1;
-  }
-
-  .pb :global(.pb__res) {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-2) var(--sp-4);
-    margin: 0;
-    padding: var(--sp-2) 0 0;
-    border: 0;
-  }
-
-  .pb :global(.pb__res legend) {
-    float: left;
-    margin-right: var(--sp-3);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: var(--navy-900);
-  }
-
-  .pb :global(.pb__res label) {
-    display: inline-flex;
-    gap: 0.3rem;
-    align-items: center;
-    font-weight: 500;
-  }
-
-  .pb :global(.pb__remove) {
-    position: absolute;
-    top: -0.75rem;
-    right: var(--sp-3);
-    padding: 0.1rem 0.6rem;
-    border: 1px solid var(--rule);
-    border-radius: 999px;
-    background: #fff;
-    font: 600 0.75rem/1.4 var(--font-ui);
-    color: var(--text-muted);
-    cursor: pointer;
-  }
-
-  .pb__bar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-2);
-    margin-top: var(--sp-4);
-  }
-
-  .pb__review {
-    margin-top: var(--sp-5);
-    padding: var(--sp-4);
-    background: var(--ivory-50);
-    border-left: 3px solid var(--navy-900);
-  }
-
-  .pb__prompts {
-    display: grid;
-    gap: var(--sp-2);
-    margin: var(--sp-3) 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .pb__prompts :global(li) {
-    display: grid;
-    grid-template-columns: 2.25rem minmax(0, 1fr);
-    gap: var(--sp-2);
-    margin: 0;
-    font-size: 0.9375rem;
-  }
-
-  .pb__prompts :global(.pb__crit) {
-    display: inline-grid;
-    place-items: center;
-    height: 1.5rem;
-    background: var(--navy-900);
-    color: var(--gold-400);
-    font-size: 0.75rem;
-    font-weight: 700;
-  }
-
-  .pb__prompts :global(.is-met .pb__crit) {
-    background: var(--green-text);
-    color: #fff;
-  }
-
-  .pb__prompts :global(.is-warn .pb__crit) {
-    background: var(--signal-text);
-    color: #fff;
-  }
-
-  @media (max-width: 48rem) {
-    .pb__dir,
-    .pb :global(.pb__act) {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-
-  @media print {
-    .pb__bar,
-    .pb :global(.pb__remove) {
-      display: none !important;
-    }
-  }
-</style>
 
 <script>
   import '../../scripts/centre/plan-builder';
