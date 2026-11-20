@@ -168,7 +168,7 @@ function growthTimeline(id: string, o?: RenderOpts): string {
     inner.push(text(x, gy + 38, g.lines.join('\n'), { size: 13, fill: C.body, anchor: 'middle', lh: 15.5 }));
     p.push(part(o, s.id, GROWTH_PARTS[i]!.label, [x - col / 2 + 2, 30, col - 4, gy + gh - 26], inner.join('')));
   });
-  p.push(para(0, H - 40, 'Each step brings more finance and protection, at the price of more formality, more disclosure and shared control. Internal growth uses the business’s own resources; external growth joins with or buys other businesses.', 118, { size: 13, italic: true, fill: C.slate, lh: 16 }));
+  p.push(para(2, H - 40, 'Each step brings more finance and protection, at the price of more formality, more disclosure and shared control. Internal growth uses the business’s own resources; external growth joins with or buys other businesses.', 118, { size: 13, italic: true, fill: C.slate, lh: 16 }));
   p.push(text(W, 16, 'Stonebridge Coffee: a fictional business', { size: 13, italic: true, fill: C.slate, anchor: 'end' }));
   return frame({ id, w: W, h: H, title: 'How a business changes as it grows', alt: GROWTH_ALT, desc: GROWTH_DESC, interactive: Boolean(o?.link) }, p.join(''));
 }
@@ -178,7 +178,7 @@ const GROWTH_ALT = 'A timeline of six stages in the growth of a fictional coffee
 function growthTimelineNarrow(id: string, o?: RenderOpts): string {
   const p: string[] = [];
   let y = 8;
-  p.push(text(0, y + 12, 'Stonebridge Coffee (fictional)', { size: 14, italic: true, fill: C.slate }));
+  p.push(text(2, y + 12, 'Stonebridge Coffee (fictional)', { size: 14, italic: true, fill: C.slate }));
   y += 30;
   const lx = 16;
   const tx = 42;
@@ -203,7 +203,7 @@ function growthTimelineNarrow(id: string, o?: RenderOpts): string {
   // The line runs behind the badges, so it goes first.
   p.unshift(line(id, lx, startY + 24, lx, y - 30, { stroke: C.rule, sw: 2 }));
   const note = lines('Liability turns limited when the business becomes a company; growth moves from internal steps to external methods.', NW, 14, 18);
-  p.push(text(0, y + 6, note.lines.join('\n'), { size: 14, italic: true, fill: C.slate, lh: 18 }));
+  p.push(text(2, y + 6, note.lines.join('\n'), { size: 14, italic: true, fill: C.slate, lh: 18 }));
   const H = y + note.h + 10;
   return frame({ id, w: NW, h: H, title: 'How a business changes as it grows', alt: GROWTH_ALT, desc: GROWTH_DESC, interactive: Boolean(o?.link) }, p.join(''));
 }
@@ -452,7 +452,7 @@ function entityGrid(id: string): string {
       alt: ENTITY_ALT,
       desc: ENTITY_DESC,
     },
-    body + text(0, H - 8, 'Dashed line: the edge of the owners’ risk. Limited liability puts only the business inside it; unlimited liability takes in the owners’ own assets.', { size: 14, italic: true, fill: C.slate }),
+    body + text(2, H - 8, 'Dashed line: the edge of the owners’ risk. Limited liability puts only the business inside it; unlimited liability takes in the owners’ own assets.', { size: 14, italic: true, fill: C.slate }),
   );
 }
 
@@ -584,7 +584,7 @@ function stakeholderState(id: string, sid: string, narrow: boolean): string {
       p.push(circle(562, yb, 3.5, { fill: C.signal }));
     });
     const H = y + 24;
-    p.push(text(0, H - 10, '+ gains, − loses, ± mixed. Dashed red arcs join the groups in conflict. Redwick Packaging is fictional.', { size: 13, italic: true, fill: C.slate }));
+    p.push(text(2, H - 10, '+ gains, − loses, ± mixed. Dashed red arcs join the groups in conflict. Redwick Packaging is fictional.', { size: 13, italic: true, fill: C.slate }));
     return frame({ id, w: W, h: H, title: `Stakeholders and one decision: ${d.label.toLowerCase()}`, alt: STAKE_ALT, desc }, p.join(''));
   }
   const head = lines(d.label, NW - 24, 15, 19);
@@ -686,7 +686,7 @@ function tbl(id: string, o: RenderOpts | undefined, narrow: boolean): string {
       p.push(para(bx + 12, y + 44, s, 36, { size: 13, fill: C.body, lh: 16 }));
     });
     const H = Math.max(cy + R * 1.577 + 20, 46 + 3 * 84) + 44;
-    p.push(para(0, H - 30, 'The triple bottom line is not a syllabus term: the guide suggests it as an inquiry in unit 3. It is a way to weigh corporate social responsibility.', 112, { size: 13, italic: true, fill: C.slate, lh: 16 }));
+    p.push(para(2, H - 30, 'The triple bottom line is not a syllabus term: the guide suggests it as an inquiry in unit 3. It is a way to weigh corporate social responsibility.', 112, { size: 13, italic: true, fill: C.slate, lh: 16 }));
     return frame({ id, w: W, h: H, title: 'The triple bottom line', alt: TBL_ALT, desc: TBL_DESC, interactive: Boolean(o?.link) }, p.join(''));
   }
   let y = cy + R * 1.577 + 30;

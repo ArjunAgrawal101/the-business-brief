@@ -108,7 +108,7 @@ function strategyMap(id: string, o: RenderOpts | undefined, narrow: boolean): st
       maxY = Math.max(maxY, y);
     });
     const H = maxY + 34;
-    p.push(text(0, H - 10, 'Many tools serve more than one stage; this order is a way to see them together, not one the guide prescribes.', { size: 13, italic: true, fill: C.slate }));
+    p.push(text(2, H - 10, 'Many tools serve more than one stage; this order is a way to see them together, not one the guide prescribes.', { size: 13, italic: true, fill: C.slate }));
     return frame({ id, w: W, h: H, title: 'Where each toolkit tool helps', alt: MAP_ALT, desc: MAP_DESC, interactive: Boolean(o?.link) }, p.join(''));
   }
   let y = 0;
@@ -130,7 +130,7 @@ function strategyMap(id: string, o: RenderOpts | undefined, narrow: boolean): st
     }
   });
   const note = wrap('Many tools serve more than one stage; this order is the platform’s, not the guide’s.', charsFor(NW, 14));
-  p.push(text(0, y + 18, note.join('\n'), { size: 14, italic: true, fill: C.slate, lh: 18 }));
+  p.push(text(2, y + 18, note.join('\n'), { size: 14, italic: true, fill: C.slate, lh: 18 }));
   return frame({ id, w: NW, h: y + 20 + note.length * 18, title: 'Where each toolkit tool helps', alt: MAP_ALT, desc: MAP_DESC, interactive: Boolean(o?.link) }, p.join(''));
 }
 

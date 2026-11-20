@@ -205,7 +205,7 @@ function financeTree(id: string, narrow: boolean): string {
     lines.push(line(id, lx, me.y, me.x, me.y, { stroke: C.rule, sw: 1.4 }));
   }
   const H = y + 30;
-  const foot = text(0, H - 8, 'A way to think the choice through, not a rule.', { size: narrow ? 14 : 13, italic: true, fill: C.slate });
+  const foot = text(2, H - 8, 'A way to think the choice through, not a rule.', { size: narrow ? 14 : 13, italic: true, fill: C.slate });
   return frame({ id, w: W, h: H, title: 'Choosing a source of finance', alt: TREE_ALT, desc: TREE_DESC }, lines.join('') + p.join('') + foot);
 }
 

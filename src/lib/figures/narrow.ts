@@ -15,8 +15,10 @@ export interface Drawn {
 export function block(x: number, top: number, s: string, width: number, o: { size?: number; weight?: number; fill?: string; italic?: boolean; serif?: boolean; lh?: number; anchor?: 'start' | 'middle' | 'end' } = {}): Drawn {
   const size = o.size ?? 14;
   const lh = o.lh ?? Math.round(size * 1.3);
-  const lines = wrap(s, charsFor(width, size));
-  const body = text(x, top + size * 0.92, lines.join('\n'), { size, weight: o.weight, fill: o.fill ?? C.body, italic: o.italic, serif: o.serif, lh, anchor: o.anchor });
+  // Slanted glyphs lean left of where they start: italic text starts 2 units in, so it stays inside the frame.
+  const nudge = o.italic && (o.anchor ?? 'start') === 'start' ? 2 : 0;
+  const lines = wrap(s, charsFor(width - nudge, size));
+  const body = text(x + nudge, top + size * 0.92, lines.join('\n'), { size, weight: o.weight, fill: o.fill ?? C.body, italic: o.italic, serif: o.serif, lh, anchor: o.anchor });
   return { body, h: lines.length * lh };
 }
 

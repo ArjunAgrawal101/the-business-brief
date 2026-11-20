@@ -86,7 +86,7 @@ function spanDraw(id: string, v: Values, narrow: boolean): string {
     const bx = 120;
     const bw = 450;
     const cx = bx + bw / 2;
-    const H = top + n * row + 72;
+    const H = top + n * row + 90;
     p.push(text(0, 20, 'Level', { size: 13, weight: 700, fill: C.slate, label: true }));
     p.push(text(cx, 20, 'People at each level', { size: 13, weight: 700, fill: C.slate, anchor: 'middle', label: true }));
     h.levels.forEach((count, i) => {
@@ -108,7 +108,7 @@ function spanDraw(id: string, v: Values, narrow: boolean): string {
     const fy = top + n * row + 14;
     p.push(rect(0, fy, W, 1, { fill: C.hair }));
     p.push(text(0, fy + 24, `Span of control ${v.span}: ${h.levels.length} levels, ${n0(h.managers)} managers, ${n0(h.total)} people in all.`, { size: 13.5, weight: 700, fill: C.ink }));
-    p.push(text(0, fy + 46, 'Assumes every manager has the same span; where the numbers do not divide exactly, one manager has fewer.', { size: 13, italic: true, fill: C.slate }));
+    p.push(para(2, fy + 46, 'Assumes every manager has the same span; where the numbers do not divide exactly, one manager has fewer.', charsFor(W - 4, 13), { size: 13, italic: true, fill: C.slate, lh: 16 }));
     return frame({ id, w: W, h: H, title: 'Span of control and levels of hierarchy', alt: LIVE.span.alt, desc }, p.join(''));
   }
   const top = 6;
@@ -362,7 +362,7 @@ function ratiosDraw(id: string, v: Values, narrow: boolean): string {
   p.push(text(22, y, keyLines.join('\n'), { size: narrow ? 14 : 13, fill: C.body, lh: narrow ? 18 : 16 }));
   y += keyLines.length * (narrow ? 18 : 16) + 8;
   const fl = wrap(`${TIDEWATER.business}: fictional figures, $000.`, charsFor(W, narrow ? 14 : 13));
-  p.push(text(0, y + 4, fl.join('\n'), { size: narrow ? 14 : 13, italic: true, fill: C.slate, lh: narrow ? 18 : 15 }));
+  p.push(text(2, y + 4, fl.join('\n'), { size: narrow ? 14 : 13, italic: true, fill: C.slate, lh: narrow ? 18 : 15 }));
   const H = y + 14 + (fl.length - 1) * (narrow ? 18 : 15);
   return frame({ id, w: W, h: H, title: 'Profitability and liquidity at a glance', alt: LIVE.ratios.alt, desc }, p.join(''));
 }

@@ -137,8 +137,9 @@ function segmentState(id: string, bid: string, narrow: boolean): string {
       }
     });
     p.push(text(0, 18, `${b.question} Each dot is one customer.`, { size: 13, weight: 600, fill: C.ink }));
-    const H = 30 + maxH + 40;
-    p.push(para(0, H - 18, `${b.note} Quenchwell and its customers are fictional.`, 116, { size: 13, italic: true, fill: C.slate, lh: 16 }));
+    const note = wrap(`${b.note} Quenchwell and its customers are fictional.`, charsFor(W - 4, 13));
+    const H = 30 + maxH + 24 + note.length * 16;
+    p.push(text(2, 30 + maxH + 28, note.join('\n'), { size: 13, italic: true, fill: C.slate, lh: 16 }));
     return frame({ id, w: W, h: H, title: `One market segmented by ${b.label.toLowerCase()}`, alt: SEG_ALT, desc }, p.join(''));
   }
   let y = 0;
@@ -280,7 +281,7 @@ function plcExtension(id: string, o: RenderOpts | undefined, narrow: boolean): s
       const inner = rect(sx, y, W - sx, 36, { fill: C.white, stroke: C.gold, sw: 1.2, rx: 3 }) + text(sx + 12, y + 23, s.label, { size: 13.5, weight: 700, fill: C.ink });
       p.push(part(o, s.id, s.label, [sx - 2, y - 2, W - sx + 2, 40], inner));
     });
-    p.push(para(0, 360, 'Extend while the product is still in maturity: it costs less than a new product and keeps a cash cow earning, but no extension lasts for ever.', 112, { size: 13, italic: true, fill: C.slate, lh: 16 }));
+    p.push(para(2, 360, 'Extend while the product is still in maturity: it costs less than a new product and keeps a cash cow earning, but no extension lasts for ever.', 112, { size: 13, italic: true, fill: C.slate, lh: 16 }));
     return frame({ id, w: W, h: 392, title: 'Extension strategies on the product life cycle', alt: PLC_ALT, desc: PLC_DESC, interactive: Boolean(o?.link) }, p.join(''));
   }
   let y = py + ph + 50;
@@ -292,7 +293,7 @@ function plcExtension(id: string, o: RenderOpts | undefined, narrow: boolean): s
     y += 40;
   });
   const n = lines('Extend while the product is still in maturity; no extension lasts for ever.', NW, 14, 18);
-  p.push(text(0, y + 12, n.lines.join('\n'), { size: 14, italic: true, fill: C.slate, lh: 18 }));
+  p.push(text(2, y + 12, n.lines.join('\n'), { size: 14, italic: true, fill: C.slate, lh: 18 }));
   return frame({ id, w: NW, h: y + n.h + 18, title: 'Extension strategies on the product life cycle', alt: PLC_ALT, desc: PLC_DESC, interactive: Boolean(o?.link) }, p.join(''));
 }
 
@@ -374,7 +375,7 @@ function methodPanel(id: string, mid: string): string {
   const m = METHODS.find((x) => x.id === mid) ?? METHODS[0]!;
   const p: string[] = [];
   const st = [10, 110, 210];
-  const sy = 40;
+  const sy = 44;
   const sw = 80;
   const sh = 54;
   const stations = ['Cut', 'Assemble', 'Finish'];
@@ -385,13 +386,13 @@ function methodPanel(id: string, mid: string): string {
   if (m.id === 'job') {
     p.push(item(2, st[1]! + sw / 2, sy + sh / 2, C.gold));
     p.push(arrowPath(id, `M${st[0]! + 40},${sy - 6} C${st[0]! + 40},${sy - 20} ${st[2]! + 40},${sy - 20} ${st[2]! + 40},${sy - 6}`, { tone: 'gold', sw: 1.8 }));
-    p.push(text(NW / 2, 12, 'one skilled worker, every stage', { size: 14, italic: true, fill: C.goldText, anchor: 'middle' }));
+    p.push(text(NW / 2, 16, 'one skilled worker, every stage', { size: 14, italic: true, fill: C.goldText, anchor: 'middle' }));
   } else if (m.id === 'batch') {
     for (let k = 0; k < 4; k++) p.push(item(1, st[0]! + 22 + (k % 2) * 36, sy + 16 + Math.floor(k / 2) * 22, C.ink));
     for (let k = 0; k < 4; k++) p.push(item(0, st[1]! + 22 + (k % 2) * 36, sy + 16 + Math.floor(k / 2) * 22, C.slate));
     p.push(line(id, st[0]! + sw + 2, sy + sh / 2, st[1]! - 2, sy + sh / 2, { sw: 1.6, arrow: 'end' }));
     p.push(line(id, st[1]! + sw + 2, sy + sh / 2, st[2]! - 2, sy + sh / 2, { sw: 1.6, arrow: 'end' }));
-    p.push(text(NW / 2, 14, 'a batch moves together, then waits', { size: 14, italic: true, fill: C.slate, anchor: 'middle' }));
+    p.push(text(NW / 2, 16, 'a batch moves together, then waits', { size: 14, italic: true, fill: C.slate, anchor: 'middle' }));
   } else {
     p.push(rect(0, sy + sh / 2 - 3, NW, 6, { fill: C.hair }));
     const custom = m.id === 'customization';
@@ -400,7 +401,7 @@ function methodPanel(id: string, mid: string): string {
       const shape = custom ? k % 3 : 0;
       p.push(item(shape, x, sy + sh / 2, custom ? [C.ink, C.cobalt, C.gold][k % 3]! : C.ink));
     }
-    p.push(text(NW / 2, 14, custom ? 'a flowing line, each item to order' : 'a continuous flow of identical items', { size: 14, italic: true, fill: custom ? C.cobaltText : C.slate, anchor: 'middle' }));
+    p.push(text(NW / 2, 16, custom ? 'a flowing line, each item to order' : 'a continuous flow of identical items', { size: 14, italic: true, fill: custom ? C.cobaltText : C.slate, anchor: 'middle' }));
     if (custom) p.push(rect(st[1]! - 4, sy - 6, sw + 8, sh + 12, { stroke: C.cobalt, sw: 2, rx: 5, dash: '5 4' }));
   }
   const cy = sy + sh + 52;
@@ -489,7 +490,7 @@ function quality(id: string, o: RenderOpts | undefined, narrow: boolean): string
       p.push(line(id, 496, by + bh / 2, 466, by + bh / 2, { stroke: C.rule, sw: 1.4, arrow: 'end' }));
     });
     const H = ringsH + 40;
-    p.push(text(0, H - 10, 'From finding faults to preventing them: each ring widens who is responsible for quality.', { size: 13, italic: true, fill: C.slate }));
+    p.push(text(2, H - 10, 'From finding faults to preventing them: each ring widens who is responsible for quality.', { size: 13, italic: true, fill: C.slate }));
     return frame({ id, w: W, h: H, title: 'From inspection to total quality management', alt: QUALITY_ALT, desc: QUALITY_DESC, interactive: Boolean(o?.link) }, p.join(''));
   }
   y = ringsH + 30;
@@ -540,8 +541,8 @@ function leanState(id: string, sid: string, narrow: boolean): string {
     p.push(text(lx + w + 6, y + 14, `${n1(st.hours)} h, ${KIND_WORDS[st.kind]}`, { size, fill: va ? C.greenText : C.signalText, weight: va ? 700 : 400 }));
     y += 24;
     if (sid === 'after' && st.change) {
-      const c = lines(st.change, narrow ? NW : W - lx, size, size * 1.3);
-      p.push(text(narrow ? 0 : lx, y + 8, c.lines.join('\n'), { size, italic: true, fill: C.slate, lh: size * 1.3 }));
+      const c = lines(st.change, (narrow ? NW : W - lx) - 4, size, size * 1.3);
+      p.push(text((narrow ? 0 : lx) + 2, y + 8, c.lines.join('\n'), { size, italic: true, fill: C.slate, lh: size * 1.3 }));
       y += c.h + 6;
     }
     y += narrow ? 8 : 4;
@@ -552,7 +553,7 @@ function leanState(id: string, sid: string, narrow: boolean): string {
   const sl = lines(sum, W, size + 0.5, (size + 0.5) * 1.3);
   p.push(text(0, y + 24, sl.lines.join('\n'), { size: size + 0.5, weight: 700, fill: C.ink, lh: (size + 0.5) * 1.3 }));
   y += 24 + sl.h + 6;
-  p.push(text(0, y + 6, `${LEAN_PROCESS.business} is fictional.`, { size: narrow ? 14 : 13, italic: true, fill: C.slate }));
+  p.push(text(2, y + 6, `${LEAN_PROCESS.business} is fictional.`, { size: narrow ? 14 : 13, italic: true, fill: C.slate }));
   const H = y + 14;
   const desc = `${LEAN_PROCESS.business}, a fictional workshop, makes a table to order, ${sid === 'after' ? 'after' : 'before'} lean production. ${steps.map((x) => `${x.name}: ${n1(x.hours)} hours, ${KIND_WORDS[x.kind]}${sid === 'after' && x.change ? `. ${x.change}` : ''}`).join('. ')}. ${sum}`;
   return frame({ id, w: W, h: H, title: `Making a table to order, ${sid === 'after' ? 'after' : 'before'} lean production`, alt: LEAN_ALT, desc }, p.join(''));
