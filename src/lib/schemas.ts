@@ -629,7 +629,8 @@ export const questionSchema = z.object({
   qualification: z.literal('ib-dp-bm'),
   level,
   paperStyle: z.enum(['paper-1', 'paper-2', 'paper-3', 'ia-skill', 'general']),
-  topic: z.string(),
+  /** The topic brief the question belongs to, when one covers its subtopic; otherwise it is listed under its subtopic. */
+  topic: z.string().optional(),
   syllabus: z.array(z.string()).min(1),
   commandTerm: z.string(),
   ao: ao,
