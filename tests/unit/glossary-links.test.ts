@@ -66,7 +66,7 @@ describe('formula links', () => {
     expect(formulaLink('market-share', ctx)?.href).toBe('/market-studio/market-metrics/');
     expect(formulaLink('defect-rate', ctx)?.href).toBe('/operations-floor/capacity-and-productivity/');
     expect(formulaLink('labour-turnover', ctx)?.href).toBe('/topics/leadership-and-management/#calc-labour-turnover');
-    expect(formulaLink('price-elasticity-of-demand', ctx)?.href).toBe('/resources/formula-sheet/#fs-learn');
+    expect(formulaLink('price-elasticity-of-demand', ctx)?.href).toBe('/resources/formula-sheet/#fs-site');
     expect(formulaLink('standard-deviation', ctx)?.label).toBe('See it worked in the toolkit guide to descriptive statistics');
     expect(formulaLink('economic-order-quantity', ctx)?.beyond).toBe(true);
     expect(formulaLink('motivation', ctx)).toBeUndefined();

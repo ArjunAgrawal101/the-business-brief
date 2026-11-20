@@ -268,7 +268,7 @@ export interface FormulaContext {
   calculations: Record<string, { name: string; page: string }>;
 }
 
-const SHEET_SECTION = { given: 'fs-given', learn: 'fs-learn' } as const;
+const SHEET_SECTION = { given: 'fs-ib', learn: 'fs-site' } as const;
 
 /** Where a term's formula is worked, or nothing for a term with no formula and no calculator. */
 export function formulaLink(id: string, ctx: FormulaContext): FormulaLink | undefined {

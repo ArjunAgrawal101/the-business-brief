@@ -178,13 +178,12 @@ const FAMILIES: Array<[RegExp, Family]> = [
   // The subtopics marked complete with Mark as complete (src/lib/learner.ts).
   [/^bb:studied$/, 'learner'],
   // Practice records the dashboard reads for progress and weak areas (src/lib/progress.ts), and the revision plan.
+  // The flashcards' Leitner boxes and due days (bb:cards, src/lib/flashcards.ts) are among them.
   [/^bb:(bank|p2-practice|cards|planner)$/, 'practice'],
   [/^bb:q:.+$/, 'question'],
   [/^bb:quiz:.+$/, 'quiz'],
   [/^bb:dr:.+$/, 'decision'],
   [/^bb:rc:.+$/, 'retrieval'],
-  // The flashcards' Leitner boxes and due days (src/lib/flashcards.ts), read by quick revision, not a room tool's work.
-  [/^bb:cards$/, 'retrieval'],
   [/^bb:case-lab:.+$/, 'lab'],
   [/^bb:boardroom:.+$/, 'simulation'],
   [/^bb:case:.+$/, 'case-decision'],

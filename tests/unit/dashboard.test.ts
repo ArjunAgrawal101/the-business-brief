@@ -16,7 +16,6 @@ describe('stored items by family', () => {
       ['bb:quiz:ix-costs-classifier-atelier', 'quiz'],
       ['bb:dr:marigold-growth', 'decision'],
       ['bb:rc:notes-1-4', 'retrieval'],
-      ['bb:cards', 'retrieval'],
       ['bb:case-lab:ix-halden-diagnosis', 'lab'],
       ['bb:boardroom:kestle-cycles', 'simulation'],
       ['bb:case:tausi-beverages', 'case-decision'],

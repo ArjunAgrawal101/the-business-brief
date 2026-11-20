@@ -205,7 +205,7 @@ describe('the formula register', () => {
     expect(new Set(ids).size).toBe(ids.length);
     const lt = data.formulae.find((f) => f.id === 'labour-turnover');
     expect(lt?.codes).toEqual(['2.4', '5.9']);
-    expect(data.formulae.find((f) => f.id === 'working-capital')?.codes).toEqual(['3.5', '3.7']);
+    expect(data.formulae.find((f) => f.id === 'working-capital')?.codes).toEqual(['3.1', '3.5', '3.7']);
     expect(data.formulae.find((f) => f.id === 'current-ratio')?.codes).toEqual(['3.5']);
     expect(data.formulae.find((f) => f.id === 'net-present-value')?.level).toBe('HL');
   });
