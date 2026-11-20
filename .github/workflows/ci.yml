@@ -12,8 +12,9 @@ permissions:
 jobs:
   qa:
     runs-on: ubuntu-latest
-    # The full QA takes about 25 minutes on two workers since 2.2 (1,092 browser tests); 40 leaves room to grow.
-    timeout-minutes: 40
+    # The full QA took about 25 minutes on two workers in 2.2 (1,092 browser tests). Release 3.0 has 1,694, and its
+    # first runs reached the 40-minute limit before the browser tests could finish; 75 leaves room to grow.
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

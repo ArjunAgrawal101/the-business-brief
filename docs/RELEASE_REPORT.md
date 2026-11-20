@@ -31,7 +31,7 @@ Four photographs are used, each with a purpose, in AVIF with a WebP fallback and
 | --- | --- |
 | The awards portrait (light grey blazer, black shirt, trophy cabinet) | The About page hero (the brief's image 1); a small square on the home page's creator section |
 | Teaching a class in front of a screen (grey suit and tie) | About, teaching and academic work (image 2); the Tutorials page |
-| At a conference table (black blazer), a colleague beside him | About, the professional journey (image 3) |
+| At a conference table (black blazer), with a colleague alongside | About, the professional journey (image 3) |
 | Traditional attire | About, the personal note |
 
 Not used, and why (also in `assets/creator/README.md`):
@@ -40,7 +40,7 @@ Not used, and why (also in `assets/creator/README.md`):
 - **The teal-blazer photograph** (image 4 in the brief) was not among the supplied files.
 - **An outdoor full-length photograph** under an orange canopy is authentic but competes with the page and adds nothing the four do not.
 
-The home page does not lead with a portrait: the brief asks that it remain about Business Management, so the creator appears in his own section, small.
+The home page does not lead with a portrait: the brief asks that it remain about Business Management, so the creator has one small section of it.
 
 ## New features
 
@@ -93,9 +93,10 @@ Stated plainly, as the brief asks:
 
 ## For the owner to confirm
 
-1. **Photographs.** Whether camera originals exist for the three AI-marked photographs; and that you are content to publish the conference-table photograph, where a colleague appears (he is not named).
+1. **Photographs.** Whether camera originals exist for the three AI-marked photographs; and that you are content to publish the conference-table photograph, where a colleague appears (not named).
 2. **Your four assessment guides** cite the IB guide as "updated July 2024"; the edition supplied and checked against says "updated May 2022". The Paper 1 guide's front panel says "Case study: Pre-released"; the guide releases a statement and about the first 200 words, not the case. The PDFs are published unchanged, so this is yours to correct.
 3. **Examiner emphasis** is shown as your guides report it, attributed; it was not checked against subject reports, which were not supplied. One point (the Paper 3 question 1 mark split) comes from "examiner instructions (2026)", which may be markscheme content; you may want to check you are free to publish it.
+4. **GitHub Pages** is still switched on for the repository, so every push starts a Pages build that fails, as it has since October; Vercel hosts the site, and the build can be switched off in Settings, Pages (docs/DEPLOYMENT.md).
 
 ## Delivery
 
