@@ -1,0 +1,330 @@
+/*
+  The top of My dashboard (/dashboard/): the first-visit welcome, the
+  revision queue, progress by unit, the weak areas, practice by source and
+  where the reader left off; drawn by src/scripts/workspace/overview.ts.
+  Ruled rows and numbered items, no cards; every state is written in words
+  beside any mark.
+*/
+
+/* ---------- First visit ---------- */
+
+/* The welcome is a ruled block, not a raised card. */
+.db-empty {
+  box-shadow: none;
+  border-top-color: var(--rule-ink);
+}
+
+.db-empty .db-empty__k {
+  margin: var(--sp-4) 0 var(--sp-2);
+  font: 700 0.75rem/1.3 var(--font-ui);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+ol.db-empty__starts {
+  counter-reset: start;
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 2px solid var(--rule-ink);
+}
+
+ol.db-empty__starts li {
+  counter-increment: start;
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: 0.15rem var(--sp-3);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+ol.db-empty__starts li::before {
+  content: counter(start, decimal-leading-zero);
+  grid-row: 1 / span 2;
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-style: italic;
+  color: var(--text-muted);
+}
+
+ol.db-empty__starts a {
+  justify-self: start;
+  font-size: 1.0625rem;
+}
+
+ol.db-empty__starts span {
+  font-size: 0.9375rem;
+  color: var(--text-body);
+}
+
+.db-empty .small {
+  margin: var(--sp-4) 0 0;
+}
+
+/* ---------- Revision priorities ---------- */
+
+.db-queue {
+  margin: var(--sp-5) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 2px solid var(--rule-ink);
+  max-width: 60rem;
+}
+
+.db-q {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+  gap: var(--sp-1) var(--sp-4);
+  align-items: start;
+  padding: var(--sp-4) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.db-q--none {
+  display: block;
+}
+
+.db-q--none .db-none {
+  margin: 0;
+}
+
+.db-q__n {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-style: italic;
+  line-height: 1.1;
+  color: var(--text-muted);
+}
+
+.db-q__main > p {
+  margin: 0;
+}
+
+.db-q__k {
+  font: 700 0.75rem/1.3 var(--font-ui);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.db-q__t {
+  font-family: var(--font-display);
+  font-size: 1.1875rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-strong);
+}
+
+.db-q__why {
+  font-size: 0.9375rem;
+  color: var(--text-body);
+}
+
+.db-q__links {
+  display: grid;
+  justify-items: start;
+  gap: var(--sp-1);
+  margin: 0;
+  padding-top: 1.1rem;
+  font-weight: 600;
+}
+
+.db-q__links a {
+  min-height: 24px;
+}
+
+/* A planned session and a card due are today's; the rest are suggestions. */
+.db-q--plan .db-q__n,
+.db-q--cards .db-q__n {
+  color: var(--text-strong);
+}
+
+.db-plan {
+  margin: var(--sp-4) 0 0;
+  max-width: 60rem;
+  font-size: 0.9375rem;
+}
+
+@media (max-width: 47.99rem) {
+  .db-q {
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+  }
+
+  .db-q__links {
+    grid-column: 2;
+    padding-top: 0;
+    grid-auto-flow: row;
+  }
+}
+
+/* ---------- Your progress ---------- */
+
+.db-level {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-5);
+  margin-top: var(--sp-4);
+}
+
+.db-level__text {
+  margin: 0;
+  font-weight: 560;
+}
+
+.db-progress {
+  display: grid;
+  gap: var(--sp-5);
+  margin-top: var(--sp-4);
+}
+
+@media (min-width: 60rem) {
+  .db-progress {
+    grid-template-columns: minmax(0, 24rem) minmax(0, 1fr);
+    align-items: start;
+    gap: var(--sp-7);
+  }
+}
+
+.pgc text {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pgc-label {
+  fill: var(--text-muted);
+  font-weight: 600;
+}
+
+.pgc-value {
+  fill: var(--text-strong);
+  font-weight: 600;
+}
+
+.pgc-cell {
+  fill: none;
+  stroke: var(--slate-500);
+  stroke-width: 1;
+}
+
+.pgc-cell--none {
+  fill: var(--surface-sheet);
+}
+
+.pgc-cell--studied,
+.pgc-cell--completed {
+  stroke: var(--navy-900);
+}
+
+.pgc-fill,
+.pgc-half {
+  fill: var(--navy-900);
+}
+
+.pgc-half {
+  fill-opacity: 0.55;
+}
+
+.db-more-link {
+  margin: var(--sp-4) 0 0;
+  font-size: 0.9375rem;
+  font-weight: 560;
+}
+
+/* ---------- Weak areas ---------- */
+
+.db-weak {
+  margin: var(--sp-5) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 2px solid var(--rule-ink);
+  max-width: 60rem;
+}
+
+.db-weak__i {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.1rem var(--sp-5);
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.db-weak__i > p {
+  margin: 0;
+}
+
+.db-weak__t {
+  font-weight: 600;
+}
+
+.db-weak__fig {
+  grid-column: 2;
+  grid-row: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.db-weak__src {
+  grid-column: 1 / -1;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.db-weak__links {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-5);
+  font-size: 0.9375rem;
+  font-weight: 560;
+}
+
+.db-weak__links a {
+  min-height: 24px;
+}
+
+@media (max-width: 40rem) {
+  .db-weak__i {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .db-weak__fig {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+/* ---------- Practice ---------- */
+
+.db-pr__lead {
+  margin: var(--sp-5) 0 var(--sp-3);
+  max-width: 52rem;
+}
+
+.db-pr__n {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.db-pr {
+  font-size: 0.9375rem;
+}
+
+.db-pr th[scope='row'] {
+  min-width: 11rem;
+}
+
+.db-pr td {
+  vertical-align: top;
+}
+
+.db-pr .db-none {
+  margin: 0;
+  font-size: inherit;
+}

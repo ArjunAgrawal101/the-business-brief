@@ -183,9 +183,10 @@ test.describe('Strategy Studio tools', () => {
     await page.goto('/strategy-studio/');
     await expect(page.locator('.sx-register [data-saved-for="ansoff"]')).toContainText('Saved');
     await expect(page.locator('[data-saved-summary]')).toContainText('1 of the tools');
-    // The progress page lists it too.
+    // The dashboard lists it among the saved analyses, and the progress page counts it.
+    await page.goto('/dashboard/');
+    await expect(page.locator('[data-work] .pr-group', { hasText: 'Strategy Studio' })).toContainText('Ansoff planner');
     await page.goto('/progress/');
-    await expect(page.locator('.pr-group', { hasText: 'Strategy Studio' })).toContainText('Ansoff planner');
     await expect(page.locator('[data-summary]')).toContainText('Strategy Studio analyses');
   });
 

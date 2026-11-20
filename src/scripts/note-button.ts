@@ -40,7 +40,7 @@ function build(): HTMLDialogElement {
         <button type="button" class="btn" data-ne-cancel>Cancel</button>
         <button type="submit" class="btn btn--primary">Save note</button>
       </div>
-      <p class="ne-foot">Kept in this browser only, in the notebook of <a href="/dashboard/#notes">My Business Workspace</a>, where you can edit, search and export it.</p>
+      <p class="ne-foot">Kept in this browser only, in the notes on <a href="/dashboard/#notes">your dashboard</a>, where you can edit, search and export it.</p>
     </form>`;
   document.body.append(d);
   bindKind(d);

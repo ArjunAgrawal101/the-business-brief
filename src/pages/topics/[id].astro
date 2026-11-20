@@ -13,6 +13,7 @@ import QuestionCard from '../../components/assess/QuestionCard.astro';
 import RetrievalCards from '../../components/assess/RetrievalCards.astro';
 import LevelSwitch from '../../components/ui/LevelSwitch.astro';
 import SaveButton from '../../components/ui/SaveButton.astro';
+import StudyMode from '../../components/learn/StudyMode.astro';
 import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
 import VerifyTag from '../../components/ui/VerifyTag.astro';
 import LevelTag from '../../components/ui/LevelTag.astro';
@@ -111,6 +112,7 @@ const nav = [
     </aside>
 
     <div class="brief__main">
+      <StudyMode code={t.code} title={`${t.code} ${t.title}`} root=".brief__main" rail={false} save={false} />
       <section class="brief-why" aria-labelledby="why-h">
         <div class="brief-why__grid">
           <div>

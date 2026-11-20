@@ -1,0 +1,88 @@
+---
+/**
+ * Study mode, at the top of a subtopic's article: the text in three sizes,
+ * low-light reading in ivory on navy, the reading progress, an "On this
+ * page" contents list (a sticky rail on wide screens, a jump menu under the
+ * header on narrower ones), Save, Mark as complete and Print.
+ *
+ * Save is the platform's own button (bb:saved), here unless the page has it
+ * already. The article is the element `root` names. An inline script applies the
+ * reader's size and light (bb:study) to it before it is drawn, so nothing
+ * flashes; src/scripts/study-mode.ts does the rest. Marking a subtopic
+ * complete keeps its code in bb:studied, which the dashboard counts. The
+ * contents list is read from the article's own section headings when the
+ * page has loaded, so sections added to the page later join it without a
+ * change here. Without JavaScript none of the controls shows, and the page
+ * reads as before.
+ */
+import SaveButton from '../ui/SaveButton.astro';
+import { SIZE_LABELS, STUDY_EARLY } from '../../lib/study';
+import '../../styles/study.css';
+
+interface Props {
+  /** The subtopic's code, as the syllabus writes it. */
+  code: string;
+  /** The page's name as the dashboard lists it, such as "1.4 Stakeholders". */
+  title: string;
+  /** A selector for the article, which this component sits inside: size and light apply to it. */
+  root: string;
+  /** Whether wide screens get the contents rail; a page with a contents list of its own says no. */
+  rail?: boolean;
+  /** Whether the bar carries Save; a page that already has it at the top says no. */
+  save?: boolean;
+}
+const { code, title, root, rail = true, save = true } = Astro.props;
+const uid = `sm-${code.replace(/\W/g, '-')}`;
+---
+
+<script is:inline data-root={root} set:html={STUDY_EARLY}></script>
+<div class="sm" data-ix="study" data-code={code} data-title={title} data-rail={rail ? 'true' : 'false'}>
+  <p class="state state--error" data-error hidden>Study mode could not start. The page reads as usual.</p>
+  <div class="sm__row">
+    <p class="sm__k js-only" id={`${uid}-k`}>Study mode</p>
+    <div class="sm__tools js-only" role="group" aria-labelledby={`${uid}-k`}>
+      <fieldset class="sm-size">
+        <legend class="sm-size__legend">Text size</legend>
+        <span class="sm-size__opts">
+          {
+            SIZE_LABELS.map((label, i) => (
+              <label class="sm-size__opt">
+                <input type="radio" name={`${uid}-size`} value={String(i)} checked={i === 0} data-size />
+                <span>{label}</span>
+              </label>
+            ))
+          }
+        </span>
+      </fieldset>
+      <button type="button" class="sm-btn" aria-pressed="false" data-low>Low light</button>
+      <button type="button" class="sm-btn" data-print>Print</button>
+    </div>
+  </div>
+  <div class="sm__row sm__row--keep">
+    <span class="sm-done js-only" data-done-box>
+      <button type="button" class="sm-btn sm-btn--done" aria-pressed="false" data-complete>
+        <span class="sm-btn__tick" aria-hidden="true"></span>
+        <span>Mark as complete</span><span class="sr-only">: {title}</span>
+      </button>
+      <a class="sm-done__link" href="/dashboard/#studied" data-complete-link hidden>Completed: see your dashboard</a>
+    </span>
+    {save && <SaveButton title={title} kind="topic" />}
+  </div>
+  <p class="sr-only" aria-live="polite" data-live></p>
+</div>
+<div class="sm-strip js-only" data-strip hidden>
+  <details class="sm-jump" data-jump>
+    <summary class="sm-jump__sum">
+      <span class="sm-jump__k">On this page</span>
+      <span class="sm-jump__now" data-now></span>
+    </summary>
+    <nav class="sm-jump__panel" aria-label="On this page">
+      <ol class="sm-toc" data-toc></ol>
+    </nav>
+  </details>
+  <div class="sm-strip__bar" aria-hidden="true"><span class="sm-strip__fill" data-fill></span></div>
+</div>
+
+<script>
+  import '../../scripts/study-mode';
+</script>

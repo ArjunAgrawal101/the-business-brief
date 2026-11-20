@@ -485,3 +485,12 @@ Nine tools at `/assessment/internal-assessment/<tool>/`, listed in `IA_TOOL_PAGE
 | **60. Progress tracker** (`progress`, `bb:ia-progress`) | Marks each stage, records the words that count and ticks the guide's final checks | What is done, next and overdue against the timeline, and the checks in place | Finishing the writing is finishing the project |
 
 The checker on the internal assessment page (`DocAnalyser`, `bb:ia:sd`) applies the same rules as the documents tool and the IA Studio planner through `src/lib/ia.ts`, to the month.
+
+## 61 to 62. The revision planner and study mode
+
+The revision planner at `/revision/planner/` (rules in `src/lib/planner.ts`, the page's script in `src/scripts/planner.ts`, kept under `bb:planner`) and study mode on every subtopic page (`src/components/learn/StudyMode.astro`, `src/scripts/study-mode.ts`, settings under `bb:study`, subtopics marked complete under `bb:studied`). Both are the platform's recommended strategy, not IB requirements, and the planner says on its page what it assumes.
+
+| Tool | The learner does | Feedback | Misconception diagnosed |
+| --- | --- | --- | --- |
+| **61. Revision planner** | Enters the date of the first paper, the start, SL or HL, the hours a week and the study days, chooses the subtopics and puts the hardest first (the weak areas their own results show are offered), then marks each session done and makes the plan again as the weeks go by | A plan for each week, day by day: each subtopic learnt or reviewed and then retrieved a gap later (a third time where there is room), weakest first, with case practice, Paper 2 calculations and, at HL, Paper 3 in turn, timed practice in the final fortnight and free days before the examination; the subtopics that do not fit, named; progress in sessions, minutes and subtopics met twice; a calendar file and a printed plan | Rereading each topic once is revising; the plan has to be followed to the day; everything can be left to the last week |
+| **62. Study mode** | Chooses the text size, low light, marks the subtopic complete, saves it, follows the On this page list and prints the page | The article in the chosen size and light, kept on this device; the section in view marked in the list and the reading progress shown; the subtopic counted as completed on the dashboard | Reading a page to the end is the same as knowing it: completion is the reader's own judgement, and the dashboard keeps it apart from the results |

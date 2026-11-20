@@ -1,5 +1,5 @@
 /**
- * My Business Workspace, driven as a reader would drive it: the learning list
+ * My Business Workspace, the workspace part of My dashboard, driven as a reader would drive it: the learning list
  * (order, status, a note, pages added from the workspace), notes started
  * beside a Save button and written, edited, searched and deleted in the
  * workspace, saved analyses from the rooms' tools and a result saved from the
@@ -50,14 +50,18 @@ const save = async (page: Page, path: string) => {
 const titles = (page: Page) => page.locator('[data-saved] .db-saved__title').allInnerTexts();
 
 test.describe('My Business Workspace', () => {
-  test('is the page at both addresses', async ({ page }) => {
-    for (const path of [WS, '/progress/']) {
-      await page.goto(path);
-      await ready(page, '[data-ix="progress"]');
-      await expect(page.locator('h1')).toHaveText('My Business Workspace');
-      await expect(page).toHaveTitle(/^My Business Workspace/);
-      await expect(page.locator('#db-saved-h')).toContainText('My learning list');
-    }
+  test('is part of My dashboard; the old address shows the full record behind it', async ({ page }) => {
+    await page.goto(WS);
+    await ready(page, '[data-ix="progress"]');
+    await expect(page.locator('h1')).toHaveText('My dashboard');
+    await expect(page).toHaveTitle(/^My dashboard/);
+    await expect(page.locator('#db-saved-h')).toContainText('My learning list');
+    await page.goto('/progress/');
+    await ready(page, '[data-ix="progress"]');
+    await expect(page.locator('h1')).toHaveText('Your progress');
+    await expect(page).toHaveTitle(/^Your progress/);
+    await expect(page.locator('#db-course-h')).toContainText('Your course');
+    await expect(page.locator('#db-saved-h')).toHaveCount(0);
   });
 
   test('the learning list is put in order, marked and noted, and kept after a reload', async ({ page }) => {
@@ -85,7 +89,7 @@ test.describe('My Business Workspace', () => {
     await item('1.4 Stakeholders').getByLabel(/^Note/).fill('Revise the power and interest grid');
     await item('1.4 Stakeholders').getByLabel(/^Note/).press('Tab');
     await expect(page.locator('[data-list-counts]')).toContainText('1 to do, 1 in progress, 1 done');
-    await expect(page.locator('[data-summary]')).toContainText('Saved items3');
+    await expect(page.locator('[data-saved-n]')).toHaveText('3');
 
     await page.reload();
     await ready(page, '[data-ix="progress"]');
@@ -226,7 +230,7 @@ test.describe('My Business Workspace', () => {
     await page.reload();
     await ready(page, '[data-ix="progress"]');
     await expect(notes).toHaveCount(2);
-    await expect(page.locator('[data-summary]')).toContainText('Notes2');
+    await expect(page.locator('[data-note-count]')).toContainText('2 notes');
 
     // Delete, after a confirmation
     await notes.filter({ hasText: 'Kiln questions' }).getByRole('button', { name: /^Delete/ }).click();
@@ -281,7 +285,7 @@ test.describe('My Business Workspace', () => {
 
     await page.reload();
     await ready(page, '[data-ix="progress"]');
-    await expect(page.locator('[data-summary]')).toContainText('Saved analyses4');
+    await expect(page.locator('[data-work-n]')).toContainText('4 pieces of work');
     // The saved result opens its calculator with the figures it was worked from.
     const href = await snap.locator('a.db-work__title').getAttribute('href');
     expect(href).toMatch(/^\/finance-desk\/lab\/break-even-quantity\/\?.*price=30/);
@@ -432,12 +436,13 @@ test.describe('Without JavaScript', () => {
 
   test('the workspace says what it would show, and no control it cannot run is shown', async ({ page }) => {
     await page.goto(WS);
-    await expect(page.locator('h1')).toHaveText('My Business Workspace');
+    await expect(page.locator('h1')).toHaveText('My dashboard');
     const nojs = page.locator('.db-nojs');
     await expect(nojs).toBeVisible();
-    for (const part of ['My learning list:', 'Notes:', 'Saved analyses:', 'Export selected work:']) await expect(nojs).toContainText(part);
+    for (const part of ['Revision priorities:', 'Your progress:', 'Weak areas:', 'Practice:', 'Your workspace:', 'Your data:']) await expect(nojs).toContainText(part);
+    for (const sel of ['#today', '#saved', '#notes', '#analyses', '#export', '[data-note-new]', '[data-list-pick]', '[data-export]']) await expect(page.locator(sel).first()).toBeHidden();
+    await page.goto('/progress/');
     await expect(page.locator('.db-row')).toHaveCount(37);
-    for (const sel of ['#saved', '#notes', '#analyses', '#export', '[data-note-new]', '[data-list-pick]', '[data-export]']) await expect(page.locator(sel).first()).toBeHidden();
   });
 
   test('pages with a Save button show neither it nor Add a note, and the Financial Laboratory keeps its worked example', async ({ page }) => {

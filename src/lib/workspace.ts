@@ -26,6 +26,8 @@
  * copy" reads it back and combines it with what is there.
  */
 import { dashboardView, type DashConfig, type DashboardView, type WorkItem } from './dashboard';
+import type { EvidenceConfig } from './progress';
+import type { CalcFamily } from './planner';
 import {
   SAVED_KEY,
   SAVED_KIND_LABELS,
@@ -575,6 +577,11 @@ export interface WorkspaceConfig extends DashConfig {
   /** The Financial Laboratory's name, and the Boardroom's, as the rooms are named. */
   labName: string;
   boardroomName: string;
+  /** Every question in the question bank with its subtopics and paper style, and each kind of Paper 2 calculation with its subtopic (src/lib/progress.ts). */
+  bank: EvidenceConfig['bank'];
+  p2: EvidenceConfig['p2'];
+  /** The Paper 2 calculation families, to name the revision plan's sessions. */
+  calc: CalcFamily[];
 }
 
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
@@ -812,9 +819,11 @@ export function selectionWords(sel: Selection): string {
 
 /**
  * Check a file before anything is written: the learner record's checks
- * (src/lib/learner.ts), with the workspace's own items cleaned through their
- * parsers, so a hand-edited note or arrangement cannot carry anything the
- * workspace would not write itself.
+ * (src/lib/learner.ts, which also cleans bb:studied), with the workspace's
+ * own items cleaned through their parsers, so a hand-edited note or
+ * arrangement cannot carry anything the workspace would not write itself.
+ * The dashboard adds the revision plan and study mode's settings
+ * (checkDashboardImport in src/lib/workspace-progress.ts).
  */
 export function checkImport(text: string): ImportCheck {
   const r = validateImport(text);
