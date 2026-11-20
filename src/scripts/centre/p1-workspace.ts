@@ -29,17 +29,10 @@ import {
   type WorkspaceState,
 } from '../../lib/p1-workspace';
 import { download, twoStepReset } from './ia-common';
+import { attachTagger, type Pending } from './p1-tagger';
 
 const KEY = 'p1-workspace';
 const WORD = { ok: 'Fine', advice: 'Advice' } as const;
-
-interface Pending {
-  para: number;
-  start: number;
-  end: number;
-  text: string;
-  from: HTMLElement | null;
-}
 
 each('[data-ix="p1-workspace"]', (root) => {
   const { example } = readConfig<{ example: { title: string; note: string; text: string } }>(root);
@@ -56,7 +49,6 @@ each('[data-ix="p1-workspace"]', (root) => {
   const ownBox = q<HTMLElement>('[data-own]');
   const ownText = q<HTMLTextAreaElement>('[data-own-text]');
   let paras: Paragraph[] = [];
-  let pending: Pending | null = null;
 
   const caseText = () => (state.source === 'own' && state.own.trim() ? state.own : example.text);
 
@@ -76,122 +68,27 @@ each('[data-ix="p1-workspace"]', (root) => {
     if (ownText && document.activeElement !== ownText) ownText.value = state.own;
   };
 
-  /** Character offset of a point inside a paragraph, counting the case's words only (not the tag labels). */
-  const offsetIn = (paraEl: HTMLElement, node: Node, offset: number): number => {
-    let total = 0;
-    const walker = document.createTreeWalker(paraEl, NodeFilter.SHOW_TEXT, {
-      acceptNode: (n) => ((n.parentElement?.closest('.ws-label') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT)),
-    });
-    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
-      if (n === node) return total + offset;
-      total += n.textContent?.length ?? 0;
-    }
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      // A point between elements: count the text before the child at `offset`.
-      const el = node as Element;
-      const range = document.createRange();
-      range.setStart(paraEl, 0);
-      range.setEnd(el, offset);
-      const frag = range.cloneContents();
-      frag.querySelectorAll('.ws-label').forEach((x) => x.remove());
-      return frag.textContent?.length ?? 0;
-    }
-    return total;
-  };
-
-  const openPalette = (p: Pending) => {
-    pending = p;
-    if (!palette || !quote) return;
-    root.querySelectorAll('.ws-s.is-active').forEach((x) => x.classList.remove('is-active'));
-    p.from?.classList.add('is-active');
-    quote.textContent = quoted(p.text.length > 220 ? `${p.text.slice(0, 220)}…` : p.text);
-    palette.hidden = false;
-    palette.querySelector<HTMLButtonElement>('[data-tag]')?.focus({ preventScroll: true });
-    palette.scrollIntoView({ block: 'nearest' });
-  };
-
-  const closePalette = (focusBack = true) => {
-    if (palette) palette.hidden = true;
-    root.querySelectorAll('.ws-s.is-active').forEach((x) => x.classList.remove('is-active'));
-    const from = pending?.from;
-    pending = null;
-    if (focusBack && from && document.contains(from)) from.focus({ preventScroll: true });
-  };
-
-  const sentencePending = (s: HTMLElement): Pending | null => {
-    const para = Number(s.dataset.p);
-    const start = Number(s.dataset.start);
-    const end = Number(s.dataset.end);
-    const p = paras[para];
-    if (!p || !(end > start)) return null;
-    return { para, start, end, text: p.text.slice(start, end), from: s };
-  };
-
-  caseEl?.addEventListener('mouseup', () => {
-    window.setTimeout(() => {
-      const sel = window.getSelection();
-      if (!sel || sel.isCollapsed || !sel.rangeCount) return;
-      const range = sel.getRangeAt(0);
-      const startPara = (range.startContainer.nodeType === Node.ELEMENT_NODE ? (range.startContainer as Element) : range.startContainer.parentElement)?.closest<HTMLElement>('[data-para]');
-      if (!startPara || !caseEl.contains(startPara)) return;
-      const para = Number(startPara.dataset.para);
-      const p = paras[para];
-      if (!p) return;
-      let start = offsetIn(startPara, range.startContainer, range.startOffset);
-      let end = startPara.contains(range.endContainer) ? offsetIn(startPara, range.endContainer, range.endOffset) : p.text.length;
-      while (start < end && /\s/.test(p.text[start] ?? '')) start++;
-      while (end > start && /\s/.test(p.text[end - 1] ?? '')) end--;
-      if (end - start < 2) return;
-      const s = (range.startContainer.parentElement?.closest<HTMLElement>('.ws-s')) ?? null;
-      openPalette({ para, start, end, text: p.text.slice(start, end), from: s });
-    }, 0);
-  });
-
-  caseEl?.addEventListener('click', (e) => {
-    const sel = window.getSelection();
-    if (sel && !sel.isCollapsed) return;
-    const s = (e.target as HTMLElement).closest<HTMLElement>('.ws-s');
-    if (!s) return;
-    const p = sentencePending(s);
-    if (p) openPalette(p);
-  });
-
-  caseEl?.addEventListener('keydown', (e) => {
-    const s = (e.target as HTMLElement).closest<HTMLElement>('.ws-s');
-    if (!s || (e.key !== 'Enter' && e.key !== ' ')) return;
-    e.preventDefault();
-    const p = sentencePending(s);
-    if (p) openPalette(p);
-  });
-
-  palette?.addEventListener('click', (e) => {
-    const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button');
-    if (!b) return;
-    if (b.hasAttribute('data-cancel')) {
-      closePalette();
-      return;
-    }
-    const tag = b.dataset.tag as Tag | undefined;
-    if (!tag || !pending) return;
-    const p = pending;
-    const before = state.items.length;
-    state = addEvidence(state, { tag, text: p.text, para: p.para, start: p.start, end: p.end }, newId());
-    save();
-    const added = state.items.length > before;
-    const sentenceIndex = p.from?.dataset.s;
-    closePalette(false);
-    renderAll();
-    const back = sentenceIndex !== undefined ? caseEl?.querySelector<HTMLElement>(`[data-para="${p.para}"] [data-s="${sentenceIndex}"]`) : null;
-    back?.focus({ preventScroll: true });
-    window.getSelection()?.removeAllRanges();
-    announce(live, added ? `Tagged as ${TAGS[tag].label}: ${p.text.slice(0, 80)}${p.text.length > 80 ? '…' : ''}. It is in the ${TAGS[tag].label} column of your evidence.` : `Already tagged as ${TAGS[tag].label}.`);
-  });
-  palette?.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      e.preventDefault();
-      closePalette();
-    }
-  });
+  const tagger =
+    caseEl && palette && quote
+      ? attachTagger({
+          caseEl,
+          palette,
+          quote,
+          paras: () => paras,
+          onTag: (p: Pending, tag: Tag) => {
+            const before = state.items.length;
+            state = addEvidence(state, { tag, text: p.text, para: p.para, start: p.start, end: p.end }, newId());
+            save();
+            const added = state.items.length > before;
+            const sentenceIndex = p.from?.dataset.s;
+            renderAll();
+            const back = sentenceIndex !== undefined ? caseEl.querySelector<HTMLElement>(`[data-para="${p.para}"] [data-s="${sentenceIndex}"]`) : null;
+            back?.focus({ preventScroll: true });
+            announce(live, added ? `Tagged as ${TAGS[tag].label}: ${p.text.slice(0, 80)}${p.text.length > 80 ? '…' : ''}. It is in the ${TAGS[tag].label} column of your evidence.` : `Already tagged as ${TAGS[tag].label}.`);
+          },
+        })
+      : null;
+  const closePalette = (focusBack = true) => tagger?.close(focusBack);
 
   /* ---------- The evidence board ---------- */
 

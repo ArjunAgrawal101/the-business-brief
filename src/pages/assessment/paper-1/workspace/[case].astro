@@ -1,0 +1,472 @@
+---
+/**
+ * A Paper 1 practice case in the workspace: the pre-released statement (the
+ * context topics, with a place for research notes, and the opening of the
+ * case), preparation (a stakeholder analysis compared with a model, and the
+ * choice of tools, with feedback on each), then the examination: the full
+ * case, a timed paper at the guide's durations, and every question with an
+ * answer built in parts, the evidence tied to it, structure checks, and the
+ * platform's guidance to self-mark against. Saved on this device only
+ * (bb:p1-case:<id>). Without JavaScript the statement, the case, the paper
+ * and the guidance can all be read, and the full case is behind a disclosure.
+ */
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import SectionHead from '../../../../components/layout/SectionHead.astro';
+import CentreHead from '../../../../components/centre/CentreHead.astro';
+import GuideLabel from '../../../../components/centre/GuideLabel.astro';
+import ProvenanceTag from '../../../../components/ui/ProvenanceTag.astro';
+import TutorNote from '../../../../components/ui/TutorNote.astro';
+import { corpus, href } from '../../../../lib/content';
+import { P1_CASES, fullCase, paperMarks, type P1Case } from '../../../../lib/p1-cases';
+import { READING_SECONDS, SECTION_A_SECONDS, WRITING_SECONDS } from '../../../../lib/p1-practice';
+import { TAGS, TAG_IDS, paragraphHtml, splitCase, wordCount } from '../../../../lib/p1-workspace';
+import { fmtDuration } from '../../../../lib/bank';
+import { inline, jsonForScript } from '../../../../lib/markup';
+import '../../../../styles/centre.css';
+import '../../../../styles/p1-workspace.css';
+
+export function getStaticPaths() {
+  return P1_CASES.map((c) => ({ params: { case: c.id }, props: { c } }));
+}
+
+interface Props {
+  c: P1Case;
+}
+const { c } = Astro.props;
+const corp = await corpus();
+const full = fullCase(c);
+const paras = splitCase(full);
+const openingParas = splitCase(c.opening).length;
+const words = wordCount(full);
+const openingWords = wordCount(c.opening);
+const marks = paperMarks(c);
+const A = c.questions.filter((q) => q.section === 'A');
+const B = c.questions.filter((q) => q.section === 'B');
+const term = (id: string) => corp.commandTerms[id];
+const config = {
+  id: c.id,
+  organization: c.organization,
+  openingParas,
+  reading: READING_SECONDS,
+  writing: WRITING_SECONDS,
+  sectionA: SECTION_A_SECONDS,
+};
+const others = P1_CASES.filter((x) => x.id !== c.id);
+---
+
+<BaseLayout
+  room="assessment"
+  title={`Paper 1 practice case: ${c.organization}`}
+  description={`An original IB Business Management Paper 1 practice case (fictional): ${c.summary} The pre-released statement, the full case, a timed paper with Section A and Section B, and guidance to self-mark against.`}
+  section="assessment"
+>
+  <CentreHead
+    crumb={c.organization}
+    parent={{ label: 'Paper 1 case workspace', href: '/assessment/paper-1/workspace/' }}
+    kicker="Paper 1 · Practice case"
+    title={c.title}
+    lead={`${c.summary} Work through it as you would the real paper: the pre-released statement first, then the full case, the questions and the clock.`}
+    stats={[
+      { value: c.industry, label: 'Industry', note: `${c.country}, fictional organization` },
+      { value: `${words} words`, label: 'The full case', note: `the first ${openingWords} released in advance` },
+      { value: String(marks.a + marks.b), label: 'Marks', note: `Section A ${marks.a} · Section B ${marks.b}` },
+      { value: '1 h 30', label: 'Duration', note: "plus 5 minutes' reading time" },
+    ]}
+  />
+
+  <div class="wrap page-body ws-page p1c" data-ix="p1-case">
+    <script type="application/json" data-config set:html={jsonForScript(config)} />
+    <p class="state state--error" data-error hidden>The workspace could not start. The statement, the case, the questions and the guidance can still be read.</p>
+    <p class="sr-only" aria-live="polite" data-live></p>
+
+    <div class="p1c-standing">
+      <p class="p1c-standing__tags"><span class="tag tag--simulated">Fictional</span> <ProvenanceTag kind="original-practice" /> <GuideLabel kind="example" /></p>
+      <p>
+        {c.organization}, its people, places and figures are invented for this practice case; the country is real. The questions are the platform's own, set
+        in the structure the guide gives Paper 1, and the guidance is written for them: it is not an IB markscheme.
+      </p>
+    </div>
+
+    <div class="p1c-clock js-only" data-clock-bar hidden>
+      <div>
+        <p class="label" data-clock-state>Reading time</p>
+        <p class="p1c-clock__time num" data-clock>05:00</p>
+      </div>
+      <p class="p1c-clock__info" data-clock-info></p>
+      <div class="p1c-clock__actions">
+        <button type="button" class="btn btn--small" data-clock-pause>Pause</button>
+        <button type="button" class="btn btn--small btn--primary" data-clock-finish>Finish the paper</button>
+        <button type="button" class="btn btn--small" data-clock-quit>Stop without saving</button>
+      </div>
+    </div>
+
+    <section class="ws-sec" aria-labelledby="p1c-pre-h">
+      <SectionHead no="01" title="The pre-released statement" id="p1c-pre-h" dek="About three months before the examination you receive a few context topics to research and about the first 200 words of the case. Everything else is unseen until the day." />
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="example" /></p>
+      <p class="small muted">The format is the guide's (p. 41); the topics and the case are invented for practice.</p>
+      <ol class="p1c-topics">
+        {
+          c.context.map((t, i) => (
+            <li class="p1c-topic">
+              <h3 class="p1c-topic__t">{t.topic}</h3>
+              <p class="p1c-topic__p">{t.prompt}</p>
+              <div class="field js-only">
+                <label for={`p1c-note-${i}`}>Your research notes</label>
+                <textarea class="textarea" id={`p1c-note-${i}`} rows="3" data-note-topic={i} aria-describedby="p1c-note-hint" />
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="field__hint js-only" id="p1c-note-hint">Kept on this device. About five hours of research in all is what the course allows (guide, p. 22).</p>
+    </section>
+
+    <section class="ws-sec" aria-labelledby="p1c-case-h">
+      <SectionHead no="02" title="The case" id="p1c-case-h" dek="The opening is what you have before the day. Tag what matters in it now; open the full case for the examination, and keep tagging." />
+      <div class="ws-layout">
+        <article class="ws-casebox" aria-labelledby="p1c-title">
+          <header class="ws-casebox__head">
+            <h3 id="p1c-title">{c.title}</h3>
+            <p class="small muted" data-case-note>The opening, released in advance: {openingWords} words.</p>
+          </header>
+          <p class="ws-how js-only">Click or press Enter on a sentence to tag it, or select a few words with the mouse and choose a tag.</p>
+          <div class="ws-case" data-case>
+            {paras.slice(0, openingParas).map((p, i) => <p class="ws-p" data-para={i} set:html={paragraphHtml(p, i, [])} />)}
+          </div>
+          <div class="p1c-reveal js-only" data-reveal-box>
+            <p class="small">On the day, the case continues with new information.</p>
+            <button type="button" class="btn btn--primary" data-reveal>Open the full case</button>
+            <button type="button" class="btn" data-start>Start the timed paper</button>
+          </div>
+          <details class="p1c-full nojs-only">
+            <summary>The full case: open it on examination day</summary>
+            <div class="ws-case">{paras.slice(openingParas).map((p, i) => <p class="ws-p">{p.text}<span class="sr-only"> (paragraph {i + openingParas + 1})</span></p>)}</div>
+          </details>
+          <div class="ws-palette" data-palette hidden role="group" aria-labelledby="p1c-pal-h">
+            <p class="ws-palette__k" id="p1c-pal-h">Tag these words</p>
+            <p class="ws-palette__q" data-quote></p>
+            <div class="ws-palette__tags">
+              {
+                TAG_IDS.map((t) => (
+                  <button type="button" class={`btn btn--small ws-tagbtn ws-tagbtn--${t}`} data-tag={t}>
+                    {TAGS[t].label}
+                  </button>
+                ))
+              }
+              <button type="button" class="btn btn--small" data-cancel>Cancel</button>
+            </div>
+          </div>
+        </article>
+
+        <aside class="ws-key" aria-labelledby="p1c-key-h">
+          <p class="label" id="p1c-key-h">The four tags</p>
+          <dl>
+            {
+              TAG_IDS.map((t) => (
+                <div class={`ws-key__row ws-key__row--${t}`}>
+                  <dt>{TAGS[t].label}</dt>
+                  <dd>{TAGS[t].hint}</dd>
+                </div>
+              ))
+            }
+          </dl>
+          <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+          <p class="small">Paragraphs are numbered in the margin: each question says where to look. Read the questions first, then the case.</p>
+        </aside>
+      </div>
+
+      <div class="p1c-evidence js-only">
+        <h3 class="ce-h3">Your evidence</h3>
+        <p class="ws-count" data-count aria-live="polite" tabindex="-1">Nothing tagged yet.</p>
+        <ul class="p1c-evlist" data-evidence></ul>
+      </div>
+    </section>
+
+    <section class="ws-sec" aria-labelledby="p1c-prep-h">
+      <SectionHead no="03" title="Before the examination" id="p1c-prep-h" dek="Know who the decision affects and which tools could help, before you see the questions." />
+      <div class="p1c-prep">
+        <div class="p1c-stake">
+          <h3 class="ce-h3">Stakeholder analysis</h3>
+          <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+          <p class="small">For each stakeholder: what they want from the decision, how much power they have over it, and where they stand. Then compare with the model.</p>
+          <div class="table-scroll js-only" role="region" aria-label="Your stakeholder analysis" tabindex="0">
+            <table class="table p1c-stake__table">
+              <thead>
+                <tr>
+                  <th scope="col">Stakeholder</th>
+                  <th scope="col">What they want</th>
+                  <th scope="col">Power</th>
+                  <th scope="col">Stance</th>
+                  <th scope="col"><span class="sr-only">Remove</span></th>
+                </tr>
+              </thead>
+              <tbody data-stake-rows></tbody>
+            </table>
+          </div>
+          <div class="p1c-stake__bar js-only">
+            <button type="button" class="btn btn--small" data-stake-add>Add a stakeholder</button>
+            <p class="small muted" data-stake-compare aria-live="polite"></p>
+          </div>
+          <details class="p1c-model">
+            <summary>Compare with a model analysis</summary>
+            <div class="table-scroll" role="region" aria-label="A model stakeholder analysis" tabindex="0">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Stakeholder</th>
+                    <th scope="col">What they want</th>
+                    <th scope="col">Power</th>
+                    <th scope="col">Stance on the decision</th>
+                    <th scope="col">Paragraph</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {
+                    c.stakeholders.map((s) => (
+                      <tr>
+                        <th scope="row">{s.name}</th>
+                        <td>{s.interest}</td>
+                        <td>{s.power}</td>
+                        <td>{s.stance}</td>
+                        <td class="n">{s.para}</td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
+            </div>
+            <p class="small muted">The platform's reading of the case. Power and stance are judgements: defend your own from the evidence.</p>
+          </details>
+        </div>
+
+        <div class="p1c-tools">
+          <h3 class="ce-h3">Which tools fit this case?</h3>
+          <p class="ce-labels"><GuideLabel kind="strategy" /> <GuideLabel kind="ib" /></p>
+          <p class="small">Choose the tools you would use. A tool earns its place when it changes the argument; Paper 1 is not set on HL-only content (guide, p. 43).</p>
+          <fieldset class="p1c-tools__fs js-only">
+            <legend class="sr-only">Tools you would use</legend>
+            {
+              c.tools.map((t) => (
+                <label class="p1c-tool">
+                  <input type="checkbox" value={t.id} data-tool />
+                  <span>
+                    {t.name}
+                    {t.level === 'HL' && <span class="tag tag--hl">HL</span>}
+                  </span>
+                </label>
+              ))
+            }
+          </fieldset>
+          <ul class="p1c-toolnotes js-only" data-tool-notes aria-live="polite"></ul>
+          <details class="p1c-model">
+            <summary>How well each tool fits</summary>
+            <ul class="p1c-fits">
+              {
+                c.tools.map((t) => (
+                  <li>
+                    <a href={t.href}>{t.name}</a>
+                    {t.level === 'HL' && ' (HL)'}: <b>{t.level === 'HL' ? 'not for Paper 1' : t.fit === 'strong' ? 'a strong fit' : t.fit === 'possible' ? 'possible, with care' : 'a weak fit'}</b>. {t.why}
+                  </li>
+                ))
+              }
+            </ul>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="ws-sec" aria-labelledby="p1c-paper-h">
+      <SectionHead no="04" title="The paper" id="p1c-paper-h" dek={`Section A: answer every question (${marks.a} marks). Section B: answer one of the two (${marks.b} marks). Build each answer in its parts, tie the evidence to it, then mark it against the guidance.`} />
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="strategy" /></p>
+      <p class="small muted">
+        The structure, times and marks are the guide's (pp. 41 and 43). The suggested split, about {fmtDuration(SECTION_A_SECONDS)} for Section A, follows the
+        teacher support material's advice of about 60% of the time; it is not an IB rule.
+      </p>
+
+      <h3 class="p1c-sec-h">Section A</h3>
+      <ol class="p1c-qs">
+        {
+          [...A, ...B].map((q, qi) => (
+            <>
+              {qi === A.length && (
+                <li class="p1c-sec-li">
+                  <h3 class="p1c-sec-h">Section B</h3>
+                  <fieldset class="p1c-choice js-only">
+                    <legend>The question you are answering</legend>
+                    <div class="ws-seg">
+                      {B.map((b) => (
+                        <label class="ws-opt">
+                          <input type="radio" name="p1c-choice" value={b.id} data-choice /> <span>Question {b.number}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                </li>
+              )}
+              <li class="p1c-q" id={`q-${q.id}`} data-q={q.id}>
+                <p class="p1c-q__meta">
+                  <span class="p1c-q__n">{q.number}</span>
+                  <a href={href.commandTerm(term(q.command)?.term ?? q.command)}>{term(q.command)?.term ?? q.command}</a>
+                  <span>{term(q.command)?.ao}</span>
+                  <span class="p1c-q__codes">{q.codes.join(', ')}</span>
+                </p>
+                <p class="p1c-q__prompt">
+                  <span set:html={inline(q.prompt)} /> <span class="p1c-q__marks">[{q.marks}]</span>
+                </p>
+                <p class="small muted">Where to look: {q.look.length === 1 ? 'paragraph' : 'paragraphs'} {q.look.join(', ')}.</p>
+                <div class="p1c-build js-only">
+                  {q.plan.map((s) => (
+                    <div class="field">
+                      <label for={`p1c-${q.id}-${s.id}`}>{s.title}</label>
+                      <textarea class="textarea" id={`p1c-${q.id}-${s.id}`} rows={q.section === 'B' ? 3 : 2} data-slot={s.id} aria-describedby={`p1c-${q.id}-${s.id}-h`} />
+                      <span class="field__hint" id={`p1c-${q.id}-${s.id}-h`}>
+                        {s.prompt}
+                      </span>
+                    </div>
+                  ))}
+                  <details class="p1c-evpick">
+                    <summary>
+                      Evidence for this answer <span class="p1c-evpick__n" data-ev-n></span>
+                    </summary>
+                    <div class="p1c-evpick__body" data-ev-pick />
+                  </details>
+                  <div class="ws-checks">
+                    <p class="label">What the answer still needs</p>
+                    <ul class="ws-checklist" data-checks />
+                  </div>
+                </div>
+                <details class="p1c-guide" data-guide>
+                  <summary>Guidance and self-mark</summary>
+                  <div class="p1c-guide__body">
+                    <p class="ce-labels">
+                      <ProvenanceTag kind="assessment-explanation" /> <GuideLabel kind="example" />
+                    </p>
+                    <p class="small">{q.scheme.note}</p>
+                    {q.scheme.kind === 'points' ? (
+                      <fieldset class="p1c-points">
+                        <legend class="label">Award marks for</legend>
+                        <ul>
+                          {q.scheme.points.map((p, k) => (
+                            <li>
+                              <label class="p1c-point">
+                                <input type="checkbox" class="js-only" data-mark-point={k} />
+                                <span class="p1c-point__m num">[{p.marks}]</span>
+                                <span>{p.text}</span>
+                              </label>
+                            </li>
+                          ))}
+                        </ul>
+                        {q.scheme.answer && <p class="p1c-answer">Answer: {q.scheme.answer}</p>}
+                      </fieldset>
+                    ) : (
+                      <>
+                        <div class="p1c-indicative">
+                          <p class="label">What an answer could draw on</p>
+                          <ul>
+                            {q.scheme.indicative.map((x) => (
+                              <li>{x}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        <fieldset class="p1c-levels">
+                          <legend class="label">Which level best fits your answer?</legend>
+                          <div class="table-scroll" role="region" aria-label={`Levels for question ${q.number}`} tabindex="0">
+                            <table class="table">
+                              <thead>
+                                <tr>
+                                  <th scope="col" class="js-only">
+                                    <span class="sr-only">Choose</span>
+                                  </th>
+                                  <th scope="col">Marks</th>
+                                  <th scope="col">What a response at this level does</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {q.scheme.levels.map((l, k) => (
+                                  <tr>
+                                    <td class="js-only">
+                                      <input type="radio" name={`p1c-${q.id}-level`} value={l.marks} id={`p1c-${q.id}-l${k}`} data-mark-level aria-label={`${l.marks.replace('-', ' to ')} marks`} />
+                                    </td>
+                                    <th scope="row" class="num">
+                                      {l.marks.replace('-', ' to ')}
+                                    </th>
+                                    <td>{l.text}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </fieldset>
+                      </>
+                    )}
+                    <div class="p1c-errors">
+                      <p class="label">Where marks are lost</p>
+                      <ul>
+                        {q.errors.map((e) => (
+                          <li>{e}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <p class="p1c-mark js-only" data-mark aria-live="polite" />
+                  </div>
+                </details>
+              </li>
+            </>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="ws-sec" aria-labelledby="p1c-you-h">
+      <SectionHead no="05" title="Your paper" id="p1c-you-h" dek="Your self-marked total and your timed attempts, kept on this device. A self-mark is your own judgement against the platform's guidance, never a grade." />
+      <p class="nojs-only small muted">Your total and attempts need JavaScript. The guidance under each question needs nothing.</p>
+      <div class="p1c-total js-only">
+        <p class="p1c-total__line" data-total aria-live="polite">Nothing self-marked yet.</p>
+        <div class="table-scroll" role="region" aria-label="Your timed attempts" tabindex="0" data-attempts-wrap hidden>
+          <table class="table">
+            <caption>Timed attempts</caption>
+            <thead>
+              <tr>
+                <th scope="col">Finished</th>
+                <th scope="col" class="n">Reading time used</th>
+                <th scope="col" class="n">Writing time used</th>
+                <th scope="col" class="n">Allowed</th>
+              </tr>
+            </thead>
+            <tbody data-attempts></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="ws-export js-only">
+        <button type="button" class="btn btn--small btn--primary" data-txt>Download my answers (text)</button>
+        <button type="button" class="btn btn--small" data-json>Download a backup (JSON)</button>
+        <button type="button" class="btn btn--small" data-print>Print</button>
+        <button type="button" class="btn btn--small" data-reset>Clear my work on this case</button>
+        <span class="ws-export__confirm" data-reset-confirm hidden>
+          <span>This clears your notes, evidence, analysis, answers, marks and attempts for this case.</span>
+          <button type="button" class="btn btn--small btn--primary" data-reset-yes>Clear it</button>
+          <button type="button" class="btn btn--small" data-reset-no>Keep it</button>
+        </span>
+      </div>
+      <div class="p1c-next">
+        <p class="small">
+          Other practice cases:
+          {
+            others.map((o, i) => (
+              <>
+                {i > 0 && ', '}
+                <a href={`/assessment/paper-1/workspace/${o.id}/`}>{o.organization}</a>
+              </>
+            ))
+          }
+          . <a href="/assessment/paper-1/">The Paper 1 page</a> explains each part of the paper.
+        </p>
+      </div>
+    </section>
+    <TutorNote lead="Want feedback on a full answer?" offer="A session can mark a practice paper with you, question by question." />
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../../../scripts/centre/p1-case';
+</script>
