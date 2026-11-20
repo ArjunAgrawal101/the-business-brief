@@ -68,6 +68,13 @@ const sameName = (name: string, expression: string) => {
         <span class="rs__code">{s.code}</span>
         <span>{s.title.split('/').map((part, i, all) => (i < all.length - 1 ? <>{part}/<wbr /></> : part))}</span>
       </h1>
+      {
+        s.question && (
+          <p class="rs__question">
+            <span class="rs__question-label">The decision</span> {s.question}
+          </p>
+        )
+      }
       <div class="rs__meta">
         <span class:list={['tag', s.level === 'HL' ? 'tag--hl' : 'tag--plain']}>{levelText}</span>
         <span class="rs__counts">{counts}</span>

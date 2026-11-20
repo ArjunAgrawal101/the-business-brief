@@ -252,6 +252,7 @@ describe('the sheets', () => {
     for (const [id, t] of Object.entries(c.topics)) {
       const s = data.sheets.find((x) => x.slug === id)!;
       expect(s.points).toEqual(t.revision.keyPoints);
+      expect(s.question).toBe(t.decisionQuestion);
       for (const trap of t.revision.traps.slice(0, 4)) expect(s.mistakes.map((m) => m.text)).toContain(trap);
       for (const k of t.related.calculations) expect(s.formulae.map((f) => f.id), `${id} ${k}`).toContain(k);
       for (const g of t.related.glossary) expect(s.terms.map((x) => x.id), `${id} ${g}`).toContain(g);

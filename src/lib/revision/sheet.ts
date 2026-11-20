@@ -70,6 +70,8 @@ export interface Sheet {
   unit: number;
   unitTitle: string;
   level: Subtopic['level'];
+  /** The decision a brief is built around, shown as the old revision briefs showed it. */
+  question?: string;
   /** True when an SL/HL subtopic's sheet carries HL-only items, so it needs the level switch. */
   hasHL: boolean;
   points: string[];
@@ -262,6 +264,7 @@ export function buildSheet({ c, s, frameworks, formulae, revision, recall, subto
     unit: s.unit,
     unitTitle: s.unitTitle,
     level: s.level,
+    question: brief?.decisionQuestion,
     hasHL,
     points,
     terms,
