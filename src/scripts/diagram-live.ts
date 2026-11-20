@@ -25,7 +25,7 @@ export function setupLive(root: HTMLElement): void {
   const status = root.querySelector<HTMLElement>('[data-status]');
   if (!fig || !form || !wide || !read) return;
 
-  const field = (key: string) => form.querySelector<HTMLInputElement | HTMLSelectElement>(`[data-key="${CSS.escape(key)}"]`);
+  const field = (key: string) => form.querySelector<HTMLInputElement | HTMLSelectElement>(`[data-dg-input="${CSS.escape(key)}"]`);
   const values = (): Values => Object.fromEntries(cfg.inputs.map((i) => [i.key, parseNumber(field(i.key)?.value ?? '') ?? NaN]));
 
   let timer = 0;

@@ -74,7 +74,7 @@ const panels = ix?.kind === 'compare' ? ix.panels.map((p) => ({ ...p, svg: ix.dr
                 <div class="dg-field">
                   <label for={`${uid}-${i.key}`}>{i.label}</label>
                   {i.options ? (
-                    <select id={`${uid}-${i.key}`} data-key={i.key} aria-describedby={`${uid}-${i.key}-err`}>
+                    <select id={`${uid}-${i.key}`} data-dg-input={i.key} aria-describedby={`${uid}-${i.key}-err`}>
                       {i.options.map((o) => (
                         <option value={o.value} selected={o.value === i.value}>
                           {o.label}
@@ -92,7 +92,7 @@ const panels = ix?.kind === 'compare' ? ix.panels.map((p) => ({ ...p, svg: ix.dr
                         max={i.max}
                         step={i.step}
                         value={i.value}
-                        data-key={i.key}
+                        data-dg-input={i.key}
                         aria-describedby={`${uid}-${i.key}-err${i.suffix ? ` ${uid}-${i.key}-unit` : ''}`}
                       />
                       {i.suffix && (
@@ -246,7 +246,7 @@ const panels = ix?.kind === 'compare' ? ix.panels.map((p) => ({ ...p, svg: ix.dr
           <summary>Every part, explained</summary>
           <ol class="dg__key">
             {parts.map((p) => (
-              <li id={`${keyId}-${p.id}`} data-key={p.id}>
+              <li id={`${keyId}-${p.id}`} data-dg-entry={p.id}>
                 <strong class="dg__key-name">{p.label}</strong>
                 <span class="dg__key-text">{p.text}</span>
                 {partHref(p) && (

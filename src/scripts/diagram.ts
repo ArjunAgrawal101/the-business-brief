@@ -47,7 +47,7 @@ function setupExplore(root: HTMLElement): void {
     active = pid;
     root.querySelectorAll('.dgp.is-active').forEach((x) => x.classList.remove('is-active'));
     root.querySelectorAll(`.dgp[data-part="${CSS.escape(pid)}"]`).forEach((x) => x.classList.add('is-active'));
-    const entry = root.querySelector<HTMLElement>(`[data-key="${CSS.escape(pid)}"]`);
+    const entry = root.querySelector<HTMLElement>(`[data-dg-entry="${CSS.escape(pid)}"]`);
     if (entry) readout.replaceChildren(...[...entry.childNodes].map((n) => n.cloneNode(true)));
   };
   root.querySelectorAll<SVGElement>('.dgp').forEach((el) => {

@@ -206,7 +206,7 @@ test.describe('without JavaScript', () => {
     await expect(page.locator('[data-read] .dg-read__text')).toContainText('February, March and April');
     await page.goto('/diagrams/communication-flows/');
     await expect(page.locator('[data-parts]')).toHaveAttribute('open', '');
-    await expect(page.locator('[data-key="diagonal"]')).toBeVisible();
+    await expect(page.locator('[data-dg-entry="diagonal"]')).toBeVisible();
     await page.goto('/diagrams/finance-decision-tree/');
     await expect(page.locator('[data-tree-q][open]')).toHaveCount(5);
     await expect(page.getByRole('link', { name: 'Crowdfunding' })).toBeVisible();

@@ -47,7 +47,7 @@ for (const size of sizes) {
           const frame = s.getBoundingClientRect();
           if (!frame.width || !s.checkVisibility()) continue;
           const k = frame.width / s.viewBox.baseVal.width;
-          const labels = [...s.querySelectorAll('text')].filter((t) => (t.textContent ?? '').trim()).map((t) => ({ t: (t.textContent ?? '').slice(0, 40), r: t.getBoundingClientRect(), px: parseFloat(getComputedStyle(t).fontSize) * k }));
+          const labels = [...s.querySelectorAll('text')].filter((t) => (t.textContent ?? '').trim()).map((t) => ({ t: (t.textContent ?? '').slice(0, 40), r: t.getBoundingClientRect(), px: parseFloat(window.getComputedStyle(t).fontSize) * k }));
           for (const { t, r } of labels) if (r.left < frame.left - 1 || r.top < frame.top - 1 || r.right > frame.right + 1 || r.bottom > frame.bottom + 1) res.push(`"${t}" runs outside the frame`);
           for (let i = 0; i < labels.length; i++)
             for (let j = i + 1; j < labels.length; j++) {
