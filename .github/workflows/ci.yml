@@ -12,8 +12,8 @@ permissions:
 jobs:
   qa:
     runs-on: ubuntu-latest
-    # The full QA took about 25 minutes on two workers in 2.2 (1,092 browser tests). Release 3.0 has 1,694, and its
-    # first runs reached the 40-minute limit before the browser tests could finish; 75 leaves room to grow.
+    # The full QA took about 25 minutes on two workers in 2.2 (1,092 browser tests); 3.0 has 1,694, so 75 leaves room.
+    # A test that waits for ever is caught by the test's own limits, not this one (see tests/e2e/pages.spec.ts).
     timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4

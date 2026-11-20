@@ -709,12 +709,12 @@ const QUICK = [
     border-top: 1px solid var(--rule);
     border-bottom: 3px solid var(--navy-900);
     box-shadow: 0 24px 40px -32px rgba(11, 26, 51, 0.5);
-    animation: mega-in var(--dur-slow) var(--ease-out);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .hsearch__panel {
-      animation: none;
+  /* Only while open, as the menus do: a closed panel carries no animation that could never run. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hsearch[open] > .hsearch__panel {
+      animation: mega-in var(--dur-slow) var(--ease-out);
     }
   }
 

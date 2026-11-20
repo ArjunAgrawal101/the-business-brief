@@ -23,10 +23,27 @@ for (const path of PAGES) {
     const res = await page.goto(path);
     expect(res?.status()).toBe(200);
     // Let arrival animations finish, so the scan sees the page as a reader does after the first half-second.
-    await page.evaluate(async () => {
+    // One that has not finished in ten seconds never will (an animation inside a closed disclosure is never
+    // advanced), so the test names it rather than waiting for the test's own time limit.
+    const stuck = await page.evaluate(async () => {
       const running = document.getAnimations().filter((a) => a.effect?.getTiming().iterations !== Infinity);
-      await Promise.all(running.map((a) => a.finished.catch(() => undefined)));
+      // Settled promises are counted, not play states: reading a play state recalculates style, which would
+      // move a stuck animation on and hide it.
+      const pending = new Set(running);
+      const done = Promise.all(running.map((a) => a.finished.catch(() => undefined).then(() => pending.delete(a)))).then(() => [] as string[]);
+      const late = new Promise<string[]>((resolve) =>
+        setTimeout(() => {
+          const name = (a: Animation) => (a instanceof CSSAnimation ? a.animationName : a instanceof CSSTransition ? a.transitionProperty : a.id);
+          const on = (a: Animation) => {
+            const t = (a.effect as KeyframeEffect | null)?.target;
+            return t instanceof Element ? `${t.tagName.toLowerCase()}${t.classList.length ? `.${[...t.classList].join('.')}` : ''}` : 'a pseudo-element';
+          };
+          resolve([...pending].map((a) => `${name(a)} on ${on(a)}`));
+        }, 10_000),
+      );
+      return Promise.race([done, late]);
     });
+    expect(stuck, 'animations that never finish').toEqual([]);
     await expect(page.locator('h1')).toHaveCount(1);
     await expect(page.locator('main#main')).toHaveCount(1);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);

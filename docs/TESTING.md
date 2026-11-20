@@ -8,6 +8,8 @@ npm run qa
 
 runs, in order: `astro check`, ESLint and the content lint, the unit tests, the build, the link check and the browser tests. Each can also be run on its own (see the README).
 
+Run the browser tests as CI does before trusting a local pass: `CI=1 npx playwright test` keeps the configuration's trace on failure and one retry. Recording a trace makes the browser work out the style of every element, closed disclosures included, so a fault that only appears then (in 3.0, an entrance animation on the header's closed search panel that could never run, which held every page test until its time limit) is missed by a faster run with `--trace off`.
+
 ## What is tested
 
 | Suite | File | What it proves |
