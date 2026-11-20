@@ -246,7 +246,7 @@ const sameName = (name: string, expression: string) => {
                 <div class="rs__stem" set:html={inline(x.stem)} />
                 <p class="rs__q" set:html={inline(x.question)} />
                 <details class="disclosure rs__outline">
-                  <summary>Show a model answer outline</summary>
+                  <summary><span class="no-print">Show a model answer outline</span><span class="rs__print-only">Model answer outline</span></summary>
                   <div class="disclosure__body">
                     <ul>
                       {x.outline.map((o) => (

@@ -567,6 +567,10 @@
   margin-top: 0.35em;
 }
 
+.rs__print-only {
+  display: none;
+}
+
 .rs__recall {
   margin-top: var(--sp-2);
 }
@@ -589,7 +593,11 @@
   margin-top: var(--sp-4);
 }
 
-/* ---------- Print: an A4 sheet ---------- */
+/* ---------- Print: an A4 sheet ----------
+   Nothing prints below 9pt, which is 12px. The sheet keeps its two columns,
+   the frameworks keep their three fields side by side, the recall questions
+   print as a list in two columns, and a long table or exercise may run on to
+   the next page rather than leave a gap. */
 
 @media print {
   @page {
@@ -612,14 +620,22 @@
     font-size: 20pt;
   }
 
+  .rs__question {
+    font-size: 10.5pt;
+  }
+
   .rs__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 5mm 8mm;
+    gap: 4mm 8mm;
     margin-top: 4mm;
   }
 
   .rs__sec--wide {
     grid-column: 1 / -1;
+  }
+
+  .rs__sec {
+    padding-top: 2mm;
   }
 
   .rs__h {
@@ -628,16 +644,30 @@
 
   .rs__dek,
   .rs__src,
-  .rs__counts {
-    font-size: 8pt;
+  .rs__counts,
+  .rs__outline > summary {
+    font-size: 9pt;
+    color: var(--text-muted);
   }
 
   .rs__points,
   .rs__mistakes,
   .rs__outline ul,
   .rs__formulae,
-  .rs__fw-dl {
+  .rs__fw-dl,
+  .rs__terms dd,
+  .rs .rcard {
     font-size: 9pt;
+    line-height: 1.4;
+  }
+
+  .rs__points li + li,
+  .rs__outline li + li {
+    margin-top: 0.25em;
+  }
+
+  .rs__mistakes > li + li {
+    margin-top: 2mm;
   }
 
   .rs__terms {
@@ -645,38 +675,100 @@
     column-gap: 6mm;
   }
 
-  .rs__terms dt {
-    font-size: 9.5pt;
+  .rs__terms > div {
+    padding: 1mm 0;
   }
 
-  .rs__terms dd {
-    font-size: 8.5pt;
-  }
-
+  .rs__terms dt,
   .rs__fexpr,
   .rs__stem {
     font-size: 9.5pt;
   }
 
+  .rs__formulae {
+    break-inside: auto;
+  }
+
+  .rs__formulae th,
+  .rs__formulae td {
+    padding: 1mm 3mm 1mm 0;
+  }
+
+  .rs__fws > li {
+    padding: 2mm 0;
+  }
+
+  .rs__fw-name a {
+    font-size: 10.5pt;
+  }
+
+  .rs__fw-dl {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1mm 5mm;
+    margin-top: 1mm;
+  }
+
+  .rs__fw-dl dt {
+    font-size: 9pt;
+  }
+
   .rs__exs {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4mm 8mm;
+  }
+
+  .rs__ex-tags,
+  .rs__stem,
+  .rs__q {
+    break-after: avoid;
   }
 
   .rs__mistakes > li,
   .rs__terms > div,
   .rs__fws > li,
-  .rs__exs > li,
-  .rs__formulae tr {
+  .rs__formulae tr,
+  .rs__outline li,
+  .rs .rcard {
     break-inside: avoid;
   }
 
-  .rs .rcards__rate,
-  .rs .rcards__how {
+  .rs__print-only {
+    display: inline;
+  }
+
+  .rs .rcard__rate,
+  .rs .rcards__how,
+  .rs .rcard__reveal,
+  .rs .quiz__bar,
+  .rs__foot {
     display: none !important;
   }
 
-  .rs__outline > summary {
-    font-size: 8.5pt;
-    color: #444;
+  .rs .rcards__list {
+    display: block;
+    columns: 2;
+    column-gap: 8mm;
+  }
+
+  .rs .rcard {
+    border: 0;
+    border-bottom: 1px solid var(--rule-hair);
+    box-shadow: none;
+    background: none;
+  }
+
+  .rs .rcard__q {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 2mm;
+    padding: 1.5mm 0 0;
+  }
+
+  .rs .rcard__no {
+    font-size: 9pt;
+  }
+
+  .rs .rcard__a {
+    gap: 1mm;
+    padding: 0.5mm 0 1.5mm 7mm;
   }
 }
