@@ -68,12 +68,12 @@ The multi-round business strategy simulation the brief asks for already existed 
 | --- | --- |
 | Type check (`astro check`) | 0 errors, 0 warnings, 0 hints |
 | ESLint | No problems |
-| Unit tests (Vitest) | 1,783 tests in 87 files, all pass |
+| Unit tests (Vitest) | 1,784 tests in 87 files, all pass |
 | Build | 1,329 pages |
 | Content lint (no dashes, leaks or placeholders, source and built pages) | No problems |
 | Link check | No broken links |
 | Colour contrast (`qa:contrast`) | Every pair meets its minimum |
-| Browser tests (Playwright, Chromium), every page at desktop and phone size with an axe-core WCAG 2.2 AA scan, plus every interaction spec | See the delivery note below |
+| Browser tests (Playwright, Chromium), every page at desktop and phone size with an axe-core WCAG 2.2 AA scan, plus every interaction spec | 1,694 tests in 21.6 minutes: 1,688 passed and 3 were skipped by design (desktop-only or phone-only). Three failed because the test counted the header's hidden Search button as a visible one; the test was corrected and they pass. The specs covering the later fixes (61 tests) were run again on the final build, and all pass |
 
 Each engineer also ran their own specs and page checks on a private build. A shared content cache was found to let one branch's build read another's content during the parallel work; the cache now lives in each checkout's own `.astro` folder, and every result above comes from the integrated branch.
 
