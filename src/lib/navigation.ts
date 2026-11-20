@@ -80,7 +80,7 @@ export const NAV: NavGroup[] = [
     intro: 'Prepare for every component of the IB assessment, with the requirements kept apart from advice and examples.',
     links: [
       { label: 'Assessment Centre', href: '/assessment/', text: 'Every component, explained from the IB guide' },
-      { label: 'IA Studio', href: '/assessment/internal-assessment/', text: 'The business research project, from question to submission' },
+      { label: 'IA Studio', href: '/assessment/internal-assessment/', text: 'The business research project: nine tools from the research question to the final checks' },
       { label: 'Paper 1', href: '/assessment/paper-1/', text: 'The case study paper: from the pre-released statement to answers built on the case' },
       { label: 'Paper 2', href: '/assessment/paper-2/', text: 'Quantitative questions: calculations, constructions and their interpretation' },
       { label: 'Calculation practice', href: '/assessment/paper-2/practice/', text: 'Paper 2 practice with fresh fictional figures each time, checked, with the working and the slip behind each wrong answer' },
