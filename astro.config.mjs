@@ -12,6 +12,8 @@ const site = process.env.SITE_URL || (vercelHost ? `https://${vercelHost}` : und
 
 export default defineConfig({
   site,
+  // The content cache lives in the project's own .astro folder (git-ignored), not in node_modules, so checkouts that share an install never read each other's content.
+  cacheDir: './.astro/cache',
   trailingSlash: 'always',
   build: {
     format: 'directory',
