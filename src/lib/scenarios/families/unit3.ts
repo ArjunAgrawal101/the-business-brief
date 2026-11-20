@@ -674,7 +674,7 @@ const dropProduct: Family = {
           choices: [
             best(`Customers who buy the ${C.prod.toLowerCase()} with other lines`, 'They would lose part of what they come for, and some may take their other purchases elsewhere.'),
             fair(`The staff who make the ${C.prod.toLowerCase()}`, 'Their work would change or end if the line were dropped, though they could move to the other lines.'),
-            weak('The label designer', 'A distractor: unaffected by the decision.'),
+            weak('The label designer', 'A distractor: the designer is paid for the labels whichever lines are kept.'),
           ],
         },
         risk: {

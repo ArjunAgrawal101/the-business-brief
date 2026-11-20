@@ -283,7 +283,7 @@ const workforcePlan: Family = {
           choices: [
             best(`The existing ${k.jobs}, who cover the gaps with extra shifts`, 'They carry the extra work now, and if they burn out and leave, the shortage deepens.'),
             fair('The owners, who pay for agency staff', 'They bear the cost, but the existing staff bear the strain.'),
-            weak('The web designer', 'A distractor: unaffected by the shortage.'),
+            weak('The web designer', 'A distractor: the web designer is paid the same whether or not the posts are filled.'),
           ],
         },
         risk: {
