@@ -61,6 +61,14 @@ export interface Frame {
   h: number;
   title: string;
   desc: string;
+  /**
+   * A one-sentence text alternative. When given, it is the drawing's
+   * accessible name and the full description becomes its description, so a
+   * screen reader hears the short version first.
+   */
+  alt?: string;
+  /** The drawing holds links (its parts open their subtopics), so it is a group rather than a single image. */
+  interactive?: boolean;
 }
 
 const TONE_KEYS = Object.keys(TONES) as Tone[];
@@ -74,11 +82,61 @@ function markers(id: string): string {
 }
 
 export function frame(f: Frame, body: string): string {
+  const role = f.interactive ? 'group' : 'img';
+  const names = f.alt ? `aria-labelledby="${f.id}-t" aria-describedby="${f.id}-d"` : `aria-labelledby="${f.id}-t ${f.id}-d"`;
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f.w} ${f.h}" width="${f.w}" height="${f.h}" role="img" aria-labelledby="${f.id}-t ${f.id}-d" font-family="${esc(SANS)}" font-size="13" fill="${C.body}">` +
-    `<title id="${f.id}-t">${esc(f.title)}</title><desc id="${f.id}-d">${esc(f.desc)}</desc>` +
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${r(f.w)} ${r(f.h)}" width="${r(f.w)}" height="${r(f.h)}" role="${role}" ${names} font-family="${esc(SANS)}" font-size="13" fill="${C.body}">` +
+    `<title id="${f.id}-t">${esc(f.alt ? `${f.title}. ${f.alt}` : f.title)}</title><desc id="${f.id}-d">${esc(f.desc)}</desc>` +
     `<defs>${markers(f.id)}</defs>${body}</svg>`
   );
+}
+
+/* ------------------------------------------------------------------ */
+/* Parts a reader can explore                                          */
+/* ------------------------------------------------------------------ */
+
+/** How a diagram is drawn on a page, rather than as a download. */
+export interface RenderOpts {
+  /** The address each part opens (its subtopic or page). Left out of downloads, where parts are plain drawing. */
+  link?: (part: string) => string | undefined;
+  /** The id prefix of the explanations printed beside the drawing: part p is described by `${describedBy}-${p}`. */
+  describedBy?: string;
+}
+
+/**
+ * One part of an explorable diagram. On a page it is a link to where the part
+ * is taught, described by its explanation, with an invisible hit area that
+ * the page's styles outline on hover and focus; in a download it is a plain
+ * group.
+ */
+export function part(o: RenderOpts | undefined, pid: string, label: string, hit: [number, number, number, number], inner: string): string {
+  const [x, y, w, h] = hit;
+  const area = `<rect class="dgp-hit" x="${r(x)}" y="${r(y)}" width="${r(w)}" height="${r(h)}" rx="4" fill="transparent"/>`;
+  const href = o?.link?.(pid);
+  // The hit area goes last, over the drawing, so the whole part answers the pointer and shows the outline.
+  if (!href) return `<g class="dgp" data-part="${pid}">${inner}${area}</g>`;
+  const desc = o?.describedBy ? ` aria-describedby="${o.describedBy}-${pid}"` : '';
+  return `<a class="dgp" data-part="${pid}" href="${esc(href)}" aria-label="${esc(label)}"${desc}>${inner}${area}</a>`;
+}
+
+/* ------------------------------------------------------------------ */
+/* Layouts for phones                                                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * The width of a layout drawn for phones. On a 320 pixel screen the drawing
+ * gets about 270 pixels, so text set at NARROW_MIN or more stays at 12 pixels
+ * or more (tests/e2e/visual.spec.ts measures it).
+ */
+export const NW = 300;
+export const NARROW_MIN = 14;
+
+/** Characters per line for wrapped text of a given size in a given width (Inter, mixed case). */
+export const charsFor = (width: number, size: number) => Math.max(6, Math.floor(width / (size * 0.56)));
+
+/** The height a paragraph takes: its lines at the given line height. */
+export function paraHeight(s: string, width: number, size: number, lh = size * 1.3): number {
+  return wrap(s, charsFor(width, size)).length * lh;
 }
 
 /* ------------------------------------------------------------------ */

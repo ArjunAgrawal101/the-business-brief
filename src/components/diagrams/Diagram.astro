@@ -1,16 +1,30 @@
 ---
 /**
  * A diagram from the platform's library, by id. The library (src/lib/diagrams)
- * draws each one from data, so its proportions and labels are exact. On a
- * narrow screen the drawing keeps a readable size and scrolls sideways; the
- * text description is always one tap away.
+ * draws each one from data, so its proportions and labels are exact.
+ *
+ * - It fits its frame at every width: a diagram with a layout for phones
+ *   switches to it when the frame is narrow (a container query), so its
+ *   labels stay at 12 pixels or more on a 320 pixel screen; one without can
+ *   be shown larger on request.
+ * - Parts a reader can explore are links to where each is taught, described
+ *   by their explanation; the explanation also appears beside the drawing on
+ *   hover, focus or a first tap, and every part is listed in words.
+ * - A diagram with an interaction renders every state, panel or figure on
+ *   the server, so it reads in full without JavaScript; src/scripts/diagram.ts
+ *   adds the switching, comparing, recalculating and printing.
  */
-import { DIAGRAMS, describe } from '../../lib/diagrams';
+import { DIAGRAMS, describe, type DiagramPart } from '../../lib/diagrams';
+import { corpus } from '../../lib/content';
+import { allSubtopics, subtopicHref } from '../../lib/learning';
+import { jsonForScript } from '../../lib/markup';
+import { LIVE, defaults, readingHtml } from '../../lib/figures/live';
+import DiagramTree from './DiagramTree.astro';
 
 interface Props {
   id: string;
   caption?: string;
-  /** Show the download link (the library page does). */
+  /** Show the download and print actions (the library and subtopic pages do). */
   download?: boolean;
   /** Set when the same diagram appears twice on one page, to keep its internal ids unique. */
   instance?: string;
@@ -19,25 +33,262 @@ const { id, caption, download = false, instance } = Astro.props;
 const d = DIAGRAMS[id];
 if (!d) throw new Error(`Diagram "${id}" is not in the library (src/lib/diagrams).`);
 const uid = instance ? `dg-${id}-${instance}` : `dg-${id}`;
-const svg = d.render(uid);
-const desc = describe(svg);
+const keyId = `${uid}-k`;
+const c = await corpus();
+const subs = allSubtopics(c);
+const titleOf = (code: string) => subs.find((x) => x.s.code === code)?.s.title ?? code;
+const partHref = (p: DiagramPart) => p.href ?? (p.code ? subtopicHref(c, p.code) : undefined);
+const partLink = (p: DiagramPart) => p.hrefLabel ?? (p.code ? `${p.code} ${titleOf(p.code)}` : 'Open');
+const parts = d.parts ?? [];
+const opts = parts.length ? { link: (pid: string) => partHref(parts.find((x) => x.id === pid)!), describedBy: keyId } : undefined;
+const ix = d.ix;
+const kind = ix?.kind ?? (parts.length ? 'explore' : 'static');
+
+// The drawing (or, for a switch, the first state's), and its layout for phones.
+const wide = d.render(uid, opts);
+const narrow = d.narrow?.(`${uid}-n`, opts);
+const desc = describe(wide);
+const live = ix?.kind === 'live' ? { fig: LIVE[ix.model], values: defaults(ix.inputs) } : undefined;
+const reading = live ? live.fig.read(live.values) : undefined;
+const groups = ix?.kind === 'live' ? [...new Set(ix.inputs.map((i) => i.group ?? ''))] : [];
+const config = ix?.kind === 'live' ? { uid, model: ix.model, inputs: ix.inputs } : ix?.kind === 'compare' ? { first: ix.first } : {};
+const art = (w: string, n: string | undefined) => ({ w, n });
+const states = ix?.kind === 'switch' ? ix.states.map((s) => ({ ...s, ...art(ix.draw(`${uid}-${s.id}`, s.id, false, opts), ix.draw(`${uid}-${s.id}-n`, s.id, true, opts)) })) : [];
+const panels = ix?.kind === 'compare' ? ix.panels.map((p) => ({ ...p, svg: ix.draw(`${uid}-${p.id}`, p.id, opts) })) : [];
 ---
 
-<figure class="dg" id={`diagram-${id}`}>
-  <div class="dg__art" tabindex="0" role="group" aria-label={`${d.title}. Scroll sideways on a narrow screen.`} set:html={svg} />
+<figure class:list={['dg', `dg--${kind}`]} id={`diagram-${id}`} data-ix="diagram" data-kind={kind} data-dg={id} aria-labelledby={`${uid}-cap`}>
+  {kind === 'live' && <script type="application/json" data-config set:html={jsonForScript(config)} />}
+  {kind === 'compare' && <script type="application/json" data-config set:html={jsonForScript(config)} />}
+
+  {
+    ix?.kind === 'live' && (
+      <form class="dg-live js-only" data-live-form novalidate aria-label={`The figures for ${d.title.toLowerCase()}`}>
+        {groups.map((g) => (
+          <fieldset class="dg-live__group">
+            {g && <legend>{g}</legend>}
+            {ix.inputs
+              .filter((i) => (i.group ?? '') === g)
+              .map((i) => (
+                <div class="dg-field">
+                  <label for={`${uid}-${i.key}`}>{i.label}</label>
+                  {i.options ? (
+                    <select id={`${uid}-${i.key}`} data-key={i.key} aria-describedby={`${uid}-${i.key}-err`}>
+                      {i.options.map((o) => (
+                        <option value={o.value} selected={o.value === i.value}>
+                          {o.label}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <span class="dg-field__box">
+                      {i.prefix && <span class="dg-field__fix" aria-hidden="true">{i.prefix}</span>}
+                      <input
+                        id={`${uid}-${i.key}`}
+                        type="number"
+                        inputmode="decimal"
+                        min={i.min}
+                        max={i.max}
+                        step={i.step}
+                        value={i.value}
+                        data-key={i.key}
+                        aria-describedby={`${uid}-${i.key}-err${i.suffix ? ` ${uid}-${i.key}-unit` : ''}`}
+                      />
+                      {i.suffix && (
+                        <span class="dg-field__fix" id={`${uid}-${i.key}-unit`}>
+                          {i.suffix}
+                        </span>
+                      )}
+                    </span>
+                  )}
+                  <p class="dg-field__err" id={`${uid}-${i.key}-err`} data-err={i.key} hidden />
+                </div>
+              ))}
+          </fieldset>
+        ))}
+        <p class="dg-live__actions">
+          <button type="button" class="dg-btn" data-reset>
+            Back to the example’s figures
+          </button>
+        </p>
+      </form>
+    )
+  }
+
+  {
+    ix?.kind === 'switch' && (
+      <fieldset class="dg-switch js-only">
+        <legend>{ix.legend}</legend>
+        <div class="dg-switch__opts">
+          {ix.states.map((s, i) => (
+            <label>
+              <input type="radio" name={`${uid}-state`} value={s.id} checked={i === 0} />
+              <span>{s.label}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+    )
+  }
+
+  {
+    ix?.kind === 'compare' && (
+      <div class="dg-pick js-only" role="group" aria-label={ix.legend}>
+        <p class="dg-pick__legend">{ix.legend}</p>
+        {(['a', 'b'] as const).map((side, k) => (
+          <label class="dg-pick__field">
+            <span>{k === 0 ? 'First' : 'Second'}</span>
+            <select data-pick={side}>
+              {ix.panels.map((p) => (
+                <option value={p.id} selected={p.id === ix.first[k]}>
+                  {p.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        ))}
+        <p class="dg-pick__same" data-same hidden>
+          Choose two different ones to compare.
+        </p>
+      </div>
+    )
+  }
+
+  {
+    ix?.kind === 'switch' ? (
+      <div class="dg__states">
+        {states.map((s) => (
+          <section class="dg__state" data-state={s.id} aria-label={s.label}>
+            <p class="dg__state-h">{s.label}</p>
+            <div class="dg__art">
+              <div class="dg__view dg__view--wide has-narrow" set:html={s.w} />
+              <div class="dg__view dg__view--narrow" set:html={s.n} />
+            </div>
+            <p class="dg__state-note">{s.note}</p>
+          </section>
+        ))}
+      </div>
+    ) : ix?.kind === 'compare' ? (
+      <div class="dg__panels" data-panels>
+        {panels.map((p) => (
+          <section class="dg__panel" data-panel={p.id} aria-label={p.label}>
+            <p class="dg__panel-h">{p.label}</p>
+            <div class="dg__art dg__art--panel" set:html={p.svg} />
+            <dl class="dg__facts">
+              {p.facts.map(([k, v]) => (
+                <div data-fact={k}>
+                  <dt>
+                    {k}
+                    <span class="dg__differs" hidden>
+                      differs
+                    </span>
+                  </dt>
+                  <dd>{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        ))}
+      </div>
+    ) : ix?.kind === 'tree' ? (
+      <div class="dg-tree">
+        <p class="dg-tree__tools js-only">
+          <button type="button" class="dg-btn" data-tree-all="close">
+            Close every question
+          </button>
+          <button type="button" class="dg-btn" data-tree-all="open">
+            Open every question
+          </button>
+        </p>
+        <ul class="dgt">
+          <DiagramTree node={ix.tree} />
+        </ul>
+        <div class="dg__art dg__art--print" aria-hidden="true">
+          <div class="dg__view dg__view--wide" set:html={wide} />
+        </div>
+      </div>
+    ) : (
+      <div class="dg__stage">
+        <div class="dg__art" data-art>
+          <div class:list={['dg__view dg__view--wide', { 'has-narrow': Boolean(narrow) }]} data-view="wide" set:html={wide} />
+          {narrow && <div class="dg__view dg__view--narrow" data-view="narrow" set:html={narrow} />}
+        </div>
+        {kind === 'explore' && (
+          <div class="dg__readout js-only" data-readout>
+            <p class="dg__readout-hint">
+              Point to a part, or tab to it, to read what it means here; select it to open where it is taught. On a touch screen, the first tap explains and the
+              second opens.
+            </p>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  {
+    reading && (
+      <div class="dg-read" data-read set:html={readingHtml(reading)} />
+    )
+  }
+  {kind === 'live' && <p class="nojs-only dg-read__nojs small muted">The figures above are the example’s. With JavaScript on, they can be changed here.</p>}
+  <p class="sr-only" aria-live="polite" data-status></p>
+
   <figcaption class="dg__cap">
-    <span class="dg__title">{d.title}{d.level === 'HL' && <span class="dg__hl">HL</span>}</span>
+    <span class="dg__title" id={`${uid}-cap`}>
+      {d.title}
+      {d.level === 'HL' && <span class="dg__hl">HL</span>}
+    </span>
     {(caption ?? d.caption) && <span class="dg__text">{caption ?? d.caption}</span>}
+    {d.howTo && <span class="dg__how js-only">{d.howTo}</span>}
+    {
+      parts.length > 0 && (
+        <details class="dg__parts" open data-parts>
+          <summary>Every part, explained</summary>
+          <ol class="dg__key">
+            {parts.map((p) => (
+              <li id={`${keyId}-${p.id}`} data-key={p.id}>
+                <strong class="dg__key-name">{p.label}</strong>
+                <span class="dg__key-text">{p.text}</span>
+                {partHref(p) && (
+                  <a class="dg__key-link" href={partHref(p)}>
+                    {partLink(p)}
+                  </a>
+                )}
+              </li>
+            ))}
+          </ol>
+        </details>
+      )
+    }
     <details class="dg__desc">
       <summary>Text description</summary>
       <p>{desc}</p>
     </details>
-    {download && <a class="dg__dl" href={`/downloads/diagrams/${id}.svg`} download>Download SVG</a>}
+    <span class="dg__actions">
+      {!narrow && kind === 'static' && (
+        <button type="button" class="dg-btn dg__zoom needs-js" data-zoom aria-pressed="false">
+          Show larger
+        </button>
+      )}
+      {
+        download && (
+          <>
+            <a class="dg__dl" href={`/downloads/diagrams/${id}.svg`} download>
+              Download SVG
+            </a>
+            <button type="button" class="dg-btn needs-js" data-print>
+              Print
+            </button>
+          </>
+        )
+      }
+    </span>
   </figcaption>
 </figure>
 
 <style>
   .dg {
+    container-type: inline-size;
     margin: 0;
     padding: var(--sp-4);
     background: var(--surface-sheet);
@@ -46,27 +297,148 @@ const desc = describe(svg);
     min-width: 0;
   }
 
+  /* On a phone the frame gives the drawing all the room it can: labels drawn for phones then stay at 12 pixels or more. */
+  @media (max-width: 30rem) {
+    .dg {
+      padding: var(--sp-2);
+    }
+  }
+
   .dg__art {
     position: relative;
+    min-width: 0;
+  }
+
+  .dg__view :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .dg__view--narrow {
+    display: none;
+  }
+
+  /* Below 44rem a wide drawing would shrink its labels under 12 pixels, so the phone layout takes over. */
+  @container (max-width: 44rem) {
+    .dg__view--wide.has-narrow {
+      display: none;
+    }
+
+    .dg__view--narrow {
+      display: block;
+      max-width: 24rem;
+      margin-inline: auto;
+    }
+  }
+
+  /* A wide drawing with no phone layout, shown larger on request: it then scrolls inside its own frame. */
+  .dg.is-large .dg__art {
     overflow-x: auto;
     overscroll-behavior-x: contain;
   }
 
-  .dg__art:focus-visible {
-    outline: 2px solid var(--cobalt-text);
+  .dg.is-large .dg__view--wide :global(svg) {
+    width: 42rem;
+    max-width: none;
+  }
+
+  .dg.is-large .dg__art:focus-visible {
+    outline: var(--focus-ring);
     outline-offset: 3px;
   }
 
-  .dg__art :global(svg) {
-    display: block;
-    width: 100%;
-    min-width: 34rem;
-    height: auto;
+  .dg__zoom {
+    display: none;
   }
+
+  @container (max-width: 44rem) {
+    .dg__zoom {
+      display: inline-flex;
+    }
+  }
+
+  /* ---------- Parts ---------- */
+
+  .dg :global(.dgp) {
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .dg :global(.dgp-hit) {
+    stroke: transparent;
+    stroke-width: 3;
+    transition: stroke var(--dur-fast) var(--ease);
+  }
+
+  .dg :global(a.dgp:focus) {
+    outline: none;
+  }
+
+  .dg :global(.dgp:hover .dgp-hit),
+  .dg :global(.dgp.is-active .dgp-hit) {
+    stroke: var(--cobalt-text);
+  }
+
+  .dg :global(a.dgp:focus-visible .dgp-hit) {
+    stroke: var(--cobalt-text);
+    stroke-width: 4;
+  }
+
+  .dg__stage {
+    display: grid;
+    gap: var(--sp-4);
+  }
+
+  @container (min-width: 62rem) {
+    .dg--explore .dg__stage {
+      grid-template-columns: minmax(0, 1fr) 15rem;
+      align-items: start;
+    }
+  }
+
+  .dg__readout {
+    padding: var(--sp-3) var(--sp-4);
+    border-top: 3px solid var(--navy-900);
+    background: var(--ivory-50);
+    font-size: 0.9375rem;
+    min-height: 7rem;
+  }
+
+  .dg__readout-hint {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  .dg__readout :global(.dg__key-name) {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    color: var(--navy-900);
+  }
+
+  .dg__readout :global(.dg__key-text) {
+    display: block;
+    margin-top: var(--sp-1);
+  }
+
+  .dg__readout :global(.dg__key-link) {
+    display: inline-block;
+    margin-top: var(--sp-2);
+    font-weight: 600;
+  }
+
+  .dg__readout :global(.dg__key-link)::after,
+  .dg__key-link::after {
+    content: ' \2192';
+  }
+
+  /* ---------- Caption ---------- */
 
   .dg__cap {
     display: grid;
-    gap: 0.3rem;
+    gap: 0.35rem;
     margin-top: var(--sp-3);
     padding-top: var(--sp-3);
     border-top: 1px solid var(--rule-hair);
@@ -77,13 +449,14 @@ const desc = describe(svg);
     font-weight: 600;
     color: var(--navy-900);
     display: flex;
+    flex-wrap: wrap;
     gap: 0.5rem;
     align-items: baseline;
   }
 
   .dg__hl {
     font-family: var(--font-ui);
-    font-size: 0.6875rem;
+    font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     color: var(--text-on-ink);
@@ -92,21 +465,29 @@ const desc = describe(svg);
     border-radius: 2px;
   }
 
-  .dg__text {
+  .dg__text,
+  .dg__how {
     font-size: 0.875rem;
     color: var(--text-muted);
   }
 
-  .dg__desc {
+  .dg__how {
+    color: var(--text-body);
+  }
+
+  .dg__desc,
+  .dg__parts {
     font-size: 0.875rem;
     color: var(--text-body);
   }
 
-  .dg__desc summary {
+  .dg__desc summary,
+  .dg__parts summary {
     cursor: pointer;
     color: var(--cobalt-text);
     font-weight: 600;
     width: max-content;
+    max-width: 100%;
   }
 
   .dg__desc p {
@@ -114,25 +495,467 @@ const desc = describe(svg);
     max-width: var(--text-max);
   }
 
+  .dg__key {
+    margin: var(--sp-2) 0 0;
+    padding-left: 1.25rem;
+    display: grid;
+    gap: var(--sp-2);
+  }
+
+  .dg__key li {
+    margin: 0;
+    max-width: var(--text-max);
+  }
+
+  .dg__key-name {
+    color: var(--navy-900);
+  }
+
+  .dg__key-text {
+    margin-left: 0.35rem;
+  }
+
+  .dg__key-link {
+    margin-left: 0.35rem;
+    font-weight: 600;
+  }
+
+  .dg__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-4);
+  }
+
+  .dg__actions:empty {
+    display: none;
+  }
+
   .dg__dl {
     font-size: 0.875rem;
     font-weight: 600;
-    width: max-content;
+  }
+
+  .dg-btn {
+    min-height: 2.25rem;
+    padding: 0.35rem 0.8rem;
+    border: 1px solid var(--rule-control);
+    border-radius: var(--radius-1);
+    background: var(--surface-sheet);
+    color: var(--navy-900);
+    font: 600 0.875rem/1.2 var(--font-ui);
+    cursor: pointer;
+  }
+
+  .dg-btn:hover {
+    border-color: var(--navy-900);
+  }
+
+  .dg-btn[aria-pressed='true'] {
+    background: var(--navy-900);
+    border-color: var(--navy-900);
+    color: var(--text-on-ink);
+  }
+
+  /* ---------- Switch ---------- */
+
+  .dg-switch {
+    margin: 0 0 var(--sp-4);
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .dg-switch legend {
+    margin-bottom: var(--sp-2);
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--navy-900);
+  }
+
+  .dg-switch__opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+  }
+
+  .dg-switch__opts label {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2.5rem;
+    padding: 0.35rem 0.8rem;
+    border: 1px solid var(--rule-control);
+    border-radius: var(--radius-1);
+    font-size: 0.9375rem;
+    cursor: pointer;
+    background: var(--surface-sheet);
+  }
+
+  .dg-switch__opts label:has(input:checked) {
+    border-color: var(--navy-900);
+    box-shadow: inset 0 0 0 1px var(--navy-900);
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .dg-switch__opts label:has(input:focus-visible) {
+    outline: var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  .dg-switch__opts input {
+    accent-color: var(--navy-900);
+    margin: 0;
+  }
+
+  .dg__states {
+    display: grid;
+    gap: var(--sp-6);
+  }
+
+  .dg.is-enhanced .dg__states {
+    gap: 0;
+  }
+
+  .dg__state-h,
+  .dg__panel-h {
+    margin: 0 0 var(--sp-2);
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .dg__state-note {
+    margin: var(--sp-3) 0 0;
+    font-size: 0.9375rem;
+    max-width: var(--text-max);
+  }
+
+  /* ---------- Compare ---------- */
+
+  .dg-pick {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: var(--sp-3) var(--sp-4);
+    margin-bottom: var(--sp-4);
+  }
+
+  .dg-pick__legend {
+    flex-basis: 100%;
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--navy-900);
+  }
+
+  .dg-pick__field {
+    display: grid;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    min-width: min(100%, 14rem);
+  }
+
+  .dg-pick select,
+  .dg-live select {
+    min-height: 2.5rem;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--rule-control);
+    border-radius: var(--radius-1);
+    background: var(--surface-sheet);
+    color: var(--text-body);
+    font: 500 0.9375rem/1.3 var(--font-ui);
+    max-width: 100%;
+  }
+
+  .dg-pick__same {
+    flex-basis: 100%;
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--signal-text);
+  }
+
+  .dg__panels {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+    gap: var(--sp-5);
+  }
+
+  .dg.is-enhanced .dg__panels {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @container (min-width: 38rem) {
+    .dg.is-enhanced .dg__panels {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .dg__panel {
+    min-width: 0;
+  }
+
+  .dg__art--panel {
+    max-width: 22rem;
+  }
+
+  .dg__art--panel :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .dg__facts {
+    margin: var(--sp-3) 0 0;
+    border-top: 1px solid var(--rule-hair);
+    font-size: 0.9375rem;
+  }
+
+  .dg__facts > div {
+    padding: var(--sp-2) 0;
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .dg__facts dt {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+
+  .dg__facts dd {
+    margin: 0.15rem 0 0;
+  }
+
+  .dg__facts > div.is-different {
+    border-left: 3px solid var(--navy-900);
+    padding-left: var(--sp-2);
+  }
+
+  .dg__differs {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--text-strong);
+  }
+
+  /* ---------- Live ---------- */
+
+  .dg-live {
+    display: grid;
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-4);
+  }
+
+  .dg-live__group {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr));
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .dg-live__group legend {
+    grid-column: 1 / -1;
+    margin-bottom: var(--sp-1);
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--navy-900);
+  }
+
+  .dg-field {
+    display: grid;
+    gap: 0.25rem;
+    align-content: start;
+    min-width: 0;
+  }
+
+  .dg-field label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-body);
+  }
+
+  .dg-field__box {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  .dg-field__fix {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .dg-field input {
+    width: 100%;
+    min-width: 0;
+    min-height: 2.5rem;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--rule-control);
+    border-radius: var(--radius-1);
+    background: var(--surface-sheet);
+    color: var(--text-body);
+    font: 500 1rem/1.3 var(--font-ui);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dg-field input[aria-invalid='true'],
+  .dg-field select[aria-invalid='true'] {
+    border-color: var(--signal-text);
+    box-shadow: inset 0 0 0 1px var(--signal-text);
+  }
+
+  .dg-field__err {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--signal-text);
+  }
+
+  .dg-live__actions {
+    margin: 0;
+  }
+
+  .dg-read {
+    display: grid;
+    gap: var(--sp-3);
+    margin-top: var(--sp-4);
+    font-size: 0.9375rem;
+  }
+
+  .dg-read :global(.dg-read__rows) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 8.5rem), 1fr));
+    gap: var(--sp-2) var(--sp-4);
+    margin: 0;
+  }
+
+  .dg-read :global(.dg-read__rows > div) {
+    padding-top: var(--sp-2);
+    border-top: 2px solid var(--navy-900);
+  }
+
+  .dg-read :global(.dg-read__rows dt) {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  .dg-read :global(.dg-read__rows dd) {
+    margin: 0.1rem 0 0;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--navy-900);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dg-read :global(.dg-read__table) {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .dg-read :global(.dg-read__table caption) {
+    text-align: left;
+    caption-side: top;
+    padding-bottom: var(--sp-2);
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
+
+  .dg-read :global(.dg-read__table th),
+  .dg-read :global(.dg-read__table td) {
+    padding: 0.4rem 0.5rem 0.4rem 0;
+    border-bottom: 1px solid var(--rule-hair);
+    text-align: right;
+    vertical-align: top;
+  }
+
+  .dg-read :global(.dg-read__table th:first-child) {
+    text-align: left;
+  }
+
+  .dg-read :global(.dg-read__table thead th) {
+    border-bottom: 2px solid var(--navy-900);
+    font-size: 0.8125rem;
+    color: var(--navy-900);
+  }
+
+  .dg-read :global(.dg-read__text) {
+    margin: 0;
+    max-width: var(--text-max);
+  }
+
+  .dg-read__nojs {
+    margin: var(--sp-2) 0 0;
+  }
+
+  /* ---------- Tree ---------- */
+
+  .dgt {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .dg-tree__tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+    margin: 0 0 var(--sp-3);
+  }
+
+  .dg__art--print {
+    display: none;
   }
 
   @media print {
     .dg {
       box-shadow: none;
       break-inside: avoid;
+      padding: 0;
+      border: 0;
     }
 
-    .dg__art :global(svg) {
-      min-width: 0;
+    .dg__view--wide.has-narrow {
+      display: block !important;
+    }
+
+    .dg__view--narrow {
+      display: none !important;
     }
 
     .dg__desc,
-    .dg__dl {
+    .dg__actions,
+    .dg__readout,
+    .dg-live,
+    .dg-switch,
+    .dg-pick,
+    .dg-tree__tools,
+    .dg__how {
+      display: none !important;
+    }
+
+    .dg-tree .dgt {
       display: none;
+    }
+
+    .dg__art--print {
+      display: block;
     }
   }
 </style>
+
+<script>
+  import '../../scripts/diagram';
+</script>
