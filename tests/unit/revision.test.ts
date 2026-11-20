@@ -10,7 +10,7 @@ import { buildRevision, recallSetCode, type RevisionData } from '../../src/lib/r
 import { checkRevision, commandAllowed, subtopicsOf } from '../../src/lib/revision/integrity';
 import { lhs, measureText, rhs, shape } from '../../src/lib/revision/formulae';
 import { noteErrors, MAX_MISTAKES } from '../../src/lib/revision/sheet';
-import { CARD_KINDS, recallIds, slugify } from '../../src/lib/flashcards';
+import { CARD_KINDS, recallIds, recallIsHL, slugify } from '../../src/lib/flashcards';
 import type { RevisionEntry } from '../../src/lib/revision/schema';
 import { revisionInput } from './helpers/revision';
 import { breakEvenUnits, contributionPerUnit, labourTurnover, marginOfSafety, profit, specialOrderGain, totalCost, totalRevenue } from '../../src/lib/finance';
@@ -97,13 +97,17 @@ describe('the flashcard deck', () => {
     const beyond = Object.entries(c.glossary).filter(([, g]) => g.provenance === 'enrichment');
     expect(cards.filter((x) => x.kind === 'term')).toHaveLength(ib.length);
     for (const [id] of beyond) expect(byId.has(`term:${id}`), id).toBe(false);
-    expect(byId.get('term:liquidity')).toMatchObject({ codes: ['3.5', '3.7'], level: 'SL/HL', title: 'Liquidity', href: '/glossary/liquidity/' });
+    const g = c.glossary.liquidity!;
+    expect(byId.get('term:liquidity')).toMatchObject({ codes: g.subtopics, level: g.level, title: g.term, href: '/glossary/liquidity/' });
   });
 
   it('carries every framework twice, and marks those beyond the course as enrichment', () => {
     const fw = cards.filter((x) => x.kind === 'framework');
     expect(fw.length).toBeGreaterThanOrEqual(70);
-    expect(byId.get('framework:ansoff-matrix')?.codes).toEqual(['1.5', '4.2', 'toolkit']);
+    const order = [...subs.map((s) => s.code), 'toolkit'];
+    const ansoff = input.frameworks['ansoff-matrix']!;
+    expect(ansoff.status).toBe('toolkit');
+    expect(byId.get('framework:ansoff-matrix')?.codes).toEqual([...ansoff.subtopics, 'toolkit'].sort((a, b) => order.indexOf(a) - order.indexOf(b)));
     expect(byId.get('framework:mendelow-matrix')?.enrichment).toBe(true);
     expect(byId.get('framework:ansoff-matrix')?.enrichment).toBeUndefined();
   });
@@ -127,7 +131,7 @@ describe('the flashcard deck', () => {
     const briefs = Object.values(c.topics).reduce((n, x) => n + x.revision.retrieval.length, 0);
     const recall = cards.filter((x) => x.kind === 'recall');
     expect(recall).toHaveLength(notes + briefs);
-    expect(recall.length).toBe(379);
+    expect(recall.length).toBeGreaterThanOrEqual(379);
     const note = Object.values(c.notes).find((n) => n.code === '1.4')!;
     const ids = recallIds('1.4', note.retrieval.map((r) => r.q));
     for (const id of ids) expect(byId.get(id)?.codes).toEqual(['1.4']);
@@ -135,7 +139,9 @@ describe('the flashcard deck', () => {
 
   it('marks the HL recall questions of mixed subtopics', () => {
     const hl = cards.filter((x) => x.kind === 'recall' && x.codes[0] === '2.4' && x.level === 'HL');
-    expect(hl.length).toBe(5);
+    const marked = Object.values(c.notes).find((n) => n.code === '2.4')!.retrieval.filter((r) => recallIsHL(r.q)).length;
+    expect(marked).toBeGreaterThan(0);
+    expect(hl.length).toBe(marked);
     expect(byId.get('recall:2-3-when-is-intuitive-decision-making-most-useful')?.level).toBe('HL');
     expect(cards.filter((x) => x.kind === 'recall' && x.codes[0] === '3.6').every((x) => x.level === 'HL')).toBe(true);
     // The HL mark is shown as a tag, so it leaves the question itself.

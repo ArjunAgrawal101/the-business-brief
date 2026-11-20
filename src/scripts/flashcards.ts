@@ -209,6 +209,7 @@ each('[data-ix="flashcards"]', (root) => {
     const total = session.log.length + session.queue.length;
     if (progress) progress.textContent = `Card ${n} of ${total} · ${MODE_LABELS[mode]}`;
     cardEl!.setAttribute('aria-label', `${KIND_SHORT[card.kind]} card, ${n} of ${total}`);
+    cardEl!.dataset.cardId = card.id;
     const when = today();
     RATINGS.forEach((r) => {
       const el = rateGroup!.querySelector<HTMLElement>(`[data-when="${r}"]`);

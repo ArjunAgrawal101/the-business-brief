@@ -47,7 +47,7 @@ export type Target =
   | { kind: 'case'; id: string; exists: boolean }
   | { kind: 'decision'; id: string; exists: boolean }
   | { kind: 'toolkit'; id: string; exists: boolean; level?: string }
-  | { kind: 'revision'; id: string; exists: boolean }
+  | { kind: 'revision'; id: string; exists: boolean; level?: string }
   | { kind: 'unknown-topic'; slug: string }
   | { kind: 'page'; path: string };
 
@@ -74,14 +74,20 @@ export function resolveTarget(href: string, c: Corpus): Target {
     const tool = c.tools[second];
     return { kind: 'toolkit', id: second, exists: Boolean(tool && tool.status === 'complete'), level: tool?.level };
   }
-  if (first === 'revision' && second) return { kind: 'revision', id: second, exists: has(c.topics, second) };
+  // Quick revision: a sheet for every subtopic at its topic page's slug, and the flashcards page.
+  if (first === 'revision' && second === 'flashcards') return { kind: 'page', path };
+  if (first === 'revision' && second) {
+    const sub = subtopicRefs(c).find((s) => s.slug === second);
+    return { kind: 'revision', id: second, exists: Boolean(sub), level: sub?.level };
+  }
   return { kind: 'page', path };
 }
 
-/** True when a link leads to material the guide makes HL only: an HL-only subtopic, an HL section of notes, or an HL-only tool. */
+/** True when a link leads to material the guide makes HL only: an HL-only subtopic or its revision sheet, an HL section of notes, or an HL-only tool. */
 export function isHlTarget(t: Target): boolean {
   if (t.kind === 'subtopic') return t.level === 'HL' || t.section?.level === 'HL';
   if (t.kind === 'toolkit') return t.level === 'HL';
+  if (t.kind === 'revision') return t.level === 'HL';
   return false;
 }
 

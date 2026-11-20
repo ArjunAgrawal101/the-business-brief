@@ -12,6 +12,7 @@ import type { Corpus } from './integrity';
 import type { NavGroup } from './navigation';
 import type { SearchEntry, SearchKind } from './search';
 import { normalize } from './search';
+import { slugify } from './flashcards';
 
 export interface SearchLinks {
   subtopic(code: string): string;
@@ -313,8 +314,10 @@ export function buildSearchIndex(input: IndexInput): SearchEntry[] {
     });
   for (const [id, d] of Object.entries(input.diagrams ?? {}))
     add({ kind: 'resources', type: 'Diagram', title: d.title, url: `/diagrams/#diagram-${id}`, text: d.caption ?? '', keys: '', units: d.group === 'toolkit' ? ['toolkit', ...unitsOf(d.syllabus)] : unitsOf(d.syllabus), codes: d.syllabus.filter((x) => x !== 'toolkit'), hl: d.level === 'HL' });
-  for (const [id, t] of Object.entries(c.topics).sort((a, b) => codeKey(a[1].code) - codeKey(b[1].code)))
-    add({ kind: 'resources', type: 'Revision brief', title: `Revision brief: ${t.code} ${t.title}`, url: links.revision(id), text: 'The key points, the traps, the formulas and retrieval questions on one printable page.', keys: t.title, units: [unitOf(t.code)], codes: [t.code], hl: t.level === 'HL' });
+  // Quick revision: a sheet for every subtopic, at its topic page's slug, and the flashcards for the whole course.
+  for (const { s } of subtopics)
+    add({ kind: 'resources', type: 'Revision sheet', title: `Revision sheet: ${s.code} ${s.title}`, url: links.revision(slugify(s.title)), text: 'Key definitions, formulae, frameworks, common mistakes and short exercises, on one printable sheet.', keys: s.title, units: [unitOf(s.code)], codes: [s.code], hl: s.level === 'HL' });
+  add({ kind: 'resources', type: 'Flashcards', title: 'Flashcards', url: '/revision/flashcards/', text: 'The course as flashcards: terms, formulae, frameworks, distinctions, scenarios and recall questions, with spaced repetition kept on your device.', keys: 'flashcards spaced repetition Leitner recall', units: [], codes: [], hl: false });
 
   // Every link in the menu, then the rooms' own pages, the pathways and the other pages: each once.
   for (const g of input.nav)

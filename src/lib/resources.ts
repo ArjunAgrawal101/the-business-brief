@@ -1,7 +1,7 @@
 /**
  * The Resources Library's catalogue: the curated entries (resources.yaml)
  * and entries generated from the content itself (mindmaps, briefs, notes,
- * revision briefs, cases, Decision Rooms, tools and practice). A download is
+ * revision sheets, cases, Decision Rooms, tools and practice). A download is
  * listed only when its file exists: a file in public/, or one the build
  * itself writes (the glossary CSV and the mindmap SVGs). The build fails on a
  * download whose file is missing.
@@ -9,7 +9,7 @@
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { getCollection } from 'astro:content';
-import { corpus, href } from './content';
+import { corpus, href, slug } from './content';
 import { subtopicHref } from './learning';
 import { RESOURCE_TYPE_LABELS, type RESOURCE_TYPES } from './schemas';
 import { DIAGRAMS, DIAGRAM_GROUPS } from './diagrams';
@@ -141,29 +141,35 @@ export function library(): Promise<LibraryItem[]> {
         units: [unitOf(t.code)],
         subtopics: [t.code],
         primary: { kind: 'page', href: href.topic(id), label: 'Read the brief' },
-        secondary: { href: href.revision(id), label: 'Revision brief' },
+        secondary: { href: href.revision(id), label: 'Revision sheet' },
         contents: t.sections.map((s) => s.title),
         updated: '2026-10-29',
         order: order++,
         curated: false,
       });
-      items.push({
-        id: `revision-${id}`,
-        title: `${t.code} ${t.title}: revision brief`,
-        summary: `One printable page: the key ideas of ${t.title.toLowerCase()}, with retrieval questions.`,
-        type: 'revision-brief',
-        typeLabel: RESOURCE_TYPE_LABELS['revision-brief'],
-        qualification: 'ib-dp-bm',
-        audiences: ['students'],
-        level: t.level === 'HL' ? 'HL' : 'SL/HL',
-        units: [unitOf(t.code)],
-        subtopics: [t.code],
-        primary: { kind: 'print', href: href.revision(id), label: 'Open and print' },
-        contents: [],
-        updated: '2026-10-29',
-        order: order++,
-        curated: false,
-      });
+    }
+
+    // Quick revision: a printable sheet for every subtopic, at the slug of its page in the topic library.
+    for (const u of c.curricula['ib-dp-bm']?.units ?? []) {
+      for (const s of u.subtopics) {
+        items.push({
+          id: `revision-${slug(s.title)}`,
+          title: `${s.code} ${s.title}: revision sheet`,
+          summary: `Key definitions, formulae, frameworks, common mistakes and short exercises for ${s.title}, on one printable sheet.`,
+          type: 'revision-brief',
+          typeLabel: RESOURCE_TYPE_LABELS['revision-brief'],
+          qualification: 'ib-dp-bm',
+          audiences: ['students', 'teachers', 'independent'],
+          level: s.level === 'HL' ? 'HL' : 'SL/HL',
+          units: [u.number],
+          subtopics: [s.code],
+          primary: { kind: 'print', href: href.revision(slug(s.title)), label: 'Open and print' },
+          contents: ['Key definitions', 'Formulae', 'Frameworks', 'Common examination mistakes', 'Short application exercises'],
+          updated: '2026-11-20',
+          order: order++,
+          curated: false,
+        });
+      }
     }
 
     for (const [, n] of Object.entries(c.notes)) {
@@ -179,6 +185,7 @@ export function library(): Promise<LibraryItem[]> {
         units: [unitOf(n.code)],
         subtopics: [n.code],
         primary: { kind: 'page', href: subtopicHref(c, n.code), label: 'Read the notes' },
+        secondary: { href: href.revision(slug(n.title)), label: 'Revision sheet' },
         contents: n.sections.map((s) => s.title),
         updated: n.updated,
         order: order++,
