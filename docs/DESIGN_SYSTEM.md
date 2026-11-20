@@ -181,18 +181,24 @@ Drawn by `src/lib/mindmap.ts`, the same code on the server and in the browser. A
 | Evaluation | #A8463F |
 | Connection | #5B6678 |
 
-Readers can fold a branch, switch between the full map and a revision view of the core nodes, zoom with the buttons, the keyboard or Ctrl and the wheel (a plain wheel scrolls the page: there is no scroll hijacking), pan by dragging, print the whole map, and download a branded SVG or PNG with the fonts embedded. On a phone the map opens folded to its branches. An outline of the same content follows every map for screen readers and for reading. On maps of HL-only subtopics the nodes carry no HL tag; the map's own level says it.
+Readers can fold a branch, switch between the full map and a revision view of the core nodes, zoom with the buttons, the keyboard or Ctrl and the wheel (a plain wheel scrolls the page: there is no scroll hijacking), pan by dragging, print the whole map, and download a branded SVG or PNG with the fonts embedded. No text in a map is under 13 units, and the map opens at a zoom where that is 12 pixels or more, centred on its subject; Whole map fits all of it. An outline of the same content follows every map for screen readers and for reading, each branch folding on its own; the revision view and Expand all or Branches only apply to it too.
+
+On a phone a map opens as its outline, and Map switches to the drawing, folded to its branches. The phone's toolbar keeps Map or Outline, the revision view and zoom, and puts the rest under More. On maps of HL-only subtopics the nodes carry no HL tag; the map's own level says it.
+
+The index at `/mindmaps/` previews each map by what it holds: its branches in order, each with a bar for the number of ideas under it in the branch's colour, and the count of ideas and branches; each unit says how many maps and ideas it has.
 
 ## Diagrams
 
-79 original diagrams in `src/lib/figures/`, drawn from data with the primitives in `src/lib/figures/kit.ts`: models, processes, structures and charts for all five units and the toolkit.
+The diagram library (`src/lib/diagrams.ts`, drawings in `src/lib/figures/`), drawn from data with the primitives in `src/lib/figures/kit.ts`: models, processes, structures and charts for all five units and the toolkit. The library page (`/diagrams/`) is a catalogue, unit by unit, and every diagram has a page of its own (`/diagrams/<id>/`) with where it is used; subtopic pages, notes and framework pages show them too.
 
 - One visual language: navy for structure, gold for the accent and for "the business", cobalt for revenue and the reader's focus, green for gains, red for losses, washes for areas; Inter labels, Source Serif titles.
 - Every chart's numbers are computed in code from stated, fictional assumptions, and the unit tests pin them to values worked by hand; the figure says it is fictional.
-- Every diagram has a `<title>` and a full `<desc>`; the page shows the same text under "Text description".
-- On narrow screens a diagram keeps a readable size (34 rem minimum) and scrolls sideways in its own focusable region.
-- Each downloads as a standalone SVG with a white ground and a credit line (`/downloads/diagrams/<id>.svg`).
-- A checking script (used in QA) screenshots every diagram and fails on any label that leaves its frame or overlaps another label.
+- Every diagram has a `<title>` and a full `<desc>`; the page shows the same text under "Text description". The newer ones also have a one-sentence text alternative, which names the drawing while the description describes it.
+- A diagram fits its frame at every width and never scrolls sideways. Below a 44 rem frame a diagram with a layout for phones (`narrow`, 300 units wide with no text under 14 units, so labels stay at 12 pixels or more on a 320 pixel screen) shows that instead; every framework diagram and every new diagram has one, built from two shared layouts in `src/lib/figures/narrow.ts` (a two by two grid and a stack of boxes) or redrawn as a chart. A diagram without one fits the frame and can be shown larger on request.
+- Parts a reader can explore are links to where each is taught: hover, focus or a first tap shows the part's explanation beside or under the drawing, and every part is also listed in words.
+- Interactions (switch between states, compare two panels, change the figures, open and close a decision tree) are drawn complete on the server; see INTERACTIONS.md, 52 to 68.
+- Each downloads as a standalone SVG with a white ground and a credit line (`/downloads/diagrams/<id>.svg`), and Print prints the diagram alone, as it stands.
+- A checking script (used in QA) opens every diagram's page on a desktop and on a 320 pixel phone and fails on any label that leaves its frame, overlaps another label, or, in a phone layout, is under 12 pixels.
 
 ## Charts in the tools
 

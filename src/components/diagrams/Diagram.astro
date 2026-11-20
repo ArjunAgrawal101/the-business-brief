@@ -327,7 +327,7 @@ const panels = ix?.kind === 'compare' ? ix.panels.map((p) => ({ ...p, svg: ix.dr
 
     .dg__view--narrow {
       display: block;
-      max-width: 24rem;
+      max-width: 22rem;
       margin-inline: auto;
     }
   }
@@ -618,6 +618,11 @@ const panels = ix?.kind === 'compare' ? ix.panels.map((p) => ({ ...p, svg: ix.dr
 
   .dg.is-enhanced .dg__states {
     gap: 0;
+  }
+
+  /* With the choice made above it, the state's own heading would only repeat the button. */
+  .dg.is-enhanced .dg__state-h {
+    display: none;
   }
 
   .dg__state-h,
