@@ -217,7 +217,8 @@ each('[data-ix="connections"]', (root) => {
 
   /* ---------- Start ---------- */
 
-  setFocusable(codeOf(nodes[0] ?? document.createElementNS('http://www.w3.org/2000/svg', 'a')));
+  // One stop in the tab order for the whole ring: the first subtopic until another is reached.
+  if (nodes[0]) setFocusable(codeOf(nodes[0]));
   // A subtopic page links to its entry (#t-3-5): choose it on the map too.
   const fromHash = /^#t-(\d)-(\d)$/.exec(location.hash);
   if (fromHash) {
@@ -228,4 +229,7 @@ each('[data-ix="connections"]', (root) => {
     }
   }
   paint();
+  // On a narrow screen the drawing is wider than its region: start with the middle of the ring in view.
+  const region = root.querySelector<HTMLElement>('[data-map]');
+  if (region && region.scrollWidth > region.clientWidth) region.scrollLeft = (region.scrollWidth - region.clientWidth) / 2;
 });
