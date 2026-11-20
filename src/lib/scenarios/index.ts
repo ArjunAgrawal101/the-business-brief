@@ -7,9 +7,10 @@ import { build, generate, MAX_SEED, parseCode } from './engine';
 import { TOOLKIT } from './kit';
 import { UNIT1 } from './families/unit1';
 import { UNIT2 } from './families/unit2';
+import { UNIT3 } from './families/unit3';
 import type { Family, Scenario } from './types';
 
-export const FAMILIES: Family[] = [...UNIT1, ...UNIT2];
+export const FAMILIES: Family[] = [...UNIT1, ...UNIT2, ...UNIT3];
 
 export { UNITS } from './types';
 
