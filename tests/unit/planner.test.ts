@@ -14,7 +14,10 @@ import {
   gapFor,
   isoWeekday,
   kindCounts,
+  dayMonth,
+  longDay,
   makePlan,
+  shortDay,
   parsePlanner,
   plannerIcs,
   plannerProgress,
@@ -127,6 +130,14 @@ describe('the rules as numbers', () => {
     expect(fmtMinutes(40)).toBe('40 min');
     expect(fmtMinutes(90)).toBe('1 h 30 min');
     expect(fmtMinutes(120)).toBe('2 h');
+  });
+
+  it('writes days out the same way everywhere', () => {
+    expect(longDay('2027-02-15')).toBe('Monday 15 February 2027');
+    expect(shortDay('2026-11-23')).toBe('Mon 23 Nov');
+    expect(dayMonth('2026-12-01')).toBe('1 December');
+    expect(longDay('soon')).toBe('soon');
+    expect(isoWeekday(dayNum('2026-11-22')!)).toBe(7);
   });
 });
 

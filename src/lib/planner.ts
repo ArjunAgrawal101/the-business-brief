@@ -157,12 +157,32 @@ export const WEEKDAYS = [
   { n: 7, name: 'Sunday', short: 'Sun' },
 ] as const;
 
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+/** A day's parts, written out the same way in every browser (locales differ on commas). */
+const parts = (s: string) => {
+  const n = dayNum(s)!;
+  const d = new Date(n * DAY_MS);
+  return { wd: WEEKDAYS[isoWeekday(n) - 1]!, day: d.getUTCDate(), month: MONTHS[d.getUTCMonth()]!, year: d.getUTCFullYear() };
+};
 /** "Tuesday 1 December 2026". */
-export const longDay = (s: string): string => (isDay(s) ? new Date(`${s}T12:00:00Z`).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }) : s);
+export const longDay = (s: string): string => {
+  if (!isDay(s)) return s;
+  const p = parts(s);
+  return `${p.wd.name} ${p.day} ${p.month} ${p.year}`;
+};
 /** "Tue 1 Dec". */
-export const shortDay = (s: string): string => (isDay(s) ? new Date(`${s}T12:00:00Z`).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }) : s);
+export const shortDay = (s: string): string => {
+  if (!isDay(s)) return s;
+  const p = parts(s);
+  return `${p.wd.short} ${p.day} ${p.month.slice(0, 3)}`;
+};
 /** "1 December". */
-export const dayMonth = (s: string): string => (isDay(s) ? new Date(`${s}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' }) : s);
+export const dayMonth = (s: string): string => {
+  if (!isDay(s)) return s;
+  const p = parts(s);
+  return `${p.day} ${p.month}`;
+};
 
 /** 40 as "40 min", 90 as "1 h 30 min", 120 as "2 h". */
 export function fmtMinutes(m: number): string {

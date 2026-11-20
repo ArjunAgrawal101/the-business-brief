@@ -589,7 +589,13 @@ export const QUEUE_MAX = 7;
 export const QUEUE_SENTENCE =
   'In this order: the sessions your revision plan sets for today or has left overdue, then flashcards that are due, then your weakest subtopics, then subtopics at your level you have not started.';
 
-const dayWords = (day: string) => new Date(`${day}T12:00:00Z`).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
+const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+/** "Thursday 19 November", written out the same way in every browser. */
+const dayWords = (day: string) => {
+  const d = new Date(`${day}T12:00:00Z`);
+  return `${WEEKDAY_NAMES[d.getUTCDay()]} ${d.getUTCDate()} ${MONTH_NAMES[d.getUTCMonth()]}`;
+};
 
 /**
  * The revision queue for today: what to do next, most pressing first, each
