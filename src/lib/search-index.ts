@@ -312,7 +312,7 @@ export function buildSearchIndex(input: IndexInput): SearchEntry[] {
       hl: m.level === 'HL',
     });
   for (const [id, d] of Object.entries(input.diagrams ?? {}))
-    add({ kind: 'resources', type: 'Diagram', title: d.title, url: `/diagrams/#diagram-${id}`, text: d.caption ?? '', keys: '', units: d.group === 'toolkit' ? ['toolkit', ...unitsOf(d.syllabus)] : unitsOf(d.syllabus), codes: d.syllabus.filter((x) => x !== 'toolkit'), hl: d.level === 'HL' });
+    add({ kind: 'resources', type: 'Diagram', title: d.title, url: `/diagrams/${id}/`, text: d.caption ?? '', keys: '', units: d.group === 'toolkit' ? ['toolkit', ...unitsOf(d.syllabus)] : unitsOf(d.syllabus), codes: d.syllabus.filter((x) => x !== 'toolkit'), hl: d.level === 'HL' });
   for (const [id, t] of Object.entries(c.topics).sort((a, b) => codeKey(a[1].code) - codeKey(b[1].code)))
     add({ kind: 'resources', type: 'Revision brief', title: `Revision brief: ${t.code} ${t.title}`, url: links.revision(id), text: 'The key points, the traps, the formulas and retrieval questions on one printable page.', keys: t.title, units: [unitOf(t.code)], codes: [t.code], hl: t.level === 'HL' });
 

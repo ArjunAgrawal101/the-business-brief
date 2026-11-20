@@ -88,7 +88,7 @@ export function resolveRef(id: string, ctx: RefContext): RefLink | undefined {
   const t = ctx.tools[id];
   if (t) return { id, kind: 'tool', title: t.name, href: t.status === 'complete' ? `/toolkit/${id}/` : `/toolkit/#tool-${id}`, label: 'Toolkit guide' };
   const d = ctx.diagrams[id];
-  if (d) return { id, kind: 'diagram', title: d.title, href: `/diagrams/#diagram-${id}`, label: 'Diagram' };
+  if (d) return { id, kind: 'diagram', title: d.title, href: `/diagrams/${id}/`, label: 'Diagram' };
   return undefined;
 }
 
