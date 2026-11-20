@@ -204,6 +204,27 @@ export function latest(days: string[]): string | undefined {
   return [...days].sort((a, b) => dateKey(b).localeCompare(dateKey(a)))[0];
 }
 
+/** "February 2025": the month and year of a date, whether or not it names a day. */
+function monthYear(iso: string): string {
+  const { year, month } = parseDate(iso);
+  return `${MONTHS[month - 1] ?? ''} ${year}`;
+}
+
+/**
+ * The span of the developments the briefing covers, computed from their dates
+ * for the hub's copy: "from February 2025 to October 2026", or "in October
+ * 2026" when every date falls in one month; empty when there are none.
+ */
+export function developmentSpan(dates: string[]): string {
+  const sorted = [...dates].sort((a, b) => dateKey(a).localeCompare(dateKey(b)));
+  const first = sorted[0];
+  const last = sorted[sorted.length - 1];
+  if (first === undefined || last === undefined) return '';
+  const from = monthYear(first);
+  const to = monthYear(last);
+  return from === to ? `in ${from}` : `from ${from} to ${to}`;
+}
+
 /** Newest first; items on the same date keep a stable order by id. */
 export function byDateDesc<T extends { date: string }>(entries: Array<[string, T]>): Array<[string, T]> {
   return [...entries].sort((a, b) => dateKey(b[1].date).localeCompare(dateKey(a[1].date)) || a[0].localeCompare(b[0]));

@@ -124,6 +124,33 @@ describe('the briefing', () => {
     for (const it of Object.values(items)) expect(['2024', '2025', '2026']).toContain(it.date.slice(0, 4));
   });
 
+  it('names the issuing organization as the publisher of a document read on a site that republishes it, and says where it was read', () => {
+    // Investegate republishes the London Stock Exchange's regulatory announcements; PR Newswire and GlobeNewswire distribute releases.
+    const republishers: Array<[RegExp, RegExp]> = [
+      [/^https:\/\/www\.investegate\.co\.uk\//, /Investegate/],
+      [/^https:\/\/www\.prnewswire\.com\//, /PR Newswire/],
+    ];
+    for (const [id, it] of Object.entries(items)) {
+      for (const s of it.sources) {
+        const where = `${id} ${s.id}`;
+        expect(s.publisher, where).not.toMatch(/investegate|newswire/i);
+        for (const [host, named] of republishers) if (host.test(s.url)) expect(s.note ?? '', where).toMatch(named);
+      }
+    }
+  });
+
+  it('marks every fact that rests only on undated pages as at the day they were read', () => {
+    for (const [id, it] of Object.entries(items)) {
+      const byId = new Map(it.sources.map((s) => [s.id, s]));
+      for (const [part, list] of factLists(it)) {
+        list.forEach((f, i) => {
+          const cited = f.sources.map((sid) => byId.get(sid));
+          if (cited.length && cited.every((s) => s && !s.published)) expect(f.asAt, `${id} ${part} ${i + 1}`).toBe(true);
+        });
+      }
+    }
+  });
+
   it('links every item to a toolkit tool, a framework or a platform tool, and keeps frameworks beyond the course labelled by the library', () => {
     for (const [id, it] of Object.entries(items)) {
       expect(it.concepts.tools.length + it.concepts.frameworks.length + it.concepts.apply.length, id).toBeGreaterThan(0);
