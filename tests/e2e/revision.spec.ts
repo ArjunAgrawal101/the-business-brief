@@ -127,6 +127,8 @@ test.describe('Quick revision: a sheet', () => {
   test('prints as a sheet: the controls and the site around it go, and the outlines open', async ({ page }) => {
     await page.goto('/revision/stakeholders/');
     await page.emulateMedia({ media: 'print' });
+    // Printing opens every disclosure first (src/scripts/print.ts), as the browser's print does.
+    await page.evaluate(() => window.dispatchEvent(new Event('beforeprint')));
     await expect(page.locator('.rs__actions')).toBeHidden();
     await expect(page.locator('.site-header')).toBeHidden();
     await expect(page.locator('.rs__pager')).toBeHidden();
@@ -243,7 +245,14 @@ test.describe('Flashcards', () => {
     await page.selectOption('#fc-kind', 'formula');
     await expect(page).toHaveURL(/\?topic=3\.6&type=formula$/);
     await count({ unit: '3', code: '3.6', kind: 'formula' });
+    // 3.6 is HL only, but a formula it shares with 3.5, such as capital employed, is SL content too.
     await page.selectOption('#fc-level', 'sl');
+    const shared = select(deck, { unit: '3', code: '3.6', kind: 'formula', level: 'sl' });
+    expect(shared.length).toBeGreaterThan(0);
+    expect(shared.every((c) => c.codes.some((code) => code !== '3.6'))).toBe(true);
+    await count({ unit: '3', code: '3.6', kind: 'formula', level: 'sl' });
+    expect(select(deck, { unit: '3', code: '3.6', kind: 'recall', level: 'sl' })).toEqual([]);
+    await page.selectOption('#fc-kind', 'recall');
     await expect(status(page)).toHaveText('No cards match these choices. Clear one of them to see more.');
     await expect(page.getByRole('button', { name: /^Study every card here/ })).toBeDisabled();
     await page.selectOption('#fc-unit', '1');

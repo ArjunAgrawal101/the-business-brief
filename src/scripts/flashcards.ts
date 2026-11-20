@@ -322,7 +322,7 @@ each('[data-ix="flashcards"]', (root) => {
     if (b?.dataset.rating) rate(b.dataset.rating as Rating);
   });
   root.querySelector('[data-end]')?.addEventListener('click', () => finish('Session ended early.'));
-  summaryBox.querySelector('[data-back]')?.addEventListener('click', () => {
+  summaryBox.querySelector('[data-to-setup]')?.addEventListener('click', () => {
     showSetup();
     startBtn('due')?.focus();
   });
