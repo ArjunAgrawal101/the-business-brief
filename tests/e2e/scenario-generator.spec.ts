@@ -9,8 +9,8 @@
  * without JavaScript.
  */
 import { expect, test, type Page } from '@playwright/test';
-import { FAMILIES, filtered, scenarioFor } from '../../src/lib/scenarios/index';
-import type { Scenario } from '../../src/lib/scenarios/types';
+import { FAMILIES, filtered, scenarioFor } from '../../src/lib/scenario-generator';
+import type { Scenario } from '../../src/lib/scenario-generator/types';
 
 const CODE = 'entry-route-7';
 const s = scenarioFor(CODE)!;
@@ -18,7 +18,7 @@ const bestId = (q: { choices: Array<{ id: string; verdict: string }> }) => q.cho
 
 async function open(page: Page, query = `?s=${CODE}`) {
   await page.goto(`/decision-room/scenarios/${query}`);
-  const root = page.locator('[data-ix="scenarios"]');
+  const root = page.locator('[data-ix="scenario-generator"]');
   await expect(root).toHaveClass(/is-enhanced/);
   return root;
 }
@@ -104,7 +104,7 @@ test.describe('a scenario, step by step', () => {
     await open(page);
     await page.evaluate(() => localStorage.removeItem('bb:scenarios'));
     await page.reload();
-    await expect(page.locator('[data-ix="scenarios"]')).toHaveClass(/is-enhanced/);
+    await expect(page.locator('[data-ix="scenario-generator"]')).toHaveClass(/is-enhanced/);
     // A figure that is not a number is refused beside the field.
     await page.locator(`input[name="sg-problem"][value="${bestId(s.problem)}"]`).check();
     await check(page, 'problem');
@@ -147,7 +147,7 @@ test.describe('a scenario, step by step', () => {
     expect(stored.items[0].verdicts.analysis).toBe('fair');
     await expectDeclared(page);
     await page.reload();
-    await expect(page.locator('[data-ix="scenarios"]')).toHaveClass(/is-enhanced/);
+    await expect(page.locator('[data-ix="scenario-generator"]')).toHaveClass(/is-enhanced/);
     await expect(page.locator('[data-end-body]')).toBeVisible();
     await expect(page.locator('.sg-step.is-done')).toHaveCount(6);
     await expect(page.locator('[data-record]')).toContainText(s.title);

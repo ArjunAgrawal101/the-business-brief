@@ -1,5 +1,5 @@
 /**
- * The shape of a generated business scenario. A family (src/lib/scenarios/
+ * The shape of a generated business scenario. A family (src/lib/scenario-generator/
  * families/) is a template: from a seed it makes one variant, with its own
  * business, place, size and figures. Every scenario is fictional and every
  * exhibit simulated; the six steps follow the way an IB answer is built:

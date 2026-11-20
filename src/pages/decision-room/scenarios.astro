@@ -1,7 +1,7 @@
 ---
 /**
  * The Business Scenario Generator: original fictional scenarios, generated
- * from templates and a seed (src/lib/scenarios/), worked in six steps with
+ * from templates and a seed (src/lib/scenario-generator/), worked in six steps with
  * feedback at each, a model answer outline and a summary at the end. A
  * scenario is shared by its code, ?s=<family>-<seed>; results are kept on
  * this device in bb:scenarios; the families can be filtered by unit,
@@ -14,11 +14,11 @@ import SectionHead from '../../components/layout/SectionHead.astro';
 import { corpus } from '../../lib/content';
 import { allSubtopics, subtopicHref } from '../../lib/learning';
 import { jsonForScript } from '../../lib/markup';
-import { DEFAULT_CODE, FAMILIES, UNITS, facets, scenarioFor } from '../../lib/scenarios/index';
-import { TOOLKIT } from '../../lib/scenarios/kit';
-import { headHtml, scenarioHtml, type RenderContext } from '../../lib/scenarios/render';
-import { STEP_IDS, STEP_TITLES } from '../../lib/scenarios/types';
-import '../../styles/scenarios.css';
+import { DEFAULT_CODE, FAMILIES, UNITS, facets, scenarioFor } from '../../lib/scenario-generator';
+import { TOOLKIT } from '../../lib/scenario-generator/kit';
+import { headHtml, scenarioHtml, type RenderContext } from '../../lib/scenario-generator/render';
+import { STEP_IDS, STEP_TITLES } from '../../lib/scenario-generator/types';
+import '../../styles/scenario-generator.css';
 
 const c = await corpus();
 const subs = allSubtopics(c);
@@ -68,7 +68,7 @@ const jsonLd = {
   </PageIntro>
 
   <div class="wrap page-body">
-    <div class="sg" data-ix="scenarios" id="sg">
+    <div class="sg" data-ix="scenario-generator" id="sg">
       <script type="application/json" data-config set:html={jsonForScript(config)} />
       <p class="state state--error" data-error hidden>The generator could not start in this browser. The scenario below is complete, with every answer explained, but new scenarios cannot be made.</p>
 
@@ -174,5 +174,5 @@ const jsonLd = {
 </BaseLayout>
 
 <script>
-  import '../../scripts/scenarios';
+  import '../../scripts/scenario-generator';
 </script>

@@ -7,11 +7,11 @@
  * reopens where it was left. The filters narrow the families by unit,
  * subtopic and tool, and are kept in the address too.
  */
-import { FAMILIES, DEFAULT_CODE, MAX_SEED, filtered, matches, parseCode, readFilters, scenarioFor, type Filters } from '../lib/scenarios/index';
-import { MIN_JUSTIFY_WORDS, VERDICT_WORDS, readNumber, stepVerdicts, wordCount, type Answers } from '../lib/scenarios/check';
-import { feedbackHtml, headHtml, scenarioHtml, summaryHtml, type RenderContext } from '../lib/scenarios/render';
-import { STORAGE_KEY, find, readRecord, upsert, type Record_ } from '../lib/scenarios/store';
-import { STEP_IDS, STEP_TITLES, type Scenario, type StepId } from '../lib/scenarios/types';
+import { FAMILIES, DEFAULT_CODE, MAX_SEED, filtered, matches, parseCode, readFilters, scenarioFor, type Filters } from '../lib/scenario-generator';
+import { MIN_JUSTIFY_WORDS, VERDICT_WORDS, readNumber, stepVerdicts, wordCount, type Answers } from '../lib/scenario-generator/check';
+import { feedbackHtml, headHtml, scenarioHtml, summaryHtml, type RenderContext } from '../lib/scenario-generator/render';
+import { STORAGE_KEY, find, readRecord, upsert, type Record_ } from '../lib/scenario-generator/store';
+import { STEP_IDS, STEP_TITLES, type Scenario, type StepId } from '../lib/scenario-generator/types';
 import { announce, each, escapeHtml, readConfig } from './ix';
 import { readItem, writeItem } from './storage';
 
@@ -22,7 +22,7 @@ interface Config {
 
 const randomSeed = () => 1 + Math.floor(Math.random() * MAX_SEED);
 
-each('[data-ix="scenarios"]', (root) => {
+each('[data-ix="scenario-generator"]', (root) => {
   const cfg = readConfig<Config>(root);
   const $ = <T extends HTMLElement>(sel: string, from: ParentNode = root) => from.querySelector<T>(sel);
   const $$ = <T extends HTMLElement>(sel: string, from: ParentNode = root) => [...from.querySelectorAll<T>(sel)];
