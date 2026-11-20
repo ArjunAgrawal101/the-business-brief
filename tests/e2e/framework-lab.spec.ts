@@ -182,9 +182,10 @@ test.describe('the Lab without JavaScript', () => {
       await expect(page.locator('[data-outputs] .sx-out__block').first()).toBeVisible();
       await expect(page.locator('[data-outputs] svg.chart').first()).toBeVisible();
       const visible = await page.evaluate(() =>
+        // checkVisibility sees what a size alone does not: a button inside a closed disclosure (the header's search panel) is not shown.
         [...document.querySelectorAll('button')].filter((b) => {
           const r = b.getBoundingClientRect();
-          return r.width > 0 && r.height > 0;
+          return r.width > 0 && r.height > 0 && b.checkVisibility();
         }).length,
       );
       expect(visible).toBe(0);
