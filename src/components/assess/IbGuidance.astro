@@ -1,5 +1,10 @@
 ---
-/** Advice from the IB teacher support material, paraphrased, each item with its page. */
+/**
+ * Advice from the IB teacher support material, paraphrased, each item with
+ * its page. It carries its own label: official guidance for teachers, not a
+ * requirement of the guide and not a report of what examiners have said.
+ */
+import GuideLabel from '../centre/GuideLabel.astro';
 import { href } from '../../lib/content';
 import { inline } from '../../lib/markup';
 
@@ -13,16 +18,16 @@ const { items } = Astro.props;
   items.length > 0 && (
     <div class="ibg">
       <p class="ibg__head">
-        <span class="tag tag--source">From IB guidance</span>
+        <GuideLabel kind="tsm" />
         <span class="small muted">
-          Paraphrased from the <a href={href.source('ib-bm-tsm-2022')}>Business management teacher support material</a> (2022). It is guidance for
-          teachers, not a report of what examiners have said.
+          Paraphrased from the <a href={href.source('ib-bm-tsm-2022')}>Business management teacher support material</a> (2022), with its pages. It is the
+          IB's guidance for teachers: not a requirement of the guide, and not a report of what examiners have said.
         </span>
       </p>
       <ul class="ibg__list">
         {items.map((g) => (
           <li>
-            <span set:html={inline(g.text)} /> <span class="ibg__loc">{g.location}</span>
+            <span set:html={inline(g.text)} /> <span class="ibg__loc">{g.location.replace(/^TSM, /, '')}</span>
           </li>
         ))}
       </ul>
@@ -34,7 +39,7 @@ const { items } = Astro.props;
   .ibg {
     padding: var(--sp-4) var(--sp-5);
     border: 1px solid var(--rule);
-    border-left: 4px solid var(--bb-cobalt);
+    border-left: 4px solid var(--navy-900);
     background: var(--surface-sheet);
   }
 
@@ -55,7 +60,6 @@ const { items } = Astro.props;
   }
 
   .ibg__loc {
-    font-family: var(--font-mono);
     font-size: 0.75rem;
     color: var(--text-muted);
     white-space: nowrap;
