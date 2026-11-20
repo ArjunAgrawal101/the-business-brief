@@ -13,7 +13,7 @@ import PageIntro from '../../components/layout/PageIntro.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import { corpus } from '../../lib/content';
 import { allSubtopics, subtopicHref } from '../../lib/learning';
-import { jsonForScript } from '../../lib/markup';
+import { esc, jsonForScript } from '../../lib/markup';
 import { DECISIONS } from '../../lib/stakeholder-impact/decisions';
 import { DEFAULT_SETTINGS, GROUPS, GROUP_INFO, NOTE_MAX, PARAMS, PARAM_IDS, RULES, simulate } from '../../lib/stakeholder-impact/model';
 import { gridListHtml, gridSvg, impactHtml, promptsHtml, settingsLine, tradeoffsHtml } from '../../lib/stakeholder-impact/render';
@@ -31,8 +31,17 @@ const subtopics = Object.fromEntries(
     return [code, { title: s.title, href: subtopicHref(c, code), hl: s.level === 'HL' }];
   }),
 );
-const serves = (codesOf: string[]) => ['1.4', ...codesOf].map((code) => ({ code, ...subtopics[code]! }));
+/** The same markup the script writes when the decision changes. */
+const servesHtml = (codesOf: string[]) =>
+  ['1.4', ...codesOf]
+    .map((code) => {
+      const s = subtopics[code]!;
+      return `<a href="${esc(s.href)}">${esc(`${code} ${s.title}`)}</a>${s.hl ? ' (HL)' : ''}`;
+    })
+    .join(', ');
 const config = { subtopics };
+/** Each setting's options, typed once here: a generic cast inside the template would read as a tag. */
+const optionsOf = (k: (typeof PARAM_IDS)[number]): ReadonlyArray<{ id: string; label: string }> => PARAMS[k].options;
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'LearningResource',
@@ -66,16 +75,16 @@ const jsonLd = {
         <h2 class="si-h" id="si-set-h"><span class="si-h__no" aria-hidden="true">1</span> The decision</h2>
         <p class="nojs-only si-nojs">Scripts are off, so this is the worked example: {first.business} with the settings below. Turn scripts on to choose another decision or change the settings.</p>
         <div class="field si-field js-only">
-          <label for="si-decision">Business and decision</label>
+          <label for="si-decision">Decision</label>
           <select id="si-decision" class="si-select" data-decision>
-            {DECISIONS.map((d) => <option value={d.id}>{`${d.title}: ${d.business}`}</option>)}
+            {DECISIONS.map((d) => <option value={d.id}>{d.title}</option>)}
           </select>
         </div>
         <div class="si-brief" data-brief>
           <p class="si-brief__where"><span data-business>{first.business}</span>, <span data-place>{first.place}</span> <span class="tag tag--simulated">Fictional</span></p>
           <p class="si-brief__text" data-brief-text>{first.brief}</p>
           <p class="si-brief__serves small">
-            Draws on <span data-serves>{serves(first.subtopics).map((s, i) => (<>{i > 0 && ', '}<a href={s.href}>{`${s.code} ${s.title}`}</a>{s.hl && ' (HL)'}</>))}</span>
+            Draws on <span data-serves set:html={servesHtml(first.subtopics)} />
           </p>
         </div>
 
@@ -90,7 +99,7 @@ const jsonLd = {
                   <span class="si-param__q">{PARAMS[k].question}</span>
                 </legend>
                 <div class="si-param__opts">
-                  {(PARAMS[k].options as ReadonlyArray<{ id: string; label: string }>).map((o) => (
+                  {optionsOf(k).map((o) => (
                     <label class="si-opt">
                       <input type="radio" name={`si-${k}`} value={o.id} checked={DEFAULT_SETTINGS[k] === o.id} />
                       <span>{o.label}</span>
@@ -168,7 +177,7 @@ const jsonLd = {
           DECISIONS.map((d) => (
             <li>
               <h3 class="si-decisions__title">{d.title}</h3>
-              <p class="si-decisions__where">{`${d.business}, ${d.place}`}</p>
+              <p class="si-decisions__where">{d.business + ', ' + d.place}</p>
               <p>{d.brief}</p>
             </li>
           ))

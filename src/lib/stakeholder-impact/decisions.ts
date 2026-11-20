@@ -20,8 +20,8 @@ export const DECISIONS: Decision[] = [
     },
     effects: {
       employees: { short: -2.5, long: -1, power: 5, interest: 9, why: 'Jobs on the folding lines go, and the staff who stay must learn to run and maintain the new machines.', mitigation: 'redundancy pay, retraining for maintenance roles and help to find work' },
-      customers: { short: -0.5, long: 1.5, power: 6, interest: 4, why: 'Installation can delay orders for a few weeks; after that the line runs faster with fewer faulty cartons.' },
-      owners: { short: -1.5, long: 2.5, power: 9, interest: 9, why: 'The machines cost a large sum up front and pay back through a lower labour cost per carton and more output.' },
+      customers: { short: -0.5, long: 1.2, power: 6, interest: 4, why: 'Installation can delay orders for a few weeks; after that the line runs faster with fewer faulty cartons.' },
+      owners: { short: -1, long: 2.5, power: 9, interest: 9, why: 'The machines cost a large sum up front and pay back through a lower labour cost per carton and more output.' },
       suppliers: { short: 0.5, long: 0.5, power: 3, interest: 4, why: 'The machine maker wins a contract, and more output means more board and glue bought.' },
       government: { short: -0.5, long: 0.5, power: 6, interest: 3, why: 'Job losses cost the state income tax and support payments at first; a more productive firm pays more tax on its profit later.' },
       community: { short: -1.5, long: -0.5, power: 3, interest: 6, why: 'Households lose a wage, and local shops lose some of their spending.', mitigation: 'a training fund run with the local college and priority hiring for local people' },

@@ -90,12 +90,17 @@
 }
 
 .si-brief__where {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.25rem 0.5rem;
   font-weight: 600;
   color: var(--text-strong);
+}
+
+.si-brief__where .tag {
+  margin-left: 0.35rem;
+  vertical-align: 0.1em;
+}
+
+.si-brief__text {
+  font-size: 0.9375rem;
 }
 
 .si-nojs {
@@ -270,14 +275,14 @@
   color: var(--text-strong);
 }
 
-.si-group__size::before,
-.si-group__when::before {
+.si-group__size::before {
   content: "\00b7";
   margin-right: 0.5rem;
   color: var(--text-muted);
 }
 
 .si-group__when {
+  flex-basis: 100%;
   color: var(--text-muted);
 }
 
