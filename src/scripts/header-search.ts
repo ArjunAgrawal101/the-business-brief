@@ -8,7 +8,8 @@
  */
 import { prepare, suggest, type Prepared, type Suggestion } from '../lib/suggest';
 import { highlight, queryWords } from '../lib/search';
-import { LEARNER_KEY, parseLog, type VisitKind } from '../lib/learner';
+import { LEARNER_KEY, recentVisits, type VisitKind } from '../lib/learner';
+import { readItem } from './storage';
 
 const VISIT_LABEL: Record<VisitKind, string> = {
   topic: 'Subtopic',
@@ -60,14 +61,7 @@ if (root && input && status && results && list && all && recent && recentList) {
   const metaOf = (s: Suggestion) => [s.type, s.codes.slice(0, 2).join(', '), s.hl ? 'HL' : ''].filter(Boolean).join(' · ');
 
   const showRecent = () => {
-    let visits: Array<{ title: string; url: string; kind: VisitKind }>;
-    try {
-      visits = parseLog(JSON.parse(localStorage.getItem(LEARNER_KEY) ?? 'null')).visits;
-    } catch {
-      visits = [];
-    }
-    const here = location.pathname;
-    const shown = visits.filter((v) => v.url !== here).slice(0, 6);
+    const shown = recentVisits(readItem(LEARNER_KEY), 6, location.pathname);
     recentList.replaceChildren(...shown.map((v) => row(v.title, v.url, VISIT_LABEL[v.kind])));
     recent.hidden = !shown.length;
   };
