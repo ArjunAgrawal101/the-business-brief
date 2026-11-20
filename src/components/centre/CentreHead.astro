@@ -49,9 +49,7 @@ const trail = [{ label: 'Assessment Centre', href: '/assessment/' }, ...(parent 
 <style>
   .ch {
     padding-block: var(--sp-6) var(--sp-7);
-    background:
-      radial-gradient(ellipse at 90% 0%, rgba(44, 70, 117, 0.6), transparent 55%),
-      var(--surface-ink);
+    background: var(--surface-ink);
     color: var(--text-on-ink);
   }
 
@@ -84,7 +82,7 @@ const trail = [{ label: 'Assessment Centre', href: '/assessment/' }, ...(parent 
   .ch__hl {
     padding: 0.15rem 0.55rem;
     border: 1px solid var(--gold-400);
-    border-radius: 999px;
+    border-radius: var(--radius-1);
     letter-spacing: 0.08em;
   }
 
@@ -102,20 +100,18 @@ const trail = [{ label: 'Assessment Centre', href: '/assessment/' }, ...(parent 
     color: var(--text-on-ink-muted);
   }
 
+  /* A hairline above each figure, so the cells line up however the grid wraps. */
   .ch__stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+    align-items: start;
+    column-gap: var(--sp-5);
     margin-top: var(--sp-6);
-    border-top: 1px solid var(--rule-on-ink);
   }
 
   .ch__stats > div {
-    padding: var(--sp-4) var(--sp-4) 0 0;
-  }
-
-  .ch__stats > div + div {
-    padding-left: var(--sp-4);
-    border-left: 1px solid var(--rule-on-ink);
+    padding: var(--sp-3) 0 var(--sp-3);
+    border-top: 1px solid var(--rule-on-ink);
   }
 
   .ch__stats dt {
@@ -146,9 +142,9 @@ const trail = [{ label: 'Assessment Centre', href: '/assessment/' }, ...(parent 
   }
 
   @media (max-width: 40rem) {
-    .ch__stats > div:nth-child(n) {
-      padding-left: 0;
-      border-left: 0;
+    .ch__stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--sp-4);
     }
   }
 </style>

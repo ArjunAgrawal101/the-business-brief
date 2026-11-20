@@ -13,7 +13,7 @@ import CentreHead from '../../../components/centre/CentreHead.astro';
 import GuideLabel from '../../../components/centre/GuideLabel.astro';
 import IaToolNav from '../../../components/centre/IaToolNav.astro';
 import IaIntegrity from '../../../components/centre/IaIntegrity.astro';
-import { PURPOSES, VOICES } from '../../../lib/ia-tools';
+import { PURPOSES, VOICES, toolPosition } from '../../../lib/ia-tools';
 import '../../../styles/centre.css';
 import '../../../styles/ia-tools.css';
 
@@ -24,14 +24,14 @@ const KINDS = [
   ['transcript', 'Transcript of audio or video'],
   ['textbook', 'Textbook or class notes'],
 ] as const;
-const RULES = [
+const RULES: Array<[string, string]> = [
   ['Three to five supporting documents, from which most of the project’s information comes.', 'Guide, p. 53'],
   ['Published within three years before you submit; submission is in April or October of the final year.', 'Guide, p. 54'],
-  ['At most one transcript of audio or video, from a reliable organization, traceable to the original.', 'Guide, p. 54'],
-  ['Primary research as a document: the blank questionnaire and a tally, or the interview or focus group questions and a summary.', 'Guide, p. 54'],
+  ['At most one transcript of audio or video, and it must give the essential points of the original; use material from a reliable organization, referenced so the original can be traced.', 'Guide, p. 54'],
+  ['Primary research as a document should include the blank questionnaire and a tally or summary of responses, or the interview or focus group questions and a summary.', 'Guide, p. 54'],
   ['Your own selection: documents must not be provided by your teacher.', 'Guide, p. 55'],
-  ['No document longer than the equivalent of five A4 pages is recommended.', 'Guide, p. 55'],
-  ['Highlight the parts you use; translate highlighted parts not in your registered language; label each document.', 'Guide, p. 55'],
+  ['You must highlight the parts of each document that relate to your project, and translate any highlighted part not in the language you are registered in.', 'Guide, p. 55'],
+  ['You should label each document ("Supporting document 1" and so on) and place them at the end. The guide recommends that none exceeds the equivalent of five A4 pages.', 'Guide, p. 55'],
   ['Textbooks and class notes are referenced, but not accepted as supporting documents.', 'Guide, p. 55'],
   ['A range of ideas and views is strongly recommended; documents from one company, or surveys of similar people, lack balance.', 'Guide, p. 54'],
   ['Criterion B, 4 marks: at the top level, relevant, sufficiently in-depth and a range of ideas and views.', 'Guide, p. 57'],
@@ -47,7 +47,7 @@ const RULES = [
   <CentreHead
     crumb="Supporting documents"
     parent={{ label: 'Internal assessment', href: '/assessment/internal-assessment/' }}
-    kicker="Internal assessment · Tool 2 of 5"
+    kicker={`Internal assessment · ${toolPosition('documents')}`}
     title="Supporting documents"
     lead="List your candidate documents. Each one is questioned on its origin, purpose, date, reliability and relevance, and the set is checked against the guide's rules. The feedback is for your thinking: your teacher guides your selection."
     stats={[
@@ -60,14 +60,8 @@ const RULES = [
   <div class="wrap page-body it-page">
     <IaToolNav current="documents" />
 
-    <section class="it-sec" aria-labelledby="sd-rules-h">
-      <SectionHead no="01" title="What the guide requires" id="sd-rules-h" />
-      <p class="ce-labels"><GuideLabel kind="ib" /></p>
-      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s}</span></li>)}</ul>
-    </section>
-
     <section class="it-sec" aria-labelledby="sd-tool-h">
-      <SectionHead no="02" title="Your documents" id="sd-tool-h" dek="Find more than five candidates, then keep the strongest three to five (TSM, p. 71). Mark the ones you will submit as selected." />
+      <SectionHead no="01" title="Your documents" id="sd-tool-h" dek="Find more than five candidates, then keep the strongest three to five (TSM, p. 71). Mark the ones you will submit as selected." />
       <div class="it-tool" data-ix="ia-documents">
         <p class="state state--error" data-error hidden>The checks could not start. You can still fill in and print the list.</p>
         <p class="sr-only" aria-live="polite" data-live></p>
@@ -161,6 +155,7 @@ const RULES = [
         </div>
         <div class="it-out js-only">
           <p class="it-out__k">Each document, questioned</p>
+          <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="strategy" /> <span class="ce-cite">The date, textbook and primary research rules are the guide's (pp. 54 to 55); the other questions are the platform's</span></p>
           <div class="table-scroll" role="region" aria-label="Source evaluation of each document" tabindex="0">
             <table class="table sd-eval">
               <thead>
@@ -177,7 +172,6 @@ const RULES = [
             </table>
           </div>
           <div class="sd-notes" data-notes></div>
-          <p class="small muted">The three-year rule and the rules on textbooks and primary research are the guide's. The other questions are the platform's way of weighing a source: a recommended strategy.</p>
         </div>
 
         <div class="it-export js-only">
@@ -192,6 +186,12 @@ const RULES = [
         </div>
         <p class="nojs-only small muted">With JavaScript off you can fill in and print the list, but nothing is checked or saved.</p>
       </div>
+    </section>
+
+    <section class="it-sec" aria-labelledby="sd-rules-h">
+      <SectionHead no="02" title="What the guide requires" id="sd-rules-h" />
+      <p class="ce-labels"><GuideLabel kind="ib" /> <span class="ce-cite">Business management guide; the page follows each rule</span></p>
+      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s.replace(/^Guide, /, '')}</span></li>)}</ul>
     </section>
 
     <section class="it-sec" aria-labelledby="sd-ex-h">

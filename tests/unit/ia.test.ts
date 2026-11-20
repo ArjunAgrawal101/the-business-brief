@@ -1,5 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import { ageInMonths, checkDocuments, daysBefore, earliestAllowed, monthIndex, selfMarkTotal, wordStatus, type SupportingDoc } from '../../src/lib/ia';
+import {
+  ageInMonths,
+  checkDocuments,
+  dateFinding,
+  daysBefore,
+  earliestAllowed,
+  monthIndex,
+  publishedRange,
+  selfMarkTotal,
+  submissionMonth,
+  threeYearRule,
+  wordStatus,
+  type SupportingDoc,
+} from '../../src/lib/ia';
 
 const doc = (over: Partial<SupportingDoc> = {}): SupportingDoc => ({
   title: 'Annual report',
@@ -32,6 +45,49 @@ describe('dates', () => {
   });
 });
 
+describe('the three-year rule, to the month (guide, p. 54)', () => {
+  it('reads a month, or a year whose month is not known', () => {
+    expect(publishedRange('2025-03')).toEqual({ from: 2025 * 12 + 2, to: 2025 * 12 + 2 });
+    expect(publishedRange(' 2025 ')).toEqual({ from: 2025 * 12, to: 2025 * 12 + 11 });
+    expect(publishedRange('March 2025')).toBeNull();
+    expect(publishedRange('2025-13')).toBeNull();
+  });
+
+  it('counts from the month of submission: the same month three years earlier still counts, the month before does not', () => {
+    // Submitting in April 2027, the earliest allowed is April 2024.
+    expect(threeYearRule('2024-04', '2027-04')).toBe('within');
+    expect(threeYearRule('2024-03', '2027-04')).toBe('too-old');
+    expect(threeYearRule('2027-04', '2027-04')).toBe('within');
+    expect(threeYearRule('2027-05', '2027-04')).toBe('after');
+    // October submissions count back to October.
+    expect(threeYearRule('2023-10', '2026-10')).toBe('within');
+    expect(threeYearRule('2023-09', '2026-10')).toBe('too-old');
+  });
+
+  it('judges a year without its month only when every month of it falls on one side', () => {
+    expect(threeYearRule('2025', '2027-04')).toBe('within');
+    expect(threeYearRule('2023', '2027-04')).toBe('too-old');
+    expect(threeYearRule('2024', '2027-04')).toBe('unclear');
+    expect(threeYearRule('2027', '2027-04')).toBe('unclear');
+    expect(threeYearRule('2028', '2027-04')).toBe('after');
+  });
+
+  it('says when a date or the submission is missing or cannot be read', () => {
+    expect(threeYearRule('', '2027-04')).toBe('missing');
+    expect(threeYearRule('soon', '2027-04')).toBe('unreadable');
+    expect(threeYearRule('2026-01', '')).toBe('no-submission');
+  });
+
+  it('words the finding for the reader, naming the earliest month allowed', () => {
+    expect(dateFinding('Survey', '2024-03', '2027-04')?.text).toBe('Survey: published more than three years before submission (the earliest allowed is April 2024).');
+    expect(dateFinding('Survey', '2024', '2027-04')?.severity).toBe('advice');
+    expect(dateFinding('Survey', '2024', '2027-04')?.text).toContain('Add the month');
+    expect(dateFinding('Survey', '2026-01', '2027-04')).toBeNull();
+    expect(submissionMonth(2027, 'april')).toBe('2027-04');
+    expect(submissionMonth(2026, 'october')).toBe('2026-10');
+  });
+});
+
 describe('supporting documents', () => {
   const five = [1, 2, 3, 4, 5].map((k) => doc({ title: `D${k}`, publisher: `P${k}` }));
 
@@ -39,9 +95,11 @@ describe('supporting documents', () => {
     expect(problems(five)).toEqual([]);
   });
 
-  it('requires three to five, and warns that more than five caps criterion B at 1', () => {
+  it('requires three to five, and warns that more than five caps criterion B at 1, as the guide sets it', () => {
     expect(problems(five.slice(0, 2))[0]?.text).toMatch(/three to five/);
-    expect(problems([...five, doc({ title: 'D6', publisher: 'P6' })])[0]?.text).toMatch(/criterion B to 1 mark/);
+    const six = problems([...five, doc({ title: 'D6', publisher: 'P6' })])[0];
+    expect(six?.text).toMatch(/criterion B to 1 mark/);
+    expect(six?.source).toBe('Guide, p. 57');
   });
 
   it('advises four or five when only three are chosen', () => {

@@ -16,11 +16,13 @@ import AnswerBuilder from '../../components/centre/AnswerBuilder.astro';
 import FactList from '../../components/assess/FactList.astro';
 import IbGuidance from '../../components/assess/IbGuidance.astro';
 import { corpus, href } from '../../lib/content';
-import { GUIDES } from '../../lib/guides';
+import { EVERY_PAPER, GUIDES, claimFacts } from '../../lib/guides';
+import { CREATOR_GUIDE } from '../../lib/guide-labels';
 import '../../styles/centre.css';
 
 const c = await corpus();
 const p2 = c.assessment['paper-2'];
+const G = CREATOR_GUIDE['paper-2'];
 const questions = Object.entries(c.questions).filter(([, q]) => q.paperStyle === 'paper-2');
 // Break-even chart: 0 to 500 kayaks across 460 px from x = 60; $0 to $250,000 up 280 px from y = 300.
 const X = (q: number) => 60 + q * 0.92;
@@ -44,18 +46,19 @@ const LOSSES = [
       { value: '1 h 30 | 1 h 45', label: 'Duration', note: "SL | HL, plus 5 minutes' reading" },
       { value: '40 | 50', label: 'Marks', note: 'SL | HL' },
       { value: '35% | 30%', label: 'Weighting', note: 'of the final grade, SL | HL' },
-      { value: 'Provided', label: 'Formulae', note: 'a copy is given in the examination' },
+      { value: 'Provided', label: 'Formulae', note: 'a copy in the examination, as in every paper' },
     ]}
   />
 
   <div class="wrap page-body ce">
-    <LabelKey />
+    <LabelKey compact />
 
     <section class="ce-sec" aria-labelledby="p2-how-h">
       <SectionHead no="01" title="How Paper 2 works" id="p2-how-h" dek="Most questions are quantitative, the stimulus mixes text with tables, charts and infographics, and Section B assesses evaluation (AO3)." />
       <p class="ce-labels"><GuideLabel kind="ib" /></p>
-      {p2 && <FactList facts={p2.facts} />}
+      {p2 && <FactList facts={[...p2.facts, ...claimFacts(c.claims, EVERY_PAPER)]} />}
       <h3 class="ce-h3">The two papers, drawn to scale</h3>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <span class="ce-cite">Guide, pp. 39 to 40, 42 to 44 and 46 to 47</span></p>
       <div class="p2-scales">
         <div>
           <p class="label">Standard Level · 40 marks · 1 h 30 min · 35%</p>
@@ -71,13 +74,17 @@ const LOSSES = [
           <thead><tr><th scope="col"></th><th scope="col">Standard Level</th><th scope="col">Higher Level</th></tr></thead>
           <tbody>
             <tr><th scope="row">Syllabus</th><td>Units 1 to 5, excluding HL extension topics</td><td>Units 1 to 5, including HL extension topics</td></tr>
-            <tr><th scope="row">Section A</th><td>All structured questions, 20 marks (two in recent papers)</td><td>All structured questions, 30 marks (three in recent papers)</td></tr>
+            <tr><th scope="row">Section A</th><td>All structured questions, 20 marks</td><td>All structured questions, 30 marks</td></tr>
             <tr><th scope="row">Section B</th><td>One of two questions (20 marks), each with structured parts and a 10-mark extended response</td><td>The same structure, 20 marks</td></tr>
             <tr><th scope="row">Social enterprise</th><td>One Section B option may be set on one</td><td>Assessed in Paper 3 instead</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="small muted"><GuideLabel kind="examiner" /> From May 2027, explain questions in Paper 2 carry 3 marks, or 6 when two things are explained, as in Paper 1 (May 2026 subject report, as cited in the Paper 2 guide).</p>
+      <p class="ce-labels"><GuideLabel kind="examiner" /> <span class="ce-cite">{G}, p. 1</span></p>
+      <ul class="ce-p small">
+        <li>In recent papers, as the Paper 2 assessment guide records them, Section A had two structured questions at SL and three at HL. The guide itself does not fix the number.</li>
+        <li>The Paper 2 assessment guide reports, from the May 2026 subject report, that from May 2027 explain questions in Paper 2 carry 3 marks, or 6 when two things are explained, as in Paper 1.</li>
+      </ul>
     </section>
 
     <section class="ce-sec" aria-labelledby="p2-read-h">
@@ -121,7 +128,7 @@ const LOSSES = [
         </div>
       </div>
       <h3 class="ce-h3">Connecting the parts</h3>
-      <p class="ce-labels"><GuideLabel kind="examiner" /> <GuideLabel kind="example" /></p>
+      <p class="ce-labels"><GuideLabel kind="examiner" /> <GuideLabel kind="example" /> <span class="ce-cite">{G}, p. 2</span></p>
       <p class="ce-p">Later questions, above all the extended response, should draw on all the relevant stimulus, not only the paragraph before them (November 2025 report). Your own earlier results count as evidence too.</p>
       <div class="table-scroll ce-scroll" role="region" aria-label="Table: Part, What it gives you, Where it is used again" tabindex="0">
         <table class="ce-table">
@@ -135,10 +142,10 @@ const LOSSES = [
         </table>
       </div>
       <div class="ce-card p2-room">
-        <p class="ce-labels"><GuideLabel kind="ib" /></p>
+        <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="strategy" /> <span class="ce-cite">Guide, pp. 43 and 64 to 66</span></p>
         <h3>What you are given in the room</h3>
-        <p><b>The formulae copy.</b> SL and HL: gross profit margin, profit margin, ROCE, current ratio, acid test ratio, ARR. HL only: stock turnover, debtor days, creditor days, gearing, NPV, capacity utilization, productivity.</p>
-        <p><b>Also:</b> a discount table when an HL question needs one. Every calculation can be done with a four-function calculator. The copy is not exhaustive: learn the others, such as break-even, margin of safety, payback and working capital.</p>
+        <p><b>The formulae copy,</b> in every paper. SL and HL: gross profit margin, profit margin, ROCE, current ratio, acid test ratio, ARR. HL only: stock turnover, debtor days, creditor days, gearing, NPV, capacity utilization, productivity.</p>
+        <p><b>Also:</b> a discount table when an HL question needs one. Any calculation can be done with a four-function calculator, and graphic display calculators are allowed. The copy is not exhaustive, so learn the formulae it leaves out, such as break-even, margin of safety, payback and working capital.</p>
       </div>
     </section>
 
@@ -156,7 +163,7 @@ const LOSSES = [
 
       <div class="ce-split">
         <div class="ce-card">
-          <p class="ce-labels"><GuideLabel kind="examiner" /> <GuideLabel kind="example" /></p>
+          <p class="ce-labels"><GuideLabel kind="examiner" /> <GuideLabel kind="example" /> <span class="ce-cite">{G}, p. 3</span></p>
           <h3>Presenting a numerical answer</h3>
           <p>Calculate Kestrel's profit margin for 2025. Profit before interest and tax was $16,000 and sales revenue was $190,000.</p>
           <dl class="ce-dl">
@@ -167,9 +174,9 @@ const LOSSES = [
           </dl>
         </div>
         <div class="ce-card">
-          <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+          <p class="ce-labels"><GuideLabel kind="examiner" /> <GuideLabel kind="tsm" /> <span class="ce-cite">{G}, p. 3; TSM, p. 60</span></p>
           <h3>The own figure rule</h3>
-          <p>If a later part uses an earlier answer that was wrong, examiners can still credit a correct method, but only if your working shows the figure you used (teacher support material; May 2025 report).</p>
+          <p>If a later part uses an earlier answer that was wrong, examiners can still credit a correct method, but only if your working shows the figure you used. The teacher support material says so, and the Paper 2 assessment guide cites the May 2025 subject report.</p>
           <dl class="ce-dl">
             <div><dt>With working</dt><dd>$60,000 ÷ $250 = 240 kayaks: the method can be credited</dd></div>
             <div><dt>Without</dt><dd>240 kayaks: nothing to trace, so nothing to credit</dd></div>
@@ -179,7 +186,7 @@ const LOSSES = [
       </div>
 
       <h3 class="ce-h3">Where calculation marks are lost</h3>
-      <p class="ce-labels"><GuideLabel kind="examiner" /></p>
+      <p class="ce-labels"><GuideLabel kind="examiner" /> <span class="ce-cite">{G}, p. 3</span></p>
       <div class="table-scroll ce-scroll" role="region" aria-label="Table: Problem, What subject reports describe, Instead" tabindex="0">
         <table class="ce-table">
           <thead><tr><th scope="col">Problem</th><th scope="col">What subject reports describe</th><th scope="col">Instead</th></tr></thead>
@@ -208,10 +215,11 @@ const LOSSES = [
       </ol>
       <div class="ce-split">
         <div class="ce-card">
-          <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="strategy" /></p>
+          <p class="ce-labels"><GuideLabel kind="strategy" /></p>
           <h3>The 10-mark extended response</h3>
           <p><b>Evidence</b> (figures from across the stimulus, and your own results), <b>theory</b> (tools that explain why the figures matter) and <b>stakeholders</b> (who gains, who loses, and by how much) feed the <b>weighing</b>: which effects matter most? Compare size, likelihood and timing, and say what the data cannot show. Then a <b>justified conclusion</b>: a decision where the question asks for one, and the condition it depends on.</p>
-          <p class="small muted"><GuideLabel kind="examiner" /> The 9 to 10 markband requires an explanation of the limitations of the stimulus material; subject reports (May 2024, November 2024) state that without it, marks are limited to 8 out of 10. A judgement is needed when the question asks you to choose; a discuss question needs a supported conclusion (May 2024, May 2026).</p>
+          <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="examiner" /> <span class="ce-cite">Guide, pp. 45 and 48; {G}, p. 4</span></p>
+          <p class="small">The 9 to 10 markband asks for an explanation of the limitations of the stimulus material. The Paper 2 assessment guide reports that subject reports (May 2024, November 2024) limit an answer without it to 8 out of 10, and that a judgement is needed when the question asks you to choose, while a discuss question needs a supported conclusion (May 2024, May 2026).</p>
         </div>
         <div class="ce-card">
           <p class="ce-labels"><GuideLabel kind="example" /></p>
@@ -231,7 +239,7 @@ const LOSSES = [
 
     <section class="ce-sec" aria-labelledby="p2-con-h">
       <SectionHead no="05" title="Constructions in IB format" id="p2-con-h" dek="What a fully credited construction looks like. Each uses Kestrel's figures." />
-      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="example" /></p>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="example" /> <span class="ce-cite">Statement layouts: guide, pp. 59 to 63</span></p>
       <div class="p2-cons">
         <figure class="p2-con">
           <figcaption><b>Statement of profit or loss</b> Kestrel Kayaks, year ended 31 December 2025</figcaption>
@@ -277,7 +285,8 @@ const LOSSES = [
             <text x="290" y="342" text-anchor="middle" class="p2-axis-t">Output (kayaks)</text>
             <text x="16" y="160" text-anchor="middle" transform="rotate(-90 16 160)" class="p2-axis-t">Costs and revenue ($000)</text>
           </svg>
-          <p class="small muted">A title, labelled axes with units, a proportional scale, named lines, and break-even and margin of safety marked. Without a correct scale, line marks are unavailable (reports).</p>
+          <p class="small muted">A title, labelled axes with units, a proportional scale, named lines, and break-even and margin of safety marked.</p>
+          <p class="small"><GuideLabel kind="examiner" /> Without a correct scale, the marks for the lines are not available, as the Paper 2 assessment guide (p. 5) reports from subject reports.</p>
         </figure>
 
         <figure class="p2-con">
@@ -328,7 +337,6 @@ const LOSSES = [
         p2 && p2.ibGuidance.length > 0 && (
           <>
             <h3 class="ce-h3">Advice from the IB's teacher support material</h3>
-            <p class="ce-labels"><GuideLabel kind="ib" /></p>
             <IbGuidance items={p2.ibGuidance} />
           </>
         )
@@ -337,13 +345,14 @@ const LOSSES = [
         <Checklist
           id="p2-handin"
           title="Before you hand in"
+          standing="strategy"
           items={[
-            { id: 'stages', text: 'Formula, substitution, working, unit, for every calculation', label: 'examiner' },
-            { id: 'round', text: 'One rounding, at the end', label: 'examiner' },
-            { id: 'comment', text: 'Every comment says what the figure means', label: 'strategy' },
-            { id: 'format', text: 'Constructions in IB format, labelled', label: 'ib' },
-            { id: 'own', text: 'Section B uses your own results', label: 'examiner' },
-            { id: 'limit', text: 'A limitation explained, and a justified conclusion', label: 'examiner' },
+            { id: 'stages', text: 'Formula, substitution, working, unit, for every calculation' },
+            { id: 'round', text: 'One rounding, at the end' },
+            { id: 'comment', text: 'Every comment says what the figure means' },
+            { id: 'format', text: 'Constructions in IB format, labelled' },
+            { id: 'own', text: 'Section B uses your own results' },
+            { id: 'limit', text: 'A limitation explained, and a justified conclusion' },
           ]}
         />
       </div>

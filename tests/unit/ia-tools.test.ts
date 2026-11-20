@@ -1,5 +1,8 @@
+import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  IA_TOOL_PAGES,
+  QUESTION_TESTS,
   STAGES,
   TOOL_RULES,
   blankEntry,
@@ -7,17 +10,23 @@ import {
   checkSet,
   conceptFit,
   documentsCsv,
+  draftQuestion,
   emptyProgress,
+  emptyRq,
   evaluateSource,
   parseProgress,
+  parseRq,
   planTimeline,
   progressSummary,
   questionForm,
+  questionWarnings,
   recommendTools,
   setStage,
+  standingOf,
   submissionNote,
   timelineCsv,
   timelineIcs,
+  toolPosition,
   type DocEntry,
   type Timeline,
 } from '../../src/lib/ia-tools';
@@ -59,6 +68,61 @@ describe('the key concept guide', () => {
   });
 });
 
+describe('standing: every check says whether it is the guide, the TSM, an assessment guide or the platform', () => {
+  it('reads the standing from where a rule comes from', () => {
+    expect(standingOf('Guide, p. 53')).toBe('ib');
+    expect(standingOf('TSM, p. 70')).toBe('tsm');
+    expect(standingOf('IA research guide, p. 2')).toBe('examiner');
+    expect(standingOf(undefined)).toBe('strategy');
+  });
+
+  it('keeps the guide’s allowance of either form apart from the platform’s reading of the question', () => {
+    const forward = checkQuestion('Should Harbour Cycles open a second workshop?', 'Harbour Cycles', 'change');
+    expect(forward.find((c) => c.text.startsWith('The guide allows'))).toMatchObject({ standing: 'ib', source: 'Guide, p. 53' });
+    expect(forward.find((c) => c.text.startsWith('It reads as forward looking'))?.standing).toBe('strategy');
+    const extent = checkQuestion('To what extent should Harbour Cycles open a second workshop?', 'Harbour Cycles', 'change');
+    expect(extent.find((c) => c.text.includes('to some extent'))).toMatchObject({ standing: 'examiner', source: 'IA research guide, p. 2' });
+    expect([...forward, ...extent].filter((c) => c.standing === 'examiner').every((c) => c.source?.startsWith('IA research guide'))).toBe(true);
+  });
+});
+
+describe('the research question builder', () => {
+  it('drafts a question from the parts, to be refined', () => {
+    expect(draftQuestion({ org: ' Harbour Cycles ', form: 'forward', decision: 'open a second workshop.', taken: '', aim: '' })).toBe('Should Harbour Cycles open a second workshop?');
+    expect(draftQuestion({ org: 'Crumb & Co.', form: 'backward', decision: '', taken: 'seasonal range', aim: 'attracted new customers' })).toBe("How effectively has Crumb & Co.'s seasonal range attracted new customers?");
+    expect(draftQuestion({ org: '', form: 'forward', decision: '', taken: '', aim: '' })).toBe('Should the organization make the decision?');
+  });
+
+  it('flags long, double and industry-wide questions as the platform’s warnings', () => {
+    expect(questionWarnings('Should Harbour Cycles open a second workshop?')).toEqual([]);
+    expect(questionWarnings('Should Harbour Cycles hire staff and open a workshop and change its prices?')[0]).toContain('two questions');
+    expect(questionWarnings('How do bicycle businesses compete?')[0]).toContain('whole industry');
+    expect(questionWarnings(Array.from({ length: 30 }, () => 'word').join(' '))[0]).toContain('30 words');
+  });
+
+  it('reads saved work defensively, and carries an older test name forward', () => {
+    expect(parseRq(null)).toEqual(emptyRq());
+    const r = parseRq({ org: 'Harbour Cycles', form: 'backward', concept: 'ethics', tests: ['focused', 'concept', 'bogus', 7], q: 42 });
+    expect(r).toMatchObject({ org: 'Harbour Cycles', form: 'backward', concept: 'ethics', q: '' });
+    expect(r.tests).toEqual(['focused', 'aligned']);
+    expect(parseRq({ concept: 'globalization' }).concept).toBe('change');
+    expect(QUESTION_TESTS.map((t) => t.id)).toContain('aligned');
+  });
+});
+
+describe('the IA tools', () => {
+  it('each has a page, a storage key of its own and a place in the list', () => {
+    for (const t of IA_TOOL_PAGES) {
+      const file = new URL(`../../src/pages${t.href.replace(/\/$/, '')}.astro`, import.meta.url);
+      expect(existsSync(file), t.href).toBe(true);
+      expect(t.key.startsWith('bb:ia')).toBe(true);
+    }
+    expect(new Set(IA_TOOL_PAGES.map((t) => t.key)).size).toBe(IA_TOOL_PAGES.length);
+    expect(toolPosition('research-question')).toBe(`Tool 1 of ${IA_TOOL_PAGES.length}`);
+    expect(toolPosition('progress')).toBe(`Tool ${IA_TOOL_PAGES.length} of ${IA_TOOL_PAGES.length}`);
+  });
+});
+
 const doc = (over: Partial<DocEntry>): DocEntry => ({ ...blankEntry(), title: 'Accounts', origin: 'Harbour Cycles', voice: 'organization', published: '2026-03', purpose: 'report', named: true, method: true, sourced: true, relevance: 'costs of the workshop', data: 'repair revenue by month', pages: 4, ...over });
 
 describe('the supporting document checklist and source evaluation', () => {
@@ -93,6 +157,15 @@ describe('the supporting document checklist and source evaluation', () => {
     );
     expect(five.some((c) => c.status === 'problem')).toBe(false);
     expect(five.some((c) => c.text.includes('different voices'))).toBe(true);
+    // The TSM's advice on three documents carries its own standing, not examiner emphasis.
+    const three = checkSet([doc({}), doc({ voice: 'independent', origin: 'Council' }), doc({ voice: 'sceptic', origin: 'Gazette' })], '2027-04');
+    expect(three.find((c) => c.source === 'TSM, p. 70')?.standing).toBe('tsm');
+    expect(three.every((c) => c.standing !== 'examiner')).toBe(true);
+  });
+
+  it('reads a year without its month as needing the month, by the same rule as the other checkers', () => {
+    expect(evaluateSource(doc({ published: '2024' }), '2027-04').date.text).toContain('add the month');
+    expect(evaluateSource(doc({ published: '2025' }), '2027-04').date.word).toBe('Within 3 years');
   });
 
   it('exports the evaluation as CSV with labels SD1, SD2', () => {
@@ -177,7 +250,7 @@ describe('the research timeline', () => {
     expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(11);
     expect(ics).toContain('DTSTART;VALUE=DATE:20270301\r\nDTEND;VALUE=DATE:20270302');
     expect(ics.split('\r\n').every((l) => l.length <= 75)).toBe(true);
-    expect(timelineCsv(t.milestones).split('\n')[1]).toBe('2026-11-07,Read the requirements and the criteria,"With your teacher, from the guide. Note where projects most often lose marks.",Recommended,"TSM, p. 69"');
+    expect(timelineCsv(t.milestones).split('\n')[1]).toBe('2026-11-07,Read the requirements and the criteria,"With your teacher, from the guide. Note where projects most often lose marks.",IB teacher support material,"TSM, p. 69"');
     expect(submissionNote('may', 2027)).toContain('April 2027');
   });
 });

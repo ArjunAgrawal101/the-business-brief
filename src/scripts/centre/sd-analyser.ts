@@ -1,11 +1,13 @@
 /**
  * Checks a list of supporting documents against the guide's rules (number,
- * date, who chose them, transcripts, textbooks) and the recommended checks
- * (a range of voices, data to analyse, length). Pure counting and dating:
- * relevance and depth are for the student and the teacher.
+ * date to the month, who chose them, transcripts, textbooks) and the
+ * recommended checks (a range of voices, data to analyse, length), through
+ * src/lib/ia-docs.ts. Pure counting and dating: relevance and depth are for
+ * the student and the teacher. Kept in bb:ia:sd.
  */
 import { each, escapeHtml, store } from '../ix';
-import { blankDoc as blank, checkDocuments, type Doc } from '../../lib/ia-docs';
+import { blankDoc as blank, checkDocuments, parseAnalyserState, submissionOf, type AnalyserState, type Doc } from '../../lib/ia-docs';
+import { LABEL_TEXT } from '../../lib/guide-labels';
 
 each('[data-ix="sd-analyser"]', (root) => {
   const rowsEl = root.querySelector<HTMLElement>('[data-rows]');
@@ -16,25 +18,33 @@ each('[data-ix="sd-analyser"]', (root) => {
   const monthEl = root.querySelector<HTMLSelectElement>('[data-sub-month]');
   if (!rowsEl || !tpl || !checksEl || !yearEl || !monthEl) return;
 
-  const saved = store.get<{ docs?: Doc[]; year?: number; month?: number }>('ia:sd', {});
-  let docs: Doc[] = saved.docs?.length ? saved.docs : [blank(), blank(), blank()];
+  const saved = parseAnalyserState(store.get<unknown>('ia:sd', null));
+  let docs: Doc[] = saved.docs.length ? saved.docs : [blank(), blank(), blank()];
   const now = new Date();
   yearEl.value = String(saved.year ?? now.getFullYear() + (now.getMonth() > 3 ? 1 : 0));
-  monthEl.value = String(saved.month ?? 3);
+  monthEl.value = saved.month;
 
   const read = (row: HTMLElement): Doc => {
-    const v = (k: string) => row.querySelector<HTMLInputElement | HTMLSelectElement>(`[data-k="${k}"]`);
-    const b = (k: string) => (row.querySelector<HTMLInputElement>(`[data-k="${k}"]`)?.checked ?? false);
-    return { title: v('title')?.value ?? '', year: v('year')?.value ?? '', voice: v('voice')?.value ?? 'org', data: b('data'), long: b('long'), teacher: b('teacher'), textbook: b('textbook'), transcript: b('transcript') };
+    const v = (k: string) => row.querySelector<HTMLInputElement | HTMLSelectElement>(`[data-k="${k}"]`)?.value.trim() ?? '';
+    const b = (k: string) => row.querySelector<HTMLInputElement>(`[data-k="${k}"]`)?.checked ?? false;
+    const year = /^\d{4}$/.test(v('year')) ? v('year') : '';
+    const month = v('month');
+    return { title: v('title'), published: year ? (month ? `${year}-${month}` : year) : '', voice: v('voice') || 'org', data: b('data'), long: b('long'), teacher: b('teacher'), textbook: b('textbook'), transcript: b('transcript') };
+  };
+
+  const state = (): AnalyserState => {
+    const y = Number(yearEl.value);
+    return { docs, year: Number.isInteger(y) && y >= 2000 && y <= 2100 ? y : null, month: monthEl.value === 'october' ? 'october' : 'april' };
   };
 
   const evaluate = () => {
     docs = [...rowsEl.querySelectorAll<HTMLElement>('[data-row]')].map(read);
-    const checks = checkDocuments(docs, Number(yearEl.value) || now.getFullYear(), Number(monthEl.value));
+    const s = state();
+    const checks = checkDocuments(docs, submissionOf(s));
     checksEl.innerHTML = checks
-      .map((c) => `<li class="${c.ok === 'tip' ? 'is-tip' : c.ok ? 'is-ok' : 'is-no'}"><span>${escapeHtml(c.text)}<small>${escapeHtml(c.label)}. ${escapeHtml(c.why)}</small></span></li>`)
+      .map((c) => `<li class="${c.ok === 'tip' ? 'is-tip' : c.ok ? 'is-ok' : 'is-no'}"><span>${escapeHtml(c.text)}<small>${escapeHtml(LABEL_TEXT[c.standing])}${c.source ? `, ${escapeHtml(c.source)}` : ''}. ${escapeHtml(c.why)}</small></span></li>`)
       .join('');
-    store.set('ia:sd', { docs, year: Number(yearEl.value), month: Number(monthEl.value) });
+    store.set('ia:sd', s);
     if (add) add.disabled = docs.length >= 7;
   };
 
@@ -46,8 +56,10 @@ each('[data-ix="sd-analyser"]', (root) => {
       if (!row) return;
       const legend = row.querySelector('legend');
       if (legend) legend.textContent = `SD${i + 1}`;
+      const [year = '', month = ''] = d.published.split('-');
       (row.querySelector('[data-k="title"]') as HTMLInputElement).value = d.title;
-      (row.querySelector('[data-k="year"]') as HTMLInputElement).value = d.year;
+      (row.querySelector('[data-k="year"]') as HTMLInputElement).value = year;
+      (row.querySelector('[data-k="month"]') as HTMLSelectElement).value = month;
       (row.querySelector('[data-k="voice"]') as HTMLSelectElement).value = d.voice;
       (['data', 'long', 'teacher', 'textbook', 'transcript'] as const).forEach((k) => ((row.querySelector(`[data-k="${k}"]`) as HTMLInputElement).checked = d[k]));
       row.querySelector('[data-remove]')?.addEventListener('click', () => {

@@ -6,7 +6,7 @@
  * Without JavaScript every field can still be filled in and printed; with it,
  * the plan is saved on this device and checked as the student types.
  */
-import ProvenanceTag from '../ui/ProvenanceTag.astro';
+import GuideLabel from '../centre/GuideLabel.astro';
 import { CONCEPT_NAMES } from '../../lib/labels';
 import { IA_LIMITS } from '../../lib/ia';
 import { jsonForScript } from '../../lib/markup';
@@ -53,12 +53,13 @@ const STEP_COUNT = 10;
 
   <div class="iap__head">
     <div class="tags">
-      <ProvenanceTag kind="aa-framework" />
-      <span class="tag tag--source">From IB guidance</span>
+      <GuideLabel kind="tsm" />
+      <GuideLabel kind="ib" />
+      <GuideLabel kind="strategy" />
     </div>
     <p class="small muted">
       The ten steps follow the IB teacher support material's guidance for the internal assessment (TSM, pp. 69 to 72), in the platform's words. The checks
-      apply the guide's requirements. Your teacher approves the question and has the final word on every requirement.
+      apply the guide's requirements, each with its page. Your teacher approves the question and has the final word on every requirement.
     </p>
     <div class="iap__progress js-only">
       <span class="small" data-progress-text>0 of {STEP_COUNT} steps done</span>
@@ -99,8 +100,8 @@ const STEP_COUNT = 10;
           <label class="iap__done js-only"><input type="checkbox" name="done-2" /> Done</label>
         </div>
         <p class="iap__why">
-          Read the requirements above and the criteria in the guide with your teacher. Common ways to lose marks: supporting documents missing, more than
-          five of them, presentation not to the standard. <span class="iap__src">TSM, p. 69</span>
+          Read the requirements on this page and the criteria in the guide with your teacher. Common ways to lose marks: supporting documents missing, more
+          than five of them, presentation not to the standard. <span class="iap__src">TSM, p. 69</span>
         </p>
         <p class="small"><a href="#req-h">The requirements</a> · <a href="#task-h">The criteria and their maximum marks</a></p>
       </li>
@@ -133,10 +134,10 @@ const STEP_COUNT = 10;
         <fieldset class="iap__choice">
           <legend>The question looks</legend>
           <div class="choice__opts">
-            <label class="opt"><input type="radio" name="direction" value="forward" /><span class="opt__body"><span class="opt__text">Forward: what should it do?</span></span></label>
-            <label class="opt"><input type="radio" name="direction" value="backward" /><span class="opt__body"><span class="opt__text">Backward: why did it happen?</span></span></label>
+            <label class="opt"><input type="radio" name="direction" value="forward" /><span class="opt__body"><span class="opt__text">Forward looking: a decision still to be made</span></span></label>
+            <label class="opt"><input type="radio" name="direction" value="backward" /><span class="opt__body"><span class="opt__text">Backward looking: a decision already taken</span></span></label>
           </div>
-          <span class="field__hint">Either is allowed (guide, p. 53). Mostly primary research tends to suit a forward-looking question, mostly secondary a backward-looking one; this is advice, not a rule (TSM, p. 70).</span>
+          <span class="field__hint">Either is allowed (guide, p. 53); the guide does not define them, and the readings above are the platform's. Mostly primary research tends to suit a forward-looking question, mostly secondary a backward-looking one; this is advice, not a rule (TSM, p. 70).</span>
         </fieldset>
         <div class="field">
           <label for="ia-tools">The tools and theories you will apply</label>
@@ -235,6 +236,7 @@ const STEP_COUNT = 10;
             </tbody>
           </table>
         </div>
+        {/* The options are written out: an expression inside a select in a template row makes the compiler close the row early. */}
         <template data-doc-template>
           <tr data-doc>
             <td data-label="Use"><input type="checkbox" data-f="selected" /></td>
@@ -243,7 +245,10 @@ const STEP_COUNT = 10;
             <td data-label="Published"><input class="input" type="month" data-f="published" placeholder="YYYY-MM" /></td>
             <td data-label="Kind">
               <select class="select" data-f="kind">
-                {KINDS.map((k) => <option value={k.v}>{k.l}</option>)}
+                <option value="secondary">Secondary</option>
+                <option value="primary">Primary</option>
+                <option value="transcript">Transcript</option>
+                <option value="textbook">Textbook or notes</option>
               </select>
             </td>
             <td data-label="A4 pages"><input class="input input--num" type="number" min="0" step="1" inputmode="numeric" data-f="pages" /></td>

@@ -1,0 +1,243 @@
+---
+/**
+ * IA tool: research methodology planning. The reader plans primary and
+ * secondary research; the plan is checked against what the guide says of
+ * research and the documents it produces (pp. 53 to 55), the TSM's advice
+ * (p. 70) and the IA research guide's report on methodology sections (p. 5),
+ * each check labelled (src/lib/ia-method.ts). It plans; it never writes any
+ * part of the project. Saved in bb:ia-method.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import CentreHead from '../../../components/centre/CentreHead.astro';
+import GuideLabel from '../../../components/centre/GuideLabel.astro';
+import IaToolNav from '../../../components/centre/IaToolNav.astro';
+import IaIntegrity from '../../../components/centre/IaIntegrity.astro';
+import { toolPosition } from '../../../lib/ia-tools';
+import { PRIMARY_IDS, PRIMARY_METHODS, SECONDARY_IDS, SECONDARY_SOURCES } from '../../../lib/ia-method';
+import { CREATOR_GUIDE } from '../../../lib/guide-labels';
+import '../../../styles/centre.css';
+import '../../../styles/ia-tools.css';
+
+const RULES: Array<[string, string]> = [
+  ['Base the research on primary or secondary research, or both, selected for its suitability, depth and breadth.', 'p. 53'],
+  ['Primary research as a supporting document: a blank copy of a questionnaire with a tally or summary of responses; interview or focus group questions with a summary.', 'p. 54'],
+  ['Secondary sources include press articles, business accounts and plans, company websites, transcripts, financial reports, statistics, journals, market research and mission statements.', 'pp. 54 to 55'],
+  ['At most one supporting document may be a transcript of audio or video, and it must give the essential points of the original.', 'p. 54'],
+  ['Textbooks and class notes must be referenced, but are not accepted as supporting documents.', 'p. 55'],
+  ['The introduction should explain the methodology used to investigate the issue.', 'p. 55'],
+  ['If classmates study the same organization, each project must show the student’s own research, interpretation and analysis.', 'p. 54'],
+  ['An IA and an extended essay in business management must be distinct, with different research approaches; the guide says to choose different organizations.', 'p. 54'],
+];
+---
+
+<BaseLayout
+  room="assessment"
+  title="Planning your research methodology"
+  description="An IB Business Management IA tool: plan your primary and secondary research, see what the guide asks you to attach, and check the plan against the guide's rules before you start."
+  section="assessment"
+>
+  <CentreHead
+    crumb="Research methodology"
+    parent={{ label: 'Internal assessment', href: '/assessment/internal-assessment/' }}
+    kicker={`Internal assessment · ${toolPosition('methodology')}`}
+    title="Planning your research"
+    lead="Plan the research before you start it: primary, secondary or both. The planner checks the plan against the guide, tells you what to attach for your own research, and keeps a note of how your introduction will explain the method. It plans; it writes nothing for you."
+    stats={[
+      { value: '2', label: 'Kinds', note: 'primary, secondary, or both' },
+      { value: String(PRIMARY_IDS.length), label: 'Primary methods', note: 'the guide names, with what to attach' },
+      { value: 'Brief', label: 'Method', note: 'explained in the introduction' },
+    ]}
+  />
+
+  <div class="wrap page-body it-page">
+    <IaToolNav current="methodology" />
+
+    <section class="it-sec" aria-labelledby="mp-tool-h">
+      <SectionHead no="01" title="Your research plan" id="mp-tool-h" dek="Everything you enter stays on this device. Talk the plan through with your teacher before you start." />
+      <div class="it-tool" data-ix="ia-method">
+        <p class="state state--error" data-error hidden>The planner could not start. You can still fill in and print this page.</p>
+        <p class="sr-only" aria-live="polite" data-live></p>
+        <div class="it-tool__head">
+          <h3 class="it-tool__title">Your plan</h3>
+          <p class="it-tool__saved js-only">Saved on this device as you type.</p>
+        </div>
+        <div class="it-grid">
+          <div class="it-stack">
+            <fieldset class="it-fs it-step">
+              <legend class="it-step__k"><span>1</span> Your question, and where most evidence will come from</legend>
+              <div class="it-pair">
+                <div class="field">
+                  <label for="mp-form">My question looks</label>
+                  <select class="select" id="mp-form" name="form">
+                    <option value="">Not decided yet</option>
+                    <option value="forward">Forward: a decision still to be made</option>
+                    <option value="backward">Backward: a decision already taken</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="mp-mainly">Most of my evidence will come from</label>
+                  <select class="select" id="mp-mainly" name="mainly">
+                    <option value="">Not decided yet</option>
+                    <option value="primary">My own primary research</option>
+                    <option value="secondary">Secondary sources</option>
+                    <option value="both">Both, about equally</option>
+                  </select>
+                </div>
+              </div>
+            </fieldset>
+            <fieldset class="it-fs it-step">
+              <legend class="it-step__k"><span>2</span> Primary research you will carry out</legend>
+              <div class="mp-prim">
+                {
+                  PRIMARY_IDS.map((id) => (
+                    <div class="mp-prim__row" data-primary={id}>
+                      <label class="it-check">
+                        <input type="checkbox" name={`use-${id}`} />
+                        <span>{PRIMARY_METHODS[id].name}</span>
+                      </label>
+                      <div class="field">
+                        <label for={`mp-who-${id}`}>Who you will ask</label>
+                        <input class="input" id={`mp-who-${id}`} name={`who-${id}`} autocomplete="off" />
+                      </div>
+                      <div class="field">
+                        <label for={`mp-size-${id}`}>How many</label>
+                        <input class="input input--num" id={`mp-size-${id}`} name={`size-${id}`} type="number" min="0" max="100000" inputmode="numeric" />
+                      </div>
+                    </div>
+                  ))
+                }
+              </div>
+            </fieldset>
+            <fieldset class="it-fs it-step">
+              <legend class="it-step__k"><span>3</span> Secondary sources you will look for</legend>
+              <div class="it-checks-in">
+                {
+                  SECONDARY_IDS.map((id) => (
+                    <label class="it-check">
+                      <input type="checkbox" name="secondary" value={id} />
+                      <span>{SECONDARY_SOURCES[id]}</span>
+                    </label>
+                  ))
+                }
+              </div>
+            </fieldset>
+          </div>
+          <div class="it-stack">
+            <fieldset class="it-fs it-step">
+              <legend class="it-step__k"><span>4</span> Your situation</legend>
+              <div class="it-checks-in">
+                <label class="it-check"><input type="checkbox" name="sameOrg" /> <span>Another student in my class is researching the same organization</span></label>
+                <label class="it-check"><input type="checkbox" name="ee" /> <span>I am also writing an extended essay in business management</span></label>
+                <label class="it-check" data-ee-only><input type="checkbox" name="eeSameOrg" /> <span>My extended essay is about the same organization</span></label>
+              </div>
+            </fieldset>
+            <div class="it-step">
+              <div class="field">
+                <label for="mp-intro"><span class="it-step__k"><span>5</span> How your introduction will explain the method</span></label>
+                <textarea class="textarea" id="mp-intro" name="intro" rows="4" aria-describedby="mp-intro-hint"></textarea>
+                <span class="field__hint" id="mp-intro-hint">A note for yourself, in a line or two: what you did, who took part, and why that suits the question. Write the introduction itself in your own words later.</span>
+              </div>
+            </div>
+            <div class="it-out js-only">
+              <p class="it-out__k" id="mp-checks-h">Your plan, checked</p>
+              <ul class="it-list" data-checks aria-labelledby="mp-checks-h"></ul>
+            </div>
+            <div class="it-out js-only">
+              <p class="it-out__k" id="mp-attach-h">What you will attach</p>
+              <ul class="mp-attach" data-attach aria-labelledby="mp-attach-h"></ul>
+            </div>
+          </div>
+        </div>
+        <div class="it-export js-only">
+          <button type="button" class="btn btn--small" data-download>Download a summary (text)</button>
+          <button type="button" class="btn btn--small" data-print>Print</button>
+          <button type="button" class="btn btn--small" data-reset>Clear this page</button>
+          <span class="it-export__confirm" data-reset-confirm hidden>
+            <span>This clears your research plan on this page.</span>
+            <button type="button" class="btn btn--small btn--primary" data-reset-yes>Clear it</button>
+            <button type="button" class="btn btn--small" data-reset-no>Keep it</button>
+          </span>
+        </div>
+        <p class="nojs-only small muted">With JavaScript off you can fill in and print this page, but nothing is checked or saved.</p>
+      </div>
+    </section>
+
+    <section class="it-sec" aria-labelledby="mp-rules-h">
+      <SectionHead no="02" title="What the guide says of research" id="mp-rules-h" />
+      <p class="ce-labels"><GuideLabel kind="ib" /> <span class="ce-cite">Business management guide; the page follows each rule</span></p>
+      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s}</span></li>)}</ul>
+      <p class="ce-labels"><GuideLabel kind="tsm" /> <GuideLabel kind="examiner" /> <span class="ce-cite">TSM, p. 70; {CREATOR_GUIDE['internal-assessment']}, p. 5</span></p>
+      <ul class="it-rules">
+        <li><span>A project based mostly on primary research tends to suit a forward-looking question, and one based mostly on secondary research a backward-looking one. Advice, not a rule.</span><span class="it-src">TSM, p. 70</span></li>
+        <li><span>Keep the account of your method brief: the IA research guide reports that subject reports advise against a long research proposal or methodology section.</span><span class="it-src">IA research guide, p. 5</span></li>
+      </ul>
+    </section>
+
+    <section class="it-sec" aria-labelledby="mp-ex-h">
+      <SectionHead no="03" title="A plan that will not answer, and one that will" id="mp-ex-h" dek="Should Harbour Cycles, a fictional repair shop, open a second workshop? Two plans for the same question." />
+      <div class="it-examples">
+        <article class="it-ex it-ex--weak" aria-labelledby="mp-weak-h">
+          <p class="it-ex__k">Weaker <GuideLabel kind="example" /></p>
+          <h3 id="mp-weak-h">Whatever can be found online</h3>
+          <dl>
+            <div><dt>Primary</dt><dd>None: "there is not enough time".</dd></div>
+            <div><dt>Secondary</dt><dd>Three pages of the shop's own website and a textbook chapter on location.</dd></div>
+            <div><dt>Method</dt><dd>A page and a half on how the research was done.</dd></div>
+          </dl>
+          <p class="it-why">The textbook cannot be a supporting document (guide, p. 55), the website gives one voice only (p. 54), and a long methodology crowds out the analysis.</p>
+        </article>
+        <article class="it-ex it-ex--strong" aria-labelledby="mp-strong-h">
+          <p class="it-ex__k">Stronger <GuideLabel kind="example" /></p>
+          <h3 id="mp-strong-h">Research chosen for the decision</h3>
+          <dl>
+            <div><dt>Primary</dt><dd>A survey of 60 cyclists near the proposed site, with the blank questionnaire and a tally attached; an interview with the owner, with the questions and a summary.</dd></div>
+            <div><dt>Secondary</dt><dd>The shop's accounts, council footfall figures and a local press report on a rival.</dd></div>
+            <div><dt>Method</dt><dd>Two sentences in the introduction: what was done, with whom, and why.</dd></div>
+          </dl>
+          <p class="it-why">Mostly primary research for a forward-looking question, several voices, and the method stated briefly. The business and its figures are invented for illustration.</p>
+        </article>
+      </div>
+    </section>
+
+    <IaIntegrity no="04" />
+  </div>
+</BaseLayout>
+
+<style>
+  .mp-prim {
+    display: grid;
+    gap: var(--sp-3);
+  }
+
+  .mp-prim__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.4fr) 6.5rem;
+    gap: var(--sp-2) var(--sp-3);
+    align-items: end;
+    padding-bottom: var(--sp-3);
+    border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .mp-attach {
+    display: grid;
+    gap: var(--sp-2);
+    margin: 0;
+    padding-left: 1.1rem;
+    font-size: 0.9375rem;
+  }
+
+  @media (max-width: 40rem) {
+    .mp-prim__row {
+      grid-template-columns: minmax(0, 1fr) 6rem;
+    }
+
+    .mp-prim__row .it-check {
+      grid-column: 1 / -1;
+    }
+  }
+</style>
+
+<script>
+  import '../../../scripts/centre/ia-method';
+</script>

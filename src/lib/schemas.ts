@@ -731,7 +731,10 @@ export const assessmentSchema = z.object({
     .default([]),
   /** Assessment criteria by name and maximum mark (descriptors are not reproduced). */
   criteria: z.array(z.object({ id: z.string(), name: z.string(), marks: z.number().int().positive() })).default([]),
+  /** What the guide says the component must do, each with its page: the guide's musts only. */
   requirements: z.array(md).default([]),
+  /** What the guide says should be done or recommends, each with its page: not a must. */
+  recommendations: z.array(md).default([]),
   /** Advice from the IB teacher support material, paraphrased, with its page. */
   ibGuidance: z.array(z.object({ text: md, location: z.string() })).default([]),
   notStated: z.array(z.string()).min(1),

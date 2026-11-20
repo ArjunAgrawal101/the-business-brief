@@ -6,9 +6,10 @@
 import { announce, each, escapeHtml, store } from '../ix';
 import { longDay, planTimeline, submissionNote, timelineCsv, timelineIcs, type Milestone, type Timeline } from '../../lib/ia-tools';
 import { download, today, twoStepReset } from './ia-common';
+import { LABEL_TEXT } from '../../lib/guide-labels';
 
 const KEY = 'ia-timeline';
-const STAND: Record<string, string> = { ib: 'IB requirement', strategy: 'Recommended', examiner: 'Examiner emphasis' };
+const STAND: Record<string, string> = LABEL_TEXT;
 
 interface Saved {
   start: string;
