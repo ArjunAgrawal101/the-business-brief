@@ -1,106 +1,102 @@
-# Release report: 2.2.0
+# Release report: 3.0.0
 
-16 November 2026
+20 November 2026
 
 ## Summary
 
-The Business Brief 2.2 takes the platform beyond the IB course without redesigning it. It adds one-to-one tutoring with its creator, a library of thirty Advanced Management modules for undergraduates, MBA students and professionals, an executive simulation in the Boardroom, the Boardroom Briefings, a Framework Application Lab, advanced financial analysis, and My Business Workspace. Business Intelligence is rebuilt as an editorial hub. Every existing page keeps its address, its design and its behaviour. The audit behind the release, with the list of what had to stay unchanged, is in [audit/NEXT_LEVEL_AUDIT.md](audit/NEXT_LEVEL_AUDIT.md); the full list of changes is in [CHANGELOG.md](../CHANGELOG.md).
+Release 3.0.0 is built to the owner's brief "The Business Brief 2.0", which asked for the platform to be made significantly better, not merely bigger, without discarding what worked. Three read-only audits came first: content and features, design and navigation, and assessment accuracy with technical health. Their findings decided the work, which ten engineers then carried out in parallel, each on a branch of its own, before a single integration. Every page that worked in 2.2 keeps its address. The changes, part by part, are in [CHANGELOG.md](../CHANGELOG.md); the 2.2.0 report is in [releases/2026-11-16-2.2.0.md](releases/2026-11-16-2.2.0.md).
 
-The source is on `main` at https://github.com/ArjunAgrawal101/the-business-brief, and Vercel deploys from that branch to https://the-business-brief-dun.vercel.app/. For the first time, this environment could open the live site, so the deployment was checked from here (see Delivery).
+The source is on `main` at https://github.com/ArjunAgrawal101/the-business-brief, and Vercel deploys from that branch to https://the-business-brief-dun.vercel.app/.
 
-## Preserved
+## What the audits found, and what was done about it
 
-Nothing that worked in 2.1 was removed, renamed or restyled: the identity (navy, ivory and champagne gold; Source Serif 4, Inter and Cinzel; the AA monogram), the cinematic opening and its rule, the page conventions, the topic library and its notes, the glossary, the frameworks library, the mindmaps and diagrams, the Case Vault, the three Boardroom scenarios, the Decision Rooms and the Case Room, the twenty Financial Laboratory calculators, the studios, the Assessment Centre, the Resources Library, the seven pathways, search, privacy (no accounts, analytics or cookies), the integrity gate, provenance labels and the SL and HL distinction. Enhancements sit beside what existed: the advanced finance tools beside the calculators, the executive simulation beside the scenarios, the workspace at the dashboard's own addresses. The full browser suite that guarded 2.1 still passes.
-
-## Implemented, by part of the brief
-
-| Part | What was built |
+| Finding | What changed |
 | --- | --- |
-| Tutorials | `/tutorials/`: the hero ("IB DP Business Management Tutoring", the owner's subheading and the price), what the tutorials cover (syllabus, Papers 1, 2 and 3 at HL, IA guidance, revision and exam strategy), how a session works (eight steps and what an hour looks like), who they are for, five pathways with their fees, which pathway fits, verified facts about Arjun Agrawal, how to get started with an enquiry builder, and ten questions. Linked from the header (a gold Tutorials button), the drawer, the footer, the home page ("Take your Business Management learning further"), About, the IB DP pathway and the Assessment Centre, and by one quiet note on subtopic pages, briefs, revision briefs, case files and calculation practice |
-| Advanced Management and Strategy | `/advanced/`: six domains and thirty modules (strategy 6, finance 6, leadership and organizational behaviour 5, marketing 5, operations and supply chain 4, entrepreneurship and innovation 4), each in eight parts: foundation, advanced explanation, models (121 in all), real applications (75), cases (30, fictional and labelled), critical evaluation, a decision exercise and further reading. Kept apart from the IB course, with its own room identity |
-| Boardroom Briefings | `/boardroom-briefings/`: ten board decisions as editorial cases, each answering its question in a Student edition and an Analysis edition, with recomputed exhibits and weighted option appraisals; linked both ways to the Advanced Management modules |
-| A more sophisticated Boardroom | `/boardroom/executive/`: seven roles, nine stages, three yearly rounds, interconnected functions on one deterministic engine with simulated data, and a debrief against four strategies and a baseline |
-| Business Intelligence | The six questions on every item, twelve themes with pages of their own, an issue layout, and stricter dating rules; eleven items, every fact dated and sourced, none presented as live |
-| My Business Workspace | `/dashboard/`: a learning list in the reader's order with status and notes, case notes under six headings, saved analyses from every studio and saved Financial Laboratory results, completed practice, and selective export to Markdown or JSON; all in this browser only, every key declared on the privacy page |
-| Framework Application Lab | Every framework's structure, fit, interpretation, implications, mistakes and works; an Apply it mode on each; `/frameworks/lab/` by decision; three new Strategy Studio tools (scenarios, stakeholder salience, strategic fit); the five forces, Ansoff, BCG and decision tree tools already gave attractiveness, risk, portfolio and expected value readings and were left as they were |
-| Finance Desk advanced mode | `/finance-desk/advanced/`: a three-statement forecast, a capital budgeting comparator with IRR, WACC and sensitivity, break-even scenarios and a performance dashboard, every figure tagged IB, IB HL or beyond the course, 57 unit tests against hand-worked values; the twenty calculators unchanged |
-| Navigation | Learn, Practise, Tools, Assess, Advance and Connect, in the existing mega menu and drawer, with the Tutorials button |
+| The interactive blue was an electric cobalt; gold was everywhere; buttons were pills with shadows; labels fell to 10.5 px; the header was translucent | A muted steel blue that passes AA; gold kept for rules and one emphasis; square buttons; labels and chips at 12 px or more; flat navy bands; an opaque header |
+| Seven menus, with the Academic Ecosystem in the bar and the topic library called "The Business Brief" | Five groups (Explore, Practise, Tools, Assess, Discover); the ecosystem in the Discover panel; "Topic library" |
+| Search had no type-ahead, ranked only within each kind ("Liquidity" came eighth) and found nothing for a slip | Suggestions as you type in the header, every kind ranked together, slips forgiven, recently viewed pages; best matches first on the search page |
+| The opening played for five seconds on every reload and on every page reached from a search result | It plays only when the home page is freshly opened, in about 2.75 seconds |
+| The home page was 17 screens long, three times repeated the full menu, and its counters understated questions (24 against 269) and overstated IB terms (701, including 135 beyond the course) | The brief's sections in varied compositions, 11,600 px at 1440 wide; every count computed from the content (now 315 questions, 576 IB terms) |
+| Revision briefs existed for 3 of 37 subtopics; no spaced repetition, planner, weak areas or revision queue | Quick revision sheets for all 37, 1,416 flashcards with spaced repetition, the revision planner, and a dashboard with a queue and weak areas |
+| Subtopic pages barely linked to the rest of the platform; 16 had no tools section | Connected learning, a tools section and the subtopic's worked connections on every subtopic page; back links on every tool |
+| Assessment pages mixed the guide's rules with the site's advice in 13 places; "examiner emphasis" was unattributed | Every fact checked against the guide; labels corrected; every examiner-emphasis point attributed to the creator's guide and page |
+| Business Intelligence held 11 items, all from software, cloud and AI firms | 25 items across twelve sectors and five regions |
+| The sitemap listed 190 of about 1,080 pages | It is written from the built pages after every build (1,312 pages at this release) |
 
-## The Tutorials, and the terms used
+## Photographs
 
-The brief named the live Economics Tutorials page as the definitive reference for the commercial offering. Read in a browser on 16 November 2026, it offers, all one-to-one and online:
+Four photographs are used, each with a purpose, in AVIF with a WebP fallback and separate crops for wide screens and phones. Nothing is retouched; the one correction is a brightness and contrast lift on the conference-table photograph, whose window washes the room out.
 
-| Pathway | Fee | Sessions |
-| --- | --- | --- |
-| Regular sessions | US$20 per session | 1 session of 1 hour, any topic |
-| IA support | US$100 for the package | 6 sessions of 1 hour |
-| EE supervisor support | US$150 for the support | Agreed at enquiry |
-| Marathon Revision | US$300 for the package | 20 sessions of 1 hour |
-| Exam Practice | US$200 for the package | 12 sessions of 1 hour |
+| Photograph | Where |
+| --- | --- |
+| The awards portrait (light grey blazer, black shirt, trophy cabinet) | The About page hero (the brief's image 1); a small square on the home page's creator section |
+| Teaching a class in front of a screen (grey suit and tie) | About, teaching and academic work (image 2); the Tutorials page |
+| At a conference table (black blazer), a colleague beside him | About, the professional journey (image 3) |
+| Traditional attire | About, the personal note |
 
-The Business Management page states exactly these terms, plus the owner's statement that group discounts are available, with no group price. Enquiries go by email to arjun1agr@gmail.com with the subject "IB DP Business Management Tutorials Enquiry", the template asking for the year, SL or HL, school, topics and preferred arrangement; WhatsApp, LinkedIn and Instagram are listed as on the Economics page. There is no booking calendar, payment, deposit, automatic confirmation or extra charge, no testimonial, result or guarantee, and the IA is offered as guidance only. Every term lives in `src/lib/tutorials.ts` and is tested.
+Not used, and why (also in `assets/creator/README.md`):
 
-**For confirmation:** the brief gave the latest information as US$20 for a 90-minute session. The live Economics page says one hour (its earlier version said 90 minutes; the final release changed it). Following the brief's rule, this page says one hour. If 90 minutes is right, one line in `src/lib/tutorials.ts` changes it here, and the Economics page needs the same correction.
+- **Three supplied photographs carry Google Gemini's AI mark** in the lower right corner: the navy-suit portrait against a stone wall (the brief's optional image 6), the group photograph with students (image 5) and the panel photograph with name cards (offered for image 4). The brief rules out AI-generated portraits, and cropping the mark away would hide it. The navy-suit portrait, which was the home and About hero until this release, is retired. If camera originals exist, they can be added in minutes: the About page has places for academic dialogue and for the group photograph in the journey.
+- **The teal-blazer photograph** (image 4 in the brief) was not among the supplied files.
+- **An outdoor full-length photograph** under an orange canopy is authentic but competes with the page and adds nothing the four do not.
 
-## Tests
+The home page does not lead with a portrait: the brief asks that it remain about Business Management, so the creator appears in his own section, small.
 
-On the final 2.2 source and build (details in [TESTING.md](TESTING.md)):
+## New features
+
+| Feature | Address |
+| --- | --- |
+| Quick revision: a printable sheet for every subtopic | `/revision/` and `/revision/<slug>/` |
+| Flashcards with spaced repetition (1,416 cards) | `/revision/flashcards/` |
+| Revision planner | `/revision/planner/` |
+| My dashboard: today's queue, progress, weak areas, practice by source | `/dashboard/`, with the full record at `/progress/` |
+| Study mode on every subtopic page: text size, low light, reading progress, contents, Mark as complete, print | every `/topics/<slug>/` |
+| Business Scenario Generator: 25 families of fictional cases in six steps | `/decision-room/scenarios/` |
+| Stakeholder Impact Simulator: eight decisions, seven groups | `/decision-room/stakeholder-impact/` |
+| Framework comparison: any two side by side, 16 curated | `/frameworks/compare/` |
+| Topic connections: 50 worked connections on a map | `/ib/connections/` |
+| Teacher resource area: sequences, prompts, six activities, checklists | `/teachers/` |
+| A page for every diagram, and 17 new teaching diagrams (107 in all) | `/diagrams/<id>/` |
+| IA Studio: four new tools (research question, methodology, evidence, word count) | `/assessment/internal-assessment/` |
+| Paper 1 practice cases (two), Paper 3 practice stimuli (two) and a coherence-checking plan builder | `/assessment/paper-1/workspace/`, `/assessment/paper-3/practice/` |
+
+The multi-round business strategy simulation the brief asks for already existed (the executive simulation, run over three years with prices, marketing, people, capacity, exports and finance) and is now named as such in the menu.
+
+## Testing
 
 | Check | Result |
 | --- | --- |
-| `astro check` | 0 errors, 0 warnings, 0 hints |
-| ESLint and the content lint | No problems (1,000 source files, 1,088 built pages) |
-| Unit tests | 1,175 passed in 61 files |
-| Build | 1,084 pages; every integrity check passes (the content, the Advanced Management modules, the Boardroom Briefings, the executive simulation's accounts and the Business Intelligence dating rules) |
-| Link check | 213,346 internal links and assets, none broken; 157 external links listed, not fetched |
-| Contrast | 56 colour pairs, all pass, including the two new rooms' text colours |
-| Persona walkthroughs | 8 routes passed: first-time visitor, IB student (phone), teacher, undergraduate (tablet), MBA student, entrepreneur (phone), MBA student reading advanced strategy, IB student finding a tutor (phone) |
-| Browser tests | 1,092 tests on the release code (`d7b472c`): 1,089 passed and 3 skipped by design (two wide-screen navigation tests on the phone, one drawer test on the desktop), in 14.2 minutes, with no failures and no retries. The run before it, on the release candidate `c233161`, found one failure: the announcement race described below, fixed in `d7b472c` |
-| GitHub CI | The QA workflow (check, lint, unit tests, build, links, the full browser suite and contrast) passed on `720e6c7`, the first push of the release, and on `dc585a0`, with the same results as the local run (1,175 unit tests; 1,089 browser tests passed and 3 skipped; every colour pair passing). The two runs between them were stopped by the job's 20-minute limit with 853 of 1,092 browser tests passed and none failed; the full QA now takes about 20 to 25 minutes on GitHub's two workers, so the limit is 40 |
+| Type check (`astro check`) | 0 errors, 0 warnings, 0 hints |
+| ESLint | No problems |
+| Unit tests (Vitest) | 1,783 tests in 87 files, all pass |
+| Build | 1,329 pages |
+| Content lint (no dashes, leaks or placeholders, source and built pages) | No problems |
+| Link check | No broken links |
+| Colour contrast (`qa:contrast`) | Every pair meets its minimum |
+| Browser tests (Playwright, Chromium), every page at desktop and phone size with an axe-core WCAG 2.2 AA scan, plus every interaction spec | See the delivery note below |
 
-Found and fixed during QA:
+Each engineer also ran their own specs and page checks on a private build. A shared content cache was found to let one branch's build read another's content during the parallel work; the cache now lives in each checkout's own `.astro` folder, and every result above comes from the integrated branch.
 
-- An `aria-label` on the tutorials price block, which axe reports as a prohibited attribute; the full sentence is now visually hidden text.
-- The tutorials enquiry builder's no-JavaScript paragraph showed with JavaScript on, because the builder was not inside an enhanced region.
-- The same documents and works were registered two or three times by the different writers of the modules, the finance tools, the Framework Lab and the Briefings (36 duplicates merged at integration, after the writers had merged others themselves); each is now one entry. Documents opened and read are labelled as such, not as found by search.
-- Spelling in the new modules drifted from the site's Oxford spelling; normalized, with cited titles left as published.
-- The Finance Desk's new tools and the Advanced Management finance domain shared a name; the tools are now Advanced financial analysis, and the two link to each other.
-- A module's details line ran into the room's drawing on wide screens, and its date was written as digits.
-- A stale announcement: two messages to the same live region within 60 ms (a wrong answer, then Show the answer at once) let the older one be read out after the newer. A pending announcement is now cancelled by a newer one, everywhere. The final browser run caught it as one failed Paper 2 practice test; the suite was run again in full after the fix.
+## Remaining limitations
 
-## In development
+Stated plainly, as the brief asks:
 
-| Item | Status |
-| --- | --- |
-| Real organizations in the Boardroom Briefings | All ten use fictional companies, because the publishers' sites could not be read while they were written |
-| Business Intelligence | Eleven items; the twelve themes need several each, across industries and regions, read from the organizations' own documents |
-| Advanced Management | The further reading is cited as bibliographic references, not opened; several organizations (bp, Northvolt, Novo Nordisk, Unilever, Nippon Steel) recur across domains because few publishers' sites could be read; the case exhibits were checked by script but have no recomputation test like the Case Vault's |
-| Framework pages | Scenario planning and stakeholder salience are reached through their tools, not yet framework pages of their own; Hofstede and RACI have no tool |
+- **Topic depth.** The ten thinnest subtopics were deepened to the brief's eleven elements. The other 27 are unchanged; they were already between about 7,700 and 14,400 words. No real-company examples were added to the notes, because the build environment could not open the sources; each subtopic page links its real, sourced Business Intelligence items instead.
+- **Business Intelligence sources.** Every fact was read in a company's or regulator's own documents. Major news organizations could not be reached from the build environment, so seven items rest on one organization's documents, and each says so. Six subtopics have no item yet (2.4, 2.7, 3.9, 5.1, 5.2 and 5.5), India is represented by one item centred there, and no small-business story had sources that could be read.
+- **Diagrams on phones.** All 17 new diagrams and every framework diagram have phone layouts; 54 older library diagrams do not, so at 320 px some of their labels fall below 12 px ("Show larger" opens them at full size). None scrolls sideways.
+- **Revision sheets** run from 2.4 to 6.6 screens rather than about two, because each includes every IB term of its subtopic.
+- **Lesson presentations** do not exist; the library says "Not yet available" and counts none.
+- **Paper 3 practice** has no clock and no answer boxes for questions 1 and 2, and the plan builder's checks are prompts, not marks.
+- **Practice not yet in the question bank:** the Paper 1 case questions and the 50 connection questions.
+- **Browsers.** Tests run in Chromium only, and no testing with assistive-technology users has been done.
+- **Astro 6.4.8** carries advisories that concern server rendering, view transitions and untrusted content, none of which this static site uses. Moving to Astro 7 needs a newer Node than the build environment had; it is the first item for the next release.
 
-The full order is in [ROADMAP.md](ROADMAP.md).
+## For the owner to confirm
 
-## Known limitations
-
-- **Browsers and people.** Only Chromium was tested, with emulated phones; no real devices, other browsers or users of assistive technology ([TESTING.md](TESTING.md#what-is-not-tested)).
-- **Sources.** External links are listed but not fetched by the link check. Company facts are dated and will age; nothing is presented as live.
-- **Page weight.** The question bank lists all 269 questions so it works without JavaScript (1.3 MB, 197 KB compressed); the workspace page lists every page a reader can add (about 200 KB).
-- **Astro 6.4.8** has published advisories with low exposure for a static site; the fix needs Node 24 (SECURITY.md).
-- **GitHub Pages.** The repository still runs GitHub's Pages build on every push, which fails because the site is built for Vercel. It does not affect the site.
-- **The environment.** A network environment, "Arjun Agrawal platforms", was created with the owner's approval so the live sites could be opened; during the release it was widened, with approval each time, to sixteen company and regulator sites used as sources. Its setup script (`npm ci` in the repository) has not yet run in a fresh session.
-
-## Decisions for the creator
-
-1. **The session length:** one hour, as the live Economics page says, or 90 minutes, as the brief said (above).
-2. **The formal portrait** (`9.webp`) carries Google Gemini's sparkle mark. It is used only as a portrait, cropped above the mark. Confirm it, or supply an original photograph.
-3. **The four assessment guides** are public downloads. Confirm that they may be.
-4. **The About page** and its contact address. Confirm, or say what to change.
-5. **Licensing.** Commercial use by teacher resource platforms needs a licence from the IB. The platform paraphrases and cites, and reproduces no IB text. The tutorials are a commercial service; the site never claims IB endorsement.
-6. **GitHub Pages.** Turn it off in the repository's Settings, under Pages, since Vercel hosts the site.
-7. **The network environment's company sites** can be removed from its allowlist when no longer needed.
+1. **Photographs.** Whether camera originals exist for the three AI-marked photographs; and that you are content to publish the conference-table photograph, where a colleague appears (he is not named).
+2. **Your four assessment guides** cite the IB guide as "updated July 2024"; the edition supplied and checked against says "updated May 2022". The Paper 1 guide's front panel says "Case study: Pre-released"; the guide releases a statement and about the first 200 words, not the case. The PDFs are published unchanged, so this is yours to correct.
+3. **Examiner emphasis** is shown as your guides report it, attributed; it was not checked against subject reports, which were not supplied. One point (the Paper 3 question 1 mark split) comes from "examiner instructions (2026)", which may be markscheme content; you may want to check you are free to publish it.
 
 ## Delivery
 
-- **Source:** `main`. This report is in the release commit, and `git log` lists every commit.
-- **Pushed in two steps.** The first push (`720e6c7`) carried everything but the executive simulation and the Boardroom Briefings; GitHub's QA workflow passed on it, and Vercel reported the deployment complete. The live site, opened from this environment, then served the Tutorials page with its terms, Advanced Management (six domains, thirty modules), the Framework Application Lab, the advanced financial analysis tools, My Business Workspace and the Business Intelligence hub. The release commit adds the simulation, the Briefings and this report; its deployment is checked the same way after the push.
-- **Network:** the environment allows `the-business-brief-dun.vercel.app` and `ib-economics-pi.vercel.app`, so each deployment can be opened from here.
-- **Supplied files:** never committed. The photographs used are in `assets/creator/originals/`, with rights reserved, outside the code licence.
+The work was integrated on `claude/business-brief-2`, merged into `main` and pushed; Vercel builds `main`. The live site was checked after the deployment (see the completion report in the conversation for the result).

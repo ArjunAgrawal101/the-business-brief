@@ -50,7 +50,7 @@ Built to the owner's brief "The Business Brief 2.0": the platform made significa
 
 ### Technical
 
-- The sitemap is written after the build from the pages the build wrote (about 1,200), breadcrumbs carry BreadcrumbList data, and `npm run qa` lints the built pages.
+- The sitemap is written after the build from the pages the build wrote (1,312 at this release), breadcrumbs carry BreadcrumbList data, and `npm run qa` lints the built pages.
 - The content cache lives in the project (`.astro/cache`), not in the shared `node_modules`.
 
 ## 2.2.0: 16 November 2026
