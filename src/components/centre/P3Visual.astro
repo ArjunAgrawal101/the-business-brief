@@ -1,0 +1,180 @@
+---
+/**
+ * The visual of a product in a Paper 3 practice stimulus (guide, p. 42): a
+ * line drawing with numbered markers, keyed to a list of labels in text, so
+ * nothing is only in the picture. Drawn for the invented organizations in
+ * src/lib/p3-stimuli.ts.
+ */
+interface Props {
+  stimulus: string;
+  product: string;
+  labels: string[];
+  description: string;
+}
+const { stimulus, product, labels, description } = Astro.props;
+const marks: Record<string, Array<[number, number]>> = {
+  ripplestone: [
+    [226, 36],
+    [127, 91],
+    [198, 160],
+    [257, 122],
+    [37, 86],
+  ],
+  relay: [
+    [150, 14],
+    [33, 50],
+    [262, 124],
+    [268, 50],
+    [282, 175],
+  ],
+};
+const points = marks[stimulus] ?? [];
+---
+
+<figure class="p3v">
+  <svg class="p3v__svg" viewBox="0 0 300 200" role="img" aria-label={`${product}. ${description}`}>
+    {
+      stimulus === 'ripplestone' && (
+        <g>
+          <line class="p3v-line" x1="8" y1="182" x2="292" y2="182" />
+          <rect class="p3v-fill" x="78" y="82" width="144" height="100" />
+          <polygon class="p3v-fill" points="66,82 234,82 218,62 82,62" />
+          <polygon class="p3v-accent" points="92,58 208,58 196,30 104,30" />
+          <path class="p3v-thin" d="M121 58 L127 30 M150 58 L150 30 M179 58 L173 30 M98 44 L202 44" />
+          <rect class="p3v-paper" x="96" y="100" width="108" height="40" />
+          <rect class="p3v-accent" x="104" y="106" width="20" height="30" rx="3" />
+          <rect class="p3v-accent" x="130" y="106" width="20" height="30" rx="3" />
+          <polyline class="p3v-pipe" points="176,100 176,114 186,114 186,121" />
+          <rect class="p3v-fill" x="90" y="140" width="120" height="6" />
+          <rect class="p3v-fill" x="240" y="140" width="34" height="42" rx="3" />
+          <rect class="p3v-line" x="248" y="132" width="18" height="8" rx="2" />
+          <line class="p3v-line" x1="36" y1="182" x2="36" y2="128" />
+          <rect class="p3v-paper" x="8" y="98" width="58" height="30" />
+          <text class="p3v-text" x="37" y="118" text-anchor="middle">$0.25</text>
+        </g>
+      )
+    }
+    {
+      stimulus === 'relay' && (
+        <g>
+          <rect class="p3v-fill" x="70" y="24" width="160" height="104" rx="4" />
+          <rect class="p3v-paper" x="80" y="34" width="140" height="84" />
+          <polygon class="p3v-fill" points="50,128 250,128 270,150 30,150" />
+          <path class="p3v-thin" d="M92 134 L208 134 M88 139 L212 139" />
+          <rect class="p3v-line" x="128" y="142" width="44" height="6" />
+          <rect class="p3v-accent" x="214" y="131" width="30" height="12" />
+          <rect class="p3v-paper" x="8" y="60" width="50" height="64" />
+          <path class="p3v-thin" d="M16 74 L50 74 M16 84 L50 84 M16 94 L42 94" />
+          <polyline class="p3v-pipe" points="20,108 28,116 44,102" />
+          <rect class="p3v-paper" x="244" y="60" width="48" height="34" />
+          <path class="p3v-thin" d="M251 72 L285 72 M251 82 L275 82" />
+          <rect class="p3v-fill" x="236" y="166" width="28" height="18" rx="3" />
+          <path class="p3v-line" d="M236 175 C180 192 90 192 52 152" />
+        </g>
+      )
+    }
+    {
+      points.map(([x, y], i) => (
+        <g class="p3v-mark" aria-hidden="true">
+          <circle cx={x} cy={y} r="10" />
+          <text x={x} y={y + 5} text-anchor="middle">
+            {i + 1}
+          </text>
+        </g>
+      ))
+    }
+  </svg>
+  <figcaption class="p3v__cap">
+    <p>{description}</p>
+    <ol class="p3v__labels">{labels.map((l) => <li>{l}</li>)}</ol>
+  </figcaption>
+</figure>
+
+<style>
+  .p3v {
+    display: grid;
+    grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
+    gap: var(--sp-4);
+    align-items: start;
+    margin: 0;
+  }
+
+  .p3v__svg {
+    width: 100%;
+    height: auto;
+    background: var(--surface-page);
+    border: 1px solid var(--rule-hair);
+  }
+
+  .p3v__cap {
+    font-size: 0.9375rem;
+  }
+
+  .p3v__labels {
+    margin: var(--sp-2) 0 0;
+    padding-left: 1.4rem;
+  }
+
+  .p3v__labels li {
+    margin: 0.15rem 0;
+  }
+
+  .p3v-line,
+  .p3v-pipe {
+    fill: none;
+    stroke: var(--text-strong);
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+
+  .p3v-pipe {
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+
+  .p3v-thin {
+    fill: none;
+    stroke: var(--text-strong);
+    stroke-width: 1;
+  }
+
+  .p3v-fill {
+    fill: var(--surface-sunk);
+    stroke: var(--text-strong);
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+
+  .p3v-paper {
+    fill: var(--surface-sheet);
+    stroke: var(--text-strong);
+    stroke-width: 2;
+  }
+
+  .p3v-accent {
+    fill: var(--surface-cobalt-wash);
+    stroke: var(--cobalt-text);
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+
+  .p3v-text {
+    fill: var(--text-strong);
+    font: 700 15px var(--font-ui);
+  }
+
+  .p3v-mark circle {
+    fill: var(--surface-ink);
+  }
+
+  .p3v-mark text {
+    fill: var(--text-on-ink);
+    font: 700 15px var(--font-ui);
+  }
+
+  @media (max-width: 40rem) {
+    .p3v {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

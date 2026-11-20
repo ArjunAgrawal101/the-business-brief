@@ -724,3 +724,419 @@
     display: none !important;
   }
 }
+
+/* ---------- Kinds of task, topics, answer forms (2.0 additions) ---------- */
+
+.pp-tasks {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.pp-topics__all {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+
+.pp-q__task {
+  padding: 0.1rem 0.45rem;
+  border: 1px solid var(--rule-ink);
+  border-radius: var(--radius-1);
+  letter-spacing: 0.06em;
+}
+
+.pp-answer__body {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.pp-answer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-3);
+  margin-top: var(--sp-2);
+}
+
+/* A chart, kept readable on a narrow screen by scrolling inside its own region. */
+.pp-fig {
+  margin: 0;
+  max-width: 46rem;
+}
+
+.pp-fig__scroll {
+  overflow-x: auto;
+  border: 1px solid var(--rule-hair);
+  background: var(--surface-sheet);
+}
+
+.pp-fig__scroll:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Never narrower than the drawing's own 600 units, so no label is smaller than its 13 pixels. */
+.pp-fig__scroll svg {
+  display: block;
+  width: 100%;
+  min-width: 37.5rem;
+  height: auto;
+}
+
+.pp-fig__cap {
+  margin-top: var(--sp-2);
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.p2f text {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  fill: var(--text-body);
+}
+
+.p2f .p2f-tick {
+  fill: var(--text-muted);
+}
+
+.p2f .p2f-title,
+.p2f .p2f-label {
+  font-weight: 600;
+}
+
+.p2f .p2f-grid {
+  stroke: var(--rule-hair);
+  stroke-width: 1;
+}
+
+.p2f .p2f-axis {
+  stroke: var(--text-strong);
+  stroke-width: 1.25;
+}
+
+.p2f .p2f-marker {
+  stroke: var(--text-muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.p2f .p2f-line {
+  stroke-width: 2.5;
+}
+
+.p2f .p2f-line--dashed {
+  stroke-width: 1.75;
+  stroke-dasharray: 7 5;
+}
+
+.p2f .p2f-line--revenue,
+.p2f .p2f-label--revenue {
+  stroke: var(--cobalt-text);
+  fill: var(--cobalt-text);
+}
+
+.p2f .p2f-line--cost,
+.p2f .p2f-label--cost,
+.p2f .p2f-line--stock,
+.p2f .p2f-label--stock {
+  stroke: var(--navy-900);
+  fill: var(--navy-900);
+}
+
+.p2f .p2f-line--fixed,
+.p2f .p2f-label--fixed,
+.p2f .p2f-label--marker {
+  stroke: var(--text-muted);
+  fill: var(--text-muted);
+}
+
+.p2f path.p2f-line {
+  fill: none;
+}
+
+.p2f .p2f-bar {
+  fill: var(--navy-700);
+}
+
+.p2f .p2f-bar--neg {
+  fill: var(--signal-text);
+}
+
+/* A choice: the lines of a worked answer, months or statements, one to pick. */
+.pp-choice {
+  display: grid;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.pp-choice__legend {
+  margin-bottom: var(--sp-2);
+  padding: 0;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.pp-choice__opt {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.2rem var(--sp-3);
+  align-items: start;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--rule-hair);
+  background: var(--surface-sheet);
+  cursor: pointer;
+}
+
+.pp-choice__opt input {
+  width: 1rem;
+  height: 1rem;
+  margin: 0.2rem 0 0;
+  accent-color: var(--bb-cobalt);
+}
+
+.pp-choice__opt:has(input:checked) {
+  border-color: var(--bb-cobalt);
+  background: var(--surface-cobalt-wash);
+}
+
+.pp-choice__opt:has(input:focus-visible) {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.pp-choice--lines .pp-choice__text {
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.pp-choice__mark {
+  grid-column: 2;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.pp-choice__mark:empty {
+  display: none;
+}
+
+.pp-choice__opt[data-verdict='right'] {
+  border-color: var(--green-text);
+  border-left-width: 4px;
+}
+
+.pp-choice__opt[data-verdict='right'] .pp-choice__mark {
+  color: var(--green-text);
+}
+
+.pp-choice__opt[data-verdict='wrong'] {
+  border-color: var(--signal-text);
+  border-left-width: 4px;
+}
+
+.pp-choice__opt[data-verdict='wrong'] .pp-choice__mark {
+  color: var(--signal-text);
+}
+
+/* A grid: a statement, forecast or schedule with cells to fill. */
+.pp-grid {
+  max-width: 100%;
+}
+
+.pp-grid caption {
+  padding: var(--sp-2) 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-align: left;
+  color: var(--text-muted);
+}
+
+.pp-grid__table th[scope='row'] {
+  min-width: 10rem;
+}
+
+.pp-grid__table td.n {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pp-grid__table .pp-t__head td {
+  padding-top: var(--sp-3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--brass-text);
+}
+
+.pp-grid__table .is-total th {
+  border-top: 1px solid var(--rule-ink);
+}
+
+.pp-cell {
+  min-width: 7.5rem;
+  vertical-align: top;
+}
+
+.pp-cell__in {
+  width: 100%;
+  min-width: 6.5rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+select.pp-cell__in {
+  text-align: left;
+}
+
+.pp-cell__in[aria-invalid='true'] {
+  border-color: var(--bb-signal);
+  border-width: 2px;
+}
+
+.pp-cell__m {
+  display: block;
+  margin-top: 0.2rem;
+  max-width: 14rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  white-space: normal;
+  text-align: left;
+}
+
+.pp-cell__m:empty {
+  display: none;
+}
+
+[data-verdict='right'] > .pp-cell__m {
+  color: var(--green-text);
+  font-weight: 600;
+}
+
+[data-verdict='own'] > .pp-cell__m,
+[data-verdict='close'] > .pp-cell__m {
+  color: var(--brass-text);
+}
+
+[data-verdict='wrong'] > .pp-cell__m,
+[data-verdict='invalid'] > .pp-cell__m,
+[data-verdict='blank'] > .pp-cell__m {
+  color: var(--signal-text);
+}
+
+.pp-grid__extra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3) var(--sp-5);
+  margin-top: var(--sp-3);
+}
+
+.pp-grid__field {
+  display: grid;
+  gap: 0.25rem;
+  max-width: 16rem;
+}
+
+.pp-grid__field label {
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.pp-grid__hint {
+  margin-top: var(--sp-2);
+}
+
+/* The working for the other tasks. */
+.pp-src {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-3);
+  align-items: baseline;
+  padding: var(--sp-2) var(--sp-3);
+  border-left: 3px solid var(--rule-ink);
+  background: var(--surface-sunk);
+  font-size: 0.875rem;
+}
+
+.pp-src--sheet {
+  border-left-color: var(--navy-900);
+}
+
+.pp-src__k {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--navy-900);
+}
+
+.pp-explain ul,
+ul.pp-explain,
+.pp-extra {
+  display: grid;
+  gap: var(--sp-2);
+  margin: var(--sp-2) 0 0;
+  padding-left: 1.2rem;
+}
+
+.pp-corrected ol {
+  display: grid;
+  gap: 0.3rem;
+  margin: var(--sp-2) 0 0;
+  padding-left: 1.6rem;
+  overflow-wrap: anywhere;
+}
+
+.pp-meaning {
+  max-width: 48rem;
+}
+
+.pp-static__list {
+  display: grid;
+  gap: 0.3rem;
+  margin: var(--sp-2) 0 0;
+  padding-left: 1.4rem;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.pp-static__gap {
+  color: var(--text-muted);
+}
+
+.pp-worked__form {
+  min-width: 0;
+}
+
+.pp-rec__task {
+  margin-left: var(--sp-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* What the practice covers. */
+.pp-cover {
+  display: grid;
+  gap: var(--sp-6);
+  margin-top: var(--sp-5);
+}
+
+.pp-cover__table {
+  min-width: 36rem;
+}
+
+.pp-cover__table th[scope='row'] {
+  white-space: nowrap;
+}
+
+.pp-cover__table td a {
+  white-space: normal;
+}

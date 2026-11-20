@@ -11,7 +11,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import SectionHead from '../../../components/layout/SectionHead.astro';
 import CentreHead from '../../../components/centre/CentreHead.astro';
 import GuideLabel from '../../../components/centre/GuideLabel.astro';
-import { ILLUSTRATIVE_CASE } from '../../../lib/p1-cases';
+import { ILLUSTRATIVE_CASE, P1_CASES, fullCase } from '../../../lib/p1-cases';
 import { PLANS, TAGS, TAG_IDS, paragraphHtml, splitCase, wordCount } from '../../../lib/p1-workspace';
 import { jsonForScript } from '../../../lib/markup';
 import '../../../styles/centre.css';
@@ -37,6 +37,7 @@ const PLAN_KINDS = Object.keys(PLANS) as Array<keyof typeof PLANS>;
     stats={[
       { value: '4', label: 'Tags', note: 'stakeholder · problem · data · tool' },
       { value: '2', label: 'Plans', note: 'Section A and Section B' },
+      { value: String(P1_CASES.length), label: 'Practice papers', note: 'full cases, timed, with guidance' },
       { value: 'Local', label: 'Storage', note: 'nothing leaves this device' },
     ]}
   />
@@ -45,6 +46,24 @@ const PLAN_KINDS = Object.keys(PLANS) as Array<keyof typeof PLANS>;
     <script type="application/json" data-config set:html={jsonForScript({ example: ILLUSTRATIVE_CASE })} />
     <p class="state state--error" data-error hidden>The workspace could not start. The case and the plan structures can still be read and printed.</p>
     <p class="sr-only" aria-live="polite" data-live></p>
+
+    <nav class="p1c-papers" aria-labelledby="ws-papers-h">
+      <p class="label" id="ws-papers-h">Full practice papers</p>
+      <ul>
+        {
+          P1_CASES.map((pc) => (
+            <li>
+              <a href={`/assessment/paper-1/workspace/${pc.id}/`}>{pc.organization}</a>
+              <span class="small muted">
+                {pc.industry}, {pc.country} · fictional · {wordCount(fullCase(pc))} words, 30 marks
+              </span>
+              <span class="small">{pc.summary}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="small muted">Each has the pre-released statement, the full case, a timed paper and guidance to mark your answers against.</p>
+    </nav>
 
     <section class="ws-sec" aria-labelledby="ws-case-h">
       <SectionHead no="01" title="The case" id="ws-case-h" dek="A Paper 1 case is about 800 to 1,000 words, of which about the first 200 are released three months before the examination (guide, p. 41)." />

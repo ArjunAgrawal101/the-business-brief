@@ -1,0 +1,105 @@
+---
+/**
+ * Paper 3 practice stimuli: invented social enterprises in the form the guide
+ * gives Paper 3, each with all three questions, the platform's guidance and
+ * the plan builder. Haven Lunchbox, the worked example, lives on the Paper 3
+ * page; the others have pages of their own.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import CentreHead from '../../../components/centre/CentreHead.astro';
+import GuideLabel from '../../../components/centre/GuideLabel.astro';
+import ProvenanceTag from '../../../components/ui/ProvenanceTag.astro';
+import { STIMULI, stimulusWords } from '../../../lib/p3-stimuli';
+import '../../../styles/centre.css';
+import '../../../styles/p3-practice.css';
+
+const practice = STIMULI.filter((s) => s.id !== 'haven');
+const haven = STIMULI.find((s) => s.id === 'haven');
+---
+
+<BaseLayout
+  room="assessment"
+  title="Paper 3 practice stimuli"
+  description="Original IB Business Management Paper 3 (HL) practice stimuli on fictional social enterprises, each with all three questions, guidance, and a plan builder that checks the plan against criteria A to D."
+  section="assessment"
+>
+  <CentreHead
+    crumb="Practice stimuli"
+    parent={{ label: 'Paper 3', href: '/assessment/paper-3/' }}
+    kicker="Paper 3 · Practice"
+    hl
+    title="Paper 3 practice stimuli"
+    lead="Invented social enterprises in the form of the paper: an introduction, a visual of a product and five excerpts, then the need, the challenges and a plan of action built step by step."
+    stats={[
+      { value: String(practice.length), label: 'Practice stimuli', note: 'each with its own page' },
+      { value: '3', label: 'Questions each', note: '2 · 6 · 17 marks' },
+      { value: '1 h 15', label: 'Duration', note: "plus 5 minutes' reading" },
+      { value: 'Fictional', label: 'Organizations', note: 'and their regions' },
+    ]}
+  />
+
+  <div class="wrap page-body ce p3p">
+    <section class="ce-sec" aria-labelledby="p3s-list-h">
+      <SectionHead no="01" title="Choose a stimulus" id="p3s-list-h" dek="Each is a social enterprise with a human need to meet and challenges in the way. None is an IB paper." />
+      <p class="ce-labels"><GuideLabel kind="example" /></p>
+      <ul class="p3p-list">
+        {
+          practice.map((s) => (
+            <li>
+              <p class="p3p-standing__tags">
+                <span class="tag tag--simulated">Fictional</span> <ProvenanceTag kind="original-practice" />
+              </p>
+              <h3 class="p3p-list__title">
+                <a href={s.href}>{s.organization}</a>
+              </h3>
+              <p>{s.summary}</p>
+              <p class="p3p-list__meta">
+                <span>{s.setting}</span>
+                <span>{stimulusWords(s)} words</span>
+                <span>{s.resources.length} resources</span>
+              </p>
+            </li>
+          ))
+        }
+        {
+          haven && (
+            <li>
+              <p class="p3p-standing__tags">
+                <span class="tag tag--simulated">Fictional</span> <GuideLabel kind="example" />
+              </p>
+              <h3 class="p3p-list__title">
+                <a href={haven.href}>{haven.organization}</a>
+              </h3>
+              <p>{haven.summary} The worked example of the Paper 3 page and its guide, with the plan builder there.</p>
+              <p class="p3p-list__meta">
+                <span>{haven.setting}</span>
+                <span>{haven.resources.length} resources</span>
+              </p>
+            </li>
+          )
+        }
+      </ul>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p3s-how-h">
+      <SectionHead no="02" title="How to practise" id="p3s-how-h" dek="As on the day: read first, then the questions in order, with the clock running." />
+      <div class="ce-split">
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="ib" /></p>
+          <h3>The paper</h3>
+          <p>One hour 15 minutes, with 5 minutes' reading. Question 1 is worth 2 marks, question 2 is worth 6 and question 3 is worth 17, marked on criteria A to D (guide, pp. 47-50).</p>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+          <h3>The platform's timings</h3>
+          <p>About three minutes a mark: 6 minutes for question 1, 18 for question 2 and about 50 for question 3, with its planning. Build the plan in the builder, then write it out in full against the clock.</p>
+        </div>
+      </div>
+      <div class="ce-cta">
+        <a class="btn btn--primary" href="/assessment/paper-3/">The Paper 3 Strategic Planning Centre <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+        <a class="btn" href="/assessment/question-bank/">The question bank</a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>

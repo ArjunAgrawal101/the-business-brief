@@ -227,7 +227,7 @@ export function checkIntegrity(c: Corpus): Problem[] {
 
   for (const [id, q] of Object.entries(c.questions)) {
     const w = `questions/${id}`;
-    need(c.topics, q.topic, w, 'topic');
+    if (q.topic !== undefined) need(c.topics, q.topic, w, 'topic');
     // Guide, p. 43: paper 1 excludes HL extension material; p. 47: paper 3 is HL only.
     if (q.paperStyle === 'paper-1' && q.level === 'HL') problems.push({ where: w, message: 'paper 1 excludes HL-only content, so an HL question cannot be in the style of paper 1' });
     if (q.paperStyle === 'paper-3' && q.level !== 'HL') problems.push({ where: w, message: 'paper 3 is HL only' });

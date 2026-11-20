@@ -4,11 +4,19 @@ import PageIntro from '../../components/layout/PageIntro.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import QuestionCard from '../../components/assess/QuestionCard.astro';
 import LevelSwitch from '../../components/ui/LevelSwitch.astro';
-import { questionsInOrder, topicsInOrder } from '../../lib/content';
+import { corpus, questionsInOrder, topicsInOrder } from '../../lib/content';
 
 
 const questions = await questionsInOrder();
 const topics = await topicsInOrder();
+// Questions on a subtopic no topic brief covers are listed under their first subtopic, in syllabus order.
+const subtopicTitles = new Map((await corpus()).curricula['ib-dp-bm']?.units.flatMap((u) => u.subtopics.map((x) => [x.code, x.title] as const)) ?? []);
+const codeOrder = (code: string) => code.split('.').reduce((n, part) => n * 100 + Number(part), 0);
+const unbriefed = questions.filter(([, q]) => !q.topic || !topics.some(([tid]) => tid === q.topic));
+const bySubtopic = [...new Set(unbriefed.map(([, q]) => q.syllabus[0] ?? ''))]
+  .sort((a, b) => codeOrder(a) - codeOrder(b))
+  .map((code) => ({ code, title: subtopicTitles.get(code) ?? '', qs: unbriefed.filter(([, q]) => (q.syllabus[0] ?? '') === code) }));
+const briefed = topics.filter(([tid]) => questions.some(([, q]) => q.topic === tid)).length;
 const PAPERS = { 'paper-1': 'Paper 1 style', 'paper-2': 'Paper 2 style', 'paper-3': 'Paper 3 style', 'ia-skill': 'IA skill', general: 'Practice' } as const;
 const papers = [...new Set(questions.map(([, q]) => q.paperStyle))];
 const terms = [...new Set(questions.map(([, q]) => q.commandTerm))].sort();
@@ -67,6 +75,20 @@ const terms = [...new Set(questions.map(([, q]) => q.commandTerm))].sort();
           </section>
         );
       })
+    }
+    {
+      bySubtopic.map((g, k) => (
+        <section aria-labelledby={`ps-${g.code.replace('.', '-')}`} data-filter-group>
+          <SectionHead no={briefed + k + 1} title={`${g.code} ${g.title}`} id={`ps-${g.code.replace('.', '-')}`} />
+          <div class="stack" style="margin-top:var(--sp-5)">
+            {g.qs.map(([id, q]) => (
+              <div data-filter-item data-paper={q.paperStyle} data-term={q.commandTerm} data-calc={String(q.requiresCalculation)} data-eval={String(q.requiresEvaluation)}>
+                <QuestionCard id={id} question={q} />
+              </div>
+            ))}
+          </div>
+        </section>
+      ))
     }
     <p class="state" data-empty hidden>No questions match these filters.</p>
   </div>

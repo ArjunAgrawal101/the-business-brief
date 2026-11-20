@@ -1,0 +1,236 @@
+---
+/**
+ * A Paper 3 practice stimulus: an invented social enterprise in the form the
+ * guide gives Paper 3 (p. 42), its three questions with the platform's
+ * guidance, and the plan builder for question 3 with a model plan to compare.
+ * Everything here is fictional and labelled so; the guidance is the
+ * platform's, never an IB markscheme.
+ */
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import SectionHead from '../../../../components/layout/SectionHead.astro';
+import CentreHead from '../../../../components/centre/CentreHead.astro';
+import GuideLabel from '../../../../components/centre/GuideLabel.astro';
+import PlanBuilder from '../../../../components/centre/PlanBuilder.astro';
+import P3Visual from '../../../../components/centre/P3Visual.astro';
+import ProvenanceTag from '../../../../components/ui/ProvenanceTag.astro';
+import TutorNote from '../../../../components/ui/TutorNote.astro';
+import { CRITERIA, STIMULI, stimulusWords, type Stimulus } from '../../../../lib/p3-stimuli';
+import { KIND_LABEL, FN_LABEL } from '../../../../lib/p3-plan';
+import '../../../../styles/centre.css';
+import '../../../../styles/p3-practice.css';
+
+export function getStaticPaths() {
+  return STIMULI.filter((s) => s.id !== 'haven').map((s) => ({ params: { stimulus: s.id }, props: { s } }));
+}
+
+interface Props {
+  s: Stimulus;
+}
+const { s } = Astro.props;
+const words = stimulusWords(s);
+const marks = s.questions.reduce((n, q) => n + q.marks, 0);
+const excerpts = s.resources.filter((r) => r.kind !== 'Text' && r.kind !== 'Visual').length;
+const others = STIMULI.filter((x) => x.id !== s.id);
+const q3 = s.questions.find((q) => q.number === 3);
+---
+
+<BaseLayout
+  room="assessment"
+  title={`Paper 3 practice stimulus: ${s.organization}`}
+  description={`An original IB Business Management Paper 3 (HL) practice stimulus on a fictional social enterprise: ${s.summary} All three questions with guidance, and the plan builder for question 3.`}
+  section="assessment"
+>
+  <CentreHead
+    crumb={s.organization}
+    parent={{ label: 'Paper 3 practice', href: '/assessment/paper-3/practice/' }}
+    kicker="Paper 3 · Practice stimulus"
+    hl
+    title={s.organization}
+    lead={`${s.summary} Read the stimulus, answer questions 1 and 2, then build the plan for question 3.`}
+    stats={[
+      { value: `${words} words`, label: 'Stimulus', note: `an introduction, a visual and ${excerpts} excerpts` },
+      { value: String(marks), label: 'Marks', note: s.questions.map((q) => q.marks).join(' · ') },
+      { value: '1 h 15', label: 'Duration', note: "plus 5 minutes' reading" },
+      { value: 'Fictional', label: 'Organization', note: 'invented, like its region' },
+    ]}
+  />
+
+  <div class="wrap page-body ce p3p">
+    <div class="p3p-standing">
+      <p class="p3p-standing__tags"><span class="tag tag--simulated">Fictional</span> <ProvenanceTag kind="original-practice" /> <GuideLabel kind="example" /></p>
+      <p>
+        {s.setting}. Every organization, person, place and figure is invented for practice, as the organization and region of a real Paper 3 stimulus are
+        fictitious. The questions follow the structure of the paper; the guidance is the platform's own, not an IB markscheme.
+      </p>
+    </div>
+
+    <nav class="p3p-jump" aria-label="On this page">
+      <a href="#p3p-stim-h">The stimulus</a>
+      <a href="#p3p-q12-h">Questions 1 and 2</a>
+      <a href={`#pb-${s.id}`}>The plan builder</a>
+    </nav>
+
+    <section class="ce-sec" aria-labelledby="p3p-stim-h">
+      <SectionHead no="01" title="The stimulus" id="p3p-stim-h" dek={`Read all ${s.resources.length} resources: question 3 asks you to use every one of them. Allow the five minutes' reading time.`} />
+      <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="example" /></p>
+      <p class="small muted">The form is the guide's (p. 42): a short introduction, a visual of a product and five or six excerpts. The content is invented.</p>
+      <div class="p3p-res">
+        {
+          s.resources.map((r) => (
+            <article class:list={['p3p-r', `p3p-r--${r.kind.toLowerCase().replace(/\s+/g, '-')}`]} id={`${s.id}-${r.id.toLowerCase()}`} aria-labelledby={`${s.id}-${r.id.toLowerCase()}-h`}>
+              <h3 class="p3p-r__id" id={`${s.id}-${r.id.toLowerCase()}-h`}>
+                {r.id} · {r.title}
+                <span class="p3p-r__kind">{r.kind}</span>
+              </h3>
+              {r.from && <p class="p3p-r__from">From: {r.from}</p>}
+              {r.headline && <p class="p3p-r__head">{r.headline}</p>}
+              {r.visual && <P3Visual stimulus={s.id} product={r.visual.product} labels={r.visual.labels} description={r.visual.description} />}
+              {r.body?.map((p) => <p>{p}</p>)}
+              {r.table && (
+                <div class="table-scroll ce-scroll" role="region" aria-label={`Table: ${r.table.caption}`} tabindex="0">
+                  <table class="ce-table p3p-t">
+                    <caption>{r.table.caption}</caption>
+                    <thead>
+                      <tr>
+                        {r.table.columns.map((c, i) => (i === 0 ? <td /> : <th scope="col">{c}</th>))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {r.table.rows.map((row) => (
+                        <tr>
+                          {row.map((cell, i) => (i === 0 ? <th scope="row">{cell}</th> : <td class="num">{cell}</td>))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p3p-q12-h">
+      <SectionHead no="02" title="Questions 1 and 2" id="p3p-q12-h" dek="Describe the need, then explain the challenges. About three minutes a mark is the platform's suggestion: 6 minutes, then 18." />
+      {
+        s.questions
+          .filter((q) => q.number !== 3)
+          .map((q) => (
+            <div class="p3p-q">
+              <p class="p3p-q__n">Question {q.number}</p>
+              <p class="p3p-q__prompt">
+                <strong>{q.prompt}</strong> <span class="p3p-q__marks">[{q.marks}]</span>
+              </p>
+              <details class="p3p-guide">
+                <summary>Guidance to check your answer against</summary>
+                <div class="p3p-guide__body">
+                  <p class="ce-labels">
+                    <GuideLabel kind="strategy" /> <GuideLabel kind="example" />
+                  </p>
+                  <ul>
+                    {q.guidance.map((g) => (
+                      <li>{g}</li>
+                    ))}
+                  </ul>
+                  <p class="small muted">
+                    The platform's guidance for its own question, in the structure the Paper 3 page sets out: the need and a theory for question 1; for each
+                    challenge in question 2, identify, explain and apply. A real paper's markscheme decides what earns marks.
+                  </p>
+                </div>
+              </details>
+            </div>
+          ))
+      }
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p3p-q3-h">
+      <SectionHead no="03" title="Question 3: the plan of action" id="p3p-q3-h" dek="Build the plan step by step. Each step checks what you have written; the end shows the plan in order against criteria A to D." />
+      {
+        q3 && (
+          <div class="p3p-q">
+            <p class="p3p-q__n">Question 3</p>
+            <p class="p3p-q__prompt">
+              <strong>{q3.prompt}</strong> <span class="p3p-q__marks">[{q3.marks}]</span>
+            </p>
+            <ul class="p3p-q3">
+              {q3.guidance.map((g) => (
+                <li>{g}</li>
+              ))}
+            </ul>
+            <dl class="p3p-crit">
+              {CRITERIA.map((c) => (
+                <div>
+                  <dt>
+                    {c.id} · {c.name}
+                  </dt>
+                  <dd>
+                    {c.marks} marks. {c.prompt}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <p class="small muted">Criteria names and marks from the guide (pp. 48-50); the question under each is the platform's prompt, not a descriptor.</p>
+          </div>
+        )
+      }
+      <PlanBuilder resources={s.resources} stimulus={s.id} />
+      <details class="p3p-model">
+        <summary>Compare with a model plan</summary>
+        <div class="p3p-model__body">
+          <p class="ce-labels"><GuideLabel kind="strategy" /> <GuideLabel kind="example" /></p>
+          <p><b>Direction:</b> {s.model.direction}</p>
+          <ol class="ce-flow">
+            <li><span class="label">First</span><p>{s.model.first}</p></li>
+            <li><span class="label">Then</span><p>{s.model.then}</p></li>
+            <li><span class="label">Later</span><p>{s.model.later}</p></li>
+            <li><span class="label">Throughout</span><p>{s.model.throughout}</p></li>
+          </ol>
+          {s.model.tradeoffs.map((t) => (
+            <p>
+              <b>Trade-off:</b> {t}
+            </p>
+          ))}
+          <p class="small muted">One of many good plans, in outline. A plan that reaches a different, feasible recommendation from the same evidence is credited on its merits.</p>
+        </div>
+      </details>
+      <h3 class="ce-h3">What the stimulus offers the plan</h3>
+      <p class="ce-labels"><GuideLabel kind="example" /></p>
+      <div class="table-scroll ce-scroll" role="region" aria-label="Table: what the stimulus offers the plan" tabindex="0">
+        <table class="ce-table">
+          <thead><tr><th scope="col">Kind</th><th scope="col">In the stimulus</th><th scope="col">Resources</th></tr></thead>
+          <tbody>
+            {
+              s.needs.map((n) => (
+                <tr>
+                  <th scope="row">{`${KIND_LABEL[n.kind]}${n.fn ? `, ${FN_LABEL[n.fn].toLowerCase()}` : ''}`}</th>
+                  <td>{n.text}</td>
+                  <td>{n.resources.join(', ')}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="ce-sec" aria-labelledby="p3p-more-h">
+      <SectionHead no="04" title="More stimuli" id="p3p-more-h" dek="Each invented, each with all three questions." />
+      <ul class="p3p-others">
+        {
+          others.map((o) => (
+            <li>
+              <a href={o.href}>{o.organization}</a>
+              <span class="small muted">{o.summary}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="ce-cta">
+        <a class="btn btn--primary" href="/assessment/paper-3/">The Paper 3 Strategic Planning Centre <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+        <a class="btn" href="/assessment/paper-3/practice/">All Paper 3 practice stimuli</a>
+      </div>
+    </section>
+    <TutorNote lead="Preparing for Paper 3?" offer="A session can work through a social enterprise, its human needs, the resource materials and a strategic plan you can defend." />
+  </div>
+</BaseLayout>

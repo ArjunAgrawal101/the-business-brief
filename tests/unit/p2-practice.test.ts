@@ -228,7 +228,37 @@ describe('choosing questions and keeping scores', () => {
     expect(sl).toContain('payback-period');
     expect(hl).toEqual(KIND_IDS);
     expect(kindsFor(['efficiency'], 'SL')).toEqual([]);
-    expect(KIND_IDS.filter((k) => KINDS[k]?.level === 'HL').sort()).toEqual(['creditor-days', 'debtor-days', 'gearing-ratio', 'net-present-value', 'stock-turnover-days', 'stock-turnover-times']);
+    expect(KIND_IDS.filter((k) => KINDS[k]?.level === 'HL').sort()).toEqual(
+      [
+        'absorption-cost',
+        'budget-variance',
+        'capacity-utilization',
+        'capital-productivity',
+        'creditor-days',
+        'debtor-days',
+        'defect-rate',
+        'free-float',
+        'gearing-ratio',
+        'labour-productivity',
+        'labour-turnover',
+        'make-or-buy',
+        'net-book-value',
+        'net-present-value',
+        'operating-leverage',
+        'price-elasticity',
+        'productivity-rate',
+        'read-stock-chart',
+        'regression-forecast',
+        'reorder-level',
+        'reorder-quantity',
+        'special-order',
+        'stock-turnover-days',
+        'stock-turnover-times',
+        'straight-line-depreciation',
+        'total-float',
+        'units-of-production-depreciation',
+      ].sort(),
+    );
   });
 
   it('draws a timed set from a seed, spreading it across the kinds chosen', () => {
