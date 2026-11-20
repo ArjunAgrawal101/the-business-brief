@@ -11,58 +11,14 @@
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/layout/PageIntro.astro';
-import { corpus, href, modulesInOrder, pathwaysInOrder } from '../lib/content';
-import { subtopicHref } from '../lib/learning';
-import { DIAGRAMS } from '../lib/diagrams';
-import { library } from '../lib/resources';
-import { library as frameworkLibrary } from '../lib/frameworks-content';
-import { advancedLibrary } from '../lib/advanced-content';
-import { DOMAIN_BY_ID, advancedHref } from '../lib/advanced';
-import { series as briefingSeries } from '../lib/boardroom-briefings/content';
-import { briefingHref as seriesHref, issueNo } from '../lib/boardroom-briefings/series';
-import { plain } from '../lib/markup';
-import { NAV } from '../lib/navigation';
-import { buildSearchIndex, type SearchLinks } from '../lib/search-index';
+import { corpus } from '../lib/content';
+import { siteSearchEntries } from '../lib/search-entries';
 import { SEARCH_KINDS, extraWords } from '../lib/search';
 import { iconSvg } from '../lib/icons';
 import '../styles/search.css';
 
 const c = await corpus();
-const links: SearchLinks = {
-  subtopic: (code) => subtopicHref(c, code),
-  topic: href.topic,
-  case: href.case,
-  decision: href.decision,
-  toolEntry: (id) => href.toolEntry(id, c.tools[id]),
-  question: href.question,
-  glossary: href.glossary,
-  mindmap: href.mindmap,
-  commandTerm: href.commandTerm,
-  concept: href.concept,
-  revision: href.revision,
-  calculation: href.calculation,
-  pathway: href.pathway,
-};
-const entries = buildSearchIndex({
-  c,
-  nav: NAV,
-  links,
-  modules: (await modulesInOrder()).map((m) => m.data),
-  library: (await library())
-    .filter((r) => r.curated)
-    .map((r) => ({ title: r.title, summary: r.summary, typeLabel: r.typeLabel, level: r.level, units: r.units, subtopics: r.subtopics, href: r.details ?? r.primary.href })),
-  diagrams: DIAGRAMS,
-  pathways: (await pathwaysInOrder()).map((p) => ({ id: p.id, name: p.data.name, promise: p.data.promise })),
-  frameworks: (await frameworkLibrary()).frameworks,
-  advanced: (await advancedLibrary()).modules.map((m) => ({ url: advancedHref(m.data.domain, m.id), title: m.data.title, dek: plain(m.data.dek), domain: DOMAIN_BY_ID[m.data.domain].name, covers: m.data.covers })),
-  boardroomBriefings: (await briefingSeries()).list.map(([id, b]) => ({
-    url: seriesHref(id),
-    title: `${issueNo(b.number)}: ${b.question}`,
-    text: plain(b.dek),
-    keys: `${b.title} ${b.company.name} ${b.industry} ${b.decisionType} ${b.functions.join(' ')}`,
-    codes: b.course.subtopics.map((s) => s.code),
-  })),
-});
+const entries = await siteSearchEntries();
 const groups = SEARCH_KINDS.map((k) => ({ ...k, items: entries.filter((e) => e.kind === k.id) })).filter((g) => g.items.length);
 const units = c.curricula['ib-dp-bm']?.units ?? [];
 const total = entries.length.toLocaleString('en-GB');
@@ -163,6 +119,10 @@ const codesLabel = (title: string, codes: string[], unitList: string[]) =>
         </nav>
 
         <div class="sx-results" data-results>
+          <section class="sx-best" data-best hidden aria-labelledby="sx-best-h">
+            <h2 class="sx-group__h" id="sx-best-h" tabindex="-1">Best matches</h2>
+            <ol class="sx-list sx-best__list" role="list" data-best-list></ol>
+          </section>
           {
             groups.map((g) => (
               <section class="sx-group" id={`k-${g.id}`} data-group={g.id} aria-labelledby={`k-${g.id}-h`}>
@@ -184,9 +144,13 @@ const codesLabel = (title: string, codes: string[], unitList: string[]) =>
               </section>
             ))
           }
-          <p class="state sx-none" data-none hidden>
-            Nothing matches. Try a shorter word or another spelling, clear a filter, or browse the <a href="/topics/">topic library</a> and the <a href="/glossary/">glossary</a>.
-          </p>
+          <div class="state sx-none" data-none hidden>
+            <p>Nothing matches. Try a shorter word or another spelling, clear a filter, or browse the <a href="/topics/">topic library</a> and the <a href="/glossary/">glossary</a>.</p>
+            <div class="sx-close" data-close hidden>
+              <p class="sx-close__k">Close spellings</p>
+              <ol class="sx-list" role="list" data-close-list></ol>
+            </div>
+          </div>
         </div>
       </div>
     </div>

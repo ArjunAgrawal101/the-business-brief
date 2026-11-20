@@ -1,25 +1,32 @@
 /**
- * My Business Workspace (/dashboard/, also /progress/). Reads every item this
- * site keeps in this browser, turns them into a view with workspaceView()
+ * My dashboard (/dashboard/) and Your progress (/progress/), one script for
+ * both: data-view on the root says which. It reads every item this site
+ * keeps in this browser, turns them into a view with workspaceView()
  * (src/lib/workspace.ts, which builds on dashboardView() in
- * src/lib/dashboard.ts) and renders each section. The learning list, the
- * notebook, the saved analyses and the export of selected work are parts of
- * their own in src/scripts/workspace/. It writes only when the reader asks:
- * changing the list, writing or deleting a note, removing a saved result,
- * pausing the record, importing a copy or clearing what is kept; deleting a
- * note, importing and clearing are confirmed first. It re-renders when
- * another tab changes what is kept.
+ * src/lib/dashboard.ts) and renders each section the page has. The top of
+ * the dashboard (the revision queue, progress by unit, weak areas, practice
+ * and where the reader left off) is src/scripts/workspace/overview.ts; the
+ * learning list, the notebook, the saved analyses and the export of selected
+ * work are parts of their own in src/scripts/workspace/. It writes only when
+ * the reader asks: changing the list, writing or deleting a note, removing a
+ * saved result, pausing the record, importing a copy or clearing what is
+ * kept; deleting a note, importing and clearing are confirmed first. It
+ * re-renders when another tab changes what is kept, and when the reader
+ * switches between SL and HL.
  */
 import { each, escapeHtml as h, readConfig } from './ix';
 import { courseChartSvg, shortDate, tallyWords, type Row } from '../lib/dashboard';
-import { LEARNER_KEY, SAVED_KEY, VISIT_KINDS, VISIT_KIND_LABELS, buildExport, emptyLog, parseLog, type Visit } from '../lib/learner';
-import { LIST_KEY, NOTES_KEY, SNAPSHOTS_KEY, checkImport, planWorkspaceImport, workspaceView, type WorkspaceConfig, type WorkspaceView } from '../lib/workspace';
+import { LEARNER_KEY, SAVED_KEY, STUDIED_KEY, VISIT_KINDS, VISIT_KIND_LABELS, buildExport, emptyLog, parseLog, parseStudied, type Visit } from '../lib/learner';
+import { LIST_KEY, NOTES_KEY, SNAPSHOTS_KEY, planWorkspaceImport, type WorkspaceConfig, type WorkspaceView } from '../lib/workspace';
+import { checkDashboardImport as checkImport, dashboardWorkspaceView as workspaceView } from '../lib/workspace-progress';
 import { readItem, removeItem, siteItems, storageWorks, writeItem } from './storage';
 import { n, plural, type AskOptions, type Ctx } from './workspace/context';
 import { bindList, renderList } from './workspace/list';
-import { bindNotes } from './workspace/notes';
+import { bindNotes, type NotesPart } from './workspace/notes';
 import { bindAnalyses, renderAnalyses } from './workspace/analyses';
-import { bindExport } from './workspace/export';
+import { bindExport, type ExportPart } from './workspace/export';
+import { renderOverview, rowExtras } from './workspace/overview';
+import { parseCards, pct, readBank, scoreOf } from '../lib/progress';
 
 const longDate = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -73,10 +80,13 @@ each('[data-ix="progress"]', (root) => {
 
   let view: WorkspaceView = workspaceView(siteItems() ?? {}, cfg);
   const ctx: Ctx = { root, cfg, view: () => view, say, ask, refresh: () => render() };
-  const list = bindList(ctx);
-  const notes = bindNotes(ctx);
-  bindAnalyses(ctx);
-  const exporter = bindExport(ctx);
+  // The dashboard holds the workspace; the progress page holds the record behind it.
+  const isDashboard = root.dataset.view !== 'progress';
+  const idle = { flush: () => undefined, render: () => undefined };
+  const list: { flush: () => void } = isDashboard ? bindList(ctx) : idle;
+  const notes: NotesPart = isDashboard ? bindNotes(ctx) : idle;
+  if (isDashboard) bindAnalyses(ctx);
+  const exporter: ExportPart = isDashboard ? bindExport(ctx) : idle;
 
   /* ---------- Rendering ---------- */
 
@@ -106,8 +116,13 @@ each('[data-ix="progress"]', (root) => {
     // Focus stays on the same control when a part is drawn again (another tab changed what is kept).
     const active = document.activeElement instanceof HTMLElement && root.contains(document.activeElement) ? document.activeElement.dataset.focus : undefined;
 
+    // The top of the dashboard, which also says whether its practice records hold anything.
+    const overview = isDashboard ? renderOverview(ctx, items, view, now) : { any: false };
+    const any = view.any || overview.any || Object.keys(parseStudied(items[STUDIED_KEY]).done).length > 0 || Object.keys(readBank(items['bb:bank']).items).length > 0 || parseCards(items['bb:cards']).cards.length > 0;
     const empty = $('[data-empty]');
-    if (empty) empty.hidden = view.any;
+    if (empty) empty.hidden = any;
+    // A first visit sees what the page will show and how to start, not empty sections.
+    root.querySelectorAll<HTMLElement>('[data-needs-data]').forEach((el) => (el.hidden = !any));
 
     // Status line
     const status = $('[data-statusline]');
@@ -191,6 +206,8 @@ each('[data-ix="progress"]', (root) => {
       const el = root.querySelector<HTMLElement>(`[data-unit-sum="${u.number}"]`);
       if (el) el.textContent = `${u.explored} of ${u.total} explored, ${u.practised} practised`;
     }
+    // On the progress page, each row also says whether the subtopic is marked complete, and how its results average.
+    const extras = isDashboard ? null : rowExtras(items, cfg, view);
     for (const r of view.course.rows) {
       const li = root.querySelector<HTMLElement>(`.db-row[data-code="${CSS.escape(r.code)}"]`);
       if (!li) continue;
@@ -199,7 +216,12 @@ each('[data-ix="progress"]', (root) => {
       const mark = li.querySelector<HTMLElement>('[data-mark]');
       if (mark) mark.className = `db-mark js-only${r.status === 'none' ? '' : ` db-mark--${r.status}`}`;
       const you = li.querySelector<HTMLElement>('[data-you]');
-      if (you) you.textContent = r.words;
+      const x = extras?.get(r.code);
+      const words = [x?.completedAt ? `Completed ${shortDate(x.completedAt, now)}` : '', r.words === 'Not started' && x?.completed ? '' : r.words, x?.results?.n ? `results average ${pct(scoreOf(x.results))} of ${x.results.n}` : '']
+        .filter(Boolean)
+        .join(' · ');
+      li.classList.toggle('is-completed', Boolean(x?.completed));
+      if (you) you.textContent = words;
     }
 
     // Where you have been
@@ -389,6 +411,8 @@ each('[data-ix="progress"]', (root) => {
   window.addEventListener('storage', (e) => {
     if (e.key === null || e.key.startsWith('bb:')) render();
   });
+  // The SL and HL switch changes which subtopics count.
+  new MutationObserver(() => render()).observe(document.documentElement, { attributes: true, attributeFilter: ['data-level'] });
 
   render();
 });

@@ -12,7 +12,8 @@ import CentreHead from '../../../components/centre/CentreHead.astro';
 import GuideLabel from '../../../components/centre/GuideLabel.astro';
 import IaToolNav from '../../../components/centre/IaToolNav.astro';
 import IaIntegrity from '../../../components/centre/IaIntegrity.astro';
-import { STAGES, STAGE_STATUS } from '../../../lib/ia-tools';
+import { STAGES, STAGE_STATUS, toolPosition } from '../../../lib/ia-tools';
+import { LABEL_TEXT } from '../../../lib/guide-labels';
 import '../../../styles/centre.css';
 import '../../../styles/ia-tools.css';
 
@@ -20,7 +21,8 @@ const FINAL = [
   { id: 'one-org', text: 'The project refers directly to a single organization.', source: 'Guide, p. 53' },
   { id: 'concept', text: 'The key concept is stated on the title page.', source: 'Guide, p. 53' },
   { id: 'count', text: 'The word count is on the cover page, and the words that count are 1,800 or fewer.', source: 'Guide, p. 56' },
-  { id: 'docs', text: 'Three to five supporting documents are attached at the end, labelled, with the parts you use highlighted.', source: 'Guide, p. 55' },
+  { id: 'docs', text: 'Three to five supporting documents of your own selection are attached, with the parts you use highlighted.', source: 'Guide, pp. 53 and 55' },
+  { id: 'dates', text: 'Every supporting document was published within the three years before submission, and at most one is a transcript, giving the essential points of the original.', source: 'Guide, p. 54' },
   { id: 'translate', text: 'Highlighted parts not in your registered language are translated.', source: 'Guide, p. 55' },
   { id: 'refs', text: 'Every supporting document and other source is cited in the text and listed in a bibliography.', source: 'Guide, pp. 53 and 55' },
   { id: 'present', text: 'A title page, an accurate table of contents, headings and subheadings, and numbered pages.', source: 'Guide, p. 55' },
@@ -38,7 +40,7 @@ const NOT_COUNTED = ['Acknowledgments', 'The contents page', 'Tables of statisti
   <CentreHead
     crumb="Progress tracker"
     parent={{ label: 'Internal assessment', href: '/assessment/internal-assessment/' }}
-    kicker="Internal assessment · Tool 5 of 5"
+    kicker={`Internal assessment · ${toolPosition('progress')}`}
     title="Your progress"
     lead="Track each stage of your project, the words that count and the guide's requirements before you submit. If you have used the other tools, it reads your deadline, documents and lens from them. It never predicts a mark: only your teacher's marking and the IB's moderation decide that."
     stats={[
@@ -91,7 +93,7 @@ const NOT_COUNTED = ['Acknowledgments', 'The contents page', 'Tables of statisti
                   </div>
                 </div>
                 <div class="pg-stage__side">
-                  <p class="pg-stand">{s.standing === 'ib' ? 'IB requirement' : 'Recommended'}</p>
+                  <p class="pg-stand">{LABEL_TEXT[s.standing]}</p>
                   <div class="field">
                     <label for={`pg-${s.id}-status`}>Status</label>
                     <select class="select" id={`pg-${s.id}-status`} data-status aria-describedby={`pg-${s.id}-done`}>
@@ -118,7 +120,7 @@ const NOT_COUNTED = ['Acknowledgments', 'The contents page', 'Tables of statisti
             <p class="ce-labels"><GuideLabel kind="ib" /></p>
             <p class="small"><b>Not counted</b> (guide, p. 56):</p>
             <ul class="pg-not">{NOT_COUNTED.map((x) => <li>{x}</li>)}</ul>
-            <p class="small">Everything else counts, including headings, definitions of business terms and quotations. Footnotes and endnotes may hold references only.</p>
+            <p class="small">Definitions of business terms and quotations count, and must be in the body; footnotes and endnotes may hold references only (p. 56). The guide does not exclude headings, so the platform's reading is that they count too.</p>
           </div>
         </div>
       </section>
@@ -126,14 +128,14 @@ const NOT_COUNTED = ['Acknowledgments', 'The contents page', 'Tables of statisti
       <section class="it-sec" aria-labelledby="pg-final-h">
         <SectionHead no="04" title="Before you submit" id="pg-final-h" dek="The guide's requirements for the submitted project. Ticking them tells you what is in place; it does not predict a mark." />
         <fieldset class="it-fs">
-          <legend class="ce-labels"><GuideLabel kind="ib" /></legend>
+          <legend class="ce-labels"><GuideLabel kind="ib" /> <span class="ce-cite">Business management guide; the page follows each check</span></legend>
           <div class="it-checks-in">
             {
               FINAL.map((f) => (
                 <label class="it-check">
                   <input type="checkbox" value={f.id} data-final />
                   <span>
-                    {f.text} <span class="it-src">{f.source}</span>
+                    {f.text} <span class="it-src">{f.source.replace(/^Guide, /, '')}</span>
                   </span>
                 </label>
               ))
@@ -162,7 +164,7 @@ const NOT_COUNTED = ['Acknowledgments', 'The contents page', 'Tables of statisti
           <p class="it-ex__k">Weaker <GuideLabel kind="example" /></p>
           <h3 id="pg-weak-h">Five stages done, the draft never shown</h3>
           <dl>
-            <div><dt>Stages</dt><dd>5 of 11 done; "first draft to your teacher" not started.</dd></div>
+            <div><dt>Stages</dt><dd>5 of {STAGES.length} done; "first draft to your teacher" not started.</dd></div>
             <div><dt>Words</dt><dd>2,140 counted: the last 340 would not be read.</dd></div>
             <div><dt>Documents</dt><dd>Four, one published four years before submission.</dd></div>
             <div><dt>Title page</dt><dd>No key concept stated.</dd></div>
@@ -173,10 +175,10 @@ const NOT_COUNTED = ['Acknowledgments', 'The contents page', 'Tables of statisti
           <p class="it-ex__k">Stronger <GuideLabel kind="example" /></p>
           <h3 id="pg-strong-h">Ten stages done, one week for the final version</h3>
           <dl>
-            <div><dt>Stages</dt><dd>10 of 11 done; the draft was commented on in January and revised.</dd></div>
+            <div><dt>Stages</dt><dd>{STAGES.length - 1} of {STAGES.length} done; the draft was commented on in January and revised.</dd></div>
             <div><dt>Words</dt><dd>1,760 that count, with the count on the cover page.</dd></div>
             <div><dt>Documents</dt><dd>Five, all within three years, labelled SD1 to SD5 and highlighted.</dd></div>
-            <div><dt>Final checks</dt><dd>All eight in place; the penultimate draft was marked strictly against each criterion.</dd></div>
+            <div><dt>Final checks</dt><dd>All {FINAL.length} in place; the penultimate draft was marked strictly against each criterion.</dd></div>
           </dl>
           <p class="it-why">What is left is the final read, not missing requirements. That is a sign of a well-run project, not a prediction of its mark.</p>
         </article>

@@ -2,6 +2,8 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
 import { corpus, decisionsInOrder, href } from '../../lib/content';
+import { STEP_IDS } from '../../lib/scenario-generator/types';
+import { count } from '../../lib/strategy/common';
 
 const c = await corpus();
 const decisions = await decisionsInOrder();
@@ -15,6 +17,19 @@ const decisions = await decisionsInOrder();
     lead="Read the situation, commit to a choice, and see what it does to the business, its numbers and its people. Then decide how to make it work. The debrief opens only after you have committed, so you cannot read the answer first."
   />
   <div class="wrap page-body">
+    <section class="dr-more" aria-labelledby="dr-more-h">
+      <h2 class="label label--ink" id="dr-more-h">Practise the reasoning</h2>
+      <ul class="dr-more__list" role="list">
+        <li>
+          <a class="dr-more__name" href="/decision-room/scenarios/">Business scenario generator</a>
+          <p>A fresh fictional case every time, worked in {count(STEP_IDS.length)} steps: the problem, the evidence, the tool, the analysis, the recommendation and its consequences, with feedback at each step and a model answer at the end.</p>
+        </li>
+        <li>
+          <a class="dr-more__name" href="/decision-room/stakeholder-impact/">Stakeholder impact simulator</a>
+          <p>Choose a decision and how it is carried out, and see who gains, who loses, when and why, with the trade-offs and a power-interest grid.</p>
+        </li>
+      </ul>
+    </section>
     <ol class="index-list">
       {
         decisions.map(([id, d]) => {
@@ -51,3 +66,33 @@ const decisions = await decisionsInOrder();
     </aside>
   </div>
 </BaseLayout>
+
+<style>
+  .dr-more {
+    margin-bottom: var(--sp-7);
+    padding: var(--sp-4) var(--sp-5);
+    border-left: 3px solid var(--rule-ink);
+    background: var(--surface-sheet);
+    max-width: 64rem;
+  }
+
+  .dr-more__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: var(--sp-3) var(--sp-6);
+    margin: var(--sp-3) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .dr-more__name {
+    font-family: var(--font-display);
+    font-size: 1.1875rem;
+    font-weight: 600;
+  }
+
+  .dr-more__list p {
+    margin: var(--sp-1) 0 0;
+    font-size: 0.9375rem;
+  }
+</style>

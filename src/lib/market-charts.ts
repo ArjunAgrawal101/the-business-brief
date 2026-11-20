@@ -16,8 +16,8 @@ export const C = {
   muted: '#566173',
   rule: '#E3DAC8',
   ruleStrong: '#CDC2AB',
-  cobalt: '#2F55E4',
-  cobaltText: '#2448D0',
+  cobalt: '#3A6797',
+  cobaltText: '#2D5B8C',
   gold: '#B39350',
   goldText: '#76591F',
   green: '#2F6F5E',
@@ -26,7 +26,7 @@ export const C = {
   signalText: '#9E3F38',
   wash: '#F6F1E7',
   washGold: '#F3EAD6',
-  washCobalt: '#E8EDFD',
+  washCobalt: '#E7EDF3',
 };
 
 const r1 = (n: number) => Math.round(n * 10) / 10;

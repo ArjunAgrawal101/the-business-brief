@@ -1,0 +1,258 @@
+---
+/**
+ * The Smart Revision Planner: the reader's examination date, level,
+ * subtopics, hours and study days in; a week-by-week plan out, from the
+ * pure rules in src/lib/planner.ts. Weak subtopics come first (offered from
+ * the reader's own results, read from this browser by src/lib/progress.ts),
+ * every subtopic is met at least twice, examination practice is woven in,
+ * and the last days before the examination are left free. The plan is kept
+ * in bb:planner: sessions are marked done, the plan is made again keeping
+ * what is done, printed, and exported to a calendar file. Without
+ * JavaScript an illustrative plan with invented dates is shown. Script:
+ * src/scripts/planner.ts.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/layout/PageIntro.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import { corpus } from '../../lib/content';
+import { jsonForScript } from '../../lib/markup';
+import { evidenceOf, plannerContext, progressSubtopics } from '../../lib/progress-build';
+import { KIND_LABELS, RULES, WEEKDAYS, buildPlan, fmtMinutes, gapFor, kindCounts, sessionTitle, shortDay, topicsAt, type Session } from '../../lib/planner';
+import '../../styles/planner.css';
+
+const c = await corpus();
+const ctx = plannerContext(c);
+const cur = c.curricula['ib-dp-bm'];
+const units = (cur?.units ?? []).map((u) => ({ number: u.number, title: u.title }));
+const subtopics = progressSubtopics(c);
+const hlOnly = ctx.topics.filter((t) => t.level === 'HL').length;
+
+// An illustrative plan for a reader without JavaScript: invented dates, eight weeks from a Monday, at SL.
+const EXAMPLE = { start: '2027-03-01', exam: '2027-04-26', level: 'SL' as const, hours: 6, days: [1, 2, 3, 4, 5], topics: topicsAt(ctx, 'SL').map((t) => t.code), weak: [], studied: [] };
+const example = buildPlan(EXAMPLE, ctx);
+if (!example.ok) throw new Error(`The illustrative plan cannot be made: ${example.error}`);
+const exampleWeeks = (() => {
+  const byWeek = new Map<number, Session[]>();
+  const from = Date.parse(`${example.plan.from}T00:00:00Z`);
+  for (const s of example.sessions) {
+    const n = Math.floor((Date.parse(`${s.date}T00:00:00Z`) - from) / (7 * 86_400_000)) + 1;
+    byWeek.set(n, [...(byWeek.get(n) ?? []), s]);
+  }
+  return [...byWeek.entries()].slice(0, 2);
+})();
+const exampleKinds = kindCounts(example.sessions);
+// The example is an illustration: its sessions are named, not linked, since a reader's own plan links each to where it is done.
+
+const config = { ctx, evidence: evidenceOf(c), subtopics, units };
+const p = ctx.papers;
+const TITLE = 'Revision planner';
+---
+
+<BaseLayout title={TITLE} description="Make a week-by-week revision plan for IB Business Management from your examination date, level, subtopics, hours and study days: weakest subtopics first, each met twice, with examination practice and free days before the examination. Kept on this device." section="revision">
+  <PageIntro
+    trail={[{ label: 'Revision', href: '/revision/' }, { label: TITLE }]}
+    kicker="Revision"
+    title={TITLE}
+    lead="Your examination date, level, hours and study days in; a plan for each week out, weakest subtopics first, each met twice, with practice in between. Kept in this browser only."
+  />
+
+  <div class="wrap page-body pl-page">
+    <section aria-labelledby="pl-tool-h">
+      <SectionHead no="01" title="Your plan" id="pl-tool-h" />
+      <div class="pl" data-ix="planner">
+        <script type="application/json" data-config set:html={jsonForScript(config)} />
+        <p class="state state--error" data-error hidden>The planner could not start. The illustrative plan below can still be read and printed.</p>
+        <p class="sr-only" aria-live="polite" data-live></p>
+        <p class="pl-note js-only" data-unavailable hidden>This browser is not letting the site keep anything, so your plan lasts for this visit only. Print it, or add it to your calendar, before you leave.</p>
+
+        <form class="pl-form js-only" data-form novalidate aria-labelledby="pl-form-h">
+          <h3 class="pl-form__h" id="pl-form-h">What the plan works from</h3>
+          <p class="field__error pl-form__err" data-form-err hidden tabindex="-1"></p>
+          <div class="pl-grid">
+            <div class="field">
+              <label for="pl-exam">The date of your first examination paper</label>
+              <input class="input" id="pl-exam" name="exam" type="date" required aria-describedby="pl-exam-hint pl-exam-err" />
+              <span class="field__hint" id="pl-exam-hint">From your school or the IB's published timetable.</span>
+              <span class="field__error" id="pl-exam-err" data-err="exam" hidden></span>
+            </div>
+            <div class="field">
+              <label for="pl-start">The day you start</label>
+              <input class="input" id="pl-start" name="start" type="date" aria-describedby="pl-start-hint pl-start-err" />
+              <span class="field__hint" id="pl-start-hint">Today, unless you start later.</span>
+              <span class="field__error" id="pl-start-err" data-err="start" hidden></span>
+            </div>
+            <div class="field">
+              <label for="pl-hours">Hours a week</label>
+              <input class="input input--num" id="pl-hours" name="hours" type="number" min={RULES.hours.min} max={RULES.hours.max} step="0.5" inputmode="decimal" aria-describedby="pl-hours-hint pl-hours-err" />
+              <span class="field__hint" id="pl-hours-hint">From {RULES.hours.min} to {RULES.hours.max}, for revision of this subject alone.</span>
+              <span class="field__error" id="pl-hours-err" data-err="hours" hidden></span>
+            </div>
+            <fieldset class="pl-level" aria-describedby="pl-level-err">
+              <legend>Your level</legend>
+              <label class="pl-radio"><input type="radio" name="level" value="SL" /> <span>SL</span></label>
+              <label class="pl-radio"><input type="radio" name="level" value="HL" /> <span>HL</span></label>
+              <span class="field__error" id="pl-level-err" data-err="level" hidden></span>
+            </fieldset>
+          </div>
+
+          <fieldset class="pl-days" aria-describedby="pl-days-hint pl-days-err">
+            <legend>Study days each week</legend>
+            <p class="field__hint" id="pl-days-hint" data-days-hint>The hours are shared equally between the days you choose.</p>
+            <div class="pl-days__list">
+              {
+                WEEKDAYS.map((d) => (
+                  <label class="pl-day">
+                    <input type="checkbox" name="days" value={String(d.n)} />
+                    <span>{d.name}</span>
+                  </label>
+                ))
+              }
+            </div>
+            <span class="field__error" id="pl-days-err" data-err="days" hidden></span>
+          </fieldset>
+
+          <div class="pl-weak" data-weak-offer hidden>
+            <p data-weak-text></p>
+            <button type="button" class="btn btn--small" data-weak-use>Choose them and put them first</button>
+          </div>
+
+          <details class="pl-topics" data-topics-box>
+            <summary class="pl-topics__sum"><span>Subtopics to revise</span> <span class="pl-topics__count" data-topics-count></span></summary>
+            <div class="pl-topics__body">
+              <p class="field__hint">Tick the subtopics to revise. Tick <strong>Put first</strong> for those you find hardest: they start first.</p>
+              <div class="pl-topics__bar">
+                <button type="button" class="btn btn--small" data-pick="all">Every subtopic at my level</button>
+                <button type="button" class="btn btn--small" data-pick="fresh">Those not yet studied</button>
+                <button type="button" class="btn btn--small" data-pick="none">None</button>
+              </div>
+              <span class="field__error" id="pl-topics-err" data-err="topics" hidden></span>
+              {
+                units.map((u) => (
+                  <fieldset class="pl-unit" aria-describedby="pl-topics-err">
+                    <legend>
+                      Unit {u.number}: {u.title}
+                    </legend>
+                    <ul class="pl-unit__list" role="list">
+                      {ctx.topics
+                        .filter((t) => t.unit === u.number)
+                        .map((t) => (
+                          <li class="pl-topic" data-topic={t.code} data-hl={t.level === 'HL' ? 'true' : undefined}>
+                            <label class="pl-topic__pick">
+                              <input type="checkbox" name="topics" value={t.code} />
+                              <span>
+                                <span class="pl-topic__code">{t.code}</span> {t.title}
+                                {t.level === 'HL' && <span class="pl-tag">HL only</span>}
+                              </span>
+                            </label>
+                            <span class="pl-topic__state" data-topic-state />
+                            <label class="pl-topic__weak">
+                              <input type="checkbox" name="weak" value={t.code} />
+                              <span>
+                                Put first<span class="sr-only">: {t.code}</span>
+                              </span>
+                            </label>
+                          </li>
+                        ))}
+                    </ul>
+                  </fieldset>
+                ))
+              }
+            </div>
+          </details>
+
+          <div class="pl-submit">
+            <button type="submit" class="btn btn--primary" data-make>Make my plan</button>
+            <p class="small muted" data-make-note>Sessions you mark done are kept when you make the plan again.</p>
+          </div>
+        </form>
+
+        <div class="pl-out" data-out>
+          <div class="pl-sum" data-sum>
+            <p class="pl-sum__k">Illustrative example, with invented dates</p>
+            <h3 class="pl-sum__h">
+              A plan at SL from {shortDay(example.plan.from)} to an examination on {shortDay(example.plan.exam)}
+            </h3>
+            <p>
+              {example.sessions.length} sessions of {fmtMinutes(example.plan.slot)} ({fmtMinutes(example.sessions.reduce((a, s) => a + s.minutes, 0))}), {EXAMPLE.hours} hours a week on weekdays: {exampleKinds.learn} subtopics learnt and {exampleKinds.retrieve} retrieval sessions, {exampleKinds.case + exampleKinds.calc} practice sessions and {exampleKinds.timed} timed. The last {example.plan.buffer} days before the examination are free. Its first two weeks:
+            </p>
+          </div>
+          <div class="pl-weeks" data-weeks>
+            {
+              exampleWeeks.map(([n, list]) => (
+                <section class="pl-week" aria-labelledby={`pl-ex-w${n}`}>
+                  <h4 class="pl-week__h" id={`pl-ex-w${n}`}>
+                    Week {n}
+                  </h4>
+                  <ol class="pl-sessions" role="list">
+                    {list.map((s) => (
+                      <li class={`pl-s pl-s--${s.kind}`}>
+                        <span class="pl-s__day">{shortDay(s.date)}</span>
+                        <span class="pl-s__kind">{KIND_LABELS[s.kind]}</span>
+                        <span class="pl-s__t">{sessionTitle(s, ctx)}</span>
+                        <span class="pl-s__min">{fmtMinutes(s.minutes)}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+              ))
+            }
+          </div>
+          <p class="nojs-only small muted">With JavaScript on, enter your own dates and subtopics to make your own plan, mark sessions done and add the plan to your calendar.</p>
+        </div>
+
+        <div class="pl-actions js-only" data-actions hidden>
+          <button type="button" class="btn btn--small" data-print>Print the plan</button>
+          <button type="button" class="btn btn--small" data-ics>Add to my calendar (.ics)</button>
+          <button type="button" class="btn btn--small" data-reset>Clear the plan</button>
+          <span class="pl-actions__confirm" data-reset-confirm hidden>
+            <span>This clears the plan and the sessions marked done. Your choices in the form stay.</span>
+            <button type="button" class="btn btn--small btn--primary" data-reset-yes>Clear it</button>
+            <button type="button" class="btn btn--small" data-reset-no>Keep it</button>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="pl-assume-h">
+      <SectionHead no="02" title="What the planner assumes" id="pl-assume-h" dek="Read these before you trust the plan. It is a recommended strategy, the platform's own, not an IB requirement." />
+      <ul class="pl-list">
+        <li>The date you enter is your first paper. The planner does not know the IB's timetable, your school's mock examinations, your other subjects or your internal assessment deadline: leave room for them, or give it fewer hours.</li>
+        <li>Every session in a plan is the same length, about {RULES.aimSlot} minutes, cut from your hours and study days. A week asks for no more than the hours you give it, and often a little less, because sessions are rounded down to five minutes.</li>
+        <li>It knows how well you know a subtopic only from what this browser keeps: your question bank ratings, practice questions, Paper 2 calculations, flashcards, recall cards and exercises, read on <a href="/dashboard/">your dashboard</a>. A subtopic you have studied elsewhere looks untouched until you tell it otherwise with <strong>Put first</strong>.</li>
+        <li>A session is planned as a reasonable amount of work, not measured against you. If a session runs over, finish it another day and mark it done then: making the plan again from today moves what is left.</li>
+        <li>Timed practice is a timed set of questions at a paper's pace, as long as a session. The papers themselves take longer in one sitting (Paper 1, {fmtMinutes(p['paper-1'])}; Paper 2, {fmtMinutes(p['paper-2-sl'])} at SL and {fmtMinutes(p['paper-2-hl'])} at HL; Paper 3, {fmtMinutes(p['paper-3'])}; guide, pp. 39 to 40): sit a whole one on a free day, or in your school's mock examinations.</li>
+        <li>At SL the {hlOnly} HL-only subtopics, Paper 3 and the HL calculations are left out. At HL everything is in.</li>
+        <li>It plans revision, not first teaching: a subtopic you have never met needs more than one session to learn.</li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="pl-how-h">
+      <SectionHead no="03" title="How a plan is made" id="pl-how-h" dek="The same rules every time, so the same choices always give the same plan." />
+      <ol class="pl-steps">
+        <li>
+          <strong>Free days first.</strong> About one day in every fortnight before the examination is left free, from one to {RULES.maxBuffer} days, for whatever slipped and for rest. With under a week to go, none is.
+        </li>
+        <li>
+          <strong>Sessions.</strong> Your hours are shared equally between your study days, and each day is cut into sessions of about {RULES.aimSlot} minutes.
+        </li>
+        <li>
+          <strong>Practice woven in.</strong> One session in {RULES.practiceEvery} is examination practice, in turn: case practice in the style of Paper 1, Paper 2 calculations on your subtopics and, at HL, Paper 3. In the last {RULES.finalDays} days before the free days (the last third of a shorter plan), every other session is timed practice at each paper's pace in turn.
+        </li>
+        <li>
+          <strong>Weakest first.</strong> Subtopics marked <strong>Put first</strong> start first, then those you have not studied, then the rest, in the order of the syllabus. A subtopic you have studied starts with a review; one you have not, with learning it.
+        </li>
+        <li>
+          <strong>Every subtopic twice.</strong> Each subtopic comes back to be retrieved from memory {RULES.gapDays} days after you first revise it (in a plan under five weeks, after a fifth of the time, and at least {RULES.minGap} days; a three-week plan waits {gapFor(21)} days). Where there is room it comes back a third time, after twice the gap. A subtopic is started only when its retrieval, and every one already planned, still has a session on a later day, so none is left met once. Those that do not fit are named.
+        </li>
+        <li>
+          <strong>Kept work.</strong> Making the plan again keeps the sessions you marked done, with their dates, and plans the rest from today. A subtopic you have met once needs only its retrieval.
+        </li>
+      </ol>
+      <p class="small muted">Retrieval practice and spacing are the reasons for meeting each subtopic twice, some days apart; the gaps and shares above are the platform's choices for an examination season, not fixed rules. <a href="/dashboard/#today">Your dashboard</a> lists each day's planned sessions with the rest of what is due.</p>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../scripts/planner';
+</script>

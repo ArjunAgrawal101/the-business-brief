@@ -1,0 +1,151 @@
+---
+/**
+ * A curated framework comparison: two or three ideas side by side on the same
+ * nine questions (standing in the course, purpose, structure, context,
+ * strengths, limitations, common mistakes, a fictional application and how to
+ * use it in an examination answer), then the difference in a paragraph, which
+ * to use when, how they work together and where to read more. The grid comes
+ * first; on a phone it stacks, each cell labelled with its side.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageIntro from '../../../components/layout/PageIntro.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import { comparisons } from '../../../lib/compare/content';
+import { curatedColumn, gridHtml } from '../../../lib/compare/render';
+import { compareHref } from '../../../lib/compare/schema';
+import { frameworkHref } from '../../../lib/frameworks';
+import { inline, rich } from '../../../lib/markup';
+import '../../../styles/compare.css';
+
+export async function getStaticPaths() {
+  const cmp = await comparisons();
+  return cmp.all.map(([slug]) => ({ params: { slug }, props: { slug } }));
+}
+
+interface Props {
+  slug: string;
+}
+const { slug } = Astro.props;
+const cmp = await comparisons();
+const c = cmp.all.find(([s]) => s === slug)![1];
+const statements = cmp.statements(slug);
+const cols = c.sides.map((side, i) => curatedColumn(side, i, statements[i] ?? [], side.framework ? cmp.ctx.frameworks[side.framework] : undefined, cmp.render));
+const anyHl = c.sides.some((s) => s.level === 'HL');
+const allHl = c.sides.every((s) => s.level === 'HL');
+const libSides = c.sides.filter((s) => s.framework);
+const codes = new Set(c.sides.flatMap((s) => [...s.syllabus.map((x) => x.code), ...s.subtopics]));
+const related = cmp.all
+  .filter(([s]) => s !== slug)
+  .map(([s, o]) => ({ s, o, shared: o.sides.filter((x) => (x.framework && libSides.some((y) => y.framework === x.framework)) || [...x.syllabus.map((z) => z.code), ...x.subtopics].some((code) => codes.has(code))).length }))
+  .filter((x) => x.shared > 0)
+  .slice(0, 6);
+const sideNames = c.sides.map((s) => s.name);
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LearningResource',
+  name: c.title,
+  description: c.summary,
+  learningResourceType: 'Comparison',
+  isAccessibleForFree: true,
+};
+---
+
+<BaseLayout title={c.title} description={c.summary} section="toolkit" jsonLd={jsonLd}>
+  <PageIntro trail={[{ label: 'Frameworks', href: '/frameworks/' }, { label: 'Framework comparison', href: '/frameworks/compare/' }, { label: c.title }]} kicker="Framework comparison" title={c.title} lead={c.question}>
+    <div class="tags">
+      {allHl ? <span class="tag tag--hl">HL only</span> : anyHl ? <span class="tag tag--hl">Part HL only</span> : <span class="tag tag--plain">SL and HL</span>}
+      <span class="tag tag--simulated">Applications: fictional</span>
+      <span class="tag tag--framework">Exam advice: recommended strategy</span>
+    </div>
+  </PageIntro>
+
+  <div class="wrap page-body cmp-page">
+    <p class="cmp-summary">{c.summary}</p>
+    <div class="cmp-curated" set:html={gridHtml(cols)} />
+
+    <section aria-labelledby="cmp-diff-h" class="cmp-after">
+      <SectionHead no={1} title="The difference, in a paragraph" id="cmp-diff-h" />
+      <div class="prose cmp-diff" set:html={rich(c.difference)} />
+    </section>
+
+    <section aria-labelledby="cmp-when-h" class="cmp-after">
+      <SectionHead no={2} title="Which to use when" id="cmp-when-h" />
+      <ol class="cmp-when">
+        {
+          c.choose.map((x) => (
+            <li>
+              <p class="cmp-when__situation" set:html={inline(x.when)} />
+              <p class="cmp-when__use">
+                <span class="cmp-when__label">Use</span> <strong>{sideNames[x.use]}</strong>
+              </p>
+              <p class="cmp-when__why" set:html={inline(x.why)} />
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    {
+      c.together && (
+        <section aria-labelledby="cmp-together-h" class="cmp-after">
+          <SectionHead no={3} title="Using them together" id="cmp-together-h" />
+          <div class="prose cmp-diff" set:html={rich(c.together)} />
+        </section>
+      )
+    }
+
+    <section aria-labelledby="cmp-more-h" class="cmp-after">
+      <SectionHead no={c.together ? 4 : 3} title="Read more" id="cmp-more-h" />
+      <div class="cmp-more">
+        {
+          libSides.length > 0 && (
+            <div>
+              <h3 class="label label--ink">In the frameworks library</h3>
+              <ul class="link-list">
+                {libSides.map((s) => (
+                  <li>
+                    <a href={frameworkHref(s.framework!)}>{cmp.ctx.frameworks[s.framework!]!.name}</a>
+                    <span class="small muted"> Its page also says when to <a href={`${frameworkHref(s.framework!)}#fw-when`}>look elsewhere</a> and what to <a href={`${frameworkHref(s.framework!)}#fw-related`}>read with it</a>.</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+        <div>
+          <h3 class="label label--ink">In the course</h3>
+          <ul class="link-list">
+            {
+              [...codes].map((code) => {
+                const s = cmp.render.subtopic(code)!;
+                return (
+                  <li>
+                    <a href={s.href}>{s.code} {s.title}</a>
+                    {s.hl && <span class="small muted"> HL only</span>}
+                  </li>
+                );
+              })
+            }
+          </ul>
+        </div>
+        {
+          related.length > 0 && (
+            <div>
+              <h3 class="label label--ink">Related comparisons</h3>
+              <ul class="link-list">
+                {related.map((r) => (
+                  <li>
+                    <a href={compareHref(r.s)}>{r.o.title}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      </div>
+      <p class="small muted cmp-note">
+        Statements about the course come from the curriculum file, checked against the Business management guide (first assessment 2024); exam advice is the platform's own, labelled Recommended strategy; every business in the applications is fictional. <a href="/frameworks/compare/">Compare any two frameworks</a> in the library.
+      </p>
+    </section>
+  </div>
+</BaseLayout>

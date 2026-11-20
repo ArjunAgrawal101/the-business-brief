@@ -10,6 +10,7 @@
  * This module imports nothing from `astro:content`, so tests can use it too.
  */
 import { z } from 'astro/zod';
+import { LIBRARY_CATEGORIES } from './library/categories';
 import { RATIO_IDS, STATEMENT_FIELDS } from './ratios';
 import { BASES } from './market-stp';
 import { PRICE_METHODS } from './market-mix';
@@ -629,7 +630,8 @@ export const questionSchema = z.object({
   qualification: z.literal('ib-dp-bm'),
   level,
   paperStyle: z.enum(['paper-1', 'paper-2', 'paper-3', 'ia-skill', 'general']),
-  topic: z.string(),
+  /** The topic brief the question belongs to, when one covers its subtopic; otherwise it is listed under its subtopic. */
+  topic: z.string().optional(),
   syllabus: z.array(z.string()).min(1),
   commandTerm: z.string(),
   ao: ao,
@@ -731,7 +733,10 @@ export const assessmentSchema = z.object({
     .default([]),
   /** Assessment criteria by name and maximum mark (descriptors are not reproduced). */
   criteria: z.array(z.object({ id: z.string(), name: z.string(), marks: z.number().int().positive() })).default([]),
+  /** What the guide says the component must do, each with its page: the guide's musts only. */
   requirements: z.array(md).default([]),
+  /** What the guide says should be done or recommends, each with its page: not a must. */
+  recommendations: z.array(md).default([]),
   /** Advice from the IB teacher support material, paraphrased, with its page. */
   ibGuidance: z.array(z.object({ text: md, location: z.string() })).default([]),
   notStated: z.array(z.string()).min(1),
@@ -1974,7 +1979,7 @@ export const RESOURCE_TYPES = [
 export const RESOURCE_TYPE_LABELS: Record<(typeof RESOURCE_TYPES)[number], string> = {
   'assessment-guide': 'Assessment guide',
   'topic-notes': 'Topic notes',
-  'revision-brief': 'Revision brief',
+  'revision-brief': 'Revision sheet',
   mindmap: 'Mindmap',
   diagram: 'Diagrams',
   framework: 'Business framework',
@@ -1989,23 +1994,29 @@ export const RESOURCE_TYPE_LABELS: Record<(typeof RESOURCE_TYPES)[number], strin
 };
 export const AUDIENCES = ['students', 'teachers', 'independent'] as const;
 
+/** The Resources Library's twelve categories, in the order the library shows them (src/lib/library/categories.ts). */
+export { LIBRARY_CATEGORIES };
+
 export const resourceSchema = z.object({
   title: z.string(),
   summary: md,
   type: z.enum(RESOURCE_TYPES),
+  /** The library category it is filed under. */
+  category: z.enum(LIBRARY_CATEGORIES),
   qualification: z.enum(['ib-dp-bm', 'general']).default('ib-dp-bm'),
   audiences: z.array(z.enum(AUDIENCES)).min(1),
   level: z.enum(['SL/HL', 'HL']).default('SL/HL'),
   units: z.array(z.number().int().min(1).max(5)).default([]),
   subtopics: z.array(z.string()).default([]),
   component: z.enum(['internal-assessment', 'paper-1', 'paper-2', 'paper-3']).optional(),
-  /** How to get it: a file to download (it must exist in public/), a page, or a page to print. */
+  /**
+   * How to get it: a file to download (it must exist in public/ or be written
+   * by the build), a page, or a page to print. A download's format, size and
+   * pages are measured from the file (src/lib/library/downloads.ts), never typed.
+   */
   access: z.object({
     kind: z.enum(['download', 'page', 'print']),
     href: z.string().startsWith('/'),
-    format: z.string().optional(),
-    pages: z.number().int().positive().optional(),
-    size: z.string().optional(),
   }),
   /** What it contains, for its details page. */
   contents: z.array(z.string()).default([]),

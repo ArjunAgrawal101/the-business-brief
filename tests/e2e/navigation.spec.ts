@@ -12,19 +12,19 @@ test('the skip link moves focus to the main content', async ({ page }) => {
 test('the current section is marked in the navigation', async ({ page, isMobile }) => {
   test.skip(isMobile, 'On small screens the groups are in the drawer, tested below.');
   await page.goto('/mindmaps/');
-  await expect(page.locator('.mega.is-current > summary')).toContainText('Learn');
+  await expect(page.locator('.mega.is-current > summary')).toContainText('Explore');
   await expect(page.locator('.mega-nav a[aria-current="page"]')).toContainText('Mindmaps');
   await page.goto('/assessment/paper-2/');
   await expect(page.locator('.mega.is-current > summary')).toContainText('Assess');
   await expect(page.locator('.mega-nav a[aria-current="page"]')).toContainText('Paper 2');
   await page.goto('/glossary/break-even-quantity/');
-  await expect(page.locator('.mega.is-current > summary')).toContainText('Learn');
+  await expect(page.locator('.mega.is-current > summary')).toContainText('Explore');
   await expect(page.locator('.mega-nav a[aria-current="true"]')).toContainText('Glossary');
   await page.goto('/tutorials/');
-  await expect(page.locator('.mega.is-current > summary')).toContainText('Connect');
+  await expect(page.locator('.mega.is-current > summary')).toContainText('Discover');
   await expect(page.locator('a.hdr-btn--cta[href="/tutorials/"]')).toHaveAttribute('aria-current', 'page');
   await page.goto('/advanced/');
-  await expect(page.locator('.mega.is-current > summary')).toContainText('Advance');
+  await expect(page.locator('.mega.is-current > summary')).toContainText('Discover');
 });
 
 test('the Tutorials button is in the header on wide screens, and first in the drawer on small ones', async ({ page, isMobile }) => {
@@ -40,14 +40,15 @@ test('the Tutorials button is in the header on wide screens, and first in the dr
   await expect(page).toHaveURL(/\/tutorials\/$/);
 });
 
-test('six groups and the Academic Ecosystem menu fit the header at the narrowest wide-screen width', async ({ browser }) => {
+test('the five groups, Explore, Practise, Tools, Assess and Discover, fit the header at the narrowest wide-screen width', async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 1024, height: 768 } });
   const page = await context.newPage();
   await page.goto('/');
   await expect(page.locator('.mega-nav')).toBeVisible();
-  await expect(page.locator('.mega-nav__item .mega:not(.mega--ecosystem)')).toHaveCount(6);
-  await expect(page.locator('.mega-nav__item .mega--ecosystem')).toHaveCount(1);
-  await expect(page.locator('.mega--ecosystem > summary')).toBeVisible();
+  await expect(page.locator('.mega-nav__item .mega > summary')).toHaveText([/Explore/, /Practise/, /Tools/, /Assess/, /Discover/]);
+  // The Academic Ecosystem lives in the Discover panel, not in the bar.
+  await page.locator('.mega--discover > summary').click();
+  await expect(page.locator('.mega--discover .mega__feature a[target="_blank"]')).toHaveCount(2);
   const overflow = await page.evaluate(() => {
     const bar = document.querySelector('.site-header__bar')!;
     return bar.scrollWidth - bar.clientWidth;
@@ -83,7 +84,8 @@ test('the drawer holds every group on small screens and closes with Escape', asy
   await expect(toggle).toHaveAccessibleName('Menu');
   await toggle.click();
   await expect(drawer).toHaveAttribute('open', '');
-  await expect(drawer.locator('.drawer__group')).toHaveCount(6);
+  await expect(drawer.locator('.drawer__group')).toHaveCount(5);
+  await expect(drawer.locator('.drawer__search input[type="search"]')).toBeVisible();
   // The current group opens with the drawer, its page marked.
   await expect(drawer.locator('.drawer__group.is-current')).toHaveAttribute('open', '');
   await expect(drawer.locator('a[aria-current="page"]')).toContainText('Finance Desk');
@@ -118,4 +120,42 @@ test('search filters as you type and keeps the query in the address', async ({ p
   await expect(page.locator('#q')).toHaveValue('franchising');
   await box.fill('zzzzqqq');
   await expect(page.locator('[data-none]')).toBeVisible();
+});
+
+test('the header search suggests as you type, forgives a slip and opens the full results on Enter', async ({ page, isMobile }) => {
+  await page.goto('/topics/cash-flow/');
+  await page.goto('/glossary/');
+  const panel = page.locator('[data-hsearch]');
+  await panel.locator('summary').click();
+  const box = page.locator('#hsearch-q');
+  await expect(box).toBeFocused();
+  // With the box empty, the pages this browser opened most recently.
+  await expect(page.locator('[data-hs-recent-list] a').first()).toContainText('Cash flow');
+  await box.fill('liqudity');
+  await expect(page.locator('[data-hs-list] a').first()).toBeVisible();
+  await expect(page.locator('[data-hs-list]')).toContainText(/liquidity/i);
+  await expect(page.locator('[data-hs-status]')).toContainText('close spelling');
+  await page.keyboard.press('ArrowDown');
+  await expect(page.locator('[data-hs-list] a').first()).toBeFocused();
+  await page.keyboard.press('ArrowUp');
+  await expect(box).toBeFocused();
+  await box.fill('gearing ratio');
+  await box.press('Enter');
+  await expect(page).toHaveURL(/\/search\/\?q=gearing\+ratio/);
+  if (!isMobile) {
+    await page.locator('[data-hsearch] summary').click();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('[data-hsearch]')).not.toHaveAttribute('open', '');
+  }
+});
+
+test('the search page ranks every kind together and offers close spellings when nothing matches', async ({ page }) => {
+  await page.goto('/search/?q=liquidity');
+  await expect(page.locator('[data-best]')).toBeVisible();
+  await expect(page.locator('[data-best-list] a').first()).toHaveText('Liquidity');
+  await page.goto('/search/?q=liqudity');
+  await expect(page.locator('[data-none]')).toBeVisible();
+  await expect(page.locator('[data-close-list] a').filter({ hasText: /^Liquidity$/ })).toHaveCount(1);
+  await page.locator('#q').press('ArrowDown');
+  await expect(page.locator('[data-close-list] a').first()).toBeFocused();
 });

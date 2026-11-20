@@ -26,6 +26,8 @@
  * copy" reads it back and combines it with what is there.
  */
 import { dashboardView, type DashConfig, type DashboardView, type WorkItem } from './dashboard';
+import type { EvidenceConfig } from './progress';
+import type { CalcFamily } from './planner';
 import {
   SAVED_KEY,
   SAVED_KIND_LABELS,
@@ -43,6 +45,7 @@ import {
   type SavedItem,
   type SavedList,
 } from './learner';
+import { CARDS_KEY, mergeCards, parseCards } from './flashcards';
 
 export const LIST_KEY = 'bb:workspace:list';
 export const NOTES_KEY = 'bb:workspace:notes';
@@ -575,6 +578,11 @@ export interface WorkspaceConfig extends DashConfig {
   /** The Financial Laboratory's name, and the Boardroom's, as the rooms are named. */
   labName: string;
   boardroomName: string;
+  /** Every question in the question bank with its subtopics and paper style, and each kind of Paper 2 calculation with its subtopic (src/lib/progress.ts). */
+  bank: EvidenceConfig['bank'];
+  p2: EvidenceConfig['p2'];
+  /** The Paper 2 calculation families, to name the revision plan's sessions. */
+  calc: CalcFamily[];
 }
 
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
@@ -812,9 +820,11 @@ export function selectionWords(sel: Selection): string {
 
 /**
  * Check a file before anything is written: the learner record's checks
- * (src/lib/learner.ts), with the workspace's own items cleaned through their
- * parsers, so a hand-edited note or arrangement cannot carry anything the
- * workspace would not write itself.
+ * (src/lib/learner.ts, which also cleans bb:studied), with the workspace's
+ * own items cleaned through their parsers, so a hand-edited note or
+ * arrangement cannot carry anything the workspace would not write itself.
+ * The dashboard adds the revision plan and study mode's settings
+ * (checkDashboardImport in src/lib/workspace-progress.ts).
  */
 export function checkImport(text: string): ImportCheck {
   const r = validateImport(text);
@@ -825,6 +835,8 @@ export function checkImport(text: string): ImportCheck {
       if (key === LIST_KEY) return { key, value: JSON.stringify(parseList(value)) };
       if (key === NOTES_KEY) return { key, value: JSON.stringify(parseNotebook(value)) };
       if (key === SNAPSHOTS_KEY) return { key, value: JSON.stringify(parseSnapshots(value)) };
+      // The flashcards' progress (src/lib/flashcards.ts): cleaned like the stored item.
+      if (key === CARDS_KEY) return { key, value: JSON.stringify(parseCards(value)) };
       return { key, value };
     }),
   };
@@ -843,6 +855,8 @@ export function planWorkspaceImport(current: Readonly<Record<string, string | nu
       [LIST_KEY]: () => mergeLists(parseList(had), parseList(w.value)),
       [NOTES_KEY]: () => mergeNotebooks(parseNotebook(had), parseNotebook(w.value)),
       [SNAPSHOTS_KEY]: () => mergeSnapshots(parseSnapshots(had), parseSnapshots(w.value)),
+      // Card by card, the record rated more recently wins.
+      [CARDS_KEY]: () => mergeCards(parseCards(had), parseCards(w.value)),
     };
     const combine = merge[w.key];
     if (!combine) return w;

@@ -1,9 +1,14 @@
 /**
- * Checks for the internal assessment planner. Pure functions, shared by the
- * page script and the unit tests. Each rule cites the document it comes from:
+ * Checks for the internal assessment. Pure functions, shared by the page
+ * scripts and the unit tests. Each rule cites the document it comes from:
  * the Business management guide (first assessment 2024) or the teacher support
  * material (TSM, 2022). The checks help a student plan; they do not replace
  * the teacher's approval or the guide.
+ *
+ * Every tool that checks supporting documents (the IA Studio planner, the
+ * documents tool and the checker on the internal assessment page) applies the
+ * guide's rules through this module, so they give the same verdict on the
+ * same documents: one rule, to the month, for the three years (p. 54).
  */
 
 export type DocKind = 'primary' | 'secondary' | 'transcript' | 'textbook';
@@ -67,6 +72,49 @@ export function ageInMonths(published: string, submission: string): number | nul
   return s - p;
 }
 
+/**
+ * The months a publication date can stand for: one month for "YYYY-MM", the
+ * twelve months of the year for "YYYY" (a year without its month), or null
+ * when the date cannot be read.
+ */
+export function publishedRange(published: string): { from: number; to: number } | null {
+  const t = published.trim();
+  const m = monthIndex(t);
+  if (m !== null) return { from: m, to: m };
+  const y = /^(\d{4})$/.exec(t);
+  if (!y) return null;
+  const year = Number(y[1]);
+  return { from: year * 12, to: year * 12 + 11 };
+}
+
+/**
+ * What the three-year rule says of one document (guide, p. 54): it must be
+ * published within the three years before the month of submission, so a
+ * document from the same month three years earlier still counts and one from
+ * the month before does not. A year without its month is judged only when
+ * every month of that year falls on the same side; otherwise the verdict is
+ * "unclear" and the month is needed.
+ */
+export type DateVerdict = 'within' | 'too-old' | 'after' | 'unclear' | 'missing' | 'unreadable' | 'no-submission';
+
+export function threeYearRule(published: string, submission: string): DateVerdict {
+  if (published.trim() === '') return 'missing';
+  const r = publishedRange(published);
+  if (!r) return 'unreadable';
+  const s = monthIndex(submission);
+  if (s === null) return 'no-submission';
+  const earliest = s - IA_LIMITS.maxYears * 12;
+  if (r.to < earliest) return 'too-old';
+  if (r.from > s) return 'after';
+  if (r.from >= earliest && r.to <= s) return 'within';
+  return 'unclear';
+}
+
+/** "YYYY-04" or "YYYY-10": the IB submission month the guide names, April or October of the final year (p. 54). */
+export function submissionMonth(year: number, month: 'april' | 'october'): string {
+  return `${year}-${month === 'april' ? '04' : '10'}`;
+}
+
 const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, ' ');
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -94,8 +142,8 @@ export function checkDocuments(docs: SupportingDoc[], submission: string): Findi
   } else if (n > IA_LIMITS.maxDocs) {
     out.push({
       severity: 'problem',
-      text: `${n} selected. More than five supporting documents limits criterion B to 1 mark.`,
-      source: 'TSM, p. 71',
+      text: `${n} selected. More than five supporting documents limits criterion B to 1 mark, its lowest level.`,
+      source: 'Guide, p. 57',
     });
   } else if (n === 3) {
     out.push({
@@ -107,27 +155,13 @@ export function checkDocuments(docs: SupportingDoc[], submission: string): Findi
     out.push({ severity: 'ok', text: `${n} selected, within three to five.`, source: 'Guide, p. 53' });
   }
 
-  const earliest = earliestAllowed(submission);
   for (const { d, i } of chosen) {
     const name = d.title.trim() || `Document ${i + 1}`;
     if (d.kind === 'textbook') {
       out.push({ severity: 'problem', text: `${name}: textbooks and class notes can be cited, but are not accepted as supporting documents.`, source: 'Guide, p. 55', doc: i });
     }
-    const age = ageInMonths(d.published, submission);
-    if (age !== null && age > IA_LIMITS.maxYears * 12) {
-      out.push({
-        severity: 'problem',
-        text: `${name}: published more than three years before submission${earliest ? ` (the earliest allowed is ${monthLabel(earliest)})` : ''}.`,
-        source: 'Guide, p. 54',
-        doc: i,
-      });
-    } else if (age !== null && age < 0) {
-      out.push({ severity: 'problem', text: `${name}: the publication date is after the submission date. Check both dates.`, source: 'Guide, p. 54', doc: i });
-    } else if (d.published.trim() === '') {
-      out.push({ severity: 'advice', text: `${name}: add the publication month so its age can be checked.`, source: 'Guide, p. 54', doc: i });
-    } else if (monthIndex(d.published) === null) {
-      out.push({ severity: 'advice', text: `${name}: write the publication month as year and month, for example 2026-03.`, source: 'Guide, p. 54', doc: i });
-    }
+    const date = dateFinding(name, d.published, submission);
+    if (date) out.push({ ...date, doc: i });
     if (d.pages > IA_LIMITS.recommendedPages) {
       out.push({
         severity: 'advice',
@@ -157,6 +191,29 @@ export function checkDocuments(docs: SupportingDoc[], submission: string): Findi
     out.push({ severity: 'advice', text: 'Add the month you will submit to the IB, so the three-year rule can be checked.', source: 'Guide, p. 54' });
   }
   return out;
+}
+
+/**
+ * The three-year rule's finding for one document, worded for the reader, or
+ * null when the date passes or the submission month is still to come.
+ */
+export function dateFinding(name: string, published: string, submission: string): Finding | null {
+  const earliest = earliestAllowed(submission);
+  const from = earliest ? ` (the earliest allowed is ${monthLabel(earliest)})` : '';
+  switch (threeYearRule(published, submission)) {
+    case 'too-old':
+      return { severity: 'problem', text: `${name}: published more than three years before submission${from}.`, source: 'Guide, p. 54' };
+    case 'after':
+      return { severity: 'problem', text: `${name}: the publication date is after the submission date. Check both dates.`, source: 'Guide, p. 54' };
+    case 'unclear':
+      return { severity: 'advice', text: `${name}: published in ${published.trim()}. Add the month: in that year the three-year rule depends on it${from}.`, source: 'Guide, p. 54' };
+    case 'missing':
+      return { severity: 'advice', text: `${name}: add the publication month so its age can be checked.`, source: 'Guide, p. 54' };
+    case 'unreadable':
+      return { severity: 'advice', text: `${name}: write the publication month as year and month, for example 2026-03.`, source: 'Guide, p. 54' };
+    default:
+      return null;
+  }
 }
 
 /** Status of a word count against the limit. */

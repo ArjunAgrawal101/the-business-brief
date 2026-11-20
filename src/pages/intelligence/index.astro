@@ -1,8 +1,9 @@
 ---
 /**
- * The Business Intelligence Briefing: real business developments from 2024
- * to 2026, curated by hand and read through the ideas of the course, laid
- * out as an issue of a business publication. The front page carries a lead
+ * The Business Intelligence Briefing: real business developments, curated by
+ * hand and read through the ideas of the course, laid out as an issue of a
+ * business publication; the span of dates the copy states is computed from
+ * the items themselves. The front page carries a lead
  * story and the rest of the issue; the themes, each a page of its own so
  * they work without JavaScript; every item in date order, with filters by
  * unit, key concept and theme; the six questions every item answers; how the
@@ -20,6 +21,7 @@ import {
   SOURCE_KIND_LABELS,
   THEME_INFO,
   dateParts,
+  developmentSpan,
   facetsOf,
   filterSummary,
   formatDate,
@@ -41,6 +43,8 @@ const lead = items.find(([, it]) => it.lead);
 // The rest of the issue on the front page: the newest items after the lead.
 const stories = items.filter(([, it]) => !it.lead).slice(0, 6);
 const curated = latest(items.map(([, it]) => it.written)) ?? '';
+// "from February 2025 to October 2026": the span of the items' own dates, never typed.
+const span = developmentSpan(items.map(([, it]) => it.date));
 const newestCheck = latest(items.map(([, it]) => it.checked)) ?? '';
 const units = c.curricula['ib-dp-bm']?.units ?? [];
 
@@ -78,7 +82,7 @@ const SIX = [
 
 <BaseLayout
   title="Business Intelligence Briefing"
-  description="Real business developments from 2024 to 2026, curated by hand, dated and sourced to the organizations' own documents, filed under twelve themes and read through the ideas of IB Business Management and beyond."
+  description={`Real business developments ${span}, curated by hand, dated and sourced to the organizations' own documents, filed under twelve themes and read through the ideas of IB Business Management and beyond.`}
   section="intelligence"
 >
   <div class="wrap">
@@ -95,7 +99,7 @@ const SIX = [
             <li>{regions.size} {regions.size === 1 ? 'region' : 'regions'}</li>
           </ul>
           <p class="lead ib-mast__lead">
-            Real business developments from 2024 to 2026, read through the ideas of the course. Each item answers six questions in order: what happened, the business context, the management concepts that apply, the choices the organization faced, the implications, and what a student or manager can learn. Every fact is dated and traced to the document that states it; everything after the facts is labelled as analysis.
+            Real business developments {span}, read through the ideas of the course. Each item answers six questions in order: what happened, the business context, the management concepts that apply, the choices the organization faced, the implications, and what a student or manager can learn. Every fact is dated and traced to the document that states it; everything after the facts is labelled as analysis.
           </p>
         </div>
         <nav class="ib-contents" aria-label="In this edition">

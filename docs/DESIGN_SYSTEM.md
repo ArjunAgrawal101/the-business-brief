@@ -23,22 +23,22 @@ Rules: keep the monogram's proportions (viewBox 350.8 by 268.4); give it clear s
 
 ### The opening
 
-A five-second cinematic sequence (`src/components/brand/CinematicIntro.astro`), in four movements:
+A cinematic sequence of about 2.75 seconds (`src/components/brand/CinematicIntro.astro`), in four movements. It was drawn as a five-second sequence; since 20 November 2026 every time in it is multiplied by one factor, `--cx-k` (0.55), in the styles and the script alike, so the movements keep their proportions:
 
-| Time | Movement |
-| --- | --- |
-| 0.0 to 1.0 s | The room: deep navy, ambient light, gold dust, and an architecture (a floor in one-point perspective, columns, a horizon) drawing itself |
-| 1.0 to 2.1 s | The business world: an organization chart, a market line with candles, a globe of trade routes and a decision tree choosing its path |
-| 2.0 to 3.5 s | The identity: the AA monogram rises from the creator's vector master with a sheen, the name and rule open, then The Business Brief and Strategy. Leadership. Decisions. |
-| 3.5 to 5.0 s | The convergence: the world is drawn in, the monogram flies to its place in the header and takes the header's colours, the curtain dissolves |
+| Drawn time | Played at | Movement |
+| --- | --- | --- |
+| 0.0 to 1.0 s | 0 to 0.55 s | The room: deep navy, ambient light, gold dust, and an architecture (a floor in one-point perspective, columns, a horizon) drawing itself |
+| 1.0 to 2.1 s | 0.55 to 1.15 s | The business world: an organization chart, a market line with candles, a globe of trade routes and a decision tree choosing its path |
+| 2.0 to 3.5 s | 1.1 to 1.9 s | The identity: the AA monogram rises from the creator's vector master with a sheen, the name and rule open, then The Business Brief and Strategy. Leadership. Decisions. |
+| 3.5 to 5.0 s | 1.9 to 2.75 s | The convergence: the world is drawn in, the monogram flies to its place in the header and takes the header's colours, the curtain dissolves |
 
 **When it plays** (`src/lib/intro.ts`, decided in the head before the first paint, and unit-tested as the same source text):
-- on every fresh entry to the site: a new tab or window, a new browser, a link from another site, a bookmark, a typed address or a reload;
-- never between the site's own pages, on Back or Forward, or under automation (`navigator.webdriver`), unless `?intro` asks for it ("Replay the opening" in the footer);
+- when the home page is freshly opened: a new tab or window, a link from another site, a bookmark or a typed address;
+- never on any other page (a reader arriving at a topic from a search result goes straight to it), on a reload, between the site's own pages, on Back or Forward, or under automation (`navigator.webdriver`), unless `?intro` asks for it ("Replay the opening" in the footer);
 - nothing about earlier visits is stored or read.
 
 **How it behaves:**
-- Under reduced motion it is a still title card that fades after about 1.2 seconds, with no movement.
+- Under reduced motion it is a still title card that fades after about 1.2 seconds, with no movement (its timing is not scaled).
 - It is decoration: the layer is `aria-hidden`, the page beneath is never `inert`, and screen readers read the page at once.
 - Any key, click, tap or scroll ends it; Tab lands on Skip to content. A visible Skip intro button and a progress line sit outside the hidden layer.
 - In a background tab it waits until the tab is shown.
@@ -61,14 +61,14 @@ Each learning environment sets `room` on BaseLayout (`data-room` on the body). I
 | Room | Accent | Drawing |
 | --- | --- | --- |
 | Finance | deep green | a spreadsheet grid and a market line |
-| Strategy | cobalt | a matrix of options and the path between them |
+| Strategy | muted blue | a matrix of options and the path between them |
 | Market | plum | a positioning map with a target segment |
 | People | umber | an organization of connected people |
 | Operations | steel blue | a process line and a conveyor |
 | Enterprise | amber | a blueprint and a canvas |
 | Boardroom | gold | the table and the trend on it |
 | Cases | oxblood | an editorial page of columns |
-| Assessment | deep cobalt | a ruled answer page |
+| Assessment | deep blue | a ruled answer page |
 | Advanced | deep claret | a lecture theatre's tiers |
 | Tutorials | antique gold | a desk with an open book |
 
@@ -106,7 +106,7 @@ Rendered from the monogram's master by `npm run brand` (`scripts/brand/render-as
 | `public/brand/templates/resource-cover.svg` (with a preview PNG) | A4 cover for printed resources, with editable text |
 | `public/brand/templates/document-header.svg`, `document-footer.svg` | A4-width strips for handouts |
 
-Resource covers in the Resources Library are drawn per resource by `src/components/resources/ResourceCover.astro`, on navy for assessment guides and ivory for the rest, each with a motif for its type.
+The Resources Library shows each resource as it is, not a drawn cover: the real mindmap or diagram, the first page of a PDF guide (rendered once from the file by `scripts/brand/guide-covers.mjs`), or the sections of a set of notes (`src/components/resources/LibraryEntry.astro`).
 
 ## Colour
 
@@ -125,7 +125,7 @@ Tokens are in `src/styles/tokens.css`. Brand hues are used as specified; where a
 | `--brass-text` | #76591F | Gold-brown text and labels on light surfaces |
 | `--charcoal` (`--text-body`) | #252D3A | Body text |
 | `--slate-600` (`--text-muted`) | #566173 | Secondary text |
-| `--bb-cobalt`, `--cobalt-text` | #2F55E4, #2448D0 | Links, focus, the learner's choice, total revenue |
+| `--bb-cobalt`, `--cobalt-text` | #3A6797, #2D5B8C | The muted blue of interaction: links, focus, the learner's choice, total revenue. Until 20 November 2026 an electric cobalt (#2F55E4, #2448D0); the 2.0 brief asked for a muted blue. `--cobalt-text` measures 6.25 on ivory and 7.03 on white; `--cobalt-on-ink` (#A9BFDC) 9.24 on navy |
 | `--bb-signal`, `--signal-text` | #A8463F, #9E3F38 | Errors, losses, adverse variances |
 | `--bb-green`, `--green-text` | #2F6F5E, #2B6A59 | Right answers, profit, favourable variances |
 
@@ -141,14 +141,17 @@ Colour never carries meaning alone: every verdict, level, state and variance is 
 | Inter | Body text, interface, labels, numbers | `--font-body`, `--font-ui` |
 | Cinzel | The brand lockup only | `--font-brand` |
 
-All three are under the SIL Open Font Licence and self-hosted from `public/fonts/` with their licences. Headlines use a gold italic accent once per heading at most ("Think *strategically.*"). Labels are Inter, uppercase and letter-spaced. Figures in tables and workings use tabular numbers.
+All three are under the SIL Open Font Licence and self-hosted from `public/fonts/` with their licences. Gold stays out of headings: emphasis in a heading is italic in the heading's own colour, and gold is kept for rules, the monogram and one emphasis at most on a screen. Labels are Inter, uppercase and letter-spaced, at least 12 px (`--fs-label`, 0.75rem), as are chips (`.tag`). No text that carries information is set below 12 px. Figures in tables and workings use tabular numbers.
 
 ## Space, layout and shape
 
 - Tokens `--sp-1` to `--sp-10`; page width 80 rem; reading column 42 rem; a fluid gutter from 16 px.
-- Corners 0 to 4 px; pills only for chips and filters.
+- Corners 0 to 4 px, buttons included (`.btn` has 2 px corners and no shadow); pills only for filters.
+- Section numerals (`SectionHead`) are slate italic, not gold, and on phones sit above the heading so headings and deks use the full width.
+- A plain list spaces its items; a list with a class or `role="list"` is laid out by its component (often as a row), so the global spacing does not misalign it.
 - Rules do the structural work: a navy rule with a short gold lead opens each numbered section; hairlines separate rows.
-- Navy bands carry the moments that matter (the three chains of reasoning, the Assessment Centre, the footer); ivory and white carry reading.
+- Navy bands carry the moments that matter (the three chains of reasoning, the Assessment Centre, the footer); ivory and white carry reading. Navy bands and menu panels are flat colour: no gradients.
+- The header is opaque, so nothing ghosts through it on scroll.
 - Soft sheet shadows for figures and covers; no glows, no glass, no parallax.
 
 ## Components added in 2.0
@@ -163,7 +166,8 @@ All three are under the SIL Open Font Licence and self-hosted from `public/fonts
 | Diagram (`Diagram.astro`) | Notes, briefs, `/diagrams/` | See below |
 | Glossary entry | `/glossary/<term>/` | The syllabus meaning, the everyday meaning where it differs, formula, example, related terms, subtopics |
 | Guidance labels | Assessment Centre | Four kinds of statement, each labelled: IB requirement, examiner emphasis, recommended strategy, illustrative example |
-| Resource card and cover | `/resources/` | Cover, type, level, format, size and pages for downloads |
+| Library entry | `/resources/` | A preview that carries information (the real map or diagram, a PDF's first page, a note's sections), the kind, level, standing and topic tags, the format and, for a file, its size and pages; each category set out for what it holds, or one ruled list for everything |
+| Teacher mark | `/teachers/` | The navy "For teachers" label on every page of the Teacher resource area, so teacher material is never mistaken for a student page |
 | Coverage state | `/ib/coverage/`, home | Complete (navy), partly built (gold outline), planned (dashed), with verification beside it |
 
 ## Mindmaps
@@ -187,7 +191,7 @@ Readers can fold a branch, switch between the full map and a revision view of th
 
 79 original diagrams in `src/lib/figures/`, drawn from data with the primitives in `src/lib/figures/kit.ts`: models, processes, structures and charts for all five units and the toolkit.
 
-- One visual language: navy for structure, gold for the accent and for "the business", cobalt for revenue and the reader's focus, green for gains, red for losses, washes for areas; Inter labels, Source Serif titles.
+- One visual language: navy for structure, gold for the accent and for "the business", muted blue for revenue and the reader's focus, green for gains, red for losses, washes for areas; Inter labels, Source Serif titles.
 - Every chart's numbers are computed in code from stated, fictional assumptions, and the unit tests pin them to values worked by hand; the figure says it is fictional.
 - Every diagram has a `<title>` and a full `<desc>`; the page shows the same text under "Text description".
 - On narrow screens a diagram keeps a readable size (34 rem minimum) and scrolls sideways in its own focusable region.
@@ -196,7 +200,7 @@ Readers can fold a branch, switch between the full map and a revision view of th
 
 ## Charts in the tools
 
-Interactive charts (break-even, cash flow, plans) are drawn by `src/lib/charts.ts` and the modules beside it: total revenue cobalt, total cost navy, fixed costs dashed; profit and loss areas tinted and labelled in words; every chart has a title and a description stating its result, and its figures in a table beside it.
+Interactive charts (break-even, cash flow, plans) are drawn by `src/lib/charts.ts` and the modules beside it: total revenue muted blue, total cost navy, fixed costs dashed; profit and loss areas tinted and labelled in words; every chart has a title and a description stating its result, and its figures in a table beside it.
 
 ## Motion
 
@@ -219,4 +223,4 @@ An original set in `src/lib/icons.ts` on a 24 by 24 grid with a 1.75 stroke, one
 
 ## Print
 
-`src/styles/print.css` removes the header, footer and screen-only controls, keeps exhibits, tables, workings and figures unbroken, and adds an attribution line with the page address. `src/scripts/print.ts` opens every disclosure before printing and closes them after. The formula sheet and the revision briefs are designed for A4.
+`src/styles/print.css` removes the header, footer and screen-only controls, keeps exhibits, tables, workings and figures unbroken, and adds an attribution line with the page address. `src/scripts/print.ts` opens every disclosure before printing and closes them after. The formula sheet, the revision briefs, the topic checklists and the classroom activities are designed for A4; the Resources Library prints the resources in view as a list, with each one's address.

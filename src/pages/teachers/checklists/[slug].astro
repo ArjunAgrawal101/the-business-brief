@@ -1,0 +1,97 @@
+---
+/**
+ * A topic checklist for teachers: one subtopic's syllabus statements, from the
+ * curriculum file, with the guide's depth of teaching and level, to print and
+ * tick as the topic is taught and checked. Links to the subtopic's notes, its
+ * mindmap and its timed plan in the lesson library.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/layout/Breadcrumbs.astro';
+import TeacherMark from '../../../components/teachers/TeacherMark.astro';
+import ChecklistTable from '../../../components/teachers/ChecklistTable.astro';
+import { corpus } from '../../../lib/content';
+import { AO_NAMES, AO_PAGE, COMMAND_TERMS_PAGES, checklistCounts, checklistHref, checklists, slRows, type Ao, type Checklist } from '../../../lib/teachers/checklists';
+import { lessonAnchor } from '../../../lib/teachers/sequences';
+import '../../../styles/teachers.css';
+
+export async function getStaticPaths() {
+  const cur = (await corpus()).curricula['ib-dp-bm'];
+  const lists = cur ? checklists(cur) : [];
+  return lists.map((list, i) => ({ params: { slug: list.slug }, props: { list, prev: lists[i - 1], next: lists[i + 1] } }));
+}
+
+interface Props {
+  list: Checklist;
+  prev?: Checklist;
+  next?: Checklist;
+}
+const { list, prev, next } = Astro.props;
+const c = await corpus();
+const k = checklistCounts(list);
+const sl = slRows(list).length;
+const map = Object.entries(c.mindmaps).find(([, m]) => m.scope === 'subtopic' && m.code === list.code);
+const aos = [...new Set(list.rows.flatMap((r) => r.ao))].sort() as Ao[];
+const levelText = list.level === 'HL' ? 'HL only' : list.level === 'SL/HL' ? 'SL and HL' : 'SL and HL, with HL-only statements';
+---
+
+<BaseLayout title={`Checklist: ${list.code} ${list.title}`} description={`A printable checklist of the syllabus statements for ${list.code} ${list.title}, with the depth of teaching and level of each, for teachers of IB DP Business Management.`} section="teachers">
+  <article class="wrap tr-page tr-print">
+    <div class="tr-screen">
+      <Breadcrumbs trail={[{ label: 'Teacher resources', href: '/teachers/' }, { label: 'Topic checklists', href: '/teachers/checklists/' }, { label: `${list.code} ${list.title}` }]} />
+      <TeacherMark />
+    </div>
+    <header class="tr-page__head">
+      <p class="tr-page__kicker">Topic checklist · Unit {list.unit}: {list.unitTitle}</p>
+      <h1>{list.code} {list.title}</h1>
+      <dl class="tr-facts tr-facts--row">
+        <div><dt>Level</dt><dd>{levelText}</dd></div>
+        <div><dt>Statements</dt><dd>{k.statements}{k.hl > 0 && list.level !== 'HL' ? `, of which ${k.hl} HL only` : ''}</dd></div>
+        <div><dt>For an SL class</dt><dd>{sl === 0 ? 'Not taught: HL only' : `${sl} ${sl === 1 ? 'statement' : 'statements'}`}</dd></div>
+        {list.page && <div><dt>Guide page</dt><dd>{list.page}</dd></div>}
+      </dl>
+      <p class="tr-page__acts tr-screen">
+        <button type="button" class="btn btn--primary needs-js" data-print>Print this checklist</button>
+        <a class="btn" href={`/topics/${list.slug}/`}>The notes for {list.code}</a>
+      </p>
+    </header>
+
+    <ChecklistTable list={list} />
+
+    <section class="tr-key" aria-labelledby="tr-key-h">
+      <h2 id="tr-key-h">Reading the depth</h2>
+      <p>
+        The depth of teaching is the assessment objective, or objectives, the guide sets for each statement (named on p. {AO_PAGE}). From AO1 to AO3 the demand rises, from knowing to evaluating; AO4 marks a statement
+        that needs a skill, such as a calculation or a chart. The command terms for each are on pp. {COMMAND_TERMS_PAGES} of the guide, and explained on the <a href="/examiner-lens/">Examiner Lens</a>.
+      </p>
+      <ul>
+        {
+          aos.map((a) => (
+            <li>
+              <strong>{a}</strong> {AO_NAMES[a]}
+            </li>
+          ))
+        }
+      </ul>
+      <p class="tr-key__note">
+        The statements are the platform's own wording, checked against the IB Business management guide (first assessment 2024), which is the authority. HL-only statements are marked; an SL class is not taught them.
+      </p>
+    </section>
+
+    <nav class="tr-related tr-screen" aria-label={`More for ${list.code}`}>
+      <a href={`/topics/${list.slug}/`}>Notes</a>
+      {map && <a href={`/mindmaps/${map[0]}/`}>Mindmap</a>}
+      <a href={lessonAnchor(list.code)}>Lesson plan</a>
+      <a href={`/resources/?subtopic=${list.code}#lib-results`}>Everything for {list.code} in the library</a>
+    </nav>
+
+    <nav class="tr-pager tr-screen" aria-label="Other checklists">
+      {prev ? <a href={checklistHref(prev.slug)}>&larr; {prev.code} {prev.title}</a> : <span />}
+      <a href="/teachers/checklists/">All checklists</a>
+      {next ? <a href={checklistHref(next.slug)}>{next.code} {next.title} &rarr;</a> : <span />}
+    </nav>
+  </article>
+</BaseLayout>
+
+<script>
+  document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+</script>

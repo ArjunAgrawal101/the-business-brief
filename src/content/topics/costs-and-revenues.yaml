@@ -44,6 +44,8 @@ objectives:
   - text: Evaluate a pricing decision using contribution, and state the limits of the model.
   - text: Use contribution to decide whether to accept a special order.
     level: HL
+  - text: Explain how cost structures and revenue streams differ between industries, and why the difference matters for profit.
+  - text: Analyse how a decision about costs or prices moves money between stakeholders.
 
 sections:
   - id: situation
@@ -67,7 +69,7 @@ sections:
         title: How this brief works
         provenance: aa-framework
         body: >
-          First classify the costs, then calculate, then decide. At section 07 you will make Atelier Barro's decisions in
+          First classify the costs, then calculate, then decide. At section 08 you will make Atelier Barro's decisions in
           the Decision Room. Every number on this page comes from one cost ledger, and every calculation shows its
           working in the same eight parts.
 
@@ -287,6 +289,102 @@ sections:
         intro: Each worked solution below contains one wrong line. Find it before you look at the explanation.
         provenance: subject-knowledge
 
+  - id: in-practice
+    kind: learn
+    title: Costs and revenue streams across industries
+    dek: >
+      Every business has fixed and variable costs and at least one revenue stream; the balance decides how its profit
+      behaves.
+    blocks:
+      - type: prose
+        provenance: subject-knowledge
+        body: >
+          The same two questions about costs, how they behave and whether they can be traced, apply in every industry,
+          but the answers differ. In some businesses most costs are fixed: an airline pays for its aircraft and crews
+          whether a flight is full or half empty, and a software company pays its developers whatever it sells. In
+          others most costs are variable: a supermarket's largest cost is the goods it sells, and a builder buys the
+          materials for each job. Revenue streams differ as much, from a single product to tickets, subscriptions,
+          advertising and licences.
+
+
+          The balance matters because it decides how profit responds when sales change. Where fixed costs are high,
+          each extra sale adds a large contribution, so profit rises fast when sales grow and falls fast when they
+          shrink. Where variable costs are high, profit moves more gently in both directions. At HL, subtopic 5.6
+          calls this operating leverage.
+      - type: comparison
+        title: Cost structures and revenue streams in six industries
+        provenance: subject-knowledge
+        caption: Typical patterns, which vary from one business to another within each industry.
+        columns: [Typical fixed costs, Typical variable costs, Main revenue streams]
+        rows:
+          - label: Airline
+            cells:
+              - Aircraft leases, salaried crews, maintenance programmes and the head office.
+              - Fuel and airport charges for each flight, and catering for each passenger.
+              - Tickets, baggage and seat fees, cargo, and fees from partners in loyalty schemes.
+          - label: Software sold by subscription
+            cells:
+              - Developers' salaries, offices and most server capacity.
+              - Payment fees and some hosting for each extra user.
+              - Monthly or annual subscriptions, premium tiers, and fees for setting up and supporting large customers.
+          - label: Hotel
+            cells:
+              - The building or its lease, salaried staff and insurance.
+              - Cleaning, laundry and energy for each occupied room, and commission to booking websites.
+              - Room nights, food and drink, events and meeting rooms, and parking.
+          - label: Supermarket
+            cells:
+              - Store rents, salaried managers, systems and distribution centres.
+              - The goods it sells, by far the largest cost, plus packaging and card fees.
+              - Sales of products, delivery charges, and payments from suppliers for promotions.
+          - label: Professional football club
+            cells:
+              - Players' and staff wages under contract, and the stadium.
+              - Stewarding and catering for each match.
+              - Match tickets, broadcasting rights, sponsorship, merchandise and fees for players transferred to other clubs.
+          - label: Social enterprise café
+            cells:
+              - Rent, and the salaries of the trainers who teach young people to cook.
+              - Ingredients and packaging.
+              - Food and drink sales, catering contracts, and grants for the training it provides.
+      - type: example
+        title: Two gyms, two cost structures (fictional)
+        provenance: simulated-data
+        body: |
+          Two fictional gyms each have 1,000 members paying $45 a month, so each takes $45,000 a month and makes a profit of $5,000.
+
+          - **Ironside Gym** employs salaried staff and owns its equipment: fixed costs of $38,000 a month and a variable cost of $2 a member, for towels and card fees. Each member contributes $43.
+          - **Flowline Studios** pays its instructors for each class they teach, so its costs follow attendance: fixed costs of $15,000 a month and a variable cost of $25 a member. Each member contributes $20.
+
+          If membership rises by 20% to 1,200, Ironside's profit rises to $13,600 and Flowline's to $9,000. If it falls by 20% to 800, Ironside makes a loss of $3,600 while Flowline still makes $1,000. Ironside breaks even at 884 members ($38,000 ÷ $43 = 883.7, rounded up) and Flowline at 750 ($15,000 ÷ $20). Same profit today, very different risk: the gym with high fixed costs gains more in a good year and loses more in a bad one.
+      - type: example
+        title: An aquarium's revenue streams (fictional)
+        provenance: simulated-data
+        body: >
+          Tidewater Aquarium, a fictional charity, took $2,000,000 last year from five streams: tickets $1,040,000
+          (52%), memberships $360,000 (18%), the café and shop $280,000 (14%), grants and donations $200,000 (10%) and
+          school visits $120,000 (6%).
+
+
+          Five streams look like a spread of risk, but tickets, the café and shop, and school visits all depend on
+          people coming through the door: together $1,440,000, or 72% of revenue. A wet summer or a closure for
+          repairs would hit all three at once. Memberships are paid in advance and grants are agreed for a year, so
+          they are steadier, which is why the aquarium is trying to grow its membership.
+      - type: misconception
+        provenance: subject-knowledge
+        claim: More revenue streams always make a business safer.
+        correction: >
+          Only if the streams do not depend on the same customers or events. Tidewater's tickets, café and school
+          visits are three streams with one weakness, the number of visitors, so a bad season hits them together.
+      - type: callout
+        tone: note
+        title: Use the numbers yourself
+        provenance: aa-framework
+        body: >
+          Work through costs and revenue on the [Finance Desk](/finance-desk/costs-and-revenue/), test a break-even
+          quantity in the [Financial Laboratory](/finance-desk/lab/break-even-quantity/), and see the subtopic on one
+          page in the [3.3 mindmap](/mindmaps/costs-and-revenues/).
+
   - id: evidence
     kind: evidence
     title: The evidence
@@ -357,11 +455,12 @@ sections:
         title: Contribution and special orders
         level: HL
         provenance: subject-knowledge
+        sources: [ib-bm-guide-2024]
         body: >
           A special order is judged on contribution. If the business has spare capacity and the order does not affect its
           regular sales, an order adds to profit whenever its price is above the variable cost of fulfilling it, even if
-          that price is below the average cost of a unit. Contribution appears in the business management toolkit as an
-          HL-only tool, as reported by one secondary source.
+          that price is below the average cost of a unit. Contribution, which includes contribution costing and make or
+          buy analysis, is one of the HL-only tools of the business management toolkit (guide, p. 14).
       - type: worked
         title: The hotel's order at €11
         calculation: special-order
@@ -386,6 +485,182 @@ sections:
           Average cost includes fixed costs that are already covered by regular sales. If they are, the order only has to
           cover its own variable costs to add profit. The belief is right only when the order displaces sales at the full
           price or needs extra fixed costs.
+
+  - id: stakeholders
+    kind: evaluate
+    title: Who pays, who gains
+    dek: >
+      Every decision about costs or prices moves money between groups. The arithmetic shows how much; the stakeholders
+      decide whether it works.
+    blocks:
+      - type: prose
+        provenance: subject-knowledge
+        body: >
+          A business can respond to a rise in costs by raising its price, cutting other costs, changing what it sells
+          or accepting lower profit, and each response moves the burden onto a different group. A price rise falls on
+          customers; cheaper materials may fall on quality and so, in time, on customers again; a cut in pay or hours
+          falls on employees; slower payment falls on suppliers. Contribution and break-even show how large each
+          effect is, which is what makes a stakeholder analysis ([1.4](/topics/stakeholders/)) of a cost decision
+          precise rather than general.
+      - type: comparison
+        title: Atelier Barro's options and its stakeholders, in a month from November
+        provenance: simulated-data
+        caption: >
+          From the cost ledger, the price test and the hotel's request. The price rise assumes that sales fall to 590
+          mugs a month, as the survey and the price test suggest.
+        columns: [Raise the price to €24, Cut marketing by €280, Accept the hotel's order]
+        rows:
+          - label: Inês, the owner
+            cells:
+              - Profit rises from €1,344.80 to €1,736.60 a month, if sales fall only to 590 mugs.
+              - Profit rises by €280 a month if sales hold, but each lost mug costs €14.82, so 19 fewer mugs would wipe out the saving.
+              - €1,395 more profit in November, and a possible repeat order next year.
+          - label: The two throwers
+            cells:
+              - '50 fewer mugs a month, so €120 less pay between them at €2.40 a mug.'
+              - No change, unless fewer advertisements mean fewer sales.
+              - '300 more mugs, so €720 more pay between them in November.'
+          - label: Rui, the studio manager
+            cells:
+              - Fewer orders to pack, and questions from regular customers about the price.
+              - Less advertising to run, and more pressure on the website to sell without it.
+              - A busier November, with 300 hotel mugs on top of the season's 830.
+          - label: Online and studio customers
+            cells:
+              - Pay €2 more, about 9%; about 50 a month stop buying, by the survey estimate.
+              - See fewer advertisements, so fewer new customers find the studio.
+              - May find the same mugs in hotel rooms at half the price, which could change what they think a mug is worth.
+          - label: Casa Alfama Hotels
+            cells:
+              - No effect.
+              - No effect.
+              - '300 distinctive local mugs at €11 each, delivered for its guests'' winter season.'
+      - type: list
+        title: 'Beyond the studio: who carries a change in costs'
+        style: pairs
+        provenance: subject-knowledge
+        items:
+          - label: Customers
+            body: Pay for cost rises through prices, or through quality when cheaper materials replace better ones.
+          - label: Employees
+            body: >
+              Paid by the piece, they share the risk of falling sales, because their pay is a variable cost. On
+              salaries they are protected week to week, but a business with high fixed costs may cut jobs when sales
+              fall.
+          - label: Suppliers
+            body: Feel cost-cutting as pressure on their prices or as slower payment.
+          - label: Owners
+            body: >
+              Take what is left. A business with high fixed costs gives them large profits in good years and losses in
+              bad ones.
+          - label: Government
+            body: >
+              Collects taxes on profit and on sales, so it shares in the result, and sets rules, such as a minimum
+              wage or taxes on energy, that change costs for many businesses at once.
+          - label: The environment
+            body: >
+              Using less energy lowers a variable cost and emissions at the same time, which is why rising energy
+              prices can push businesses towards more sustainable processes.
+      - type: callout
+        tone: caution
+        title: Moving risk onto people with less power
+        provenance: aa-framework
+        body: >
+          Paying workers by the piece, or only for the hours a business chooses, turns labour from a fixed cost into a
+          variable one. That protects the business when sales fall, but moves the risk onto the workers, whose pay
+          falls with the orders. Atelier Barro's throwers carry part of the studio's risk in this way. Whether that is
+          fair depends on how their earnings compare with a salary, and on whether they chose the arrangement.
+      - type: misconception
+        provenance: subject-knowledge
+        claim: Cutting costs is always good for a business.
+        correction: >
+          It depends on which costs, and on who bears the cut. Cutting marketing lowers fixed costs, but if Atelier
+          Barro's sales then fall by 19 mugs a month or more, its profit falls. Cutting the piece rate would raise
+          contribution, but could cost the studio its throwers, and with them its product.
+
+  - id: assess
+    kind: assess
+    title: Exam-style practice
+    dek: >
+      Original questions in the style of the papers, each followed by what a strong response does. They are not IB
+      questions, and the guidance is not an official markscheme. Answer before you read it.
+    blocks:
+      - type: prose
+        title: Question 1 · Suggest · 4 marks
+        provenance: original-practice
+        body: >
+          Suggest **two** ways Atelier Barro could reduce the effect of the electricity price rise on its costs, other
+          than by raising its price.
+      - type: callout
+        tone: exam
+        title: 'Question 1: what a strong response does'
+        provenance: assessment-explanation
+        body: |
+          A strong response puts forward two plausible measures, each with a reason that fits the case.
+
+          - **Fire fuller kilns:** firing now costs €0.75 a mug, so packing each firing as full as possible spreads its electricity over more mugs.
+          - **Fire at cheaper times:** if the new tariff charges less at night or at weekends, scheduling firings then lowers the cost of each one.
+          - Other valid suggestions include servicing or insulating the kiln so that it uses less energy. Selling spare kiln time to other potters adds revenue to offset the rise rather than cutting the cost, so it answers a slightly different question.
+
+          Two marks for each: one for the measure and one for a reason linked to Atelier Barro's costs.
+      - type: prose
+        title: Question 2 · Demonstrate · 4 marks
+        provenance: original-practice
+        body: >
+          Ironside Gym and Flowline Studios, two fictional gyms, each have 1,000 members paying $45 a month. Ironside
+          has fixed costs of $38,000 a month and a variable cost of $2 a member; Flowline has fixed costs of $15,000 a
+          month and a variable cost of $25 a member.
+
+
+          Demonstrate why the gym with the higher fixed costs gains more when membership rises by 20%, and loses more
+          when it falls by 20%.
+      - type: callout
+        tone: exam
+        title: 'Question 2: what a strong response does'
+        provenance: assessment-explanation
+        body: |
+          A strong response proves the point with the figures rather than asserting it.
+
+          - **Today:** each makes $45,000 − its total costs = $5,000 (Ironside $38,000 + $2,000; Flowline $15,000 + $25,000).
+          - **1,200 members:** Ironside makes $54,000 − $40,400 = $13,600; Flowline $54,000 − $45,000 = $9,000.
+          - **800 members:** Ironside makes $36,000 − $39,600, a loss of $3,600; Flowline $36,000 − $35,000 = $1,000.
+          - **Why:** each Ironside member contributes $43 against Flowline's $20, so every member gained or lost moves Ironside's profit more than twice as far.
+      - type: prose
+        title: Question 3 · Comment · 4 marks
+        provenance: original-practice
+        body: >
+          Tidewater Aquarium, a fictional charity, took $2,000,000 last year: tickets $1,040,000, memberships
+          $360,000, the café and shop $280,000, grants and donations $200,000, and school visits $120,000.
+
+
+          Comment on the spread of the aquarium's revenue streams.
+      - type: callout
+        tone: exam
+        title: 'Question 3: what a strong response does'
+        provenance: assessment-explanation
+        body: |
+          A strong response works out the shares, then judges what they show.
+
+          - **Shares:** tickets 52%, memberships 18%, café and shop 14%, grants and donations 10%, school visits 6%.
+          - **The hidden concentration:** tickets, the café and shop, and school visits all depend on visitors, $1,440,000 or 72% of revenue.
+          - **Judgement:** five streams look diverse, but one event that keeps visitors away would cut nearly three-quarters of revenue at once, so the aquarium is less protected than the count suggests.
+          - A top response notes the steadier streams, memberships paid in advance and grants agreed for a year, and what the figures leave out, such as the costs of each stream.
+      - type: prose
+        title: Question 4 · Analyse · 6 marks
+        provenance: original-practice
+        body: >
+          Analyse the effect of raising the price of a mug from €22 to €24 on **two** of Atelier Barro's stakeholders.
+      - type: callout
+        tone: exam
+        title: 'Question 4: what a strong response does'
+        provenance: assessment-explanation
+        body: |
+          A strong response chooses two groups, traces the effect on each with the case's figures, and analyses how they might respond.
+
+          - **The owner:** contribution per mug rises from €14.82 to €16.74, because the 4% fee rises with the price; if sales fall to 590 mugs, profit rises from €1,344.80 to €1,736.60 a month, but only if the survey's estimate holds.
+          - **The throwers:** paid €2.40 a mug, they make 50 fewer mugs a month and earn €120 less between them, although nothing about their work has changed.
+          - **Customers** are an equally valid choice: they pay €2, about 9%, more, and about 50 a month are expected to stop buying.
+          - **Analysis:** the price rise moves money from customers and throwers to the owner. Whether it works depends on how regular customers react, and the throwers' loss shows how piece rates pass the risk of lower sales on to the workers.
 
 conceptLens:
   - concept: change
@@ -429,8 +704,10 @@ lenses:
     provenance: enrichment
     body: >
       A business with high fixed costs and a high contribution per unit, like Atelier Barro, has high operating
-      leverage: its profit rises fast when sales rise and falls fast when they fall. That is why the margin of safety
-      matters more than the profit in a good month.
+      leverage, a measure HL students meet in subtopic 5.6: its profit rises fast when sales rise and falls fast when
+      they fall. MBA finance courses combine it with financial leverage, the extra risk that borrowing adds, to judge
+      how risky a business's profits are. That is why the margin of safety matters more than the profit in a good
+      month.
   - pathway: secondary
     title: For IGCSE and other courses
     provenance: aa-framework
@@ -458,6 +735,7 @@ teaching:
     - When is it right to sell below average cost?
     - Who should bear an energy price rise?
     - What does break-even analysis assume that is not true at Atelier Barro?
+    - Who should carry the risk when sales fall, the owner, the workers or the customers?
   notes: >
     Watch for students who divide fixed costs by the price, who round the break-even quantity down, and who leave out
     the 4% fee when the price changes. The error diagnosis activity targets all three.
@@ -470,6 +748,8 @@ revision:
     - Contribution per unit = price − variable cost per unit. Break-even quantity = fixed costs ÷ contribution per unit, rounded up.
     - Margin of safety = actual or forecast output − break-even output, measured in units.
     - Break-even analysis assumes a constant price and unit cost, and that everything produced is sold.
+    - Cost structures differ by industry. Where fixed costs are high, profit rises fast when sales grow and falls fast when they shrink; where variable costs are high, profit moves more gently. At HL this is operating leverage (5.6).
+    - 'Every cost or price decision moves money between stakeholders: a price rise falls on customers, a piece rate passes falling sales on to workers, and the owner takes what is left.'
   retrieval:
     - q: What is a semi-variable cost?
       a: A cost with a fixed part and a part that varies with output, such as electricity with a standing charge and a charge for each unit used.
@@ -483,11 +763,16 @@ revision:
       a: Because one unit fewer than the exact figure leaves a loss.
     - q: In what is the margin of safety measured?
       a: In units of output, or as a share of sales. Not in money.
+    - q: Two businesses make the same profit. One has high fixed costs and a large contribution per unit; the other has low fixed costs and a small contribution per unit. Whose profit changes more when sales change?
+      a: The one with high fixed costs, because each unit gained or lost changes its profit by its larger contribution.
+    - q: Why are several revenue streams not always safer than one?
+      a: If the streams depend on the same customers or events, such as the number of visitors, one bad season hits them all at once.
   traps:
     - Dividing fixed costs by the price instead of by contribution per unit.
     - Rounding the break-even quantity down.
     - Forgetting that a cost which is a share of the price changes when the price changes.
     - Confusing the margin of safety with profit.
+    - Counting revenue streams without asking whether they depend on the same customers or events.
 
 related:
   cases: [atelier-barro]
@@ -496,7 +781,7 @@ related:
   calculations: [total-revenue, total-cost, profit, contribution-per-unit, total-contribution, break-even-quantity, break-even-revenue, margin-of-safety, target-profit-output, target-price, special-order]
   questions: [q-costs-p2-classify, q-costs-p2-direct, q-costs-p1-streams, q-costs-p2-beq, q-costs-p2-mos, q-costs-p2-price, q-costs-p2-evaluate, q-costs-hl-special]
   topics: [growth-and-evolution]
-  glossary: [fixed-cost, variable-cost, semi-variable-cost, direct-cost, indirect-cost, total-cost, total-revenue, revenue-stream, contribution, break-even-quantity, margin-of-safety, target-profit-output, average-cost, special-order]
-syllabusLinks: ['5.5', '3.1', '4.5']
+  glossary: [fixed-cost, variable-cost, semi-variable-cost, direct-cost, indirect-cost, total-cost, total-revenue, revenue-stream, contribution, break-even-quantity, margin-of-safety, target-profit-output, average-cost, special-order, operating-leverage, stakeholder]
+syllabusLinks: ['5.5', '3.1', '4.5', '1.4', '5.6']
 sources: [ib-bm-guide-2024, method-simulated]
-updated: 2026-10-29
+updated: 2026-11-20

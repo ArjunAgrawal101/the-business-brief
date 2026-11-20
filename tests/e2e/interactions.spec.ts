@@ -197,7 +197,7 @@ test.describe('Exam Desk', () => {
     await expect(page.locator('[data-count]')).toHaveText('3 questions');
     await page.selectOption('#f-paper', '');
     await page.selectOption('#f-calc', 'calc');
-    await expect(page.locator('[data-filter-item]:visible')).toHaveCount(6);
+    await expect(page.locator('[data-filter-item]:visible')).toHaveCount(8);
   });
 });
 

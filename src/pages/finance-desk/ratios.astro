@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
+import BackToTopic from '../../components/connect/BackToTopic.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import Interactive from '../../components/interactive/Interactive.astro';
 import CalcCard from '../../components/finance/CalcCard.astro';
@@ -24,6 +25,7 @@ const hl = calcs.filter(([, k]) => k.level === 'HL');
     title="Ratio analysis"
     lead="Ratios turn a year's accounts into questions: why did the margin fall, where has the cash gone, how much of the business is borrowed? Work out each ratio from Halden Distribution's accounts, check your answer against the full working, then try the strategies that would improve the ratios and see which ones they actually move."
   >
+    <BackToTopic />
     <div class="tags"><span class="tag tag--plain">IB 3.5 and 3.6</span><span class="tag tag--hl">Efficiency ratios: HL only</span></div>
   </PageIntro>
   <div class="wrap page-body">

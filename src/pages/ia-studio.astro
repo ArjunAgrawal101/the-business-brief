@@ -1,4 +1,10 @@
 ---
+/**
+ * IA Studio: the ten-step planner first, then the task as the guide sets it
+ * out, what the project must do (the guide's musts only) apart from what the
+ * guide recommends, the IB's advice to teachers under its own label, the
+ * platform's advice, the IA tools and the integrity reminders.
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/layout/PageIntro.astro';
 import SectionHead from '../components/layout/SectionHead.astro';
@@ -6,27 +12,35 @@ import FactList from '../components/assess/FactList.astro';
 import PaperStructure from '../components/assess/PaperStructure.astro';
 import IbGuidance from '../components/assess/IbGuidance.astro';
 import IaPlanner from '../components/ia/IaPlanner.astro';
+import GuideLabel from '../components/centre/GuideLabel.astro';
+import IaIntegrity from '../components/centre/IaIntegrity.astro';
 import VerifyTag from '../components/ui/VerifyTag.astro';
 import { corpus, href } from '../lib/content';
+import { IA_TOOL_PAGES } from '../lib/ia-tools';
 import { inline } from '../lib/markup';
+import '../styles/centre.css';
 
 const c = await corpus();
 const ia = c.assessment['internal-assessment'];
 ---
 
-<BaseLayout room="assessment" title="IA Studio" description="The IB Business Management internal assessment as the guide sets it out, with the IB's own guidance and a ten-step planner that checks your supporting documents." section="exam-desk">
+<BaseLayout room="assessment" title="IA Studio" description="The IB Business Management internal assessment: a ten-step planner that checks your supporting documents, the task as the guide sets it out, what the project must do and what the guide recommends, and the IB's own advice." section="exam-desk">
   <PageIntro
     trail={[{ label: 'Assessment Centre', href: '/assessment/' }, { label: 'Internal assessment', href: '/assessment/internal-assessment/' }, { label: 'Planner' }]}
     kicker="IA Studio"
     title="The business research project"
-    lead="The internal assessment as the Business management guide sets it out, the IB's own advice for preparing it, and a planner that takes you through ten steps and checks your supporting documents against the rules."
+    lead="A planner that takes you through ten steps and checks your supporting documents against the rules, then the internal assessment as the Business management guide sets it out and the IB's own advice for preparing it."
   />
   <div class="wrap page-body">
+    <section aria-labelledby="plan-h">
+      <SectionHead no={1} title="Plan your project" dek="Work through the ten steps in order. Your plan is saved on this device only, and you can print it for a meeting with your teacher." id="plan-h" />
+      {ia && <IaPlanner criteria={ia.criteria} />}
+    </section>
     {
       ia && (
         <>
           <section aria-labelledby="task-h">
-            <SectionHead no={1} title="The task" dek={ia.summary} id="task-h" />
+            <SectionHead no={2} title="The task" dek={ia.summary} id="task-h" />
             <div style="margin-top:var(--sp-4)">
               <PaperStructure a={ia} />
             </div>
@@ -39,59 +53,75 @@ const ia = c.assessment['internal-assessment'];
             </div>
           </section>
           <section aria-labelledby="req-h">
-            <SectionHead no={2} title="The requirements" dek="What the project must do, from the guide, in the platform's words." id="req-h" />
+            <SectionHead no={3} title="The requirements" dek="What the project must do, from the guide, in the platform's words: the guide's musts only." id="req-h" />
+            <p class="ce-labels">
+              <GuideLabel kind="ib" /> <span class="ce-cite">Business management guide; the page follows each requirement</span> <VerifyTag status="primary" />
+            </p>
             <ol class="req-list">
               {ia.requirements.map((r) => (
                 <li set:html={inline(r)} />
               ))}
             </ol>
-            <p class="small muted">
-              Business management guide, pp. 53 to 56. <VerifyTag status="primary" />
-            </p>
+            <h3 class="req-h3" id="rec-h">What the guide recommends</h3>
+            <p class="small muted">What the guide says should be done, or recommends: advice from the guide, not a must.</p>
+            <ul class="req-list req-list--rec" aria-labelledby="rec-h">
+              {ia.recommendations.map((r) => (
+                <li set:html={inline(r)} />
+              ))}
+            </ul>
           </section>
           <section aria-labelledby="ibg-h">
-            <SectionHead no={3} title="Advice from the IB" id="ibg-h" />
+            <SectionHead no={4} title="Advice from the IB's teacher support material" id="ibg-h" />
             <div style="margin-top:var(--sp-4)">
               <IbGuidance items={ia.ibGuidance} />
             </div>
           </section>
+          <section aria-labelledby="advice-h">
+            <SectionHead no={5} title="What makes a project work" id="advice-h" />
+            <p class="ce-labels">
+              <GuideLabel kind="strategy" /> <span class="ce-cite">The platform's teaching, not examiner observations</span>
+            </p>
+            <div class="grid grid--3" style="margin-top:var(--sp-4)">
+              <div>
+                <h3 class="label label--ink">What tends to earn credit</h3>
+                <ul class="prose">{ia.rewards.map((x) => <li set:html={inline(x)} />)}</ul>
+              </div>
+              <div>
+                <h3 class="label label--ink">Preparation</h3>
+                <ol class="prose">{ia.preparation.map((x) => <li set:html={inline(x)} />)}</ol>
+              </div>
+              <div>
+                <h3 class="label label--ink">Errors to avoid</h3>
+                <ul class="prose traps">{ia.errors.map((x) => <li set:html={inline(x)} />)}</ul>
+              </div>
+            </div>
+            <div class="callout callout--caution" style="margin-top:var(--sp-5)">
+              <span class="callout__kicker">Not on this page</span>
+              <ul class="prose">{ia.notStated.map((x) => <li>{x}</li>)}</ul>
+            </div>
+            <p class="small" style="margin-top:var(--sp-4)">
+              Practise the analysis on the platform's cases first: a <a href={href.case('halden-distribution')}>people problem</a>, a{' '}
+              <a href={href.case('atelier-barro')}>costing problem</a> and a <a href={href.case('marigold-kitchens')}>growth decision</a>. They are
+              fictional, so they cannot be the organization for your project.
+            </p>
+          </section>
         </>
       )
     }
-    <section aria-labelledby="plan-h">
-      <SectionHead no={4} title="Plan your project" dek="Work through the ten steps in order. Your plan is saved on this device only, and you can print it for a meeting with your teacher." id="plan-h" />
-      {ia && <IaPlanner criteria={ia.criteria} />}
+    <section aria-labelledby="tools-h">
+      <SectionHead no={6} title="The IA tools" dek={`${IA_TOOL_PAGES.length} tools for one part of the project each, in the order a project uses them.`} id="tools-h" />
+      <ol class="req-tools">
+        {
+          IA_TOOL_PAGES.map((t) => (
+            <li>
+              <a href={t.href}>{t.name}</a>
+              <span class="small muted">{t.line}</span>
+            </li>
+          ))
+        }
+      </ol>
     </section>
-    {
-      ia && (
-        <section aria-labelledby="advice-h">
-          <SectionHead no={5} title="What makes a project work" id="advice-h" />
-          <div class="grid grid--3" style="margin-top:var(--sp-4)">
-            <div>
-              <h3 class="label label--ink">What tends to earn credit</h3>
-              <ul class="prose">{ia.rewards.map((x) => <li set:html={inline(x)} />)}</ul>
-            </div>
-            <div>
-              <h3 class="label label--ink">Preparation</h3>
-              <ol class="prose">{ia.preparation.map((x) => <li set:html={inline(x)} />)}</ol>
-            </div>
-            <div>
-              <h3 class="label label--ink">Errors to avoid</h3>
-              <ul class="prose traps">{ia.errors.map((x) => <li set:html={inline(x)} />)}</ul>
-            </div>
-          </div>
-          <div class="callout callout--caution" style="margin-top:var(--sp-5)">
-            <span class="callout__kicker">Not on this page</span>
-            <ul class="prose">{ia.notStated.map((x) => <li>{x}</li>)}</ul>
-          </div>
-          <p class="small" style="margin-top:var(--sp-4)">
-            Practise the analysis on the platform's cases first: a <a href={href.case('halden-distribution')}>people problem</a>, a{' '}
-            <a href={href.case('atelier-barro')}>costing problem</a> and a <a href={href.case('marigold-kitchens')}>growth decision</a>. They are
-            fictional, so they cannot be the organization for your project.
-          </p>
-        </section>
-      )
-    }
+    <IaIntegrity no="07" />
   </div>
 </BaseLayout>
 
@@ -105,8 +135,30 @@ const ia = c.assessment['internal-assessment'];
   }
 
   .req-list li::marker {
-    font-family: var(--font-mono);
     font-weight: 600;
     color: var(--text-muted);
+  }
+
+  .req-h3 {
+    margin-top: var(--sp-6);
+    font-size: 1.3125rem;
+  }
+
+  .req-tools {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: var(--sp-3) var(--sp-5);
+    max-width: 64rem;
+    margin: var(--sp-4) 0 0;
+    padding-left: 1.4em;
+  }
+
+  .req-tools li {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .req-tools a {
+    font-weight: 600;
   }
 </style>

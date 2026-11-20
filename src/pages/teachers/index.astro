@@ -1,0 +1,328 @@
+---
+/**
+ * The Teacher resource area: suggested lesson sequences across the course
+ * (from the lesson library's own functions), discussion prompts for every
+ * subtopic, classroom activities built on the platform's fictional cases and
+ * Decision Rooms, a checklist of syllabus statements for each subtopic with a
+ * CSV of them all, the files worth downloading for teaching, and how to set
+ * work with a platform that has no accounts. Teacher-facing throughout, and
+ * marked so.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import SectionHead from '../../components/layout/SectionHead.astro';
+import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
+import TeacherMark from '../../components/teachers/TeacherMark.astro';
+import SequenceTable from '../../components/teachers/SequenceTable.astro';
+import { corpus } from '../../lib/content';
+import { lessonLibrary } from '../../lib/lesson-sources';
+import { activities, catalogue, prompts } from '../../lib/resources';
+import { sequenceRows } from '../../lib/teachers/sequences';
+import { checklistCounts, checklistHref, checklists } from '../../lib/teachers/checklists';
+import { activityHref, activityMinutes } from '../../lib/teachers/schema';
+import { activityCase } from '../../lib/teachers/integrity';
+import { catalogueDownloads, linkFacts } from '../../lib/library/catalogue';
+import { promptLists } from '../../lib/teachers/prompts';
+import '../../styles/teachers.css';
+
+const c = await corpus();
+const cur = c.curricula['ib-dp-bm']!;
+const ps = await prompts();
+const rows = sequenceRows(lessonLibrary(c, promptLists(ps)));
+const acts = await activities();
+const lists = checklists(cur);
+const cat = await catalogue();
+const files = catalogueDownloads(cat);
+const file = (href: string) => files.find((f) => f.href === href);
+const guides = cat.items.filter((it) => it.category === 'assessment' && it.primary.format === 'pdf');
+const glossary = file('/downloads/glossary.csv');
+const checklistCsv = file('/downloads/topic-checklists.csv');
+const svgs = (prefix: RegExp) => files.filter((f) => prefix.test(f.href));
+const mapSvgs = svgs(/^\/downloads\/mindmaps\/[a-z0-9-]+\.svg$/);
+const diagramSvgs = svgs(/^\/downloads\/diagrams\//);
+const statements = lists.reduce((n, l) => n + l.rows.length, 0);
+const hlStatements = lists.reduce((n, l) => n + checklistCounts(l).hl, 0);
+const promptTotal = Object.values(ps).reduce((n, p) => n + p.prompts.length, 0);
+const totalMinutes = acts.map(([, a]) => activityMinutes(a));
+let n = 0;
+---
+
+<BaseLayout
+  title="Teacher resources"
+  description="For teachers of IB DP Business Management: lesson sequences for every subtopic, discussion prompts, case-based classroom activities, printable topic checklists with a CSV, and the files to download."
+  section="teachers"
+>
+  <header class="wrap tr-head">
+    <Breadcrumbs trail={[{ label: 'Teacher resources' }]} />
+    <TeacherMark home />
+    <div class="tr-head__grid">
+      <div>
+        <h1>Teacher resources</h1>
+        <p class="tr-head__lead">
+          Plans, prompts, classroom activities and checklists for teaching IB DP Business Management, built from the platform's notes, cases and syllabus statements. Adapt them to your class: the timings and activities
+          are suggestions, not IB requirements.
+        </p>
+        <p class="tr-head__also">
+          The <a href="/pathways/teachers/">teachers' pathway</a> sets out how the platform fits a teaching cycle, and its <a href="/pathways/teachers/#lessons">lesson library</a> gives every subtopic a timed plan.
+        </p>
+      </div>
+      <nav class="tr-toc" aria-labelledby="tr-toc-h">
+        <h2 class="tr-toc__h" id="tr-toc-h">In this area</h2>
+        <ol>
+          <li><a href="#sequences">Lesson sequences</a> <span>{rows.length} subtopics</span></li>
+          <li><a href="#prompts">Discussion prompts</a> <span>{promptTotal} prompts</span></li>
+          <li><a href="#activities">Classroom activities</a> <span>{acts.length} lessons</span></li>
+          <li><a href="#checklists">Topic checklists</a> <span>{lists.length} subtopics</span></li>
+          <li><a href="#downloads">Teaching downloads</a> <span>{files.length} files</span></li>
+          <li><a href="#assigning">Setting work</a></li>
+        </ol>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap page-body tr-body">
+    <section class="tr-sec" id="sequences" aria-labelledby="tr-seq-h">
+      <SectionHead
+        no={++n}
+        title="Lesson sequences"
+        id="tr-seq-h"
+        dek="How many lessons each subtopic takes for an SL and an HL class, and what each lesson covers, from the lesson library's plans. Open a subtopic for its timed plan: starter, teaching, activity, check and exit ticket."
+      />
+      <div class="tags tr-tags"><ProvenanceTag kind="aa-framework" /></div>
+      <SequenceTable rows={rows} cur={cur} />
+    </section>
+
+    <section class="tr-sec" id="prompts" aria-labelledby="tr-prompts-h">
+      <SectionHead no={++n} title="Discussion prompts" id="tr-prompts-h" dek="Questions to open a lesson or test a judgement, by unit and subtopic. Each is written to have more than one defensible answer." />
+      <div class="tags tr-tags"><ProvenanceTag kind="aa-framework" /></div>
+      <div class="tr-prompts">
+        {
+          cur.units.map((u) => (
+            <section class="tr-prompts__unit" aria-labelledby={`tr-p-u${u.number}`}>
+              <h3 id={`tr-p-u${u.number}`}>
+                Unit {u.number}: {u.title}
+              </h3>
+              <dl>
+                {u.subtopics
+                  .filter((s) => ps[s.code])
+                  .map((s) => (
+                    <div class="tr-prompts__sub">
+                      <dt>
+                        <span class="tr-code">{s.code}</span> {s.title}
+                        {s.level === 'HL' && <span class="tr-hl">HL only</span>}
+                      </dt>
+                      <dd>
+                        <ol>
+                          {ps[s.code]!.prompts.map((p) => (
+                            <li>{p}</li>
+                          ))}
+                        </ol>
+                      </dd>
+                    </div>
+                  ))}
+              </dl>
+            </section>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="tr-sec" id="activities" aria-labelledby="tr-act-h">
+      <SectionHead
+        no={++n}
+        title="Classroom activities"
+        id="tr-act-h"
+        dek="Whole lessons built on the platform's fictional cases and Decision Rooms: students take the roles of the people in the case, work against the clock, and finish with a debrief. Each prints for the classroom."
+      />
+      <ol class="tr-acts" role="list">
+        {
+          acts.map(([id, a], i) => {
+            const caseId = activityCase(a, c);
+            const basis = a.basis.kind === 'decision' ? c.decisions[a.basis.id]?.title : c.cases[a.basis.id]?.title;
+            return (
+              <li class="tr-act">
+                <p class="tr-act__no" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </p>
+                <div class="tr-act__body">
+                  <h3>
+                    <a href={activityHref(id)}>{a.title}</a>
+                  </h3>
+                  <p>{a.summary}</p>
+                  <dl class="tr-facts">
+                    <div>
+                      <dt>Time</dt>
+                      <dd>{totalMinutes[i]} minutes</dd>
+                    </div>
+                    <div>
+                      <dt>Groups</dt>
+                      <dd>of {a.groupSize}</dd>
+                    </div>
+                    <div>
+                      <dt>Built on</dt>
+                      <dd>
+                        {a.basis.kind === 'decision' ? 'The Decision Room ' : 'The case file '}
+                        <a href={a.basis.kind === 'decision' ? `/decision-room/${a.basis.id}/` : `/cases/${a.basis.id}/`}>{basis}</a>
+                        {caseId && c.cases[caseId]?.kind === 'fictional' && <span class="tr-fic">Fictional</span>}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Subtopics</dt>
+                      <dd>
+                        {a.subtopics.join(', ')}
+                        {a.level === 'HL' && ' (HL)'}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+              </li>
+            );
+          })
+        }
+      </ol>
+    </section>
+
+    <section class="tr-sec" id="checklists" aria-labelledby="tr-check-h">
+      <SectionHead
+        no={++n}
+        title="Topic checklists"
+        id="tr-check-h"
+        dek={`Every syllabus statement, subtopic by subtopic, with the guide's depth of teaching and its level: ${statements} statements, ${hlStatements} of them HL only. Print one to track a topic, or take them all as a spreadsheet.`}
+      />
+      <p class="tr-check__acts">
+        {checklistCsv && (
+          <a class="btn btn--primary" href={checklistCsv.href} download>
+            Download every checklist, {linkFacts(checklistCsv)}
+          </a>
+        )}
+        <a class="btn" href="/teachers/checklists/">All the checklists on one page</a>
+      </p>
+      <div class="tr-checks">
+        {
+          cur.units.map((u) => (
+            <section aria-labelledby={`tr-c-u${u.number}`}>
+              <h3 id={`tr-c-u${u.number}`}>
+                Unit {u.number}: {u.title}
+              </h3>
+              <ul role="list">
+                {lists
+                  .filter((l) => l.unit === u.number)
+                  .map((l) => {
+                    const k = checklistCounts(l);
+                    return (
+                      <li>
+                        <a href={checklistHref(l.slug)}>
+                          <span class="tr-code">{l.code}</span> {l.title}
+                        </a>
+                        <span class="tr-checks__n">{`${k.statements} ${k.statements === 1 ? 'statement' : 'statements'}${l.level === 'HL' ? ', HL only' : k.hl ? `, ${k.hl} HL only` : ''}`}</span>
+                      </li>
+                    );
+                  })}
+              </ul>
+            </section>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="tr-sec" id="downloads" aria-labelledby="tr-dl-h">
+      <SectionHead no={++n} title="Teaching downloads" id="tr-dl-h" dek="Files to keep, share with a class or put on a school system." />
+      <div class="table-scroll" role="region" aria-label="Teaching downloads" tabindex="0">
+        <table class="table tr-dl">
+          <thead>
+            <tr>
+              <th scope="col">File</th>
+              <th scope="col">What it holds</th>
+              <th scope="col">Format and size</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              guides.map((g) => (
+                <tr>
+                  <th scope="row">
+                    <a href={g.primary.href} download>
+                      {g.title}
+                    </a>
+                  </th>
+                  <td>{g.summary}</td>
+                  <td class="tr-dl__f">{linkFacts(g.primary)}</td>
+                </tr>
+              ))
+            }
+            {
+              checklistCsv && (
+                <tr>
+                  <th scope="row">
+                    <a href={checklistCsv.href} download>
+                      Topic checklists
+                    </a>
+                  </th>
+                  <td>All {statements} syllabus statements, one row each, with the depth of teaching, the level, the guide's page and empty columns to record when each was taught and checked.</td>
+                  <td class="tr-dl__f">{linkFacts(checklistCsv)}</td>
+                </tr>
+              )
+            }
+            {
+              glossary && (
+                <tr>
+                  <th scope="row">
+                    <a href={glossary.href} download>
+                      The glossary
+                    </a>
+                  </th>
+                  <td>Every term with its definition, plain and fuller explanations, subtopics, level, formula, misconceptions and related terms, for a spreadsheet or a flashcard app.</td>
+                  <td class="tr-dl__f">{linkFacts(glossary)}</td>
+                </tr>
+              )
+            }
+            <tr>
+              <th scope="row">
+                <a href="/resources/?category=mindmaps#cat-mindmaps">Mindmaps</a>
+              </th>
+              <td>A map of every subtopic and each unit, branded, for slides or a handout: {mapSvgs.length} files, each downloaded from its entry in the library.</td>
+              <td class="tr-dl__f">SVG, {Math.min(...mapSvgs.map((f) => Math.round((f.file?.bytes ?? 0) / 1000)))} to {Math.max(...mapSvgs.map((f) => Math.round((f.file?.bytes ?? 0) / 1000)))} KB each</td>
+            </tr>
+            <tr>
+              <th scope="row">
+                <a href="/resources/?category=diagrams#cat-diagrams">Diagrams</a>
+              </th>
+              <td>Every diagram on the platform, drawn from data, with the credit line: {diagramSvgs.length} files, each downloaded from its entry in the library.</td>
+              <td class="tr-dl__f">SVG, {Math.min(...diagramSvgs.map((f) => Math.max(1, Math.round((f.file?.bytes ?? 0) / 1000))))} to {Math.max(...diagramSvgs.map((f) => Math.round((f.file?.bytes ?? 0) / 1000)))} KB each</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="tr-note">
+        Not yet available: slide decks. Each subtopic's plan in the <a href="/pathways/teachers/#lessons">lesson library</a> has a presentation outline as text, to build your own slides from.
+      </p>
+    </section>
+
+    <section class="tr-sec" id="assigning" aria-labelledby="tr-assign-h">
+      <SectionHead no={++n} title="Setting work" id="tr-assign-h" dek="The platform has no accounts, classes or assignment feature, and collects nothing about students. Work is set by sending an address, and handed in by students' own choice." />
+      <ol class="tr-steps">
+        <li>
+          <p class="tr-steps__h">Send the address of exactly what you want done</p>
+          <p>Every page has its own address, and several keep a selection in it, so the student opens the same thing you saw:</p>
+          <ul>
+            <li>a filtered view of the library, such as <a href="/resources/?subtopic=3.5#lib-results">everything for 3.5</a>;</li>
+            <li>one practice question, by its own address on the <a href="/exam-desk/practice/">practice page</a>;</li>
+            <li>one Paper 2 calculation, by its code: <a href="/assessment/paper-2/practice/#BEQ-24680">this break-even question</a> gives every student the same figures;</li>
+            <li>a selection of the <a href="/case-vault/?industry=retail">Case Vault</a>, or a <a href="/search/?q=gearing">search</a>.</li>
+          </ul>
+        </li>
+        <li>
+          <p class="tr-steps__h">Students keep their work on their own device</p>
+          <p>Answers, notes and saved results stay in the browser they were made in. Nothing reaches you, or anyone else, unless the student sends it.</p>
+        </li>
+        <li>
+          <p class="tr-steps__h">They hand it in as a file</p>
+          <p>
+            In <a href="/dashboard/">My Business Workspace</a> a student can export a selection of their work, notes and saved results as Markdown or JSON, and send it as they would any homework. Paper and printouts work too: notes,
+            case files, checklists and these activities all print.
+          </p>
+        </li>
+      </ol>
+    </section>
+  </div>
+</BaseLayout>

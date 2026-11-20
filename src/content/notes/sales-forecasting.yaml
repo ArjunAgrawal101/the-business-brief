@@ -12,6 +12,16 @@
 # was read to check terms, and nothing from it is reproduced. No coursebook
 # chapter for unit 4 was supplied. Every business named is fictional, and
 # every figure was checked by script.
+#
+# On 20 November 2026 a section on planning with a range was added, using the
+# toolkit's decision trees and expected values (p. 14), with formulas for the
+# average change per period, the seasonal share, the forecast error and the
+# expected value, each labelled as a standard form the guide's formula list
+# does not include. Advantages and limitations of extrapolation and of
+# regression, two diagrams from the library, an industry and three exam-style
+# questions (comment, determine and to what extent) came with it. Riverbend
+# Catering and Brewhaus Cafés are fictional, and every figure was checked by
+# script.
 code: '4.3'
 title: Sales forecasting
 level: HL
@@ -26,6 +36,7 @@ objectives:
   - '**Distinguish** between quantitative and qualitative methods of sales forecasting.'
   - '**Evaluate** the benefits and limitations of sales forecasting for a business in a given situation.'
   - '**Discuss** how a business can make good decisions with forecasts that will never be exactly right.'
+  - '**Calculate** the expected value of a decision from a forecast''s range, and **comment** on what it leaves out.'
 situation:
   title: How many heaters for winter?
   fictional: true
@@ -86,6 +97,21 @@ sections:
       - term: Random variation
         level: HL
         text: Unpredictable one-off movements from events such as extreme weather, a product recall, a strike or a sudden craze. They distort a trend if they are not identified and removed.
+    formulas:
+      - name: Average change per period
+        expression: Average change per period = (latest value − earliest value) ÷ number of periods between them
+        note: A standard form, not on the guide's formula list. Willowmere's annual totals rose from 440 to 512 over two years, an average change of (512 − 440) ÷ 2 = 36 a year.
+      - name: Seasonal share
+        expression: Seasonal share = sales in the period ÷ sales in the year × 100
+        note: A standard form, not on the guide's formula list. The average share over several years, applied to the forecast for the year, gives a forecast for the period.
+    advantages:
+      - Quick and cheap, using data the business already holds.
+      - Objective, so two analysts working from the same figures reach the same forecast.
+      - Seasonal patterns, once found, make forecasts for each month or quarter far more useful than an annual average.
+    limitations:
+      - Assumes the future will follow the past, which fails when tastes, rivals or the economy change.
+      - Needs several years of reliable data, which new products and new businesses lack.
+      - One-off events left in the data distort the trend.
     example:
       title: Three years at Willowmere Garden Centre
       fictional: true
@@ -108,7 +134,7 @@ sections:
 
       A **line of best fit** is the straight line that best follows the pattern of the points, with points balanced above and below it. It can be drawn by eye, in which case it should pass through the point given by the mean of x and the mean of y, or calculated, as the line in the diagram is, by the least-squares method, which always passes through that point. Its equation takes the form y = a + bx, where **a** is the intercept, the value of y when x is zero, and **b** is the gradient, the change in y for each one-unit change in x. Reading a value from the line within the range of the data is **interpolation**; extending the line beyond that range to forecast is **extrapolation**, which is riskier, because the relationship may not hold where there are no data. When x is time, the line of best fit is the trend line, and extending it is how a trend is extrapolated.
 
-      **Correlation** describes how closely the points follow a straight line. It can be positive (y tends to rise as x rises) or negative (y tends to fall), and strong (points close to the line) or weak (points widely scattered). A **correlation coefficient**, r, measures it on a scale from −1 to +1, where values near either end mean a strong relationship and values near 0 mean little or none. Correlation is not causation: two variables can move together because a third factor drives both, or by coincidence, so a strong correlation makes a forecast more reliable only if there is a good business reason for the relationship.
+      **Correlation** describes how closely the points follow a straight line. It can be positive (y tends to rise as x rises) or negative (y tends to fall), and strong (points close to the line) or weak (points widely scattered). A **correlation coefficient**, r, measures it on a scale from −1 to +1, where values near either end mean a strong relationship and values near 0 mean little or none. Correlation is not causation: two variables can move together because a third factor drives both, or by coincidence, so a strong correlation makes a forecast more reliable only if there is a good business reason for the relationship. The toolkit's guide to [simple linear regression](/toolkit/simple-linear-regression/) works through the method step by step.
     diagram: linear-regression
     formulas:
       - name: Line of best fit
@@ -124,6 +150,14 @@ sections:
       - term: Interpolation and extrapolation
         level: HL
         text: Interpolation reads the line inside the range of the data and is usually reasonable. Extrapolation reads it beyond the data, assuming the relationship continues, and becomes less reliable the further out it goes.
+    advantages:
+      - Shows the strength of a relationship as well as its direction, through the correlation coefficient.
+      - Lets a business forecast sales from a factor it can see or plan, such as its advertising or the weather forecast.
+      - Once the line is found, each forecast is a quick calculation.
+    limitations:
+      - Assumes a straight-line relationship, when returns often fall as spending rises.
+      - Extrapolation beyond the data, and claims of cause from correlation alone, can mislead.
+      - One factor rarely explains sales on its own, so other influences are left unexplained.
     example:
       title: Advertising and sales at Quillfeather Books
       fictional: true
@@ -240,6 +274,7 @@ sections:
     title: Using forecasts well
     kind: application
     level: HL
+    diagram: descriptive-statistics
     body: |
       Since no forecast will be exactly right, the aim is not a perfect forecast but good decisions made with an imperfect one. Businesses that forecast well tend to do five things.
 
@@ -256,6 +291,10 @@ sections:
       - term: Rolling forecasts
         level: HL
         text: Forecasts revised every month or quarter, always looking the same distance ahead, keep plans in step with the latest information.
+    formulas:
+      - name: Forecast error
+        expression: Forecast error = (actual − forecast) ÷ forecast × 100
+        note: A standard measure, not on the guide's formula list; measures of forecast error are enrichment. A positive error means the forecast was too low, a negative one that it was too high.
     example:
       title: How good are our forecasts?
       fictional: true
@@ -263,6 +302,49 @@ sections:
         A fictional furniture retailer compares its last four quarterly forecasts with actual sales, in $000: forecast 200, actual 188; forecast 240, actual 252; forecast 220, actual 209; forecast 260, actual 286.
 
         The errors are −6%, +5%, −5% and +10% of the forecast, an average error of 6.5% either way. So the next forecast should be read as a range of roughly 6.5% either side, not as a single figure. The latest error is also the largest, and positive: demand may be rising faster than the forecasting method assumes, a reason to look again at the trend before ordering stock for the next quarter.
+
+        The toolkit's descriptive statistics add a second reading. The mean of the signed errors is (−6 + 5 − 5 + 10) ÷ 4 = **+1%**, so on average the forecasts were almost unbiased: the problem is the size of the errors, not a lean in one direction. The errors run from −6% to +10%, a range of 16 percentage points, which is the spread a plan for next quarter should allow for.
+  - id: planning-with-a-range
+    title: 'Planning with a range: scenarios and expected values'
+    kind: method
+    level: HL
+    diagram: decision-tree
+    body: |
+      Since no forecast is exact, its most useful job is often to show the range of outcomes a plan must survive. The simplest way is to prepare a **low**, an **expected** and a **high** case, each with its own stated assumptions, and test a decision against all three, as Emberline's decision below does.
+
+      Where managers can put rough probabilities on the cases, the toolkit's [decision trees](/toolkit/decision-trees/) (p. 14) combine them into an **expected value**: each outcome is multiplied by its probability and the results are added. The expected value is an average over many repetitions, not a forecast of what will happen this time, so read it beside the worst case. A business that could not survive the low case should not choose an option only because its expected value is highest.
+
+      The probabilities in sales forecasting are judgements, not measurements, and two managers may set them differently. Changing them to see whether the choice changes, a **sensitivity test**, shows how much the decision depends on them. The costs of being wrong in each direction matter too: when a lost sale costs more than an unsold unit, as it usually does where the contribution per unit is large, it pays to plan for somewhat more than the expected case. The Strategy Studio's [decision tree builder](/strategy-studio/decision-tree/) rolls back the values for a tree of your own and lets you test the probabilities.
+    formulas:
+      - name: Expected value
+        expression: Expected value = the sum of (probability of each outcome × value of that outcome)
+        note: The method of the toolkit's decision trees; the probabilities of the outcomes of one chance event add up to 1, and an option's cost, if it has one, is subtracted. Not on the guide's formula list.
+    points:
+      - term: Low, expected and high cases
+        text: Three forecasts, each with stated assumptions, that show the range a plan must survive.
+      - term: Expected value
+        text: The average outcome of an option over many repetitions, found by multiplying each outcome by its probability and adding the results.
+      - term: Sensitivity test
+        text: Changing an estimate, such as a probability, to see whether the decision changes. A decision that survives large changes is robust.
+    advantages:
+      - Makes the uncertainty in a forecast visible and usable in a decision.
+      - Forces managers to state their assumptions and probabilities, which others can then challenge.
+      - Shows the worst case as well as the average.
+    limitations:
+      - The probabilities are judgements, and precise-looking figures can hide guesswork.
+      - Three cases stand for a range in which demand could fall anywhere.
+      - Expected value ignores how much risk a business can bear.
+    example:
+      title: How many meals for the festival?
+      fictional: true
+      text: |
+        Riverbend Catering, a fictional caterer, has the food concession at a three-day music festival and must order its ingredients a week ahead. Each meal sells for $14 and uses $5 of ingredients; meals not sold are thrown away, and a customer turned away is a sale lost. From ticket sales and last year's weather it forecasts 6,000 meals (probability 0.5), with a low case of 4,000 if it rains (0.3) and a high case of 7,000 (0.2). Profit before fixed costs is $14 × meals sold − $5 × meals prepared.
+
+        - **Prepare 4,000:** $36,000 whatever the demand, so the expected value is **$36,000**.
+        - **Prepare 6,000:** $26,000 if demand is 4,000, and $54,000 if it is 6,000 or 7,000. Expected value = 0.3 × $26,000 + 0.5 × $54,000 + 0.2 × $54,000 = **$45,600**.
+        - **Prepare 7,000:** $21,000, $49,000 or $63,000. Expected value = 0.3 × $21,000 + 0.5 × $49,000 + 0.2 × $63,000 = **$43,400**.
+
+        Preparing 6,000 has the highest expected value, and its worst case, $26,000, is still a profit before fixed costs. A sensitivity test supports it: if rain were as likely as 0.5, with the expected case at 0.3, preparing 6,000 would still give $40,000, against $36,000 for 4,000 and $37,800 for 7,000. The arithmetic also shows why caterers err high: a meal too few costs $9 of lost contribution, a meal too many only $5.
 applications:
   - industry: Fashion and retail
     text: Fashion retailers must order many months ahead for products that may sell for only one season, so forecasts drive their profits directly. Too much stock means heavy discounting; too little means lost sales. Many now use sales data from tills and online shops to update forecasts weekly and reorder the lines that sell.
@@ -276,6 +358,8 @@ applications:
     text: Hospitals and public services forecast demand rather than sales, such as patient numbers, admissions in winter or pupils starting school, to plan staff, beds and budgets. Seasonal and demographic patterns help, but outbreaks of illness and other shocks can overwhelm any forecast.
   - industry: Tourism and travel
     text: Airlines, hotels and tour operators forecast demand seasons ahead to plan capacity, and adjust prices as bookings arrive, so that prices rise when demand runs above forecast. Their capacity cannot be stored, so an empty seat or room is revenue lost for ever.
+  - industry: Energy and utilities
+    text: Electricity suppliers forecast demand hour by hour from the weather, the day of the week and the season, because electricity is hard to store in large amounts and supply must match demand at every moment. Errors are costly either way, risking shortages if supply falls short and wasted fuel or sales at a loss if it overshoots.
 stakeholders:
   - group: Managers
     text: Managers in every function plan from the forecast and are judged against the targets built on it. That creates pressure to bias it, upwards to win resources or downwards to make targets easy, which conflicts with the business's need for an honest estimate.
@@ -296,6 +380,7 @@ evaluation:
   - Statistical tools have limits. A strong correlation or a well-fitting trend line describes the past; extrapolation and claims of cause need a business reason to believe the relationship will continue.
   - Who makes the forecast, and why, matters. Bias from optimism, from targets or from the wish to win approval can be more damaging than any technical weakness, so look for the interests behind a forecast in a case.
   - The benefits usually outweigh the limitations, because planning with an imperfect forecast is better than planning with none. The strongest answers say how the business should use the forecast in the case, through ranges, updates and flexible plans, rather than simply listing benefits and limitations.
+  - A range is more useful than a single figure. Low, expected and high cases, combined into expected values where probabilities can be estimated, show what a plan must survive; but the probabilities are judgements, so test how far the decision depends on them.
 decision:
   title: Emberline's production decision
   fictional: true
@@ -403,6 +488,49 @@ exam:
       - consider the consequences of error: with a bank loan to repay, a shortfall would squeeze cash flow, so the cost of an optimistic forecast is high;
       - suggest how to make the forecast more useful: a range with a low case that allows for the rivals, market research among current and potential members, and phasing the expansion, opening one gym first;
       - reach a justified judgement, for example that the forecast is useful as a starting point but unreliable as the basis for committing to two gyms and a loan, because it extends a past trend upwards just as the conditions behind that trend are changing.
+  - q: |
+      Brewhaus Cafés, a fictional chain, plotted its weekly sales of hot drinks against each week's average temperature. The line of best fit has a correlation coefficient of −0.42.
+
+      Comment on the usefulness of the line for forecasting Brewhaus's sales of hot drinks.
+    marks: 4
+    command: comment
+    level: HL
+    paper: '2'
+    answer: |
+      A strong response reads the coefficient correctly, then judges what it means for forecasting.
+
+      - **Direction:** the correlation is negative, so sales tend to fall as the temperature rises, which makes business sense for hot drinks.
+      - **Strength:** −0.42 is a moderate to weak correlation, with the points widely scattered, so temperature explains only part of the change in sales; holidays, promotions and events matter too.
+      - **Judgement:** the line is of limited use on its own, since forecasts read from it would carry large errors; it is better combined with the seasonal pattern and the managers' judgement.
+      - A top response adds that even a strong correlation would not prove cause, and that a forecast for a temperature outside the range of the data would be an extrapolation.
+  - q: |
+      Riverbend Catering, a fictional caterer, sells festival meals for $14 each; each meal prepared uses $5 of ingredients, and unsold meals are thrown away. Demand is forecast at 4,000 meals (probability 0.3), 6,000 (probability 0.5) or 7,000 (probability 0.2).
+
+      Determine which order, 6,000 or 7,000 meals, gives Riverbend the higher expected value.
+    marks: 4
+    command: determine
+    level: HL
+    paper: '2'
+    answer: |
+      A strong response works out each outcome, then each expected value, and states the one answer.
+
+      - **6,000 meals:** $26,000 if demand is 4,000 ($56,000 − $30,000), and $54,000 if it is 6,000 or 7,000. Expected value = 0.3 × $26,000 + 0.5 × $54,000 + 0.2 × $54,000 = **$45,600**.
+      - **7,000 meals:** $21,000, $49,000 or $63,000. Expected value = 0.3 × $21,000 + 0.5 × $49,000 + 0.2 × $63,000 = **$43,400**.
+      - **Answer:** 6,000 meals, by $2,200.
+
+      Most marks are for the outcomes and the working; a common slip is to multiply the meals prepared, not the meals sold, by the price.
+  - q: To what extent should Riverbend Catering rely on its sales forecast, and the expected values built from it, to decide how much food to prepare for the festival?
+    marks: 10
+    command: to-what-extent
+    level: HL
+    paper: '2'
+    answer: |
+      A strong response weighs how far the forecast and its expected values should guide the decision, and reaches a judgement that says how far, and under what conditions.
+
+      - **How far they help:** the forecast rests on ticket sales and last year's weather, and the expected values turn its range into one figure for each option ($36,000, $45,600 and $43,400), make the assumptions explicit, and show that preparing 6,000 meals is best on average and still profitable before fixed costs in the worst case.
+      - **Their limits:** the probabilities are judgements, and one year's weather is a thin basis for them; an expected value is an average over many festivals, while Riverbend faces one; and the calculation ignores whether a turned-away customer harms the caterer's chance of next year's contract.
+      - **What else matters:** whether Riverbend can afford the worst case; the chance of buying more ingredients during the festival, which would favour preparing fewer at first; storage and food safety; and the organizers' view of queues.
+      - **Judgement:** for example, rely on them to a large extent here, because the sensitivity test shows that 6,000 stays best even if rain becomes more likely, but combine them with a plan to top up stock if demand runs high, since the decision is repeated only once a year and reputation is at stake.
 summary:
   - A sales forecast estimates future sales, in units or value, over a stated period; budgets, cash flow forecasts and production and workforce plans start from it.
   - Past sales mix a trend, seasonal variation, cyclical variation and random variation; extrapolating the trend and adjusting for the season gives a basic forecast.
@@ -412,6 +540,8 @@ summary:
   - Benefits include better planning of production, stock, staff and cash, support for raising finance, targets for control, and coordination between departments.
   - Limitations include the assumption that the past continues, external shocks, poor or missing data, method weaknesses, bias, cost, and falling accuracy the further ahead the forecast looks.
   - Use forecasts well by combining methods, forecasting a range, updating regularly, measuring past accuracy and building flexibility into plans.
+  - Plan with a range of low, expected and high cases, combined where possible into an expected value (the sum of probability × outcome), read beside the worst case and tested for its sensitivity to the probabilities.
+  - Measure past forecasts with the forecast error, (actual − forecast) ÷ forecast × 100. The mean of the signed errors shows bias; their spread shows how wide a range the next forecast needs.
 retrieval:
   - q: What is a sales forecast?
     a: An estimate of the sales a business expects to make over a stated future period, in units or in value, based on past data, research or judgement.
@@ -437,6 +567,12 @@ retrieval:
     a: For example, the future may not follow the past, external shocks, poor or missing data, bias in judgement, cost and time, and lower accuracy further ahead.
   - q: Why might a business forecast a range rather than a single figure?
     a: Because a range shows the uncertainty, so managers can see the risk, test their plans against the low case and prepare responses in advance.
+  - q: How is the expected value of an option calculated?
+    a: Multiply each outcome by its probability and add the results; subtract the option's cost if it has one.
+  - q: Forecasts were 100 and 120; actual sales were 92 and 126. What were the forecast errors, and what does their mean show?
+    a: (92 − 100) ÷ 100 × 100 = −8% and (126 − 120) ÷ 120 × 100 = +5%. Their mean is −1.5%, so on average the forecasts were slightly too high, but the size of the errors matters more than the lean.
+  - q: Why might a business plan for more than its expected sales?
+    a: When a lost sale costs more than an unsold unit, for example when the contribution per unit is large and unsold stock can be sold off, erring on the high side costs less than running out.
 connections:
   - code: '2.1'
     text: Human resource planning depends on forecast sales, which set how many staff are needed and when.
@@ -450,6 +586,10 @@ connections:
     text: At HL, production planning, stock control and capacity utilization follow forecast demand.
   - code: '5.7'
     text: At HL, contingency planning prepares a business for the cases a forecast cannot rule out.
+  - code: '5.5'
+    text: Testing a forecast's low case against the break-even quantity shows whether a plan keeps a margin of safety.
+  - code: '4.1'
+    text: Forecasts of market growth, and of the business's share of the market, are the starting point for many sales forecasts.
 terms:
   - sales-forecast
   - quantitative-sales-forecasting
@@ -472,13 +612,17 @@ terms:
   - steeple-analysis
   - expected-value
   - margin-of-safety
+  - decision-tree
+  - descriptive-statistics
+  - mean
+  - contribution
 questions: []
 basis:
   - source: ib-bm-guide-2024
     pages: 14 to 15, 31, 42 to 47
-    note: The content statement and its assessment objective (p. 31); simple linear regression in the HL toolkit, with scatter diagrams, the line of best fit, and correlation and extrapolation (pp. 14 to 15); the papers on which HL-only content can be examined (pp. 42 to 47)
+    note: The content statement and its assessment objective (p. 31); simple linear regression in the HL toolkit, with scatter diagrams, the line of best fit, and correlation and extrapolation, and the toolkit's decision trees and descriptive statistics (pp. 14 to 15); the papers on which HL-only content can be examined (pp. 42 to 47)
   - source: ib-bm-tsm-2022
     pages: 22, 80 to 90
     note: Forecasting numbers among the course's quantitative skills (p. 22); the glossary, read to check terms; nothing reproduced
 verification: primary
-updated: '2026-11-03'
+updated: '2026-11-20'

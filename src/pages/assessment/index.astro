@@ -9,10 +9,14 @@ import TutorNote from '../../components/ui/TutorNote.astro';
 import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import LabelKey from '../../components/centre/LabelKey.astro';
+import GuideLabel from '../../components/centre/GuideLabel.astro';
+import FactList from '../../components/assess/FactList.astro';
 import Monogram from '../../components/brand/Monogram.astro';
 import { corpus } from '../../lib/content';
-import { CENTRE_HREF, GUIDES, type GuideId } from '../../lib/guides';
+import { CENTRE_HREF, EVERY_PAPER, GUIDES, claimFacts, type GuideId } from '../../lib/guides';
 import { buildBank } from '../../lib/bank-build';
+import { IA_TOOL_PAGES } from '../../lib/ia-tools';
+import '../../styles/centre.css';
 
 const c = await corpus();
 const comps = Object.entries(c.assessment).sort((a, b) => a[1].order - b[1].order);
@@ -25,11 +29,11 @@ const EXTRA: Record<GuideId, { line: string; points: string[] }> = {
   },
   'paper-1': {
     line: 'A case study about a fictitious organization, part of it released in advance.',
-    points: ['Pre-released statement', 'Section A structured questions', 'Section B: one extended response', 'Units 1 to 5, no HL extension'],
+    points: ['Pre-released statement: context topics and the opening', 'Section A structured questions', 'Section B: one extended response', 'Units 1 to 5, no HL-only topics'],
   },
   'paper-2': {
     line: 'The quantitative paper, on unseen stimulus material presented in parts.',
-    points: ['Formulae provided', 'Section A: all questions', 'Section B: one of two, with a 10-mark response', 'Different papers at SL and HL'],
+    points: ['Mostly quantitative questions', 'Section A: all questions', 'Section B: one of two, with a 10-mark response', 'Different papers at SL and HL'],
   },
   'paper-3': {
     line: 'A social enterprise: describe a need, explain the challenges, recommend a plan.',
@@ -41,14 +45,16 @@ const weights = (level: 'sl' | 'hl') =>
     .map((id) => ({ id, name: byId[id]?.short ?? id, w: byId[id]?.outline?.[level]?.weight ?? 0 }))
     .filter((x) => x.w > 0);
 const practice = Object.values(c.questions);
-const bankSize = buildBank(c).items.length;
+const bank = buildBank(c).items;
+const fromSource = (s: string) => bank.filter((b) => b.source === s).length;
+const inEveryExam = claimFacts(c.claims, [...EVERY_PAPER, 'command-term-rule', 'access-arrangements', 'grade-descriptors']);
 /** The Centre's practice tools, each for the components it serves. */
 const TOOLS: Array<{ href: string; kind: string; title: string; text: string; for: string[] }> = [
   {
     href: '/assessment/question-bank/',
     kind: 'Question bank',
-    title: `All ${bankSize} questions in one bank`,
-    text: 'Every original question on the platform, filtered by unit, paper, level, command term and marks, with guidance to reveal, self-ratings and timed sets at each paper’s pace.',
+    title: `All ${bank.length} questions in one bank`,
+    text: `Every original question on the platform: the ${fromSource('question')} practice questions with full mark schemes, ${fromSource('note')} from the subtopic notes and ${fromSource('case')} from the case files. Filter by unit, paper, level, command term and marks, reveal the guidance, rate yourself and take timed sets at each paper’s pace.`,
     for: ['P1', 'P2', 'P3'],
   },
   {
@@ -66,10 +72,10 @@ const TOOLS: Array<{ href: string; kind: string; title: string; text: string; fo
     for: ['P1'],
   },
   {
-    href: '/assessment/internal-assessment/key-concept/',
+    href: IA_TOOL_PAGES[0].href,
     kind: 'IA tools',
-    title: 'Five tools for your research project',
-    text: 'Choose a key concept, question your supporting documents, select business tools, plan back from your deadline and track your progress, with the guide’s rules beside each.',
+    title: `${IA_TOOL_PAGES.length} tools for your research project`,
+    text: 'Build and check your research question, choose a key concept, plan your research, question your supporting documents, select business tools, analyse your evidence, plan your words and your time, and track your progress, with the guide’s rules beside each.',
     for: ['IA'],
   },
 ];
@@ -159,7 +165,7 @@ const terms = Object.values(c.commandTerms);
     </section>
 
     <section class="ac-sec" aria-labelledby="ac-labels-h">
-      <SectionHead no="02" title="What you are reading" id="ac-labels-h" dek="Every statement in the Assessment Centre carries one of four labels, so you always know whether it is a rule, a pattern examiners have reported, or a technique." />
+      <SectionHead no="02" title="What you are reading" id="ac-labels-h" dek="Every statement in the Assessment Centre carries a label, so you always know whether it is a rule from the IB guide, a pattern the assessment guides report from examiners, the IB's advice to teachers, a technique or an invented example." />
       <div class="ac-key"><LabelKey /></div>
     </section>
 
@@ -188,6 +194,9 @@ const terms = Object.values(c.commandTerms);
 
     <section class="ac-sec" aria-labelledby="ac-more-h">
       <SectionHead no="04" title="Across every component" id="ac-more-h" />
+      <h3 class="ac-every__h">In every examination</h3>
+      <p class="ce-labels"><GuideLabel kind="ib" /></p>
+      <FactList facts={inEveryExam} />
       <div class="ac-more">
         <a class="ac-more__item" href="/examiner-lens/">
           <p class="label">Command terms</p>
@@ -196,10 +205,10 @@ const terms = Object.values(c.commandTerms);
         </a>
         <a class="ac-more__item" href="/exam-desk/practice/">
           <p class="label">Practice questions</p>
-          <h3>{practice.length} original questions</h3>
+          <h3>{practice.length} practice questions with mark schemes</h3>
           <p>
-            {byStyle('paper-1')} in the style of Paper 1, {byStyle('paper-2')} of Paper 2 and {byStyle('paper-3')} of Paper 3, each with a mark scheme to
-            check yourself against. None is an IB question.
+            {byStyle('paper-1')} in the style of Paper 1, {byStyle('paper-2')} of Paper 2 and {byStyle('paper-3')} of Paper 3, each with a full mark scheme to
+            check yourself against. They are also in the question bank of {bank.length}. None is an IB question.
           </p>
         </a>
         <a class="ac-more__item" href="/ia-studio/">
@@ -233,9 +242,7 @@ const terms = Object.values(c.commandTerms);
 <style>
   .ac-hero {
     padding-block: var(--sp-6) var(--sp-8);
-    background:
-      radial-gradient(ellipse at 90% 0%, rgba(44, 70, 117, 0.6), transparent 55%),
-      var(--surface-ink);
+    background: var(--surface-ink);
     color: var(--text-on-ink);
   }
 
@@ -329,7 +336,7 @@ const terms = Object.values(c.commandTerms);
   }
 
   .ac-w__part--paper-3 {
-    background: #3d5a8c;
+    background: var(--slate-600);
   }
 
   .ac-w__note {
@@ -459,11 +466,20 @@ const terms = Object.values(c.commandTerms);
     margin-top: var(--sp-5);
   }
 
+  .ac-every__h {
+    margin-top: var(--sp-5);
+    font-size: 1.3125rem;
+  }
+
+  .ac-every__h + .ce-labels {
+    margin-top: var(--sp-2);
+  }
+
   .ac-more {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--sp-4);
-    margin-top: var(--sp-5);
+    margin-top: var(--sp-6);
   }
 
   .ac-more__item {

@@ -75,7 +75,7 @@ The label column is what readers see on the page.
 | `enrichmentMaps` | `enrichment-maps/<id>.yaml` | A map of management ideas beyond the IB course, for the undergraduate and MBA pathways: a mindmap's `centre`, `branches` and nodes with `scope: enrichment` in place of an IB code, unit and level, its `audience`, `field`, the IB subtopics it `builds` on, `related` maps and its `basis`. A collection of its own, so it never counts as IB coverage, an IB map or an IB resource. `src/lib/integrity-pathways.ts` holds it to the IB map bar and rejects any HL mark |
 | `notes` | `notes/<slug>.yaml` | Full notes for one subtopic (below) |
 | `calculations` | `data/calculations.yaml` | A calculation: formula, variables, unit, interpretation, errors, worked example |
-| `assessment` | `data/assessment.yaml` | An assessment component: facts with sources and pages; `outline` (duration, marks and weight at SL and HL), `sections` (marks, task, AOs), `criteria` (name and maximum mark only), `requirements`, `ibGuidance` (paraphrased teacher support material, with page); what is not stated; preparation |
+| `assessment` | `data/assessment.yaml` | An assessment component: facts with sources and pages; `outline` (duration, marks and weight at SL and HL), `sections` (marks, task, AOs), `criteria` (name and maximum mark; the pages paraphrase descriptors briefly, never in the guide's wording), `requirements` (the guide's musts only, each with its page), `recommendations` (what the guide says should be done or recommends, each with its page), `ibGuidance` (paraphrased teacher support material, with page); what is not stated; preparation. Rules that hold in every paper (reading time, calculators, the formulae copy) are claims in `claims.yaml`, shown on each paper's page from there |
 | `commandTerms` | `data/command-terms.yaml` | A command term at the guide's AO level (`aoStatus`), the platform's explanation (`definitionSource: platform`) and the page of the official definition (`officialPage`) |
 | `concepts`, `pathways`, `modules` | `data/*.yaml` | The four concepts, the audience pathways, the platform's rooms. A room may carry a `lead`, `items` (each a working page or anchor, checked by the link check), the `syllabus` codes it serves and what is `planned`, which its page renders |
 | `sources`, `claims` | `sources/*.yaml` (one file per area; `register.yaml` holds the original entries), `data/claims.yaml` | The source register and the claims register |
@@ -84,8 +84,14 @@ The label column is what readers see on the page.
 | `labTools` | `lab/<id>.yaml` | The data behind one of the Lab's six tools, by `kind` (`canvas`, `costs`, `revenue`, `unit-economics`, `feasibility`, `plan`): the page's question, lead, IB status and links, steps, cautions, definitions, the briefing it pairs with, and the fictional example it opens with (Refill Round), whose figures are worked by hand in `tests/unit/lab-models.test.ts` |
 | `advanced` | `advanced/<id>.yaml` | An Advanced Management and Strategy module beyond the IB course, in eight parts (below) |
 | `intelligence` | `intelligence/<id>.yaml` | An item of the Business Intelligence Briefing: a real development, dated, filed under one or more themes, answering six questions in order (below), with its own sources. Checked by `src/lib/integrity-intelligence.ts` |
+| `resources` | `data/resources.yaml` | A curated resource for the library: type, the library `category` it is filed under (one of the twelve in `src/lib/library/categories.ts`), audiences, level, units and subtopics, the assessment component, `access` (a `download` by its address; a `page`; or a `print` page), `contents` and `updated`. A download must exist, or the build fails; its format, size and pages are measured from the file, never typed. Everything else in the library is generated from the content |
+| `activities` | `activities/<id>.yaml` | A classroom activity for the Teacher resource area (`src/lib/teachers/schema.ts`): a `basis` (a fictional `case` or a `decision` room), the `subtopics` it teaches and its `level`, a `format` and `groupSize`, what to `prepare`, `roles` (each a `stakeholder` named by the start of its name in the case, and the role's `task`; the page shows the stakeholder's interest and concern from the case itself), timed `phases`, the `output`, `debrief` questions, `next` links and an `order`. The lesson's length is the sum of its phases. Checked by `src/lib/teachers/integrity.ts` |
+| `topicConnections` | `data/topic-connections.yaml` | A worked connection between two subtopics (`between`), for the map at `/ib/connections/` and every subtopic page: a `title`, a one-paragraph `explanation`, an original exam-style `question` (command term, marks, prompt, and for a calculation its worked `answer`, reworked in the tests), `featured` for the five the platform leads with, and `level` (HL whenever an end is HL only). Checked by `src/lib/connections.ts` |
+| `subtopicTools` | `data/subtopic-tools.yaml` | For a subtopic (the id is its code), existing tools that serve it although their own data does not name it, each with one sentence on what to use it for; every address must be a tool page and must not already name the subtopic |
 | `resources` | `data/resources.yaml` | A curated resource for the library: type, audiences, level, units and subtopics, the assessment component, `access` (a `download` with its file, format, size and pages; a `page`; or a `print` page), `contents` and `updated`. A download must exist, or the build fails |
+| `revision` | `revision/<subtopic slug>.yaml` | What a subtopic's revision sheet and flashcards need beyond the rest of the content (below) |
 | `studio` | `studio/<slug>.yaml` | A Strategy Studio tool (`type: tool`): its `kind`, `slug`, `stage` of the engagement, `purpose`, `howTo`, `limitations`, its IB `status` (an `ib-toolkit` tool names its `toolkit` entry and `level`; anything else is `enrichment`, with any `extensions` such as the TOWS matrix), the notes and guides to `read`, the worked `example` (the tool's state exactly as the tool saves it) and its recommended use (`inUse`). Three tools, scenario planning (`scenarios`), stakeholder salience (`salience`) and the strategic fit check (`fit`), were added with the Framework Application Lab, all enrichment. One entry is the `engagement` that frames the room: the fictional client, its question, facts, the four stages, principles, reading and Decision Rooms |
+| `comparisons` | `comparisons/<a>-vs-<b>.yaml` | A curated comparison of two or three frameworks or ideas, with a page at `/frameworks/compare/<a>-vs-<b>/` (below) |
 
 ## The Business Intelligence Briefing
 
@@ -100,7 +106,7 @@ The label column is what readers see on the page.
 | What were the implications? | `implications` | For the organization, its stakeholders and its industry |
 | What can a student or manager learn? | `lessons` | Lessons that travel, followed by a discussion `question` of the platform's own (a command term from the register) and the `limits` of the evidence |
 
-An item also carries its `title`, `dek`, `organizations`, `categories` (its themes: the twelve editorial themes in `src/lib/intel-themes.ts`, plus the first edition's `restructuring` and `global-trend`), `regions`, `industry`, the IB `keyConcepts`, its `date` (the headline fact's), `written` (published) and `checked` dates, up to three headline `figures` (each from a source) and its `sources`. Each source names its publisher, its kind (an organization's own release, report, blog, page or filing is primary; business press is not), when it was published (or why its page carries no date), when it was read, its https address and the facts it `supports`.
+An item also carries its `title`, `dek`, `organizations`, `categories` (its themes: the twelve editorial themes in `src/lib/intel-themes.ts`, plus the first edition's `restructuring` and `global-trend`), `regions`, `industry`, the IB `keyConcepts`, its `date` (the headline fact's), `written` (published) and `checked` dates, up to three headline `figures` (each from a source) and its `sources`. Each source names its publisher, its kind (an organization's own release, report, blog, page or filing is primary; business press is not), when it was published (or why its page carries no date), when it was read, its https address and the facts it `supports`. A document read on a site that republishes it, such as a regulatory announcement on Investegate or a release distributed through PR Newswire, is credited to the organization that issued it, and its `note` says where it was read. The span of dates the hub's copy states is computed from the items (`developmentSpan` in `src/lib/briefing.ts`), never typed.
 
 The rules, enforced by the build: every fact cites a listed source that was published, or for an undated page read, on or after the fact's date; background comes no later than the development and later facts no earlier; every source supports something on the page and was read on or after the day the briefing began and by the item's check date; every item has a primary source, links to at least one toolkit tool, framework or platform tool, and dates its development in 2024 or later; no quotation runs past 25 words; every internal link resolves; exactly one item is the lead; and together the items cover all twelve themes.
 
@@ -280,7 +286,7 @@ Each calculation's `id` matches a builder in `workings` (`src/lib/finance.ts`). 
 | `assessment` | How learning is checked, with its provenance: the IB's own assessment for the IB DP route, the platform's practice formats elsewhere |
 | `leavesOut` | What the pathway leaves out on purpose, and why |
 | `practice` | Short-answer and data-response tasks. A part with a `calculation` names finance functions and figures, so its answer is worked, never typed |
-| `lessons` | Teachers: discussion prompts by subtopic for the lesson sequences that `src/lib/lessons.ts` builds from the notes |
+| `lessons` | Teachers: discussion prompts by subtopic for the lesson sequences that `src/lib/lessons.ts` builds from the notes; every subtopic with notes has them, and a subtopic taught from its brief uses the brief's own `teaching.prompts` (`src/lib/teachers/prompts.ts`). The Teacher resource area shows them all |
 | `reading` | Reading pointers, limited to the sources register |
 
 `checkPathways` in `src/lib/integrity-pathways.ts` runs when the pathway pages build and in the unit tests: the secondary route uses SL material only and names no syllabus, a link is marked HL exactly when it leads to HL-only material, enrichment maps stay off the IB DP, secondary and teachers' routes, and every practice answer can be worked.
@@ -303,6 +309,38 @@ Each calculation's `id` matches a builder in `workings` (`src/lib/finance.ts`). 
 | `reading`, `basis` | Part 8, three or more pieces of further reading from the register (never IB documents), and the sources the module itself rests on |
 
 `checkAdvanced` in `src/lib/integrity-advanced.ts` runs before any module page is built and in `tests/unit/advanced.test.ts`, and fails the build on a module off the plan, an unknown source, framework or code, an unsourced real application or case, a misfit exhibit, IB material offered as reading, or a module under 1,500 words.
+
+## Quick revision
+
+`revisionSchema` in `src/lib/revision/schema.ts` (strict); one file per subtopic, named after its slug; checked by `src/lib/revision/integrity.ts`. A revision sheet (`/revision/<slug>/`) and the flashcard deck are built by `src/lib/revision/` from the notes or brief (key points, recall questions), the glossary (IB terms only), the formula register (`src/lib/revision/formulae.ts`: the calculation register, the notes' formulas and the glossary's, each formula once) and the frameworks library. A revision file adds only what those lack:
+
+| Field | What it holds |
+| --- | --- |
+| `code` | The subtopic |
+| `exercises` | Three to five: a fictional `business`, named in its `stem`, a `command` term at or below the AO level of the statements the exercise is set on, the `question` and an `outline` of what a strong answer does (never a markscheme), with its `level` |
+| `mistakes` | Common examination mistakes with their `fix`, written only where the content holds too few; shown as Recommended strategy. Those the content holds come first, each linked to its source: a brief's traps and misconceptions, the notes' sentences that state a common error, the glossary's misconceptions, the calculation register's errors and the mistakes of the frameworks the subtopic serves first |
+| `formulas` | By formula id: the `situation` in which it is the formula to use (the situation-to-formula card), and what it `measures` where the glossary and the calculation register say nothing usable |
+| `distinctions` | Pairs students confuse (`pair`), the `difference` and an optional `example`, with their `codes` and `level` |
+| `scenarios` | A fictional `business` and `stem`, the concept or tool that applies (`answer`) and `why` |
+| `evaluations` | A `claim` and the `counter`: the counter-argument, or the condition under which it fails |
+| `hlRecall` | Recall cards that are HL only although their question does not say so (most say "(HL)" themselves) |
+
+Card ids are `<kind>:<id>`: `term:<glossary id>`, `formula:<id>` and `formula:<id>:use`, `framework:<id>` and `framework:<id>:structure`, `distinction:`, `scenario:` and `evaluation:` with the file's ids, and `recall:<code>-<start of the question>` (`recallIds()` in `src/lib/flashcards.ts`), so an id survives a rebuild and a new question elsewhere in its set. Every card carries its subtopic codes (or `toolkit`) and a level.
+
+## Framework comparisons
+
+`comparisonSchema` in `src/lib/compare/schema.ts` (strict: an unknown field fails the build); rendered by `src/pages/frameworks/compare/[slug].astro` with the grid in `src/lib/compare/grid.ts`, which the comparison tool also uses for any two frameworks in the library. A file's name is its address, the sides joined by `-vs-`.
+
+| Field | What it holds |
+| --- | --- |
+| `title`, `question`, `summary`, `order` | The page's title, the question the comparison settles, a sentence for the index and its place in the list |
+| `sides` | Two or three sides. Each is a framework in the library (`framework`), a toolkit tool (`tool`), a syllabus idea that is neither (`syllabus`: a subtopic `code` and words from its content statement exactly as the curriculum file has them), or a mix; with further `subtopics`, glossary `terms`, its `level` (`SL/HL` or `HL`), `purpose`, `structure`, the `context` it suits, two or more `strengths`, `limitations` and `mistakes`, a fictional business `application` (`fictional: true`, the `business` and the `body`) and the `exam` advice, which the page labels Recommended strategy |
+| `difference` | The essential difference, in a paragraph |
+| `choose` | Which to use when: two or more situations (`when`), the side each calls for (`use`, by position from 0) and why, calling for more than one side |
+| `together` | How the sides work together, where they do (Markdown links allowed) |
+| `sources` | Register sources for what the page says about the course (the guide by default) |
+
+A side's standing in the course (syllabus, IB toolkit or enrichment, its subtopic and the guide's page, SL and HL or HL only) is worked out from the curriculum file, the toolkit and the library, never typed. `checkComparisons` in `src/lib/compare/integrity.ts` runs before any comparison page is built and in `tests/unit/framework-compare.test.ts` (see [ARCHITECTURE.md](ARCHITECTURE.md#the-integrity-gate)). PESTLE against STEEPLE is not a comparison here: the PESTLE page already sets the two side by side, and the tool and the check point to it.
 
 ## Adding a topic brief
 

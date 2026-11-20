@@ -1,0 +1,314 @@
+---
+/**
+ * IA tool: word count planning. The reader shares the guide's 1,800 words
+ * between the project's sections, then records the words written that count,
+ * against the limit and the guide's list of what does not count (p. 56),
+ * through src/lib/ia-words.ts. The suggested split is the platform's.
+ * Saved in bb:ia-words.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import CentreHead from '../../../components/centre/CentreHead.astro';
+import GuideLabel from '../../../components/centre/GuideLabel.astro';
+import IaToolNav from '../../../components/centre/IaToolNav.astro';
+import IaIntegrity from '../../../components/centre/IaIntegrity.astro';
+import { toolPosition } from '../../../lib/ia-tools';
+import { IA_LIMITS } from '../../../lib/ia';
+import { MAX_SECTIONS, NOT_COUNTED, SUGGESTED, suggestedSections } from '../../../lib/ia-words';
+import '../../../styles/centre.css';
+import '../../../styles/ia-tools.css';
+
+const START = suggestedSections();
+const PARTS = [
+  ['introduction', 'Introduction'],
+  ['body', 'Main body'],
+  ['conclusion', 'Conclusion'],
+] as const;
+const limit = IA_LIMITS.words.toLocaleString('en-GB');
+---
+
+<BaseLayout
+  room="assessment"
+  title="Planning your word count"
+  description="An IB Business Management IA tool: share the 1,800 words between the sections of your research project, record the words that count as you write, and check them against the guide's limit and its list of what does not count."
+  section="assessment"
+>
+  <CentreHead
+    crumb="Word count planner"
+    parent={{ label: 'Internal assessment', href: '/assessment/internal-assessment/' }}
+    kicker={`Internal assessment · ${toolPosition('word-count')}`}
+    title="Planning your word count"
+    lead={`Share the ${limit} words between your sections before you write, then record the words that count as you go. The planner checks both against the guide's limit and its list of what does not count.`}
+    stats={[
+      { value: limit, label: 'Words', note: 'at most, that count' },
+      { value: String(NOT_COUNTED.length), label: 'Left out', note: 'kinds of material the guide excludes' },
+      { value: 'Cover', label: 'Word count', note: 'stated on the cover page' },
+    ]}
+  />
+
+  <div class="wrap page-body it-page">
+    <IaToolNav current="word-count" />
+
+    <section class="it-sec" aria-labelledby="wc-tool-h">
+      <SectionHead no="01" title={`Your ${limit} words`} id="wc-tool-h" dek="Plan first, then fill in the words written as each section takes shape. Count only the words that count: the list beside the plan says what to leave out." />
+      <div class="it-tool" data-ix="ia-words">
+        <p class="state state--error" data-error hidden>The planner could not start. You can still fill in and print this page.</p>
+        <p class="sr-only" aria-live="polite" data-live></p>
+        <div class="it-tool__head">
+          <h3 class="it-tool__title">Your plan</h3>
+          <p class="it-tool__saved js-only">Saved on this device as you type.</p>
+        </div>
+        <div class="wc-totals js-only" data-totals>
+          <div class="wc-total">
+            <p class="label">Planned</p>
+            <p class="wc-total__v" data-planned>0 of {limit}</p>
+            <span class="wc-meter" aria-hidden="true"><span data-planned-bar></span></span>
+          </div>
+          <div class="wc-total">
+            <p class="label">Written that count</p>
+            <p class="wc-total__v" data-written>0 of {limit}</p>
+            <span class="wc-meter" aria-hidden="true"><span data-written-bar></span></span>
+          </div>
+        </div>
+        <div class="table-scroll" role="region" aria-label="Your sections and their words" tabindex="0">
+          <table class="table wc-table">
+            <caption class="sr-only">Your sections, the words planned for each and the words written that count</caption>
+            <thead>
+              <tr>
+                <th scope="col">Section</th>
+                <th scope="col">Part</th>
+                <th scope="col" class="n">Planned</th>
+                <th scope="col" class="n">Written</th>
+                <th scope="col" class="js-only"><span class="sr-only">Remove</span></th>
+              </tr>
+            </thead>
+            <tbody data-rows>
+              {
+                START.map((s, i) => (
+                  <tr data-row>
+                    <td data-label="Section">
+                      <input class="input" type="text" data-f="name" value={s.name} aria-label={`Section ${i + 1}: name`} />
+                    </td>
+                    <td data-label="Part">
+                      <select class="select" data-f="part" aria-label={`Section ${i + 1}: part of the project`}>
+                        {PARTS.map(([v, l]) => (
+                          <option value={v} selected={v === s.part}>
+                            {l}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td data-label="Planned">
+                      <input class="input input--num" type="number" min="0" max="5000" step="10" inputmode="numeric" data-f="planned" value={String(s.planned)} aria-label={`Section ${i + 1}: words planned`} />
+                    </td>
+                    <td data-label="Written">
+                      <input class="input input--num" type="number" min="0" max="5000" step="1" inputmode="numeric" data-f="written" aria-label={`Section ${i + 1}: words written that count`} />
+                    </td>
+                    <td class="js-only">
+                      <button type="button" class="btn btn--small btn--quiet" data-remove aria-label={`Remove section ${i + 1}`}>
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+        {/* The options are written out: an expression inside a select in a template row makes the compiler close the row early. */}
+        <template data-row-template>
+          <tr data-row>
+            <td data-label="Section"><input class="input" type="text" data-f="name" /></td>
+            <td data-label="Part">
+              <select class="select" data-f="part">
+                <option value="introduction">Introduction</option>
+                <option value="body">Main body</option>
+                <option value="conclusion">Conclusion</option>
+              </select>
+            </td>
+            <td data-label="Planned"><input class="input input--num" type="number" min="0" max="5000" step="10" inputmode="numeric" data-f="planned" /></td>
+            <td data-label="Written"><input class="input input--num" type="number" min="0" max="5000" step="1" inputmode="numeric" data-f="written" /></td>
+            <td><button type="button" class="btn btn--small btn--quiet" data-remove>Remove</button></td>
+          </tr>
+        </template>
+        <p class="cluster js-only">
+          <button type="button" class="btn btn--small" data-add>Add a section</button>
+          <button type="button" class="btn btn--small" data-suggest>Use the suggested split</button>
+          <span class="small muted">Up to {MAX_SECTIONS} sections.</span>
+        </p>
+        <div class="it-grid">
+          <div class="it-out js-only">
+            <p class="it-out__k" id="wc-checks-h">Your words, checked</p>
+            <ul class="it-list" data-checks aria-labelledby="wc-checks-h"></ul>
+          </div>
+          <fieldset class="it-fs it-step">
+            <legend class="it-step__k">My count leaves out</legend>
+            <div class="it-checks-in">
+              {
+                NOT_COUNTED.map((x) => (
+                  <label class="it-check">
+                    <input type="checkbox" name="excluded" value={x.id} />
+                    <span>{x.text}</span>
+                  </label>
+                ))
+              }
+            </div>
+            <p class="small muted js-only" data-excluded aria-live="polite">0 of {NOT_COUNTED.length} checked.</p>
+            <p class="small">Definitions of business terms and quotations count, and go in the body; footnotes and endnotes hold references only (guide, p. 56).</p>
+          </fieldset>
+        </div>
+        <div class="it-export js-only">
+          <button type="button" class="btn btn--small" data-print>Print</button>
+          <button type="button" class="btn btn--small" data-reset>Clear this page</button>
+          <span class="it-export__confirm" data-reset-confirm hidden>
+            <span>This clears your sections and counts on this page.</span>
+            <button type="button" class="btn btn--small btn--primary" data-reset-yes>Clear it</button>
+            <button type="button" class="btn btn--small" data-reset-no>Keep it</button>
+          </span>
+        </div>
+        <p class="nojs-only small muted">With JavaScript off you can fill in and print the plan, but nothing is added up or saved.</p>
+      </div>
+    </section>
+
+    <section class="it-sec" aria-labelledby="wc-rules-h">
+      <SectionHead no="02" title="What the guide says of the words" id="wc-rules-h" />
+      <p class="ce-labels"><GuideLabel kind="ib" /> <span class="ce-cite">Business management guide, p. 56</span></p>
+      <ul class="it-rules">
+        <li><span>The project must not exceed 1,800 words, and the word count must be on the cover page.</span><span class="it-src">p. 56</span></li>
+        <li><span>Over the limit, the teacher's marking is based on the first 1,800 words, and moderators do not read beyond them.</span><span class="it-src">p. 56</span></li>
+        <li><span>Not counted: {NOT_COUNTED.map((x) => x.text.toLowerCase()).join('; ')}.</span><span class="it-src">p. 56</span></li>
+        <li><span>Definitions of business management terms and quotations must be in the body, and are counted. Footnotes and endnotes may be used for references only.</span><span class="it-src">p. 56</span></li>
+      </ul>
+      <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+      <ul class="it-rules">
+        <li><span>The guide does not exclude headings, so the platform's reading is that they count.</span></li>
+        <li><span>The suggested split gives {SUGGESTED.map((s) => `${Math.round(s.share * 100)}%`).join(', ')} of the limit to its five sections: most of the words go to the main body, where the tools are applied and the evidence weighed. Change it to fit your project.</span></li>
+      </ul>
+    </section>
+
+    <IaIntegrity no="03" />
+  </div>
+</BaseLayout>
+
+<style>
+  .wc-totals {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--sp-4);
+  }
+
+  .wc-total__v {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--navy-900);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .wc-meter {
+    display: block;
+    height: 6px;
+    margin-top: var(--sp-2);
+    overflow: hidden;
+    background: var(--surface-sunk);
+  }
+
+  .wc-meter > span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: var(--navy-900);
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+
+  .wc-meter.is-over > span {
+    background: var(--bb-signal);
+  }
+
+  .wc-table {
+    min-width: 34rem;
+  }
+
+  .wc-table td {
+    vertical-align: middle;
+  }
+
+  .wc-table .input--num {
+    width: 6.5rem;
+  }
+
+  .wc-table th.n {
+    text-align: right;
+  }
+
+  /* Narrow screens: each section becomes a card, its labels written above its fields. */
+  @media (max-width: 47.99rem) {
+    .wc-table {
+      min-width: 0;
+    }
+
+    .wc-table thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    .wc-table,
+    .wc-table tbody,
+    .wc-table td {
+      display: block;
+    }
+
+    .wc-table tr {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--sp-2) var(--sp-3);
+      padding: var(--sp-3) 0;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .wc-table td {
+      padding: 0;
+      border: 0;
+    }
+
+    .wc-table td[data-label='Section'],
+    .wc-table td[data-label='Part'],
+    .wc-table td:not([data-label]) {
+      grid-column: 1 / -1;
+    }
+
+    .wc-table td[data-label]::before {
+      content: attr(data-label);
+      display: block;
+      margin-bottom: 0.2rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .wc-table .input--num {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .wc-totals {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .wc-meter > span {
+      transition: transform var(--dur-base) var(--ease);
+    }
+  }
+</style>
+
+<script>
+  import '../../../scripts/centre/ia-words';
+</script>

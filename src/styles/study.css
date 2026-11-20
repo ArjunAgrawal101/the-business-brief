@@ -1,0 +1,578 @@
+/*
+  Study mode on the subtopic pages (src/components/learn/StudyMode.astro,
+  src/scripts/study-mode.ts): the bar of study tools, the strip under the
+  header with the reading progress and the jump menu, the contents rail
+  beside the article on wide screens, the three text sizes and low light.
+
+  Text size zooms the article's sections (not the tools), so every part of
+  them grows together, rem or not, and wraps within the column. Low light
+  redefines the semantic tokens inside the article: the ground is navy, the
+  reading text ivory, cards a raised navy. Diagrams, mindmaps and the
+  interactive exercises keep their light sheet, like paper on a dark desk,
+  because their drawings are made for it. Print always takes the standard
+  size in daylight.
+*/
+
+/* The light values of the tokens low light changes, read once from the page,
+   so a light sheet inside the dark article can take them back. */
+:root {
+  --sm-l-text-body: var(--text-body);
+  --sm-l-text-strong: var(--text-strong);
+  --sm-l-text-muted: var(--text-muted);
+  --sm-l-cobalt: var(--cobalt-text);
+  --sm-l-cobalt-deep: var(--cobalt-deep);
+  --sm-l-brass: var(--brass-text);
+  --sm-l-green: var(--green-text);
+  --sm-l-signal: var(--signal-text);
+  --sm-l-rule-hair: var(--rule-hair);
+  --sm-l-rule: var(--rule);
+  --sm-l-rule-ink: var(--rule-ink);
+  --sm-l-rule-control: var(--rule-control);
+  --sm-l-page: var(--surface-page);
+  --sm-l-sheet: var(--surface-sheet);
+  --sm-l-sunk: var(--surface-sunk);
+  --sm-l-ink: var(--surface-ink);
+  --sm-l-gold-wash: var(--surface-gold-wash);
+  --sm-l-cobalt-wash: var(--surface-cobalt-wash);
+  --sm-l-navy: var(--navy-900);
+  --sm-l-ivory-50: var(--ivory-50);
+}
+
+/* ---------- The bar of study tools ---------- */
+
+.sm {
+  display: grid;
+  gap: var(--sp-3);
+  padding: var(--sp-3) 0;
+  border-top: 1px solid var(--rule-hair);
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.sm__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-4);
+}
+
+.sm__k {
+  margin: 0;
+  font: 700 0.75rem/1.2 var(--font-ui);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sm__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-4);
+}
+
+.sm-size {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.sm-size__legend {
+  float: left;
+  margin-right: var(--sp-2);
+  padding: 0;
+  font: 600 0.8125rem/1.2 var(--font-ui);
+  color: var(--text-body);
+}
+
+.sm-size__opts {
+  display: inline-flex;
+  flex-wrap: wrap;
+  border: 1px solid var(--rule-control);
+  border-radius: var(--radius-1);
+}
+
+.sm-size__opt {
+  position: relative;
+  display: inline-flex;
+}
+
+.sm-size__opt + .sm-size__opt {
+  border-left: 1px solid var(--rule-control);
+}
+
+.sm-size__opt input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.sm-size__opt span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0.3rem 0.75rem;
+  font: 560 0.8125rem/1 var(--font-ui);
+  color: var(--text-strong);
+}
+
+.sm-size__opt:nth-child(2) span {
+  font-size: 0.9375rem;
+}
+
+.sm-size__opt:nth-child(3) span {
+  font-size: 1.0625rem;
+}
+
+.sm-size__opt input:checked + span {
+  background: var(--bb-ink);
+  color: var(--text-on-ink);
+}
+
+.sm-size__opt input:focus-visible + span {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.sm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--rule-control);
+  border-radius: var(--radius-1);
+  background: transparent;
+  color: var(--text-strong);
+  font: 600 0.8125rem/1 var(--font-ui);
+  cursor: pointer;
+  transition:
+    background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.sm-btn:hover {
+  background: var(--surface-sunk);
+}
+
+.sm-btn:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.sm-btn[aria-pressed='true'] {
+  background: var(--bb-ink);
+  border-color: var(--bb-ink);
+  color: var(--text-on-ink);
+}
+
+/* Mark as complete: a square that fills with a tick when it is pressed, so the state is told by shape too. */
+.sm-btn--done {
+  min-height: 2.75rem;
+  border-color: var(--bb-ink);
+  font-size: 0.875rem;
+}
+
+.sm-btn__tick {
+  position: relative;
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+}
+
+.sm-btn--done[aria-pressed='true'] .sm-btn__tick::after {
+  content: '';
+  position: absolute;
+  left: 0.28rem;
+  top: 0.06rem;
+  width: 0.3rem;
+  height: 0.6rem;
+  border: solid currentColor;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.sm-done {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-3);
+}
+
+.sm-done[hidden],
+.sm-done__link[hidden] {
+  display: none;
+}
+
+.sm-done__link {
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--fs-small);
+  font-weight: 560;
+}
+
+/* ---------- The strip: reading progress and the jump menu ---------- */
+
+.sm-strip {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 30;
+  background: var(--surface-page);
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+/* The bar opens the article, and the strip follows it directly, whatever space the article puts between its parts. */
+[data-study-root] > .sm {
+  margin-top: var(--sp-5);
+}
+
+[data-study-root] > .sm-strip {
+  margin-top: 0;
+}
+
+.sm-strip[hidden] {
+  display: none;
+}
+
+/* The strip sits under the sticky header, so a jump lands below both. */
+@media (max-width: 74.99rem) {
+  html.has-study-strip {
+    scroll-padding-top: calc(var(--header-h) + 3.5rem);
+  }
+}
+
+.sm-strip__bar {
+  display: block;
+  height: 3px;
+  background: var(--rule-hair);
+  overflow: hidden;
+}
+
+.sm-strip__fill {
+  display: block;
+  height: 100%;
+  background: var(--bb-ink);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.sm-jump__sum {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+  min-height: 2.75rem;
+  padding: 0.65rem 0;
+  list-style: none;
+  cursor: pointer;
+  font: 600 0.875rem/1.3 var(--font-ui);
+  color: var(--text-strong);
+}
+
+.sm-jump__sum::-webkit-details-marker {
+  display: none;
+}
+
+.sm-jump__sum::after {
+  content: '';
+  flex: none;
+  align-self: center;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-left: auto;
+  border: solid currentColor;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.sm-jump[open] .sm-jump__sum::after {
+  transform: rotate(225deg);
+}
+
+.sm-jump__k {
+  flex: none;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sm-jump__now {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+/* The menu opens over the page rather than pushing it down. */
+.sm-jump {
+  position: relative;
+}
+
+.sm-jump__panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: min(60vh, 28rem);
+  overflow-y: auto;
+  padding: 0 var(--sp-3) var(--sp-3);
+  background: var(--surface-page);
+  border: 1px solid var(--rule);
+  border-top: 2px solid var(--rule-ink);
+}
+
+/* ---------- The contents list, in the jump menu and the rail ---------- */
+
+.sm-toc {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sm-toc li {
+  margin: 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.sm-toc__a {
+  display: flex;
+  gap: var(--sp-2);
+  min-height: 2.25rem;
+  padding: 0.45rem 0 0.45rem 0.6rem;
+  border-left: 3px solid transparent;
+  color: var(--text-body);
+  font-size: var(--fs-small);
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.sm-toc__a:hover {
+  color: var(--cobalt-text);
+  text-decoration: underline;
+}
+
+/* The section in view: a rule and weight, not colour alone; a brief's own contents list marks it too. */
+.brief-toc a[aria-current='location'] {
+  color: var(--text-strong);
+  font-weight: 650;
+  box-shadow: inset 3px 0 0 var(--bb-ink);
+  padding-left: 0.5rem;
+}
+
+.sm-toc__a[aria-current='location'] {
+  border-left-color: var(--bb-ink);
+  color: var(--text-strong);
+  font-weight: 650;
+}
+
+.sm-toc__no {
+  flex: none;
+  min-width: 1.6rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.sm-rail {
+  display: none;
+}
+
+.sm-rail__h {
+  margin: 0 0 var(--sp-2);
+  font: 700 0.75rem/1.2 var(--font-ui);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sm-rail .sm-toc {
+  border-top: 2px solid var(--rule-ink);
+}
+
+.sm-rail__read {
+  display: grid;
+  gap: var(--sp-1);
+  margin-bottom: var(--sp-3);
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+/* Wide screens: the article takes the left column, the contents rail the empty right one. */
+@media (min-width: 75rem) {
+  .sm-has-rail {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 15rem;
+    column-gap: var(--sp-7);
+    align-items: start;
+  }
+
+  .sm-has-rail > * {
+    grid-column: 1;
+  }
+
+  .sm-has-rail > .sm-rail {
+    display: block;
+    grid-column: 2;
+    grid-row: 1 / span 80;
+    position: sticky;
+    top: calc(var(--header-h) + var(--sp-5));
+    max-height: calc(100vh - var(--header-h) - var(--sp-7));
+    overflow-y: auto;
+    margin-top: 0;
+    padding-top: var(--sp-3);
+  }
+
+  .sm-has-rail > .sm-strip {
+    display: none;
+  }
+
+  .sm-jump {
+    display: none;
+  }
+}
+
+/* ---------- Text size ---------- */
+
+/* The steps match TEXT_SIZES in src/lib/study.ts. */
+[data-study-root][data-study-size='1'] > :not(.sm, .sm-strip, .sm-rail, script) {
+  zoom: 1.125;
+}
+
+[data-study-root][data-study-size='2'] > :not(.sm, .sm-strip, .sm-rail, script) {
+  zoom: 1.25;
+}
+
+/* On the narrowest screens the steps are smaller, so nothing is pushed past the edge of the screen. */
+@media (max-width: 29.99rem) {
+  [data-study-root][data-study-size='1'] > :not(.sm, .sm-strip, .sm-rail, script) {
+    zoom: 1.0625;
+  }
+
+  [data-study-root][data-study-size='2'] > :not(.sm, .sm-strip, .sm-rail, script) {
+    zoom: 1.125;
+  }
+}
+
+/* ---------- Low light ---------- */
+
+@media screen {
+  [data-study-root][data-study-low] {
+    /* From the saved navy: --navy-900 itself is redefined below. */
+    --surface-page: var(--sm-l-navy);
+    --surface-sheet: var(--navy-800);
+    --surface-sunk: var(--navy-950);
+    --surface-ink: var(--navy-950);
+    --surface-gold-wash: var(--navy-800);
+    --surface-cobalt-wash: var(--navy-800);
+    --ivory-50: var(--navy-800);
+    --text-strong: var(--text-on-ink);
+    --text-body: var(--text-on-ink);
+    --text-muted: var(--text-on-ink-muted);
+    --cobalt-text: var(--cobalt-on-ink);
+    --cobalt-deep: var(--cobalt-on-ink);
+    --brass-text: var(--gold-400);
+    --green-text: var(--text-on-ink);
+    --signal-text: var(--text-on-ink);
+    --rule-hair: var(--rule-on-ink);
+    --rule: var(--slate-500);
+    --rule-ink: var(--slate-300);
+    --rule-control: var(--slate-300);
+    /* The navy used for headings and rules becomes ivory on the navy ground. */
+    --navy-900: var(--ivory-100);
+    background: var(--sm-l-navy);
+    color: var(--text-body);
+    padding-block: var(--sp-6);
+    border-radius: var(--radius-2);
+  }
+
+  /* A column of its own (a brief's main column) needs room at its sides too, where the screen has it. */
+  @media (min-width: 48rem) {
+    .brief__main[data-study-root][data-study-low] {
+      padding-inline: clamp(var(--sp-4), 3vw, var(--sp-6));
+    }
+  }
+
+  [data-study-root][data-study-low] ::selection {
+    background: var(--gold-400);
+    color: var(--sm-l-navy);
+  }
+
+  [data-study-root][data-study-low] :focus-visible {
+    outline-color: var(--gold-400);
+  }
+
+  /* Buttons that fill with navy fill with ivory instead, keeping navy text. */
+  [data-study-root][data-study-low] :is(.btn--primary, .btn:hover, .sm-btn[aria-pressed='true'], .save__btn[aria-pressed='true'], .sm-size__opt input:checked + span) {
+    background: var(--ivory-100);
+    border-color: var(--ivory-100);
+    color: var(--sm-l-navy);
+  }
+
+  [data-study-root][data-study-low] .sm-strip__fill {
+    background: var(--text-on-ink);
+  }
+
+  /* Cards written on white (recall cards, the concept lens, options and facts) are cards of raised navy in low light. */
+  [data-study-root][data-study-low] :is(.rcard, .concept-card, .option-card, .fact-interp > div) {
+    background: var(--surface-sheet);
+  }
+
+  /* Diagrams, mindmaps and exercises keep their light sheet: their drawings and colours are made for it. */
+  [data-study-root][data-study-low] :is(figure.dg, .mm, [data-ix]:not([data-ix='study'], [data-ix='save'], [data-ix='note-add'], [data-ix='retrieval'])) {
+    --surface-page: var(--sm-l-page);
+    --surface-sheet: var(--sm-l-sheet);
+    --surface-sunk: var(--sm-l-sunk);
+    --surface-ink: var(--sm-l-ink);
+    --surface-gold-wash: var(--sm-l-gold-wash);
+    --surface-cobalt-wash: var(--sm-l-cobalt-wash);
+    --ivory-50: var(--sm-l-ivory-50);
+    --text-strong: var(--sm-l-text-strong);
+    --text-body: var(--sm-l-text-body);
+    --text-muted: var(--sm-l-text-muted);
+    --cobalt-text: var(--sm-l-cobalt);
+    --cobalt-deep: var(--sm-l-cobalt-deep);
+    --brass-text: var(--sm-l-brass);
+    --green-text: var(--sm-l-green);
+    --signal-text: var(--sm-l-signal);
+    --rule-hair: var(--sm-l-rule-hair);
+    --rule: var(--sm-l-rule);
+    --rule-ink: var(--sm-l-rule-ink);
+    --rule-control: var(--sm-l-rule-control);
+    --navy-900: var(--sm-l-navy);
+    background-color: var(--sm-l-sheet);
+    color: var(--sm-l-text-body);
+  }
+
+  [data-study-root][data-study-low] :is(figure.dg, .mm, [data-ix]:not([data-ix='study'], [data-ix='save'], [data-ix='note-add'], [data-ix='retrieval'])) :is(.btn--primary, .btn:hover) {
+    background: var(--sm-l-navy);
+    border-color: var(--sm-l-navy);
+    color: var(--text-on-ink);
+  }
+}
+
+/* ---------- Print ---------- */
+
+@media print {
+  .sm,
+  .sm-strip,
+  .sm-rail {
+    display: none !important;
+  }
+
+  [data-study-root] > * {
+    zoom: 1 !important;
+  }
+
+  .sm-has-rail {
+    display: block !important;
+  }
+}

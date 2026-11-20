@@ -1,24 +1,30 @@
 import { describe, expect, it } from 'vitest';
 import { INTRO_GATE, introMode, type IntroInput } from '../../src/lib/intro';
 
-const base: IntroInput = { forced: false, automated: false, navType: 'navigate', sameOrigin: false, reduced: false };
+const base: IntroInput = { forced: false, automated: false, navType: 'navigate', sameOrigin: false, reduced: false, home: true };
 const mode = (over: Partial<IntroInput>) => introMode({ ...base, ...over });
 
 describe('when the opening plays', () => {
-  it('plays on a fresh entry: typed address, bookmark, new tab or a link from another site', () => {
+  it('plays when the home page is freshly opened: typed address, bookmark, new tab or a link from another site', () => {
     expect(mode({})).toBe('full');
   });
 
-  it('plays again on every fresh entry, whatever happened before (nothing is stored)', () => {
+  it('plays again on every fresh entry to the home page, whatever happened before (nothing is stored)', () => {
     expect(mode({})).toBe('full');
     expect(mode({})).toBe('full');
   });
 
-  it('plays on a reload, which opens the site afresh', () => {
-    expect(mode({ navType: 'reload', sameOrigin: true })).toBe('full');
+  it('never plays on any other page, so a reader arriving at a topic from a search result goes straight to it', () => {
+    expect(mode({ home: false })).toBe('none');
+    expect(mode({ home: false, reduced: true })).toBe('none');
   });
 
-  it('does not play when moving between the site\'s own pages', () => {
+  it('does not play on a reload', () => {
+    expect(mode({ navType: 'reload' })).toBe('none');
+    expect(mode({ navType: 'reload', sameOrigin: true })).toBe('none');
+  });
+
+  it("does not play when moving between the site's own pages", () => {
     expect(mode({ sameOrigin: true })).toBe('none');
   });
 
@@ -37,8 +43,9 @@ describe('when the opening plays', () => {
     expect(mode({ automated: true, forced: true })).toBe('full');
   });
 
-  it('?intro forces it, as a still card under reduced motion', () => {
+  it('?intro forces it on any page, as a still card under reduced motion', () => {
     expect(mode({ forced: true, sameOrigin: true })).toBe('full');
+    expect(mode({ forced: true, home: false })).toBe('full');
     expect(mode({ forced: true, reduced: true })).toBe('still');
   });
 

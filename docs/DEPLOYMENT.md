@@ -61,7 +61,7 @@ npm run build
 Then on the production address:
 
 - the home page, a topic page (`/topics/costs-and-revenues/`), a Decision Room (`/decision-room/atelier-pricing/`), the case lab (`/case-room/halden-diagnosis/`) and the break-even workspace (`/finance-desk/break-even/`) load and work;
-- `/sitemap.xml` lists absolute addresses on the production domain, and `/robots.txt` names it;
+- `/sitemap.xml` lists every indexable page the build wrote (about 1,080), with absolute addresses on the production domain, and `/robots.txt` names it; `npm run build` writes it after `astro build` (`scripts/build/sitemap.mjs`);
 - an unknown address returns the 404 page with status 404;
 - the social card appears when the address is shared (`/brand/social-card.png`);
 - responses carry the security headers above.

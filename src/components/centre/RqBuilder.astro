@@ -1,39 +1,45 @@
 ---
 /**
- * The research question builder: from an organization and a real issue to a
- * focused question through one key concept, with the six tests to check it
- * against before your teacher approves it. A recommended strategy, not a rule.
+ * The research question builder: from an organization, a real issue, the
+ * decision and one key concept to a draft question, checked as the reader
+ * types against the guide's requirements for the question (p. 53, through
+ * checkQuestion in src/lib/ia-tools.ts), with the IA research guide's six
+ * tests to tick before the teacher approves it. Each check says its standing.
+ * It drafts nothing the reader cannot change, and approves nothing.
  */
 import GuideLabel from './GuideLabel.astro';
+import { CONCEPTS, CONCEPT_NAMES, QUESTION_TESTS } from '../../lib/ia-tools';
 ---
 
 <div class="rq" data-ix="rq-builder">
+  <p class="state state--error" data-error hidden>The builder could not start. The six tests below still work on paper.</p>
   <div class="rq__head">
     <h3 class="rq__title">Build your research question</h3>
+    <GuideLabel kind="ib" />
     <GuideLabel kind="strategy" />
   </div>
   <p class="nojs-only state">The builder needs JavaScript. The six tests below work on paper: write your question, then check it against each one.</p>
   <div class="rq__grid js-only">
     <div class="rq__form">
       <label class="rq__f">
-        <span>The organization</span>
+        <span>1 · The organization</span>
         <input type="text" data-f="org" placeholder="One real organization you can research" autocomplete="off" />
       </label>
       <label class="rq__f">
-        <span>The real issue it faces</span>
+        <span>2 · The real issue it faces</span>
         <input type="text" data-f="issue" placeholder="For example: turns customers away at weekends" autocomplete="off" />
       </label>
       <fieldset class="rq__f">
-        <legend>The kind of question</legend>
+        <legend>3 · The kind of question</legend>
         <label class="rq__opt"><input type="radio" name="rq-form" value="forward" checked /> Forward looking: a decision still to be made</label>
         <label class="rq__opt"><input type="radio" name="rq-form" value="backward" /> Backward looking: a decision already taken</label>
       </fieldset>
       <label class="rq__f" data-when="forward">
-        <span>The decision to be made</span>
+        <span>4 · The decision to be made</span>
         <input type="text" data-f="decision" placeholder="For example: open a second shop in Eastgate" autocomplete="off" />
       </label>
       <label class="rq__f" data-when="backward" hidden>
-        <span>The decision already taken</span>
+        <span>4 · The decision already taken</span>
         <input type="text" data-f="taken" placeholder="For example: its seasonal range" autocomplete="off" />
       </label>
       <label class="rq__f" data-when="backward" hidden>
@@ -41,44 +47,47 @@ import GuideLabel from './GuideLabel.astro';
         <input type="text" data-f="aim" placeholder="For example: attracted new customers" autocomplete="off" />
       </label>
       <label class="rq__f">
-        <span>The key concept that is your lens</span>
-        <select data-f="concept">
-          <option value="change">Change</option>
-          <option value="creativity">Creativity</option>
-          <option value="ethics">Ethics</option>
-          <option value="sustainability">Sustainability</option>
-        </select>
+        <span>5 · The key concept that is your lens</span>
+        <select data-f="concept">{CONCEPTS.map((k) => <option value={k}>{CONCEPT_NAMES[k]}</option>)}</select>
       </label>
     </div>
-    <div class="rq__out" aria-live="polite">
+    <div class="rq__out">
       <p class="label">Your question, to refine</p>
-      <textarea class="rq__q" data-q rows="3" aria-label="Your research question"></textarea>
+      <textarea class="rq__q" data-q rows="3" aria-label="Your research question" aria-describedby="rq-checks-h"></textarea>
       <p class="rq__lens" data-lens></p>
       <p class="rq__warn" data-warn hidden></p>
       <p class="small muted" data-alt></p>
+      <p class="label" id="rq-checks-h">Checked against the guide</p>
+      <ul class="it-list" data-guide aria-live="polite" aria-labelledby="rq-checks-h"></ul>
     </div>
   </div>
   <fieldset class="rq__tests">
     <legend>Six tests before your teacher approves it</legend>
     <ul>
-      <li><label><input type="checkbox" value="focused" /> <b>Focused:</b> one decision, one place.</label></li>
-      <li><label><input type="checkbox" value="real" /> <b>Real:</b> a live issue, not a hypothetical.</label></li>
-      <li><label><input type="checkbox" value="one" /> <b>One organization:</b> named, and central to the question.</label></li>
-      <li><label><input type="checkbox" value="researchable" /> <b>Researchable:</b> three to five recent documents can answer it.</label></li>
-      <li><label><input type="checkbox" value="concept" /> <b>Concept-aligned:</b> the lens fits the issue.</label></li>
-      <li><label><input type="checkbox" value="answerable" /> <b>Answerable:</b> an explicit answer within 1,800 words.</label></li>
+      {
+        QUESTION_TESTS.map((t) => (
+          <li>
+            <label>
+              <input type="checkbox" value={t.id} /> <b>{t.name}:</b> {t.text}.
+            </label>
+          </li>
+        ))
+      }
     </ul>
-    <p class="rq__count js-only" data-count></p>
+    <p class="rq__count js-only" data-count aria-live="polite"></p>
   </fieldset>
-  <p class="small muted">The guide allows forward- or backward-looking questions, and your teacher approves the question before work starts. The tests and the wording are the platform's technique. Your work stays on this device.</p>
+  <p class="small muted">
+    The checks against the guide test the question's form, never its quality: your teacher approves the question before work starts (guide, p. 53). The six
+    tests come from the creator's IA research guide, and the drafting is the platform's technique: a recommended strategy, not IB rules. Your work stays on
+    this device.
+  </p>
 </div>
 
 <style>
   .rq {
     padding: var(--sp-5);
     background: var(--surface-sheet);
-    border-top: 3px solid var(--bb-cobalt);
-    box-shadow: var(--shadow-sheet);
+    border-top: 3px solid var(--navy-900);
   }
 
   .rq__head {
@@ -101,6 +110,7 @@ import GuideLabel from './GuideLabel.astro';
 
   .rq__form {
     display: grid;
+    align-content: start;
     gap: var(--sp-3);
   }
 
@@ -126,7 +136,7 @@ import GuideLabel from './GuideLabel.astro';
     padding: 0.45rem 0.7rem;
     border: 1px solid var(--rule-control);
     border-radius: var(--radius-2);
-    background: #fff;
+    background: var(--surface-sheet);
     color: var(--text-strong);
     font: 400 0.9375rem/1.4 var(--font-ui);
   }

@@ -26,6 +26,8 @@ import { allSubtopics, subtopicHref } from '../../lib/learning';
 import { inline, jsonForScript, plain, rich } from '../../lib/markup';
 import { QUALIFICATION_TAG_LABELS } from '../../lib/schemas';
 import { studioHref } from '../../lib/strategy/content';
+import { comparisons } from '../../lib/compare/content';
+import { compareHref } from '../../lib/compare/schema';
 
 export async function getStaticPaths() {
   const lib = await library();
@@ -56,6 +58,14 @@ const app = applicationOf(f, lib.tools);
 const studioOf = (href: string) => lib.studio.find((x) => `/strategy-studio/${x.slug}/` === href);
 const works = f.references.map((r) => ({ id: r, s: c.sources[r]! }));
 const pageRef = f.guidePages ? `${f.guidePages.includes(' ') ? 'pp.' : 'p.'} ${f.guidePages}` : '';
+// The comparisons that set this framework beside another: a curated page where there is one, otherwise the comparison tool.
+const cmp = await comparisons();
+const curatedWith = cmp.all.filter(([, cc]) => cc.sides.some((s) => s.framework === id));
+const curatedFor = (other: string) => cmp.all.find(([, cc]) => cc.sides.some((s) => s.framework === id) && cc.sides.some((s) => s.framework === other));
+const comparePair = (other: string) => {
+  const cur = curatedFor(other);
+  return cur ? compareHref(cur[0]) : `/frameworks/compare/?a=${id}&b=${other}`;
+};
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'LearningResource',
@@ -382,6 +392,7 @@ const jsonLd = {
                     <a href={frameworkHref(r.id)}>{r.f.name}</a>
                     <span class="fw-rel__kind">{STATUS_LABELS[r.f.status]}</span>
                     <span class="fw-rel__sum">{r.f.summary}</span>
+                    <a class="fw-rel__cmp" href={comparePair(r.id)}>{curatedFor(r.id) ? 'Read the comparison' : 'Compare side by side'}<span class="sr-only">: {f.name} and {r.f.name}</span></a>
                   </li>
                 ))}
               </ul>
@@ -389,6 +400,25 @@ const jsonLd = {
           )
         }
       </div>
+      <p class="small fw-compare">
+        {
+          curatedWith.length > 0 ? (
+            <>
+              Compared with it:{' '}
+              {curatedWith.map(([slug, cc], n) => (
+                <>
+                  {n > 0 && '; '}
+                  <a href={compareHref(slug)}>{cc.title}</a>
+                </>
+              ))}
+              . Or{' '}
+            </>
+          ) : (
+            ''
+          )
+        }
+        <a href={`/frameworks/compare/?a=${id}`}>{curatedWith.length > 0 ? 'compare it' : 'Compare it'} with any other framework in the library</a>.
+      </p>
       {
         works.length > 0 && (
           <div class="fw-works">
@@ -715,6 +745,17 @@ const jsonLd = {
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--text-muted);
+  }
+
+  .fw-rel__cmp {
+    flex-basis: 100%;
+    font-size: var(--fs-small);
+    font-weight: 600;
+  }
+
+  .fw-compare {
+    margin-top: var(--sp-4);
+    max-width: var(--text-max);
   }
 
   .fw-note {

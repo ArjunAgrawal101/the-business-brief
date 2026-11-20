@@ -1,5 +1,6 @@
 /**
- * The Business Intelligence Briefing: its filters narrow the dated list and
+ * The Business Intelligence Briefing: its standfirst states the span of the
+ * developments it lists, computed from their dates; its filters narrow the dated list and
  * say so in a polite live region, keep their state in the address, recover
  * from an empty result, and leave a complete list without JavaScript; its
  * themes are pages of their own that list exactly the items filed under them,
@@ -88,6 +89,25 @@ test.describe('the Business Intelligence Briefing', () => {
     const total = await page.locator('[data-item]').count();
     await expect(page.locator('#ib-unit')).toHaveValue('');
     await expect(visibleRows(page)).toHaveCount(total);
+  });
+
+  test('states the span of the developments it lists, computed from their dates', async ({ page }) => {
+    await page.goto('/intelligence/');
+    // The development dates of every row, oldest first; a month without a day sorts before the days in it.
+    const dates = await page.locator('[data-item] .ib-row__date time').evaluateAll((ts) =>
+      ts
+        .map((t) => t.getAttribute('datetime') ?? '')
+        .filter(Boolean)
+        .sort(),
+    );
+    expect(dates.length).toBeGreaterThanOrEqual(8);
+    const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const monthYear = (iso: string) => `${MONTHS[Number(iso.slice(5, 7)) - 1]} ${iso.slice(0, 4)}`;
+    const first = monthYear(dates[0]!);
+    const last = monthYear(dates[dates.length - 1]!);
+    const span = first === last ? `in ${first}` : `from ${first} to ${last}`;
+    await expect(page.locator('.ib-mast__lead')).toContainText(`Real business developments ${span},`);
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', `Real business developments ${span}, curated by hand, dated and sourced to the organizations' own documents, filed under twelve themes and read through the ideas of IB Business Management and beyond.`);
   });
 
   test('lists every item without JavaScript and shows no filters', async ({ browser }) => {

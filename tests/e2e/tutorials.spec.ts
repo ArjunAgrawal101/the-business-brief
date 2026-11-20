@@ -99,10 +99,10 @@ test('the contextual notes appear once a page, with the same price, where help i
     await expect(notes.locator('a[href="/tutorials/"]')).toHaveCount(1);
   }
   await page.goto('/about/');
-  await expect(page.locator('#ab-tutor-h')).toBeVisible();
+  await expect(page.locator('.ab-contact a[href="/tutorials/"]')).toBeVisible();
+  await expect(page.locator('.ab-contact')).toContainText('US$20 for a one-hour session');
   await page.goto('/pathways/ib-dp/');
   await expect(page.locator('main a[href="/tutorials/"]').first()).toBeVisible();
   await page.goto('/');
-  await expect(page.locator('#tutor-h')).toBeVisible();
-  await expect(page.locator('.htu__amt')).toHaveText('20');
+  await expect(page.locator('.hcr__actions a[href="/tutorials/"]')).toContainText('US$20 for a one-hour online session');
 });

@@ -12,6 +12,7 @@ const modules = await modulesInOrder();
 const NUMBER_WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
 const howMany = NUMBER_WORDS[modules.length] ?? String(modules.length);
 const c = await corpus();
+const caseCount = Object.keys(c.cases).length;
 const interactions = Object.entries(c.interactives).sort((a, b) => a[1].title.localeCompare(b[1].title, 'en'));
 const CHAINS = [
   { name: 'Situation, decision, consequence', steps: ['Situation', 'Decision', 'Consequence'], where: 'Every topic brief and Decision Room' },
@@ -90,7 +91,7 @@ const CHAINS = [
         </div>
         <div>
           <h3>Fictional means fictional</h3>
-          <p>The three cases are fictional and their data simulated, which lets every figure be complete and consistent. Real organizations appear only as cited, dated facts, kept apart from interpretation.</p>
+          <p>The {caseCount} cases in the Case Vault are fictional and their data simulated, which lets every figure be complete and consistent. Real organizations appear only as cited, dated facts, kept apart from interpretation.</p>
         </div>
         <div>
           <h3>Practice is labelled as practice</h3>

@@ -1346,6 +1346,17 @@
   list-style: none;
 }
 
+/* Each briefing link is a target of at least 24 px, with room between them (WCAG 2.5.8). */
+.bbr-index dd li + li {
+  margin-top: 0.35rem;
+}
+
+.bbr-index dd a {
+  display: inline-block;
+  min-height: 1.5rem;
+  padding-block: 0.125rem;
+}
+
 @media print {
   .bbr-switch,
   .bbr-series-nav {

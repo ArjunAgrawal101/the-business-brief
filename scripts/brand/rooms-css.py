@@ -66,14 +66,14 @@ def tutorials(a):
 # accent: rules and marks; text: an AA-safe shade of it on ivory (checked by scripts/qa/contrast.mjs)
 ROOMS = [
   ('finance', '#2f6f5e', '#2b6a59', finance, 'Finance Desk: a spreadsheet grid and a market line'),
-  ('strategy', '#2f55e4', '#2448d0', strategy, 'Strategy Studio: a matrix of options and the path between them'),
+  ('strategy', '#3a6797', '#2d5b8c', strategy, 'Strategy Studio: a matrix of options and the path between them'),
   ('market', '#6b4c8a', '#5f4380', market, 'Market Studio: a positioning map with a target segment'),
   ('people', '#9a5b3f', '#8a4f35', people, 'People and Culture: an organization of connected people'),
   ('operations', '#3b6f8f', '#33617d', operations, 'Operations Floor: a process line and a conveyor'),
   ('enterprise', '#b8862f', '#76591f', enterprise, 'Entrepreneurship Lab: a blueprint and a canvas'),
   ('boardroom', '#b39350', '#76591f', boardroom, 'Boardroom: the table and the trend on it'),
   ('cases', '#7a2e2e', '#7a2e2e', cases, 'Case Vault: an editorial page of columns'),
-  ('assessment', '#1d3cb4', '#1d3cb4', assessment, 'Assessment Centre: a ruled answer page'),
+  ('assessment', '#22476f', '#22476f', assessment, 'Assessment Centre: a ruled answer page'),
   ('advanced', '#7b2d4f', '#7b2d4f', advanced, 'Advanced Management: a case-method lecture theatre facing the board'),
   ('tutorials', '#b39350', '#76591f', tutorials, 'Tutorials: a desk with an open book, a pen and a lamp'),
 ]

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
+import BackToTopic from '../../components/connect/BackToTopic.astro';
 import SectionHead from '../../components/layout/SectionHead.astro';
 import Interactive from '../../components/interactive/Interactive.astro';
 import CalcCard from '../../components/finance/CalcCard.astro';
@@ -19,7 +20,9 @@ const calcs = Object.entries(c.calculations)
     kicker="Finance Desk"
     title="Costs and revenue"
     lead="Before any calculation, sort the costs. How a cost behaves when output changes decides where it goes in every formula that follows. The figures come from the Atelier Barro case, a fictional studio with simulated data."
-  />
+  >
+    <BackToTopic />
+  </PageIntro>
   <div class="wrap page-body">
     <section aria-labelledby="classify-h">
       <SectionHead no={1} title="Sort the costs" id="classify-h" />

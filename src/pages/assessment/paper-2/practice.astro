@@ -3,8 +3,11 @@
  * Paper 2 calculation practice: questions generated from the platform's
  * tested finance functions with new fictional figures each time, checked
  * within a stated tolerance, with the full working and the error behind each
- * typical wrong answer. A timed mode works at Paper 2's pace; scores stay on
- * this device (bb:p2-practice). Without JavaScript the page is a worked set.
+ * typical wrong answer. Four kinds of task: calculate, find the slip in a
+ * worked answer, read the data in a table or chart, and construct a
+ * statement, forecast, schedule or chart in a grid. A timed mode works at
+ * Paper 2's pace; scores stay on this device (bb:p2-practice). Without
+ * JavaScript the page is a worked set with every answer and working.
  */
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import TutorNote from '../../../components/ui/TutorNote.astro';
@@ -13,8 +16,10 @@ import CentreHead from '../../../components/centre/CentreHead.astro';
 import GuideLabel from '../../../components/centre/GuideLabel.astro';
 import ProvenanceTag from '../../../components/ui/ProvenanceTag.astro';
 import { corpus } from '../../../lib/content';
-import { GROUPS, GROUP_IDS, KINDS, KIND_IDS, generate, type GroupId } from '../../../lib/p2-practice';
-import { questionHtml, workingHtml } from '../../../lib/p2-render';
+import { ALL_IDS, GROUPS, GROUP_IDS, META, generateAny, isChoice, isGrid, type GroupId, type TaskType } from '../../../lib/p2-practice';
+import { TASK_LABELS } from '../../../lib/p2-tasks';
+import { ELSEWHERE, SHEET, STATEMENTS } from '../../../lib/p2-coverage';
+import { answerHtml, answerStaticHtml, questionHtml, taskLabel, workingAnyHtml } from '../../../lib/p2-render';
 import { fmtPace, pacesFrom } from '../../../lib/bank';
 import { jsonForScript } from '../../../lib/markup';
 import '../../../styles/centre.css';
@@ -23,39 +28,59 @@ import '../../../styles/p2-practice.css';
 const c = await corpus();
 /* Paper 2's time and marks at SL and HL, from the guide's assessment outlines (pp. 39 to 40). */
 const paces = pacesFrom(c.assessment).filter((p) => p.paper === 'paper-2');
-const first = generate('break-even-quantity', 24680);
-/** A worked set for every reader, with or without JavaScript: one question from each topic. */
+const first = generateAny('break-even-quantity', 24680);
+if (isChoice(first) || isGrid(first)) throw new Error('The first question must be a single figure');
+/** A worked set for every reader, with or without JavaScript: a calculation from each topic, then one of each other kind of task. */
 const WORKED: Array<[string, number]> = [
   ['margin-of-safety', 31415],
   ['profit-margin', 27182],
   ['acid-test-ratio', 16180],
-  ['average-rate-of-return', 14142],
-  ['closing-balance', 17320],
   ['gearing-ratio', 22360],
+  ['average-rate-of-return', 14142],
   ['net-present-value', 26457],
+  ['closing-balance', 17320],
+  ['straight-line-depreciation', 11235],
+  ['budget-variance', 28657],
+  ['market-share', 46368],
+  ['labour-turnover', 75025],
+  ['capacity-utilization', 12586],
+  ['expected-value', 19641],
+  ['total-float', 31781],
 ];
-const worked = WORKED.map(([k, s]) => generate(k, s));
-const kindsBy = (g: GroupId) => KIND_IDS.filter((id) => KINDS[id]?.group === g);
-const slCount = KIND_IDS.filter((id) => KINDS[id]?.level !== 'HL').length;
+const WORKED_TASKS: Array<[string, number]> = [
+  ['slip-break-even', 51422],
+  ['read-ratio-table', 83204],
+  ['build-cash-flow', 13462],
+];
+const worked = WORKED.map(([k, s]) => generateAny(k, s));
+const workedTasks = WORKED_TASKS.map(([k, s]) => generateAny(k, s));
+const kindsBy = (g: GroupId) => ALL_IDS.filter((id) => META[id]?.group === g);
+const slCount = ALL_IDS.filter((id) => META[id]?.level !== 'HL').length;
+const TASKS: TaskType[] = ['calc', 'spot', 'read', 'build'];
+const taskCount = (t: TaskType) => ALL_IDS.filter((id) => META[id]?.task === t).length;
 const config = {
   paces,
   first: first.code,
-  kinds: Object.fromEntries(KIND_IDS.map((id) => [id, { name: KINDS[id]?.name ?? id, group: KINDS[id]?.group, level: KINDS[id]?.level, marks: KINDS[id]?.marks }])),
+  kinds: Object.fromEntries(ALL_IDS.map((id) => [id, META[id]])),
 };
-const LEVEL_NOTE: Record<GroupId, string> = {
-  'break-even': '5.5',
-  profitability: '3.5',
-  liquidity: '3.5',
-  efficiency: '3.6, HL only',
-  investment: '3.8; NPV is HL only',
-  'cash-flow': '3.7',
+/** The syllabus a topic practises, and where part of it is HL only. */
+const HL_PART: Partial<Record<GroupId, string>> = {
+  investment: 'NPV is HL only',
+  accounts: 'depreciation is HL only',
+  marketing: 'elasticity is HL only',
 };
+const note = (g: GroupId) => {
+  const gr = GROUPS[g];
+  const where = gr.syllabus === 'toolkit' ? 'the toolkit' : gr.syllabus;
+  return gr.level === 'HL' ? `${where}, HL only` : HL_PART[g] ? `${where}; ${HL_PART[g]}` : where;
+};
+const sheetHl = SHEET.filter((f) => f.level === 'HL').length;
 ---
 
 <BaseLayout
   room="assessment"
   title="Paper 2 calculation practice"
-  description="IB Business Management Paper 2 calculation practice: break-even, contribution, ratios, investment appraisal and cash flow, generated with new fictional figures each time, checked with the full working and the error behind each wrong answer."
+  description="IB Business Management Paper 2 practice: every formula on the formulae sheet and every calculation in the syllabus, with new fictional figures each time. Calculate, find the slip in a worked answer, read data from tables and charts, and construct statements and charts in a grid, with the working and the error behind each wrong answer."
   section="assessment"
 >
   <CentreHead
@@ -63,11 +88,11 @@ const LEVEL_NOTE: Record<GroupId, string> = {
     parent={{ label: 'Paper 2', href: '/assessment/paper-2/' }}
     kicker="Paper 2 · Practice"
     title="Calculation practice"
-    lead="Every question is generated from the platform's finance functions, with new fictional figures each time. Answer, check, and see the full working and the error that leads to each typical wrong answer."
+    lead="Every question is generated from the platform's finance functions, with new fictional figures each time. Calculate, find the slip in a worked answer, read the data, or construct a statement or chart in a grid, then see the working and the error behind each typical wrong answer."
     stats={[
-      { value: String(KIND_IDS.length), label: 'Calculations', note: `${slCount} at SL, all ${KIND_IDS.length} at HL` },
-      { value: '6', label: 'Topics', note: 'syllabus 3.5 to 3.8 and 5.5' },
-      { value: '90,000', label: 'Question codes', note: 'for each calculation' },
+      { value: String(ALL_IDS.length), label: 'Kinds of question', note: `${slCount} at SL, all ${ALL_IDS.length} at HL` },
+      { value: String(GROUP_IDS.length), label: 'Topics', note: 'units 2 to 5 and the toolkit' },
+      { value: `${SHEET.length} of ${SHEET.length}`, label: 'Formulae sheet', note: `every formula practised, ${sheetHl} HL` },
       { value: paces.map((p) => String(Math.round((p.minutes / p.marks) * 100) / 100)).join(' | '), label: 'Timed pace', note: 'minutes a mark, SL | HL' },
     ]}
   />
@@ -82,7 +107,7 @@ const LEVEL_NOTE: Record<GroupId, string> = {
     </div>
 
     <section class="pp-sec" aria-labelledby="pp-h">
-      <SectionHead no="01" title="Practise a calculation" id="pp-h" dek="Choose your level and topics, answer, then check. Each question has a code: enter it later to see the same question again." />
+      <SectionHead no="01" title="Practise" id="pp-h" dek="Choose your level, topics and kinds of task, answer, then check. Each question has a code: enter it later to see the same question again." />
 
       <div class="pp" data-ix="p2-practice">
         <script type="application/json" data-config set:html={jsonForScript(config)} />
@@ -105,7 +130,26 @@ const LEVEL_NOTE: Record<GroupId, string> = {
                   <label class="pp-topic" data-topic={g} data-hl={GROUPS[g].level === 'HL' ? 'true' : undefined}>
                     <input type="checkbox" name="topic" value={g} checked />
                     <span>
-                      {GROUPS[g].label} <span class="pp-topic__n">{LEVEL_NOTE[g]}</span>
+                      {GROUPS[g].label} <span class="pp-topic__n">{note(g)}</span>
+                    </span>
+                  </label>
+                ))
+              }
+            </div>
+            <div class="pp-topics__all">
+              <button type="button" class="btn btn--small" data-topics="all">All topics</button>
+              <button type="button" class="btn btn--small" data-topics="none">Clear topics</button>
+            </div>
+          </fieldset>
+          <fieldset class="pp-fs">
+            <legend>Kinds of task</legend>
+            <div class="pp-tasks">
+              {
+                TASKS.map((t) => (
+                  <label class="pp-topic">
+                    <input type="checkbox" name="task" value={t} checked />
+                    <span>
+                      {TASK_LABELS[t]} <span class="pp-topic__n">{taskCount(t)} kinds</span>
                     </span>
                   </label>
                 ))
@@ -148,6 +192,7 @@ const LEVEL_NOTE: Record<GroupId, string> = {
         <article class="pp-q" data-question aria-labelledby="pp-q-h">
           <header class="pp-q__head">
             <p class="pp-q__meta">
+              <span class="pp-q__task" data-q-task>{taskLabel(first)}</span>
               <span data-q-group>{GROUPS[first.group].label}</span>
               <span class="pp-q__code" data-q-code>Question code {first.code}</span>
               <span class="tag tag--hl" data-q-hl hidden={first.level !== 'HL'}>HL</span>
@@ -157,20 +202,17 @@ const LEVEL_NOTE: Record<GroupId, string> = {
           </header>
           <div class="pp-q__body" data-q-body set:html={questionHtml(first, 'pp-q')} />
           <form class="pp-answer js-only" data-answer-form novalidate>
-            <label for="pp-answer" class="pp-answer__label">Your answer</label>
-            <div class="pp-answer__row">
-              <span class="pp-answer__fix" data-prefix aria-hidden="true">{first.prefix}</span>
-              <input class="input input--num pp-answer__in" id="pp-answer" name="answer" inputmode="decimal" autocomplete="off" aria-describedby="pp-answer-hint pp-feedback" />
-              <span class="pp-answer__fix" data-suffix aria-hidden="true">{first.suffix}</span>
+            <div class="pp-answer__body" data-answer-body set:html={answerHtml(first, 'pp-q', true)} />
+            <div class="pp-answer__actions">
               <button type="submit" class="btn btn--primary">Check answer</button>
               <button type="button" class="btn" data-reveal>Show the working</button>
             </div>
-            <span class="field__hint" id="pp-answer-hint" data-hint>For example {first.example}. {first.toleranceText}</span>
           </form>
           <div class="pp-feedback" id="pp-feedback" data-feedback></div>
+          <div data-chart-slot></div>
           <details class="pp-work" data-work>
             <summary>Answer, working and typical errors</summary>
-            <div class="pp-work__body" data-work-body set:html={workingHtml(first)} />
+            <div class="pp-work__body" data-work-body set:html={workingAnyHtml(first, 'pp-q')} />
           </details>
         </article>
 
@@ -213,13 +255,14 @@ const LEVEL_NOTE: Record<GroupId, string> = {
     </section>
 
     <section class="pp-sec" aria-labelledby="pp-worked-h">
-      <SectionHead no="02" title="A worked set" id="pp-worked-h" dek="One question from each topic, the same for every reader. Try each before you open its working; the codes load the same questions above." />
+      <SectionHead no="02" title="A worked set" id="pp-worked-h" dek="One calculation from each topic, then one of each other kind of task, the same for every reader. Try each before you open its working; the codes load the same questions above." />
       <ol class="pp-worked">
         {
-          worked.map((q, i) => (
+          [...worked, ...workedTasks].map((q, i) => (
             <li class="pp-q pp-q--worked">
               <header class="pp-q__head">
                 <p class="pp-q__meta">
+                  <span class="pp-q__task">{taskLabel(q)}</span>
                   <span>{GROUPS[q.group].label}</span>
                   <span class="pp-q__code">Question code {q.code}</span>
                   {q.level === 'HL' && <span class="tag tag--hl">HL</span>}
@@ -230,9 +273,10 @@ const LEVEL_NOTE: Record<GroupId, string> = {
                 <p class="pp-q__biz">{q.business}: fictional, figures simulated</p>
               </header>
               <div class="pp-q__body" set:html={questionHtml(q, `pp-w${i}`)} />
+              {(isChoice(q) || isGrid(q)) && <div class="pp-worked__form" set:html={answerStaticHtml(q, `pp-w${i}`)} />}
               <details class="pp-work">
                 <summary>Answer, working and typical errors</summary>
-                <div class="pp-work__body" set:html={workingHtml(q)} />
+                <div class="pp-work__body" set:html={workingAnyHtml(q, `pp-w${i}`)} />
               </details>
             </li>
           ))
@@ -241,15 +285,15 @@ const LEVEL_NOTE: Record<GroupId, string> = {
     </section>
 
     <section class="pp-sec" aria-labelledby="pp-rec-h">
-      <SectionHead no="03" title="Your record" id="pp-rec-h" dek="Every calculation you have checked, and every timed set, kept on this device only." />
+      <SectionHead no="03" title="Your record" id="pp-rec-h" dek="Every kind of question you have checked, and every timed set, kept on this device only." />
       <p class="nojs-only small muted">Your record needs JavaScript. The worked set above needs nothing.</p>
       <div class="pp-rec js-only" data-record>
-        <div class="table-scroll" role="region" aria-label="Your record by calculation" tabindex="0">
+        <div class="table-scroll" role="region" aria-label="Your record by kind of question" tabindex="0">
           <table class="table pp-rec__table">
-            <caption>By calculation</caption>
+            <caption>By kind of question</caption>
             <thead>
               <tr>
-                <th scope="col">Calculation</th>
+                <th scope="col">Kind of question</th>
                 <th scope="col" class="n">Checked</th>
                 <th scope="col" class="n">Right first time</th>
                 <th scope="col"><span class="sr-only">Share right</span></th>
@@ -264,8 +308,9 @@ const LEVEL_NOTE: Record<GroupId, string> = {
                   {kindsBy(g).map((id) => (
                     <tr data-kind={id}>
                       <th scope="row">
-                        {KINDS[id]?.name}
-                        {KINDS[id]?.level === 'HL' && <span class="pp-rec__hl">HL</span>}
+                        {META[id]?.name}
+                        {META[id]?.task !== 'calc' && <span class="pp-rec__task">{TASK_LABELS[META[id]?.task ?? 'calc']}</span>}
+                        {META[id]?.level === 'HL' && <span class="pp-rec__hl">HL</span>}
                       </th>
                       <td class="n" data-tried>
                         0
@@ -317,8 +362,105 @@ const LEVEL_NOTE: Record<GroupId, string> = {
       </div>
     </section>
 
+    <section class="pp-sec" aria-labelledby="pp-cover-h">
+      <SectionHead no="04" title="What the practice covers" id="pp-cover-h" dek="Every formula on the formulae sheet, and every statement in the syllabus with a calculation, each with the kinds of question that practise it." />
+      <div class="pp-cover">
+        <div>
+          <p class="ce-labels"><GuideLabel kind="ib" /></p>
+          <h3 class="ce-h3">The formulae sheet</h3>
+          <p class="small muted">The IB gives every student a copy of these formulae in the examination, with a discount table when an HL question needs one (guide, pp. 64 to 66).</p>
+          <div class="table-scroll" role="region" aria-label="The formulae sheet and its practice" tabindex="0">
+            <table class="table pp-cover__table">
+              <thead>
+                <tr>
+                  <th scope="col">Formula</th>
+                  <th scope="col">Level</th>
+                  <th scope="col">Guide</th>
+                  <th scope="col">Practised by</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  SHEET.map((f) => (
+                    <tr>
+                      <th scope="row">{f.name}</th>
+                      <td>{f.level}</td>
+                      <td>p. {f.page}</td>
+                      <td>
+                        {f.kinds.map((k, i) => (
+                          <>
+                            {i > 0 && ', '}
+                            <a href={`#${META[k]?.code}-24680`} data-code-link>
+                              {META[k]?.name}
+                            </a>
+                          </>
+                        ))}
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="strategy" /></p>
+          <h3 class="ce-h3">Every calculation in the syllabus</h3>
+          <p class="small muted">
+            Statements whose depth of teaching includes a calculation or a construction from figures (AO4), price elasticity of demand, and the toolkit's
+            tools with a calculation, paraphrased (guide, pp. 14 and 25 to 35). Formulas not on the formulae sheet are the standard forms the platform's
+            notes use: learn them.
+          </p>
+          <div class="table-scroll" role="region" aria-label="The syllabus calculations and their practice" tabindex="0">
+            <table class="table pp-cover__table">
+              <thead>
+                <tr>
+                  <th scope="col">Syllabus</th>
+                  <th scope="col">Statement</th>
+                  <th scope="col">Level</th>
+                  <th scope="col">Practised by</th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  STATEMENTS.map((st) => (
+                    <tr>
+                      <th scope="row">{st.code}</th>
+                      <td>{st.text}</td>
+                      <td>
+                        {st.level}
+                        {st.note && <span class="small muted"> ({st.note})</span>}
+                      </td>
+                      <td>
+                        {st.kinds.map((k, i) => (
+                          <>
+                            {i > 0 && ', '}
+                            <a href={`#${META[k]?.code}-24680`} data-code-link>
+                              {META[k]?.name}
+                            </a>
+                          </>
+                        ))}
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+          <p class="small muted">
+            {ELSEWHERE.map((e, i) => (
+              <>
+                {i > 0 && ' '}
+                {e.code} {e.text}: constructions with no calculation, practised in <a href={e.href}>{e.tool}</a>.
+              </>
+            ))}
+          </p>
+        </div>
+      </div>
+    </section>
+
     <section class="pp-sec" aria-labelledby="pp-how-h">
-      <SectionHead no="04" title="How answers are marked" id="pp-how-h" />
+      <SectionHead no="05" title="How answers are marked" id="pp-how-h" />
       <div class="pp-how">
         <div class="ce-card">
           <p class="ce-labels"><GuideLabel kind="strategy" /></p>
@@ -339,17 +481,35 @@ const LEVEL_NOTE: Record<GroupId, string> = {
           <p class="small muted"><a href="/assessment/paper-2/#p2-calc-h">Mastering quantitative questions</a>, on the Paper 2 page.</p>
         </div>
         <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="examiner" /> <GuideLabel kind="strategy" /></p>
+          <h3>Constructions and your own figures</h3>
+          <p>
+            In a grid, each cell is marked. A total or a carried figure that follows correctly from your own earlier cells is credited and said to
+            be so, as the Paper 2 guide describes examiners crediting a correct method on a wrong earlier figure when the working shows it. A grid earns
+            its marks in proportion to the cells credited, rounded down: the platform's rule for practice.
+          </p>
+        </div>
+        <div class="ce-card">
+          <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+          <h3>Find the slip, read the data</h3>
+          <p>
+            A slip question shows a worked answer with one line that goes wrong first: choose it, then compare the corrected working. A reading question
+            asks what a table or chart shows; read the scale and the units before you answer. Charts come with their figures in a table, so nothing
+            depends on seeing them.
+          </p>
+        </div>
+        <div class="ce-card">
           <p class="ce-labels"><GuideLabel kind="ib" /></p>
           <h3>Paper 2's time and marks</h3>
           <ul class="pp-paces">{paces.map((p) => <li><b>{p.label}</b> {p.minutes} minutes, {p.marks} marks</li>)}</ul>
           <p class="small muted">Guide, pp. 39 to 40. A timed set allows its marks at the paper's time per mark, a recommended pace rather than an IB rule.</p>
         </div>
         <div class="ce-card">
-          <p class="ce-labels"><GuideLabel kind="strategy" /></p>
+          <p class="ce-labels"><GuideLabel kind="ib" /> <GuideLabel kind="strategy" /></p>
           <h3>The formulas used</h3>
           <p>
-            Ratios, ARR and NPV use the formulas on the guide's formula sheet (pp. 64 to 65) and NPV its printed discount factors. Break-even, margin of
-            safety, payback and working capital use the standard methods the Finance Desk uses.
+            Ratios, ARR, NPV, capacity utilization and the productivity rate use the formulae sheet (guide, pp. 64 to 65) and NPV its printed discount
+            factors. Every other formula is the standard form the platform's notes and the Finance Desk use, and each question's working says which.
           </p>
           <p class="small muted"><a href="/finance-desk/">The Finance Desk</a> works each one with figures you choose.</p>
         </div>

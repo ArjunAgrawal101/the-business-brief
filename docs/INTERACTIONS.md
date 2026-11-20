@@ -162,7 +162,7 @@ Every practice question.
 
 ## 13. Retrieval cards
 
-Every topic and revision brief.
+Every topic and revision sheet. A rating here also schedules the same card in the flashcards (52).
 
 | | |
 | --- | --- |
@@ -467,3 +467,86 @@ Three Strategy Studio tools were added with the Lab, all enrichment, on the same
 | **49. Scenario planner** (`scenarios`) | States the focal question and horizon, lists driving forces with their impact, uncertainty and the two ends of their range, chooses two critical uncertainties as the axes, writes a name, narrative, implications and signposts for each of the four futures, and rates each option in each future | Each force's class (critical uncertainty, predetermined element, secondary uncertainty, background; high is 4 or more), the suggested axes, the two by two of futures with each option's rating as dots, and each option's verdict: robust (3 or more everywhere), contingent (does well somewhere and struggles somewhere) or fragile; checks on the axes, the stories and the signposts | A scenario is a forecast; the most likely future is the one to plan for; the option that does best in one future is the best option |
 | **50. Stakeholder salience** (`stakeholder-salience`) | Judges each stakeholder's power (and its kind: coercive, utilitarian or normative), the legitimacy of its claim and its urgency, with the evidence, what could change them and a plan | The three circles with each stakeholder in its region, its class among the seven of Mitchell, Agle and Wood (1997) and what the class asks of managers, the class it would move to by gaining or losing each attribute, and the stakeholders one attribute from definitive or dangerous | Power is legitimacy; a group without power can be ignored; a stakeholder's class is fixed |
 | **51. Strategic fit check** (`strategic-fit`) | States the strategy, weights the factors in the environment and rates how the strategy answers each, rates the capabilities it needs now and as needed with a route to close each gap, and describes and rates the six other 7S elements, with the conflicts between them | External fit (importance-weighted, from −100% to +100%), capability readiness, the 7S average support, each in a band; the verdict from the weakest of the three; the gaps in order of weight; the element at the centre of the most conflicts, drawn on the 7S diagram | A strategy that suits the market will work; a reorganization of the hard elements is enough; fit is an average |
+
+## 52 to 60. The internal assessment tools
+
+Nine tools at `/assessment/internal-assessment/<tool>/`, listed in `IA_TOOL_PAGES` (`src/lib/ia-tools.ts`) in the order a project uses them, each with the tool first, then the guide's rules with their pages, an illustrative weaker and stronger example, and the integrity reminders. Every check carries its standing (IB requirement, IB teacher support material, examiner emphasis as the IA research guide reports it, or recommended strategy) and its source. None writes any part of a project, awards a mark or approves a question.
+
+| Tool | The learner does | Feedback | Misconception diagnosed |
+| --- | --- | --- | --- |
+| **52. Research question** (`research-question`, `bb:ia:rq`) | Names the organization, the issue, the decision (or the decision taken and its aim) and the lens, and refines the drafted question | The question's form checked against the guide as it is typed (one organization named, a question, one concept, stated on the title page), the platform's warnings (length, two questions, a whole industry), the six tests to tick | Any interesting topic is a research question; the concept must be in the question |
+| **53. Key concept guide** (`key-concept`, `bb:ia-concept`) | Describes the issue, ticks what it is about, chooses a lens | The concepts the issue points to, the lens's questions for each section, the question's form | The concept is a label added at the end |
+| **54. Research methodology** (`methodology`, `bb:ia-method`) | Plans primary research (who and how many) and secondary sources, notes a classmate on the same organization or a business management extended essay, and notes how the introduction will explain the method | What to attach for each primary method (p. 54), transcripts and textbooks (pp. 54 to 55), a single company's material, the TSM's advice on the question's form, own research when classmates share the organization, a different organization and research approach for the essay, a method kept brief | A textbook can be a supporting document; methodology needs a long section; the essay can reuse the project's organization |
+| **55. Supporting documents** (`documents`, `bb:ia-documents`) | Lists candidate documents with origin, voice, date, purpose, reliability and relevance, and selects three to five | The set against the guide's rules, to the month, and each document questioned | Any article will do whatever its age; more documents are better |
+| **56. Tool selection** (`tool-selection`, `bb:ia-tools`) | Says what the question asks and what data the documents hold | Tools that fit and can work on that data, HL tools marked | Many tools score more than a few applied in depth |
+| **57. Evidence analysis** (`evidence`, `bb:ia-evidence`) | Logs each piece of evidence: its document, the finding, the tool and what it showed, the document it is weighed against, an assumption and what it means for the question | Each read as quoted, used or integrated (IA research guide, p. 4), the counts against criterion D's top level (guide, p. 58), the documents no evidence comes from, a CSV of the log | Quoting statistics is analysis |
+| **58. Word count planner** (`word-count`, `bb:ia-words`) | Shares the 1,800 words between sections, then records the words written that count, and ticks what the count leaves out | Planned and written totals against the limit, sections over their plan, a long introduction, a thin main body, the nine exclusions (p. 56) | Headings, definitions or quotations do not count; the plan can be over the limit if the writing is not |
+| **59. Research timeline** (`timeline`, `bb:ia-timeline`) | Enters the start date, the internal deadline and the session | Milestones counted back in the TSM's order, exported as .ics and CSV | The draft can go to the teacher at the last minute |
+| **60. Progress tracker** (`progress`, `bb:ia-progress`) | Marks each stage, records the words that count and ticks the guide's final checks | What is done, next and overdue against the timeline, and the checks in place | Finishing the writing is finishing the project |
+
+The checker on the internal assessment page (`DocAnalyser`, `bb:ia:sd`) applies the same rules as the documents tool and the IA Studio planner through `src/lib/ia.ts`, to the month.
+
+## 61 to 62. The revision planner and study mode
+
+The revision planner at `/revision/planner/` (rules in `src/lib/planner.ts`, the page's script in `src/scripts/planner.ts`, kept under `bb:planner`) and study mode on every subtopic page (`src/components/learn/StudyMode.astro`, `src/scripts/study-mode.ts`, settings under `bb:study`, subtopics marked complete under `bb:studied`). Both are the platform's recommended strategy, not IB requirements, and the planner says on its page what it assumes.
+
+| Tool | The learner does | Feedback | Misconception diagnosed |
+| --- | --- | --- | --- |
+| **61. Revision planner** | Enters the date of the first paper, the start, SL or HL, the hours a week and the study days, chooses the subtopics and puts the hardest first (the weak areas their own results show are offered), then marks each session done and makes the plan again as the weeks go by | A plan for each week, day by day: each subtopic learnt or reviewed and then retrieved a gap later (a third time where there is room), weakest first, with case practice, Paper 2 calculations and, at HL, Paper 3 in turn, timed practice in the final fortnight and free days before the examination; the subtopics that do not fit, named; progress in sessions, minutes and subtopics met twice; a calendar file and a printed plan | Rereading each topic once is revising; the plan has to be followed to the day; everything can be left to the last week |
+| **62. Study mode** | Chooses the text size, low light, marks the subtopic complete, saves it, follows the On this page list and prints the page | The article in the chosen size and light, kept on this device; the section in view marked in the list and the reading progress shown; the subtopic counted as completed on the dashboard | Reading a page to the end is the same as knowing it: completion is the reader's own judgement, and the dashboard keeps it apart from the results |
+
+## 63. Flashcards with spaced repetition
+
+`/revision/flashcards/`. The deck is built from the content at build time (`src/lib/revision/deck.ts`, written to `/revision/flashcards/deck.json`); the rules are in `src/lib/flashcards.ts` and the page's script in `src/scripts/flashcards.ts`.
+
+| | |
+| --- | --- |
+| **The learner does** | Chooses cards by unit, subtopic, kind (terms, formulae, frameworks, key distinctions, application scenarios, evaluation prompts, recall questions) and level, or arrives on one subtopic from its revision sheet (`?topic=3.5`); starts a session of the cards due today, of up to twenty new cards, or of every card chosen, in course order or shuffled; answers each card from memory, turns it (the button, Space or Enter) and rates it 1 Again, 2 Hard, 3 Good or 4 Easy |
+| **Must understand** | The term, formula, framework, distinction or argument on the card well enough to produce it unprompted, which is what an examination asks |
+| **Decides or infers** | The answer, before turning the card; then, honestly, how well it came back |
+| **Feedback** | The answer, with where it comes from; on each rating button, the day the card will next be due; for the selection, the cards due today, new and waiting, and how many sit in each box; at the end, the ratings, the cards still due today and when the next cards fall due, with the cards missed offered again |
+| **Misconception diagnosed** | That rereading is revising (each card asks for recall first); that a card known once is known for good (it comes back after a gap that grows only while it is recalled) |
+| **Objective** | Revise the whole course by retrieval, spending the time on the cards not yet known |
+
+Scheduling is a Leitner system of five boxes, due again after 1, 2, 4, 8 and 16 days: Again sends a card to box 1 and round once more in the session, Hard keeps it in its box, Good moves it up one and Easy two. Due days are the reader's local calendar days. Progress is one item, `bb:cards`, in the shape the dashboard reads: `{ "v": 1, "cards": { "<id>": { box, due, seen, last, rating, codes, title } } }`. The number keys act only while focus is inside the session, so a single key never acts elsewhere on the page (WCAG 2.1.4). Without JavaScript the page lists every revision sheet.
+
+The recall cards on the subtopic pages and the revision sheets (`src/components/assess/RetrievalCards.astro`) are the deck's recall cards, with the same ids (`recallIds()`): their three ratings also schedule the card, Not yet as Again, Partly as Hard and Got it as Good, and changing a rating on the page replaces the earlier one rather than counting twice.
+
+## 64. Business scenario generator
+
+`/decision-room/scenarios/`. Twenty-five families of scenario across the five units (`src/lib/scenario-generator/families/`), each a template that a seed fills with a fictional business: its name, place, currency, size, industry, figures and the order of the choices. A scenario's code, `<family>-<seed>`, is its address (`?s=`), so the same code always gives the same scenario and can be shared. Every scenario is labelled Fictional, and its exhibits Simulated data. The families are filtered by unit, subtopic and toolkit tool, kept in the address. Without JavaScript the page is one complete scenario with every answer explained.
+
+| | |
+| --- | --- |
+| **The learner does** | Works the scenario in six steps: names the real problem, chooses the relevant exhibits from an evidence pack that includes distractors, picks the toolkit tool that fits from four, carries out the analysis (a calculation that is checked, a sort, or both), chooses a recommendation and justifies it in their own words, and evaluates it: who is affected, the main risk and what would change the decision |
+| **Must understand** | A decision runs from the problem through the evidence and a fitting tool to a justified recommendation with its conditions; the question decides the tool, not the unit the case sits in |
+| **Decides or infers** | Which symptom points to the cause; which exhibits bear on the decision and which only look as if they do; which tool answers this question; what the worked figures mean; which option the evidence supports, at what cost and to whom |
+| **Feedback** | At every step, in words: each choice marked Best fit, Partly fits or Does not fit with the reason, including why each other tool does not fit; each exhibit marked relevant and chosen, relevant and missed, a distractor chosen, or a distractor rightly left out; the calculation marked right, a named slip (such as a ratio divided the wrong way up, or one outcome used without its probability) or wrong, with the working line by line; a justification under eight words returned with what it should name; at the end, the model answer outline and a summary of every step's verdict, kept in `bb:scenarios` |
+| **Misconception diagnosed** | Every exhibit in a case is evidence; the tool follows from the topic rather than the question; a figure is the answer rather than the start of a judgement; a recommendation needs no condition and no view of the stakeholders |
+| **Objective** | Practise the whole route of a business decision, from the problem to the evaluation, on businesses never seen before and as often as wanted, with the reason for every verdict |
+
+## 65. Stakeholder impact simulator
+
+`/decision-room/stakeholder-impact/`. Eight decisions at fictional businesses (`src/lib/stakeholder-impact/decisions.ts`), from automating a production line to accepting a takeover offer, read through six rules written in `src/lib/stakeholder-impact/model.ts` and printed on the page. The effects are the model's judgements about a fictional business, never measurements. Without JavaScript the page is the first decision as a worked example, with its rules.
+
+| | |
+| --- | --- |
+| **The learner does** | Chooses a decision, then its scale (small, moderate, large), speed (phased, standard, fast), compensation and mitigation (none, standard, generous) and communication (minimal, timely, early and open), and writes an evaluation against the decision's prompts |
+| **Must understand** | One decision affects employees, customers, owners, suppliers, government, the local community and wider society differently, in size and over time; how a decision is carried out changes who bears its cost |
+| **Decides or infers** | Which setting moves harm from one group to another (more mitigation helps employees and costs the owners; a faster closure gains the owners sooner and hurts the community more); which conflicts between groups are live; which groups to manage closely on the power and interest grid |
+| **Feedback** | For each of the seven groups: the direction (gains, loses, or one then the other), the size, the timescale (mainly the first year, mainly after, or both) and the reason, rewritten for the settings; the main gainers and losers, the trade-offs the settings create and the conflicts that are live; the grid with each group in its quadrant (the Strategy Studio's stakeholder map) and the same as a list; the evaluation prompts. The choice is kept in the address and the evaluation in `bb:stakeholder-impact` |
+| **Misconception diagnosed** | A decision is good or bad for "the stakeholders" as one group; compensation is free; the speed of a change only affects the owners; a group with little power can be left out of the evaluation |
+| **Objective** | Evaluate a decision's consequences for each stakeholder group, and how scale, speed, mitigation and communication change them |
+
+## 66. Framework comparison
+
+`/frameworks/compare/`. Any two frameworks in the library side by side under nine headings (their standing in the IB course, purpose, structure, the context each suits, strengths, limitations, common mistakes, a fictional business application and their use in an examination answer, labelled Recommended strategy), from each framework's own data (`/frameworks/compare/data/<id>.json`, written by the build). The pair is chosen from two lists or by searching, and kept in the address (`?a=&b=`); the tool points to a curated comparison when one exists and to the PESTLE against STEEPLE page for that pair. Sixteen curated comparisons (the `comparisons` collection) each have a page at `/frameworks/compare/<a>-vs-<b>/` with the essential difference, which to use when, and how they work together; a side's standing comes from the curriculum file and the toolkit. Side by side on a wide screen, stacked on a phone with each cell naming its side.
+
+| | |
+| --- | --- |
+| **The learner does** | Chooses or searches for two frameworks, swaps them, and reads them against each other; on a curated page, reads which to use in which situation |
+| **Must understand** | Frameworks that look alike answer different questions, and the situation decides which to use |
+| **Decides or infers** | Which framework suits the situation in front of them, and what each leaves out |
+| **Feedback** | The two sides under the same headings, with each framework's own Look elsewhere when section and links to both pages and their subtopics; a notice when a curated comparison exists; the same framework chosen twice is refused with a message |
+| **Misconception diagnosed** | Ansoff and BCG answer the same question; SWOT and STEEPLE are interchangeable; payback, ARR and NPV are three ways to the same answer; quality control and quality assurance are the same thing |
+| **Objective** | Choose the right framework for a question, and justify the choice against the alternative |

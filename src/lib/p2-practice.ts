@@ -11,229 +11,76 @@
  * the checker can say not only that an answer is wrong but why it is likely
  * to be wrong. The businesses are fictional and their figures simulated.
  * Mark allocations are the platform's, for practice; they are not IB marks.
+ *
+ * The kinds defined here are the first set. src/lib/p2-calcs.ts adds the rest
+ * of the formulae sheet and the syllabus's other calculations, and
+ * src/lib/p2-tasks.ts the tasks that are not one figure: finding the slip in a
+ * worked answer, reading data, and constructions completed in a grid. This
+ * module joins them into one registry (META), so a code, a timed set and the
+ * record (bb:p2-practice) work the same for every kind.
  */
-import { breakEvenExact, breakEvenUnits, buildWorking, contributionPerUnit, profit, targetPriceExact, targetProfitOutput, type Labels, type Working } from './finance';
-import { RATIOS, TOLERANCE, derive, fmtRatio, ratioInputs, slips as ratioSlips, statementSlips, valueFromInputs, type RatioId, type Statement } from './ratios';
-import { RATES, arr, discountFactor, fmtPayback, npv, payback, presentValues, projectInputs, totalReturns, type Project, type Rate } from './investment';
+import { breakEvenExact, breakEvenUnits, buildWorking, contributionPerUnit, profit, targetPriceExact, targetProfitOutput, type Working } from './finance';
+import { RATIOS, TOLERANCE, derive, fmtRatio, ratioInputs, slips as ratioSlips, statementSlips, valueFromInputs, type RatioId } from './ratios';
+import { arr, discountFactor, fmtPayback, npv, payback, presentValues, projectInputs, totalReturns } from './investment';
 import { bracket } from './cashflow';
 import { fmtMoney, fmtNumber, fmtPercent, round, roundUp } from './format';
 import { rng, type Rng } from './random';
+import { MORE_KINDS } from './p2-calcs';
+import { TASK_LIST, checkChoice, checkGrid, type ChoiceFeedback, type ChoiceQuestion, type GridFeedback, type GridQuestion, type TaskDef, type TaskQuestion, type TaskType } from './p2-tasks';
+import {
+  LABELS,
+  MAKERS,
+  MONTHS,
+  accountsIntro,
+  both,
+  costIntro,
+  costScenario,
+  costTable,
+  currentTable,
+  drawAccounts,
+  drawProject,
+  k,
+  n0,
+  n2,
+  near,
+  plTable,
+  plural,
+  positionTable,
+  projectIntro,
+  projectTable,
+  tidySlips,
+  usd,
+  usd2,
+  parseAnswer,
+  type Accounts,
+  type GroupId,
+  type KindDef,
+  type KindId,
+  type PracticeQuestion,
+  type Slip,
+  type Table,
+  type Verdict,
+} from './p2-base';
 
-/* ------------------------------------------------------------------ */
-/* Kinds and groups                                                    */
-/* ------------------------------------------------------------------ */
-
-export const GROUPS = {
-  'break-even': { label: 'Break-even and contribution', syllabus: '5.5', level: 'SL/HL' },
-  profitability: { label: 'Profitability ratios', syllabus: '3.5', level: 'SL/HL' },
-  liquidity: { label: 'Liquidity ratios', syllabus: '3.5', level: 'SL/HL' },
-  efficiency: { label: 'Efficiency ratios and gearing', syllabus: '3.6', level: 'HL' },
-  investment: { label: 'Investment appraisal', syllabus: '3.8', level: 'SL/HL' },
-  'cash-flow': { label: 'Cash flow and working capital', syllabus: '3.7', level: 'SL/HL' },
-} as const;
-export type GroupId = keyof typeof GROUPS;
-export const GROUP_IDS = Object.keys(GROUPS) as GroupId[];
-
-export type Level = 'SL/HL' | 'HL';
-export type AnswerUnit = 'money' | 'money000' | 'units' | 'percent' | 'ratio' | 'times' | 'days' | 'years';
-
-export interface Table {
-  caption: string;
-  /** Column headings after the row labels; empty for a two-column list of figures. */
-  columns: string[];
-  rows: Array<{ label: string; cells: string[]; total?: boolean; heading?: boolean }>;
-}
-
-export interface Slip {
-  value: number;
-  message: string;
-  /** A near miss, such as the unrounded figure, rather than an error of method. */
-  close?: boolean;
-}
-
-export interface PracticeQuestion {
-  code: string;
-  kind: KindId;
-  seed: number;
-  group: GroupId;
-  level: Level;
-  name: string;
-  marks: number;
-  business: string;
-  intro: string;
-  tables: Table[];
-  prompt: string;
-  unit: AnswerUnit;
-  /** Shown beside the answer box: "$", "units", "%", "days". */
-  suffix: string;
-  prefix: string;
-  /** An example of the form the answer can take, for the hint. */
-  example: string;
-  exact: number;
-  answer: string;
-  tolerance: number;
-  toleranceText: string;
-  working: Working;
-  meaning: string;
-  slips: Slip[];
-}
-
-type Made = Omit<PracticeQuestion, 'code' | 'kind' | 'seed' | 'group' | 'level' | 'name' | 'marks'>;
-
-interface KindDef {
-  code: string;
-  name: string;
-  group: GroupId;
-  level: Level;
-  marks: number;
-  make: (r: Rng) => Made;
-}
-
-/* ------------------------------------------------------------------ */
-/* Fictional businesses                                                */
-/* ------------------------------------------------------------------ */
-
-interface Maker {
-  name: string;
-  unit: string;
-  units: string;
-  /** Price band: lowest, highest and the step prices move in. */
-  price: [number, number, number];
-  /** Typical break-even output a year. */
-  beq: [number, number];
-}
-
-/** Invented businesses: none is a real organization, and every figure is simulated. */
-export const MAKERS: Maker[] = [
-  { name: 'Tarnside Bicycles', unit: 'bicycle', units: 'bicycles', price: [280, 620, 10], beq: [300, 1500] },
-  { name: 'Wrenfield Candles', unit: 'candle', units: 'candles', price: [14, 36, 1], beq: [2000, 12000] },
-  { name: 'Mossgate Ceramics', unit: 'bowl', units: 'bowls', price: [18, 60, 2], beq: [1500, 9000] },
-  { name: 'Hollin and Reed', unit: 'chair', units: 'chairs', price: [120, 340, 10], beq: [400, 2400] },
-  { name: 'Saltreach Kayaks', unit: 'kayak', units: 'kayaks', price: [380, 900, 20], beq: [200, 1200] },
-  { name: 'Copperbeck Coffee', unit: 'bag of coffee', units: 'bags of coffee', price: [8, 18, 0.5], beq: [6000, 30000] },
-  { name: 'Larchwood Prints', unit: 'print', units: 'prints', price: [25, 90, 5], beq: [800, 5000] },
-  { name: 'Fernhollow Soap', unit: 'bar of soap', units: 'bars of soap', price: [4, 9, 0.25], beq: [10000, 60000] },
-  { name: 'Northgill Tents', unit: 'tent', units: 'tents', price: [90, 260, 10], beq: [600, 3000] },
-  { name: 'Ashcombe Bakehouse', unit: 'celebration cake', units: 'celebration cakes', price: [16, 40, 1], beq: [1500, 8000] },
-  { name: 'Tidemark Surfboards', unit: 'surfboard', units: 'surfboards', price: [300, 700, 20], beq: [200, 1100] },
-  { name: 'Kittiwake Knitwear', unit: 'jumper', units: 'jumpers', price: [45, 120, 5], beq: [900, 5000] },
-];
-
-export const COMPANIES = [
-  'Brackwater Foods',
-  'Elmstead Logistics',
-  'Pellow Engineering',
-  'Quillon Hotels',
-  'Rookhaven Retail',
-  'Stourmere Pharmacy',
-  'Thornby Motors',
-  'Vellacott Textiles',
-  'Wexcombe Printing',
-  'Yarrow Health Foods',
-];
-
-const PROJECTS: Array<{ a: string; the: string }> = [
-  { a: 'a new delivery van', the: 'the new delivery van' },
-  { a: 'a second production line', the: 'the second production line' },
-  { a: 'solar panels for its workshop', the: 'the solar panels' },
-  { a: 'an online shop', the: 'the online shop' },
-  { a: 'a new packing machine', the: 'the packing machine' },
-  { a: 'a showroom extension', the: 'the showroom extension' },
-  { a: 'an automated stock system', the: 'the automated stock system' },
-  { a: 'a second workshop', the: 'the second workshop' },
-];
-
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
-/* ------------------------------------------------------------------ */
-/* Formatting                                                          */
-/* ------------------------------------------------------------------ */
-
-const LABELS = (m: Maker): Labels => ({ unit: m.unit, units: m.units, period: 'year' });
-/** Money in dollars: whole dollars when exact, otherwise cents. */
-export const usd = (v: number) => fmtMoney(v, '$', Number.isInteger(round(v, 2)) ? 0 : 2);
-const usd2 = (v: number) => fmtMoney(v, '$', 2);
-const n0 = (v: number) => fmtNumber(v, 0);
-const n2 = (v: number) => fmtNumber(v, 2);
-const plural = (n: number, one: string, many: string) => (Math.abs(n) === 1 ? one : many);
-/** A figure in a statement, in $000, with brackets for a negative as the guide prints them. */
-const k = (v: number) => bracket(v, 0);
-const near = (a: number, b: number, tol: number) => Math.abs(a - b) <= tol + 1e-9;
-
-/** Keeps only slips that are finite and distinct from the right answer and from each other. */
-function tidySlips(list: Slip[], exact: number, tolerance: number): Slip[] {
-  const out: Slip[] = [];
-  for (const s of list) {
-    if (!Number.isFinite(s.value)) continue;
-    if (near(s.value, exact, Math.max(tolerance, 1e-6))) continue;
-    if (out.some((o) => near(o.value, s.value, 1e-6))) continue;
-    out.push(s);
-  }
-  return out;
-}
-
-/* ------------------------------------------------------------------ */
-/* Break-even and contribution (5.5)                                   */
-/* ------------------------------------------------------------------ */
-
-interface CostScenario {
-  m: Maker;
-  P: number;
-  V: number;
-  c: number;
-  F: number;
-  Q: number;
-}
-
-/** A price, a variable cost, fixed costs and a forecast that make sense together. */
-function costScenario(r: Rng, opts: { wholeBreakEven?: boolean; fractional?: boolean } = {}): CostScenario {
-  for (let tries = 0; tries < 200; tries++) {
-    const m = r.pick(MAKERS);
-    const [lo, hi, st] = m.price;
-    const P = r.step(lo, hi, st);
-    const share = r.step(0.35, 0.7, 0.05);
-    const vStep = P < 20 ? 0.05 : 1;
-    const V = round(Math.round((P * share) / vStep) * vStep, 2);
-    const c = round(P - V, 2);
-    if (!(c > 0) || V <= 0) continue;
-    const target = r.int(m.beq[0], m.beq[1]);
-    let F: number;
-    if (opts.wholeBreakEven) {
-      const beq = Math.round(target / 10) * 10;
-      F = round(beq * c, 2);
-      if (!Number.isInteger(F)) continue;
-    } else {
-      const unit = target * c > 200000 ? 1000 : 100;
-      F = Math.max(unit, Math.round((target * c) / unit) * unit);
-    }
-    const exact = F / c;
-    if (opts.fractional && Math.abs(exact - Math.round(exact)) < 0.01) continue;
-    const beq = Math.ceil(round(exact, 9));
-    const Q = Math.round((beq * r.step(1.12, 1.6, 0.02)) / 10) * 10;
-    if (Q <= beq) continue;
-    return { m, P, V, c, F, Q };
-  }
-  throw new Error('Could not draw a cost scenario');
-}
-
-const costIntro = (s: CostScenario, withForecast = true) =>
-  `${s.m.name} makes and sells ${s.m.units}. Each ${s.m.unit} sells for ${usd(s.P)} and costs ${usd(s.V)} in variable costs to make. Fixed costs are ${usd(s.F)} a year.${withForecast ? ` The business forecasts sales of ${n0(s.Q)} ${s.m.units} next year.` : ''}`;
-
-function costTable(s: CostScenario, rows: Array<'P' | 'V' | 'F' | 'Q'>): Table {
-  const all = {
-    P: { label: `Selling price per ${s.m.unit}`, cells: [usd(s.P)] },
-    V: { label: `Variable cost per ${s.m.unit}`, cells: [usd(s.V)] },
-    F: { label: 'Fixed costs per year', cells: [usd(s.F)] },
-    Q: { label: 'Forecast sales next year', cells: [`${n0(s.Q)} ${s.m.units}`] },
-  };
-  return { caption: `${s.m.name}: costs and price (fictional, simulated figures)`, columns: [], rows: rows.map((x) => all[x]) };
-}
-
-/** A wrong answer in its exact form and rounded up, both pointing to the same error. */
-const both = (value: number, message: string): Slip[] => [
-  { value, message },
-  { value: Math.ceil(round(value, 9)), message },
-];
+export {
+  COMPANIES,
+  GROUPS,
+  GROUP_IDS,
+  MAKERS,
+  drawAccounts,
+  drawProject,
+  parseAnswer,
+  usd,
+  type AnswerUnit,
+  type Figure,
+  type GroupId,
+  type KindId,
+  type Level,
+  type PracticeQuestion,
+  type Slip,
+  type Table,
+  type Verdict,
+} from './p2-base';
 
 const KIND_LIST: Array<[string, KindDef]> = [
   [
@@ -600,128 +447,6 @@ const KIND_LIST: Array<[string, KindDef]> = [
   ],
 ];
 
-/* ------------------------------------------------------------------ */
-/* Ratios (3.5, 3.6): a statement that balances                        */
-/* ------------------------------------------------------------------ */
-
-interface Accounts {
-  name: string;
-  s: Statement;
-  opening: number;
-}
-
-/** A year's statements in $000 that balance, with ratios in a believable range. */
-export function drawAccounts(r: Rng): Accounts {
-  for (let tries = 0; tries < 400; tries++) {
-    const name = r.pick(COMPANIES);
-    const salesRevenue = r.step(400, 9000, 10);
-    const costOfSales = Math.round(salesRevenue * r.step(0.38, 0.7, 0.01));
-    const gross = salesRevenue - costOfSales;
-    const expenses = Math.round(gross * r.step(0.45, 0.85, 0.01));
-    const pbit = gross - expenses;
-    if (pbit < salesRevenue * 0.03) continue;
-    const interest = Math.max(1, Math.round(pbit * r.step(0.04, 0.18, 0.01)));
-    const pbt = pbit - interest;
-    const tax = Math.round(pbt * r.step(0.18, 0.26, 0.01));
-    const pfp = pbt - tax;
-    const dividends = Math.round(pfp * r.step(0.2, 0.6, 0.05));
-    const propertyPlantEquipment = Math.round(salesRevenue * r.step(0.45, 1.2, 0.05));
-    const accumulatedDepreciation = Math.round(propertyPlantEquipment * r.step(0.15, 0.4, 0.05));
-    const cash = Math.round(salesRevenue * r.step(0.01, 0.08, 0.005));
-    const debtors = Math.round(salesRevenue * r.step(0.04, 0.16, 0.005));
-    const stock = Math.round(costOfSales * r.step(0.06, 0.22, 0.005));
-    const bankOverdraft = r.chance(0.4) ? Math.round(salesRevenue * r.step(0.005, 0.04, 0.005)) : 0;
-    const tradeCreditors = Math.round(costOfSales * r.step(0.05, 0.16, 0.005));
-    const otherShortTermLoans = r.chance(0.35) ? Math.round(salesRevenue * r.step(0.005, 0.03, 0.005)) : 0;
-    const longTermBorrowings = Math.round(salesRevenue * r.step(0.08, 0.55, 0.01));
-    const shareCapital = Math.round(salesRevenue * r.step(0.08, 0.35, 0.01));
-    const nonCurrentAssets = propertyPlantEquipment - accumulatedDepreciation;
-    const netAssets = nonCurrentAssets + cash + debtors + stock - bankOverdraft - tradeCreditors - otherShortTermLoans - longTermBorrowings;
-    const retainedEarnings = netAssets - shareCapital;
-    if (retainedEarnings < salesRevenue * 0.03) continue;
-    const s: Statement = {
-      salesRevenue,
-      costOfSales,
-      expenses,
-      interest,
-      tax,
-      dividends,
-      propertyPlantEquipment,
-      accumulatedDepreciation,
-      cash,
-      debtors,
-      stock,
-      bankOverdraft,
-      tradeCreditors,
-      otherShortTermLoans,
-      longTermBorrowings,
-      shareCapital,
-      retainedEarnings,
-    };
-    const d = derive(s);
-    const cr = d.currentAssets / d.currentLiabilities;
-    if (cr < 0.55 || cr > 3.2) continue;
-    if (d.capitalEmployed <= 0) continue;
-    const opening = Math.round(stock * r.step(0.75, 1.3, 0.01));
-    if (opening <= 0 || stock <= 0) continue;
-    return { name, s, opening };
-  }
-  throw new Error('Could not draw a set of accounts');
-}
-
-function plTable(a: Accounts): Table {
-  const d = derive(a.s);
-  return {
-    caption: `${a.name}: statement of profit or loss for the year ended 31 December 2026 ($000)`,
-    columns: [],
-    rows: [
-      { label: 'Sales revenue', cells: [k(a.s.salesRevenue)] },
-      { label: 'Cost of sales', cells: [k(-a.s.costOfSales)] },
-      { label: 'Gross profit', cells: [k(d.grossProfit)], total: true },
-      { label: 'Expenses', cells: [k(-a.s.expenses)] },
-      { label: 'Profit before interest and tax', cells: [k(d.pbit)], total: true },
-      { label: 'Interest', cells: [k(-a.s.interest)] },
-      { label: 'Profit before tax', cells: [k(d.profitBeforeTax)], total: true },
-      { label: 'Tax', cells: [k(-a.s.tax)] },
-      { label: 'Profit for the period', cells: [k(d.profitForPeriod)], total: true },
-    ],
-  };
-}
-
-function currentTable(a: Accounts): Table {
-  const d = derive(a.s);
-  const rows: Table['rows'] = [
-    { label: 'Cash', cells: [k(a.s.cash)] },
-    { label: 'Debtors', cells: [k(a.s.debtors)] },
-    { label: 'Stock', cells: [k(a.s.stock)] },
-    { label: 'Current assets', cells: [k(d.currentAssets)], total: true },
-    ...(a.s.bankOverdraft ? [{ label: 'Bank overdraft', cells: [k(a.s.bankOverdraft)] }] : []),
-    { label: 'Trade creditors', cells: [k(a.s.tradeCreditors)] },
-    ...(a.s.otherShortTermLoans ? [{ label: 'Other short-term loans', cells: [k(a.s.otherShortTermLoans)] }] : []),
-    { label: 'Current liabilities', cells: [k(d.currentLiabilities)], total: true },
-  ];
-  return { caption: `${a.name}: extract from the statement of financial position at 31 December 2026 ($000)`, columns: [], rows };
-}
-
-function positionTable(a: Accounts): Table {
-  const d = derive(a.s);
-  return {
-    caption: `${a.name}: statement of financial position at 31 December 2026, summarized ($000)`,
-    columns: [],
-    rows: [
-      { label: 'Non-current assets', cells: [k(d.nonCurrentAssets)] },
-      { label: 'Current assets', cells: [k(d.currentAssets)] },
-      { label: 'Total assets', cells: [k(d.totalAssets)], total: true },
-      { label: 'Current liabilities', cells: [k(d.currentLiabilities)] },
-      { label: 'Non-current liabilities: long-term borrowings', cells: [k(d.nonCurrentLiabilities)] },
-      { label: 'Net assets', cells: [k(d.netAssets)], total: true },
-      { label: 'Share capital', cells: [k(a.s.shareCapital)] },
-      { label: 'Retained earnings', cells: [k(a.s.retainedEarnings)] },
-      { label: 'Total equity', cells: [k(d.totalEquity)], total: true },
-    ],
-  };
-}
-
 const RATIO_TEXT: Record<RatioId, (v: string, a: Accounts) => string> = {
   'gross-profit-margin': (v) => `${v} of every dollar of sales is left after the cost of sales.`,
   'profit-margin': (v) => `${v} of every dollar of sales is left as profit before interest and tax.`,
@@ -789,7 +514,6 @@ function ratioKind(id: RatioId, code: string, tables: (a: Accounts) => Table[], 
   ];
 }
 
-const accountsIntro = (a: Accounts) => `${a.name} is a private limited company. The figures below are from its accounts for 2026, in thousands of dollars.`;
 
 KIND_LIST.push(
   ratioKind('gross-profit-margin', 'GPM', (a) => [plTable(a)], accountsIntro),
@@ -867,49 +591,6 @@ KIND_LIST.push(
   ),
   ratioKind('gearing-ratio', 'GEA', (a) => [positionTable(a)], accountsIntro),
 );
-
-/* ------------------------------------------------------------------ */
-/* Investment appraisal (3.8)                                          */
-/* ------------------------------------------------------------------ */
-
-interface Proposal {
-  m: Maker;
-  /** The project with "a" and with "the". */
-  what: { a: string; the: string };
-  p: Project;
-  rate: Rate;
-}
-
-/** A project whose cost is recovered within its life and whose returns vary from year to year. */
-export function drawProject(r: Rng): Proposal {
-  for (let tries = 0; tries < 300; tries++) {
-    const m = r.pick(MAKERS);
-    const what = r.pick(PROJECTS);
-    const cost = r.step(40000, 600000, 5000);
-    const years = r.int(3, 6);
-    const base = (cost * r.step(1.15, 1.7, 0.05)) / years;
-    const unit = cost >= 200000 ? 1000 : 500;
-    const returns = Array.from({ length: years }, () => Math.round((base * r.step(0.7, 1.35, 0.05)) / unit) * unit);
-    if (returns.some((x) => x <= 0)) continue;
-    const p: Project = { id: 'project', label: what.the, capitalCost: cost, returns };
-    const pb = payback(p);
-    if (!pb || pb.inYear >= years || pb.total < 1) continue;
-    if (totalReturns(p) < cost * 1.12) continue;
-    const rate = r.pick([6, 8, 8, 10, 10, 4, 20].filter((x): x is Rate => (RATES as readonly number[]).includes(x)));
-    return { m, what, p, rate };
-  }
-  throw new Error('Could not draw a project');
-}
-
-function projectTable(pr: Proposal, withFactors: boolean): Table {
-  const years = pr.p.returns.map((_, i) => `Year ${i + 1}`);
-  const rows: Table['rows'] = [{ label: 'Net cash flow ($)', cells: pr.p.returns.map((x) => n0(x)) }];
-  if (withFactors) rows.push({ label: `Discount factor at ${pr.rate}%`, cells: pr.p.returns.map((_, i) => discountFactor(pr.rate, i + 1).toFixed(4)) });
-  return { caption: `${pr.m.name}: forecast net cash flows from ${pr.what.the} (fictional, simulated figures)`, columns: ['', ...years], rows };
-}
-
-const projectIntro = (pr: Proposal) =>
-  `${pr.m.name} is considering ${pr.what.a}, at a capital cost of ${usd(pr.p.capitalCost)} paid now. It expects these net cash flows over the ${pr.p.returns.length} years of its life.`;
 
 KIND_LIST.push(
   [
@@ -1214,9 +895,76 @@ KIND_LIST.push(
   ],
 );
 
-export type KindId = string;
+KIND_LIST.push(...MORE_KINDS);
+
+/** Every kind with a single figure for an answer: calculations, and readings of a chart or table. */
 export const KINDS: Record<KindId, KindDef> = Object.fromEntries(KIND_LIST);
 export const KIND_IDS: KindId[] = KIND_LIST.map(([id]) => id);
+
+/** The tasks that are not one figure: find the slip, choose from the data, construct in a grid. */
+export const TASKS: Record<KindId, TaskDef> = Object.fromEntries(TASK_LIST);
+export const TASK_IDS: KindId[] = TASK_LIST.map(([id]) => id);
+
+export type { TaskType } from './p2-tasks';
+
+/** What the page, a timed set and the record need to know about any kind. */
+export interface KindMeta {
+  code: string;
+  name: string;
+  group: GroupId;
+  level: 'SL/HL' | 'HL';
+  marks: number;
+  task: TaskType;
+}
+
+export const META: Record<KindId, KindMeta> = Object.fromEntries([
+  ...KIND_LIST.map(([id, d]) => [id, { code: d.code, name: d.name, group: d.group, level: d.level, marks: d.marks, task: d.task ?? 'calc' }] as const),
+  ...TASK_LIST.map(([id, d]) => [id, { code: d.code, name: d.name, group: d.group, level: d.level, marks: d.marks, task: d.task }] as const),
+]);
+export const ALL_IDS: KindId[] = [...KIND_IDS, ...TASK_IDS];
+
+/** Any question: a single figure (PracticeQuestion), a choice or a grid. */
+export type AnyQuestion = PracticeQuestion | TaskQuestion;
+
+export const isChoice = (q: AnyQuestion): q is ChoiceQuestion => 'form' in q && q.form === 'choice';
+export const isGrid = (q: AnyQuestion): q is GridQuestion => 'form' in q && q.form === 'grid';
+export const taskOf = (q: AnyQuestion): TaskType => ('form' in q ? q.task : (q.task ?? 'calc'));
+
+/**
+ * Where each kind's formula comes from: the formulae sheet the IB provides in
+ * the examination (guide, pp. 64 to 66), or a standard form the guide does
+ * not list, which the platform's notes use and a student must learn.
+ */
+const ON_SHEET: Record<string, string> = {
+  'gross-profit-margin': 'p. 64',
+  'profit-margin': 'p. 64',
+  roce: 'p. 64',
+  'current-ratio': 'p. 64',
+  'acid-test-ratio': 'p. 64',
+  'stock-turnover-times': 'p. 64',
+  'stock-turnover-days': 'p. 64',
+  'debtor-days': 'p. 64',
+  'creditor-days': 'p. 64',
+  'gearing-ratio': 'p. 64',
+  'average-rate-of-return': 'p. 65',
+  'net-present-value': 'p. 65, with the discount table on p. 66',
+  'capacity-utilization': 'p. 65',
+  'productivity-rate': 'p. 65',
+};
+const TOOLKIT = new Set(['expected-value', 'mean', 'median', 'interquartile-range', 'standard-deviation', 'special-order', 'absorption-cost', 'total-float', 'free-float', 'regression-forecast']);
+
+export interface FormulaSource {
+  /** On the formulae sheet given in the examination. */
+  sheet: boolean;
+  text: string;
+}
+
+export function formulaSource(kind: KindId): FormulaSource {
+  const page = ON_SHEET[kind];
+  if (page) return { sheet: true, text: `On the formulae sheet given in the examination (guide, ${page}).` };
+  if (TOOLKIT.has(kind)) return { sheet: false, text: 'A toolkit method (guide, p. 14). It is not on the formulae sheet: learn it.' };
+  return { sheet: false, text: 'Not on the formulae sheet: the standard form the platform’s notes use. Learn it.' };
+}
 
 /* ------------------------------------------------------------------ */
 /* Generating, finding and choosing questions                          */
@@ -1229,7 +977,16 @@ export function generate(kind: KindId, seed: number): PracticeQuestion {
   const def = KINDS[kind];
   if (!def) throw new Error(`Unknown kind of question "${kind}"`);
   const made = def.make(rng(seed * 7919 + def.code.charCodeAt(0) * 31 + def.code.charCodeAt(2)));
-  return { ...made, code: `${def.code}-${seed}`, kind, seed, group: def.group, level: def.level, name: def.name, marks: def.marks };
+  return { ...made, code: `${def.code}-${seed}`, kind, seed, group: def.group, level: def.level, name: def.name, marks: def.marks, ...(def.task ? { task: def.task } : {}) };
+}
+
+/** Any kind of question from its kind and seed: a single figure, a choice or a grid. */
+export function generateAny(kind: KindId, seed: number): AnyQuestion {
+  if (KINDS[kind]) return generate(kind, seed);
+  const def = TASKS[kind];
+  if (!def) throw new Error(`Unknown kind of question "${kind}"`);
+  const made = def.make(rng(seed * 7919 + def.code.charCodeAt(0) * 31 + def.code.charCodeAt(2)));
+  return { ...made, code: `${def.code}-${seed}`, kind, seed, group: def.group, level: def.level, name: def.name, marks: def.marks, task: def.task } as TaskQuestion;
 }
 
 /** "BEQ-48213" back to its kind and seed, or null. Case and spaces do not matter. */
@@ -1237,7 +994,7 @@ export function parseCode(code: string): { kind: KindId; seed: number } | null {
   const m = /^\s*([a-z]{3})\s*-?\s*(\d{5})\s*$/i.exec(code);
   if (!m) return null;
   const prefix = (m[1] as string).toUpperCase();
-  const kind = KIND_IDS.find((id) => KINDS[id]?.code === prefix);
+  const kind = ALL_IDS.find((id) => META[id]?.code === prefix);
   const seed = Number(m[2]);
   return kind && seed >= SEED_MIN && seed <= SEED_MAX ? { kind, seed } : null;
 }
@@ -1247,6 +1004,14 @@ export function kindsFor(groups: readonly GroupId[], level: 'SL' | 'HL'): KindId
   return KIND_IDS.filter((id) => {
     const d = KINDS[id];
     return d !== undefined && groups.includes(d.group) && (level === 'HL' || d.level !== 'HL');
+  });
+}
+
+/** Every kind a reader can be set, of the chosen task types: HL kinds only for HL. */
+export function allKindsFor(groups: readonly GroupId[], level: 'SL' | 'HL', tasks: readonly TaskType[] = ['calc', 'spot', 'read', 'build']): KindId[] {
+  return ALL_IDS.filter((id) => {
+    const d = META[id];
+    return d !== undefined && groups.includes(d.group) && tasks.includes(d.task) && (level === 'HL' || d.level !== 'HL');
   });
 }
 
@@ -1282,43 +1047,7 @@ export function drawSet(kinds: readonly KindId[], n: number, seed: number): Arra
 /* Checking an answer                                                  */
 /* ------------------------------------------------------------------ */
 
-/**
- * Reads an answer typed by a person: "1,250", "$1,250.50", "(2,400)" or
- * "−2,400" for a negative, "18.5%", "1.6 : 1", "42 days", and for payback
- * "2.5", "2 years 6 months" or "2 years and 6.5 months". Returns null when
- * it is not a number.
- */
-export function parseAnswer(raw: string, unit: AnswerUnit): number | null {
-  let s = raw.trim().toLowerCase().replace(/[\u2212\u2013]/g, '-').replace(/\u00a0/g, ' ');
-  if (!s) return null;
-  if (unit === 'years') {
-    const ym = /^(\d+(?:\.\d+)?)\s*(?:years?|yrs?|y)\b\s*(?:and\s*|,\s*)?(?:(\d+(?:\.\d+)?)\s*(?:months?|mths?|m)\b)?\.?$/.exec(s);
-    if (ym) return Number(ym[1]) + (ym[2] ? Number(ym[2]) / 12 : 0);
-    const mo = /^(\d+(?:\.\d+)?)\s*(?:months?|mths?|m)\.?$/.exec(s);
-    if (mo) return Number(mo[1]) / 12;
-  }
-  let negative = false;
-  const br = /^\((.*)\)$/.exec(s);
-  if (br) {
-    negative = true;
-    s = br[1] as string;
-  }
-  s = s
-    .replace(/\s*:\s*1$/, '')
-    .replace(/us\$|\$|£|€/g, '')
-    .replace(/[%a-z\s.]*$/, '')
-    .replace(/[,\s]/g, '');
-  if (s.startsWith('-')) {
-    negative = !negative;
-    s = s.slice(1);
-  }
-  if (s.startsWith('$')) s = s.slice(1);
-  if (!/^\d*\.?\d+$/.test(s)) return null;
-  const v = Number(s);
-  return Number.isFinite(v) ? (negative ? -v : v) : null;
-}
 
-export type Verdict = 'right' | 'close' | 'wrong' | 'invalid';
 
 export interface Feedback {
   verdict: Verdict;
@@ -1336,7 +1065,7 @@ export function check(q: PracticeQuestion, raw: string): Feedback {
   if (v === null) {
     return { verdict: 'invalid', value: null, headline: 'Enter a number.', detail: `For example ${q.example}. Units and commas are fine.` };
   }
-  if (near(v, q.exact, q.tolerance)) {
+  if (near(v, q.exact, q.tolerance) || (q.alsoRight ?? []).some((x) => near(v, x, q.tolerance))) {
     return { verdict: 'right', value: v, headline: 'Right.', detail: `The answer is ${q.answer}. ${q.toleranceText}` };
   }
   const st = slipTolerance(q);
@@ -1349,6 +1078,18 @@ export function check(q: PracticeQuestion, raw: string): Feedback {
     headline: 'Not this time.',
     detail: `The answer is ${q.answer}. Compare your steps with the working below, and check which figures the formula uses.`,
   };
+}
+
+/** The reader's response to any question: typed text, a chosen option, or the grid's cells. */
+export type Response = string | null | Record<string, string>;
+
+export type AnyFeedback = ({ form: 'number' } & Feedback) | ({ form: 'choice' } & ChoiceFeedback) | ({ form: 'grid' } & GridFeedback);
+
+/** Checks any question; a grid also says how many of its marks were earned. */
+export function checkAny(q: AnyQuestion, response: Response): AnyFeedback {
+  if (isChoice(q)) return { form: 'choice', ...checkChoice(q, typeof response === 'string' ? response : null) };
+  if (isGrid(q)) return { form: 'grid', ...checkGrid(q, response && typeof response === 'object' ? response : {}) };
+  return { form: 'number', ...check(q, typeof response === 'string' ? response : '') };
 }
 
 /* ------------------------------------------------------------------ */
@@ -1383,7 +1124,7 @@ export function parseP2(raw: unknown): P2State {
   const num = (x: unknown) => (typeof x === 'number' && Number.isFinite(x) ? Math.max(0, Math.floor(x)) : 0);
   if (r.kinds && typeof r.kinds === 'object') {
     for (const [id, v] of Object.entries(r.kinds as Record<string, unknown>)) {
-      if (!KINDS[id] || !v || typeof v !== 'object') continue;
+      if (!META[id] || !v || typeof v !== 'object') continue;
       const x = v as { tried?: unknown; right?: unknown };
       const tried = num(x.tried);
       if (tried) out.kinds[id] = { tried, right: Math.min(tried, num(x.right)) };
@@ -1427,19 +1168,23 @@ export function recordTimed(state: P2State, rec: TimedRecord): P2State {
   return { ...next, timed: [...next.timed, rec].slice(-MAX_TIMED) };
 }
 
-/** Marks for a set: full marks for a right answer, none otherwise (the platform's rule for practice). */
-export function score(codes: string[], results: Array<Verdict | 'blank'>): { marks: number; total: number; right: number } {
+/**
+ * Marks for a set: full marks for a right answer and none otherwise (the
+ * platform's rule for practice), except a grid, which earns its marks in
+ * proportion to the cells credited (`earned`, when given).
+ */
+export function score(codes: string[], results: Array<Verdict | 'blank'>, earned: Array<number | null> = []): { marks: number; total: number; right: number } {
   let marks = 0;
   let total = 0;
   let right = 0;
   codes.forEach((code, i) => {
     const p = parseCode(code);
-    const m = p ? (KINDS[p.kind]?.marks ?? 0) : 0;
+    const m = p ? (META[p.kind]?.marks ?? 0) : 0;
     total += m;
     if (results[i] === 'right') {
       marks += m;
       right++;
-    }
+    } else if (typeof earned[i] === 'number') marks += Math.min(m, Math.max(0, Math.floor(earned[i] as number)));
   });
   return { marks, total, right };
 }

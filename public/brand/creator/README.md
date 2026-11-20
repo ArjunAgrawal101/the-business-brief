@@ -9,10 +9,11 @@ These files are the creator's authentic brand assets. They were copied **unchang
 | `arjun-agrawal-logo.svg` | `logo.svg` | Full logo with "Knowledge. Insight. Impact.", in the footer and on documents |
 | `arjun-agrawal-logo-reversed.svg` | `logo-reversed.svg` | The same, for dark surfaces |
 | `arjun-agrawal-monogram.png`, `arjun-agrawal-monogram-reversed.png` | same names | Raster fallbacks for documents |
-| `arjun-agrawal-portrait-4x5.webp` | same name | The creator profile photograph (432 by 540) |
 
 The source SVGs record their own origin in a comment: the monogram was traced from the supplied artwork; the wordmark is set in Cinzel (SIL Open Font Licence) and converted to outlines.
 
 **How the identity works in 2.0.** The Business Brief is one of the two platforms of the Arjun Agrawal Knowledge Series, so it carries the creator's identity: the AA monogram beside "Arjun Agrawal | The Business Brief" set in Cinzel. The monogram's paths are used unchanged (`src/lib/brand.ts` holds them, read from these files); only its two fills change between light and navy surfaces, using the brand's own colours. The favicon, app icons and social card are rendered from the monogram by `scripts/brand/render-assets.mjs`. The platform's earlier mark (a folded brief with a decision node) was retired in 2.0.
 
-**Rights.** The name, monogram, logo and photograph belong to Arjun Agrawal and are not covered by the code licence. See `LICENSE`.
+**Photographs.** The profile photograph once copied here (`arjun-agrawal-portrait-4x5.webp`) was removed on 20 November 2026: its source carries Google Gemini's AI mark. The creator's photographs now live in `public/images/creator/`, made from the originals in `assets/creator/originals/` (see `assets/creator/README.md`).
+
+**Rights.** The name, monogram, logo and photographs belong to Arjun Agrawal and are not covered by the code licence. See `LICENSE`.

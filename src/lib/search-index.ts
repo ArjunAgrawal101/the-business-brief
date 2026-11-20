@@ -12,6 +12,7 @@ import type { Corpus } from './integrity';
 import type { NavGroup } from './navigation';
 import type { SearchEntry, SearchKind } from './search';
 import { normalize } from './search';
+import { slugify } from './flashcards';
 
 export interface SearchLinks {
   subtopic(code: string): string;
@@ -67,11 +68,13 @@ const STATIC_PAGES: Array<{ kind: SearchKind; type: string; url: string; title: 
   { kind: 'tools', type: 'Calculator', url: '/finance-desk/ratios/', title: 'Ratio analysis', text: 'Profitability, liquidity and (HL) efficiency ratios from two years of accounts, with every working shown.' },
   { kind: 'tools', type: 'Calculator', url: '/finance-desk/investment-appraisal/', title: 'Investment appraisal', text: 'Payback period, average rate of return and (HL) net present value on two projects you can change.' },
   { kind: 'tools', type: 'Planner', url: '/ia-studio/', title: 'IA Studio planner', text: 'The internal assessment as the guide sets it out, with a ten-step planner that checks your supporting documents.' },
+  { kind: 'tools', type: 'Planner', url: '/revision/planner/', title: 'Revision planner', text: 'A week-by-week revision plan from your examination date, level, subtopics and hours: weakest first, each subtopic met twice, practice woven in.' },
   { kind: 'resources', type: 'Printable sheet', url: '/resources/formula-sheet/', title: 'Formula sheet', text: 'Every formula on one printable page: the ones the examination provides and the ones to learn.' },
   { kind: 'pages', type: 'Course', url: '/ib/', title: 'IB DP Business Management: the course', text: 'The course unit by unit: subtopics, content statements, depth of teaching, SL and HL, teaching hours.' },
   { kind: 'pages', type: 'Course', url: '/ib/coverage/', title: 'Coverage tracker', text: 'What the platform has for each subtopic: complete, partly built or planned, and verified against the guide.' },
   { kind: 'pages', type: 'Platform', url: '/rooms/', title: 'All rooms', text: 'Every room of the platform, what each is for and what works in it now.' },
-  { kind: 'pages', type: 'Platform', url: '/dashboard/', title: 'My Business Workspace', text: 'Your learning list, case notebook and saved analyses, with what you have read, practised and saved here, kept on this device only.' },
+  { kind: 'pages', type: 'Platform', url: '/dashboard/', title: 'My dashboard', text: 'What to revise today, your progress unit by unit, weak areas and practice, your learning list, notes and saved analyses, kept on this device only.' },
+  { kind: 'pages', type: 'Platform', url: '/progress/', title: 'Your progress', text: 'Every subtopic with what you have read, completed and practised, every page you opened and every piece of practice, kept on this device only.' },
   { kind: 'pages', type: 'Platform', url: '/platform/', title: 'The platform', text: 'How the platform is organized: its modules, learning architecture, interactions and content governance.' },
   { kind: 'pages', type: 'Platform', url: '/accessibility/', title: 'Accessibility', text: 'The accessibility standard the platform aims for, how it was tested, and the known limits.' },
   { kind: 'pages', type: 'Platform', url: '/privacy/', title: 'Privacy', text: 'No accounts, no analytics, no cookies: what is kept on your device, and how to clear it.' },
@@ -294,7 +297,7 @@ export function buildSearchIndex(input: IndexInput): SearchEntry[] {
   for (const [id, it] of Object.entries(c.interactives))
     if (it.page && it.component !== 'case-lab') add({ kind: 'tools', type: 'Interaction', title: it.title, url: `${it.page}#ix-${id}`, text: plain(it.purpose), keys: it.component.replace(/-/g, ' '), units: unitsOf(it.syllabus), codes: it.syllabus, hl: false });
 
-  // Resources: the curated library, the mindmaps, the diagrams and the revision briefs.
+  // Resources: the curated library, the mindmaps, the diagrams and the revision sheets.
   for (const r of input.library ?? [])
     add({ kind: 'resources', type: r.typeLabel, title: r.title, url: r.href, text: r.summary, keys: r.subtopics.join(' '), units: r.units.map(String), codes: r.subtopics, hl: r.level === 'HL' });
   // In course order: each unit's own map, then its subtopics' maps.
@@ -313,8 +316,10 @@ export function buildSearchIndex(input: IndexInput): SearchEntry[] {
     });
   for (const [id, d] of Object.entries(input.diagrams ?? {}))
     add({ kind: 'resources', type: 'Diagram', title: d.title, url: `/diagrams/#diagram-${id}`, text: d.caption ?? '', keys: '', units: d.group === 'toolkit' ? ['toolkit', ...unitsOf(d.syllabus)] : unitsOf(d.syllabus), codes: d.syllabus.filter((x) => x !== 'toolkit'), hl: d.level === 'HL' });
-  for (const [id, t] of Object.entries(c.topics).sort((a, b) => codeKey(a[1].code) - codeKey(b[1].code)))
-    add({ kind: 'resources', type: 'Revision brief', title: `Revision brief: ${t.code} ${t.title}`, url: links.revision(id), text: 'The key points, the traps, the formulas and retrieval questions on one printable page.', keys: t.title, units: [unitOf(t.code)], codes: [t.code], hl: t.level === 'HL' });
+  // Quick revision: a sheet for every subtopic, at its topic page's slug, and the flashcards for the whole course.
+  for (const { s } of subtopics)
+    add({ kind: 'resources', type: 'Revision sheet', title: `Revision sheet: ${s.code} ${s.title}`, url: links.revision(slugify(s.title)), text: 'Key definitions, formulae, frameworks, common mistakes and short exercises, on one printable sheet.', keys: s.title, units: [unitOf(s.code)], codes: [s.code], hl: s.level === 'HL' });
+  add({ kind: 'resources', type: 'Flashcards', title: 'Flashcards', url: '/revision/flashcards/', text: 'The course as flashcards: terms, formulae, frameworks, distinctions, scenarios and recall questions, with spaced repetition kept on your device.', keys: 'flashcards spaced repetition Leitner recall', units: [], codes: [], hl: false });
 
   // Every link in the menu, then the rooms' own pages, the pathways and the other pages: each once.
   for (const g of input.nav)

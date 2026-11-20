@@ -1,0 +1,70 @@
+# Quick revision for 4.3 Sales forecasting, an HL subtopic whose one statement
+# is at AO3. Simple linear regression is an HL toolkit tool. Written for the
+# platform; every business named is fictional.
+code: '4.3'
+exercises:
+  - id: ferrymoor-benefits
+    business: Ferrymoor Bikes
+    stem: "Ferrymoor Bikes forecasts next year's sales from five years of monthly sales, which show a steady upward trend and a peak every spring."
+    command: explain
+    question: "**Explain** two benefits of the sales forecast for Ferrymoor Bikes."
+    level: HL
+    outline:
+      - "Operations: it can plan production and stock for the spring peak, avoiding lost sales and unsold bikes."
+      - "Human resources: it can hire seasonal staff in time."
+      - "Finance: it can plan the cash needed to build stock before the peak, and set budgets and targets."
+      - "Explains each benefit with Ferrymoor Bikes' trend and spring peak."
+  - id: ferrymoor-limitations
+    business: Ferrymoor Bikes
+    stem: "Ferrymoor Bikes' managers want to rely on past sales alone to plan the next three years."
+    command: discuss
+    question: "**Discuss** the limitations of using past sales to forecast Ferrymoor Bikes' sales."
+    level: HL
+    outline:
+      - "The forecast assumes the past continues, but the economy, cycling fashions, a new rival or a run of bad weather could change the trend."
+      - "Random variation and poor data make any forecast uncertain, and accuracy falls the further ahead it looks."
+      - "Qualitative methods, such as sales force estimates or surveys, can add what the data miss, though they bring their own bias."
+      - "Judges how far to rely on it, for example to use a range of forecasts and update them every quarter."
+  - id: ferrymoor-correlation
+    business: Ferrymoor Bikes
+    stem: "Ferrymoor Bikes finds a strong positive correlation between its monthly sales and the hours of sunshine each month."
+    command: explain
+    question: "**Explain** why Ferrymoor Bikes should be careful about using this correlation to forecast sales."
+    level: HL
+    outline:
+      - "Correlation is not causation: sunshine and sales both rise in spring and summer, with holidays and longer evenings, so other factors may drive both."
+      - "Sunshine itself cannot be forecast far ahead, so it is a poor basis for a long-range plan."
+      - "The relationship may change, and extrapolating beyond the data is less reliable than reading within it."
+formulas:
+  line-of-best-fit:
+    situation: "An analyst has plotted monthly sales against spending on advertising and wants an equation to estimate sales at a planned level of spending."
+  average-change-per-period:
+    situation: "A café has quarterly sales for the last two years and wants a simple figure for how much they have grown each quarter, to extend the trend."
+    measures: "The typical rise or fall from one period to the next across a run of data, used to extend a trend forward. A simple technique, not one the guide names."
+  seasonal-share:
+    situation: "A festival caterer wants to know how much of its year's sales come in July and August, so it can plan staff and stock for the summer."
+    measures: "How much of a year's sales one period accounts for, which shows how strongly sales follow the seasons."
+  forecast-error:
+    situation: "When a quarter ends, a retailer compares the sales it forecast with the sales it made, to see how far out its forecast was."
+    measures: "How far the actual result differed from the forecast, as a percentage of the forecast: a positive figure means the result beat the forecast, a negative one that it fell short."
+  expected-value-2:
+    situation: "A caterer deciding how much food to prepare for a weekend event has estimates of the chance of a busy, an average or a quiet weekend and of its takings in each."
+distinctions:
+  - id: correlation-vs-causation
+    pair: [Correlation, Causation]
+    codes: ['4.3', 'toolkit']
+    level: HL
+    difference: "Correlation means two variables move together, positively or negatively, and can be measured from −1 to +1. Causation means a change in one actually brings about a change in the other. Two variables can be strongly correlated because a third factor drives both, or by chance."
+scenarios:
+  - id: ferrymoor-regression
+    business: Ferrymoor Bikes
+    stem: "Ferrymoor Bikes wants to estimate next spring's sales from the relationship between its monthly sales and the number of cycling events held in the region each month."
+    answer: "Simple linear regression"
+    level: HL
+    codes: ['4.3', 'toolkit']
+    why: "Plotting sales (y) against events (x) on a scatter diagram and fitting the line of best fit, y = a + bx, gives an estimate for the number of events planned. The strength of the correlation shows how far to trust it, and reading beyond the data is less reliable."
+evaluations:
+  - id: five-years-reliable
+    claim: "A forecast based on five years of sales data is reliable."
+    counter: "Five years helps if the market is stable, but a shock, a new competitor or a change in tastes can break the pattern at once. Reliability also falls the further ahead the forecast reaches, so it should be a range, checked and updated, not a single figure."
+    level: HL

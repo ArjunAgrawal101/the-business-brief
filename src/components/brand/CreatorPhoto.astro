@@ -1,13 +1,20 @@
 ---
 /**
  * One of the creator's own photographs, as prepared by
- * scripts/brand/creator-photos.mjs (cropped and resized, nothing else).
+ * scripts/brand/creator-photos.mjs (cropped and resized; see
+ * assets/creator/README.md for the one light tonal correction).
+ *
+ * Writes a <picture>: AVIF first, WebP as the fallback. `narrow` names a
+ * second crop of the same photograph for screens under 40rem (art direction),
+ * with its own width and height so the box is reserved before it loads.
  */
 import manifest from '../../../public/images/creator/manifest.json';
 
 type Name = keyof typeof manifest;
 interface Props {
   name: Name;
+  /** A second crop for screens under 40rem. */
+  narrow?: Name;
   alt: string;
   /** The sizes attribute: how wide the image is shown. */
   sizes?: string;
@@ -15,22 +22,48 @@ interface Props {
   priority?: boolean;
   class?: string;
 }
-const { name, alt, sizes = '(min-width: 64rem) 40vw, 90vw', priority = false, class: className } = Astro.props;
-const entry = manifest[name];
-const files = entry.files;
-const largest = files[files.length - 1]!;
-const srcset = files.map((f) => `${f.src} ${f.w}w`).join(', ');
+const { name, narrow, alt, sizes = '(min-width: 64rem) 40vw, 90vw', priority = false, class: className } = Astro.props;
+
+const set = (n: Name) => {
+  const files = manifest[n].files;
+  const largest = files[files.length - 1]!;
+  return {
+    largest,
+    webp: files.map((f) => `${f.src} ${f.w}w`).join(', '),
+    avif: files.map((f) => `${f.avif} ${f.w}w`).join(', '),
+  };
+};
+const main = set(name);
+const small = narrow ? set(narrow) : null;
+const narrowQuery = '(max-width: 40rem)';
 ---
 
-<img
-  class={className}
-  src={largest.src}
-  srcset={srcset}
-  sizes={sizes}
-  width={largest.w}
-  height={largest.h}
-  alt={alt}
-  loading={priority ? 'eager' : 'lazy'}
-  fetchpriority={priority ? 'high' : undefined}
-  decoding="async"
-/>
+<picture class="creator-photo">
+  {small && <source media={narrowQuery} type="image/avif" srcset={small.avif} sizes="92vw" width={small.largest.w} height={small.largest.h} />}
+  {small && <source media={narrowQuery} type="image/webp" srcset={small.webp} sizes="92vw" width={small.largest.w} height={small.largest.h} />}
+  <source type="image/avif" srcset={main.avif} sizes={sizes} />
+  <img
+    class={className}
+    src={main.largest.src}
+    srcset={main.webp}
+    sizes={sizes}
+    width={main.largest.w}
+    height={main.largest.h}
+    alt={alt}
+    loading={priority ? 'eager' : 'lazy'}
+    fetchpriority={priority ? 'high' : undefined}
+    decoding="async"
+  />
+</picture>
+
+<style>
+  /* The picture is a wrapper only: the image keeps its place in each layout. */
+  .creator-photo {
+    display: contents;
+  }
+
+  /* Sources choose the file; they are never boxes, so they take no grid cell in a figure laid out as a grid. */
+  .creator-photo source {
+    display: none;
+  }
+</style>

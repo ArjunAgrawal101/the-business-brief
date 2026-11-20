@@ -165,14 +165,21 @@ export type Family =
   | 'tool'
   | 'checklist'
   | 'workspace'
+  | 'practice'
   | 'work';
 
 const FAMILIES: Array<[RegExp, Family]> = [
-  [/^bb:(level|intro-seen)$/, 'preference'],
+  // The reader's choices: the level, study mode's text size and light, the last Paper 2 practice settings.
+  [/^bb:(level|intro-seen|study|p2-prefs)$/, 'preference'],
   // A tool's check that storage works, written and removed at once; never the reader's work.
   [/^bb:(.+:)?(probe|storage-check)$/, 'preference'],
   [/^bb:learner$/, 'learner'],
   [/^bb:saved$/, 'saved'],
+  // The subtopics marked complete with Mark as complete (src/lib/learner.ts).
+  [/^bb:studied$/, 'learner'],
+  // Practice records the dashboard reads for progress and weak areas (src/lib/progress.ts), and the revision plan.
+  // The flashcards' Leitner boxes and due days (bb:cards, src/lib/flashcards.ts) are among them.
+  [/^bb:(bank|p2-practice|cards|planner)$/, 'practice'],
   [/^bb:q:.+$/, 'question'],
   [/^bb:quiz:.+$/, 'quiz'],
   [/^bb:dr:.+$/, 'decision'],

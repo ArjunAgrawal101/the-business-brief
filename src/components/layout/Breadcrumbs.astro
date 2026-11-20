@@ -1,8 +1,27 @@
 ---
+/**
+ * The breadcrumb trail, and the same trail as schema.org BreadcrumbList
+ * structured data. The structured data needs absolute addresses, so it is
+ * written only when the build knows the site's address (on Vercel, always).
+ */
 interface Props {
   trail: Array<{ label: string; href?: string }>;
 }
 const { trail } = Astro.props;
+
+const site = Astro.site;
+const steps = [{ label: 'Home', href: '/' }, ...trail];
+const jsonLd = site
+  ? JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: steps.map((s, i) => {
+        const last = i === steps.length - 1;
+        const url = s.href ? new URL(s.href, site).href : last ? new URL(Astro.url.pathname, site).href : undefined;
+        return { '@type': 'ListItem', position: i + 1, name: s.label, ...(url ? { item: url } : {}) };
+      }),
+    }).replace(/</g, '\\u003c')
+  : null;
 ---
 
 <nav class="crumbs" aria-label="Breadcrumb">
@@ -15,3 +34,4 @@ const { trail } = Astro.props;
     }
   </ol>
 </nav>
+{jsonLd && <script type="application/ld+json" set:html={jsonLd} />}

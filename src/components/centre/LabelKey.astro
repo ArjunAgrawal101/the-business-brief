@@ -1,34 +1,96 @@
 ---
-/** How to read the labels, and where the assessment content comes from. */
+/**
+ * How to read the labels, and where the assessment content comes from. Open
+ * on the Assessment Centre's front page; a closed disclosure on each
+ * component's page, so the key is there without repeating in full.
+ */
 import GuideLabel from './GuideLabel.astro';
+import { LABEL_MEANING, type Standing } from '../../lib/guide-labels';
+
+interface Props {
+  /** A closed disclosure instead of an open panel. */
+  compact?: boolean;
+}
+const { compact = false } = Astro.props;
+const ORDER: Standing[] = ['ib', 'examiner', 'strategy', 'example', 'tsm'];
 ---
 
-<aside class="lk" aria-labelledby="lk-h">
-  <h2 id="lk-h" class="lk__h">How to read the labels</h2>
-  <dl class="lk__list">
-    <div><dt><GuideLabel kind="ib" /></dt><dd>From the IB Business management guide or the IB's examiner instructions.</dd></div>
-    <div><dt><GuideLabel kind="examiner" /></dt><dd>What IB subject reports (May 2024 to May 2026) say examiners reward or penalize, as cited in the assessment guides.</dd></div>
-    <div><dt><GuideLabel kind="strategy" /></dt><dd>A technique the platform recommends. It is not an IB rule.</dd></div>
-    <div><dt><GuideLabel kind="example" /></dt><dd>Invented for teaching: the businesses, figures and answers are fictional.</dd></div>
-  </dl>
-  <p class="lk__src">
-    Built from the Arjun Agrawal Knowledge Series assessment guides (IA, Paper 1, Paper 2, Paper 3), which cite the IB guide (first assessment 2024),
-    the IB teacher support material and IB subject reports. Facts about the IB course were checked against the guide itself, with its pages; the subject
-    reports were not supplied to this platform, so examiner emphasis is given as the guides state it. Nothing here predicts a grade or approves a piece of
-    work.
-  </p>
-</aside>
+{
+  compact ? (
+    <details class="lk lk--compact">
+      <summary class="lk__sum">How to read the labels</summary>
+      <dl class="lk__list">
+        {ORDER.map((k) => (
+          <div>
+            <dt>
+              <GuideLabel kind={k} />
+            </dt>
+            <dd>{LABEL_MEANING[k]}</dd>
+          </div>
+        ))}
+      </dl>
+      <p class="lk__src">
+        Requirements were checked against the IB guide itself. Examiner emphasis is given as the creator's assessment guides state it, with the guide named
+        beside it; the subject reports they cite were not supplied to this platform. <a href="/assessment/#ac-labels-h">More on the sources</a>
+      </p>
+    </details>
+  ) : (
+    <aside class="lk" aria-labelledby="lk-h">
+      <h2 id="lk-h" class="lk__h">
+        How to read the labels
+      </h2>
+      <dl class="lk__list">
+        {ORDER.map((k) => (
+          <div>
+            <dt>
+              <GuideLabel kind={k} />
+            </dt>
+            <dd>{LABEL_MEANING[k]}</dd>
+          </div>
+        ))}
+      </dl>
+      <p class="lk__src">
+        The explanations are built from the creator's four assessment guides (IA, Paper 1, Paper 2, Paper 3). Every requirement was checked against the IB
+        Business management guide itself, first assessment 2024, in the edition supplied to the platform (published February 2022, updated May 2022), and
+        is given with its page; the assessment guides cite the guide as updated July 2024. Examiner emphasis is given as the assessment guides state it,
+        with the guide named beside it: they cite IB subject reports from May 2024 to May 2026, which were not supplied to this platform, so it has not
+        checked them. Markbands and criteria appear only as brief paraphrases with their pages, never in the guide's wording. Nothing here predicts a
+        grade or approves a piece of work.
+      </p>
+    </aside>
+  )
+}
 
 <style>
   .lk {
     padding: var(--sp-5);
     background: var(--surface-sheet);
     border-top: 3px solid var(--navy-900);
-    box-shadow: var(--shadow-sheet);
   }
 
   .lk__h {
     font-size: 1.25rem;
+  }
+
+  .lk--compact {
+    padding: 0;
+    border-top: 0;
+    border-bottom: 1px solid var(--rule-hair);
+    background: transparent;
+  }
+
+  .lk__sum {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-strong);
+    cursor: pointer;
+  }
+
+  .lk--compact[open] {
+    padding-bottom: var(--sp-4);
   }
 
   .lk__list {
@@ -48,6 +110,7 @@ import GuideLabel from './GuideLabel.astro';
     margin-top: var(--sp-4);
     padding-top: var(--sp-3);
     border-top: 1px solid var(--rule-hair);
+    max-width: 60rem;
     font-size: 0.8125rem;
     color: var(--text-muted);
   }

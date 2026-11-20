@@ -7,14 +7,26 @@
  * a project, awards a mark, predicts a grade or approves a question: the
  * teacher approves the question and marks the work (guide, pp. 51 to 53).
  *
- * Every rule says where it comes from: "Guide, p. N" for a requirement in the
- * IB guide, "TSM, p. N" for the IB teacher support material, and none for the
- * platform's own recommendation.
+ * Every rule says where it comes from and what standing it has: "Guide, p. N"
+ * for the IB guide (an IB requirement), "TSM, p. N" for the IB teacher
+ * support material (its own label), the creator's IA research guide for
+ * examiner emphasis, and no source for the platform's own recommendation.
  */
-import { IA_LIMITS, ageInMonths, checkDocuments as guideDocumentChecks, earliestAllowed, monthIndex, monthLabel, type DocKind, type Finding } from './ia';
+import { checkDocuments as guideDocumentChecks, earliestAllowed, monthLabel, threeYearRule, type DocKind, type Finding } from './ia';
+import { LABEL_TEXT, type Standing as LabelStanding } from './guide-labels';
 
-export type Standing = 'ib' | 'examiner' | 'strategy';
+/** The standing of a check or a milestone: every label but the illustrative example. */
+export type Standing = Exclude<LabelStanding, 'example'>;
 export type Status = 'ok' | 'advice' | 'problem';
+
+/** Where a finding comes from decides its standing: the IB guide, the TSM, or (with no source) the platform. */
+export function standingOf(source: string | undefined): Standing {
+  if (!source) return 'strategy';
+  if (source.startsWith('TSM')) return 'tsm';
+  if (source.startsWith('Guide')) return 'ib';
+  if (source.startsWith('IA research guide')) return 'examiner';
+  return 'strategy';
+}
 
 export interface Check {
   status: Status;
@@ -118,13 +130,15 @@ export function checkQuestion(rq: string, org: string, concept: ConceptId | ''):
       : { status: 'advice', text: 'It does not end with a question mark. The guide asks for a title in the form of a research question.', standing: 'ib', source: 'Guide, p. 53' },
   );
   const form = questionForm(q);
-  if (form === 'forward') out.push({ status: 'ok', text: 'It looks forward: a decision still to be made. The guide allows a forward- or backward-looking question.', standing: 'ib', source: 'Guide, p. 53' });
-  else if (form === 'backward') out.push({ status: 'ok', text: 'It looks backward: a decision already taken. The guide allows a forward- or backward-looking question.', standing: 'ib', source: 'Guide, p. 53' });
+  out.push({ status: 'ok', text: 'The guide allows a research question that looks forward or backward.', standing: 'ib', source: 'Guide, p. 53' });
+  if (form === 'forward') out.push({ status: 'ok', text: 'It reads as forward looking, about a decision still to be made. (The guide does not define the two forms; this reading is the platform’s.)', standing: 'strategy' });
+  else if (form === 'backward') out.push({ status: 'ok', text: 'It reads as backward looking, about a decision already taken. (The guide does not define the two forms; this reading is the platform’s.)', standing: 'strategy' });
   else if (form === 'extent')
     out.push({
       status: 'advice',
-      text: '"To what extent" is allowed, but it needs a precise judgement in the conclusion; the assessment guides report that a vague "to some extent" cannot reach the top of criterion E.',
+      text: '"To what extent" is allowed, but it needs a precise judgement in the conclusion. The IA research guide reports that subject reports (May 2025, May 2026) warn that a vague "to some extent" cannot reach the top of criterion E.',
       standing: 'examiner',
+      source: 'IA research guide, p. 2',
     });
   else out.push({ status: 'advice', text: 'It is not clear whether it looks forward or backward. Questions that start "Should..." or "How effectively has..." make the decision behind them plain.', standing: 'strategy' });
   const name = org.trim();
@@ -134,7 +148,7 @@ export function checkQuestion(rq: string, org: string, concept: ConceptId | ''):
   const n = words(q);
   if (n > 25) out.push({ status: 'advice', text: `${n} words. A long question is hard to answer explicitly in 1,800 words: try to keep it to one decision.`, standing: 'strategy' });
   if (/\band\b/i.test(q.replace(/\b(change|creativity|ethics|sustainability)\b/gi, '')) && n > 12)
-    out.push({ status: 'advice', text: 'It may ask about two things. If it does, the conclusion must answer both.', standing: 'examiner' });
+    out.push({ status: 'advice', text: 'It may ask about two things. If it does, the conclusion must answer both, as the IA research guide advises.', standing: 'examiner', source: 'IA research guide, p. 4' });
   const named = CONCEPTS.filter((k) => new RegExp(`\\b${k}\\b`, 'i').test(q));
   if (concept && named.length && !named.includes(concept))
     out.push({ status: 'problem', text: `It mentions ${named.join(' and ')}, but your lens is ${concept}. The project must use only one of the four key concepts.`, standing: 'ib', source: 'Guide, p. 53' });
@@ -153,6 +167,67 @@ export const QUESTION_TESTS = [
   { id: 'aligned', name: 'Concept-aligned', text: 'The lens fits the issue, not added to it' },
   { id: 'answerable', name: 'Answerable', text: 'An explicit answer is possible within 1,800 words' },
 ] as const;
+
+/* ------------------------------------------------------------------ */
+/* 1b. The research question builder                                   */
+/* ------------------------------------------------------------------ */
+
+export interface RqState {
+  org: string;
+  issue: string;
+  form: 'forward' | 'backward';
+  decision: string;
+  taken: string;
+  aim: string;
+  concept: ConceptId;
+  /** The reader's own wording of the question, once they have edited the draft; empty while the draft is kept. */
+  q: string;
+  /** The six tests ticked, by id. */
+  tests: string[];
+}
+
+export const emptyRq = (): RqState => ({ org: '', issue: '', form: 'forward', decision: '', taken: '', aim: '', concept: 'change', q: '', tests: [] });
+
+const squash = (s: string) => s.trim().replace(/\s+/g, ' ');
+/** The end of a phrase that goes inside the question: no full stop or question mark of its own. */
+const tidy = (s: string) => squash(s).replace(/[.?!]+$/, '');
+
+/** A draft question from the parts the reader gave: a starting point to refine, never a finished question. A name keeps its own full stop ("Crumb & Co."). */
+export function draftQuestion(s: Pick<RqState, 'org' | 'form' | 'decision' | 'taken' | 'aim'>): string {
+  const org = squash(s.org) || 'the organization';
+  if (s.form === 'forward') return `Should ${org} ${tidy(s.decision) || 'make the decision'}?`;
+  return `How effectively has ${org}'s ${tidy(s.taken) || 'decision'} ${tidy(s.aim) || 'met its aim'}?`;
+}
+
+/** The platform's own warnings about a question's shape: recommended strategy, not the guide's rules. */
+export function questionWarnings(q: string): string[] {
+  const text = q.trim();
+  const n = words(text);
+  const out: string[] = [];
+  if (n > 25) out.push(`${n} words: a shorter question is usually a more focused one.`);
+  if ((text.match(/\band\b/gi) ?? []).length >= 2 || (text.match(/\?/g) ?? []).length > 1) out.push('It may be two questions in one: keep one decision.');
+  if (/\b(industry|sector|companies|businesses|firms)\b/i.test(text)) out.push('It mentions a whole industry: the project is about one organization, though industry-wide issues may come in where they affect it.');
+  return out;
+}
+
+/** Saved builder state, read defensively. Older saves named the concept-aligned test "concept". */
+export function parseRq(raw: unknown): RqState {
+  const out = emptyRq();
+  if (!raw || typeof raw !== 'object') return out;
+  const r = raw as Record<string, unknown>;
+  const str = (v: unknown) => (typeof v === 'string' ? v.slice(0, 400) : '');
+  out.org = str(r.org);
+  out.issue = str(r.issue);
+  out.decision = str(r.decision);
+  out.taken = str(r.taken);
+  out.aim = str(r.aim);
+  out.q = str(r.q);
+  out.form = r.form === 'backward' ? 'backward' : 'forward';
+  out.concept = (CONCEPTS as readonly string[]).includes(r.concept as string) ? (r.concept as ConceptId) : 'change';
+  const ids = QUESTION_TESTS.map((t) => t.id as string);
+  if (Array.isArray(r.tests)) out.tests = [...new Set(r.tests.map((t) => (t === 'concept' ? 'aligned' : t)).filter((t): t is string => typeof t === 'string' && ids.includes(t)))];
+  return out;
+}
 
 /* ------------------------------------------------------------------ */
 /* 2. Supporting documents and source evaluation                       */
@@ -238,19 +313,23 @@ export function evaluateSource(d: DocEntry, submission: string): Evaluation {
         ? { status: 'ok', word: 'Your purpose', text: 'Designed for your question, so it fits it closely; say how many took part and how they were chosen, because criterion D rewards weighing that.' }
         : { status: 'ok', word: 'Stated', text: `${PURPOSES[d.purpose]}: usually more even-handed, though it may still leave things out.` };
 
-  const age = ageInMonths(d.published, submission);
   const earliest = earliestAllowed(submission);
-  const date: Note = !d.published.trim()
-    ? { status: 'missing', word: 'Missing', text: 'Add the month it was published: the guide requires documents published within three years before submission (p. 54).' }
-    : monthIndex(d.published) === null
-      ? { status: 'check', word: 'Check', text: 'Write the month as year and month, for example 2026-03.' }
-      : !submission.trim() || monthIndex(submission) === null
-        ? { status: 'check', word: 'Check', text: `Published ${monthLabel(d.published)}. Add your submission month above to check the three-year rule.` }
-        : age !== null && age < 0
-          ? { status: 'check', word: 'Check', text: 'Published after your submission month: check both dates.' }
-          : age !== null && age > IA_LIMITS.maxYears * 12
-            ? { status: 'missing', word: 'Too old', text: `Published ${monthLabel(d.published)}, more than three years before submission${earliest ? `: the earliest allowed is ${monthLabel(earliest)}` : ''}. It cannot be a supporting document (guide, p. 54).` }
-            : { status: 'ok', word: 'Within 3 years', text: `Published ${monthLabel(d.published)}, within the three years before submission (guide, p. 54).` };
+  const verdict = threeYearRule(d.published, submission);
+  const when = monthLabel(d.published.trim());
+  const date: Note =
+    verdict === 'missing'
+      ? { status: 'missing', word: 'Missing', text: 'Add the month it was published: the guide requires documents published within three years before submission (p. 54).' }
+      : verdict === 'unreadable'
+        ? { status: 'check', word: 'Check', text: 'Write the month as year and month, for example 2026-03.' }
+        : verdict === 'no-submission'
+          ? { status: 'check', word: 'Check', text: `Published ${when}. Add your submission month above to check the three-year rule.` }
+          : verdict === 'after'
+            ? { status: 'check', word: 'Check', text: 'Published after your submission month: check both dates.' }
+            : verdict === 'unclear'
+              ? { status: 'check', word: 'Check', text: `Published in ${when}: add the month, because in that year the three-year rule depends on it${earliest ? ` (the earliest allowed is ${monthLabel(earliest)})` : ''}.` }
+              : verdict === 'too-old'
+                ? { status: 'missing', word: 'Too old', text: `Published ${when}, more than three years before submission${earliest ? `: the earliest allowed is ${monthLabel(earliest)}` : ''}. It cannot be a supporting document (guide, p. 54).` }
+                : { status: 'ok', word: 'Within 3 years', text: `Published ${when}, within the three years before submission (guide, p. 54).` };
 
   const signs = [d.named, d.method, d.sourced].filter(Boolean).length;
   const missingSigns = [
@@ -280,7 +359,7 @@ export function checkSet(docs: DocEntry[], submission: string): Check[] {
     docs.map((d) => ({ title: d.title, publisher: d.origin, published: d.published, kind: d.kind, pages: d.pages, selected: d.selected })),
     submission,
   );
-  const out: Check[] = findings.map((f) => ({ status: f.severity, text: f.text, standing: f.source.startsWith('TSM') ? 'examiner' : 'ib', source: f.source }));
+  const out: Check[] = findings.map((f) => ({ status: f.severity, text: f.text, standing: standingOf(f.source), source: f.source }));
   const chosen = docs.filter((d) => d.selected);
   const voices = new Set(chosen.map((d) => d.voice).filter(Boolean));
   if (chosen.length >= 2) {
@@ -449,16 +528,16 @@ export interface Milestone {
 
 /** Milestones in the order of the TSM's ten steps (pp. 69 to 72), with the guide's requirements where they apply. */
 export const STAGES: Array<{ id: string; title: string; detail: string; share: number; standing: Standing; source?: string }> = [
-  { id: 'requirements', title: 'Read the requirements and the criteria', detail: 'With your teacher, from the guide. Note where projects most often lose marks.', share: 0.04, standing: 'strategy', source: 'TSM, p. 69' },
-  { id: 'question', title: 'Choose the organization, the issue and a draft question', detail: 'One real organization and a live issue. Refine the question and the documents together.', share: 0.14, standing: 'strategy', source: 'TSM, pp. 69 to 70' },
+  { id: 'requirements', title: 'Read the requirements and the criteria', detail: 'With your teacher, from the guide. Note where projects most often lose marks.', share: 0.04, standing: 'tsm', source: 'TSM, p. 69' },
+  { id: 'question', title: 'Choose the organization, the issue and a draft question', detail: 'One real organization and a live issue. Refine the question and the documents together.', share: 0.14, standing: 'tsm', source: 'TSM, pp. 69 to 70' },
   { id: 'approved', title: 'Question approved by your teacher', detail: 'The teacher approves the question before work starts.', share: 0.18, standing: 'ib', source: 'Guide, p. 53' },
-  { id: 'concept', title: 'Key concept chosen and an initial proposal written', detail: 'One of the four concepts as your lens; a short proposal for your teacher to comment on.', share: 0.24, standing: 'strategy', source: 'TSM, pp. 70 to 71' },
-  { id: 'candidates', title: 'More than five candidate documents found', detail: 'Primary and secondary, within three years of submission, from more than one voice.', share: 0.36, standing: 'strategy', source: 'TSM, p. 71' },
+  { id: 'concept', title: 'Key concept chosen and an initial proposal written', detail: 'One of the four concepts as your lens; a short proposal for your teacher to comment on.', share: 0.24, standing: 'tsm', source: 'TSM, pp. 70 to 71' },
+  { id: 'candidates', title: 'More than five candidate documents found', detail: 'Primary and secondary, within three years of submission, from more than one voice.', share: 0.36, standing: 'tsm', source: 'TSM, p. 71' },
   { id: 'selected', title: 'Three to five supporting documents selected', detail: 'Relevant, in depth, a range of views; highlighted and labelled SD1 to SD5.', share: 0.42, standing: 'ib', source: 'Guide, pp. 53 to 55' },
   { id: 'analysis', title: 'Tools applied and findings analysed', detail: 'Each tool applied to the documents’ own figures, through your concept.', share: 0.64, standing: 'strategy' },
   { id: 'draft', title: 'First draft to your teacher', detail: 'Your best draft: the teacher reads and advises on one draft, but does not edit it.', share: 0.78, standing: 'ib', source: 'Guide, p. 51' },
-  { id: 'revised', title: 'Draft revised after the teacher’s comments', detail: 'Act on the advice; check every figure is traced to its document.', share: 0.92, standing: 'strategy', source: 'TSM, p. 71' },
-  { id: 'review', title: 'Penultimate draft checked against the criteria', detail: 'At least two weeks before the deadline: mark it strictly against each criterion and note what one more mark would need.', share: -14, standing: 'strategy', source: 'TSM, p. 72' },
+  { id: 'revised', title: 'Draft revised after the teacher’s comments', detail: 'Act on the advice; check every figure is traced to its document.', share: 0.92, standing: 'tsm', source: 'TSM, p. 71' },
+  { id: 'review', title: 'Penultimate draft checked against the criteria', detail: 'At least two weeks before the deadline: mark it strictly against each criterion and note what one more mark would need.', share: -14, standing: 'tsm', source: 'TSM, p. 72' },
   { id: 'final', title: 'Final version to your teacher', detail: 'By your school’s internal deadline. Once submitted, the final version cannot be retracted.', share: 0, standing: 'ib', source: 'Guide, p. 51' },
 ];
 
@@ -542,7 +621,7 @@ export function timelineIcs(ms: Milestone[], stamp: string): string {
 }
 
 export function timelineCsv(ms: Milestone[]): string {
-  return [['Date', 'Milestone', 'What it involves', 'Standing', 'Source'], ...ms.map((m) => [m.date, m.title, m.detail, m.standing === 'ib' ? 'IB requirement' : 'Recommended', m.source ?? ''])]
+  return [['Date', 'Milestone', 'What it involves', 'Standing', 'Source'], ...ms.map((m) => [m.date, m.title, m.detail, LABEL_TEXT[m.standing], m.source ?? ''])]
     .map((r) => r.map(csv).join(','))
     .join('\n')
     .concat('\n');
@@ -612,11 +691,21 @@ export function progressSummary(state: ProgressState, today: string, plan?: Time
 /* The tools themselves                                                */
 /* ------------------------------------------------------------------ */
 
+/** The IA tools, in the order a project uses them. Each is a page of its own; the count shown anywhere is this list's length. */
 export const IA_TOOL_PAGES = [
-  { id: 'key-concept', href: '/assessment/internal-assessment/key-concept/', name: 'Key concept guide', line: 'Which of the four concepts fits your issue as a lens, and checks of your question’s form' },
-  { id: 'documents', href: '/assessment/internal-assessment/documents/', name: 'Supporting documents', line: 'The guide’s rules for the set, and each document’s origin, purpose, date, reliability and relevance' },
-  { id: 'tool-selection', href: '/assessment/internal-assessment/tool-selection/', name: 'Tool selection', line: 'The toolkit and syllabus tools that fit your question and the data in your documents' },
-  { id: 'timeline', href: '/assessment/internal-assessment/timeline/', name: 'Research timeline', line: 'Milestones counted back from your deadline, to print or add to your calendar' },
-  { id: 'progress', href: '/assessment/internal-assessment/progress/', name: 'Progress tracker', line: 'Each stage, the words that count and the checks before you submit' },
+  { id: 'research-question', href: '/assessment/internal-assessment/research-question/', name: 'Research question', key: 'bb:ia:rq', line: 'A question built from your organization, issue, decision and lens, and checked against the guide' },
+  { id: 'key-concept', href: '/assessment/internal-assessment/key-concept/', name: 'Key concept guide', key: 'bb:ia-concept', line: 'Which of the four concepts fits your issue as a lens, and checks of your question’s form' },
+  { id: 'methodology', href: '/assessment/internal-assessment/methodology/', name: 'Research methodology', key: 'bb:ia-method', line: 'Primary and secondary research planned against the guide: what to attach, and what to say in your introduction' },
+  { id: 'documents', href: '/assessment/internal-assessment/documents/', name: 'Supporting documents', key: 'bb:ia-documents', line: 'The guide’s rules for the set, and each document’s origin, purpose, date, reliability and relevance' },
+  { id: 'tool-selection', href: '/assessment/internal-assessment/tool-selection/', name: 'Tool selection', key: 'bb:ia-tools', line: 'The toolkit and syllabus tools that fit your question and the data in your documents' },
+  { id: 'evidence', href: '/assessment/internal-assessment/evidence/', name: 'Evidence analysis', key: 'bb:ia-evidence', line: 'Each piece of evidence from your documents: quoted, used with a tool, or integrated into the argument' },
+  { id: 'word-count', href: '/assessment/internal-assessment/word-count/', name: 'Word count planner', key: 'bb:ia-words', line: 'Your 1,800 words shared between the sections, against the guide’s limit and its list of what does not count' },
+  { id: 'timeline', href: '/assessment/internal-assessment/timeline/', name: 'Research timeline', key: 'bb:ia-timeline', line: 'Milestones counted back from your deadline, to print or add to your calendar' },
+  { id: 'progress', href: '/assessment/internal-assessment/progress/', name: 'Progress tracker', key: 'bb:ia-progress', line: 'Each stage, the words that count and the checks before you submit' },
 ] as const;
 export type IaToolId = (typeof IA_TOOL_PAGES)[number]['id'];
+
+/** "Tool 3 of 9": where a tool stands in the list, for its page's kicker. */
+export function toolPosition(id: IaToolId): string {
+  return `Tool ${IA_TOOL_PAGES.findIndex((t) => t.id === id) + 1} of ${IA_TOOL_PAGES.length}`;
+}

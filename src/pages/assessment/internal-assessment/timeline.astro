@@ -12,23 +12,26 @@ import CentreHead from '../../../components/centre/CentreHead.astro';
 import GuideLabel from '../../../components/centre/GuideLabel.astro';
 import IaToolNav from '../../../components/centre/IaToolNav.astro';
 import IaIntegrity from '../../../components/centre/IaIntegrity.astro';
-import { longDay, planTimeline, type Timeline } from '../../../lib/ia-tools';
+import { STAGES, longDay, planTimeline, toolPosition, type Timeline } from '../../../lib/ia-tools';
+import { LABEL_TEXT } from '../../../lib/guide-labels';
 import '../../../styles/centre.css';
 import '../../../styles/ia-tools.css';
 
 /** An illustrative plan, the same for every reader, until the reader enters their own dates. */
 const EXAMPLE = { start: '2026-09-07', deadline: '2027-03-01' };
 const example = planTimeline(EXAMPLE.start, EXAMPLE.deadline) as Timeline;
-const RULES = [
+const RULES: Array<[string, string]> = [
   ['Your teacher approves the question before work starts.', 'Guide, p. 53'],
   ['Your teacher comments on your work plans and reads and advises on one draft; the next version is the final one.', 'Guide, pp. 51 and 54'],
   ['About 20 hours of teaching time is recommended for the project, including time to work on it in class.', 'Guide, p. 52'],
   ['Supporting documents must be published within three years before submission.', 'Guide, p. 54'],
   ['Submission to the IB is in April or October of the final year, depending on the examination session.', 'Guide, p. 54'],
+];
+const TSM_ADVICE: Array<[string, string]> = [
   ['On a two-year course, steps 1 to 5 of the TSM’s guidance, up to the initial proposal, are best finished towards the end of the first year.', 'TSM, p. 69'],
   ['A penultimate draft is reviewed against the criteria at least two weeks before the project is due.', 'TSM, p. 72'],
 ];
-const STAND: Record<string, string> = { ib: 'IB requirement', strategy: 'Recommended', examiner: 'Examiner emphasis' };
+const STAND = LABEL_TEXT;
 ---
 
 <BaseLayout
@@ -40,11 +43,11 @@ const STAND: Record<string, string> = { ib: 'IB requirement', strategy: 'Recomme
   <CentreHead
     crumb="Research timeline"
     parent={{ label: 'Internal assessment', href: '/assessment/internal-assessment/' }}
-    kicker="Internal assessment · Tool 4 of 5"
+    kicker={`Internal assessment · ${toolPosition('timeline')}`}
     title="Your research timeline"
     lead="Enter the date you start and your school's internal deadline. The timeline counts back from the deadline in the order the IB's teacher support material suggests, and goes into your calendar as a file."
     stats={[
-      { value: '11', label: 'Milestones', note: 'from requirements to final version' },
+      { value: String(STAGES.length), label: 'Milestones', note: 'from requirements to final version' },
       { value: '2 weeks', label: 'Kept', note: 'for the final check' },
       { value: '.ics', label: 'Calendar file', note: 'plus CSV and print' },
     ]}
@@ -128,8 +131,10 @@ const STAND: Record<string, string> = { ib: 'IB requirement', strategy: 'Recomme
 
     <section class="it-sec" aria-labelledby="tl-rules-h">
       <SectionHead no="02" title="What sets the dates" id="tl-rules-h" />
-      <p class="ce-labels"><GuideLabel kind="ib" /></p>
-      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s}</span></li>)}</ul>
+      <p class="ce-labels"><GuideLabel kind="ib" /> <span class="ce-cite">Business management guide; the page follows each rule</span></p>
+      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s.replace(/^Guide, /, '')}</span></li>)}</ul>
+      <p class="ce-labels"><GuideLabel kind="tsm" /></p>
+      <ul class="it-rules">{TSM_ADVICE.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s}</span></li>)}</ul>
     </section>
 
     <section class="it-sec" aria-labelledby="tl-ex-h">

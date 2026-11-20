@@ -14,9 +14,13 @@ import {
   parseLog,
   parseSaved,
   pickSignature,
+  mergeStudied,
+  parseStudied,
   planImport,
+  recentVisits,
   recordVisit,
   removeSaved,
+  setStudied,
   safePath,
   toggleSaved,
   toolPrefixes,
@@ -174,6 +178,9 @@ describe('the kind of a page', () => {
     expect(tools).toContain('/frameworks/lab/');
     expect(kindOfPath('/frameworks/lab/', tools)).toBe('tool');
     expect(kindOfPath('/frameworks/lab/', tools.filter((t) => t !== '/frameworks/lab/'))).toBeNull();
+    // The comparison tool is not a framework either: it counts as a tool once the navigation lists it.
+    expect(kindOfPath('/frameworks/compare/', [...tools, '/frameworks/compare/'])).toBe('tool');
+    expect(kindOfPath('/frameworks/compare/', tools.filter((t) => t !== '/frameworks/compare/'))).toBeNull();
   });
 
   it('cleans a document title for the list', () => {
@@ -368,5 +375,86 @@ describe('export and import', () => {
       ['bb:saved', 'replace'],
     ]);
     expect(parseSaved(plan[3]!.value).items.map((x) => x.url)).toEqual(['/b/', '/a/']);
+  });
+});
+
+describe('recently viewed', () => {
+  it('lists the latest pages first, once each, with their kind and time', () => {
+    let log = recordVisit(emptyLog(), { kind: 'topic', url: '/topics/a/', title: '1.1 A' }, T0);
+    log = recordVisit(log, { kind: 'mindmap', url: '/mindmaps/b/', title: 'B map' }, later(5));
+    log = recordVisit(log, { kind: 'case', url: '/cases/c/', title: 'Case C' }, later(10));
+    // Opened again: it moves to the front, still once.
+    log = recordVisit(log, { kind: 'topic', url: '/topics/a/', title: '1.1 A' }, later(60));
+    expect(recentVisits(log, 5)).toEqual([
+      { url: '/topics/a/', title: '1.1 A', kind: 'topic', at: later(60).toISOString() },
+      { url: '/cases/c/', title: 'Case C', kind: 'case', at: later(10).toISOString() },
+      { url: '/mindmaps/b/', title: 'B map', kind: 'mindmap', at: later(5).toISOString() },
+    ]);
+    expect(recentVisits(log, 2).map((v) => v.url)).toEqual(['/topics/a/', '/cases/c/']);
+  });
+
+  it('reads the stored value as it is, drops duplicates and anything unsafe, and can leave the current page out', () => {
+    const stored = JSON.stringify({
+      v: 1,
+      visits: [
+        { kind: 'topic', url: '/topics/a/', title: 'Old A', first: '2026-11-01T10:00:00.000Z', last: '2026-11-01T10:00:00.000Z', count: 1 },
+        { kind: 'topic', url: '/topics/a/', title: 'New A', first: '2026-11-01T10:00:00.000Z', last: '2026-11-02T10:00:00.000Z', count: 2 },
+        { kind: 'case', url: 'javascript:alert(1)', title: 'x', first: '2026-11-02T10:00:00.000Z', last: '2026-11-03T10:00:00.000Z', count: 1 },
+        { kind: 'tool', url: '/finance-desk/break-even/', title: 'Break-even', first: '2026-11-01T09:00:00.000Z', last: '2026-11-01T09:00:00.000Z', count: 1 },
+      ],
+    });
+    expect(recentVisits(stored, 10).map((v) => [v.url, v.title])).toEqual([
+      ['/topics/a/', 'New A'],
+      ['/finance-desk/break-even/', 'Break-even'],
+    ]);
+    expect(recentVisits(stored, 10, '/topics/a/#map').map((v) => v.url)).toEqual(['/finance-desk/break-even/']);
+  });
+
+  it('gives an empty list for nothing, damage or a count that is not a number', () => {
+    for (const raw of [null, undefined, '', '{oops', 42, []]) expect(recentVisits(raw, 5)).toEqual([]);
+    const log = recordVisit(emptyLog(), { kind: 'topic', url: '/topics/a/', title: 'A' }, T0);
+    expect(recentVisits(log, 0)).toEqual([]);
+    expect(recentVisits(log, Number.NaN)).toEqual([]);
+    expect(recentVisits(log, -3)).toEqual([]);
+    expect(recentVisits(log, 2.7)).toHaveLength(1);
+  });
+});
+
+describe('subtopics marked as complete', () => {
+  it('marks and unmarks a subtopic by its code, keeping the first time it was marked', () => {
+    let list = setStudied(parseStudied(null), '3.5', true, T0);
+    list = setStudied(list, '1.4', true, later(5));
+    list = setStudied(list, '3.5', true, later(10));
+    expect(list.done).toEqual({ '1.4': later(5).toISOString(), '3.5': T0.toISOString() });
+    list = setStudied(list, '1.4', false, later(20));
+    expect(Object.keys(list.done)).toEqual(['3.5']);
+    // Not a code: nothing changes.
+    expect(setStudied(list, '<b>', true, T0)).toBe(list);
+  });
+
+  it('reads damaged values safely: only real codes with real times', () => {
+    for (const raw of [null, '', '{oops', '[]', { done: 'all' }]) expect(parseStudied(raw)).toEqual({ v: 1, done: {} });
+    const list = parseStudied({ v: 1, done: { '2.1': '2026-11-01T10:00:00Z', 'x.y': '2026-11-01T10:00:00Z', '3.10': 'yesterday', '5.9': 42, '1.2': '2026-11-02T10:00:00.000Z' } });
+    expect(list.done).toEqual({ '1.2': '2026-11-02T10:00:00.000Z', '2.1': '2026-11-01T10:00:00.000Z' });
+    const many = Object.fromEntries(Array.from({ length: 150 }, (_, i) => [`${1 + (i % 9)}.${1 + Math.floor(i / 9)}`, new Date(T0.getTime() + i * 1000).toISOString()]));
+    expect(Object.keys(parseStudied({ done: many }).done)).toHaveLength(LIMITS.studied);
+  });
+
+  it('combines two lists on import, the earlier time winning, twice the same as once', () => {
+    const a = setStudied(setStudied(parseStudied(null), '1.1', true, later(30)), '2.2', true, T0);
+    const b = setStudied(setStudied(parseStudied(null), '1.1', true, T0), '4.4', true, later(1));
+    const once = mergeStudied(a, b);
+    expect(once.done).toEqual({ '1.1': T0.toISOString(), '2.2': T0.toISOString(), '4.4': later(1).toISOString() });
+    expect(mergeStudied(once, b)).toEqual(once);
+    const plan = planImport({ 'bb:studied': JSON.stringify(a) }, [{ key: 'bb:studied', value: JSON.stringify(b) }]);
+    expect(plan[0]?.effect).toBe('replace');
+    expect(parseStudied(plan[0]!.value)).toEqual(once);
+  });
+
+  it('cleans the record when a file is imported', () => {
+    const file = { format: 'the-business-brief/learner-data', version: 1, items: { 'bb:studied': JSON.stringify({ v: 1, done: { '3.5': '2026-11-01T10:00:00Z', bad: 'x' } }) } };
+    const r = validateImport(JSON.stringify(file));
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(JSON.parse(r.items[0]!.value)).toEqual({ v: 1, done: { '3.5': '2026-11-01T10:00:00.000Z' } });
   });
 });

@@ -1,6 +1,6 @@
 {
   "name": "the-business-brief",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "private": true,
   "description": "Arjun Agrawal | The Business Brief. Strategy. Leadership. Decisions. A Business Management learning platform built around situation, decision and consequence.",
   "type": "module",
@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/build/sitemap.mjs",
     "preview": "astro preview --port 4321",
     "check": "astro check",
     "lint": "eslint . && node scripts/qa/content-lint.mjs",
@@ -20,7 +20,7 @@
     "qa:links": "node scripts/qa/link-check.mjs",
     "qa:contrast": "node scripts/qa/contrast.mjs",
     "qa:screens": "node scripts/qa/screens.mjs",
-    "qa": "npm run check && npm run lint && npm test && npm run build && npm run qa:links && npm run test:e2e",
+    "qa": "npm run check && npx eslint . && npm test && npm run build && npm run lint:content && npm run qa:links && npm run test:e2e",
     "brand": "node scripts/brand/render-assets.mjs",
     "qa:diagrams": "node scripts/qa/diagrams.mjs",
     "qa:personas": "node scripts/qa/personas.mjs"

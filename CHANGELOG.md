@@ -1,5 +1,58 @@
 # Changelog
 
+## 3.0.0: 20 November 2026
+
+Built to the owner's brief "The Business Brief 2.0": the platform made significantly better, not merely bigger. Three audits came first (content and features, design and navigation, assessment accuracy and technical health); their findings decided the work. Every working page keeps its address.
+
+### Design, navigation and the home page
+
+- **Palette.** The interactive blue moves from an electric cobalt to a muted steel blue that passes AA (links 6.25 on ivory, 7.03 on white; 9.24 on navy). Gold leaves headings and section numerals and stays for rules, the monogram and one emphasis at most. Navy bands and menu panels are flat colour. Buttons have 2 px corners and no shadow, labels and chips are at least 12 px, the header is opaque, and on phones section numerals sit above their headings.
+- **Five groups.** Explore, Practise, Tools, Assess and Discover, in the mega menu, the drawer and the footer. The Academic Ecosystem moves from the bar into the Discover panel.
+- **Search.** A search panel under the header suggests as you type from a compact index (`/search.json`), ranking every kind together and forgiving a slip, and lists the pages this browser opened most recently. The search page opens with the best matches across every kind and offers close spellings when nothing matches.
+- **The opening** plays only when the home page is freshly opened (never on other pages, reloads or internal navigation) and runs on one clock scaled to about 2.75 seconds.
+- **The home page** follows the brief's sections: the platform with this week's brief (case, decision, financial challenge, concept and the newest sourced news), the philosophy, every subtopic one click away, the case and decision of the week, the live financial laboratory, frameworks by the question they answer, the Assessment Centre with its weightings, the environments, visual learning, business intelligence, the creator, and the routes onward. Every figure is counted from the content; the inflated or misleading counters are gone.
+- **About** in ten sections, from the creator's claims register only, with ProfilePage structured data.
+- **The Strategy Studio** puts each tool first, its explanation after.
+
+### Photography
+
+- Four authentic photographs, in AVIF and WebP with crops for wide screens and phones: the awards portrait (About hero; a small square on the home page), the classroom (About, Tutorials), the conference table (About, the journey) and the traditional portrait (About, the personal note). The navy-suit portrait, whose source carries Google Gemini's AI mark, is retired; three more supplied files with AI marks are not used. `assets/creator/README.md` records every decision.
+
+### Learning
+
+- **Quick revision** (`/revision/`): a printable sheet for each of the 37 subtopics: key definitions, formulae with what each measures, frameworks, common mistakes (sourced first), and short fictional exercises with model outlines.
+- **Flashcards** (`/revision/flashcards/`): 1,416 cards built from the content (terms, formulae both ways, frameworks, distinctions, scenarios, evaluation prompts and the existing recall cards), with Leitner spaced repetition kept in this browser (`bb:cards`).
+- **Topic connections** (`/ib/connections/`): 50 worked connections between subtopics on an interactive map, each with an exam-style question; every subtopic page gains its connections, a tools section and Connected learning.
+- **The ten weakest subtopics** (1.4, 2.3, 2.6, 3.1, 3.3, 4.3, 4.6, 5.1, 5.2, 5.4) are deepened to the eleven elements, with 35 new exam questions using little-used command terms.
+- **The glossary** separates the IB terms from those beyond the course, adds a subtopic filter, formula links and tolerant search; 41 more full entries and ten new terms.
+
+### Tools
+
+- **My dashboard** (`/dashboard/`): today's revision queue, progress by unit, weak areas (the rule stated), practice by source and a first-visit state; the full record at `/progress/`.
+- **The revision planner** (`/revision/planner/`): a week-by-week plan from the exam date and hours, weakest subtopics first, with print and calendar export.
+- **Study mode** on every subtopic page: text size, low light, reading progress, contents, Mark as complete and print.
+- **The Business Scenario Generator** (`/decision-room/scenarios/`): 25 families of fictional scenarios from a seed, worked in six steps with feedback at every step.
+- **The Stakeholder Impact Simulator** (`/decision-room/stakeholder-impact/`): eight decisions and seven stakeholder groups, with the rules printed.
+- **Framework comparison** (`/frameworks/compare/`): any two frameworks side by side, and 16 curated comparisons.
+
+### Assessment
+
+- Every fact checked against the IB guide; the label mix-ups corrected (teacher support material has its own label; highlighting and translation are requirements); every "examiner emphasis" attributed to the creator's guides; the missing guide items added (an EE and IA on different organizations, individual research, transcripts, authenticity, access arrangements).
+- **IA Studio**: nine tools, four new (research question, methodology, evidence, word count).
+- **Paper 1**: two new practice cases with a timed paper; **Paper 2**: 67 kinds of question (calculations on every formula, spot the slip, reading charts, building forecasts and charts); **Paper 3**: two new social enterprise stimuli and a plan builder that checks coherence step by step; the **question bank** uses all 31 command terms.
+
+### Resources and intelligence
+
+- **The Resources Library** in the brief's twelve categories, with real previews, measured file sizes, filters behind one button on phones, list view and print; lesson presentations are marked "Not yet available".
+- **The Teacher resource area** (`/teachers/`): lesson sequences, discussion prompts for every subtopic, six timed classroom activities, printable topic checklists and a CSV of all 143 statements.
+- **The formula sheet**: the IB formulae exactly as the guide prints them, apart from 45 formulas the site also uses, each placed.
+- **Business Intelligence**: 14 new items across twelve sectors and five regions, every fact read in companies' and regulators' own documents and dated; syllabus coverage from 24 to 31 subtopics.
+
+### Technical
+
+- The sitemap is written after the build from the pages the build wrote (about 1,200), breadcrumbs carry BreadcrumbList data, and `npm run qa` lints the built pages.
+- The content cache lives in the project (`.astro/cache`), not in the shared `node_modules`.
+
 ## 2.2.0: 16 November 2026
 
 The Business Brief grows beyond the IB course without changing what made it work: one-to-one tutoring with its creator, a library of advanced management for undergraduates, MBA students and professionals, an executive Boardroom, a Framework Application Lab, advanced financial analysis, and a workspace for the reader's own work. Everything already on the site keeps its address, its design and its behaviour. The audit behind the release is in [docs/audit/NEXT_LEVEL_AUDIT.md](docs/audit/NEXT_LEVEL_AUDIT.md).

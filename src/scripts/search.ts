@@ -6,6 +6,10 @@
  */
 import { announce, each } from './ix';
 import { SEARCH_KINDS, countWords, highlight, matches, normalize, parseState, passes, queryWords, rank, stateQuery, type SearchKind, type SearchState } from '../lib/search';
+import { KIND_WEIGHT, editsFor, withinEdits } from '../lib/suggest';
+
+/** Entries in the best matches across every kind. */
+const BEST = 5;
 
 /** Entries shown for each kind while every kind is shown. */
 const PREVIEW = 5;
@@ -35,6 +39,10 @@ each('[data-ix="search"]', (root) => {
   const none = root.querySelector<HTMLElement>('[data-none]');
   const results = root.querySelector<HTMLElement>('[data-results]');
   const radios = [...root.querySelectorAll<HTMLInputElement>('input[name="kind"]')];
+  const best = root.querySelector<HTMLElement>('[data-best]');
+  const bestList = root.querySelector<HTMLOListElement>('[data-best-list]');
+  const close = root.querySelector<HTMLElement>('[data-close]');
+  const closeList = root.querySelector<HTMLOListElement>('[data-close-list]');
   if (!input || !results) return;
 
   const groups = [...root.querySelectorAll<HTMLElement>('[data-group]')].map((el) => {
@@ -84,6 +92,21 @@ each('[data-ix="search"]', (root) => {
     if (levelSel) levelSel.value = s.level;
   };
 
+  /** A copy of an entry's link, for the best matches and the close spellings. */
+  const linkItem = (e: Entry, words: readonly string[]) => {
+    const li = document.createElement('li');
+    li.dataset.entry = '';
+    const a = document.createElement('a');
+    a.href = e.a.getAttribute('href') ?? '#';
+    a.innerHTML = highlight(e.title, words);
+    const p = document.createElement('p');
+    const span = document.createElement('span');
+    span.textContent = SEARCH_KINDS.find((k) => k.id === e.kind)?.label ?? '';
+    p.append(span);
+    li.append(a, p);
+    return li;
+  };
+
   let timer = 0;
 
   const run = (opts: { say?: boolean } = {}) => {
@@ -128,6 +151,46 @@ each('[data-ix="search"]', (root) => {
     if (everything) everything.textContent = all.toLocaleString('en-GB');
     if (none) none.hidden = shown > 0;
 
+    // Best matches: every kind ranked together, as the header's suggestions are, while no kind is chosen.
+    const pool = groups.filter((g) => !g.el.hidden).flatMap((g) => g.current.filter((e) => passes(e, s, true) && matches(e.hay, words)));
+    const top: Entry[] = [];
+    if (words.length && !s.kind) {
+      const seen = new Set<string>();
+      for (const { e } of pool.map((e) => ({ e, r: rank(e.t, e.k, words) + KIND_WEIGHT[e.kind] })).sort((a, b) => b.r - a.r || a.e.order - b.e.order)) {
+        if (seen.has(e.t)) continue;
+        seen.add(e.t);
+        top.push(e);
+        if (top.length >= BEST) break;
+      }
+    }
+    if (best && bestList) {
+      best.hidden = top.length < 2;
+      bestList.replaceChildren(...(best.hidden ? [] : top.map((e) => linkItem(e, words))));
+    }
+
+    // Nothing found: offer entries whose title is a close spelling of every word.
+    const near: Entry[] = [];
+    if (!shown && words.some((w) => editsFor(w) > 0)) {
+      const candidates = groups.flatMap((g) => g.entries).filter((e) => passes(e, s, true));
+      const titles = new Set<string>();
+      for (const e of candidates) {
+        const key = e.t.replace(/^\d+ \d+ /, '');
+        if (titles.has(key)) continue;
+        const tw = e.t.split(' ');
+        const ok = words.every((w) => tw.some((x) => x.startsWith(w) || (editsFor(w) > 0 && withinEdits(w, x.length > w.length ? x.slice(0, w.length) : x, editsFor(w)))));
+        if (ok) {
+          near.push(e);
+          titles.add(key);
+        }
+      }
+      near.sort((a, b) => KIND_WEIGHT[b.kind] - KIND_WEIGHT[a.kind] || a.t.length - b.t.length);
+    }
+    if (close && closeList) {
+      const shownNear = near.slice(0, 6);
+      close.hidden = !shownNear.length;
+      closeList.replaceChildren(...shownNear.map((e) => linkItem(e, [])));
+    }
+
     const filtered = Boolean(words.length || s.kind || s.unit || s.level);
     const where = [
       s.kind ? `in ${SEARCH_KINDS.find((k) => k.id === s.kind)?.label.toLowerCase()}` : '',
@@ -146,7 +209,11 @@ each('[data-ix="search"]', (root) => {
     history.replaceState(history.state, '', `${location.pathname}${stateQuery({ ...s, q: s.q.trim() })}`);
   };
 
-  const visibleLinks = () => groups.filter((g) => !g.el.hidden).flatMap((g) => g.current.filter((e) => !e.li.hidden).map((e) => e.a));
+  const visibleLinks = () => [
+    ...(best && !best.hidden ? [...best.querySelectorAll<HTMLAnchorElement>('a')] : []),
+    ...groups.filter((g) => !g.el.hidden).flatMap((g) => g.current.filter((e) => !e.li.hidden).map((e) => e.a)),
+    ...(close && !close.hidden ? [...close.querySelectorAll<HTMLAnchorElement>('a')] : []),
+  ];
 
   // Start from the address.
   write(parseState(location.search));

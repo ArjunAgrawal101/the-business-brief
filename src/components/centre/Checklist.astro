@@ -1,25 +1,41 @@
 ---
 /**
  * A checklist the reader ticks for their own work. It counts what is ticked;
- * it never awards marks. Ticks are kept on this device.
+ * it never awards marks. Ticks are kept on this device. A list whose items
+ * share one standing carries one label (`standing`); an item labelled on its
+ * own differs from the rest.
  */
+import GuideLabel from './GuideLabel.astro';
+import { LABEL_TEXT, type Standing } from '../../lib/guide-labels';
+
 interface Item {
   id: string;
   text: string;
-  label?: 'ib' | 'examiner' | 'strategy';
+  label?: Exclude<Standing, 'example'>;
 }
 interface Props {
   id: string;
   title: string;
   items: Item[];
   note?: string;
+  /** The standing every item shares, shown once. */
+  standing?: Exclude<Standing, 'example'>;
+  /** A line under the title, such as what a criterion asks. */
+  lead?: string;
 }
-const { id, title, items, note } = Astro.props;
-const TAG: Record<string, string> = { ib: 'IB requirement', examiner: 'Examiner emphasis', strategy: 'Recommended' };
+const { id, title, items, note, standing, lead } = Astro.props;
 ---
 
 <fieldset class="ck" data-ix="checklist" data-key={`ck:${id}`}>
   <legend class="ck__title">{title}</legend>
+  {
+    standing && (
+      <p class="ck__standing">
+        <GuideLabel kind={standing} />
+      </p>
+    )
+  }
+  {lead && <p class="ck__lead">{lead}</p>}
   <ul class="ck__list">
     {
       items.map((it) => (
@@ -28,7 +44,7 @@ const TAG: Record<string, string> = { ib: 'IB requirement', examiner: 'Examiner 
             <input type="checkbox" value={it.id} />
             <span>
               {it.text}
-              {it.label && <span class={`ck__tag ck__tag--${it.label}`}>{TAG[it.label]}</span>}
+              {it.label && <span class={`ck__tag ck__tag--${it.label}`}>{LABEL_TEXT[it.label]}</span>}
             </span>
           </label>
         </li>
@@ -53,6 +69,16 @@ const TAG: Record<string, string> = { ib: 'IB requirement', examiner: 'Examiner 
     font-size: 1.125rem;
     font-weight: 600;
     color: var(--navy-900);
+  }
+
+  .ck__standing {
+    margin: var(--sp-2) 0 0;
+  }
+
+  .ck__lead {
+    margin: var(--sp-2) 0 0;
+    font-size: 0.875rem;
+    color: var(--text-muted);
   }
 
   .ck__list {
@@ -86,8 +112,8 @@ const TAG: Record<string, string> = { ib: 'IB requirement', examiner: 'Examiner 
     display: inline-block;
     margin-left: 0.4rem;
     padding: 0 0.4rem;
-    border-radius: 999px;
-    font-size: 0.6875rem;
+    border-radius: var(--radius-1);
+    font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.04em;
     vertical-align: 0.1em;
@@ -106,6 +132,11 @@ const TAG: Record<string, string> = { ib: 'IB requirement', examiner: 'Examiner 
   .ck__tag--strategy {
     background: var(--surface-cobalt-wash);
     color: var(--cobalt-deep);
+  }
+
+  .ck__tag--tsm {
+    border: 1px solid var(--navy-900);
+    color: var(--text-strong);
   }
 
   .ck__count {

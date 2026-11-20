@@ -114,7 +114,7 @@ export const PATHWAYS: Pathway[] = [
     tag: 'Questions only',
     what: 'Solving and discussing exam-style questions: Paper 1, Paper 2 and Paper 3.',
     who: 'Students who know the content and want to turn it into marks.',
-    does: ['Paper 1: the pre-released case study', 'Paper 2: the quantitative paper', 'Paper 3: the social enterprise (HL)', 'Every answer discussed against the published assessment criteria'],
+    does: ['Paper 1: the case study, from the pre-released statement', 'Paper 2: the quantitative paper', 'Paper 3: the social enterprise (HL)', 'Every answer discussed against the published assessment criteria'],
     expect: 'Questions only: we write, read and improve answers rather than re-teach topics.',
     cta: 'Ask about Exam Practice',
   },

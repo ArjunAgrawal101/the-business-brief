@@ -1,38 +1,127 @@
 ---
+/**
+ * Quick revision: a printable sheet for every subtopic, by unit, with SL and
+ * HL marked, and the way into the flashcards. Every count is computed from
+ * the content (src/lib/revision/). With JavaScript, each row also shows how
+ * many of the subtopic's cards are due today in this browser (bb:cards).
+ */
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import TutorNote from '../../components/ui/TutorNote.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
-import { href, topicsInOrder } from '../../lib/content';
+import TutorNote from '../../components/ui/TutorNote.astro';
+import { revisionData } from '../../lib/revision/content';
+import { LEVEL_LABELS } from '../../lib/labels';
+import { KIND_LABELS, CARD_KINDS } from '../../lib/flashcards';
+import '../../styles/revision.css';
 
-const topics = await topicsInOrder();
+const { sheets, deck, subtopics } = await revisionData();
+const units = [...new Map(subtopics.map((s) => [s.unit, s.unitTitle])).entries()].map(([n, title]) => ({ n, title, sheets: sheets.filter((x) => x.unit === n) }));
+const ibCards = deck.cards.filter((x) => !x.enrichment).length;
+const hlOnly = sheets.filter((x) => x.level === 'HL').length;
+const mixed = sheets.filter((x) => x.level === 'SL/HL with HL-only content').length;
+const exercises = sheets.reduce((n, x) => n + x.exercises.length, 0);
+const kindCounts = CARD_KINDS.map((k) => ({ k, n: deck.cards.filter((x) => x.kind === k && !x.enrichment).length })).filter((x) => x.n > 0);
+const fmt = (n: number) => n.toLocaleString('en-GB');
+const plural = (n: number, one: string, many: string) => `${fmt(n)} ${n === 1 ? one : many}`;
 ---
 
-<BaseLayout title="Revision Briefs" description="One printable page for each complete topic: the key points, the traps, the formulas and retrieval questions." section="revision">
+<BaseLayout
+  title="Quick revision"
+  description={`A printable revision sheet for each of the ${sheets.length} subtopics of IB DP Business Management, by unit, and ${fmt(ibCards)} flashcards with spaced repetition.`}
+  section="revision"
+>
   <PageIntro
-    trail={[{ label: 'Revision' }]}
-    kicker="Revision Brief"
-    title="Revision briefs"
-    lead="One page for each complete topic, made to be printed: what to know, the traps that cost marks, the formulas, and questions to answer from memory. Revise by retrieving, not by rereading."
+    trail={[{ label: 'Quick revision' }]}
+    kicker="Quick revision"
+    title="Quick revision"
+    lead={`A printable sheet for each of the ${sheets.length} subtopics: key definitions, formulae, frameworks, common examination mistakes and ${exercises} short application exercises, with each subtopic's recall questions. Then test yourself with the flashcards, which bring each card back after a gap that grows each time you recall it.`}
   />
-  <div class="wrap page-body">
-    <ol class="index-list">
-      {
-        topics.map(([id, t]) => (
-          <li class="index-item">
-            <span class="index-item__code">{t.code}</span>
-            <div class="index-item__body">
-              <h2 class="index-item__title">
-                <a href={href.revision(id)}>{t.title}</a>
-              </h2>
-              <p>{t.revision.keyPoints.length} key points, {t.revision.traps.length} traps, {t.revision.retrieval.length} retrieval questions.</p>
-            </div>
-            <div class="index-item__side">
-              <a href={href.topic(id)}>The full brief</a>
-            </div>
-          </li>
-        ))
-      }
-    </ol>
+
+  <div class="wrap page-body rv">
+    <section class="rv-deck" aria-labelledby="rv-deck-h">
+      <div>
+        <p class="rv-kicker">Practise</p>
+        <h2 id="rv-deck-h" class="rv-deck__h">Flashcards for the whole course</h2>
+        <p class="rv-deck__text">
+          {fmt(ibCards)} cards, built from the same content as the sheets: {kindCounts.map((x, i) => `${i ? (i === kindCounts.length - 1 ? ' and ' : ', ') : ''}${fmt(x.n)} ${KIND_LABELS[x.k].toLowerCase()}`).join('')}.
+          Rate each card Again, Hard, Good or Easy and it comes back when it is due.
+        </p>
+        <p class="rv-deck__due js-only" data-due-total aria-live="polite"></p>
+      </div>
+      <a class="btn btn--primary" href="/revision/flashcards/">Open the flashcards</a>
+    </section>
+
+    <nav class="rv-units" aria-label="Units">
+      <ol>
+        {
+          units.map((u) => (
+            <li>
+              <a href={`#unit-${u.n}`}>
+                <span class="rv-units__n">Unit {u.n}</span> {u.title}
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+
+    <p class="rv-key small">
+      Each sheet is marked with its level: <span class="tag tag--plain">{LEVEL_LABELS['SL/HL']}</span>, <span class="tag tag--plain">{LEVEL_LABELS['SL/HL with HL-only content']}</span> ({mixed} subtopics), or
+      <span class="tag tag--hl">{LEVEL_LABELS.HL}</span> ({hlOnly} subtopics, extension material for SL).
+    </p>
+
+    {
+      units.map((u) => (
+        <section class="rv-unit" id={`unit-${u.n}`} aria-labelledby={`rv-unit-${u.n}`}>
+          <h2 class="rv-unit__h" id={`rv-unit-${u.n}`}>
+            <span class="rv-unit__n">Unit {u.n}</span> {u.title}
+          </h2>
+          <p class="rv-unit__meta small muted">{plural(u.sheets.length, 'subtopic', 'subtopics')}</p>
+          <ol class="rv-list">
+            {u.sheets.map((s) => (
+              <li class="rv-row" data-code={s.code}>
+                <span class="rv-row__code">{s.code}</span>
+                <div class="rv-row__body">
+                  <h3 class="rv-row__title">
+                    <a href={`/revision/${s.slug}/`}>{s.title}</a>
+                  </h3>
+                  <p class="rv-row__meta">
+                    <span class:list={['tag', s.level === 'HL' ? 'tag--hl' : 'tag--plain']}>{LEVEL_LABELS[s.level]}</span>
+                    <span class="rv-row__counts">
+                      {plural(s.terms.length, 'definition', 'definitions')} · {plural(s.formulae.length, 'formula', 'formulae')} · {plural(s.frameworks.length, 'framework', 'frameworks')} ·{' '}
+                      {plural(s.exercises.length, 'exercise', 'exercises')}
+                    </span>
+                  </p>
+                </div>
+                <p class="rv-row__side">
+                  <a href={s.flashcardsHref}>{plural(s.cards, 'flashcard', 'flashcards')}</a>
+                  <span class="rv-row__due js-only" data-due={s.code} />
+                  <a class="rv-row__notes" href={s.notesHref}>
+                    {s.notesKind === 'notes' ? 'Full notes' : 'Full brief'}
+                  </a>
+                </p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))
+    }
+
+    <section class="rv-how" aria-labelledby="rv-how-h">
+      <h2 id="rv-how-h" class="rv-how__h">Using the sheets</h2>
+      <ol class="rv-how__steps">
+        <li><strong>Read the key points and the definitions</strong>, then cover them and say each definition aloud before you check it.</li>
+        <li><strong>Work the exercises before opening the outlines.</strong> Write a plan or a full answer; the outline shows what a strong answer does, not a mark.</li>
+        <li><strong>Review the flashcards most days.</strong> The cards due today come first; a card you know moves to a longer gap, and one you miss comes back tomorrow.</li>
+      </ol>
+      <p class="small muted">
+        Each common mistake links to where the notes, the glossary or the frameworks library explains it; those marked Recommended strategy are the platform's own advice.
+      </p>
+    </section>
+
     <TutorNote lead="Revising with little time left?" offer="A session can plan what to revise, test you on it and work through the questions that cost marks." />
   </div>
 </BaseLayout>
+
+<script>
+  import '../../scripts/revision-index';
+</script>

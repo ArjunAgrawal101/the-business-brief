@@ -6,6 +6,7 @@
  * builds on named in a notice the reader cannot miss.
  */
 import Breadcrumbs from '../layout/Breadcrumbs.astro';
+import BackToTopic from '../connect/BackToTopic.astro';
 import { ADVANCED_HREF, ibCodes, type AdvancedTool } from '../../lib/adv-finance/catalogue';
 import { BUSINESS } from '../../lib/adv-finance/business';
 
@@ -22,6 +23,7 @@ const codes = ibCodes(tool).map((x) => (x === 'toolkit' ? 'the toolkit' : x));
     <p class="label label--ink fl-head__kicker">Advanced financial analysis · Beyond the IB course</p>
     <h1>{tool.name}</h1>
     <p class="lead fl-head__q">{tool.question}</p>
+    <BackToTopic path={`${ADVANCED_HREF}${tool.id}/`} />
     <ul class="fl-scope" role="list">
       <li><span class="tag tag--enrichment">Beyond the IB course</span></li>
       <li>

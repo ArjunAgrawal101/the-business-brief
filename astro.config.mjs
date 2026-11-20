@@ -12,6 +12,8 @@ const site = process.env.SITE_URL || (vercelHost ? `https://${vercelHost}` : und
 
 export default defineConfig({
   site,
+  // The content cache lives in the project's own .astro folder (git-ignored), not in node_modules, so checkouts that share an install never read each other's content.
+  cacheDir: './.astro/cache',
   trailingSlash: 'always',
   build: {
     format: 'directory',
@@ -21,6 +23,16 @@ export default defineConfig({
   prefetch: false,
   // The Exam Desk became the Assessment Centre in 2.0; old addresses still work.
   redirects: {
+    // Resources Library details pages retired in 2.0 for entries that are pages in their own right.
+    '/resources/command-terms': '/examiner-lens/',
+    '/resources/ia-studio': '/assessment/internal-assessment/',
+    '/resources/ia-planner': '/ia-studio/',
+    '/resources/answer-builder': '/assessment/paper-2/',
+    '/resources/paper-2-constructions': '/assessment/paper-2/',
+    '/resources/paper-3-strategic-planning': '/assessment/paper-3/',
+    '/resources/toolkit': '/toolkit/',
+    '/resources/course-map': '/ib/map/',
+    '/resources/teachers': '/pathways/teachers/',
     '/exam-desk': '/assessment/',
     '/exam-desk/paper-1': '/assessment/paper-1/',
     '/exam-desk/paper-2': '/assessment/paper-2/',

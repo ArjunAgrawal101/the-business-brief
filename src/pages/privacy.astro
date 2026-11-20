@@ -2,26 +2,36 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/layout/PageIntro.astro';
 import SectionHead from '../components/layout/SectionHead.astro';
+import { LIMIT as SCENARIO_LIMIT } from '../lib/scenario-generator/store';
+import { STEP_IDS } from '../lib/scenario-generator/types';
+import { count } from '../lib/strategy/common';
 
 const KEYS = [
   { key: 'bb:level', what: 'Whether you chose to see SL or HL content.' },
   { key: 'bb:quiz:…', what: 'Your answers in the classification exercises, so they are still there when you return.' },
   { key: 'bb:q:…', what: 'Your answers to practice questions, and your self-check against the mark scheme.' },
   { key: 'bb:dr:…', what: 'Your choices and notes in each Decision Room.' },
+  { key: 'bb:scenarios', what: `Your results in the business scenario generator: for each scenario you worked (its code), your answer at each of the ${count(STEP_IDS.length)} steps, the verdict on it and the date, for your last ${SCENARIO_LIMIT} scenarios.` },
+  { key: 'bb:stakeholder-impact', what: 'The decision and the settings you last chose in the stakeholder impact simulator, a one-line summary of the result, and your written evaluation of each decision.' },
   { key: 'bb:boardroom:…', what: 'Your seat, decisions, reasoning and board memo in each Boardroom simulation.' },
   { key: 'bb:executive', what: 'Your role, your answers at each stage, your plan for each year, your reflections and a one-line summary of how far you have got, in the Boardroom’s executive simulation.' },
   { key: 'bb:ff:…', what: 'Your weighting of the forces in a force field analysis, and your note on it.' },
   { key: 'bb:rc:…', what: 'How well you recalled each retrieval card.' },
+  { key: 'bb:cards', what: 'Your flashcard progress: for each card you have rated, its Leitner box, the day it is next due, how many times you have rated it, when you last did, your last rating, its subtopics and a few words of its front. Ratings of the recall questions on the subtopic pages are kept here too.' },
   { key: 'bb:ia-plan', what: 'Your IA Studio plan: the notes, the list of candidate documents, the self-assessed marks and the steps marked done.' },
   { key: 'bb:bank', what: 'Your attempts and self-ratings in the question bank, and the timed sets you finished there.' },
   { key: 'bb:p2-practice', what: 'Your record in Paper 2 calculation practice: the calculations you checked, how many were right first time, and your timed sets.' },
-  { key: 'bb:p2-prefs', what: 'The level and topics you last chose in Paper 2 calculation practice.' },
+  { key: 'bb:p2-prefs', what: 'The level, topics and kinds of task you last chose in Paper 2 calculation practice.' },
   { key: 'bb:ia-concept', what: 'Your organization, issue, research question, chosen key concept and ticked tests in the IA key concept guide.' },
   { key: 'bb:ia-documents', what: 'The supporting documents you listed in the IA document tool, with your notes on each.' },
   { key: 'bb:ia-tools', what: 'Your answers and shortlist in the IA tool selection assistant.' },
   { key: 'bb:ia-timeline', what: 'The start date, deadline and session you entered in the IA research timeline.' },
   { key: 'bb:ia-progress', what: 'The stages, notes, word count and final checks in the IA progress tracker.' },
+  { key: 'bb:ia-method', what: 'Your research plan in the IA research methodology tool: the form of your question, the primary research and secondary sources you plan, who you will ask and how many, whether a classmate or your extended essay uses the same organization, and your note on the method.' },
+  { key: 'bb:ia-evidence', what: 'Your evidence log in the IA evidence analysis tool: how many supporting documents you have, and for each piece of evidence its document, the finding, the tool, what it showed, the document it is weighed against, the assumption and what it means for your question.' },
+  { key: 'bb:ia-words', what: 'Your word plan in the IA word count planner: each section’s name, part, words planned and words written, and the exclusions you checked.' },
   { key: 'bb:p1-workspace', what: 'The case you pasted into the Paper 1 workspace, the evidence you tagged and your answer plan.' },
+  { key: 'bb:p1-case:…', what: 'Your work on each Paper 1 practice case: your research notes, the evidence you tagged, your stakeholder rows and choice of tools, your answers built in parts, your self-marks and your timed attempts, with the case’s name and address for your dashboard.' },
   { key: 'bb:studio:…', what: 'Your notes, chosen axes and weights in the Market Studio and Operations Floor tools.' },
   { key: 'bb:market:…', what: 'Your work in each Market Studio instrument: segments and positioning, the marketing mix, the persona, the positioning map, the questionnaire, the product life cycle, the campaign plan, the budget split and the market metrics.' },
   { key: 'bb:cash-flow:…', what: 'How you chose to pay for the kiln, and the measures you chose, in the cash flow lab.' },
@@ -30,11 +40,15 @@ const KEYS = [
   { key: 'bb:lab:…', what: 'Your work in the Entrepreneurship and Innovation Lab: the canvas, the feasibility scores, the costs, revenue and unit economics you entered, your business plan outline, and a summary of each tool’s results for the plan to quote.' },
   { key: 'bb:case:…', what: 'The alternative you chose in a case file’s decision exercise, your reasons and the date you committed.' },
   { key: 'bb:ck:…', what: 'The items you ticked in the Assessment Centre checklists.' },
-  { key: 'bb:ia:rq', what: 'Your research question in the Assessment Centre builder.' },
-  { key: 'bb:ia:sd', what: 'The supporting documents you listed in the Assessment Centre, with their dates.' },
-  { key: 'bb:p3:plan', what: 'Your Paper 3 plan of action in the plan builder.' },
+  { key: 'bb:ia:rq', what: 'Your research question in the IA research question builder: the organization, issue, decision, lens, your own wording and the tests you ticked.' },
+  { key: 'bb:ia:sd', what: 'The supporting documents you listed in the checker on the internal assessment page, with their publication dates and your submission month.' },
+  { key: 'bb:p3:plan', what: 'Your Paper 3 plan of action for Haven Lunchbox in the plan builder: the need and challenges you chose, the direction, your recommendations with their evidence, resources, order and evaluation, and your review points.' },
+  { key: 'bb:p3:plan:…', what: 'Your Paper 3 plan of action for each practice stimulus, kept the same way, with the stimulus’s name and address for your dashboard.' },
   { key: 'bb:learner', what: 'For My Business Workspace: the subtopic, mindmap, case, toolkit, framework and tool pages you open, with the time of your first and latest visit, and the exercise items you check, with whether each was right. Capped at the 400 most recent pages.' },
   { key: 'bb:saved', what: 'The pages and items you saved with the Save button or added to your learning list, listed in My Business Workspace.' },
+  { key: 'bb:studied', what: 'The subtopics you marked as complete with Mark as complete on their pages, each with the time you did, counted on your dashboard.' },
+  { key: 'bb:study', what: 'Your study mode settings on the subtopic pages: the text size you chose and whether low light is on.' },
+  { key: 'bb:planner', what: 'Your revision planner: the examination date, start, level, hours, study days and subtopics you entered, the plan made from them, and the sessions you marked done.' },
   { key: 'bb:workspace:list', what: 'The order you gave your learning list in My Business Workspace, and the status (to do, in progress or done) and short note you gave each item on it.' },
   { key: 'bb:workspace:notes', what: 'Your notes in the workspace’s notebook, written there or with Add a note beside a Save button: case notes under six headings or free notes, each with the page it is attached to, if any, and when you wrote it.' },
   { key: 'bb:workspace:snapshots', what: 'The results you saved from the Financial Laboratory with Save this result to my workspace: the calculator, your figures, the headline result and the date.' },
@@ -42,7 +56,7 @@ const KEYS = [
   { key: 'bb:ops:…', what: 'Your figures, choices and plans in the Operations Floor tools.' },
   { key: 'bb:framework:…', what: 'Your answer to the exercise on each page of the frameworks library.' },
   { key: 'bb:framework-apply:…', what: 'Your worksheet in the Apply it section of each page of the frameworks library: your decision, the business, your entry for each part of the framework, your reading of the result and what you think it justifies.' },
-  { key: 'bb:lesson-plan', what: 'The lesson length and the SL or HL class you chose in the teachers’ lesson library.' },
+  { key: 'bb:lesson-plan', what: 'The lesson length and the SL or HL class you chose in the teachers’ lesson library, which the lesson sequences in the Teacher resource area also follow.' },
   { key: 'bb:finance:advanced:…', what: 'Your figures in each advanced financial management tool at the Finance Desk: the forecast’s drivers, scenarios and alternatives, the projects and cost of capital in the comparator, the two cost structures, and the accounts in the performance dashboard, with a one-line summary of the results for your dashboard.' },
 ];
 ---
@@ -85,7 +99,7 @@ const KEYS = [
       </div>
       <div class="prose" style="margin-top:var(--sp-5)">
         <p>
-          <a href="/dashboard/">My Business Workspace</a> is built from these items. To show where you have been, the site notes in
+          <a href="/dashboard/">My dashboard</a> is built from these items. To show where you have been, the site notes in
           <code>bb:learner</code> the pages you open, by kind, and when. Like everything else here, it stays in this browser and is never
           sent anywhere. You can turn it off in the workspace (nothing new is noted while it is off), download a copy, export the work you
           choose, or clear it.

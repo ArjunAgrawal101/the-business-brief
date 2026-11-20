@@ -1,0 +1,126 @@
+---
+/**
+ * One resource in the Resources Library: a preview that carries information
+ * (the real map or diagram, the first page of a PDF, the sections of a set of
+ * notes), what it is, its level and standing, its topic tags, its format and
+ * size, and how to open or download it. The same markup serves the card and
+ * the list views; library.css arranges it.
+ */
+import { FORMAT_LABELS, LEVEL_LABELS, STANDING_LABELS, hiddenWords, linkFacts, type LibraryItem, type LibraryLink } from '../../lib/library/catalogue';
+
+interface Props {
+  item: LibraryItem;
+  /** Subtopic titles by code, for the topic tags. */
+  titles: Record<string, string>;
+}
+const { item: it, titles } = Astro.props;
+const href = it.details ?? it.primary.href;
+const titleIsFile = href === it.primary.href && Boolean(it.primary.file);
+// The other ways in: shown only when the title does not already lead there.
+const actions = [it.primary, ...it.more].filter((l) => l.href !== href);
+const MAX_TAGS = 4;
+// The subtopic's number leads the entry when it is about one subtopic, so the title and the tags need not repeat it.
+const codeLed = Boolean(it.code && it.title.startsWith(`${it.code} `));
+const shownTitle = codeLed ? it.title.slice((it.code ?? '').length + 1) : it.title;
+const tags = it.subtopics.length === 1 && it.subtopics[0] === it.code ? [] : it.subtopics.slice(0, MAX_TAGS);
+const level = it.scope === 'enrichment' ? null : LEVEL_LABELS[it.level];
+const image = it.preview.kind === 'image' ? it.preview : null;
+const contents = it.preview.kind === 'contents' ? it.preview : null;
+const formulas = it.preview.kind === 'formulas' ? it.preview : null;
+const SHOWN = 4;
+/** What a download link says: "Download PDF, 5 pages, 1.0 MB", or its own label and the facts. */
+const fileText = (l: LibraryLink) => (l.label === 'Download' ? `Download ${linkFacts(l)}` : `${l.label}, ${linkFacts(l)}`);
+// The format in words, unless an action below already gives it with the file's size.
+const format = [titleIsFile ? linkFacts(it.primary) : it.primary.file ? null : FORMAT_LABELS[it.primary.format], it.printable && it.primary.format === 'page' ? 'prints from the page' : null].filter(Boolean).join(', ');
+---
+
+<li class:list={['lib-item', `lib-item--${it.category}`, { 'lib-item--image': image, 'lib-item--page': image?.webp }]} data-id={it.id} data-k={hiddenWords(it, SHOWN)}>
+  {
+    image && (
+      <div class="lib-item__preview" aria-hidden="true">
+        {image.webp ? (
+          <picture>
+            {image.avif && <source type="image/avif" srcset={image.avif} sizes="(max-width: 40rem) 40vw, 12rem" />}
+            <source type="image/webp" srcset={image.webp} sizes="(max-width: 40rem) 40vw, 12rem" />
+            <img src={image.src} alt="" width={image.width} height={image.height} loading="lazy" decoding="async" />
+          </picture>
+        ) : (
+          <img src={image.src} alt="" width={image.width} height={image.height} loading="lazy" decoding="async" />
+        )}
+      </div>
+    )
+  }
+  <div class="lib-item__body">
+    <p class="lib-item__kind">
+      {it.code && <span class="lib-item__code">{it.code}</span>}
+      <span>{it.kind}</span>
+    </p>
+    <h3 class="lib-item__title">
+      {titleIsFile ? <a href={href} download>{shownTitle}</a> : <a href={href}>{shownTitle}</a>}
+    </h3>
+    {it.summary && <p class="lib-item__sum">{it.summary}</p>}
+    {
+      contents && contents.items.length > 0 && (
+        <div class="lib-item__contents">
+          <p class="lib-item__contents-h">{contents.total === 1 ? 'Contains' : `Contains ${contents.total}`}</p>
+          <ol>
+            {contents.items.slice(0, SHOWN).map((x) => (
+              <li>{x}</li>
+            ))}
+          </ol>
+          {contents.total > SHOWN && <p class="lib-item__contents-more">and {contents.total - SHOWN} more</p>}
+        </div>
+      )
+    }
+    {
+      formulas && (
+        <div class="lib-item__contents lib-item__contents--formulas">
+          <p class="lib-item__contents-h">{formulas.note}</p>
+          <ol>
+            {formulas.items.map((x) => (
+              <li>{x}</li>
+            ))}
+          </ol>
+        </div>
+      )
+    }
+    <p class="lib-item__meta">
+      {level && <span class:list={['lib-lvl', { 'lib-lvl--hl': it.level === 'HL' }]}>{level}</span>}
+      {it.standing && <span class:list={['lib-std', `lib-std--${it.standing}`]}>{STANDING_LABELS[it.standing]}</span>}
+      {format && <span class="lib-fmt"><span class="sr-only">Format: </span>{format}</span>}
+    </p>
+    {
+      tags.length > 0 && (
+        <p class="lib-tags">
+          <span class="sr-only">Subtopics: </span>
+          {tags.map((code) => (
+            <a class="lib-tag" href={`?subtopic=${code}#lib-results`} data-subtopic={code}>
+              {code}
+              <span class="sr-only"> {titles[code] ?? ''}</span>
+            </a>
+          ))}
+            {it.subtopics.length > MAX_TAGS && <span class="lib-tag lib-tag--more">and {it.subtopics.length - MAX_TAGS} more</span>}
+        </p>
+      )
+    }
+    {
+      actions.length > 0 && (
+        <p class="lib-item__acts">
+          {actions.map((l) =>
+            l.file ? (
+              <a class="lib-act lib-act--file" href={l.href} download>
+                {fileText(l)}
+                <span class="sr-only">: {it.title}</span>
+              </a>
+            ) : (
+              <a class="lib-act" href={l.href}>
+                {l.label}
+                <span class="sr-only">: {it.title}</span>
+              </a>
+            ),
+          )}
+        </p>
+      )
+    }
+  </div>
+</li>

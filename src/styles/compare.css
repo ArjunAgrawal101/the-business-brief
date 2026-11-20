@@ -1,0 +1,418 @@
+/*
+ * Framework comparisons. One ruled section per question; within it, a cell
+ * per side, side by side on wide screens under a header of the sides' names,
+ * stacked on phones with each cell naming its side. The comparison tool's
+ * picker sits above in a ruled band.
+ */
+
+.cmp-summary {
+  margin: 0 0 var(--sp-5);
+  max-width: var(--text-max);
+  font-size: 1.0625rem;
+}
+
+/* The grid */
+.cmp-grid {
+  border-top: 2px solid var(--rule-ink);
+}
+
+.cmp-head {
+  display: none;
+}
+
+.cmp-row {
+  padding: var(--sp-4) 0 var(--sp-5);
+  border-bottom: 1px solid var(--rule);
+}
+
+.cmp-row__h {
+  margin: 0 0 var(--sp-3);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1.25;
+  color: var(--text-strong);
+}
+
+.cmp-cells {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.cmp-cell {
+  min-width: 0;
+}
+
+.cmp-cell__side {
+  margin: 0 0 var(--sp-1);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.cmp-cell__side a {
+  color: var(--cobalt-text);
+}
+
+.cmp-cell__body {
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+
+.cmp-cell__body p {
+  margin: 0;
+}
+
+.cmp-cell__body p + p,
+.cmp-cell__body p + ul,
+.cmp-cell__body ul + p {
+  margin-top: var(--sp-2);
+}
+
+.cmp-list {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.cmp-list li + li {
+  margin-top: var(--sp-1);
+}
+
+.cmp-fix {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--text-body);
+}
+
+.cmp-sub {
+  font-weight: 700;
+  color: var(--text-strong);
+}
+
+.cmp-tagline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-1) var(--sp-2);
+}
+
+.cmp-links,
+.cmp-terms,
+.cmp-fw {
+  font-size: var(--fs-small);
+}
+
+.cmp-hl {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-strong);
+}
+
+@media (min-width: 48rem) {
+  /* Sticks just below the site's own sticky header, so the columns stay named while the reader scrolls. */
+  .cmp-head {
+    position: sticky;
+    top: var(--header-h);
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+    gap: var(--sp-5);
+    padding: var(--sp-2) 0;
+    background: var(--surface-page);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .cmp-head__name + .cmp-head__name {
+    padding-left: var(--sp-5);
+  }
+
+  .cmp-head__name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-strong);
+  }
+
+  .cmp-cells {
+    grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+    gap: var(--sp-5);
+  }
+
+  .cmp-cell + .cmp-cell {
+    padding-left: var(--sp-5);
+    border-left: 1px solid var(--rule-hair);
+  }
+
+  /* The header names the columns, so each cell's own label is for screen readers and for phones. */
+  .cmp-cell__side {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+/* After the grid */
+.cmp-after {
+  margin-top: var(--sp-8);
+}
+
+.cmp-diff {
+  max-width: var(--text-max);
+  margin-top: var(--sp-4);
+}
+
+.cmp-when {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  gap: 0 var(--sp-6);
+  margin: var(--sp-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cmp-when li {
+  display: grid;
+  align-content: start;
+  gap: var(--sp-1);
+  padding: var(--sp-3) 0;
+  border-top: 1px solid var(--rule);
+}
+
+.cmp-when p {
+  margin: 0;
+}
+
+.cmp-when__situation {
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.cmp-when__label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.cmp-when__why {
+  font-size: 0.9375rem;
+}
+
+.cmp-more {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: var(--sp-5) var(--sp-6);
+  margin-top: var(--sp-4);
+}
+
+.cmp-more .link-list {
+  margin-top: var(--sp-2);
+}
+
+.cmp-note {
+  margin-top: var(--sp-5);
+  max-width: var(--text-max);
+}
+
+/* The tool */
+.cmp-tool {
+  display: grid;
+  gap: var(--sp-5);
+}
+
+.cmp-picker {
+  display: grid;
+  gap: var(--sp-3);
+  padding: var(--sp-4) 0;
+  border-top: 2px solid var(--rule-ink);
+  border-bottom: 1px solid var(--rule);
+}
+
+.cmp-picker__pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--sp-3) var(--sp-4);
+}
+
+.cmp-picker .select,
+.cmp-picker .input {
+  min-height: 2.75rem;
+  font-size: 0.9375rem;
+}
+
+.cmp-swap {
+  min-height: 2.75rem;
+}
+
+.cmp-search {
+  max-width: 32rem;
+}
+
+.cmp-results__count {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--text-muted);
+}
+
+.cmp-results__list {
+  margin: var(--sp-2) 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule-hair);
+}
+
+.cmp-results__list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-1) var(--sp-4);
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.cmp-results__name {
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.cmp-results__meta {
+  grid-column: 1;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.cmp-results__acts {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.cmp-results__acts .btn {
+  min-height: 2.75rem;
+}
+
+.cmp-nojs,
+.cmp-empty {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.cmp-out[aria-busy="true"] {
+  opacity: 0.6;
+}
+
+.cmp-out__h {
+  margin: 0 0 var(--sp-3);
+  font-size: var(--fs-h3);
+  overflow-wrap: anywhere;
+}
+
+.cmp-out__vs {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.cmp-notice {
+  margin: 0 0 var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-left: 3px solid var(--rule-ink);
+  background: var(--surface-sheet);
+  max-width: 52rem;
+}
+
+/* The lists after the tool */
+.cmp-index {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 0 var(--sp-6);
+  margin: var(--sp-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cmp-index li {
+  padding: var(--sp-3) 0;
+  border-top: 1px solid var(--rule);
+}
+
+.cmp-index__title {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.cmp-index__q {
+  margin: var(--sp-1) 0 0;
+  font-size: 0.9375rem;
+}
+
+.cmp-index__meta {
+  margin: var(--sp-1) 0 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.cmp-lib {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+  gap: var(--sp-5) var(--sp-6);
+  margin-top: var(--sp-4);
+}
+
+.cmp-lib__h {
+  margin: 0 0 var(--sp-2);
+  font-size: 1.0625rem;
+}
+
+.cmp-lib__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.cmp-lib__list li {
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.cmp-lib__standing {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.cmp-how {
+  margin-top: var(--sp-4);
+  max-width: var(--text-max);
+}
+
+@media (max-width: 40rem) {
+  .cmp-picker__pair {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cmp-swap {
+    justify-self: start;
+  }
+
+  .cmp-results__list li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cmp-results__acts {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}

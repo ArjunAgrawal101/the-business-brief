@@ -1,45 +1,55 @@
 /**
- * Paper 2 calculation practice in the browser: new questions from the seeded
- * generator, checking within the stated tolerance, the working and typical
- * errors, a timed set at Paper 2's pace, and the record in bb:p2-practice.
- * The rules live in src/lib/p2-practice.ts and the markup in
- * src/lib/p2-render.ts; this file wires them to the page.
+ * Paper 2 practice in the browser: new questions from the seeded generators,
+ * of four kinds (calculate, find the slip, read the data, construct in a
+ * grid), checked within their tolerance with the working and typical errors,
+ * a timed set at Paper 2's pace, and the record in bb:p2-practice. The rules
+ * live in src/lib/p2-practice.ts (with p2-calcs.ts and p2-tasks.ts) and the
+ * markup in src/lib/p2-render.ts; this file wires them to the page.
  */
 import { announce, each, escapeHtml, readConfig, store } from '../ix';
 import {
   GROUPS,
-  KINDS,
-  check,
+  META,
+  allKindsFor,
+  checkAny,
   drawSet,
   emptyP2,
-  generate,
-  kindsFor,
+  generateAny,
+  isChoice,
+  isGrid,
   nextPick,
+  parseAnswer,
   parseCode,
   parseP2,
   recordAttempt,
   recordTimed,
   score,
+  type AnyFeedback,
+  type AnyQuestion,
   type GroupId,
+  type KindMeta,
   type P2State,
-  type PracticeQuestion,
+  type Response,
+  type TaskType,
   type TimedRecord,
   type Verdict,
 } from '../../lib/p2-practice';
-import { feedbackHtml, fmtValue, questionHtml, workingHtml } from '../../lib/p2-render';
+import { answerHtml, cellMark, feedbackAnyHtml, fmtValue, gridChartHtml, questionHtml, taskLabel, workingAnyHtml } from '../../lib/p2-render';
+import { TASK_LABELS } from '../../lib/p2-tasks';
 import { fmtClock, fmtDuration, fmtPace, setSeconds, type Pace } from '../../lib/bank';
 import { rng } from '../../lib/random';
 
 interface Config {
   paces: Pace[];
   first: string;
-  kinds: Record<string, { name: string; group: GroupId; level: string; marks: number }>;
+  kinds: Record<string, KindMeta>;
 }
 
 const KEY = 'p2-practice';
 const PREFS = 'p2-prefs';
+const TASKS: TaskType[] = ['calc', 'spot', 'read', 'build'];
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
-const VERDICT_WORDS: Record<Verdict | 'blank', string> = { right: 'Right', close: 'Nearly', wrong: 'Not yet', invalid: 'Not a number', blank: 'Not answered' };
+const VERDICT_WORDS: Record<Verdict | 'blank', string> = { right: 'Right', close: 'Nearly', wrong: 'Not yet', invalid: 'Not answered', blank: 'Not answered' };
 
 function download(name: string, text: string, type: string) {
   const url = URL.createObjectURL(new Blob([text], { type }));
@@ -56,6 +66,71 @@ const today = () => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
+
+/** The answer to show once a question is marked or revealed. */
+const answerText = (q: AnyQuestion) => (isChoice(q) || isGrid(q) ? q.answerText : q.answer);
+
+/** What the reader has entered in an answer form, by the question's form. */
+function readResponse(box: ParentNode, q: AnyQuestion): Response {
+  if (isChoice(q)) return box.querySelector<HTMLInputElement>('input[data-choice]:checked')?.value ?? null;
+  if (isGrid(q)) {
+    const out: Record<string, string> = {};
+    box.querySelectorAll<HTMLInputElement | HTMLSelectElement>('[data-cell]').forEach((el) => {
+      out[el.dataset.cell ?? ''] = el.value;
+    });
+    return out;
+  }
+  return box.querySelector<HTMLInputElement>('input[data-number]')?.value ?? '';
+}
+
+/** True when nothing at all has been entered. */
+function isBlank(r: Response): boolean {
+  if (r === null) return true;
+  if (typeof r === 'string') return !r.trim();
+  return Object.values(r).every((v) => !v.trim());
+}
+
+/** Marks the answer form after a check: the cells of a grid, the chosen and the right option, an invalid figure. All in words. */
+function paintMarks(box: ParentNode, q: AnyQuestion, f: AnyFeedback) {
+  if (f.form === 'grid') {
+    for (const c of f.cells) {
+      const el = box.querySelector<HTMLInputElement | HTMLSelectElement>(`[data-cell="${c.id}"]`);
+      if (!el) continue;
+      const mark = el.parentElement?.querySelector<HTMLElement>('[data-cell-mark]');
+      if (mark) mark.textContent = cellMark(c);
+      el.closest('.pp-cell, .pp-grid__field')?.setAttribute('data-verdict', c.verdict);
+      if (c.verdict === 'wrong' || c.verdict === 'invalid') el.setAttribute('aria-invalid', 'true');
+      else el.removeAttribute('aria-invalid');
+    }
+    return;
+  }
+  if (f.form === 'choice' && isChoice(q)) {
+    box.querySelectorAll<HTMLInputElement>('input[data-choice]').forEach((inp) => {
+      const label = inp.closest('label');
+      const mark = label?.querySelector<HTMLElement>('[data-choice-mark]');
+      const right = inp.value === q.answer;
+      const chosen = inp.value === f.chosen;
+      label?.setAttribute('data-verdict', right ? 'right' : chosen ? 'wrong' : '');
+      if (mark) mark.textContent = right ? 'The answer' : chosen ? 'Your choice: not this one' : '';
+    });
+    return;
+  }
+  const inp = box.querySelector<HTMLInputElement>('input[data-number]');
+  if (!inp) return;
+  if (f.verdict === 'invalid') inp.setAttribute('aria-invalid', 'true');
+  else inp.removeAttribute('aria-invalid');
+}
+
+/** Draws the reader's own break-even chart from a grid, where the question has one. */
+function drawGridChart(box: ParentNode, slot: HTMLElement | null, q: AnyQuestion, uid: string) {
+  if (!slot) return;
+  if (!isGrid(q) || !q.chart) {
+    slot.innerHTML = '';
+    return;
+  }
+  const read = (id: string) => parseAnswer(box.querySelector<HTMLInputElement>(`[data-cell="${id}"]`)?.value ?? '', 'money');
+  slot.innerHTML = gridChartHtml(q, read, uid);
+}
 
 each('[data-ix="p2-practice"]', (root) => {
   const cfg = readConfig<Config>(root);
@@ -75,11 +150,13 @@ each('[data-ix="p2-practice"]', (root) => {
   const level = (): 'SL' | 'HL' => (radios('level').find((r) => r.checked)?.value === 'SL' ? 'SL' : 'HL');
   const mode = (): 'practice' | 'timed' => (radios('mode').find((r) => r.checked)?.value === 'timed' ? 'timed' : 'practice');
   const topics = (): GroupId[] => radios('topic').filter((r) => r.checked && !r.disabled).map((r) => r.value as GroupId);
-  const kinds = () => kindsFor(topics(), level());
+  const tasks = (): TaskType[] => radios('task').filter((r) => r.checked).map((r) => r.value as TaskType);
+  const kinds = () => allKindsFor(topics(), level(), tasks());
 
-  const prefs = store.get<{ level?: string; topics?: string[] }>(PREFS, {});
+  const prefs = store.get<{ level?: string; topics?: string[]; tasks?: string[] }>(PREFS, {});
   if (prefs.level === 'SL' || (prefs.level === undefined && document.documentElement.getAttribute('data-level') === 'SL')) radios('level').forEach((r) => (r.checked = r.value === 'SL'));
   if (Array.isArray(prefs.topics) && prefs.topics.length) radios('topic').forEach((r) => (r.checked = prefs.topics?.includes(r.value) ?? true));
+  if (Array.isArray(prefs.tasks) && prefs.tasks.some((t) => (TASKS as string[]).includes(t))) radios('task').forEach((r) => (r.checked = prefs.tasks?.includes(r.value) ?? true));
 
   const practiceBar = q<HTMLElement>('[data-practice-bar]');
   const timedBar = q<HTMLElement>('[data-timed-bar]');
@@ -98,25 +175,30 @@ each('[data-ix="p2-practice"]', (root) => {
     if (newBtn) newBtn.disabled = none;
     if (startBtn) startBtn.disabled = none;
     const info = q<HTMLElement>('[data-session]');
-    if (none && info) info.textContent = 'Choose at least one topic available at your level.';
+    if (none && info) info.textContent = 'Choose at least one topic and one kind of task available at your level.';
     const timed = mode() === 'timed';
     if (practiceBar) practiceBar.hidden = timed;
     if (timedBar) timedBar.hidden = !timed;
     if (card) card.hidden = timed || running !== null;
-    store.set(PREFS, { level: level(), topics: radios('topic').filter((r) => r.checked).map((r) => r.value) });
+    store.set(PREFS, { level: level(), topics: radios('topic').filter((r) => r.checked).map((r) => r.value), tasks: tasks() });
   };
 
   /* ---------- One question at a time ---------- */
 
-  let current: PracticeQuestion = generate(parseCode(cfg.first)?.kind ?? 'break-even-quantity', parseCode(cfg.first)?.seed ?? 24680);
+  const firstCode = parseCode(cfg.first);
+  let current: AnyQuestion = generateAny(firstCode?.kind ?? 'break-even-quantity', firstCode?.seed ?? 24680);
   let recorded = false;
   let revealed = false;
   const session = { checked: 0, right: 0 };
-  const input = q<HTMLInputElement>('#pp-answer');
+  const form = q<HTMLFormElement>('[data-answer-form]');
+  const answerBody = q<HTMLElement>('[data-answer-body]');
   const feedback = q<HTMLElement>('[data-feedback]');
   const work = q<HTMLDetailsElement>('[data-work]');
+  const chartSlot = q<HTMLElement>('[data-chart-slot]');
 
-  const show = (qq: PracticeQuestion, focus = false) => {
+  const focusAnswer = () => answerBody?.querySelector<HTMLElement>('input, select')?.focus();
+
+  const show = (qq: AnyQuestion, focus = false) => {
     current = qq;
     recorded = false;
     revealed = false;
@@ -124,26 +206,22 @@ each('[data-ix="p2-practice"]', (root) => {
       const el = q<HTMLElement>(sel);
       if (el) el.textContent = text;
     };
+    set('[data-q-task]', taskLabel(qq));
     set('[data-q-group]', GROUPS[qq.group].label);
     set('[data-q-code]', `Question code ${qq.code}`);
     set('[data-q-name]', qq.name);
     set('[data-q-biz]', qq.business);
-    set('[data-prefix]', qq.prefix);
-    set('[data-suffix]', qq.suffix);
-    set('[data-hint]', `For example ${qq.example}. ${qq.toleranceText}`);
     const hl = q<HTMLElement>('[data-q-hl]');
     if (hl) hl.hidden = qq.level !== 'HL';
     const body = q<HTMLElement>('[data-q-body]');
     if (body) body.innerHTML = questionHtml(qq, 'pp-q');
+    if (answerBody) answerBody.innerHTML = answerHtml(qq, 'pp-q', true);
     const wb = q<HTMLElement>('[data-work-body]');
-    if (wb) wb.innerHTML = workingHtml(qq);
+    if (wb) wb.innerHTML = workingAnyHtml(qq, 'pp-q');
     if (work) work.open = false;
     if (feedback) feedback.innerHTML = '';
-    if (input) {
-      input.value = '';
-      input.removeAttribute('aria-invalid');
-      if (focus) input.focus();
-    }
+    if (chartSlot) chartSlot.innerHTML = '';
+    if (focus) focusAnswer();
     try {
       history.replaceState(null, '', `#${qq.code}`);
     } catch {
@@ -155,7 +233,7 @@ each('[data-ix="p2-practice"]', (root) => {
     const ks = kinds();
     if (!ks.length) return;
     const p = nextPick(ks, pick, current.kind);
-    show(generate(p.kind, p.seed), true);
+    show(generateAny(p.kind, p.seed), true);
     announce(live, `New question: ${current.name}, code ${current.code}.`);
   };
   newBtn?.addEventListener('click', newQuestion);
@@ -165,16 +243,13 @@ each('[data-ix="p2-practice"]', (root) => {
     if (el) el.textContent = session.checked ? `This session: ${session.right} of ${plural(session.checked, 'question', 'questions')} right first time.` : 'This session: none checked yet.';
   };
 
-  q<HTMLFormElement>('[data-answer-form]')?.addEventListener('submit', (e) => {
+  form?.addEventListener('submit', (e) => {
     e.preventDefault();
-    const raw = input?.value ?? '';
-    const f = check(current, raw);
-    if (feedback) feedback.innerHTML = feedbackHtml(f, current);
-    if (input) {
-      if (f.verdict === 'invalid') input.setAttribute('aria-invalid', 'true');
-      else input.removeAttribute('aria-invalid');
-    }
+    const f = checkAny(current, readResponse(form, current));
+    if (feedback) feedback.innerHTML = feedbackAnyHtml(f, current);
+    paintMarks(form, current, f);
     if (f.verdict !== 'invalid') {
+      drawGridChart(form, chartSlot, current, 'pp-q');
       if (work) work.open = true;
       if (!recorded && !revealed) {
         recorded = true;
@@ -195,13 +270,19 @@ each('[data-ix="p2-practice"]', (root) => {
       work.open = true;
       work.querySelector('summary')?.focus();
     }
-    announce(live, `The answer is ${current.answer}. The working is shown below the question.`);
+    announce(live, `The answer is ${answerText(current)}. The working is shown below the question.`);
   });
 
   const codeForm = q<HTMLFormElement>('[data-code-form]');
   const codeIn = q<HTMLInputElement>('#pp-code');
   const codeHint = q<HTMLElement>('[data-code-hint]');
   const codeHintText = codeHint?.textContent ?? '';
+  const toPractice = () => {
+    if (mode() === 'timed' && !running) {
+      radios('mode').forEach((r) => (r.checked = r.value === 'practice'));
+      syncSettings();
+    }
+  };
   codeForm?.addEventListener('submit', (e) => {
     e.preventDefault();
     const p = parseCode(codeIn?.value ?? '');
@@ -219,18 +300,15 @@ each('[data-ix="p2-practice"]', (root) => {
       codeHint.textContent = codeHintText;
       codeHint.classList.remove('field__error');
     }
-    if (mode() === 'timed') {
-      radios('mode').forEach((r) => (r.checked = r.value === 'practice'));
-      syncSettings();
-    }
-    show(generate(p.kind, p.seed), true);
+    toPractice();
+    show(generateAny(p.kind, p.seed), true);
     announce(live, `Loaded ${current.code}: ${current.name}.`);
   });
 
   /* ---------- Timed sets ---------- */
 
   interface Running {
-    qs: PracticeQuestion[];
+    qs: AnyQuestion[];
     pace: Pace;
     allowed: number;
     banked: number;
@@ -267,16 +345,18 @@ each('[data-ix="p2-practice"]', (root) => {
     if (over) say('over', 'Time is up. Finish when you are ready; the clock now counts the time over.');
   };
 
-  const setItem = (qq: PracticeQuestion, i: number) => {
+  const setItem = (qq: AnyQuestion, i: number) => {
     const li = document.createElement('li');
     li.className = 'pp-q';
     li.dataset.index = String(i);
     const uid = `pp-s${i}`;
-    li.innerHTML = `<header class="pp-q__head"><p class="pp-q__meta"><span>Question ${i + 1} of ${running?.qs.length ?? 0}</span><span>${escapeHtml(GROUPS[qq.group].label)}</span><span class="pp-q__code">Question code ${escapeHtml(qq.code)}</span>${qq.level === 'HL' ? '<span class="tag tag--hl">HL</span>' : ''}</p><h3 class="pp-q__title" id="${uid}-h">${escapeHtml(qq.name)}</h3><p class="pp-q__biz">${escapeHtml(qq.business)}: fictional, figures simulated</p></header>
+    const num = !isChoice(qq) && !isGrid(qq);
+    li.innerHTML = `<header class="pp-q__head"><p class="pp-q__meta"><span>Question ${i + 1} of ${running?.qs.length ?? 0}</span><span class="pp-q__task">${escapeHtml(taskLabel(qq))}</span><span>${escapeHtml(GROUPS[qq.group].label)}</span><span class="pp-q__code">Question code ${escapeHtml(qq.code)}</span>${qq.level === 'HL' ? '<span class="tag tag--hl">HL</span>' : ''}</p><h3 class="pp-q__title" id="${uid}-h">${escapeHtml(qq.name)}</h3><p class="pp-q__biz">${escapeHtml(qq.business)}: fictional, figures simulated</p></header>
 <div class="pp-q__body">${questionHtml(qq, uid)}</div>
-<div class="pp-answer"><label for="${uid}-in" class="pp-answer__label">Your answer to question ${i + 1}</label><div class="pp-answer__row"><span class="pp-answer__fix" aria-hidden="true">${escapeHtml(qq.prefix)}</span><input class="input input--num pp-answer__in" id="${uid}-in" inputmode="decimal" autocomplete="off" aria-describedby="${uid}-hint" data-set-in /><span class="pp-answer__fix" aria-hidden="true">${escapeHtml(qq.suffix)}</span></div><span class="field__hint" id="${uid}-hint">For example ${escapeHtml(qq.example)}. ${escapeHtml(qq.toleranceText)}</span></div>
+<div class="pp-answer" data-set-form>${num ? answerHtml(qq, uid).replace('>Your answer<', `>Your answer to question ${i + 1}<`) : answerHtml(qq, uid)}</div>
 <div class="pp-feedback" data-set-fb></div>
-<details class="pp-work" data-set-work hidden><summary>Answer, working and typical errors</summary><div class="pp-work__body">${workingHtml(qq)}</div></details>`;
+<div data-set-chart></div>
+<details class="pp-work" data-set-work hidden><summary>Answer, working and typical errors</summary><div class="pp-work__body">${workingAnyHtml(qq, uid)}</div></details>`;
     return li;
   };
 
@@ -285,7 +365,7 @@ each('[data-ix="p2-practice"]', (root) => {
     const pace = cfg.paces.find((p) => p.id === (level() === 'SL' ? 'paper-2-sl' : 'paper-2-hl')) ?? cfg.paces[0];
     if (!ks.length || !pace) return;
     const n = Number(q<HTMLSelectElement>('[data-n]')?.value ?? 5);
-    const qs = drawSet(ks, n, seedNow()).map((x) => generate(x.kind, x.seed));
+    const qs = drawSet(ks, n, seedNow()).map((x) => generateAny(x.kind, x.seed));
     const marks = qs.reduce((s, x) => s + x.marks, 0);
     const allowed = setSeconds(marks, pace);
     running = { qs, pace, allowed, banked: 0, since: performance.now(), timer: 0, said: new Set(), done: false };
@@ -297,13 +377,13 @@ each('[data-ix="p2-practice"]', (root) => {
     if (timedBar) timedBar.hidden = true;
     if (controls) controls.hidden = true;
     const info = q<HTMLElement>('[data-run-info]');
-    if (info) info.textContent = `${plural(qs.length, 'calculation', 'calculations')}, ${marks} marks, at the ${pace.label} pace of ${fmtPace(pace)}: ${fmtDuration(allowed)} allowed.`;
+    if (info) info.textContent = `${plural(qs.length, 'question', 'questions')}, ${marks} marks, at the ${pace.label} pace of ${fmtPace(pace)}: ${fmtDuration(allowed)} allowed.`;
     if (pauseBtn) pauseBtn.textContent = 'Pause';
     tick();
     running.timer = window.setInterval(tick, 250);
     run?.scrollIntoView({ block: 'start' });
-    list?.querySelector<HTMLInputElement>('[data-set-in]')?.focus();
-    announce(live, `Timed set started: ${plural(qs.length, 'calculation', 'calculations')}, ${fmtDuration(allowed)} allowed.`);
+    list?.querySelector<HTMLElement>('input, select')?.focus();
+    announce(live, `Timed set started: ${plural(qs.length, 'question', 'questions')}, ${fmtDuration(allowed)} allowed.`);
   });
 
   pauseBtn?.addEventListener('click', () => {
@@ -339,9 +419,20 @@ each('[data-ix="p2-practice"]', (root) => {
   q<HTMLButtonElement>('[data-back]')?.addEventListener('click', () => {
     radios('mode').forEach((r) => (r.checked = r.value === 'practice'));
     endSet();
-    input?.focus();
+    focusAnswer();
     announce(live, 'Back to practice, one question at a time.');
   });
+
+  /** "Your answer" in the results table, in a few words. */
+  const yourAnswer = (qq: AnyQuestion, f: AnyFeedback | null): string => {
+    if (!f) return 'None';
+    if (f.form === 'grid') return `${f.credited} of ${f.total} cells credited`;
+    if (f.form === 'choice' && isChoice(qq)) {
+      const o = qq.options.find((x) => x.id === f.chosen);
+      return o ? o.text.slice(0, 60) + (o.text.length > 60 ? '…' : '') : 'None';
+    }
+    return f.form === 'number' && f.value !== null && !isChoice(qq) && !isGrid(qq) ? fmtValue(f.value, qq.unit) : 'Not a number';
+  };
 
   q<HTMLButtonElement>('[data-finish]')?.addEventListener('click', () => {
     const r = running;
@@ -350,23 +441,32 @@ each('[data-ix="p2-practice"]', (root) => {
     r.done = true;
     window.clearInterval(r.timer);
     const results: Array<Verdict | 'blank'> = [];
+    const earned: Array<number | null> = [];
     const rows: HTMLTableRowElement[] = [];
     list?.querySelectorAll<HTMLElement>('li[data-index]').forEach((li) => {
       const i = Number(li.dataset.index);
       const qq = r.qs[i];
       if (!qq) return;
-      const inp = li.querySelector<HTMLInputElement>('[data-set-in]');
-      const raw = inp?.value.trim() ?? '';
-      const f = raw ? check(qq, raw) : null;
+      const box = li.querySelector<HTMLElement>('[data-set-form]');
+      if (!box) return;
+      const response = readResponse(box, qq);
+      const f = isBlank(response) ? null : checkAny(qq, response);
       const v: Verdict | 'blank' = f ? f.verdict : 'blank';
       results.push(v);
-      if (inp) inp.readOnly = true;
+      earned.push(f && f.form === 'grid' ? f.earned : null);
+      box.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select').forEach((el) => {
+        if (el instanceof HTMLInputElement && el.type !== 'radio') el.readOnly = true;
+        else el.disabled = true;
+      });
+      if (f) paintMarks(box, qq, f);
       const fb = li.querySelector<HTMLElement>('[data-set-fb]');
-      if (fb) fb.innerHTML = f ? feedbackHtml(f, qq) : `<div class="feedback feedback--wrong"><p class="feedback__verdict">Not answered.</p><p>The answer is ${escapeHtml(qq.answer)}.</p></div>`;
+      if (fb) fb.innerHTML = f ? feedbackAnyHtml(f, qq) : `<div class="feedback feedback--wrong"><p class="feedback__verdict">Not answered.</p><p>The answer is ${escapeHtml(answerText(qq))}.</p></div>`;
+      if (f) drawGridChart(box, li.querySelector<HTMLElement>('[data-set-chart]'), qq, `pp-s${i}`);
       const wk = li.querySelector<HTMLDetailsElement>('[data-set-work]');
       if (wk) wk.hidden = false;
+      const m = f && f.form === 'grid' && v !== 'right' ? f.earned : v === 'right' ? qq.marks : 0;
       const tr = document.createElement('tr');
-      const cells = [`${i + 1}. ${qq.name}`, f && f.value !== null ? fmtValue(f.value, qq.unit) : 'None', qq.answer, VERDICT_WORDS[v], v === 'right' ? `${qq.marks} of ${qq.marks}` : `0 of ${qq.marks}`];
+      const cells = [`${i + 1}. ${qq.name}`, yourAnswer(qq, f), answerText(qq), VERDICT_WORDS[v], `${m} of ${qq.marks}`];
       cells.forEach((t, k) => {
         const c = document.createElement(k === 0 ? 'th' : 'td');
         if (k === 0) c.setAttribute('scope', 'row');
@@ -377,7 +477,7 @@ each('[data-ix="p2-practice"]', (root) => {
       rows.push(tr);
     });
     const codes = r.qs.map((x) => x.code);
-    const sc = score(codes, results);
+    const sc = score(codes, results, earned);
     const rec: TimedRecord = { at: new Date().toISOString(), level: level(), codes, results, marks: sc.marks, total: sc.total, allowed: r.allowed, used };
     state = recordTimed(state, rec);
     save();
@@ -439,10 +539,10 @@ each('[data-ix="p2-practice"]', (root) => {
     b.addEventListener('click', () => {
       const day = today();
       if (b.dataset.export === 'csv') {
-        const lines = [['Calculation', 'Topic', 'Level', 'Checked', 'Right first time'].join(',')];
+        const lines = [['Kind of question', 'Task', 'Topic', 'Level', 'Checked', 'Right first time'].join(',')];
         for (const [id, k] of Object.entries(state.kinds)) {
-          const d = KINDS[id];
-          if (d) lines.push([`"${d.name}"`, `"${GROUPS[d.group].label}"`, d.level, k.tried, k.right].join(','));
+          const d = META[id];
+          if (d) lines.push([`"${d.name}"`, `"${TASK_LABELS[d.task]}"`, `"${GROUPS[d.group].label}"`, d.level, k.tried, k.right].join(','));
         }
         lines.push('', ['Timed set finished', 'Level', 'Questions', 'Right', 'Marks', 'Out of', 'Seconds used', 'Seconds allowed', 'Codes'].join(','));
         for (const t of state.timed) lines.push([t.at, t.level, t.codes.length, t.results.filter((x) => x === 'right').length, t.marks, t.total, t.used, t.allowed, `"${t.codes.join(' ')}"`].join(','));
@@ -486,9 +586,34 @@ each('[data-ix="p2-practice"]', (root) => {
     if (mode() === 'practice' && ks.length && !ks.includes(current.kind)) newQuestion();
   });
   controls?.addEventListener('submit', (e) => e.preventDefault());
+  controls?.querySelectorAll<HTMLButtonElement>('[data-topics]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const all = b.dataset.topics === 'all';
+      radios('topic').forEach((r) => (r.checked = all));
+      syncSettings();
+      announce(live, all ? 'Every topic chosen.' : 'No topics chosen. Choose at least one.');
+      const ks = kinds();
+      if (mode() === 'practice' && ks.length && !ks.includes(current.kind)) newQuestion();
+    }),
+  );
 
-  const fromHash = parseCode(decodeURIComponent(location.hash.replace(/^#/, '')));
-  if (fromHash) show(generate(fromHash.kind, fromHash.seed));
+  /** A question code in the address, on arrival or from a link on the page. */
+  const fromAddress = (scroll: boolean) => {
+    const p = parseCode(decodeURIComponent(location.hash.replace(/^#/, '')));
+    if (!p) return false;
+    if (running) return false;
+    toPractice();
+    show(generateAny(p.kind, p.seed));
+    if (scroll) {
+      card?.scrollIntoView({ block: 'start' });
+      q<HTMLElement>('[data-q-name]')?.setAttribute('tabindex', '-1');
+      q<HTMLElement>('[data-q-name]')?.focus({ preventScroll: true });
+      announce(live, `Loaded ${current.code}: ${current.name}.`);
+    }
+    return true;
+  };
+  window.addEventListener('hashchange', () => fromAddress(true));
+  fromAddress(false);
   syncSettings();
   paintSession();
   paintRecord();

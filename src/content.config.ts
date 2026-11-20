@@ -34,6 +34,10 @@ import { executiveSchema } from './lib/executive/schema';
 import { briefingSchema, labToolSchema } from './lib/lab/schemas';
 import { advancedModuleSchema } from './lib/advanced-schema';
 import { boardroomBriefingSchema } from './lib/boardroom-briefings/schema';
+import { activitySchema } from './lib/teachers/schema';
+import { subtopicToolsSchema, topicConnectionSchema } from './lib/connections-schema';
+import { revisionSchema } from './lib/revision/schema';
+import { comparisonSchema } from './lib/compare/schema';
 
 /**
  * Loads every `.yaml` file in a folder, each holding a list of entries with an
@@ -99,6 +103,9 @@ export const collections = {
   concepts: defineCollection({ loader: file('./src/content/data/concepts.yaml'), schema: conceptSchema }),
   pathways: defineCollection({ loader: file('./src/content/data/pathways.yaml'), schema: pathwaySchema }),
   modules: defineCollection({ loader: file('./src/content/data/modules.yaml'), schema: moduleSchema }),
+  // The course connections: worked connections between two subtopics, and tools a subtopic can use that do not name it (src/lib/connections.ts).
+  topicConnections: defineCollection({ loader: file('./src/content/data/topic-connections.yaml'), schema: topicConnectionSchema }),
+  subtopicTools: defineCollection({ loader: file('./src/content/data/subtopic-tools.yaml'), schema: subtopicToolsSchema }),
   // The source register, one file per area (register.yaml holds the original entries), so that new material adds its own file.
   sources: defineCollection({ loader: yamlList('./src/content/sources'), schema: sourceSchema }),
   claims: defineCollection({ loader: file('./src/content/data/claims.yaml'), schema: claimSchema }),
@@ -115,4 +122,10 @@ export const collections = {
   advanced: defineCollection({ loader: yamlFiles('./src/content/advanced'), schema: advancedModuleSchema }),
   // The Boardroom Briefings: an editorial case series on management decisions (src/lib/boardroom-briefings/).
   boardroomBriefings: defineCollection({ loader: yamlFiles('./src/content/boardroom-briefings'), schema: boardroomBriefingSchema }),
+  // Classroom activities for the Teacher resource area, each built on a fictional case or Decision Room (src/lib/teachers/schema.ts).
+  activities: defineCollection({ loader: yamlFiles('./src/content/activities'), schema: activitySchema }),
+  // Quick revision: a file per subtopic with its exercises, flashcards and anything else its sheet needs (src/lib/revision/).
+  revision: defineCollection({ loader: yamlFiles('./src/content/revision'), schema: revisionSchema }),
+  // Curated framework comparisons: two or three ideas side by side, at /frameworks/compare/<a>-vs-<b>/ (src/lib/compare/).
+  comparisons: defineCollection({ loader: yamlFiles('./src/content/comparisons'), schema: comparisonSchema }),
 };

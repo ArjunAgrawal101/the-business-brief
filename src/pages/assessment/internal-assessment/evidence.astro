@@ -1,0 +1,286 @@
+---
+/**
+ * IA tool: evidence analysis. The reader logs each piece of evidence from
+ * the supporting documents and what they did with it; each is read as
+ * quoted, used or integrated (the IA research guide, p. 4), against the top
+ * level of criterion D (guide, p. 58), through src/lib/ia-evidence.ts. It
+ * gives feedback; it never marks the work. Saved in bb:ia-evidence.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import CentreHead from '../../../components/centre/CentreHead.astro';
+import GuideLabel from '../../../components/centre/GuideLabel.astro';
+import IaToolNav from '../../../components/centre/IaToolNav.astro';
+import IaIntegrity from '../../../components/centre/IaIntegrity.astro';
+import { toolPosition } from '../../../lib/ia-tools';
+import { MAX_ITEMS, emptyEvidence } from '../../../lib/ia-evidence';
+import { CREATOR_GUIDE } from '../../../lib/guide-labels';
+import '../../../styles/centre.css';
+import '../../../styles/ia-tools.css';
+
+const START = emptyEvidence().items.length;
+const SDS = ['SD1', 'SD2', 'SD3', 'SD4', 'SD5'];
+const G = CREATOR_GUIDE['internal-assessment'];
+---
+
+<BaseLayout
+  room="assessment"
+  title="Analysing your evidence"
+  description="An IB Business Management IA tool: log each piece of evidence from your supporting documents and what you did with it, and see whether it is quoted, used or integrated, against the top level of criterion D."
+  section="assessment"
+>
+  <CentreHead
+    crumb="Evidence analysis"
+    parent={{ label: 'Internal assessment', href: '/assessment/internal-assessment/' }}
+    kicker={`Internal assessment · ${toolPosition('evidence')}`}
+    title="Analysing your evidence"
+    lead="Log each piece of evidence you take from your supporting documents and what you did with it. The guide reads each one as quoted, used or integrated, and shows which documents your analysis has not touched yet. It gives feedback; it never marks your work."
+    stats={[
+      { value: '5', label: 'Marks', note: 'criterion D' },
+      { value: '3', label: 'Readings', note: 'quoted, used, integrated' },
+      { value: String(MAX_ITEMS), label: 'Pieces', note: 'of evidence at most' },
+    ]}
+  />
+
+  <div class="wrap page-body it-page">
+    <IaToolNav current="evidence" />
+
+    <section class="it-sec" aria-labelledby="ev-tool-h">
+      <SectionHead no="01" title="Your evidence" id="ev-tool-h" dek="One row for each figure or finding you use. Write in notes: this is a log of your analysis, not the project." />
+      <div class="it-tool" data-ix="ia-evidence">
+        <p class="state state--error" data-error hidden>The log could not start. You can still fill in and print this page.</p>
+        <p class="sr-only" aria-live="polite" data-live></p>
+        <div class="it-tool__head">
+          <h3 class="it-tool__title">Your evidence log</h3>
+          <p class="it-tool__saved js-only">Saved on this device as you type.</p>
+        </div>
+        <div class="field ev-docs">
+          <label for="ev-docs">How many supporting documents you have</label>
+          <select class="select" id="ev-docs" name="docs">
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5" selected>5</option>
+          </select>
+        </div>
+        <div class="it-out js-only" id="ev-out" tabindex="-1">
+          <p class="it-out__k" id="ev-sum-h">Your evidence, read as a whole</p>
+          <ul class="it-list" data-summary aria-labelledby="ev-sum-h"></ul>
+        </div>
+        <ol class="ev-items" data-items>
+          {
+            Array.from({ length: START }, (_, i) => (
+              <li class="ev-item" data-item={i}>
+                <fieldset class="it-fs">
+                  <legend class="ev-item__legend">Evidence {i + 1}</legend>
+                  <div class="ev-grid">
+                    <div class="field ev-c1">
+                      <label for={`ev-${i}-sd`}>From</label>
+                      <select class="select" id={`ev-${i}-sd`} data-f="sd">
+                        <option value="">Not traced yet</option>
+                        {SDS.map((s) => <option value={s}>{s}</option>)}
+                      </select>
+                    </div>
+                    <div class="field ev-c5">
+                      <label for={`ev-${i}-finding`}>The figure or finding</label>
+                      <input class="input" id={`ev-${i}-finding`} data-f="finding" autocomplete="off" />
+                    </div>
+                    <div class="field ev-c2">
+                      <label for={`ev-${i}-tool`}>Tool or theory applied</label>
+                      <input class="input" id={`ev-${i}-tool`} data-f="tool" autocomplete="off" list="ev-tools" />
+                    </div>
+                    <div class="field ev-c3">
+                      <label for={`ev-${i}-result`}>What it showed</label>
+                      <input class="input" id={`ev-${i}-result`} data-f="result" autocomplete="off" />
+                    </div>
+                    <div class="field ev-c1">
+                      <label for={`ev-${i}-against`}>Weighed against</label>
+                      <select class="select" id={`ev-${i}-against`} data-f="against">
+                        <option value="">No other document</option>
+                        {SDS.map((s) => <option value={s}>{s}</option>)}
+                      </select>
+                    </div>
+                    <div class="field ev-c3">
+                      <label for={`ev-${i}-assumption`}>An assumption or limitation</label>
+                      <input class="input" id={`ev-${i}-assumption`} data-f="assumption" autocomplete="off" />
+                    </div>
+                    <div class="field ev-c3">
+                      <label for={`ev-${i}-implication`}>What it means for your question</label>
+                      <input class="input" id={`ev-${i}-implication`} data-f="implication" autocomplete="off" />
+                    </div>
+                  </div>
+                  <div class="ev-verdict js-only" aria-live="polite">
+                    <p class="ev-level" data-level></p>
+                    <ul class="it-list" data-advice></ul>
+                  </div>
+                </fieldset>
+              </li>
+            ))
+          }
+        </ol>
+        <datalist id="ev-tools">
+          <option value="Break-even analysis"></option>
+          <option value="Ratio analysis"></option>
+          <option value="Cash flow forecast"></option>
+          <option value="Investment appraisal"></option>
+          <option value="Decision tree"></option>
+          <option value="Force field analysis"></option>
+          <option value="Ansoff matrix"></option>
+          <option value="STEEPLE analysis"></option>
+          <option value="SWOT analysis"></option>
+          <option value="Market share"></option>
+          <option value="Descriptive statistics"></option>
+          <option value="Motivation theory"></option>
+        </datalist>
+        <template data-item-template>
+          <li class="ev-item" data-item>
+            <fieldset class="it-fs">
+              <legend class="ev-item__legend"></legend>
+              <div class="ev-grid">
+                <div class="field ev-c1">
+                  <label data-for="sd">From</label>
+                  <select class="select" data-f="sd">
+                    <option value="">Not traced yet</option>
+                    {SDS.map((s) => <option value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div class="field ev-c5"><label data-for="finding">The figure or finding</label><input class="input" data-f="finding" autocomplete="off" /></div>
+                <div class="field ev-c2"><label data-for="tool">Tool or theory applied</label><input class="input" data-f="tool" autocomplete="off" list="ev-tools" /></div>
+                <div class="field ev-c3"><label data-for="result">What it showed</label><input class="input" data-f="result" autocomplete="off" /></div>
+                <div class="field ev-c1">
+                  <label data-for="against">Weighed against</label>
+                  <select class="select" data-f="against">
+                    <option value="">No other document</option>
+                    {SDS.map((s) => <option value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div class="field ev-c3"><label data-for="assumption">An assumption or limitation</label><input class="input" data-f="assumption" autocomplete="off" /></div>
+                <div class="field ev-c3"><label data-for="implication">What it means for your question</label><input class="input" data-f="implication" autocomplete="off" /></div>
+              </div>
+              <div class="ev-verdict" aria-live="polite">
+                <p class="ev-level" data-level></p>
+                <ul class="it-list" data-advice></ul>
+              </div>
+              <button type="button" class="btn btn--small btn--quiet ev-remove" data-remove>Remove this piece of evidence</button>
+            </fieldset>
+          </li>
+        </template>
+        <button type="button" class="btn btn--small js-only" data-add>Add a piece of evidence</button>
+        <div class="it-export js-only">
+          <button type="button" class="btn btn--small" data-csv>Download the log (CSV)</button>
+          <button type="button" class="btn btn--small" data-print>Print</button>
+          <button type="button" class="btn btn--small" data-reset>Clear this page</button>
+          <span class="it-export__confirm" data-reset-confirm hidden>
+            <span>This clears every piece of evidence you logged on this page.</span>
+            <button type="button" class="btn btn--small btn--primary" data-reset-yes>Clear it</button>
+            <button type="button" class="btn btn--small" data-reset-no>Keep it</button>
+          </span>
+        </div>
+        <p class="nojs-only small muted">With JavaScript off you can fill in and print the log, but nothing is read or saved.</p>
+      </div>
+    </section>
+
+    <section class="it-sec" aria-labelledby="ev-rules-h">
+      <SectionHead no="02" title="Quoting, using and integrating" id="ev-rules-h" />
+      <p class="ce-labels"><GuideLabel kind="ib" /> <span class="ce-cite">Business management guide, paraphrased; the page follows each point</span></p>
+      <ul class="it-rules">
+        <li><span>Criterion D (5 marks) asks how well you select and use data from the supporting documents to analyse and evaluate the research question.</span><span class="it-src">pp. 57 to 58</span></li>
+        <li><span>Its top level asks for effective use of that data, a thorough analysis and evaluation, a sustained integration of ideas, and the assumptions and implications of the arguments considered.</span><span class="it-src">p. 58</span></li>
+        <li><span>Most of the project's information should come from the three to five supporting documents.</span><span class="it-src">p. 53</span></li>
+        <li><span>The main body presents and analyses the documents' findings with tools and theories, interprets them, and weighs the strengths, weaknesses and implications of the positions on the issue.</span><span class="it-src">p. 55</span></li>
+      </ul>
+      <p class="ce-labels"><GuideLabel kind="examiner" /> <GuideLabel kind="example" /> <span class="ce-cite">{G}, p. 4</span></p>
+      <dl class="ce-dl ce-dl--wide">
+        <div><dt>Quoting</dt><dd>"SD2 says 9,000 shoppers pass each day, and 30% of those surveyed would visit weekly (SD4)."</dd></div>
+        <div><dt>Using</dt><dd>"Break-even is 20,000 sales a year, about 67 a day over 300 trading days: under 1% of the 9,000 daily shoppers (SD2)."</dd></div>
+        <div><dt>Integrating</dt><dd>"That margin looks safe, but it rests on two assumptions: Eastgate costs matching the current shop's (SD1), and Saturday interest (SD4) holding on weekdays. With two cafés closed nearby (SD5), the change is only worth making once weekday demand is tested."</dd></div>
+      </dl>
+      <p class="small muted">Crumb &amp; Co. is the IA research guide's invented bakery. The guide reports this distinction as criterion D's, and asks you always to show where a figure comes from (SD1, SD2). How the log reads each row is the platform's: a recommended strategy.</p>
+    </section>
+
+    <IaIntegrity no="03" />
+  </div>
+</BaseLayout>
+
+<style>
+  .ev-docs {
+    max-width: 22rem;
+  }
+
+  .ev-items {
+    display: grid;
+    gap: var(--sp-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .ev-items > li {
+    margin: 0;
+    padding: var(--sp-4);
+    border: 1px solid var(--rule-hair);
+    background: var(--ivory-50);
+  }
+
+  .ev-item__legend {
+    font-family: var(--font-display);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--navy-900);
+  }
+
+  .ev-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--sp-3);
+  }
+
+  .ev-c1 {
+    grid-column: span 1;
+  }
+
+  .ev-c2 {
+    grid-column: span 2;
+  }
+
+  .ev-c3 {
+    grid-column: span 3;
+  }
+
+  .ev-c5 {
+    grid-column: span 5;
+  }
+
+  .ev-verdict {
+    margin-top: var(--sp-3);
+  }
+
+  .ev-level {
+    font-weight: 700;
+    color: var(--navy-900);
+  }
+
+  .ev-level:empty {
+    display: none;
+  }
+
+  .ev-remove {
+    margin-top: var(--sp-2);
+  }
+
+  @media (max-width: 52rem) {
+    .ev-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ev-c1,
+    .ev-c2,
+    .ev-c3,
+    .ev-c5 {
+      grid-column: auto;
+    }
+  }
+</style>
+
+<script>
+  import '../../../scripts/centre/ia-evidence';
+</script>

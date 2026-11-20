@@ -32,11 +32,17 @@ test.describe('Saved items and the dashboard', () => {
     await ready(page, '[data-ix="progress"]');
     await expect(page.locator('[data-empty]')).toBeHidden();
     await expect(page.locator('[data-saved] a[href="/topics/stakeholders/"]')).toHaveText('1.4 Stakeholders');
+    await expect(page.locator('[data-recent]')).toContainText('1.4 Stakeholders');
+    expect(await axe(page), 'axe violations with data').toEqual([]);
+    // The full record is on the progress page.
+    await page.goto('/progress/');
+    await ready(page, '[data-ix="progress"]');
     await expect(page.locator('[data-visits]')).toContainText('1.4 Stakeholders');
     await expect(page.locator('.db-row[data-code="1.4"] [data-you]')).toHaveText('Read');
     await expect(page.locator('.db-row[data-code="1.4"]')).toHaveClass(/is-explored/);
     await expect(page.locator('[data-summary]')).toContainText('Saved items1');
-    expect(await axe(page), 'axe violations with data').toEqual([]);
+    await page.goto('/dashboard/');
+    await ready(page, '[data-ix="progress"]');
 
     await page.locator('[data-saved] [data-remove]').click();
     await expect(page.locator('[data-saved]')).toContainText('Nothing saved yet');
@@ -72,7 +78,7 @@ test.describe('Saved items and the dashboard', () => {
     const verdict = (await item.getAttribute('class'))?.match(/is-(right|partial|wrong)/)?.[1];
     const words = { right: '1 right', partial: '1 partly right', wrong: '1 not yet right' }[verdict ?? 'right'] ?? '1 right';
 
-    await page.goto('/dashboard/');
+    await page.goto('/progress/');
     await ready(page, '[data-ix="progress"]');
     const row = page.locator('[data-groups] li', { hasText: "Classify Atelier Barro's costs" });
     await expect(row).toContainText('Checked 1 of');
@@ -81,10 +87,11 @@ test.describe('Saved items and the dashboard', () => {
     await expect(page.locator('.db-row[data-code="3.3"]')).toHaveClass(/is-practised/);
   });
 
-  test('the old progress address shows the dashboard, now My Business Workspace', async ({ page }) => {
+  test('the old progress address shows the full record behind the dashboard', async ({ page }) => {
     await page.goto('/progress/');
     await ready(page, '[data-ix="progress"]');
-    await expect(page.locator('h1')).toHaveText('My Business Workspace');
+    await expect(page.locator('h1')).toHaveText('Your progress');
+    await expect(page.locator('main a[href="/dashboard/"]').first()).toBeVisible();
   });
 
   test('a room tool\'s work is listed under its room, with a link back to the tool', async ({ page }) => {
@@ -98,6 +105,8 @@ test.describe('Saved items and the dashboard', () => {
     const group = page.locator('[data-work] .pr-group', { hasText: 'Strategy Studio' });
     await expect(group.locator('a[href="/strategy-studio/swot/"]')).toBeVisible();
     await expect(group).toContainText('Two strengths outweigh one threat, saved today');
+    await page.goto('/progress/');
+    await ready(page, '[data-ix="progress"]');
     await expect(page.locator('[data-summary]')).toContainText(/Strategy Studio analyses1 of \d+/);
     await expect(page.locator('[data-groups] a[href="/boardroom/kestle-cycles/"]')).toBeVisible();
     await expect(page.locator('[data-groups]')).toContainText(/1 of \d rounds decided/);
@@ -114,13 +123,15 @@ test.describe('Your data', () => {
     await expect(page.locator('[data-statusline]')).toContainText('paused');
     const cases = page.locator('[data-visits] .db-col', { hasText: 'Cases' });
     await page.goto('/cases/atelier-barro/');
-    await page.goto('/dashboard/');
+    await page.goto('/progress/');
     await ready(page, '[data-ix="progress"]');
     await expect(cases.locator('.db-count')).toHaveText('0');
+    await page.goto('/dashboard/');
+    await ready(page, '[data-ix="progress"]');
     await page.locator('label.db-switch').click();
     await expect(page.locator('[data-record]')).toBeChecked();
     await page.goto('/cases/atelier-barro/');
-    await page.goto('/dashboard/');
+    await page.goto('/progress/');
     await ready(page, '[data-ix="progress"]');
     await expect(cases.locator('.db-count')).toHaveText('1');
     await expect(cases.locator('.db-list a[href="/cases/atelier-barro/"]')).toHaveText('Atelier Barro');
@@ -177,8 +188,11 @@ test.describe('Your data', () => {
     await expect(page.locator('[data-msg]')).toHaveText(`Imported ${Object.keys(file.items).length} items.`);
     await expect(page.locator('[data-import]')).not.toHaveAttribute('aria-invalid', 'true');
     await expect(page.locator('[data-saved]')).toContainText('Atelier Barro');
-    await expect(page.locator('[data-groups]')).toContainText('Self-marked: 3 of 3 marks');
+    await expect(page.locator('[data-practice]')).toContainText('1 self-marked: 3 of 3 marks (100%)');
     await expect(page.locator('html')).toHaveAttribute('data-level', 'SL');
+    await page.goto('/progress/');
+    await ready(page, '[data-ix="progress"]');
+    await expect(page.locator('[data-groups]')).toContainText('Self-marked: 3 of 3 marks');
   });
 });
 
@@ -270,12 +284,15 @@ test.describe('Without JavaScript', () => {
     await expect(page.locator('[data-entry] a[href="/topics/stakeholders/"]')).toBeVisible();
   });
 
-  test('the dashboard says what it would show, and lists the course with its coverage', async ({ page }) => {
+  test('the dashboard says what it would show, and the progress page lists the course with its coverage', async ({ page }) => {
     await page.goto('/dashboard/');
+    await expect(page.locator('.db-nojs')).toBeVisible();
+    await expect(page.locator('[data-empty]')).toBeHidden();
+    await expect(page.locator('[data-export]')).toBeHidden();
+    await page.goto('/progress/');
     await expect(page.locator('.db-nojs')).toBeVisible();
     await expect(page.locator('.db-row')).toHaveCount(37);
     await expect(page.locator('.db-row').first().locator('.db-cov')).toBeVisible();
     await expect(page.locator('[data-empty]')).toBeHidden();
-    await expect(page.locator('[data-export]')).toBeHidden();
   });
 });

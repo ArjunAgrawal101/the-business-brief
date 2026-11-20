@@ -85,4 +85,19 @@ const { current } = Astro.props;
     font-size: 0.875rem;
     color: var(--text-muted);
   }
+
+  /* On a phone the tools sit in two columns, so the list does not push the tool below the first screen. */
+  @media (max-width: 40rem) {
+    .itn__list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      width: 100%;
+    }
+
+    .itn__list a {
+      margin-right: 0;
+      padding-right: var(--sp-2);
+      font-size: 0.875rem;
+    }
+  }
 </style>

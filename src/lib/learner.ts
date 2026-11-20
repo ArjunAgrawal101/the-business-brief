@@ -6,17 +6,20 @@
  * value and returns a new one, so every rule can be tested, and a damaged or
  * hostile value (an old version, a hand-edited export) can never break a page.
  *
- * Two items belong to the dashboard:
+ * Three items belong to the dashboard:
  * - bb:learner holds the pages opened, by kind (topic, mindmap, case,
  *   framework, tool), with the time of the first and latest visit, and the
  *   exercise items checked, so the dashboard can say what was right. It is
  *   capped in entries and in size.
  * - bb:saved holds the pages the reader chose to keep.
+ * - bb:studied holds the subtopics the reader marked as complete with "Mark
+ *   as complete" on a subtopic page, by code, with the time they did.
  * Everything else on the dashboard is read from the tools' own items.
  */
 
 export const LEARNER_KEY = 'bb:learner';
 export const SAVED_KEY = 'bb:saved';
+export const STUDIED_KEY = 'bb:studied';
 
 /** The kinds of page the recorder notes. Any other page is not recorded. */
 export const VISIT_KINDS = ['topic', 'mindmap', 'case', 'framework', 'tool'] as const;
@@ -101,6 +104,8 @@ export const LIMITS = {
   title: 140,
   url: 300,
   saved: 200,
+  /** Subtopics marked as complete: the course has 37, so this only stops a hand-edited value growing. */
+  studied: 100,
   /** The whole bb:learner value, serialized. */
   bytes: 100_000,
   /** A page opened again within this time is the same visit. */
@@ -265,6 +270,37 @@ export function recordVisit(log: LearnerLog, input: { kind: VisitKind; url: stri
   return capLog({ ...log, visits: [visit, ...log.visits.filter((x) => x.url !== url)] }, limits);
 }
 
+export interface RecentVisit {
+  url: string;
+  title: string;
+  kind: VisitKind;
+  /** The time of the latest visit, ISO. */
+  at: string;
+}
+
+/**
+ * The pages most recently opened, newest first, one entry per address, at
+ * most `n` (for "Recently viewed" in the header and on the dashboard). It
+ * takes the stored bb:learner value as it is, or a record already parsed, and
+ * never throws: anything it cannot read gives an empty list. `except` leaves
+ * one address out, such as the page the reader is on.
+ */
+export function recentVisits(log: unknown, n = 5, except?: string): RecentVisit[] {
+  const max = Number.isFinite(n) ? Math.min(LIMITS.visits, Math.max(0, Math.floor(n))) : 0;
+  if (!max) return [];
+  const skip = except ? pagePath(except) : null;
+  const out: RecentVisit[] = [];
+  const seen = new Set<string>();
+  // parseLog keeps one entry per page, newest first, and drops anything malformed.
+  for (const v of parseLog(log).visits) {
+    if (v.url === skip || seen.has(v.url)) continue;
+    seen.add(v.url);
+    out.push({ url: v.url, title: v.title, kind: v.kind, at: v.last });
+    if (out.length >= max) break;
+  }
+  return out;
+}
+
 /**
  * The kind of a page, from its address. Topic, mindmap, case and framework
  * pages are the ones under /topics/, /mindmaps/, /cases/, /toolkit/ and
@@ -278,8 +314,8 @@ export function kindOfPath(path: string, toolPrefixes: readonly string[]): Visit
   if (/^\/topics\/[^/]+\/$/.test(p)) return 'topic';
   if (/^\/mindmaps\/[^/]+\/$/.test(p)) return 'mindmap';
   if (/^\/cases\/[^/]+\/$/.test(p)) return 'case';
-  // The Framework Application Lab's hub (/frameworks/lab/) is not a framework.
-  if (/^\/(toolkit|frameworks)\/[^/]+\/$/.test(p) && p !== '/frameworks/lab/') return 'framework';
+  // The Framework Application Lab's hub (/frameworks/lab/) and the comparison tool (/frameworks/compare/) are not frameworks.
+  if (/^\/(toolkit|frameworks)\/[^/]+\/$/.test(p) && p !== '/frameworks/lab/' && p !== '/frameworks/compare/') return 'framework';
   if (toolPrefixes.some((pre) => pre !== '/' && p.startsWith(pre))) return 'tool';
   return null;
 }
@@ -427,6 +463,54 @@ export function addSaved(list: SavedList, item: { url: string; title: string; ki
   return { list: { v: 1, items: [entry, ...list.items] }, added: true };
 }
 
+/* ---------- Subtopics marked as complete ---------- */
+
+export interface StudiedList {
+  v: 1;
+  /** By subtopic code ("3.5"): when the reader marked it complete, ISO. */
+  done: Record<string, string>;
+}
+
+/** A subtopic's code as the syllabus writes it: a unit and a number, such as 1.4 or 3.10. */
+export const CODE_RE = /^[1-9]\.[1-9][0-9]?$/;
+
+export function emptyStudied(): StudiedList {
+  return { v: 1, done: {} };
+}
+
+/** Read a stored bb:studied value: well-formed codes with a time, at most LIMITS.studied, newest kept first. It never throws. */
+export function parseStudied(raw: unknown, limits: Limits = LIMITS): StudiedList {
+  const v = asObject(raw);
+  if (!v || !isPlain(v.done)) return emptyStudied();
+  const entries: Array<[string, string]> = [];
+  for (const [code, at] of Object.entries(v.done)) {
+    const t = isoTime(at);
+    if (CODE_RE.test(code) && t) entries.push([code, t]);
+  }
+  entries.sort((a, b) => (a[1] < b[1] ? 1 : a[1] > b[1] ? -1 : 0));
+  return { v: 1, done: Object.fromEntries(entries.slice(0, limits.studied)) };
+}
+
+export function isStudied(list: StudiedList, code: string): boolean {
+  return Object.prototype.hasOwnProperty.call(list.done, code);
+}
+
+/** Mark a subtopic complete (`on`) or not. Marking it again keeps the first time; an unknown code changes nothing. */
+export function setStudied(list: StudiedList, code: string, on: boolean, now: Date, limits: Limits = LIMITS): StudiedList {
+  if (!CODE_RE.test(code)) return list;
+  const done = { ...list.done };
+  if (!on) delete done[code];
+  else if (!done[code]) done[code] = now.toISOString();
+  return parseStudied({ v: 1, done }, limits);
+}
+
+/** Both lists: every subtopic marked complete in either, with the earlier time. Importing the same file twice changes nothing. */
+export function mergeStudied(base: StudiedList, extra: StudiedList, limits: Limits = LIMITS): StudiedList {
+  const done = { ...base.done };
+  for (const [code, at] of Object.entries(extra.done)) if (!done[code] || at < done[code]!) done[code] = at;
+  return parseStudied({ v: 1, done }, limits);
+}
+
 /* ---------- Combining two records (import) ---------- */
 
 /** Both lists, one entry per address, the later save winning. Importing the same file twice changes nothing. */
@@ -540,6 +624,7 @@ export function validateImport(text: string, limits = IMPORT_LIMITS): ImportChec
     }
     if (key === LEARNER_KEY) items.push({ key, value: JSON.stringify(parseLog(parsed)) });
     else if (key === SAVED_KEY) items.push({ key, value: JSON.stringify(parseSaved(parsed)) });
+    else if (key === STUDIED_KEY) items.push({ key, value: JSON.stringify(parseStudied(parsed)) });
     else items.push({ key, value: JSON.stringify(parsed) });
   }
   if (!items.length) return { ok: false, error: 'The file holds nothing this site can use.' };
@@ -554,9 +639,10 @@ export interface ImportWrite {
 }
 
 /**
- * What importing will write. Saved items and visit records are combined with
- * what this browser already holds; every other item replaces the one with the
- * same name. Nothing the file does not name is touched.
+ * What importing will write. Saved items, visit records and the subtopics
+ * marked complete are combined with what this browser already holds; every
+ * other item replaces the one with the same name. Nothing the file does not
+ * name is touched.
  */
 export function planImport(current: Readonly<Record<string, string | null | undefined>>, items: ReadonlyArray<{ key: string; value: string }>): ImportWrite[] {
   return items.map(({ key, value }) => {
@@ -564,6 +650,7 @@ export function planImport(current: Readonly<Record<string, string | null | unde
     let next = value;
     if (key === LEARNER_KEY && had) next = JSON.stringify(mergeLogs(parseLog(had), parseLog(value)));
     if (key === SAVED_KEY && had) next = JSON.stringify(mergeSaved(parseSaved(had), parseSaved(value)));
+    if (key === STUDIED_KEY && had) next = JSON.stringify(mergeStudied(parseStudied(had), parseStudied(value)));
     const effect: ImportWrite['effect'] = had === null || had === undefined ? 'new' : had === next ? 'same' : 'replace';
     return { key, value: next, effect };
   });

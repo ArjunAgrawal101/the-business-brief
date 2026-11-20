@@ -91,7 +91,7 @@ const ogImage = Astro.site ? new URL(image ?? '/brand/social-card.png', Astro.si
         if (l === 'SL' || l === 'HL') document.documentElement.setAttribute('data-level', l);
       } catch (e) {}
     </script>
-    <!-- The opening plays on every fresh entry to the site, never between its own pages (src/lib/intro.ts). -->
+    <!-- The opening plays when the home page is freshly opened, never on other pages, reloads or between the site's own pages (src/lib/intro.ts). -->
     <script is:inline set:html={INTRO_GATE} />
   </head>
   <body data-room={room}>

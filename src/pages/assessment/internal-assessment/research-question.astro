@@ -1,0 +1,104 @@
+---
+/**
+ * IA tool: building the research question. The reader names the
+ * organization, the issue, the decision and the key concept; the builder
+ * drafts a question to refine and checks its form against the guide (p. 53)
+ * as they type, through checkQuestion in src/lib/ia-tools.ts, each check
+ * labelled by its standing. It never approves a question: the teacher does
+ * (guide, p. 53). Saved in bb:ia:rq.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import CentreHead from '../../../components/centre/CentreHead.astro';
+import GuideLabel from '../../../components/centre/GuideLabel.astro';
+import IaToolNav from '../../../components/centre/IaToolNav.astro';
+import IaIntegrity from '../../../components/centre/IaIntegrity.astro';
+import RqBuilder from '../../../components/centre/RqBuilder.astro';
+import { QUESTION_TESTS, toolPosition } from '../../../lib/ia-tools';
+import { CREATOR_GUIDE } from '../../../lib/guide-labels';
+import '../../../styles/centre.css';
+import '../../../styles/ia-tools.css';
+
+const RULES: Array<[string, string]> = [
+  ['A real business issue or problem, which may come from any part of the syllabus.', 'p. 53'],
+  ['The project refers directly to a single organization; industry-wide issues may be considered where they affect it.', 'p. 53'],
+  ['A research question, which may look forward or backward. The title takes the form of the research question.', 'p. 53'],
+  ['Only one of the four key concepts as the lens. It may or may not appear in the question, but the title page must state it.', 'p. 53'],
+  ['Your teacher should approve the question before work starts, so that it suits an investigation and gives access to every level of the criteria.', 'p. 53'],
+  ['The guide’s own examples ask whether a company should move its manufacturing to outsourcing, with change as the lens, and how an airline can target a segment, with sustainability as the lens.', 'p. 54'],
+];
+const TSM: Array<[string, string]> = [
+  ['The best questions are ones whose answer you do not know before you start, and that cannot be answered with minimal research.', 'p. 70'],
+  ['A narrower question can be answered in more depth, but makes three to five relevant documents harder to find: refine the question and the documents together.', 'pp. 69 to 70'],
+  ['A project based mostly on primary research tends to suit a forward-looking question, and one based mostly on secondary research a backward-looking one. This is advice, not a rule.', 'p. 70'],
+];
+---
+
+<BaseLayout
+  room="assessment"
+  title="Building your research question"
+  description="An IB Business Management IA tool: name your organization, its issue, the decision and your key concept, get a draft research question to refine, and see its form checked against the guide's requirements."
+  section="assessment"
+>
+  <CentreHead
+    crumb="Research question"
+    parent={{ label: 'Internal assessment', href: '/assessment/internal-assessment/' }}
+    kicker={`Internal assessment · ${toolPosition('research-question')}`}
+    title="Building your research question"
+    lead="Name the organization, the real issue it faces, the decision and your key concept. The builder drafts a question for you to refine and checks its form against the guide as you type. It does not approve the question: your teacher does."
+    stats={[
+      { value: '1', label: 'Organization', note: 'named, and central' },
+      { value: '1 of 4', label: 'Key concept', note: 'stated on the title page' },
+      { value: String(QUESTION_TESTS.length), label: 'Tests', note: 'before your teacher approves it' },
+    ]}
+  />
+
+  <div class="wrap page-body it-page">
+    <IaToolNav current="research-question" />
+
+    <section class="it-sec" aria-labelledby="rqp-tool-h">
+      <SectionHead no="01" title="Your question" id="rqp-tool-h" dek="Everything you type stays on this device. Nothing here is sent anywhere or approves anything." />
+      <RqBuilder />
+    </section>
+
+    <section class="it-sec" aria-labelledby="rqp-rules-h">
+      <SectionHead no="02" title="What the guide asks of the question" id="rqp-rules-h" />
+      <p class="ce-labels"><GuideLabel kind="ib" /> <span class="ce-cite">Business management guide; the page follows each rule</span></p>
+      <ul class="it-rules">{RULES.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s}</span></li>)}</ul>
+      <p class="ce-labels"><GuideLabel kind="tsm" /> <span class="ce-cite">TSM; the page follows each point</span></p>
+      <ul class="it-rules">{TSM.map(([t, s]) => <li><span>{t}</span><span class="it-src">{s}</span></li>)}</ul>
+      <p class="ce-labels"><GuideLabel kind="examiner" /> <span class="ce-cite">{CREATOR_GUIDE['internal-assessment']}, p. 2</span></p>
+      <ul class="it-rules">
+        <li><span>"To what extent...?" is allowed, but it needs a precise judgement: the IA research guide reports that subject reports (May 2025, May 2026) warn that a vague "to some extent" cannot reach 3 marks in criterion E. A closed question can be easier to answer explicitly.</span></li>
+      </ul>
+    </section>
+
+    <section class="it-sec" aria-labelledby="rqp-ex-h">
+      <SectionHead no="03" title="A topic, and a question" id="rqp-ex-h" dek="Harbour Cycles is a fictional repair shop. The same interest, written two ways." />
+      <div class="it-examples">
+        <article class="it-ex it-ex--weak" aria-labelledby="rqp-weak-h">
+          <p class="it-ex__k">Weaker <GuideLabel kind="example" /></p>
+          <h3 id="rqp-weak-h">How do bicycle shops compete?</h3>
+          <dl>
+            <div><dt>Organization</dt><dd>None: a whole industry.</dd></div>
+            <div><dt>Decision</dt><dd>None, so there is nothing to answer explicitly.</dd></div>
+            <div><dt>Lens</dt><dd>Not chosen.</dd></div>
+          </dl>
+          <p class="it-why">The guide asks for one organization (p. 53), and a question with no decision behind it tends to produce description rather than analysis.</p>
+        </article>
+        <article class="it-ex it-ex--strong" aria-labelledby="rqp-strong-h">
+          <p class="it-ex__k">Stronger <GuideLabel kind="example" /></p>
+          <h3 id="rqp-strong-h">Should Harbour Cycles open a second workshop next year?</h3>
+          <dl>
+            <div><dt>Organization</dt><dd>Harbour Cycles, named in the question.</dd></div>
+            <div><dt>Decision</dt><dd>Whether to open a second workshop: a forward-looking question.</dd></div>
+            <div><dt>Lens</dt><dd>Change, stated on the title page: what the move from one workshop to two would alter.</dd></div>
+          </dl>
+          <p class="it-why">One organization, one decision, one lens, and an answer that can be explicit. The business and its figures are invented for illustration.</p>
+        </article>
+      </div>
+    </section>
+
+    <IaIntegrity no="04" />
+  </div>
+</BaseLayout>
