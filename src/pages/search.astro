@@ -119,6 +119,10 @@ const codesLabel = (title: string, codes: string[], unitList: string[]) =>
         </nav>
 
         <div class="sx-results" data-results>
+          <section class="sx-best" data-best hidden aria-labelledby="sx-best-h">
+            <h2 class="sx-group__h" id="sx-best-h" tabindex="-1">Best matches</h2>
+            <ol class="sx-list sx-best__list" role="list" data-best-list></ol>
+          </section>
           {
             groups.map((g) => (
               <section class="sx-group" id={`k-${g.id}`} data-group={g.id} aria-labelledby={`k-${g.id}-h`}>
@@ -140,9 +144,13 @@ const codesLabel = (title: string, codes: string[], unitList: string[]) =>
               </section>
             ))
           }
-          <p class="state sx-none" data-none hidden>
-            Nothing matches. Try a shorter word or another spelling, clear a filter, or browse the <a href="/topics/">topic library</a> and the <a href="/glossary/">glossary</a>.
-          </p>
+          <div class="state sx-none" data-none hidden>
+            <p>Nothing matches. Try a shorter word or another spelling, clear a filter, or browse the <a href="/topics/">topic library</a> and the <a href="/glossary/">glossary</a>.</p>
+            <div class="sx-close" data-close hidden>
+              <p class="sx-close__k">Close spellings</p>
+              <ol class="sx-list" role="list" data-close-list></ol>
+            </div>
+          </div>
         </div>
       </div>
     </div>

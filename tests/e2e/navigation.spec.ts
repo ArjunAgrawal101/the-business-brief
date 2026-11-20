@@ -148,3 +148,14 @@ test('the header search suggests as you type, forgives a slip and opens the full
     await expect(page.locator('[data-hsearch]')).not.toHaveAttribute('open', '');
   }
 });
+
+test('the search page ranks every kind together and offers close spellings when nothing matches', async ({ page }) => {
+  await page.goto('/search/?q=liquidity');
+  await expect(page.locator('[data-best]')).toBeVisible();
+  await expect(page.locator('[data-best-list] a').first()).toHaveText('Liquidity');
+  await page.goto('/search/?q=liqudity');
+  await expect(page.locator('[data-none]')).toBeVisible();
+  await expect(page.locator('[data-close-list] a').filter({ hasText: /^Liquidity$/ })).toHaveCount(1);
+  await page.locator('#q').press('ArrowDown');
+  await expect(page.locator('[data-close-list] a').first()).toBeFocused();
+});
