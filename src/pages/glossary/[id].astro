@@ -14,7 +14,8 @@ import { inline, rich } from '../../lib/markup';
 import { subtopicHref } from '../../lib/learning';
 import { termsIn } from '../../lib/mindmap';
 import { GLOSSARY_CATEGORY_LABELS, QUALIFICATION_TAG_LABELS, type GlossaryEntry } from '../../lib/schemas';
-import { isEnrichment, qualificationsOf, suggestTerms } from '../../lib/glossary';
+import { formulaLink, isEnrichment, qualificationsOf, suggestTerms } from '../../lib/glossary';
+import { LAB } from '../../lib/finance-lab/catalogue';
 import { frameworksForTerm } from '../../lib/frameworks';
 import { library } from '../../lib/frameworks-content';
 
@@ -47,6 +48,8 @@ const lib = await library();
 const fws = frameworksForTerm(id, g, lib.refs);
 const suggested = suggestTerms(id, c.glossary, 6).map((x) => ({ ...x, e: c.glossary[x.id]! }));
 const ibRelated = beyond ? related.filter((r) => !isEnrichment(r.e!)) : [];
+// Where the formula is worked: a calculator, a room's tool, the worked calculation or the formula sheet.
+const calc = formulaLink(id, { lab: LAB.map((e) => ({ id: e.id, name: e.name })), calculations: c.calculations });
 // "undergraduate, MBA and professional": the qualifications as a phrase in running text.
 const STUDY: Record<string, string> = { secondary: 'secondary school', undergraduate: 'undergraduate', mba: 'MBA', professional: 'professional' };
 const study = quals.filter((q) => q !== 'ib').map((q) => STUDY[q] ?? q);
@@ -100,10 +103,18 @@ const jsonLd = {
           )
         }
         {
-          g.formula && (
+          (g.formula || calc) && (
             <div class="gt__formula">
-              <p class="label">Formula</p>
-              <p class="gt__formula-text">{g.formula}</p>
+              <p class="gt__formula-label">{g.formula ? 'Formula' : 'Calculate it'}</p>
+              {g.formula && <p class="gt__formula-text">{g.formula}</p>}
+              {calc && (
+                <p class="gt__calc">
+                  <a href={calc.href} data-formula-link>
+                    {calc.label}
+                  </a>
+                  {calc.beyond && <span class="tag tag--enrichment">Beyond the course</span>}
+                </p>
+              )}
             </div>
           )
         }
@@ -495,9 +506,30 @@ const jsonLd = {
     margin-top: var(--sp-5);
     padding: var(--sp-4) var(--sp-5);
     background: var(--surface-sheet);
-    border-left: 3px solid var(--gold-500);
-    box-shadow: var(--shadow-sheet);
+    border-left: 3px solid var(--rule-ink);
     max-width: 40rem;
+  }
+
+  .gt__formula-label {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-strong);
+  }
+
+  .gt__calc {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.25rem var(--sp-3);
+    margin-top: var(--sp-3);
+    font-weight: 600;
+  }
+
+  .gt__calc .tag {
+    font-size: 0.75rem;
   }
 
   .gt__formula-text {
@@ -563,8 +595,10 @@ const jsonLd = {
     color: var(--text-muted);
   }
 
+  /* The rail is as tall as what it holds, not as tall as the entry beside it. */
   .gt__side {
     display: grid;
+    align-self: start;
     align-content: start;
     gap: var(--sp-5);
     padding: var(--sp-5);
