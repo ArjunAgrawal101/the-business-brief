@@ -193,14 +193,14 @@ export const DECISIONS: Decision[] = [
       suppliers: { short: -0.5, long: -0.5, power: 2, interest: 4, why: 'Local tradespeople and delivery firms that served the branch lose work.' },
       government: { short: -0.5, long: -0.25, power: 5, interest: 3, why: 'Support payments rise and local business taxes fall a little.' },
       community: { short: -2, long: -1.5, power: 3, interest: 9, why: 'The town loses a shop, jobs and a place where people meet, and the main street gains an empty unit.', mitigation: 'help to find a new tenant for the building' },
-      society: { short: 0, long: 0, power: 1, interest: 2, why: 'Little effect beyond the town, though longer journeys add a little traffic.' },
+      society: { short: 0, long: 0, power: 1, interest: 2, why: 'Little effect beyond the town, though longer trips to other branches add a little traffic.' },
     },
     mitigationCost: 0.5,
     earlyNoticeCost: 0.2,
     earlyNotice: 'Announcing early means some staff leave and sales fall before the branch closes.',
     conflicts: [
       { gains: 'owners', loses: 'community', text: 'Ending the branch’s losses helps the owners; the town loses a shop it relies on.' },
-      { gains: 'owners', loses: 'employees', text: 'The owners stop a loss; the branch’s staff lose their jobs or their short journey to work.' },
+      { gains: 'owners', loses: 'employees', text: 'The owners stop a loss; the branch’s staff lose their jobs or must travel further to work.' },
     ],
     prompts: [
       'Could the branch be kept open in a smaller form? What would that cost, and who would gain?',
