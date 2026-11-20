@@ -162,7 +162,7 @@ Every practice question.
 
 ## 13. Retrieval cards
 
-Every topic and revision brief.
+Every topic and revision sheet. A rating here also schedules the same card in the flashcards (52).
 
 | | |
 | --- | --- |

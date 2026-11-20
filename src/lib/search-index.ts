@@ -295,7 +295,7 @@ export function buildSearchIndex(input: IndexInput): SearchEntry[] {
   for (const [id, it] of Object.entries(c.interactives))
     if (it.page && it.component !== 'case-lab') add({ kind: 'tools', type: 'Interaction', title: it.title, url: `${it.page}#ix-${id}`, text: plain(it.purpose), keys: it.component.replace(/-/g, ' '), units: unitsOf(it.syllabus), codes: it.syllabus, hl: false });
 
-  // Resources: the curated library, the mindmaps, the diagrams and the revision briefs.
+  // Resources: the curated library, the mindmaps, the diagrams and the revision sheets.
   for (const r of input.library ?? [])
     add({ kind: 'resources', type: r.typeLabel, title: r.title, url: r.href, text: r.summary, keys: r.subtopics.join(' '), units: r.units.map(String), codes: r.subtopics, hl: r.level === 'HL' });
   // In course order: each unit's own map, then its subtopics' maps.
