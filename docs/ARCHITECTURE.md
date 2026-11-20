@@ -31,7 +31,7 @@ The platform has no accounts and stores nothing on a server. A static site is th
 | --- | --- | --- |
 | topics, cases, decisions, tools, interactives, curricula, mindmaps, notes, boardroom, intelligence, executive | one YAML file per entry | Astro `glob` |
 | questions, glossary | several YAML files, each a list of entries with ids | custom `yamlList` loader (checks for duplicate ids) |
-| calculations, assessment, commandTerms, concepts, pathways, modules, claims, resources | one YAML file of entries in `src/content/data/` | Astro `file` |
+| calculations, assessment, commandTerms, concepts, pathways, modules, claims, resources, topicConnections, subtopicTools | one YAML file of entries in `src/content/data/` | Astro `file` |
 | sources | the register, one YAML file per area in `src/content/sources/`, each a list of entries with ids | `yamlList` (checks for duplicate ids across the files) |
 | advanced | one YAML file per Advanced Management module in `src/content/advanced/`, with its schema in `src/lib/advanced-schema.ts` and its checks in `src/lib/integrity-advanced.ts` | `yamlFiles` |
 | studio | one YAML file per Strategy Studio tool, and one for its engagement, in `src/content/studio/` (schema in `src/lib/schemas-strategy.ts`) | Astro `glob` |
@@ -113,6 +113,15 @@ The same checks run in the unit tests (`tests/unit/integrity.test.ts`), which lo
 
 `tests/unit/cases.test.ts` recomputes the case figures, the Decision Room board packs and the practice question answers from the exhibits with these functions.
 
+## Connections and connected learning
+
+| Module | Responsibility |
+| --- | --- |
+| `src/lib/connections.ts` | The worked connections between subtopics (`topic-connections.yaml`) and the links the notes name: their checks (codes exist and differ, no pair twice, a command term no deeper than the statements allow, every subtopic joined, curated tool links that name real tool pages), the lists for one subtopic, and the ring layout of the map at `/ib/connections/` |
+| `src/lib/connected.ts` | The tool index: every tool and desk page with the subtopics its own data names (Finance Desk interactions and calculations, the Financial Laboratory's catalogue, the Studio's and the Lab's status, the rooms' interactions, advanced financial analysis), which gives each subtopic page its Tools and practice and each tool page its link back (`BackToTopic.astro`); and Connected learning, the groups each subtopic page shows, labelled by standing |
+| `src/lib/connected-content.ts` | Gathers what the two read once per build and throws on any broken connection or tool link; the revision sheet and flashcard links appear once a revision route of their own exists |
+| `src/lib/bank-address.ts` | The question bank's address for one subtopic (`?topic=3.5`), read by the bank's script |
+
 ## Progressive enhancement
 
 Each interaction follows the same pattern:
@@ -177,7 +186,7 @@ The quiz engine (`src/scripts/quiz.ts`) dispatches a bubbling `quiz:progress` ev
 | `/exam-desk/practice/` | All practice questions, filterable (the other Exam Desk addresses redirect to the Assessment Centre) |
 | `/examiner-lens/`, `/ia-studio/` | Command terms; the IA planner |
 | `/revision/`, `/revision/[id]/` | Printable revision briefs |
-| `/ib/`, `/ib/map/`, `/ib/coverage/`, `/ib/concepts/` | The IB course, the course map, the coverage matrix, concepts |
+| `/ib/`, `/ib/map/`, `/ib/coverage/`, `/ib/concepts/`, `/ib/connections/` | The IB course, the course map, the coverage matrix, concepts, and the connections map (the subtopics on a ring with their worked connections, drawn at build time, with the same content as readable lists) |
 | `/search/`, `/sources/` | Search across everything, built from the content and every navigation link by `src/lib/search-index.ts`, with filters by kind, unit and level kept in the address; the sources and claims register |
 | `/pathways/`, `/pathways/[id]/` | Audience pathways |
 | `/entrepreneurship-lab/`, `/entrepreneurship-lab/[slug]/` | The Entrepreneurship and Innovation Lab: its home, six briefings and six tools, from the `briefings` and `labTools` collections |
