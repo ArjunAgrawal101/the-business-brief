@@ -1,0 +1,715 @@
+/*
+  The Teacher resource area (/teachers/): planning tables, prompts, activity
+  plans and checklists. Every page carries the "For teachers" mark, so teacher
+  material is never mistaken for a student page. Checklists and activities are
+  made to print on A4. Semantic tokens only; rules and tables do the work.
+*/
+
+/* ---------- The mark ---------- */
+
+.tr-mark {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-3);
+  margin-top: var(--sp-3);
+  padding: var(--sp-2) 0;
+  border-top: 3px solid var(--rule-ink);
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.tr-mark__label {
+  padding: 0.2rem 0.5rem;
+  background: var(--surface-ink);
+  color: var(--text-on-ink);
+  font: 700 0.75rem/1.3 var(--font-ui);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tr-mark__text {
+  font: 600 0.875rem/1.3 var(--font-ui);
+}
+
+span.tr-mark__text {
+  color: var(--text-muted);
+}
+
+/* ---------- The front page's head ---------- */
+
+.tr-head {
+  padding-block: var(--sp-5) var(--sp-6);
+}
+
+.tr-head__grid {
+  display: grid;
+  gap: var(--sp-6);
+  margin-top: var(--sp-5);
+}
+
+.tr-head__lead {
+  max-width: 42rem;
+  margin-top: var(--sp-3);
+  font-size: var(--fs-lead);
+  line-height: 1.5;
+}
+
+.tr-head__also {
+  max-width: 42rem;
+  margin-top: var(--sp-3);
+  color: var(--text-muted);
+}
+
+.tr-toc {
+  align-self: start;
+  border-top: 2px solid var(--rule-ink);
+}
+
+.tr-toc__h {
+  padding: var(--sp-2) 0;
+  font: 600 0.8125rem/1.3 var(--font-ui);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-strong);
+}
+
+.tr-toc ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: toc;
+}
+
+.tr-toc li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--sp-1) var(--sp-3);
+  margin: 0;
+  padding: var(--sp-2) 0;
+  border-top: 1px solid var(--rule-hair);
+  counter-increment: toc;
+}
+
+.tr-toc li::before {
+  content: counter(toc, decimal-leading-zero);
+  min-width: 1.75rem;
+  color: var(--text-muted);
+  font: 600 0.875rem/1.5 var(--font-ui);
+}
+
+.tr-toc li a {
+  flex: 1 1 auto;
+  font-weight: 600;
+}
+
+.tr-toc li span {
+  color: var(--text-muted);
+  font-size: var(--fs-small);
+}
+
+@media (min-width: 56rem) {
+  .tr-head__grid {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  }
+}
+
+/* ---------- Sections ---------- */
+
+.tr-sec + .tr-sec {
+  margin-top: var(--sp-8);
+}
+
+.tr-sec {
+  scroll-margin-top: calc(var(--header-h) + var(--sp-4));
+}
+
+.tr-tags {
+  margin-top: var(--sp-3);
+}
+
+.tr-code {
+  color: var(--text-strong);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.tr-hl {
+  display: inline-block;
+  margin-left: var(--sp-2);
+  padding: 0 0.35rem;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-1);
+  color: var(--text-strong);
+  font: 700 0.75rem/1.5 var(--font-ui);
+  vertical-align: 0.1em;
+}
+
+.tr-fic {
+  margin-left: var(--sp-2);
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.tr-note {
+  max-width: 46rem;
+  margin-top: var(--sp-4);
+  color: var(--text-muted);
+  font-size: var(--fs-small);
+}
+
+/* Lesson sequences */
+
+.tr-seq__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-3);
+  margin-top: var(--sp-5);
+  font-weight: 600;
+}
+
+.tr-seq__controls .select {
+  width: auto;
+  min-width: 11rem;
+}
+
+.tr-seq__unit {
+  margin-top: var(--sp-6);
+}
+
+.tr-seq__unit h3 {
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--rule-ink);
+  font-size: var(--fs-h4);
+}
+
+.tr-seq__sum {
+  max-width: 50rem;
+  margin-top: var(--sp-3);
+}
+
+.tr-seq__guide {
+  color: var(--text-muted);
+}
+
+.tr-seq__table {
+  margin-top: var(--sp-3);
+}
+
+.tr-seq__table tbody th {
+  min-width: 13rem;
+  font-weight: 600;
+}
+
+.tr-seq__meta {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  font-weight: 400;
+}
+
+.tr-seq__focus {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.9375rem;
+}
+
+/* Prompts */
+
+.tr-prompts {
+  display: grid;
+  gap: var(--sp-6);
+  margin-top: var(--sp-5);
+}
+
+.tr-prompts__unit h3 {
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--rule-ink);
+  font-size: var(--fs-h4);
+}
+
+.tr-prompts dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: var(--sp-4) var(--sp-6);
+  margin: var(--sp-4) 0 0;
+}
+
+.tr-prompts__sub {
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--rule-hair);
+}
+
+.tr-prompts dt {
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.tr-prompts dd {
+  margin: var(--sp-2) 0 0;
+}
+
+.tr-prompts ol {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+/* Activities */
+
+.tr-acts {
+  margin: var(--sp-5) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--rule-ink);
+}
+
+.tr-act {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: var(--sp-4);
+  margin: 0;
+  padding: var(--sp-5) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.tr-act__no {
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.tr-act h3 {
+  font-size: 1.3125rem;
+}
+
+.tr-act__body > p {
+  max-width: 46rem;
+  margin-top: var(--sp-2);
+}
+
+.tr-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: var(--sp-2) var(--sp-5);
+  margin: var(--sp-3) 0 0;
+}
+
+.tr-facts dt {
+  color: var(--text-muted);
+  font: 600 0.75rem/1.4 var(--font-ui);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tr-facts dd {
+  margin: 0.1rem 0 0;
+  font-size: 0.9375rem;
+}
+
+.tr-facts--row {
+  padding: var(--sp-3) 0;
+  border-top: 1px solid var(--rule-ink);
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+/* Checklists on the front page */
+
+.tr-check__acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-5);
+}
+
+.tr-checks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: var(--sp-5) var(--sp-6);
+  margin-top: var(--sp-6);
+}
+
+.tr-checks h3 {
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--rule-ink);
+  font-size: var(--fs-h4);
+}
+
+.tr-checks ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tr-checks li {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0;
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--rule-hair);
+}
+
+.tr-checks__n {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+/* Downloads */
+
+.tr-dl {
+  margin-top: var(--sp-4);
+}
+
+.tr-dl th[scope="row"] {
+  min-width: 11rem;
+}
+
+.tr-dl__f {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Setting work */
+
+.tr-steps {
+  max-width: 50rem;
+  margin: var(--sp-5) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.tr-steps > li {
+  position: relative;
+  margin: 0;
+  padding: var(--sp-4) 0 var(--sp-4) 3rem;
+  border-top: 1px solid var(--rule-hair);
+  counter-increment: step;
+}
+
+.tr-steps > li::before {
+  content: counter(step);
+  position: absolute;
+  left: 0;
+  top: var(--sp-4);
+  color: var(--text-strong);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.tr-steps__h {
+  color: var(--text-strong);
+  font-weight: 650;
+}
+
+.tr-steps ul {
+  margin-top: var(--sp-2);
+}
+
+/* ---------- A checklist or an activity page ---------- */
+
+.tr-page {
+  padding-block: var(--sp-5) var(--sp-8);
+}
+
+.tr-page__head {
+  margin-top: var(--sp-5);
+}
+
+.tr-page__kicker {
+  color: var(--text-muted);
+  font: 600 0.8125rem/1.4 var(--font-ui);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tr-page__head h1 {
+  margin-top: var(--sp-2);
+  font-size: clamp(2rem, 1.5rem + 2vw, 3rem);
+}
+
+.tr-page__lead {
+  max-width: 44rem;
+  margin-top: var(--sp-3);
+  font-size: var(--fs-lead);
+}
+
+.tr-page__note {
+  max-width: 44rem;
+  margin-top: var(--sp-2);
+  color: var(--text-muted);
+  font-size: var(--fs-small);
+}
+
+.tr-page__acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+.tr-page .tr-facts {
+  margin-top: var(--sp-4);
+}
+
+.tr-cl__scroll {
+  margin-top: var(--sp-5);
+}
+
+.tr-cl caption {
+  padding-bottom: var(--sp-2);
+  text-align: left;
+}
+
+.tr-cl .n {
+  white-space: nowrap;
+}
+
+.table .tr-cl__text {
+  min-width: 14rem;
+  color: var(--text-body);
+  font-weight: 500;
+}
+
+.tr-cl__hl .tr-cl__lvl {
+  color: var(--text-strong);
+  font-weight: 700;
+}
+
+.tr-cl__ao,
+.tr-cl__lvl {
+  white-space: nowrap;
+}
+
+.tr-cl__ao abbr {
+  text-decoration: none;
+}
+
+.tr-cl__box {
+  width: 5.5rem;
+  text-align: center;
+}
+
+.tr-cl__tick {
+  display: inline-block;
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 1.5px solid var(--rule-control);
+  vertical-align: middle;
+}
+
+.tr-key {
+  max-width: 46rem;
+  margin-top: var(--sp-6);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--rule-hair);
+}
+
+.tr-key h2 {
+  font-size: 1.25rem;
+}
+
+.tr-key ul {
+  margin-top: var(--sp-2);
+}
+
+.tr-key__note,
+.tr-key__inline {
+  margin-top: var(--sp-3);
+  color: var(--text-muted);
+  font-size: var(--fs-small);
+}
+
+.tr-cl-unit {
+  margin-top: var(--sp-7);
+}
+
+.tr-cl-unit > h2 {
+  padding-bottom: var(--sp-2);
+  border-bottom: 2px solid var(--rule-ink);
+  font-size: var(--fs-h3);
+}
+
+.tr-cl-sub {
+  margin-top: var(--sp-5);
+}
+
+.tr-cl-sub h3 {
+  font-size: var(--fs-h4);
+}
+
+.tr-cl-sub .tr-cl__scroll {
+  margin-top: var(--sp-2);
+}
+
+.tr-block {
+  max-width: 60rem;
+  margin-top: var(--sp-7);
+}
+
+.tr-block > h2 {
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--rule-ink);
+  font-size: var(--fs-h3);
+}
+
+.tr-block__dek {
+  max-width: 46rem;
+  margin-top: var(--sp-2);
+  color: var(--text-muted);
+}
+
+.tr-block ul,
+.tr-block ol {
+  margin-top: var(--sp-3);
+}
+
+.tr-roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: var(--sp-4) var(--sp-5);
+  padding: 0;
+  list-style: none;
+}
+
+.tr-role {
+  margin: 0;
+  padding-top: var(--sp-3);
+  border-top: 2px solid var(--rule-ink);
+}
+
+.tr-role__name {
+  font-size: 1.125rem;
+}
+
+.tr-role dl {
+  margin: var(--sp-2) 0 0;
+}
+
+.tr-role dl > div + div {
+  margin-top: var(--sp-2);
+}
+
+.tr-role dt {
+  color: var(--text-muted);
+  font: 600 0.75rem/1.4 var(--font-ui);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tr-role dd {
+  margin: 0.1rem 0 0;
+}
+
+.tr-plan th[scope="row"] {
+  min-width: 9rem;
+}
+
+.tr-plan__clock {
+  white-space: nowrap;
+  color: var(--text-muted);
+}
+
+.tr-output {
+  max-width: 46rem;
+  margin-top: var(--sp-4);
+}
+
+.tr-debrief li + li {
+  margin-top: var(--sp-2);
+}
+
+.tr-casedebrief {
+  margin-top: var(--sp-5);
+  padding: var(--sp-4) var(--sp-5);
+  border-left: 3px solid var(--rule-ink);
+  background: var(--surface-sheet);
+}
+
+.tr-casedebrief h3 {
+  font-size: 1.125rem;
+}
+
+.tr-casedebrief h4 {
+  margin-top: var(--sp-3);
+  font-size: 1rem;
+}
+
+.tr-related {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-5);
+  margin-top: var(--sp-7);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--rule-hair);
+  font-weight: 600;
+}
+
+.tr-pager {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--rule-ink);
+}
+
+/* On a phone the boxes are left for paper: the statement, its depth and its level fit the screen. */
+@media screen and (max-width: 40rem) {
+  .tr-cl .tr-cl__box {
+    display: none;
+  }
+
+  .table .tr-cl__text {
+    min-width: 0;
+  }
+}
+
+/* ---------- Print: A4, the plan and the boxes, nothing else ---------- */
+
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+
+  .tr-screen {
+    display: none !important;
+  }
+
+  .tr-page {
+    padding: 0;
+  }
+
+  .tr-print .table-scroll {
+    overflow: visible;
+  }
+
+  .tr-cl__tick {
+    border-color: var(--text-strong);
+  }
+
+  .tr-cl tr,
+  .tr-plan tr,
+  .tr-role {
+    break-inside: avoid;
+  }
+
+  .tr-cl-sub {
+    break-inside: avoid-page;
+  }
+
+  .tr-block {
+    margin-top: 6mm;
+    max-width: none;
+  }
+
+  .tr-casedebrief {
+    border-left: 1pt solid var(--rule-ink);
+  }
+}

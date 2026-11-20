@@ -106,7 +106,7 @@ Rendered from the monogram's master by `npm run brand` (`scripts/brand/render-as
 | `public/brand/templates/resource-cover.svg` (with a preview PNG) | A4 cover for printed resources, with editable text |
 | `public/brand/templates/document-header.svg`, `document-footer.svg` | A4-width strips for handouts |
 
-Resource covers in the Resources Library are drawn per resource by `src/components/resources/ResourceCover.astro`, on navy for assessment guides and ivory for the rest, each with a motif for its type.
+The Resources Library shows each resource as it is, not a drawn cover: the real mindmap or diagram, the first page of a PDF guide (rendered once from the file by `scripts/brand/guide-covers.mjs`), or the sections of a set of notes (`src/components/resources/LibraryEntry.astro`).
 
 ## Colour
 
@@ -166,7 +166,8 @@ All three are under the SIL Open Font Licence and self-hosted from `public/fonts
 | Diagram (`Diagram.astro`) | Notes, briefs, `/diagrams/` | See below |
 | Glossary entry | `/glossary/<term>/` | The syllabus meaning, the everyday meaning where it differs, formula, example, related terms, subtopics |
 | Guidance labels | Assessment Centre | Four kinds of statement, each labelled: IB requirement, examiner emphasis, recommended strategy, illustrative example |
-| Resource card and cover | `/resources/` | Cover, type, level, format, size and pages for downloads |
+| Library entry | `/resources/` | A preview that carries information (the real map or diagram, a PDF's first page, a note's sections), the kind, level, standing and topic tags, the format and, for a file, its size and pages; each category set out for what it holds, or one ruled list for everything |
+| Teacher mark | `/teachers/` | The navy "For teachers" label on every page of the Teacher resource area, so teacher material is never mistaken for a student page |
 | Coverage state | `/ib/coverage/`, home | Complete (navy), partly built (gold outline), planned (dashed), with verification beside it |
 
 ## Mindmaps
@@ -222,4 +223,4 @@ An original set in `src/lib/icons.ts` on a 24 by 24 grid with a 1.75 stroke, one
 
 ## Print
 
-`src/styles/print.css` removes the header, footer and screen-only controls, keeps exhibits, tables, workings and figures unbroken, and adds an attribution line with the page address. `src/scripts/print.ts` opens every disclosure before printing and closes them after. The formula sheet and the revision briefs are designed for A4.
+`src/styles/print.css` removes the header, footer and screen-only controls, keeps exhibits, tables, workings and figures unbroken, and adds an attribution line with the page address. `src/scripts/print.ts` opens every disclosure before printing and closes them after. The formula sheet, the revision briefs, the topic checklists and the classroom activities are designed for A4; the Resources Library prints the resources in view as a list, with each one's address.

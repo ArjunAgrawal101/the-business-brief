@@ -50,7 +50,7 @@ async function build(): Promise<SearchEntry[]> {
     modules: (await modulesInOrder()).map((m) => m.data),
     library: (await library())
       .filter((r) => r.curated)
-      .map((r) => ({ title: r.title, summary: r.summary, typeLabel: r.typeLabel, level: r.level, units: r.units, subtopics: r.subtopics, href: r.details ?? r.primary.href })),
+      .map((r) => ({ title: r.title, summary: r.summary, typeLabel: r.kind, level: r.level === 'HL' ? 'HL' : 'SL/HL', units: r.units, subtopics: r.subtopics, href: r.details ?? r.primary.href })),
     diagrams: DIAGRAMS,
     pathways: (await pathwaysInOrder()).map((p) => ({ id: p.id, name: p.data.name, promise: p.data.promise })),
     frameworks: (await frameworkLibrary()).frameworks,

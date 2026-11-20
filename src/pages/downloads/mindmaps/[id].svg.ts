@@ -1,7 +1,7 @@
-/** Each mindmap as a branded SVG file, written at build time with the same engine as the page. */
+/** Each mindmap as a branded SVG file, written at build time with the same engine as the page (src/lib/library/downloads.ts). */
 import type { APIRoute } from 'astro';
 import { corpus } from '../../../lib/content';
-import { brandedSvg } from '../../../lib/mindmap-export';
+import { mindmapFile } from '../../../lib/library/downloads';
 
 export async function getStaticPaths() {
   const c = await corpus();
@@ -9,10 +9,7 @@ export async function getStaticPaths() {
 }
 
 export const GET: APIRoute = async ({ params, site }) => {
-  const c = await corpus();
-  const id = String(params.id);
-  const map = c.mindmaps[id];
-  if (!map) return new Response('Not found', { status: 404 });
-  const page = site ? new URL(`/mindmaps/${id}/`, site).href : `/mindmaps/${id}/`;
-  return new Response(brandedSvg(id, map, { page }), { headers: { 'Content-Type': 'image/svg+xml; charset=utf-8' } });
+  const svg = mindmapFile(await corpus(), String(params.id), site);
+  if (svg === null) return new Response('Not found', { status: 404 });
+  return new Response(svg, { headers: { 'Content-Type': 'image/svg+xml; charset=utf-8' } });
 };

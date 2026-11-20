@@ -1,0 +1,202 @@
+---
+/**
+ * A classroom activity: a whole lesson on one of the platform's fictional
+ * cases or Decision Rooms. The roles are the case's own stakeholders, shown
+ * with their interests and concerns from the case file; the lesson runs phase
+ * by phase with its timings; the debrief questions come first, then what the
+ * case's own debrief says. Prints for the classroom. Teacher-facing.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/layout/Breadcrumbs.astro';
+import ProvenanceTag from '../../../components/ui/ProvenanceTag.astro';
+import TeacherMark from '../../../components/teachers/TeacherMark.astro';
+import { corpus } from '../../../lib/content';
+import { activities } from '../../../lib/resources';
+import { activityCase, stakeholderFor } from '../../../lib/teachers/integrity';
+import { activityHref, activityMinutes, type Activity } from '../../../lib/teachers/schema';
+import { inline, rich } from '../../../lib/markup';
+import '../../../styles/teachers.css';
+
+export async function getStaticPaths() {
+  const list = await activities();
+  return list.map(([id, a], i) => ({ params: { id }, props: { id, a, prev: list[i - 1], next: list[i + 1] } }));
+}
+
+interface Props {
+  id: string;
+  a: Activity;
+  prev?: [string, Activity];
+  next?: [string, Activity];
+}
+const { a, prev, next } = Astro.props;
+const c = await corpus();
+const caseId = activityCase(a, c)!;
+const cs = c.cases[caseId]!;
+const room = a.basis.kind === 'decision' ? c.decisions[a.basis.id] : undefined;
+const basisHref = room ? `/decision-room/${a.basis.id}/` : `/cases/${caseId}/`;
+const basisTitle = room ? room.title : cs.title;
+const roles = a.roles.map((r) => ({ ...r, s: stakeholderFor(c, caseId, r.stakeholder)[0]! }));
+const subs = new Map((c.curricula['ib-dp-bm']?.units ?? []).flatMap((u) => u.subtopics.map((s) => [s.code, s.title] as const)));
+let clock = 0;
+const phases = a.phases.map((p) => {
+  const from = clock;
+  clock += p.minutes;
+  return { ...p, from, to: clock };
+});
+const total = activityMinutes(a);
+const caseDebrief = room ? undefined : cs.debrief;
+---
+
+<BaseLayout title={`${a.title}: a classroom activity`} description={`${a.summary.trim()} A ${total}-minute lesson for teachers of IB DP Business Management.`} section="teachers">
+  <article class="wrap tr-page tr-print">
+    <div class="tr-screen">
+      <Breadcrumbs trail={[{ label: 'Teacher resources', href: '/teachers/' }, { label: 'Classroom activities', href: '/teachers/#activities' }, { label: a.title }]} />
+      <TeacherMark />
+    </div>
+    <header class="tr-page__head">
+      <p class="tr-page__kicker">Classroom activity · {a.format}</p>
+      <h1>{a.title}</h1>
+      <div class="tr-page__lead prose" set:html={rich(a.summary)} />
+      <dl class="tr-facts tr-facts--row">
+        <div><dt>Time</dt><dd>{total} minutes</dd></div>
+        <div><dt>Groups</dt><dd>of {a.groupSize}</dd></div>
+        <div>
+          <dt>Built on</dt>
+          <dd>{room ? 'The Decision Room ' : 'The case file '}<a href={basisHref}>{basisTitle}</a></dd>
+        </div>
+        <div>
+          <dt>Subtopics</dt>
+          <dd>{a.subtopics.map((code) => `${code} ${subs.get(code) ?? ''}`).join('; ')}</dd>
+        </div>
+        <div><dt>Level</dt><dd>{a.level === 'HL' ? 'HL only' : 'SL and HL'}</dd></div>
+      </dl>
+      <p class="tags tr-tags">
+        <ProvenanceTag kind="aa-framework" />
+        <ProvenanceTag kind="simulated-data" />
+      </p>
+      <p class="tr-page__note">The business in the case is fictional and its figures are simulated. The lesson plan is the platform's suggestion, not an IB requirement.</p>
+      <p class="tr-page__acts tr-screen">
+        <button type="button" class="btn btn--primary needs-js" data-print>Print this activity</button>
+        <a class="btn" href={basisHref}>Open the {room ? 'Decision Room' : 'case file'}</a>
+      </p>
+    </header>
+
+    <section class="tr-block" aria-labelledby="tr-prep-h">
+      <h2 id="tr-prep-h">Before the lesson</h2>
+      <ul>{a.prepare.map((p) => <li set:html={inline(p)} />)}</ul>
+    </section>
+
+    <section class="tr-block" aria-labelledby="tr-roles-h">
+      <h2 id="tr-roles-h">The roles</h2>
+      <p class="tr-block__dek">Each role is a stakeholder in the case. What they want and what worries them are taken from the case file, so students argue from the evidence.</p>
+      <ol class="tr-roles" role="list">
+        {
+          roles.map((r) => (
+            <li class="tr-role">
+              <h3 class="tr-role__name">{r.s.name}</h3>
+              <dl>
+                <div>
+                  <dt>Wants</dt>
+                  <dd>{r.s.interest}</dd>
+                </div>
+                <div>
+                  <dt>Worried about</dt>
+                  <dd>{r.s.concern}</dd>
+                </div>
+                <div>
+                  <dt>In the lesson</dt>
+                  <dd set:html={inline(r.task)} />
+                </div>
+              </dl>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="tr-block" aria-labelledby="tr-plan-h">
+      <h2 id="tr-plan-h">The lesson, phase by phase</h2>
+      <div class="table-scroll" role="region" aria-label="The lesson plan" tabindex="0">
+        <table class="table tr-plan">
+          <caption class="sr-only">{a.title}: {total} minutes in {phases.length} phases</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="n">Minutes</th>
+              <th scope="col" class="n">Clock</th>
+              <th scope="col">Phase</th>
+              <th scope="col">What happens</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              phases.map((p) => (
+                <tr>
+                  <td class="n">{p.minutes}</td>
+                  <td class="n tr-plan__clock">
+                    {p.from} to {p.to}
+                  </td>
+                  <th scope="row">{p.title}</th>
+                  <td set:html={inline(p.what)} />
+                </tr>
+              ))
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <th scope="row" class="n">{total}</th>
+              <td colspan="3">minutes in all</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <p class="tr-output"><strong>Each group produces:</strong> <span set:html={inline(a.output)} /></p>
+    </section>
+
+    <section class="tr-block" aria-labelledby="tr-debrief-h">
+      <h2 id="tr-debrief-h">Debrief</h2>
+      <p class="tr-block__dek">Ask these in order. Take answers from several groups before you give your own view.</p>
+      <ol class="tr-debrief">{a.debrief.map((q) => <li set:html={inline(q)} />)}</ol>
+      {
+        caseDebrief && (
+          <div class="tr-casedebrief">
+            <h3>What the case file's debrief says</h3>
+            <div class="prose" set:html={rich(caseDebrief.summary)} />
+            <h4>Errors to listen for</h4>
+            <ul>{caseDebrief.commonErrors.map((e) => <li set:html={inline(e)} />)}</ul>
+          </div>
+        )
+      }
+      {
+        room && (
+          <div class="tr-casedebrief">
+            <h3>What the Decision Room's debrief says</h3>
+            <h4>The trade-offs</h4>
+            <ul>{room.debrief.tradeoffs.map((t) => <li set:html={inline(t)} />)}</ul>
+            <h4>Misconceptions to listen for</h4>
+            <ul>{room.debrief.misconceptions.map((m) => <li set:html={inline(m)} />)}</ul>
+          </div>
+        )
+      }
+    </section>
+
+    {
+      a.next.length > 0 && (
+        <nav class="tr-related tr-screen" aria-label="Where to go next">
+          {a.next.map((l) => (
+            <a href={l.href}>{l.label}</a>
+          ))}
+        </nav>
+      )
+    }
+
+    <nav class="tr-pager tr-screen" aria-label="Other activities">
+      {prev ? <a href={activityHref(prev[0])}>&larr; {prev[1].title}</a> : <span />}
+      <a href="/teachers/#activities">All activities</a>
+      {next ? <a href={activityHref(next[0])}>{next[1].title} &rarr;</a> : <span />}
+    </nav>
+  </article>
+</BaseLayout>
+
+<script>
+  document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+</script>

@@ -1,317 +1,177 @@
 ---
 /**
- * The formula sheet: a printable page. The first part is the formulae the
- * examination provides (guide, pp. 64 to 65); the second, the ones students
- * must learn, in their standard form. HL-only formulae are marked.
+ * The formula sheet, a printable page in two parts that are never mixed.
+ * First, the IB formulae sheet exactly as the guide prints it (pp. 64 to 65,
+ * with the discount table of p. 66): the copy students are given in the
+ * examination. Second, "Also used on this site": every other formula the
+ * platform's tools, notes and diagrams use, each marked as beyond the IB
+ * formulae sheet and placed precisely in the course, or beyond it. The data
+ * and its checks are in src/lib/library/formula-sheet.ts.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
 import Monogram from '../../components/brand/Monogram.astro';
+import { corpus } from '../../lib/content';
+import { DISCOUNT_TABLE, MAX_YEARS, RATES } from '../../lib/investment';
+import { DISCOUNT_TABLE_PAGE, IB_SHEET, SITE_FORMULAS, formulaHtml, ibFormulas, placementLabel, placementText, siteFormulas } from '../../lib/library/formula-sheet';
+import '../../styles/formula-sheet.css';
 
-type F = { name: string; f: string; where?: string; hl?: boolean };
-const PROVIDED: Array<{ group: string; hl?: boolean; items: F[] }> = [
-  {
-    group: 'Profitability ratios',
-    items: [
-      { name: 'Gross profit margin', f: 'gross profit ÷ sales revenue × 100' },
-      { name: 'Profit margin', f: 'profit before interest and tax ÷ sales revenue × 100' },
-      { name: 'Return on capital employed (ROCE)', f: 'profit before interest and tax ÷ capital employed × 100', where: 'capital employed = non-current liabilities + equity' },
-    ],
-  },
-  {
-    group: 'Liquidity ratios',
-    items: [
-      { name: 'Current ratio', f: 'current assets ÷ current liabilities' },
-      { name: 'Acid test (quick) ratio', f: '(current assets − stock) ÷ current liabilities' },
-    ],
-  },
-  {
-    group: 'Efficiency ratios',
-    hl: true,
-    items: [
-      { name: 'Stock turnover (number of times)', f: 'cost of sales ÷ average stock', hl: true },
-      { name: 'Stock turnover (number of days)', f: 'average stock ÷ cost of sales × 365', where: 'average stock = (opening stock + closing stock) ÷ 2', hl: true },
-      { name: 'Debtor days ratio (number of days)', f: 'debtors ÷ total sales revenue × 365', hl: true },
-      { name: 'Creditor days ratio (number of days)', f: 'creditors ÷ cost of sales × 365', hl: true },
-      { name: 'Gearing ratio', f: 'non-current liabilities ÷ capital employed × 100', where: 'capital employed = non-current liabilities + equity', hl: true },
-    ],
-  },
-  {
-    group: 'Investment appraisal',
-    items: [
-      { name: 'Average rate of return (ARR)', f: '((total returns − capital cost) ÷ years of use) ÷ capital cost × 100' },
-      { name: 'Net present value (NPV)', f: 'sum of the present values of the returns − original cost', hl: true },
-    ],
-  },
-  {
-    group: 'Capacity utilization and productivity',
-    hl: true,
-    items: [
-      { name: 'Capacity utilization rate', f: 'actual output ÷ productive capacity × 100', hl: true },
-      { name: 'Productivity rate', f: 'total output ÷ total input × 100', hl: true },
-    ],
-  },
-];
-const LEARN: Array<{ group: string; items: F[] }> = [
-  {
-    group: 'Costs, revenue and break-even',
-    items: [
-      { name: 'Total cost', f: 'total fixed costs + total variable costs' },
-      { name: 'Average cost', f: 'total cost ÷ output' },
-      { name: 'Profit', f: 'total revenue − total cost' },
-      { name: 'Contribution per unit', f: 'price − variable cost per unit' },
-      { name: 'Total contribution', f: 'contribution per unit × quantity sold' },
-      { name: 'Break-even quantity', f: 'fixed costs ÷ contribution per unit', where: 'rounded up to a whole unit' },
-      { name: 'Margin of safety', f: 'actual (or forecast) output − break-even quantity' },
-      { name: 'Target profit output', f: '(fixed costs + target profit) ÷ contribution per unit' },
-      { name: 'Target price', f: '(fixed costs + target profit) ÷ expected output + variable cost per unit' },
-    ],
-  },
-  {
-    group: 'Finance',
-    items: [
-      { name: 'Working capital', f: 'current assets − current liabilities' },
-      { name: 'Payback period', f: 'whole years before recovery + (amount still to recover ÷ net cash flow in the payback year) × 12 months' },
-      { name: 'Straight-line depreciation (a year)', f: '(purchase cost − residual value) ÷ years of usage', hl: true },
-      { name: 'Units of production depreciation', f: '(purchase cost − residual value) ÷ total expected units × units produced in the period', hl: true },
-    ],
-  },
-  {
-    group: 'Marketing',
-    items: [
-      { name: 'Market share', f: "the firm's sales ÷ total market sales × 100" },
-      { name: 'Market (or sales) growth', f: '(this period − last period) ÷ last period × 100' },
-      { name: 'Price elasticity of demand', f: '% change in quantity demanded ÷ % change in price', hl: true },
-    ],
-  },
-  {
-    group: 'Operations',
-    items: [
-      { name: 'Labour productivity', f: 'total output ÷ number of workers (or labour hours)', hl: true },
-      { name: 'Capital productivity', f: 'total output ÷ capital input (such as machine hours)', hl: true },
-      { name: 'Defect rate', f: 'defective units ÷ total units produced × 100', hl: true },
-      { name: 'Cost to make (CTM)', f: 'total fixed costs + (variable cost per unit × quantity)', hl: true },
-      { name: 'Cost to buy (CTB)', f: 'price per unit × quantity', hl: true },
-    ],
-  },
-  {
-    group: 'Toolkit',
-    items: [{ name: 'Expected value (decision trees)', f: 'sum of (probability × outcome) for each chance node' }],
-  },
-];
+const c = await corpus();
+const titles = new Map((c.curricula['ib-dp-bm']?.units ?? []).flatMap((u) => u.subtopics.map((s) => [s.code, s.title] as const)));
+const title = (code: string) => titles.get(code) ?? '';
+const rates = RATES;
+const years = MAX_YEARS;
+const ib = ibFormulas();
+const site = siteFormulas();
+const inSyllabus = site.filter((f) => f.placement.kind === 'syllabus').length;
+const toolkit = site.filter((f) => f.placement.kind === 'toolkit').length;
+const beyond = site.filter((f) => f.placement.kind === 'beyond').length;
+const supports = site.filter((f) => f.placement.kind === 'supports').length;
 ---
 
-<BaseLayout title="Formula sheet" description="Every formula in IB DP Business Management on one printable page: the formulae the examination provides, and the ones you must learn, with HL-only formulae marked." section="resources">
+<BaseLayout
+  title="Formula sheet"
+  description="The IB DP Business Management formulae sheet exactly as the guide prints it, with the HL-only formulae marked, and every other formula the platform's tools use, each placed in the syllabus or marked as beyond it. Printable."
+  section="resources"
+>
   <article class="wrap fs">
     <div class="fs__screen">
-      <Breadcrumbs trail={[{ label: 'Resources', href: '/resources/' }, { label: 'Formula sheet' }]} />
-      <p class="fs__actions js-only"><button type="button" class="btn btn--primary" data-print>Print or save as PDF</button></p>
+      <Breadcrumbs trail={[{ label: 'Resources Library', href: '/resources/' }, { label: 'Formula sheet' }]} />
+      <p class="fs__actions"><button type="button" class="btn btn--primary needs-js" data-print>Print or save as PDF</button></p>
     </div>
     <header class="fs__head">
       <Monogram height={40} />
       <div>
         <p class="fs__brand">Arjun Agrawal · The Business Brief</p>
         <h1 class="fs__title">Formula sheet</h1>
-        <p class="fs__sub">IB Diploma Programme Business Management · first assessment 2024 · <span class="fs__hl">HL</span> marks a formula for HL only</p>
+        <p class="fs__sub">IB Diploma Programme Business Management, first assessment 2024. <span class="fs__hl">HL</span> marks a formula for HL only.</p>
       </div>
     </header>
+    <nav class="fs__toc fs__screen-only" aria-label="The two parts">
+      <a href="#fs-ib">The IB formulae sheet <span>{ib.length} formulae</span></a>
+      <a href="#fs-site">Also used on this site <span>{site.length} more, beyond the IB sheet</span></a>
+    </nav>
 
-    <section class="fs__part" aria-labelledby="fs-given">
-      <h2 id="fs-given">Provided in the examination</h2>
-      <p class="fs__note">The formulae the guide lists for external assessment (Business management guide, pp. 64 to 65), written out in words. A copy is given to students in the examination.</p>
-      <div class="fs__groups">
-        {
-          PROVIDED.map((g) => (
-            <div class="fs__group">
-              <h3>
-                {g.group} {g.hl && <span class="fs__hl">HL</span>}
-              </h3>
-              <dl>
-                {g.items.map((it) => (
-                  <div>
-                    <dt>
-                      {it.name} {it.hl && !g.hl && <span class="fs__hl">HL</span>}
-                    </dt>
-                    <dd>= {it.f}</dd>
-                    {it.where && <dd class="fs__where">where {it.where}</dd>}
-                  </div>
-                ))}
-              </dl>
+    <section class="fs__part fs__part--ib" aria-labelledby="fs-ib">
+      <h2 id="fs-ib">The IB formulae sheet</h2>
+      <p class="fs__note">
+        The formulae the guide lists for external assessment, exactly as it prints them (Business management guide, pp. 64 to 65). A copy is given to students in the examination.
+      </p>
+      {
+        IB_SHEET.map((part) => (
+          <div class="fs__ibpart">
+            <h3 class="fs__parth">
+              {part.title} <span class="fs__page">p. {part.page}</span>
+            </h3>
+            <div class="fs__groups">
+              {part.groups.map((g) => (
+                <div class="fs__group">
+                  <h4>
+                    {g.title} {g.level === 'HL' && <span class="fs__hl">HL</span>}
+                  </h4>
+                  <dl>
+                    {g.items.map((it) => (
+                      <div class:list={['fs__f', { 'fs__f--or': it.or }]}>
+                        <dt>
+                          {it.or && <span class="fs__or">or</span>}
+                          {it.name} {it.level === 'HL' && g.level !== 'HL' && <span class="fs__hl">HL</span>}
+                        </dt>
+                        <dd class="fs__eq">
+                          = <Fragment set:html={formulaHtml(it.rhs)} />
+                        </dd>
+                        {it.where?.map((w) => (
+                          <dd class="fs__where">
+                            where {w.name} = <Fragment set:html={formulaHtml(w.rhs)} />
+                          </dd>
+                        ))}
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              ))}
             </div>
-          ))
-        }
+          </div>
+        ))
+      }
+      <div class="fs__ibpart fs__discount">
+        <h3 class="fs__parth">
+          Discount tables <span class="fs__hl">HL</span> <span class="fs__page">p. {DISCOUNT_TABLE_PAGE}</span>
+        </h3>
+        <p class="fs__note">The guide's discount factors. The examination paper gives a table when a question needs it.</p>
+        <div class="table-scroll" role="region" aria-label="Discount factors" tabindex="0">
+          <table class="table fs__table">
+            <caption class="sr-only">Discount factors by year and discount rate</caption>
+            <thead>
+              <tr>
+                <th scope="col">Years</th>
+                {rates.map((r) => <th scope="col" class="n">{r}%</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {
+                Array.from({ length: years }, (_, y) => (
+                  <tr>
+                    <th scope="row">{y + 1}</th>
+                    {rates.map((r) => (
+                      <td class="n">{DISCOUNT_TABLE[r][y]!.toFixed(4)}</td>
+                    ))}
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
 
-    <section class="fs__part" aria-labelledby="fs-learn">
-      <h2 id="fs-learn">To learn</h2>
-      <p class="fs__note">Not on the examination's copy, so learn them. Standard forms, consistent with the platform's calculators; the guide's discount table for NPV is supplied with HL questions that need it.</p>
-      <div class="fs__groups">
-        {
-          LEARN.map((g) => (
-            <div class="fs__group">
-              <h3>{g.group}</h3>
-              <dl>
-                {g.items.map((it) => (
-                  <div>
-                    <dt>
-                      {it.name} {it.hl && <span class="fs__hl">HL</span>}
-                    </dt>
-                    <dd>= {it.f}</dd>
-                    {it.where && <dd class="fs__where">{it.where}</dd>}
-                  </div>
-                ))}
-              </dl>
-            </div>
-          ))
-        }
-      </div>
+    <section class="fs__part fs__part--site" aria-labelledby="fs-site">
+      <h2 id="fs-site">Also used on this site</h2>
+      <p class="fs__note">
+        Every other formula the platform's tools, notes and diagrams use. <strong>None of them is on the IB formulae sheet</strong>, so each is marked as beyond it, with where it stands: {inSyllabus} are in the syllabus without a
+        printed formula, so learn them; {toolkit} belong to toolkit tools;{supports ? ` ${supports} supports a statement that names no formula;` : ''} and {beyond} go beyond the IB course.
+      </p>
+      {
+        SITE_FORMULAS.map((g) => (
+          <div class="fs__sgroup">
+            <h3>{g.title}</h3>
+            <dl>
+              {g.items.map((f) => (
+                <div class:list={['fs__s', `fs__s--${f.placement.kind}`]}>
+                  <dt>
+                    {f.name}
+                    {'level' in f.placement && f.placement.level === 'HL' && <span class="fs__hl">HL</span>}
+                  </dt>
+                  <dd class="fs__eq">
+                    = <Fragment set:html={formulaHtml(f.rhs)} />
+                  </dd>
+                  {f.lines?.map((l) => (
+                    <dd class="fs__eq fs__eq--line">
+                      {l.name === 'or' ? 'or ' : `${l.name} = `}
+                      <Fragment set:html={formulaHtml(l.rhs)} />
+                    </dd>
+                  ))}
+                  <dd class="fs__place">
+                    <span class="fs__mark">Beyond the IB formulae sheet</span>
+                    <span class="fs__where-label">{placementLabel(f.placement)}</span>
+                  </dd>
+                  <dd class="fs__placetext">{placementText(f.placement, title)}</dd>
+                  <dd class="fs__used">
+                    Used in: {f.used.map((u, i) => <>{i > 0 && '; '}<a href={u.href}>{u.label}</a></>)}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        ))
+      }
     </section>
-    <p class="fs__foot">The Business Brief, by Arjun Agrawal. Original teaching material, not an IB publication. Practise every formula with the <a href="/assessment/paper-2/">Paper 2 answer builder</a>.</p>
+    <p class="fs__foot">
+      The Business Brief, by Arjun Agrawal. Original teaching material, not an IB publication. Practise every formula with the <a href="/assessment/paper-2/practice/">Paper 2 calculation practice</a> and the <a
+        href="/finance-desk/lab/">Financial Laboratory</a
+      >.
+    </p>
   </article>
 </BaseLayout>
-
-<style>
-  .fs {
-    padding-top: var(--sp-6);
-  }
-
-  .fs__screen {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--sp-3);
-  }
-
-  .fs__head {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-4);
-    margin-top: var(--sp-5);
-    padding-bottom: var(--sp-4);
-    border-bottom: 2px solid var(--navy-900);
-  }
-
-  .fs__brand {
-    font-family: var(--font-brand);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    color: var(--brass-text);
-  }
-
-  .fs__title {
-    font-size: clamp(2rem, 1.6rem + 1.8vw, 3rem);
-  }
-
-  .fs__sub {
-    font-size: 0.875rem;
-    color: var(--text-muted);
-  }
-
-  .fs__hl {
-    display: inline-block;
-    padding: 0 0.35rem;
-    background: var(--navy-900);
-    color: var(--gold-400);
-    font: 700 0.6875rem/1.6 var(--font-ui);
-    letter-spacing: 0.06em;
-    vertical-align: 0.15em;
-  }
-
-  .fs__part {
-    margin-top: var(--sp-6);
-  }
-
-  .fs__part h2 {
-    font-size: 1.5rem;
-  }
-
-  .fs__note {
-    margin-top: var(--sp-2);
-    font-size: 0.875rem;
-    color: var(--text-muted);
-    max-width: 52rem;
-  }
-
-  .fs__groups {
-    columns: 2 22rem;
-    column-gap: var(--sp-7);
-    margin-top: var(--sp-4);
-  }
-
-  .fs__group {
-    break-inside: avoid;
-    margin-bottom: var(--sp-5);
-  }
-
-  .fs__group h3 {
-    padding-bottom: 0.3rem;
-    border-bottom: 1px solid var(--gold-500);
-    font-size: 1.0625rem;
-  }
-
-  .fs__group dl {
-    margin: var(--sp-2) 0 0;
-  }
-
-  .fs__group dl > div {
-    padding: 0.4rem 0;
-    border-bottom: 1px solid var(--rule-hair);
-  }
-
-  .fs__group dt {
-    font-weight: 600;
-    color: var(--navy-900);
-    font-size: 0.9375rem;
-  }
-
-  .fs__group dd {
-    margin: 0.1rem 0 0;
-    font-family: var(--font-serif);
-    font-size: 1rem;
-    color: var(--text-body);
-  }
-
-  .fs__where {
-    font-family: var(--font-ui) !important;
-    font-size: 0.8125rem !important;
-    color: var(--text-muted) !important;
-  }
-
-  .fs__foot {
-    margin-top: var(--sp-5);
-    padding-top: var(--sp-3);
-    border-top: 1px solid var(--rule-hair);
-    font-size: 0.8125rem;
-    color: var(--text-muted);
-  }
-
-  @media print {
-    @page {
-      size: A4;
-      margin: 14mm;
-    }
-
-    .fs__screen {
-      display: none !important;
-    }
-
-    .fs {
-      padding: 0;
-    }
-
-    .fs__groups {
-      columns: 2;
-      column-gap: 10mm;
-    }
-
-    .fs__group dl > div {
-      padding: 1.5mm 0;
-    }
-  }
-</style>
 
 <script>
   document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
