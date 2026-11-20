@@ -6,6 +6,7 @@ import {
   byDateDesc,
   dateKey,
   dateParts,
+  developmentSpan,
   facetsOf,
   filterSummary,
   filtersFromQuery,
@@ -64,6 +65,14 @@ describe('briefing dates', () => {
   it('finds the latest day', () => {
     expect(latest(['2026-11-03', '2026-10-14', '2025-01-01'])).toBe('2026-11-03');
     expect(latest([])).toBeUndefined();
+  });
+
+  it('states the span of the developments from their own dates, in any order and at any precision', () => {
+    expect(developmentSpan(['2026-10-14', '2025-02-28', '2026-06-10'])).toBe('from February 2025 to October 2026');
+    expect(developmentSpan(['2025-10', '2026-03-11'])).toBe('from October 2025 to March 2026');
+    expect(developmentSpan(['2026-07-28', '2026-07-01'])).toBe('in July 2026');
+    expect(developmentSpan([])).toBe('');
+    expect(() => developmentSpan(['2026-13-01'])).toThrow();
   });
 
   it('orders items newest first, and by id on the same date', () => {
