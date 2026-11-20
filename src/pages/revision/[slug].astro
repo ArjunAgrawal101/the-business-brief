@@ -1,0 +1,291 @@
+---
+/**
+ * A subtopic's revision sheet, at the same slug as its page in the topic
+ * library: key points, key definitions, formulae, frameworks, common
+ * examination mistakes, short application exercises and recall questions, all
+ * gathered from the content by src/lib/revision/ (nothing here is retyped).
+ * Designed to print on A4; on screen it links back to the full notes and on
+ * to the subtopic's flashcards.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/layout/Breadcrumbs.astro';
+import Monogram from '../../components/brand/Monogram.astro';
+import GuideLabel from '../../components/centre/GuideLabel.astro';
+import LevelSwitch from '../../components/ui/LevelSwitch.astro';
+import SaveButton from '../../components/ui/SaveButton.astro';
+import RetrievalCards from '../../components/assess/RetrievalCards.astro';
+import TutorNote from '../../components/ui/TutorNote.astro';
+import { revisionData } from '../../lib/revision/content';
+import type { Sheet } from '../../lib/revision/sheet';
+import { STATUS_LABELS } from '../../lib/frameworks';
+import { LEVEL_LABELS } from '../../lib/labels';
+import { inline } from '../../lib/markup';
+import '../../styles/revision.css';
+
+export async function getStaticPaths() {
+  const { sheets } = await revisionData();
+  return sheets.map((sheet, i) => ({ params: { slug: sheet.slug }, props: { sheet, prev: sheets[i - 1], next: sheets[i + 1] } }));
+}
+
+interface Props {
+  sheet: Sheet;
+  prev?: Sheet;
+  next?: Sheet;
+}
+const { sheet: s, prev, next } = Astro.props;
+const levelText = LEVEL_LABELS[s.level];
+// An item is marked HL, and hidden for SL readers, only on a sheet whose subtopic is not HL only.
+const hlMark = (level: string) => level === 'HL' && s.level !== 'HL';
+const notesLabel = s.notesKind === 'notes' ? 'Read the full notes' : 'Read the full brief';
+const count = (n: number, one: string, many: string) => (n ? `${n} ${n === 1 ? one : many}` : '');
+const counts = [count(s.terms.length, 'definition', 'definitions'), count(s.formulae.length, 'formula', 'formulae'), count(s.frameworks.length, 'framework', 'frameworks'), count(s.exercises.length, 'exercise', 'exercises')]
+  .filter(Boolean)
+  .join(' · ');
+/** A formula's name is shown apart only when the expression's own left-hand side does not already say it. */
+const sameName = (name: string, expression: string) => {
+  const key = (x: string) => x.toLowerCase().replace(/\([^)]*\)/g, '').replace(/[^a-z0-9]+/g, '');
+  const at = expression.indexOf(' = ');
+  return at > 0 && key(expression.slice(0, at)) === key(name);
+};
+---
+
+<BaseLayout
+  title={`${s.code} ${s.title}: revision sheet`}
+  description={`A printable revision sheet for IB DP Business Management ${s.code} ${s.title}: key definitions, formulae, frameworks, common mistakes and short application exercises.`}
+  section="revision"
+>
+  <article class="wrap rs">
+    <div class="rs__screen no-print">
+      <Breadcrumbs trail={[{ label: 'Quick revision', href: '/revision/' }, { label: `Unit ${s.unit}`, href: `/revision/#unit-${s.unit}` }, { label: `${s.code} ${s.title}` }]} />
+    </div>
+
+    <header class="rs__head">
+      <p class="rs__brand">
+        <Monogram height={26} />
+        <span class="label">Revision sheet · Unit {s.unit}: {s.unitTitle}</span>
+      </p>
+      <h1 class="rs__title">
+        <span class="rs__code">{s.code}</span>
+        <span>{s.title.split('/').map((part, i, all) => (i < all.length - 1 ? <>{part}/<wbr /></> : part))}</span>
+      </h1>
+      <div class="rs__meta">
+        <span class:list={['tag', s.level === 'HL' ? 'tag--hl' : 'tag--plain']}>{levelText}</span>
+        <span class="rs__counts">{counts}</span>
+      </div>
+      <div class="rs__actions no-print">
+        <a class="btn btn--small" href={s.notesHref}>{notesLabel}</a>
+        <a class="btn btn--small" href={s.flashcardsHref}>Flashcards for {s.code} ({s.cards})</a>
+        <button type="button" class="btn btn--small btn--primary needs-js" data-print>Print this sheet</button>
+        <SaveButton title={`${s.code} ${s.title}: revision sheet`} kind="page" compact />
+      </div>
+      {s.hasHL && <div class="rs__switch no-print"><LevelSwitch /></div>}
+      {
+        s.level === 'HL' && (
+          <p class="hl-notice rs__hl">
+            <span class="tag tag--hl">HL</span> This subtopic is HL only. If you are taking SL, it is extension material.
+          </p>
+        )
+      }
+    </header>
+
+    <div class="rs__grid">
+      {
+        s.points.length > 0 && (
+          <section class="rs__sec" aria-labelledby="rs-points">
+            <h2 class="rs__h" id="rs-points">Key points</h2>
+            <ul class="rs__points">
+              {s.points.map((p) => (
+                <li set:html={inline(p)} />
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      <section class="rs__sec" aria-labelledby="rs-mistakes">
+        <h2 class="rs__h" id="rs-mistakes">Common examination mistakes</h2>
+        <ol class="rs__mistakes">
+          {
+            s.mistakes.map((m) => (
+              <li data-level={hlMark(m.level) ? 'HL' : undefined}>
+                <p class="rs__mistake">
+                  <span set:html={inline(m.text)} /> {hlMark(m.level) && <span class="tag tag--hl">HL</span>}
+                </p>
+                {m.fix && (
+                  <p class="rs__fix">
+                    <span class="rs__fix-label">Instead:</span> <span set:html={inline(m.fix)} />
+                  </p>
+                )}
+                <p class="rs__src">{m.source ? <a href={m.source.href}>{m.source.label}</a> : <GuideLabel kind="strategy" />}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      <section class="rs__sec rs__sec--wide" aria-labelledby="rs-terms">
+        <h2 class="rs__h" id="rs-terms">Key definitions</h2>
+        <p class="rs__dek">The IB glossary terms of {s.code}, in the platform's own words. Terms beyond the course are not included.</p>
+        <dl class="rs__terms">
+          {
+            s.terms.map((t) => (
+              <div data-level={hlMark(t.level) ? 'HL' : undefined}>
+                <dt>
+                  <a href={t.href}>{t.term}</a> {hlMark(t.level) && <span class="tag tag--hl">HL</span>}
+                </dt>
+                <dd set:html={inline(t.definition)} />
+              </div>
+            ))
+          }
+        </dl>
+      </section>
+
+      {
+        s.formulae.length > 0 && (
+          <section class="rs__sec rs__sec--wide" aria-labelledby="rs-formulae">
+            <h2 class="rs__h" id="rs-formulae">Formulae</h2>
+            <p class="rs__dek">
+              Each with what it measures. The <a href="/resources/formula-sheet/">formula sheet</a> shows which ones the examination provides.
+            </p>
+            <div class="table-scroll" role="region" aria-labelledby="rs-formulae" tabindex="0">
+              <table class="rs__formulae">
+                <thead>
+                  <tr>
+                    <th scope="col">Formula</th>
+                    <th scope="col">What it measures</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {s.formulae.map((f) => (
+                    <tr data-level={hlMark(f.level) ? 'HL' : undefined}>
+                      <th scope="row">
+                        {sameName(f.name, f.expression) ? (
+                          <span class="rs__fexpr">
+                            <a class="rs__fname" href={f.href}>
+                              {f.expression.slice(0, f.expression.indexOf(' = '))}
+                            </a>
+                            {f.expression.slice(f.expression.indexOf(' = '))}
+                          </span>
+                        ) : (
+                          <>
+                            <a class="rs__fname" href={f.href}>
+                              {f.name}
+                            </a>
+                            <span class="rs__fexpr">{f.expression}</span>
+                          </>
+                        )}{' '}
+                        {hlMark(f.level) && <span class="tag tag--hl">HL</span>}
+                      </th>
+                      <td set:html={f.measures ? inline(f.measures) : ''} />
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )
+      }
+
+      {
+        s.frameworks.length > 0 && (
+          <section class="rs__sec rs__sec--wide" aria-labelledby="rs-frameworks">
+            <h2 class="rs__h" id="rs-frameworks">Frameworks and tools</h2>
+            <p class="rs__dek">From the frameworks library: what each is for, a situation it suits, and one limitation.</p>
+            <ul class="rs__fws">
+              {s.frameworks.map((f) => (
+                <li data-level={hlMark(f.level) ? 'HL' : undefined}>
+                  <p class="rs__fw-name">
+                    <a href={f.href}>{f.name}</a>
+                    <span class:list={['tag', f.status === 'enrichment' ? 'tag--enrichment' : 'tag--ib']}>{STATUS_LABELS[f.status]}</span>
+                    {hlMark(f.level) && <span class="tag tag--hl">HL</span>}
+                  </p>
+                  <dl class="rs__fw-dl">
+                    <div>
+                      <dt>Purpose</dt>
+                      <dd set:html={inline(f.purpose)} />
+                    </div>
+                    <div>
+                      <dt>Use it when</dt>
+                      <dd set:html={inline(f.use)} />
+                    </div>
+                    <div>
+                      <dt>One limitation</dt>
+                      <dd set:html={inline(f.limitation)} />
+                    </div>
+                  </dl>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      <section class="rs__sec rs__sec--wide" aria-labelledby="rs-apply">
+        <h2 class="rs__h" id="rs-apply">Apply it</h2>
+        <p class="rs__dek">
+          Short exercises on fictional businesses, written for the platform; none is an IB question. Answer first, then open the outline of what a strong answer does.
+        </p>
+        <ol class="rs__exs">
+          {
+            s.exercises.map((x) => (
+              <li id={`ex-${x.id}`} data-level={hlMark(x.level) ? 'HL' : undefined}>
+                <p class="rs__ex-tags">
+                  <span class="tag tag--simulated">Fictional</span>
+                  <span class="tag tag--plain">
+                    {x.commandLabel} · {x.ao}
+                  </span>
+                  {hlMark(x.level) && <span class="tag tag--hl">HL</span>}
+                </p>
+                <div class="rs__stem" set:html={inline(x.stem)} />
+                <p class="rs__q" set:html={inline(x.question)} />
+                <details class="disclosure rs__outline">
+                  <summary>Show a model answer outline</summary>
+                  <div class="disclosure__body">
+                    <ul>
+                      {x.outline.map((o) => (
+                        <li set:html={inline(o)} />
+                      ))}
+                    </ul>
+                  </div>
+                </details>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      {
+        s.recall && (
+          <section class="rs__sec rs__sec--wide" aria-labelledby="rs-recall">
+            <h2 class="rs__h" id="rs-recall">Answer from memory</h2>
+            <details class="disclosure rs__recall">
+              <summary>
+                {s.recall.items.length} recall questions from the {s.recall.label}
+              </summary>
+              <div class="disclosure__body">
+                <RetrievalCards id={s.recall.set} items={s.recall.items} />
+              </div>
+            </details>
+          </section>
+        )
+      }
+    </div>
+
+    <div class="no-print">
+      <TutorNote lead="Revising with little time left?" offer="A session can plan what to revise, test you on it and work through the questions that cost marks." />
+    </div>
+
+    <nav class="rs__pager no-print" aria-label="Neighbouring revision sheets">
+      {prev ? <a href={`/revision/${prev.slug}/`}>&larr; {prev.code} {prev.title}</a> : <span />}
+      <a href="/revision/">All revision sheets</a>
+      {next ? <a href={`/revision/${next.slug}/`}>{next.code} {next.title} &rarr;</a> : <span />}
+    </nav>
+    <p class="rs__foot small muted">
+      Arjun Agrawal | The Business Brief. Gathered from the platform's notes, glossary, calculation register and frameworks library. Original teaching material; not an IB publication.
+    </p>
+  </article>
+</BaseLayout>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-print]').forEach((b) => b.addEventListener('click', () => window.print()));
+</script>

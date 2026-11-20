@@ -1,0 +1,91 @@
+# Quick revision for 3.4 Final accounts (statements at AO2 and AO4;
+# depreciation is HL, at AO2, AO3 and AO4). Written for the platform; every
+# business named is fictional.
+code: '3.4'
+exercises:
+  - id: tamberley-profit-or-loss
+    business: Tamberley Kitchens
+    stem: "For the year, Tamberley Kitchens had sales revenue of $640,000, cost of sales of $380,000, expenses of $150,000, interest of $10,000 and tax of $20,000. It paid dividends of $30,000."
+    command: prepare
+    question: "**Prepare** a statement of profit or loss for Tamberley Kitchens for the year."
+    outline:
+      - "Gross profit = $640,000 − $380,000 = $260,000."
+      - "Profit before interest and tax = $260,000 − $150,000 = $110,000."
+      - "Profit before tax = $110,000 − $10,000 = $100,000; profit for the period = $100,000 − $20,000 = $80,000."
+      - "Retained profit = $80,000 − $30,000 = $50,000."
+      - "Sets the lines out in the guide's order, each labelled, with a title naming the business and the year."
+  - id: tamberley-stakeholders
+    business: Tamberley Kitchens
+    stem: "Tamberley Kitchens has asked its bank for a larger loan, and its employees' representatives are preparing a pay claim."
+    command: explain
+    question: "**Explain** why Tamberley Kitchens' bank and its employees would each study its final accounts."
+    outline:
+      - "The bank: whether profit covers the interest (profit before interest and tax of $110,000 against $10,000 of interest), what the business already owes, and which assets could secure a loan."
+      - "The employees: whether the business can afford a pay rise and whether their jobs are secure, from its profit and its liquidity."
+      - "Explains that each stakeholder reads the accounts for its own purpose."
+  - id: tamberley-depreciation
+    business: Tamberley Kitchens
+    stem: "Tamberley Kitchens buys a panel-cutting machine for $48,000. It expects to use it for four years and then sell it for $8,000. Over its life the machine should cut 200,000 panels, 60,000 of them in the first year."
+    command: calculate
+    question: "**Calculate** the first year's depreciation by the straight line method and by the units of production method, and comment on which is more appropriate."
+    level: HL
+    outline:
+      - "Straight line: ($48,000 − $8,000) ÷ 4 = **$10,000** a year."
+      - "Units of production: ($48,000 − $8,000) ÷ 200,000 = $0.20 a panel; year one = $0.20 × 60,000 = **$12,000**."
+      - "Comments that units of production matches the charge to how hard the machine works, which suits uneven use; straight line is simpler and suits an asset used evenly."
+      - "Judges which fits this machine, for example units of production if its use really is heaviest in the first year."
+formulas:
+  gross-profit:
+    situation: "A shop knows its sales revenue for the year and what the goods it sold cost it, and wants its profit from trading before its running expenses."
+  profit-before-interest-and-tax:
+    situation: "A company knows its gross profit and its running expenses for the year, and wants the profit from its operations before the cost of borrowing and tax."
+  profit-before-tax:
+    situation: "A company has its operating profit for the year and knows how much interest it paid on its loans."
+    measures: "The profit left once the year's interest on borrowing is paid, on which tax is then charged."
+  profit-for-the-period:
+    situation: "A company knows its profit before tax and the tax it owes for the year, and wants the profit that belongs to its owners."
+  non-current-assets:
+    situation: "A firm wants the value at which its property, machines and vehicles appear in its statement of financial position, after the depreciation charged on them so far."
+  total-assets:
+    situation: "A firm wants the total value of everything it owns: what it keeps for years and what will turn into cash within a year."
+    measures: "The value of everything the business owns: its non-current assets plus its current assets."
+  total-liabilities:
+    situation: "A lender asks how much a business owes in all, both the debts due within a year and those due later."
+    measures: "Everything the business owes: its current liabilities, due within a year, plus its non-current liabilities, due later."
+  net-assets:
+    situation: "An investor wants to know what would be left if a business sold everything it owns at its recorded value and paid off every debt."
+  total-equity:
+    situation: "A company wants to show its owners' stake: the money they put in through shares, plus the profits kept in the business over the years."
+  straight-line-method:
+    situation: "A business expects a van to wear out evenly over five years and wants to charge the same amount of depreciation in each of them."
+  units-of-production-method-the-rate:
+    situation: "A printer expects its new press to make two million prints over its life, and wants to know how much depreciation each print should carry."
+  units-of-production-method-the-year-s-charge:
+    situation: "A printer knows the depreciation each print carries and how many prints its press made this year, and wants the year's depreciation charge."
+  net-book-value:
+    situation: "Three years after buying a machine, a firm wants the value at which it now appears in its accounts."
+  cost-of-sales:
+    situation: "A shop knows its stock at the start and the end of the year and what it bought during it, and wants the cost of the goods it actually sold."
+distinctions:
+  - id: profit-or-loss-vs-financial-position
+    pair: [Statement of profit or loss, Statement of financial position]
+    difference: "The statement of profit or loss records revenue, costs and profit over a period, usually a year. The statement of financial position (the balance sheet) shows what the business owns and owes, and the owners' equity, at one moment, the end of that period."
+    example: "A year's sales are in the statement of profit or loss; the stock left on the last day of the year is in the statement of financial position."
+  - id: current-vs-non-current-assets
+    pair: [Current assets, Non-current assets]
+    difference: "Non-current assets are kept and used for more than a year to run the business, such as buildings, machines and vehicles. Current assets are cash, or will be turned into cash or used up within a year, such as stock and debtors."
+  - id: straight-line-vs-units-of-production
+    pair: [Straight line method, Units of production method]
+    level: HL
+    difference: "The straight line method charges the same depreciation every year of an asset's life. The units of production method charges each period according to how much the asset was used, so the charge rises and falls with use."
+scenarios:
+  - id: keddleston-depreciation
+    business: Keddleston Couriers
+    stem: "Keddleston Couriers' vans wear out with mileage, and they are driven far more in busy years than in quiet ones."
+    answer: "The units of production method of depreciation"
+    level: HL
+    why: "The units of production method charges depreciation by use, here by miles driven, so the cost of the vans in each year's accounts follows how hard they were worked. The straight line method would charge the same in quiet and busy years alike."
+evaluations:
+  - id: accounts-show-worth
+    claim: "A business's final accounts show exactly what it is worth."
+    counter: "They record most assets at their historic cost less depreciation, which rests on estimates, and leave out assets such as a brand the business built itself. They show one date, can be window-dressed, and say nothing about the future, so what a buyer would pay can differ greatly."
