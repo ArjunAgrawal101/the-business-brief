@@ -86,6 +86,7 @@ The label column is what readers see on the page.
 | `intelligence` | `intelligence/<id>.yaml` | An item of the Business Intelligence Briefing: a real development, dated, filed under one or more themes, answering six questions in order (below), with its own sources. Checked by `src/lib/integrity-intelligence.ts` |
 | `resources` | `data/resources.yaml` | A curated resource for the library: type, audiences, level, units and subtopics, the assessment component, `access` (a `download` with its file, format, size and pages; a `page`; or a `print` page), `contents` and `updated`. A download must exist, or the build fails |
 | `studio` | `studio/<slug>.yaml` | A Strategy Studio tool (`type: tool`): its `kind`, `slug`, `stage` of the engagement, `purpose`, `howTo`, `limitations`, its IB `status` (an `ib-toolkit` tool names its `toolkit` entry and `level`; anything else is `enrichment`, with any `extensions` such as the TOWS matrix), the notes and guides to `read`, the worked `example` (the tool's state exactly as the tool saves it) and its recommended use (`inUse`). Three tools, scenario planning (`scenarios`), stakeholder salience (`salience`) and the strategic fit check (`fit`), were added with the Framework Application Lab, all enrichment. One entry is the `engagement` that frames the room: the fictional client, its question, facts, the four stages, principles, reading and Decision Rooms |
+| `comparisons` | `comparisons/<a>-vs-<b>.yaml` | A curated comparison of two or three frameworks or ideas, with a page at `/frameworks/compare/<a>-vs-<b>/` (below) |
 
 ## The Business Intelligence Briefing
 
@@ -303,6 +304,21 @@ Each calculation's `id` matches a builder in `workings` (`src/lib/finance.ts`). 
 | `reading`, `basis` | Part 8, three or more pieces of further reading from the register (never IB documents), and the sources the module itself rests on |
 
 `checkAdvanced` in `src/lib/integrity-advanced.ts` runs before any module page is built and in `tests/unit/advanced.test.ts`, and fails the build on a module off the plan, an unknown source, framework or code, an unsourced real application or case, a misfit exhibit, IB material offered as reading, or a module under 1,500 words.
+
+## Framework comparisons
+
+`comparisonSchema` in `src/lib/compare/schema.ts` (strict: an unknown field fails the build); rendered by `src/pages/frameworks/compare/[slug].astro` with the grid in `src/lib/compare/grid.ts`, which the comparison tool also uses for any two frameworks in the library. A file's name is its address, the sides joined by `-vs-`.
+
+| Field | What it holds |
+| --- | --- |
+| `title`, `question`, `summary`, `order` | The page's title, the question the comparison settles, a sentence for the index and its place in the list |
+| `sides` | Two or three sides. Each is a framework in the library (`framework`), a toolkit tool (`tool`), a syllabus idea that is neither (`syllabus`: a subtopic `code` and words from its content statement exactly as the curriculum file has them), or a mix; with further `subtopics`, glossary `terms`, its `level` (`SL/HL` or `HL`), `purpose`, `structure`, the `context` it suits, two or more `strengths`, `limitations` and `mistakes`, a fictional business `application` (`fictional: true`, the `business` and the `body`) and the `exam` advice, which the page labels Recommended strategy |
+| `difference` | The essential difference, in a paragraph |
+| `choose` | Which to use when: two or more situations (`when`), the side each calls for (`use`, by position from 0) and why, calling for more than one side |
+| `together` | How the sides work together, where they do (Markdown links allowed) |
+| `sources` | Register sources for what the page says about the course (the guide by default) |
+
+A side's standing in the course (syllabus, IB toolkit or enrichment, its subtopic and the guide's page, SL and HL or HL only) is worked out from the curriculum file, the toolkit and the library, never typed. `checkComparisons` in `src/lib/compare/integrity.ts` runs before any comparison page is built and in `tests/unit/framework-compare.test.ts` (see [ARCHITECTURE.md](ARCHITECTURE.md#the-integrity-gate)). PESTLE against STEEPLE is not a comparison here: the PESTLE page already sets the two side by side, and the tool and the check point to it.
 
 ## Adding a topic brief
 
