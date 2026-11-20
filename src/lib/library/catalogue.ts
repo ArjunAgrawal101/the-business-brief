@@ -767,8 +767,12 @@ export function buildCatalogue(input: CatalogueInput): Catalogue {
 
 /** The revision category says what it holds, which depends on what the revision workstream has built. */
 function revisionDek(input: CatalogueInput): string {
-  const sheets = input.revision.sheets === 'every-subtopic' ? 'A revision sheet to print for every subtopic' : 'A revision brief to print for each topic brief';
-  return `${sheets}${input.revision.flashcards ? ', flashcards to revise by recall,' : ''} and the glossary as a page and as a spreadsheet.`;
+  const parts = [
+    input.revision.sheets === 'every-subtopic' ? 'A revision sheet to print for every subtopic' : 'A revision brief to print for each topic brief',
+    ...(input.revision.flashcards ? ['flashcards to revise by recall'] : []),
+    'the glossary as a page and as a spreadsheet',
+  ];
+  return `${parts.slice(0, -1).join(', ')}, and ${parts[parts.length - 1]}.`;
 }
 
 /** Every download the catalogue offers, by address. */

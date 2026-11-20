@@ -260,7 +260,7 @@ export const SITE_FORMULAS: SiteGroup[] = [
       {
         name: 'Cost of sales',
         rhs: ['opening stock + purchases − closing stock'],
-        placement: { kind: 'syllabus', code: '3.4', level: 'SL/HL', page: 29, note: 'For a business that buys goods to resell.' },
+        placement: { kind: 'supports', code: '3.4', page: 29, note: 'Cost of sales is a line of the statement of profit or loss; for a business that buys goods to resell, this is how it is found.' },
         used: [LAB('profit-and-loss', 'profit and loss builder')],
       },
       {
