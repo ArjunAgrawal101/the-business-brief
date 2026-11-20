@@ -12,11 +12,14 @@ import { corpus, href, modulesInOrder } from '../../lib/content';
 import { isIcon } from '../../lib/icons';
 import { subtopicCoverage } from '../../lib/coverage';
 import { subtopicHref } from '../../lib/learning';
+import { connected } from '../../lib/connected-content';
+import { countsFor, toolsFor } from '../../lib/connected';
 
 const c = await corpus();
 const cur = c.curricula['ib-dp-bm'];
 const rooms = (await modulesInOrder()).filter((m) => m.data.href);
 const cov = subtopicCoverage(c);
+const d = await connected();
 /** The room a page belongs to: the room whose address is the longest prefix of the page's. */
 const roomOf = (page: string) =>
   rooms
@@ -28,8 +31,10 @@ const units = (cur?.units ?? []).map((u) => ({
   tiles: u.subtopics.map((s) => {
     const ixs = Object.entries(c.interactives).filter(([, it]) => it.syllabus.includes(s.code) && it.page);
     const calcs = Object.entries(c.calculations).filter(([, k]) => k.syllabus.some((x) => x.code === s.code));
-    const questions = Object.values(c.questions).filter((q) => q.syllabus.includes(s.code)).length;
-    const pages = [...ixs.map(([, it]) => it.page as string), ...calcs.map(([, k]) => k.page)];
+    // Tools, questions and cases counted from everything that names the subtopic: every tool page, the whole question bank, every case.
+    const n = countsFor(s.code, d.inputs);
+    const tools = toolsFor(s.code, d.tools, d.extraTools);
+    const pages = [...ixs.map(([, it]) => it.page as string), ...calcs.map(([, k]) => k.page), ...tools.map((t) => t.href)];
     const servedBy = new Map<string, { id: string; name: string }>();
     if (s.topic) servedBy.set('business-brief', { id: 'business-brief', name: 'The Business Brief' });
     pages.forEach((p) => {
@@ -41,7 +46,7 @@ const units = (cur?.units ?? []).map((u) => ({
     });
     const state = cov.find((x) => x.subtopic.code === s.code)?.state ?? 'planned';
     const link = s.topic && c.topics[s.topic]?.code === s.code ? href.topic(s.topic) : subtopicHref(c, s.code);
-    return { s, ixs: ixs.length, calcs: calcs.length, questions, rooms: [...servedBy.values()], state, link };
+    return { s, ...n, rooms: [...servedBy.values()], state, link };
   }),
 }));
 const all = units.flatMap((x) => x.tiles);
@@ -81,17 +86,9 @@ const count = (st: string) => all.filter((t) => t.state === st).length;
                   </a>
                   <span class="map-tile__meta">
                     {t.s.level !== 'SL/HL' && <span class="tag tag--hl">HL</span>}
-                    {t.ixs > 0 && (
-                      <span class="small">
-                        {t.ixs} {t.ixs === 1 ? 'interaction' : 'interactions'}
-                      </span>
-                    )}
-                    {t.calcs > 0 && (
-                      <span class="small">
-                        {t.calcs} {t.calcs === 1 ? 'calculation' : 'calculations'}
-                      </span>
-                    )}
-                    {t.questions > 0 && <span class="small">{t.questions} practice</span>}
+                    {t.tools > 0 && <span class="small">{`${t.tools} ${t.tools === 1 ? 'tool' : 'tools'}`}</span>}
+                    {t.questions > 0 && <span class="small">{`${t.questions} ${t.questions === 1 ? 'question' : 'questions'}`}</span>}
+                    {t.cases > 0 && <span class="small">{`${t.cases} ${t.cases === 1 ? 'case' : 'cases'}`}</span>}
                   </span>
                   {t.rooms.length > 0 && (
                     <span class="map-tile__rooms">
@@ -111,8 +108,7 @@ const count = (st: string) => all.filter((t) => t.state === st).length;
       }
     </div>
     <p class="small muted">
-      Generated from the content: a tile is filled only when a brief, an interaction or a worked calculation for that subtopic exists. The table version, with every
-      link, is the <a href="/ib/coverage/">coverage page</a>; the content statements are on the <a href="/ib/">course page</a>.
+      Generated from the content: tools are the tool and desk pages that serve the subtopic, questions are those in the question bank, and cases are the Case Vault's cases and the Case Room's labs. The table version, with every link, is the <a href="/ib/coverage/">coverage page</a>; how the subtopics link to one another is on the <a href="/ib/connections/">connections map</a>; the content statements are on the <a href="/ib/">course page</a>.
     </p>
   </div>
 </BaseLayout>

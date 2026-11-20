@@ -87,9 +87,10 @@ each('[data-ix="connections"]', (root) => {
     }
     const entry = root.querySelector<HTMLElement>(`#${anchorOf(code)}`);
     if (!entry) return;
-    const copy = entry.cloneNode(true) as HTMLElement;
-    copy.removeAttribute('id');
-    copy.removeAttribute('hidden');
+    // The entry is a list item in the list below; in the panel its content goes in a plain block, without its ids.
+    const copy = document.createElement('div');
+    copy.className = entry.className;
+    copy.innerHTML = entry.innerHTML;
     copy.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
     // The entry's h4 sits under the panel's h2 here, so it becomes an h3.
     copy.querySelectorAll('h4').forEach((h) => {

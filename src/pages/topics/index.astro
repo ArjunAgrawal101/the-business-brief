@@ -10,21 +10,34 @@ import SectionHead from '../../components/layout/SectionHead.astro';
 import { corpus, href, topicsInOrder } from '../../lib/content';
 import { allSubtopics, mindmapFor, noteFor, subtopicHref } from '../../lib/learning';
 import { coverageSummary } from '../../lib/coverage';
+import { connected } from '../../lib/connected-content';
+import { countsFor, toolsFor } from '../../lib/connected';
 
 const c = await corpus();
 const topics = await topicsInOrder();
 const cur = c.curricula['ib-dp-bm'];
+const d = await connected();
 const rows = allSubtopics(c).map(({ unit, s }) => {
   const note = noteFor(c, s.code);
   const map = mindmapFor(c, s.code);
   const terms = Object.values(c.glossary).filter((g) => g.subtopics.includes(s.code)).length;
-  const tools = Object.values(c.interactives).filter((it) => it.page && it.syllabus.includes(s.code)).length + Object.values(c.calculations).filter((k) => k.syllabus.some((x) => x.code === s.code)).length;
-  const questions = Object.values(c.questions).filter((q) => q.syllabus.includes(s.code)).length;
+  // Tools, cases, briefings and questions are counted from everything that names the subtopic: every tool page,
+  // every case and case lab, every Boardroom Briefing and every question in the bank, not one collection of each.
+  const n = countsFor(s.code, d.inputs);
   const brief = s.topic && c.topics[s.topic] && c.topics[s.topic]!.code === s.code;
   const state = brief ? 'brief' : note ? 'notes' : s.topic ? 'brief-part' : 'hub';
-  return { unit, s, note, map, terms, tools, questions, state };
+  return { unit, s, note, map, terms, ...n, state };
 });
 const withMaps = rows.filter((r) => r.map).length;
+const toolPagesUsed = new Set(rows.flatMap((r) => toolsFor(r.s.code, d.tools, d.extraTools).map((t) => t.href))).size;
+const questionsInBank = d.inputs.bank.length;
+const COUNTS: Array<{ key: 'terms' | 'tools' | 'questions' | 'cases' | 'briefings'; one: string; many: string }> = [
+  { key: 'terms', one: 'term', many: 'terms' },
+  { key: 'tools', one: 'tool', many: 'tools' },
+  { key: 'questions', one: 'question', many: 'questions' },
+  { key: 'cases', one: 'case', many: 'cases' },
+  { key: 'briefings', one: 'briefing', many: 'briefings' },
+];
 const STATE_LABEL: Record<string, string> = { brief: 'Complete brief', notes: 'Full notes', 'brief-part': 'In a brief', hub: 'Notes planned' };
 // The headline figures come from the coverage tracker's own calculation, so the two pages always agree.
 const sum = coverageSummary(c);
@@ -35,7 +48,7 @@ const sum = coverageSummary(c);
     trail={[{ label: 'Topics' }]}
     kicker="Topic library"
     title="The course, subtopic by subtopic"
-    lead={`All ${sum.total} subtopics of IB DP Business Management, in their five units. Every subtopic has a page with what the course asks, its key terms and its tools. ${sum.complete} of ${sum.total} are complete, with full notes (${sum.withNotes}) or a complete brief (${sum.withBriefs})${sum.partial + sum.planned ? `; the other ${sum.partial + sum.planned} are partly built or planned, with notes being written one at a time` : ''}.`}
+    lead={`All ${sum.total} subtopics of IB DP Business Management, in their five units. Every subtopic has a page with what the course asks, its key terms, its tools and how it connects to the rest of the course. ${sum.complete} of ${sum.total} are complete, with full notes (${sum.withNotes}) or a complete brief (${sum.withBriefs})${sum.partial + sum.planned ? `; the other ${sum.partial + sum.planned} are partly built or planned` : ''}.`}
   />
 
   <div class="wrap page-body">
@@ -43,9 +56,17 @@ const sum = coverageSummary(c);
       <div class="tl-stats__lead"><dt>Subtopics complete</dt><dd>{sum.complete}<span class="tl-stats__of"> of {sum.total}</span></dd></div>
       <div><dt>With full notes</dt><dd>{sum.withNotes}</dd></div>
       <div><dt>In a complete brief</dt><dd>{sum.withBriefs}</dd></div>
-      <div><dt>Partly built</dt><dd>{sum.partial}</dd></div>
+      {
+        sum.partial + sum.planned > 0 && (
+          <div>
+            <dt>Still to finish</dt>
+            <dd>{sum.partial + sum.planned}</dd>
+          </div>
+        )
+      }
       <div><dt>Mindmaps</dt><dd>{withMaps}</dd></div>
-      <div><dt>Glossary terms</dt><dd>{Object.keys(c.glossary).length}</dd></div>
+      <div><dt>Questions in the bank</dt><dd>{questionsInBank}</dd></div>
+      <div><dt>Tools that serve them</dt><dd>{toolPagesUsed}</dd></div>
     </dl>
 
     <section class="tl-briefs" aria-labelledby="tl-briefs-h">
@@ -82,12 +103,20 @@ const sum = coverageSummary(c);
                     </h3>
                     <p class="tl-row__cs">{r.s.content.map((x) => x.text).join(' · ')}</p>
                   </div>
-                  <ul class="tl-row__has" aria-label="What exists for this subtopic">
-                    <li class:list={['tl-chip', `tl-chip--${r.state}`]}>{STATE_LABEL[r.state]}</li>
-                    {r.map && <li class="tl-chip">Mindmap</li>}
-                    {r.terms > 0 && <li class="tl-chip">{r.terms} terms</li>}
-                    {r.tools > 0 && <li class="tl-chip">{r.tools} tools</li>}
-                    {r.questions > 0 && <li class="tl-chip">{r.questions} questions</li>}
+                  <p class="tl-row__state">
+                    <span class:list={['tl-chip', `tl-chip--${r.state}`]}>{STATE_LABEL[r.state]}</span>
+                    {r.map && (
+                      <a class="tl-row__map" href={href.mindmap(r.map[0])}>
+                        Mindmap<span class="sr-only"> for {r.s.code}</span>
+                      </a>
+                    )}
+                  </p>
+                  <ul class="tl-row__has" aria-label={`For ${r.s.code} on the platform`}>
+                    {COUNTS.map((k) => (
+                      <li class:list={['tl-count', { 'tl-count--none': r[k.key] === 0 }]}>
+                        <span class="tl-count__n">{r[k.key]}</span> <span class="tl-count__what">{r[k.key] === 1 ? k.one : k.many}</span>
+                      </li>
+                    ))}
                   </ul>
                 </li>
               ))}
@@ -97,7 +126,7 @@ const sum = coverageSummary(c);
     }
 
     <p class="small muted tl-foot">
-      Statuses are computed from the content. The <a href="/ib/coverage/">coverage tracker</a> gives the detail and the <a href="/ib/map/">course map</a> shows it at a glance.
+      Terms are the glossary entries for the subtopic; tools, every tool and desk page that serves it; questions, every question on it in the <a href="/assessment/question-bank/">question bank</a>, from the practice sets, the notes and the case files; cases, the Case Vault's cases and the Case Room's labs; briefings, the <a href="/boardroom-briefings/">Boardroom Briefings</a>. The <a href="/ib/coverage/">coverage tracker</a> gives the detail, the <a href="/ib/map/">course map</a> shows it at a glance, and the <a href="/ib/connections/">connections map</a> shows how the subtopics link.
     </p>
   </div>
 </BaseLayout>
@@ -106,6 +135,7 @@ const sum = coverageSummary(c);
   .tl-stats {
     display: grid;
     grid-template-columns: 1.4fr repeat(5, minmax(0, 1fr));
+    align-items: end;
     margin: 0 0 var(--sp-7);
     border-top: 1px solid var(--navy-900);
     border-bottom: 1px solid var(--rule-hair);
@@ -121,7 +151,7 @@ const sum = coverageSummary(c);
   }
 
   .tl-stats dt {
-    font-size: var(--fs-label);
+    font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: var(--track-label);
     text-transform: uppercase;
@@ -193,14 +223,40 @@ const sum = coverageSummary(c);
     list-style: none;
   }
 
+  /* Each row: the code, the subtopic and its statements, and five counts in fixed columns that line up from row to row. */
   .tl-row {
     display: grid;
-    grid-template-columns: 3.25rem minmax(0, 1fr) minmax(0, auto);
+    grid-template-columns: 3.25rem minmax(0, 1fr) 24rem;
+    grid-template-areas:
+      'code main counts'
+      'code state counts';
     gap: var(--sp-2) var(--sp-5);
     align-items: start;
     margin: 0;
     padding: var(--sp-4) 0;
     border-bottom: 1px solid var(--rule-hair);
+  }
+
+  .tl-row__code {
+    grid-area: code;
+  }
+
+  .tl-row__main {
+    grid-area: main;
+  }
+
+  .tl-row__state {
+    grid-area: state;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+    margin: 0;
+  }
+
+  .tl-row__map {
+    font-size: 0.875rem;
+    font-weight: 600;
   }
 
   .tl-row__code {
@@ -237,21 +293,47 @@ const sum = coverageSummary(c);
   }
 
   .tl-row__has {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 0.3rem;
-    max-width: 18rem;
+    grid-area: counts;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     margin: 0;
     padding: 0;
     list-style: none;
+    border-left: 1px solid var(--rule-hair);
+  }
+
+  .tl-count {
+    display: grid;
+    justify-items: center;
+    gap: 0.1rem;
+    margin: 0;
+    padding: 0 0.25rem;
+    text-align: center;
+  }
+
+  .tl-count__n {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    line-height: 1.1;
+    color: var(--navy-900);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .tl-count__what {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .tl-count--none .tl-count__n {
+    color: var(--text-muted);
   }
 
   .tl-chip {
     margin: 0;
     padding: 0.15rem 0.5rem;
     border: 1px solid var(--rule);
-    border-radius: 999px;
+    border-radius: var(--radius-1);
     font-size: 0.75rem;
     font-weight: 560;
     color: var(--text-muted);
@@ -294,12 +376,35 @@ const sum = coverageSummary(c);
 
     .tl-row {
       grid-template-columns: 2.75rem minmax(0, 1fr);
+      grid-template-areas:
+        'code main'
+        'code state'
+        'code counts';
     }
 
+    /* One column on a narrow screen: the counts read as a line that wraps, number beside word. */
     .tl-row__has {
-      grid-column: 2;
-      justify-content: flex-start;
-      max-width: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-1) var(--sp-4);
+      border-left: 0;
+      border-top: 1px solid var(--rule-hair);
+      padding-top: var(--sp-2);
+    }
+
+    .tl-count {
+      display: flex;
+      align-items: baseline;
+      gap: 0.3rem;
+      padding: 0;
+    }
+
+    .tl-count__n {
+      font-size: 1.125rem;
+    }
+
+    .tl-count__what {
+      font-size: 0.8125rem;
     }
   }
 </style>

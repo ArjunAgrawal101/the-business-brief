@@ -98,8 +98,9 @@
 }
 
 .tcm-notes-toggle input {
-  width: 1.125rem;
-  height: 1.125rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
   accent-color: var(--cobalt-text);
 }
 
@@ -502,9 +503,17 @@
   padding: 0.3rem 0;
 }
 
+/* WCAG 2.2 target size: every link at least 24 pixels tall, with the line under it clear of it. */
+.tcm-topic__list a {
+  display: inline-block;
+  min-height: 24px;
+  line-height: 1.6;
+}
+
 .tcm-topic__with,
 .tcm-topic__why {
   display: block;
+  padding-top: 0.15rem;
   font-size: 0.875rem;
   color: var(--text-muted);
 }
