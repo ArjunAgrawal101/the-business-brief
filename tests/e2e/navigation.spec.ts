@@ -40,12 +40,14 @@ test('the Tutorials button is in the header on wide screens, and first in the dr
   await expect(page).toHaveURL(/\/tutorials\/$/);
 });
 
-test('six groups fit the header at the narrowest wide-screen width', async ({ browser }) => {
+test('six groups and the Academic Ecosystem menu fit the header at the narrowest wide-screen width', async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 1024, height: 768 } });
   const page = await context.newPage();
   await page.goto('/');
   await expect(page.locator('.mega-nav')).toBeVisible();
-  await expect(page.locator('.mega-nav__item')).toHaveCount(6);
+  await expect(page.locator('.mega-nav__item .mega:not(.mega--ecosystem)')).toHaveCount(6);
+  await expect(page.locator('.mega-nav__item .mega--ecosystem')).toHaveCount(1);
+  await expect(page.locator('.mega--ecosystem > summary')).toBeVisible();
   const overflow = await page.evaluate(() => {
     const bar = document.querySelector('.site-header__bar')!;
     return bar.scrollWidth - bar.clientWidth;

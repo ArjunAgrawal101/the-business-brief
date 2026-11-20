@@ -2,9 +2,12 @@
 /**
  * The footer carries both identities: the full Arjun Agrawal logo (the
  * creator, from the brand's own reversed master) and The Business Brief (the
- * product), as two parts of the Arjun Agrawal Knowledge Series.
+ * product). Below them, the Arjun Agrawal Academic Ecosystem: the three
+ * platforms by the same educator, this one marked as current, the other two
+ * opening in a new tab.
  */
 import { NAV } from '../../lib/navigation';
+import { ECOSYSTEM, ECOSYSTEM_MOTTO, ECOSYSTEM_NAME, hostOf } from '../../lib/ecosystem';
 
 /** The footer's columns are the six groups of the header, from one list. */
 const COLUMNS = NAV.map((g) => ({ title: g.label, links: g.links.map((l) => [l.label, l.href] as const) }));
@@ -45,13 +48,39 @@ const year = new Date().getFullYear();
       </nav>
     </div>
 
-    <div class="site-footer__series">
-      <p class="site-footer__series-name">Arjun Agrawal Knowledge Series</p>
-      <p>
-        The Business Brief and <a href="https://ib-economics-pi.vercel.app/" rel="noopener">Arjun Agrawal Economics<span class="sr-only"> (external site)</span></a>, two
-        platforms by <a href="/about/">Arjun Agrawal</a>, IB Diploma Programme educator in Economics, Business Management and Global Politics.
-      </p>
-    </div>
+    <nav class="site-footer__series" aria-labelledby="footer-eco-h">
+      <div>
+        <p class="site-footer__series-name" id="footer-eco-h">{ECOSYSTEM_NAME}</p>
+        <p class="site-footer__series-text">
+          Three independent platforms by <a href="/about/">Arjun Agrawal</a>, IB Diploma Programme educator in Economics, Business Management and
+          Global Politics. {ECOSYSTEM_MOTTO}
+        </p>
+      </div>
+      <ul class="site-footer__eco" role="list">
+        {
+          ECOSYSTEM.map((p) => (
+            <li class={`site-footer__eco-item site-footer__eco-item--${p.key}`}>
+              {p.current ? (
+                <a href="/">
+                  <span class="site-footer__eco-name">{p.name}</span>
+                  <span class="site-footer__eco-line">{p.line}</span>
+                  <span class="site-footer__eco-here">You are here</span>
+                </a>
+              ) : (
+                <a href={p.url} target="_blank" rel="noopener noreferrer">
+                  <span class="site-footer__eco-name">
+                    {p.name} <span aria-hidden="true">&nearr;</span>
+                  </span>
+                  <span class="site-footer__eco-line">{p.line}</span>
+                  <span class="site-footer__eco-url">{hostOf(p.url)}</span>
+                  <span class="sr-only"> (opens in a new tab)</span>
+                </a>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
 
     <div class="site-footer__legal">
       <p>
@@ -202,6 +231,77 @@ const year = new Date().getFullYear();
     color: var(--gold-400);
   }
 
+  .site-footer__series-text {
+    margin-top: var(--sp-2);
+    max-width: 32rem;
+  }
+
+  .site-footer__eco {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-footer__eco-item {
+    margin: 0;
+  }
+
+  .site-footer__eco a {
+    display: grid;
+    align-content: start;
+    gap: 0.25rem;
+    height: 100%;
+    padding: var(--sp-4);
+    border: 1px solid var(--rule-on-ink);
+    text-decoration: none;
+  }
+
+  .site-footer__eco a:hover {
+    border-color: var(--gold-400);
+  }
+
+  .site-footer__eco-name {
+    font-family: var(--font-display);
+    font-size: 1.125rem;
+    font-weight: 560;
+    line-height: 1.2;
+    color: var(--text-on-ink);
+  }
+
+  .site-footer__eco-line,
+  .site-footer__eco-url {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--text-on-ink-muted);
+  }
+
+  .site-footer__eco-here {
+    margin-top: var(--sp-1);
+    font-size: 0.6875rem;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold-400);
+  }
+
+  .site-footer__eco-item--business a {
+    border-color: var(--gold-400);
+    border-top-width: 3px;
+  }
+
+  .site-footer__eco-item--economics a {
+    border-top: 3px solid #b08a47;
+    background: rgba(26, 29, 34, 0.55);
+  }
+
+  .site-footer__eco-item--politics a {
+    border-top: 3px solid #8b4a5c;
+    background: rgba(16, 29, 50, 0.7);
+  }
+
   .site-footer__legal {
     display: grid;
     gap: var(--sp-3);
@@ -225,6 +325,12 @@ const year = new Date().getFullYear();
     .site-footer__series {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--sp-5);
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .site-footer__eco {
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 

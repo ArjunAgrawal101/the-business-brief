@@ -12,6 +12,25 @@ import { expect, test, type Page } from '@playwright/test';
 type AxePage = ConstructorParameters<typeof AxeBuilder>[0]['page'];
 
 const axe = async (page: Page, where: string) => {
+  // Moving to a stage scrolls smoothly to its heading. The scan waits until the page has stopped scrolling (six
+  // frames at the same position), so nothing is measured mid-scroll, half under the sticky header.
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        let last = -1;
+        let still = 0;
+        const tick = () => {
+          if (window.scrollY === last) still += 1;
+          else {
+            still = 0;
+            last = window.scrollY;
+          }
+          if (still >= 6) resolve();
+          else requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }),
+  );
   const r = await new AxeBuilder({ page: page as unknown as AxePage }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze();
   expect(
     r.violations.map((v) => `${where}: ${v.id} (${v.impact}): ${v.nodes.length} node(s), e.g. ${v.nodes[0]?.target.join(' ')}`),

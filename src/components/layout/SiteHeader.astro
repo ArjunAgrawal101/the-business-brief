@@ -15,6 +15,7 @@ import Monogram from '../brand/Monogram.astro';
 import { NAV, navPosition } from '../../lib/navigation';
 import { corpus } from '../../lib/content';
 import { subtopicCoverage } from '../../lib/coverage';
+import { ECOSYSTEM, ECOSYSTEM_MOTTO, hostOf } from '../../lib/ecosystem';
 
 interface Props {
   current?: string;
@@ -165,9 +166,12 @@ const GUIDES = [
                           <a class="mega__cta" href="/tutorials/">
                             The tutorials <span aria-hidden="true">&rarr;</span>
                           </a>
-                          <a class="mega__cta mega__cta--quiet" href="https://ib-economics-pi.vercel.app/" rel="noopener">
-                            Arjun Agrawal Economics<span class="sr-only"> (external site)</span> <span aria-hidden="true">&nearr;</span>
-                          </a>
+                          {ECOSYSTEM.filter((p) => !p.current).map((p) => (
+                            <a class="mega__cta mega__cta--quiet" href={p.url} target="_blank" rel="noopener noreferrer">
+                              {p.key === 'economics' ? 'Arjun Agrawal Economics' : p.name}
+                              <span class="sr-only"> (opens in a new tab)</span> <span aria-hidden="true">&nearr;</span>
+                            </a>
+                          ))}
                         </>
                       )}
                     </aside>
@@ -177,6 +181,48 @@ const GUIDES = [
             </li>
           ))
         }
+        <li class="mega-nav__item">
+          <details class="mega mega--ecosystem" name="mega" data-menu>
+            <summary class="mega__trigger">
+              <span><span class="mega__eco-a">Academic </span>Ecosystem</span>
+              <svg class="mega__chev" viewBox="0 0 12 12" width="10" height="10" aria-hidden="true" focusable="false">
+                <path d="M2.5 4.5L6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </summary>
+            <div class="mega__panel">
+              <div class="wrap eco-menu">
+                <div class="mega__intro">
+                  <p class="mega__kicker">Academic Ecosystem</p>
+                  <p class="mega__lead">Three independent platforms by Arjun Agrawal. {ECOSYSTEM_MOTTO} The other two open in a new tab.</p>
+                </div>
+                <ul class="eco-menu__list" role="list">
+                  {
+                    ECOSYSTEM.map((p) => (
+                      <li class={`eco-menu__item eco-menu__item--${p.key}`}>
+                        {p.current ? (
+                          <a href="/">
+                            <span class="eco-menu__name">{p.name}</span>
+                            <span class="eco-menu__line">{p.line}</span>
+                            <span class="eco-menu__here">You are here</span>
+                          </a>
+                        ) : (
+                          <a href={p.url} target="_blank" rel="noopener noreferrer">
+                            <span class="eco-menu__name">
+                              {p.name} <span aria-hidden="true">&nearr;</span>
+                            </span>
+                            <span class="eco-menu__line">{p.line}</span>
+                            <span class="eco-menu__url">{hostOf(p.url)}</span>
+                            <span class="sr-only"> (opens in a new tab)</span>
+                          </a>
+                        )}
+                      </li>
+                    ))
+                  }
+                </ul>
+              </div>
+            </div>
+          </details>
+        </li>
       </ul>
     </nav>
 
@@ -225,6 +271,33 @@ const GUIDES = [
                 </details>
               ))
             }
+            <section class="drawer__eco" aria-labelledby="drawer-eco-h">
+              <p class="drawer__eco-k" id="drawer-eco-h">Academic Ecosystem</p>
+              <ul role="list">
+                {
+                  ECOSYSTEM.map((p) => (
+                    <li>
+                      {p.current ? (
+                        <a href="/">
+                          <span class="drawer__name">
+                            {p.name} <span class="drawer__here">You are here</span>
+                          </span>
+                          <span class="drawer__text">{p.line}</span>
+                        </a>
+                      ) : (
+                        <a href={p.url} target="_blank" rel="noopener noreferrer">
+                          <span class="drawer__name">
+                            {p.name} <span aria-hidden="true">&nearr;</span>
+                          </span>
+                          <span class="drawer__text">{p.line}</span>
+                          <span class="sr-only"> (opens in a new tab)</span>
+                        </a>
+                      )}
+                    </li>
+                  ))
+                }
+              </ul>
+            </section>
             <p class="drawer__foot">
               <a href="/search/">Search the platform</a>
               <a href="/rooms/">All rooms</a>
@@ -671,6 +744,108 @@ const GUIDES = [
     color: var(--navy-950);
   }
 
+  /* ---------- The Academic Ecosystem menu: the three platforms, each in its own colours ---------- */
+  .eco-menu {
+    display: grid;
+    grid-template-columns: minmax(12rem, 0.95fr) minmax(0, 3.55fr);
+    gap: var(--sp-6);
+    padding-block: var(--sp-6);
+  }
+
+  .eco-menu__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .eco-menu__item {
+    margin: 0;
+  }
+
+  .eco-menu__item a {
+    display: grid;
+    align-content: start;
+    gap: 0.35rem;
+    height: 100%;
+    padding: var(--sp-5);
+    color: inherit;
+    text-decoration: none;
+    transition: transform var(--dur-fast) var(--ease);
+  }
+
+  .eco-menu__item a:hover {
+    transform: translateY(-2px);
+  }
+
+  .eco-menu__name {
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    font-weight: 560;
+    line-height: 1.15;
+  }
+
+  .eco-menu__line {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 1.5;
+    text-transform: uppercase;
+  }
+
+  .eco-menu__url,
+  .eco-menu__here {
+    margin-top: var(--sp-2);
+    font-size: 0.8125rem;
+  }
+
+  .eco-menu__here {
+    font-weight: 650;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .eco-menu__item--economics a {
+    background: #1a1d22;
+    color: #f4efe4;
+    border-top: 3px solid #b08a47;
+  }
+
+  .eco-menu__item--economics .eco-menu__line,
+  .eco-menu__item--economics .eco-menu__url {
+    color: rgba(244, 239, 228, 0.78);
+  }
+
+  .eco-menu__item--business a {
+    background: var(--surface-sheet);
+    color: var(--navy-900);
+    border: 1px solid var(--gold-500);
+    border-top: 3px solid var(--gold-500);
+    box-shadow: var(--shadow-sheet);
+  }
+
+  .eco-menu__item--business .eco-menu__line {
+    color: var(--green-text);
+  }
+
+  .eco-menu__item--politics a {
+    background: #101d32;
+    color: #f7f5ef;
+    border-top: 3px solid #713d4c;
+  }
+
+  .eco-menu__item--politics .eco-menu__line,
+  .eco-menu__item--politics .eco-menu__url {
+    color: rgba(247, 245, 239, 0.78);
+  }
+
+  .eco-menu__item a:focus-visible {
+    outline-offset: 3px;
+  }
+
   /* With six groups, the wide menu tightens until the screen is wide enough. */
   @media (min-width: 64rem) and (max-width: 82rem) {
     .mega__trigger {
@@ -685,6 +860,16 @@ const GUIDES = [
 
     .site-header__bar {
       gap: var(--sp-4);
+    }
+
+    /* the seventh menu says Ecosystem; its name stays Academic Ecosystem */
+    .mega__eco-a {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
     }
 
     .site-header__tools .hdr-btn:not(.hdr-btn--cta) .hdr-btn__text {
@@ -870,6 +1055,60 @@ const GUIDES = [
   .drawer__text {
     font-size: 0.8125rem;
     color: var(--text-muted);
+  }
+
+  .drawer__eco {
+    margin-top: var(--sp-5);
+    padding: var(--sp-4);
+    border: 1px solid var(--rule-hair);
+    border-top: 3px solid var(--gold-500);
+    background: var(--surface-sheet);
+  }
+
+  .drawer__eco-k {
+    margin: 0 0 var(--sp-2);
+    font-size: var(--fs-label);
+    font-weight: 650;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
+  }
+
+  .drawer__eco ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .drawer__eco li {
+    margin: 0;
+  }
+
+  .drawer__eco li + li {
+    border-top: 1px solid var(--rule-hair);
+  }
+
+  .drawer__eco a {
+    display: grid;
+    gap: 0.1rem;
+    padding: 0.7rem 0;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .drawer__eco .drawer__name {
+    font-family: var(--font-display);
+    font-size: 1.1875rem;
+    font-weight: 560;
+  }
+
+  .drawer__here {
+    font-family: var(--font-ui);
+    font-size: 0.6875rem;
+    font-weight: 650;
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    color: var(--brass-text);
   }
 
   .drawer__foot {

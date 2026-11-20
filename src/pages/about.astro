@@ -16,6 +16,7 @@ import SectionHead from '../components/layout/SectionHead.astro';
 import Monogram from '../components/brand/Monogram.astro';
 import CreatorPhoto from '../components/brand/CreatorPhoto.astro';
 import { corpus } from '../lib/content';
+import { ECOSYSTEM } from '../lib/ecosystem';
 
 const c = await corpus();
 const claim = c.claims['creator-facts'];
@@ -27,7 +28,7 @@ const FACTS = [
   { k: 'IB Diploma Programme', a: 'Teaching and academic work', b: 'BLISS International School, Pune; Symbiosis International School, Pune' },
   { k: 'Subjects', a: 'Economics, Business Management, Global Politics', b: 'Standard and Higher Level' },
   { k: 'Mentorship', a: 'UPSC Civil Services', b: 'Economics, for aspirants preparing for the examination' },
-  { k: 'Resource design', a: 'Handbooks, presentations, Economics in 60 Seconds', b: 'and two learning platforms' },
+  { k: 'Resource design', a: 'Handbooks, presentations, Economics in 60 Seconds', b: 'and three learning platforms' },
 ];
 
 const JOURNEY = [
@@ -35,7 +36,7 @@ const JOURNEY = [
   { stage: 'Higher education', title: 'Fergusson College', where: 'Pune', line: 'Undergraduate Economics, taught as an Assistant Professor.' },
   { stage: 'IB Diploma Programme', title: 'BLISS and Symbiosis', where: 'International Schools, Pune', line: 'Diploma Programme teaching and academic work across three subjects.' },
   { stage: 'Mentorship', title: 'UPSC Civil Services', where: 'Economics', line: 'Adult learners, a different examination, the same subject.' },
-  { stage: 'Digital education', title: 'Two platforms', where: 'Arjun Agrawal Knowledge Series', line: 'Economics, and now Business Management, built to be used by anyone.' },
+  { stage: 'Digital education', title: 'Three platforms', where: 'Arjun Agrawal Academic Ecosystem', line: 'Economics, Business Management and Political Studies, built to be used by anyone.' },
 ];
 
 const PRINCIPLES = [
@@ -51,7 +52,7 @@ const tutorMail = enquiryMailto();
 
 <BaseLayout
   title="About Arjun Agrawal"
-  description="Arjun Agrawal: IB Diploma Programme educator in Economics, Business Management and Global Politics, UPSC Economics mentor, and creator of The Business Brief and Arjun Agrawal Economics."
+  description="Arjun Agrawal: IB Diploma Programme educator in Economics, Business Management and Global Politics, UPSC Economics mentor, and creator of The Business Brief, Arjun Agrawal Economics and Political Studies & Global Affairs."
   section="about"
 >
   <section class="ab-hero band--grain" aria-labelledby="ab-h">
@@ -73,7 +74,7 @@ const tutorMail = enquiryMailto();
           </p>
           <p class="ab-hero__actions">
             <a class="btn btn--primary" href={`mailto:${EMAIL}`}>Write to Arjun <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
-            <a class="btn" href="https://ib-economics-pi.vercel.app/" rel="noopener">Arjun Agrawal Economics<span class="sr-only"> (external site)</span></a>
+            <a class="btn" href="https://ib-economics-pi.vercel.app/" target="_blank" rel="noopener noreferrer">Arjun Agrawal Economics<span class="sr-only"> (opens in a new tab)</span></a>
           </p>
         </div>
         <figure class="ab-hero__figure enter">
@@ -258,27 +259,42 @@ const tutorMail = enquiryMailto();
 
   <section class="band" aria-labelledby="ab-plat-h">
     <div class="wrap">
-      <SectionHead no="08" title="Two platforms, one standard" id="ab-plat-h" dek="Siblings under one creator, each designed for its own subject." />
+      <SectionHead
+        no="08"
+        title="Three platforms, one standard"
+        id="ab-plat-h"
+        dek="The Arjun Agrawal Academic Ecosystem: siblings under one creator, each designed for its own subject. Knowledge. Insight. Impact."
+      />
       <div class="ab-plats" data-reveal="group">
-        <article class="ab-plat">
+        <article class="ab-plat ab-plat--economics">
           <p class="label">Economics</p>
           <h3>Arjun Agrawal Economics</h3>
           <p class="ab-plat__tag">Think like an economist.</p>
+          <p class="ab-plat__line">{ECOSYSTEM[0]!.line}</p>
           <p>
             IB Diploma Programme Economics as a system for practising the reasoning the course assesses: models that move, causal chains, real-world cases
-            and examination practice.
+            and examination practice, with a second pathway for UPSC CSE aspirants.
           </p>
-          <a class="btn" href="https://ib-economics-pi.vercel.app/" rel="noopener">Visit the Economics platform<span class="sr-only"> (external site)</span></a>
+          <a class="btn" href={ECOSYSTEM[0]!.url} target="_blank" rel="noopener noreferrer">Visit the Economics platform<span class="sr-only"> (opens in a new tab)</span></a>
         </article>
-        <article class="ab-plat ab-plat--here">
-          <p class="label">Business Management</p>
+        <article class="ab-plat ab-plat--here" aria-current="true">
+          <p class="label">Business Management: you are here</p>
           <h3>The Business Brief</h3>
           <p class="ab-plat__tag">Strategy. Leadership. Decisions.</p>
+          <p class="ab-plat__line">{ECOSYSTEM[1]!.line}</p>
           <p>
             IB Diploma Programme Business Management learned through decisions: topic notes, mindmaps, case studies, live financial tools and an Assessment
             Centre, with routes for other learners built on the same foundation.
           </p>
           <a class="btn btn--primary" href="/topics/">Explore the topic library <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
+        </article>
+        <article class="ab-plat ab-plat--politics">
+          <p class="label">Political Studies</p>
+          <h3>Political Studies &amp; Global Affairs</h3>
+          <p class="ab-plat__tag">Understand Power. Question Politics. Interpret the World.</p>
+          <p class="ab-plat__line">{ECOSYSTEM[2]!.line}</p>
+          <p>{ECOSYSTEM[2]!.text}</p>
+          <a class="btn" href={ECOSYSTEM[2]!.url} target="_blank" rel="noopener noreferrer">Visit Political Studies<span class="sr-only"> (opens in a new tab)</span></a>
         </article>
       </div>
     </div>
@@ -721,7 +737,7 @@ const tutorMail = enquiryMailto();
   /* ---------- Platforms ---------- */
   .ab-plats {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--sp-5);
     margin-top: var(--sp-6);
   }
@@ -739,6 +755,25 @@ const tutorMail = enquiryMailto();
 
   .ab-plat--here {
     border-top-color: var(--gold-500);
+    outline: 2px solid var(--gold-500);
+    outline-offset: 3px;
+  }
+
+  .ab-plat--economics {
+    border-top-color: #1a1d22;
+  }
+
+  .ab-plat--politics {
+    border-top-color: #713d4c;
+  }
+
+  .ab-plat__line {
+    font-size: 0.75rem;
+    font-weight: 650;
+    letter-spacing: 0.06em;
+    line-height: 1.6;
+    text-transform: uppercase;
+    color: var(--text-muted);
   }
 
   .ab-plat h3 {

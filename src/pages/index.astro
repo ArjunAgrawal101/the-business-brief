@@ -5,8 +5,9 @@
  * ecosystem drawn as an institution, the weekly briefing, the three chains
  * of reasoning, the course unit by unit, a working preview of a tool, the
  * mindmaps, diagrams and glossary, learning objectives, pathways, the
- * Assessment Centre, the latest additions, the creator and a closing
- * invitation. Every figure on the page is counted from the content.
+ * Assessment Centre, the latest additions, the creator, the Arjun Agrawal
+ * Academic Ecosystem (the three platforms by the same educator) and a
+ * closing invitation. Every figure on the page is counted from the content.
  */
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHead from '../components/layout/SectionHead.astro';
@@ -20,6 +21,7 @@ import { curriculumOf, subtopicCoverage } from '../lib/coverage';
 import { DIAGRAMS } from '../lib/diagrams';
 import { renderThumb } from '../lib/mindmap';
 import Ecosystem from '../components/home/Ecosystem.astro';
+import AcademicEcosystem from '../components/home/AcademicEcosystem.astro';
 import { SESSION as TUTOR_SESSION, enquiryMailto } from '../lib/tutorials';
 import Featured from '../components/home/Featured.astro';
 import BreakEvenPreview from '../components/home/BreakEvenPreview.astro';
@@ -443,13 +445,25 @@ const jsonLd = {
           Pune. He also mentors UPSC Civil Services aspirants in Economics.
         </p>
         <p>
-          The Business Brief and Arjun Agrawal Economics are the two platforms of the Arjun Agrawal Knowledge Series: the resources a classroom needs,
-          built to be used by anyone.
+          The Business Brief, Arjun Agrawal Economics and Political Studies &amp; Global Affairs are the three platforms of the Arjun Agrawal Academic
+          Ecosystem: the resources a classroom needs, built to be used by anyone.
         </p>
         <p class="hcr__actions">
           <a class="btn" href="/about/">Read the full profile <span class="btn__arrow" aria-hidden="true">&rarr;</span></a>
         </p>
       </div>
+    </div>
+  </section>
+
+  <section class="band" aria-labelledby="aae-h">
+    <div class="wrap">
+      <SectionHead
+        no="13"
+        title="Explore the Arjun Agrawal Academic Ecosystem"
+        id="aae-h"
+        dek="Three independent academic platforms by the same educator, each with its own subject, examinations and design. Arjun Agrawal: Knowledge. Insight. Impact."
+      />
+      <AcademicEcosystem />
     </div>
   </section>
 
