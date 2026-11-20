@@ -17,7 +17,8 @@
 import { each, escapeHtml as h, readConfig } from './ix';
 import { courseChartSvg, shortDate, tallyWords, type Row } from '../lib/dashboard';
 import { LEARNER_KEY, SAVED_KEY, STUDIED_KEY, VISIT_KINDS, VISIT_KIND_LABELS, buildExport, emptyLog, parseLog, parseStudied, type Visit } from '../lib/learner';
-import { LIST_KEY, NOTES_KEY, SNAPSHOTS_KEY, checkImport, planWorkspaceImport, workspaceView, type WorkspaceConfig, type WorkspaceView } from '../lib/workspace';
+import { LIST_KEY, NOTES_KEY, SNAPSHOTS_KEY, planWorkspaceImport, type WorkspaceConfig, type WorkspaceView } from '../lib/workspace';
+import { checkDashboardImport as checkImport, dashboardWorkspaceView as workspaceView } from '../lib/workspace-progress';
 import { readItem, removeItem, siteItems, storageWorks, writeItem } from './storage';
 import { n, plural, type AskOptions, type Ctx } from './workspace/context';
 import { bindList, renderList } from './workspace/list';

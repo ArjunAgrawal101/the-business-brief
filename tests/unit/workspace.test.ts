@@ -47,6 +47,7 @@ import {
   type SnapshotInput,
   type WorkspaceConfig,
 } from '../../src/lib/workspace';
+import { checkDashboardImport, dashboardWorkspaceView } from '../../src/lib/workspace-progress';
 
 const T0 = new Date('2026-11-03T12:00:00.000Z');
 const later = (minutes: number) => new Date(T0.getTime() + minutes * 60_000);
@@ -378,9 +379,9 @@ const UNIT = { currency: '$', cac: 20, contribution: 9, lifetime: 12.5, ltv: 112
 describe('practice records count a subtopic as practised', () => {
   it('a rating in the question bank makes its subtopic practised, in the rows, the units and the counts', () => {
     const cfg = { ...CFG, bank: [['n-what-1', ['1.1'], 'paper-1']] as WorkspaceConfig['bank'] };
-    const before = workspaceView({ 'bb:saved': JSON.stringify(saved('/topics/a/')) }, cfg);
+    const before = dashboardWorkspaceView({ 'bb:saved': JSON.stringify(saved('/topics/a/')) }, cfg);
     expect(before.course.rows[0]?.status).toBe('none');
-    const v = workspaceView({ 'bb:saved': JSON.stringify(saved('/topics/a/')), 'bb:bank': JSON.stringify({ v: 1, items: { 'n-what-1': { attempts: 1, rating: 2, last: '2026-11-03' } } }) }, cfg);
+    const v = dashboardWorkspaceView({ 'bb:saved': JSON.stringify(saved('/topics/a/')), 'bb:bank': JSON.stringify({ v: 1, items: { 'n-what-1': { attempts: 1, rating: 2, last: '2026-11-03' } } }) }, cfg);
     expect(v.course.rows[0]?.status).toBe('practised');
     expect(v.course.units[0]).toMatchObject({ explored: 1, practised: 1 });
     expect(v.figures).toMatchObject({ explored: 1, practised: 1, completeExplored: 1 });
@@ -553,7 +554,7 @@ describe('exporting a selection', () => {
     expect(checkImport('{"format":"other"}')).toMatchObject({ ok: false });
   });
 
-  it('cleans the revision plan, study mode and the subtopics marked complete in a file too', () => {
+  it('on the dashboard, also cleans the revision plan, study mode and the subtopics marked complete in a file', () => {
     const file = {
       format: 'the-business-brief/learner-data',
       version: 1,
@@ -563,7 +564,7 @@ describe('exporting a selection', () => {
         'bb:studied': JSON.stringify({ done: { '1.1': '2026-11-23T10:00:00Z', '<b>': 'x' } }),
       },
     };
-    const r = checkImport(JSON.stringify(file));
+    const r = checkDashboardImport(JSON.stringify(file));
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     const got = Object.fromEntries(r.items.map((i) => [i.key, JSON.parse(i.value)]));

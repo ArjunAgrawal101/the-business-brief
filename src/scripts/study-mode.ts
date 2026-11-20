@@ -60,7 +60,7 @@ each('[data-ix="study"]', (box) => {
   /** Change the article and keep the reader's place: the section in view stays where it was on the screen. */
   const steady = (change: () => void) => {
     const list = entries.filter((e) => e.heading.getClientRects().length);
-    const anchor = list[currentSection(list.map((e) => e.heading.getBoundingClientRect().top), readingLine())]?.heading;
+    const anchor = list[currentSection(list.map(topOf), readingLine(), inView())]?.heading;
     const before = anchor?.getBoundingClientRect().top ?? 0;
     change();
     if (anchor && window.scrollY > 0) window.scrollBy(0, anchor.getBoundingClientRect().top - before);
@@ -130,6 +130,15 @@ each('[data-ix="study"]', (box) => {
     return top + s;
   };
 
+  /**
+   * How far below the reading line a section's start may be and still count
+   * as the one being read: a quarter of the window, so a section a link has
+   * just jumped to (which its own scroll margin sets a little lower) counts.
+   */
+  const inView = () => Math.max(48, window.innerHeight * 0.25);
+  /** Where a section starts: the element a contents link goes to. */
+  const topOf = (e: Entry) => (document.getElementById(e.target) ?? e.heading).getBoundingClientRect().top;
+
   const collect = (): Entry[] =>
     [...root.querySelectorAll<HTMLElement>('h2')]
       // Section headings only: not a heading inside an aside, a dialog or the study tools themselves.
@@ -183,10 +192,7 @@ each('[data-ix="study"]', (box) => {
     for (const f of fills) f.style.transform = `scaleX(${p.toFixed(4)})`;
     if (readEl) readEl.textContent = `${Math.round(p * 100)}% read`;
     if (!entries.length) return;
-    const at = currentSection(
-      entries.map((e) => e.heading.getBoundingClientRect().top),
-      line,
-    );
+    const at = currentSection(entries.map(topOf), line, inView());
     if (at === current) return;
     current = at;
     for (const ol of tocLists)
