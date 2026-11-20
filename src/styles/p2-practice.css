@@ -776,10 +776,11 @@
   outline-offset: 2px;
 }
 
+/* Never narrower than the drawing's own 600 units, so no label is smaller than its 13 pixels. */
 .pp-fig__scroll svg {
   display: block;
   width: 100%;
-  min-width: 34rem;
+  min-width: 37.5rem;
   height: auto;
 }
 
@@ -967,7 +968,7 @@
 
 .pp-grid__table .pp-t__head td {
   padding-top: var(--sp-3);
-  font-size: var(--fs-label);
+  font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: var(--track-label);
   text-transform: uppercase;
@@ -1069,7 +1070,7 @@ select.pp-cell__in {
 }
 
 .pp-src__k {
-  font-size: var(--fs-label);
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: var(--track-label);
   text-transform: uppercase;
