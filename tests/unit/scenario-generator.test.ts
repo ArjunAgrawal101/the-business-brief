@@ -267,7 +267,7 @@ describe('the HTML', () => {
       for (const s of all(f).slice(0, 6)) {
         const html = headHtml(s, ctx) + scenarioHtml(s, ctx);
         expect(html).not.toMatch(/undefined|NaN|\[object Object\]/);
-        expect(html).not.toMatch(/[–—]/);
+        expect(html).not.toMatch(/[\u2013\u2014]/);
         for (const step of STEP_IDS) expect(html).toContain(`data-step="${step}"`);
         expect((html.match(/class="disclosure sg-why nojs-only"/g) ?? []).length).toBe(6);
         expect(html).toContain('The model answer, in outline');

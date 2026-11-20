@@ -268,7 +268,7 @@ describe('the HTML and the stored value', () => {
       const sim = simulate(d, DEFAULT_SETTINGS);
       const html = [impactHtml(sim), tradeoffsHtml(sim), gridSvg(sim, 'g'), gridListHtml(sim), promptsHtml(sim)].join('');
       expect(html).not.toMatch(/undefined|NaN|\[object Object\]/);
-      expect(html).not.toMatch(/[–—]/);
+      expect(html).not.toMatch(/[\u2013\u2014]/);
       expect((html.match(/<li class="si-group /g) ?? []).length).toBe(7);
       expect(gridSvg(sim, 'g')).toContain('<desc id="g-d">');
     }

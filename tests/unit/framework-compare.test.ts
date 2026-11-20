@@ -84,7 +84,7 @@ describe('the curated comparisons', () => {
         for (const d of DIMENSIONS) {
           expect(col.cells[d.id].length, `${where} ${d.id}`).toBeGreaterThan(40);
           expect(col.cells[d.id]).not.toMatch(/undefined|NaN|\[object Object\]/);
-          expect(col.cells[d.id]).not.toMatch(/[–—]/);
+          expect(col.cells[d.id]).not.toMatch(/[\u2013\u2014]/);
         }
         expect(col.cells.application).toContain('Fictional');
         expect(col.cells.exam).toContain('Recommended strategy');
@@ -168,7 +168,7 @@ describe('the comparison tool’s columns', () => {
       expect(col.href).toBe(`/frameworks/${id}/`);
       for (const d of DIMENSIONS) {
         expect(col.cells[d.id].length, `${id} ${d.id}`).toBeGreaterThan(40);
-        expect(col.cells[d.id]).not.toMatch(/undefined|NaN|\[object Object\]|[–—]/);
+        expect(col.cells[d.id]).not.toMatch(/undefined|NaN|\[object Object\]|[\u2013\u2014]/);
       }
       expect(col.cells.context).toContain('Look elsewhere when');
       expect(col.cells.application).toContain('Fictional');

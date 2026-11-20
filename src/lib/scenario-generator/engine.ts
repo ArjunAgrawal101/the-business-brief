@@ -68,7 +68,7 @@ export function generate(code: string, families: readonly Family[]): Scenario | 
 /* ---------- What makes a scenario fit to publish ---------- */
 
 const LEAK = /\bundefined\b|\bNaN\b|\[object Object\]|Infinity/;
-const DASH = /[–—]/;
+const DASH = /[\u2013\u2014]/;
 
 function texts(v: unknown, out: string[] = []): string[] {
   if (typeof v === 'string') out.push(v);
