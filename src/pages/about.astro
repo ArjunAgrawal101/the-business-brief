@@ -58,12 +58,28 @@ const SHARED = [
   { idea: 'International markets', code: '4.6', note: 'Trade and globalization, as one organization meets them.' },
 ];
 const [economics, , politics] = ECOSYSTEM;
+
+/** Structured data: only what the claims register holds, with no current employer claimed. */
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  name: 'About Arjun Agrawal',
+  mainEntity: {
+    '@type': 'Person',
+    name: 'Arjun Agrawal',
+    description: 'IB Diploma Programme educator in Economics, Business Management and Global Politics, UPSC Economics mentor and resource creator.',
+    alumniOf: { '@type': 'CollegeOrUniversity', name: "St. Stephen's College, University of Delhi" },
+    knowsAbout: ['Economics', 'Business Management', 'Global Politics'],
+    ...(Astro.site ? { url: new URL('/about/', Astro.site).href } : {}),
+  },
+};
 ---
 
 <BaseLayout
   title="About Arjun Agrawal"
   description="Arjun Agrawal: IB Diploma Programme educator in Economics, Business Management and Global Politics, UPSC Economics mentor, and creator of The Business Brief, Arjun Agrawal Economics and Political Studies & Global Affairs."
   section="about"
+  jsonLd={jsonLd}
 >
   <!-- 1. Hero portrait and professional introduction -->
   <section class="ab-hero band--grain" aria-labelledby="ab-h">
