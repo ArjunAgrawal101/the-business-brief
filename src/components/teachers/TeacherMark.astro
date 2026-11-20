@@ -1,0 +1,17 @@
+---
+/**
+ * The mark every page of the Teacher resource area carries, so teacher-facing
+ * material is never mistaken for a student page: a navy rule with "For
+ * teachers" and the way back to the area's front page.
+ */
+interface Props {
+  /** True on the area's own front page, which needs no link back to itself. */
+  home?: boolean;
+}
+const { home = false } = Astro.props;
+---
+
+<p class="tr-mark">
+  <span class="tr-mark__label">For teachers</span>
+  {home ? <span class="tr-mark__text">Planning and classroom material</span> : <a class="tr-mark__text" href="/teachers/">Teacher resource area</a>}
+</p>

@@ -1,0 +1,86 @@
+---
+/**
+ * Every topic checklist on one page, unit by unit, to print the whole course
+ * at once, with the CSV of the same statements. Teacher-facing.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../../components/layout/Breadcrumbs.astro';
+import TeacherMark from '../../../components/teachers/TeacherMark.astro';
+import ChecklistTable from '../../../components/teachers/ChecklistTable.astro';
+import { corpus } from '../../../lib/content';
+import { AO_NAMES, AO_PAGE, checklistCounts, checklistHref, checklists, type Ao } from '../../../lib/teachers/checklists';
+import { CHECKLISTS_CSV, fileFacts, factsLine } from '../../../lib/library/downloads';
+import '../../../styles/teachers.css';
+
+const c = await corpus();
+const cur = c.curricula['ib-dp-bm']!;
+const lists = checklists(cur);
+const statements = lists.reduce((n, l) => n + l.rows.length, 0);
+const hl = lists.reduce((n, l) => n + checklistCounts(l).hl, 0);
+const csv = fileFacts(CHECKLISTS_CSV, { c, site: import.meta.env.SITE });
+const AOS = Object.keys(AO_NAMES) as Ao[];
+---
+
+<BaseLayout title="Topic checklists" description="Every syllabus statement of IB DP Business Management, subtopic by subtopic, with its depth of teaching and level, to print and tick, and as a CSV file." section="teachers">
+  <article class="wrap tr-page tr-print">
+    <div class="tr-screen">
+      <Breadcrumbs trail={[{ label: 'Teacher resources', href: '/teachers/' }, { label: 'Topic checklists' }]} />
+      <TeacherMark />
+    </div>
+    <header class="tr-page__head">
+      <p class="tr-page__kicker">Topic checklists · IB DP Business Management</p>
+      <h1>Every syllabus statement, to tick</h1>
+      <p class="tr-page__lead">
+        {statements} content statements in {lists.length} subtopics, {hl} of them HL only, each with the depth the guide sets. Print a subtopic from its own page, or this page for the whole course.
+      </p>
+      <p class="tr-page__acts tr-screen">
+        {
+          csv && (
+            <a class="btn btn--primary" href={CHECKLISTS_CSV} download>
+              Download as a spreadsheet, {factsLine(csv)}
+            </a>
+          )
+        }
+        <button type="button" class="btn needs-js" data-print>Print every checklist</button>
+      </p>
+      <p class="tr-key__inline">
+        Depth (guide, p. {AO_PAGE}):
+        {
+          AOS.map((a, i) => (
+            <>
+              {i > 0 && '; '}
+              <strong>{a}</strong> {AO_NAMES[a].toLowerCase()}
+            </>
+          ))
+        }. The statements are the platform's own wording, checked against the guide, which is the authority.
+      </p>
+    </header>
+
+    {
+      cur.units.map((u) => (
+        <section class="tr-cl-unit" aria-labelledby={`tr-cl-u${u.number}`}>
+          <h2 id={`tr-cl-u${u.number}`}>
+            Unit {u.number}: {u.title}
+          </h2>
+          {lists
+            .filter((l) => l.unit === u.number)
+            .map((l) => (
+              <section class="tr-cl-sub" aria-labelledby={`tr-cl-${l.slug}`}>
+                <h3 id={`tr-cl-${l.slug}`}>
+                  <a href={checklistHref(l.slug)}>
+                    {l.code} {l.title}
+                  </a>
+                  {l.level === 'HL' && <span class="tr-hl">HL only</span>}
+                </h3>
+                <ChecklistTable list={l} />
+              </section>
+            ))}
+        </section>
+      ))
+    }
+  </article>
+</BaseLayout>
+
+<script>
+  document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+</script>

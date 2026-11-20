@@ -1,0 +1,53 @@
+---
+/**
+ * One subtopic's checklist: each syllabus statement with the guide's depth of
+ * teaching (its assessment objectives) and its level, and two empty columns
+ * to tick on paper when the statement has been taught and checked.
+ */
+import { AO_NAMES, LEVEL_WORDS, type Checklist } from '../../lib/teachers/checklists';
+
+interface Props {
+  list: Checklist;
+  /** A visible caption, when several checklists share a page; otherwise the caption is for screen readers. */
+  caption?: string;
+}
+const { list, caption } = Astro.props;
+---
+
+<div class="table-scroll tr-cl__scroll" role="region" aria-label={`Checklist for ${list.code} ${list.title}`} tabindex="0">
+  <table class="table tr-cl">
+    <caption class={caption ? undefined : 'sr-only'}>{caption ?? `${list.code} ${list.title}: syllabus statements`}</caption>
+    <thead>
+      <tr>
+        <th scope="col" class="n">No.</th>
+        <th scope="col">Content statement</th>
+        <th scope="col">Depth</th>
+        <th scope="col">Level</th>
+        <th scope="col" class="tr-cl__box">Taught</th>
+        <th scope="col" class="tr-cl__box">Checked</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        list.rows.map((r) => (
+          <tr class:list={{ 'tr-cl__hl': r.level === 'HL' }}>
+            <td class="n">
+              {list.code}.{r.n}
+            </td>
+            <th scope="row" class="tr-cl__text">
+              {r.text}
+            </th>
+            <td class="tr-cl__ao">{r.ao.map((a, i) => <>{i > 0 && ', '}<abbr title={AO_NAMES[a]}>{a}</abbr></>)}</td>
+            <td class="tr-cl__lvl">{LEVEL_WORDS[r.level]}</td>
+            <td class="tr-cl__box">
+              <span class="tr-cl__tick" aria-hidden="true" />
+            </td>
+            <td class="tr-cl__box">
+              <span class="tr-cl__tick" aria-hidden="true" />
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

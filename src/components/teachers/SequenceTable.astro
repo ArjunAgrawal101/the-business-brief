@@ -1,0 +1,115 @@
+---
+/**
+ * The suggested lesson sequences across the course: for each unit, every
+ * subtopic's lessons for an SL and an HL class and what each HL lesson covers,
+ * with the guide's recommended hours for the unit beside the total. Rendered
+ * for 60-minute lessons; the script swaps in the figures for another length,
+ * worked at build time by the lesson library's own functions
+ * (src/lib/teachers/sequences.ts), and keeps the choice as bb:lesson-plan, the
+ * lesson library's own item, so both pages open on the same length.
+ */
+import { jsonForScript } from '../../lib/markup';
+import { DEFAULT_LENGTH, LESSON_LENGTHS } from '../../lib/lessons';
+import { lessonHours, unitPlans, type SequenceRow } from '../../lib/teachers/sequences';
+import type { Curriculum } from '../../lib/schemas';
+
+interface Props {
+  rows: SequenceRow[];
+  cur: Curriculum;
+}
+const { rows, cur } = Astro.props;
+const len = DEFAULT_LENGTH;
+const plans = unitPlans(rows, cur, len);
+const byLength = Object.fromEntries(LESSON_LENGTHS.map((l) => [l, unitPlans(rows, cur, l)]));
+const config = { rows: rows.map((r) => ({ code: r.code, byLength: r.byLength })), units: byLength };
+const levelWord = (l: string) => (l === 'HL' ? 'HL only' : l === 'SL/HL' ? 'SL and HL' : 'SL and HL, HL parts');
+---
+
+<div class="tr-seq" data-ix="sequences">
+  <script type="application/json" data-config set:html={jsonForScript(config)} />
+  <div class="tr-seq__controls js-only">
+    <label for="tr-length">Lesson length</label>
+    <select id="tr-length" class="select" data-length>
+      {
+        LESSON_LENGTHS.map((n) => (
+          <option value={n} selected={n === len}>
+            {n} minutes
+          </option>
+        ))
+      }
+    </select>
+    <p class="sr-only" aria-live="polite" data-status></p>
+  </div>
+  <p class="nojs-only small muted">Shown for {len}-minute lessons. With JavaScript on, you can choose another length.</p>
+  {
+    cur.units.map((u) => {
+      const mine = rows.filter((r) => r.unit === u.number);
+      const p = plans.find((x) => x.unit === u.number)!;
+      return (
+        <section class="tr-seq__unit" aria-labelledby={`tr-seq-u${u.number}`}>
+          <h3 id={`tr-seq-u${u.number}`}>
+            Unit {u.number}: {u.title}
+          </h3>
+          <p class="tr-seq__sum" data-unit-sum={u.number}>
+            <span data-unit-sl>{p.sl}</span> lessons for an SL class and <span data-unit-hl>{p.hl}</span> for an HL class, about <span data-unit-hours>{lessonHours(p.hl, len)}</span> hours at HL.
+            {u.hours && (
+              <span class="tr-seq__guide">
+                {' '}
+                The guide recommends {u.hours.sl} teaching hours for the unit at SL and {u.hours.hl} at HL (p. 21); the toolkit, the Paper 1 research and the internal assessment have hours of their own.
+              </span>
+            )}
+          </p>
+          <div class="table-scroll" role="region" aria-label={`Lesson sequences for unit ${u.number}`} tabindex="0">
+            <table class="table tr-seq__table">
+              <caption class="sr-only">
+                Unit {u.number}: lessons for each subtopic
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Subtopic</th>
+                  <th scope="col" class="n">SL lessons</th>
+                  <th scope="col" class="n">HL lessons</th>
+                  <th scope="col">What each lesson covers (HL)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mine.map((r) => {
+                  const d = r.byLength[len]!;
+                  return (
+                    <tr data-row={r.code}>
+                      <th scope="row">
+                        <a href={r.href}>
+                          {r.code} {r.title}
+                        </a>
+                        <span class="tr-seq__meta">
+                          {levelWord(r.level)}, from the {r.from}
+                        </span>
+                      </th>
+                      <td class="n" data-sl>
+                        {d.sl === 0 ? 'Not taken' : d.sl}
+                      </td>
+                      <td class="n" data-hl>
+                        {d.hl}
+                      </td>
+                      <td>
+                        <ol class="tr-seq__focus" data-focus>
+                          {d.focus.map((f) => (
+                            <li>{f}</li>
+                          ))}
+                        </ol>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      );
+    })
+  }
+</div>
+
+<script>
+  import '../../scripts/teacher-sequences';
+</script>
