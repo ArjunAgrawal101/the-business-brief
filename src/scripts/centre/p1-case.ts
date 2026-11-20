@@ -51,8 +51,8 @@ each('[data-ix="p1-case"]', (root) => {
   const q = <T extends HTMLElement>(sel: string, from: ParentNode = root) => from.querySelector<T>(sel);
   const qa = <T extends HTMLElement>(sel: string, from: ParentNode = root) => [...from.querySelectorAll<T>(sel)];
   let w: CaseWork = parseWork(store.get<unknown>(KEY, null), c);
-  /** Nothing is written to storage until the reader does something. */
-  const save = () => store.set(KEY, w);
+  /** Nothing is written to storage until the reader does something. The title, address and time let the dashboard list the work. */
+  const save = () => store.set(KEY, { ...w, title: `Paper 1 practice case: ${c.organization}`, href: `/assessment/paper-1/workspace/${c.id}/`, savedAt: new Date().toISOString() });
   let seq = 0;
   const newId = () => `e${Date.now().toString(36)}${(seq++).toString(36)}`;
 
