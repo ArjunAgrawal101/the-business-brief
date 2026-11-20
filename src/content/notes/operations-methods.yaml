@@ -7,6 +7,16 @@
 # is the standard form used across the site; the guide's formula list has none.
 # Ashgrove Guitars, Larchmere Kitchens and the guitar factory are fictional, and
 # every figure was checked by script.
+#
+# On 20 November 2026 two sections were added: comparing methods by their
+# costs, with the crossover volume worked from total cost (3.3), a standard
+# calculation the guide does not list, and operations methods in services.
+# The product-process matrix of Hayes and Wheelwright (1979) is mentioned as
+# enrichment, with its entry in the source register. Two diagrams from the
+# library, two industries, a stakeholder group and three exam-style questions
+# (suggest, determine, and compare and contrast) came with them. Spice Route
+# Kitchens and Westmere Clinic are fictional, and their figures were checked
+# by script.
 code: '5.2'
 title: Operations methods
 level: SL/HL
@@ -20,6 +30,8 @@ objectives:
   - '**Analyse** how the operations method changes the average cost of each unit, using the figures in a case.'
   - '**Evaluate** the advantages and disadvantages of each method for a particular business.'
   - '**Recommend** an operations method for a business, or a change of method, and justify it.'
+  - '**Compare and contrast** two methods for a particular business, including the volume at which each becomes the cheaper.'
+  - '**Apply** the four methods to services as well as to manufacturing.'
 situation:
   title: Forty weeks to wait
   fictional: true
@@ -134,6 +146,7 @@ sections:
       Flow production delivers the lowest cost per unit of any method, provided that volume is high. Its heavy fixed costs, the line, the robots and the factory, are spread over enormous output, and each simple, repeated task is done quickly and consistently: the technical and purchasing economies of scale of 1.5. Quality is consistent, and output is predictable enough to plan stock and deliveries precisely.
 
       The weaknesses are the mirror image. The investment is huge and specific to one product, so the line is inflexible, and a change of design can mean costly retooling. It needs high, steady demand: running a line at half its speed doubles the fixed cost carried by each unit. A breakdown at one stage stops the whole line. And the work, divided into short repeated tasks, is the kind Taylor designed and Herzberg criticized (2.4): dull, closely timed and demotivating, which shows in absence, errors and labour turnover unless the business automates the dullest tasks or rotates and enriches jobs.
+    diagram: taylor-scientific-management
     advantages:
       - The lowest cost per unit at high volumes, through economies of scale.
       - Consistent quality, because each task is standardized and often automated.
@@ -184,6 +197,72 @@ sections:
         - At an average price of $2,600, each earns $490, or **$5,880** a week.
 
         Customers would still get a guitar that is theirs, chosen from a menu rather than designed from scratch, and the luthiers' 360 hours a week would be fully used.
+  - id: methods-and-volume
+    title: 'Volume decides: comparing methods by their costs'
+    kind: method
+    diagram: economies-of-scale
+    body: |
+      Each method has its own cost structure. Job production has low fixed costs but a high variable cost per unit, mostly skilled labour; flow production has very high fixed costs, the line and its machines, but a low variable cost per unit. Batch production and mass customization sit between them. Which method is cheapest therefore depends on volume, and the volume at which two methods cost the same can be found from their total costs ([3.3](/topics/costs-and-revenues/)).
+
+      At that **crossover volume**, fixed costs plus variable cost per unit × output come to the same total for both methods. Below it, the method with the lower fixed costs is cheaper; above it, the method with the lower variable cost per unit is cheaper. The calculation shows in numbers why rising volume pulls a business from job towards flow production, and the diagram shows the same idea as economies of scale: average cost falls as output grows, until diseconomies set in. As enrichment, Robert Hayes and Steven Wheelwright set out the matching of process to volume and variety as the product-process matrix (1979).
+
+      The comparison has limits, and they matter as much as the figures. It assumes fixed costs stay fixed and variable costs stay proportional across the whole range of output, when in practice fixed costs step up as capacity is added and bulk buying lowers variable costs. It compares costs only, while the methods also differ in what customers get: variety, speed, quality and the chance to choose. And it rests on a forecast of demand, which is exactly what makes a capital-intensive method risky.
+    formulas:
+      - name: Crossover volume
+        expression: Crossover volume = (fixed costs of method B − fixed costs of method A) ÷ (variable cost per unit of method A − variable cost per unit of method B)
+        note: A standard calculation from total cost = fixed costs + variable cost per unit × output; the guide's formula list does not include it. Method A has the lower fixed costs and method B the lower variable cost per unit. Above the crossover volume, method B has the lower total cost.
+    points:
+      - term: Cost structure
+        text: The balance between a method's fixed and variable costs. Labour-intensive methods have high variable costs; capital-intensive methods have high fixed costs.
+      - term: Crossover volume
+        text: The output at which two methods have the same total cost. Below it the method with lower fixed costs is cheaper; above it the method with the lower variable cost per unit is cheaper.
+      - term: Economies of scale (1.5)
+        text: The fall in average cost per unit as the scale of output grows, which flow production exploits through specialized machinery, divided tasks and bulk buying.
+      - term: Capacity utilization (5.6)
+        level: HL
+        text: At HL, the share of productive capacity in use. A flow line's low unit cost holds only while demand keeps it well used; at half its capacity, the fixed cost carried by each unit doubles.
+    advantages:
+      - Shows the volume a business must reach before a capital-intensive method pays.
+      - Uses figures the business already has, its fixed and variable costs.
+      - Makes the risk of a fall in demand visible before the money is spent.
+    limitations:
+      - Assumes costs behave the same way across the whole range of output.
+      - Leaves out variety, quality, lead times and motivation.
+      - Rests on a forecast of demand that may not hold.
+    example:
+      title: When does a flow line beat batch cooking?
+      fictional: true
+      text: |
+        Spice Route Kitchens, a fictional maker of chilled curries for supermarkets, cooks in batches in large kettles. Its fixed costs are $12,000 a week and its variable cost $1.30 a pot, much of it labour. A flow line would raise fixed costs to $40,000 a week and cut the variable cost to $0.60 a pot.
+
+        - **Crossover volume:** ($40,000 − $12,000) ÷ ($1.30 − $0.60) = $28,000 ÷ $0.70 = **40,000 pots** a week. At that volume both methods cost $64,000.
+        - **At today's 30,000 pots:** batch costs $12,000 + 30,000 × $1.30 = $51,000, **$1.70** a pot; the line would cost $40,000 + 30,000 × $0.60 = $58,000, about **$1.93** a pot.
+        - **At 55,000 pots,** if a supermarket contract is won: batch about **$1.52** a pot, the line about **$1.33**.
+
+        The line pays only if volume stays above 40,000 pots a week. If the contract is lost and sales fall back to 30,000, the line costs $7,000 a week more than batching. The decision therefore turns on how secure the contract is, as well as on the arithmetic.
+  - id: methods-in-services
+    title: Operations methods in services
+    kind: application
+    body: |
+      The four methods are usually taught with factories, but services use the same logic. A **job** is a service designed for one client: an architect's design, a wedding, a legal case, an operation on one patient. In a **batch** service, customers move through the process together in groups: a coach tour, a cinema screening, a class, a flight. A **flow** service processes large numbers of customers through standardized steps: a fast-food counter, a car wash, an online payment. Digital services can practise **mass customization** at very low cost: a streaming service builds a different home screen for each viewer from the same catalogue, and an online shop recommends different products to each customer from the same stock.
+
+      Two features of services sharpen the trade-off between volume and variety. The customer is usually present, so the method shapes the experience as well as the cost: a flow process that is efficient can feel impersonal, and a job that is personal can keep customers waiting. And services cannot be stored, so capacity must match demand at the moment it arises, which favours flexible staff, appointments and booking systems over stock ([5.1](/topics/introduction-to-operations-management/)).
+    points:
+      - term: Job services
+        text: Designed for one client at a time, priced individually and dependent on skilled professionals, such as an architect, a wedding planner or a surgeon.
+      - term: Batch services
+        text: Groups of customers served together at set times, such as tours, classes, screenings and flights, which spreads fixed costs across the group but fixes the timetable.
+      - term: Flow services
+        text: Many customers taken through the same standard steps, such as a fast-food counter or a drive-through, which keeps costs low and speed high but limits choice.
+      - term: Mass customization in services
+        text: A personal version for each customer assembled from standard parts or data, such as an online learning course that adapts to each learner.
+    example:
+      title: A clinic that batches its operations
+      fictional: true
+      text: |
+        Westmere Clinic, a fictional private eye clinic, used to fit cataract operations into whatever theatre time was free, each one treated as a separate job. It now runs dedicated cataract lists on two days a week: the same team, the same equipment and the same sequence for every patient.
+
+        Average theatre time per operation fell from 45 to 30 minutes, so a six-hour list now treats 360 ÷ 30 = **12** patients instead of 360 ÷ 45 = **8**. Complex cases are still treated individually, as jobs, and patients book their time and follow-up online from a set menu. One clinic uses three methods, each matched to what the patient needs.
   - id: choosing-and-changing
     title: Choosing and changing the method
     kind: evaluation
@@ -224,6 +303,10 @@ applications:
     text: Most clothing is batch-produced, a run of each style in each size, and fast fashion relies on quick, small batches that follow trends. Made-to-measure tailoring is job production, and body scanning with computer-controlled cutting is bringing it closer to mass customization.
   - industry: Healthcare
     text: Each patient is in a sense a job, with treatment fitted to the individual. Yet hospitals organize routine operations into dedicated lists run in a standard sequence, gaining some of the efficiency of batch production without losing care for each patient.
+  - industry: Printing and publishing
+    text: Long print runs of books and magazines are batches, cheap per copy but leaving stock that may not sell. Digital printing on demand makes a single copy when it is ordered, close to job production at a moderate cost, and personalized books and photo albums are a simple form of mass customization.
+  - industry: Pharmaceuticals
+    text: Medicines are made in batches, each one tested and recorded so that it can be traced and recalled if something goes wrong, with long, strictly checked cleaning between products. The batch record is part of what makes the product safe to sell.
 stakeholders:
   - group: Customers
     text: Weigh price against choice and waiting time. Flow production gives low prices and instant availability; job production gives exactly what they want, at a price and after a wait; mass customization offers a middle way.
@@ -235,6 +318,8 @@ stakeholders:
     text: Flow and batch production give them large, regular orders; job production gives small, irregular ones; mass customization needs suppliers flexible enough to deliver many variants quickly.
   - group: The environment and local community
     text: Making to order avoids unsold stock and waste, while mass production uses resources efficiently per unit but can encourage overproduction. A large flow-production plant brings many jobs to an area, and many lost jobs if it closes.
+  - group: Managers
+    text: Must match the method to demand and keep it running well, by scheduling batches and changeovers, keeping a line busy or coordinating every variant of a customized order. A change of method changes what managers do, from supervising craft to planning capacity and data.
 evaluation:
   - No method is best in general. The right method fits the volume and variety of demand, the product, what customers value, and the business's finance, skills and image; judge it for the business in the case, not in the abstract.
   - The trade-off between volume and variety is real. Mass customization narrows it but does not abolish it, because the technology is costly, every order adds complexity, and customers still wait longer than for a product in stock.
@@ -242,6 +327,7 @@ evaluation:
   - Changing method is costly and disruptive. It needs investment, retraining and new working practices, can meet resistance from employees, and can change how customers see the brand, so the expected gains must be large enough to justify the risk.
   - The human side matters. Job production can be deeply motivating and flow production dull, but automation can remove the dullest tasks, and job rotation and enrichment can improve the rest.
   - In an examination, use the figures. Compare unit costs, capacity and payback where the case gives them, then weigh them against the qualitative factors, such as quality, flexibility, motivation and brand, before recommending a method.
+  - Cost comparisons favour volume, so use them with care. A crossover volume shows when a capital-intensive method becomes cheaper, but it assumes demand will stay above that volume and ignores what customers lose in variety and choice.
 decision:
   title: How should Ashgrove grow?
   fictional: true
@@ -334,6 +420,50 @@ exam:
       - **Judgement:** for example, mass customization fits Ashgrove's identity and growth best if the configurator is trialled first; or a price rise now, with mass customization later. Say what evidence would change the recommendation.
 
       An answer that only describes the methods, without the figures or a recommendation, does not do what the command term asks.
+  - q: Suggest **two** ways Ashgrove Guitars could shorten its customers' wait without changing its operations method.
+    marks: 4
+    command: suggest
+    level: SL/HL
+    paper: '1'
+    answer: |
+      A strong response puts forward two plausible measures, each with a reason that fits the case.
+
+      - **Raise the price**, which would slow new orders and lift profit while the waiting list falls, as long as enough customers still want an Ashgrove guitar.
+      - **Train apprentices alongside the luthiers**, adding hours of skilled work over time, although luthiers take years to train, so this works slowly.
+      - Other valid suggestions include subcontracting a stage such as lacquering, or offering a limited set of options that take fewer hours to build, while each guitar is still made to order.
+
+      Suggestions that change the method, such as moving to batch production, do not answer the question.
+  - q: |
+      Spice Route Kitchens, a fictional food manufacturer, cooks curries in batches with fixed costs of $12,000 a week and a variable cost of $1.30 a pot. A flow line would have fixed costs of $40,000 a week and a variable cost of $0.60 a pot.
+
+      Determine the weekly output above which the flow line has the lower total cost.
+    marks: 4
+    command: determine
+    level: SL/HL
+    paper: '2'
+    answer: |
+      A strong response finds the one volume at which the two total costs are equal and shows how.
+
+      - **Set the totals equal:** $12,000 + $1.30Q = $40,000 + $0.60Q.
+      - **Solve:** $0.70Q = $28,000, so Q = **40,000 pots** a week.
+      - **Check:** at 40,000 pots both methods cost $64,000 ($12,000 + $52,000 and $40,000 + $24,000).
+
+      Above 40,000 pots a week the line is cheaper. Full marks need the method and the answer with its unit; the check is good practice.
+  - q: Compare and contrast batch production and mass customization for Larchmere Kitchens.
+    marks: 10
+    command: compare-and-contrast
+    level: SL/HL
+    paper: '1'
+    answer: |
+      A strong response sets out similarities and differences point by point, with both methods in every point and evidence from Larchmere throughout, and ends with a judgement on which differences matter most.
+
+      - **Similarities:** both make variety from standardized processes, such as doors painted in each colour or cabinets in standard sizes; both cost far less per unit than making each kitchen as a one-off job; both need careful planning of what is made when.
+      - **Differences in who sets the variety:** in batch production the business chooses the versions, a run of each colour; in mass customization the customer chooses, online, from the standard parts.
+      - **Differences in timing and stock:** batches are made ahead of demand and held as stock; a customized kitchen is assembled after it is ordered, so less stock is held but each customer waits longer.
+      - **Differences in investment and complexity:** mass customization needs the online configurator and the systems to turn each order into a production plan, and every order differs, so errors are easier to make.
+      - **Judgement:** for example, that the biggest difference for Larchmere is who chooses, because its customers buy a kitchen for their own room, which is why it combines the two, batch-producing doors and frames and customizing the whole.
+
+      An answer that describes each method in turn, without linking them point by point, does not compare and contrast.
 summary:
   - Job production makes one-off products to each customer's specification, with high variety, skilled labour and a high unit cost.
   - Batch production makes groups of identical items and then changes over, giving some variety and some economies of scale, at the cost of idle changeovers and stock between stages.
@@ -343,6 +473,8 @@ summary:
   - The choice depends on demand, the product, what customers value, finance, skills, technology and the business's image.
   - Methods can be combined, and businesses change method as they grow; a change needs investment and can meet resistance.
   - Judge a method with figures and with people, weighing unit cost against flexibility, motivation, brand and sustainability.
+  - Each method has its own cost structure. The **crossover volume** = difference in fixed costs ÷ difference in variable cost per unit; above it, the method with the lower variable cost per unit is cheaper.
+  - Services use the same four methods, from a job for one client to a flow of standardized steps, but the customer's presence and the fact that services cannot be stored sharpen the trade-off.
 connections:
   - code: '1.5'
     text: Unit costs fall from job to flow production because of technical and purchasing economies of scale.
@@ -356,6 +488,12 @@ connections:
     text: The method shapes every operations objective, from cost and quality to flexibility and dependability.
   - code: '5.3'
     text: At HL, lean production, kaizen and just-in-time cut the changeover times and stock that batch production creates.
+  - code: '2.1'
+    text: A change of method changes jobs, skills and working practices, which can meet the resistance to change that human resource strategies aim to reduce.
+  - code: '3.8'
+    text: The investment needed for a new line or a configurator should be appraised before it is made, as Ashgrove's payback periods show.
+  - code: '5.6'
+    text: At HL, capacity utilization and productivity measure how fully and how efficiently a method's capacity is used.
 terms:
   - job-production
   - batch-production
@@ -376,6 +514,9 @@ terms:
   - mass-market
   - lean-production
   - just-in-time
+  - capacity-utilization-rate
+  - productive-capacity
+  - goods-and-services
 retrieval:
   - q: What is job production?
     a: Making each product individually, usually to a particular customer's specification, such as a made-to-measure suit or a bridge.
@@ -399,6 +540,12 @@ retrieval:
     a: For example, the volume and stability of demand, the nature of the product, what customers value, the finance available, the skills and technology available, and the business's objectives and image.
   - q: Why might a premium brand avoid flow production even if it could afford it?
     a: Its customers pay for individuality and craft; standardized products would weaken the brand and the premium price it supports.
+  - q: Method A has fixed costs of $5,000 and a variable cost of $8 a unit; method B has fixed costs of $14,000 and a variable cost of $5 a unit. At what output do they cost the same?
+    a: ($14,000 − $5,000) ÷ ($8 − $5) = 3,000 units. Above 3,000 units, method B is cheaper.
+  - q: Give an example of a batch service and a flow service.
+    a: For example, a coach tour or a cinema screening (batch), and a fast-food counter or a car wash (flow).
+  - q: Why does a crossover volume calculation not settle the choice of method on its own?
+    a: It compares costs only and assumes demand stays above the crossover; the methods also differ in variety, quality, speed and the work people do.
 questions: []
 basis:
   - source: ib-bm-guide-2024
@@ -407,5 +554,7 @@ basis:
   - source: ib-bm-tsm-2022
     pages: 7, 34 to 35, 47, 80, 85 to 86
     note: Glossary definitions of batch, job and mass (flow) production and mass customization, and the activities on production methods, read to check definitions and scope; nothing reproduced
+  - source: adv-oe-hayes-wheelwright-1979
+    note: The product-process matrix, mentioned as enrichment; cited, not reproduced
 verification: primary
-updated: '2026-11-03'
+updated: '2026-11-20'
