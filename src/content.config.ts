@@ -34,6 +34,7 @@ import { executiveSchema } from './lib/executive/schema';
 import { briefingSchema, labToolSchema } from './lib/lab/schemas';
 import { advancedModuleSchema } from './lib/advanced-schema';
 import { boardroomBriefingSchema } from './lib/boardroom-briefings/schema';
+import { comparisonSchema } from './lib/compare/schema';
 
 /**
  * Loads every `.yaml` file in a folder, each holding a list of entries with an
@@ -115,4 +116,6 @@ export const collections = {
   advanced: defineCollection({ loader: yamlFiles('./src/content/advanced'), schema: advancedModuleSchema }),
   // The Boardroom Briefings: an editorial case series on management decisions (src/lib/boardroom-briefings/).
   boardroomBriefings: defineCollection({ loader: yamlFiles('./src/content/boardroom-briefings'), schema: boardroomBriefingSchema }),
+  // Curated framework comparisons: two or three ideas side by side, at /frameworks/compare/<a>-vs-<b>/ (src/lib/compare/).
+  comparisons: defineCollection({ loader: yamlFiles('./src/content/comparisons'), schema: comparisonSchema }),
 };

@@ -1,0 +1,135 @@
+---
+/**
+ * The Framework Comparison Tool: search the library and put any two
+ * frameworks side by side, from the library's own data (each framework's
+ * column is a JSON file the build writes at /frameworks/compare/data/<id>.json,
+ * fetched only when it is chosen), with the curated comparisons listed after.
+ * The pair is kept in the address (?a=&b=). Without JavaScript the page lists
+ * the curated comparisons and every framework, which work without it.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageIntro from '../../../components/layout/PageIntro.astro';
+import SectionHead from '../../../components/layout/SectionHead.astro';
+import { comparisons } from '../../../lib/compare/content';
+import { DIMENSIONS, compareHref } from '../../../lib/compare/schema';
+import { library } from '../../../lib/frameworks-content';
+import { FRAMEWORK_GROUP_INFO } from '../../../lib/framework-schema';
+import { STATUS_LABELS, frameworkHref, grouped, standing } from '../../../lib/frameworks';
+import { jsonForScript } from '../../../lib/markup';
+import '../../../styles/compare.css';
+
+const lib = await library();
+const cmp = await comparisons();
+const groups = grouped(lib.frameworks);
+const index = groups.flatMap((g) =>
+  g.items.map(([id, f]) => ({ id, name: f.name, aliases: f.aliases, summary: f.summary, group: FRAMEWORK_GROUP_INFO[f.group].title, status: STATUS_LABELS[f.status], hl: f.status !== 'enrichment' && f.level === 'HL' })),
+);
+const curated = cmp.all.map(([slug, c]) => ({ slug, title: c.title, href: compareHref(slug), sides: c.sides.map((s) => s.framework ?? '').filter(Boolean), words: [c.title, ...c.sides.map((s) => s.name)].join(' ') }));
+const config = { index, curated, pestle: { a: 'pestle', b: 'steeple-analysis', href: frameworkHref('pestle'), name: lib.frameworks['pestle']?.name ?? 'PESTLE against STEEPLE' }, dims: DIMENSIONS.map((d) => d.label) };
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LearningResource',
+  name: 'Framework comparison',
+  description: 'Put any two frameworks from the library side by side, or read a curated comparison of ideas the course sets against each other.',
+  learningResourceType: 'Comparison',
+  isAccessibleForFree: true,
+};
+---
+
+<BaseLayout title="Framework comparison" description={`Put any two of the library's ${index.length} frameworks side by side on the same nine questions, or read one of ${curated.length} curated comparisons, from the Ansoff matrix against the BCG matrix to JIT against JIC.`} section="toolkit" jsonLd={jsonLd}>
+  <PageIntro trail={[{ label: 'Frameworks', href: '/frameworks/' }, { label: 'Framework comparison' }]} kicker="Frameworks" title="Compare frameworks" lead="Put any two frameworks side by side, or open a curated comparison." />
+
+  <div class="wrap page-body">
+    <div class="cmp-tool" data-ix="fw-compare" id="compare">
+      <script type="application/json" data-config set:html={jsonForScript(config)} />
+      <p class="state state--error" data-error hidden>The comparison tool could not start in this browser. The curated comparisons and every framework's page below still work.</p>
+      <form class="cmp-picker js-only" aria-label="Choose two frameworks" data-picker>
+        <div class="cmp-picker__pair">
+          {
+            (['a', 'b'] as const).map((k) => (
+              <div class="field">
+                <label for={`cmp-${k}`}>{k === 'a' ? 'First framework' : 'Second framework'}</label>
+                <select id={`cmp-${k}`} class="select" data-pick={k}>
+                  <option value="">Choose a framework</option>
+                  {groups.map((g) => (
+                    <optgroup label={g.title}>
+                      {g.items.map(([id, f]) => (
+                        <option value={id}>{f.name}</option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </div>
+            ))
+          }
+          <button type="button" class="btn btn--small cmp-swap" data-swap>Swap them</button>
+        </div>
+        <div class="field cmp-search">
+          <label for="cmp-q">Or search the library</label>
+          <input id="cmp-q" class="input" type="search" autocomplete="off" placeholder="For example: growth, motivation, cash" data-q />
+        </div>
+        <div class="cmp-results" data-results hidden></div>
+      </form>
+      <p class="nojs-only cmp-nojs">Scripts are off, so the side-by-side tool cannot run. Every curated comparison below works without them, and so does every framework's own page.</p>
+      <div class="cmp-out" data-output>
+        <p class="cmp-empty js-only" data-empty>Choose two frameworks to see them side by side on the same {DIMENSIONS.length} questions, from their standing in the IB course to how to use them in an examination answer.</p>
+      </div>
+      <p class="sr-only" aria-live="polite" data-status></p>
+    </div>
+
+    <section aria-labelledby="cmp-curated-h" class="cmp-after">
+      <SectionHead no={1} title={`${curated.length} curated comparisons`} id="cmp-curated-h" dek="Ideas the course sets against each other, compared on the same questions by the platform, including concepts that are not frameworks, such as job, batch and flow production." />
+      <ol class="cmp-index">
+        {
+          cmp.all.map(([slug, c]) => (
+            <li>
+              <a class="cmp-index__title" href={compareHref(slug)}>
+                {c.title}
+              </a>
+              <p class="cmp-index__q">{c.question}</p>
+              <p class="cmp-index__meta">
+                {c.sides.length} sides · {c.sides.every((s) => s.level === 'HL') ? 'HL only' : c.sides.some((s) => s.level === 'HL') ? 'part HL only' : 'SL and HL'}
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section aria-labelledby="cmp-lib-h" class="cmp-after">
+      <SectionHead no={2} title={`The library's ${index.length} frameworks`} id="cmp-lib-h" dek="Any two can be compared above. Each framework's own page says when to use it, when to look elsewhere and what to read with it." />
+      <div class="cmp-lib">
+        {
+          groups.map((g) => (
+            <div class="cmp-lib__group">
+              <h3 class="cmp-lib__h">{g.title}</h3>
+              <ul class="cmp-lib__list">
+                {g.items.map(([id, f]) => (
+                  <li>
+                    <a href={frameworkHref(id)}>{f.name}</a> <span class="cmp-lib__standing">{standing(f)}{f.status !== 'enrichment' && f.level === 'HL' ? ', HL only' : ''}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section aria-labelledby="cmp-how-h" class="cmp-after">
+      <SectionHead no={3} title="How the comparison is made" id="cmp-how-h" />
+      <div class="prose cmp-how">
+        <p>
+          Each column is built from the framework's own entry in the library: its purpose, its parts, the situations it suits and those where another tool serves better, its strengths, limits and common mistakes, and its fictional example. The advice on using it in an examination answer is the platform's own, labelled Recommended strategy, and built from the framework's standing in the course and from what its result can and cannot justify.
+        </p>
+        <p>
+          The library already has a page on <a href={frameworkHref('pestle')}>PESTLE against STEEPLE</a>; choosing those two here points to it. Curated comparisons are written for pairs the course sets against each other, and state each side's standing from the curriculum file, which is checked against the Business management guide.
+        </p>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<script>
+  import '../../../scripts/framework-compare';
+</script>
