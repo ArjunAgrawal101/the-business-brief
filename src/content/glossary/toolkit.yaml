@@ -291,6 +291,11 @@
   subtopics: ['toolkit']
   level: SL/HL
   category: measure
+  simple: "The ordinary average: add up all the values and divide by how many there are."
+  technical: "Mean = Σx ÷ n. It uses every value, so one extreme value (an outlier) can pull it well away from the rest; in skewed data, such as pay in a firm with a few very high earners, the median describes the typical value better. With the standard deviation it summarizes data that are roughly symmetrical."
+  misconceptions:
+    - claim: "The mean is always the most typical value."
+      correction: "One extreme value can pull the mean away from most of the data, so the median or the mode may describe the typical case better."
   provenance: subject-knowledge
   related: [median, mode, descriptive-statistics, standard-deviation]
 
@@ -304,6 +309,11 @@
   subtopics: ['toolkit']
   level: SL/HL
   category: measure
+  simple: "The middle value once the data are put in order, so half the values lie below it and half above."
+  technical: "For n ordered values, the median is the ((n + 1) ÷ 2)th value; with an even number of values it is the mean of the two middle ones. It is not affected by extreme values, which makes it the better measure of the centre for skewed data such as pay or house prices, but it takes no account of the size of the other values."
+  misconceptions:
+    - claim: "The median is the middle value of the data as they are listed."
+      correction: "The values must be put in order first; the median is the middle of the ordered list."
   provenance: subject-knowledge
   related: [mean, mode, quartiles, descriptive-statistics]
 
@@ -330,6 +340,11 @@
   subtopics: ['toolkit']
   level: SL/HL
   category: measure
+  simple: "The values that split an ordered data set into four equal parts; the middle half of the data lies between the lower and the upper quartile."
+  technical: "The lower quartile (Q1) has a quarter of the ordered values below it and the upper quartile (Q3) has a quarter above it. The interquartile range, Q3 − Q1, measures the spread of the middle 50% of the values and, unlike the range, is not distorted by outliers. On small data sets, different methods of locating the quartiles can give slightly different answers, so the method should be stated."
+  misconceptions:
+    - claim: "The interquartile range covers the whole spread of the data."
+      correction: "It covers only the middle half of the values; the range, from the smallest value to the largest, covers all of them."
   provenance: subject-knowledge
   related: [median, standard-deviation, descriptive-statistics]
 
@@ -343,6 +358,11 @@
   subtopics: ['toolkit']
   level: SL/HL
   category: measure
+  simple: "A measure of how far the values typically lie from their mean: the bigger it is, the more spread out the data are."
+  technical: "Standard deviation = √(Σ(x − mean)² ÷ n), in the same units as the data. It uses every value, so outliers enlarge it. In business it measures variability or risk, such as how much weekly sales or delivery times vary; software estimating it from a sample divides by n − 1, which gives a slightly larger figure."
+  misconceptions:
+    - claim: "A large standard deviation means the values themselves are large."
+      correction: "It measures spread around the mean, not the size of the mean: two data sets with the same mean can have very different standard deviations."
   provenance: subject-knowledge
   related: [mean, quartiles, descriptive-statistics]
 
@@ -633,6 +653,11 @@
   subtopics: ['toolkit']
   level: HL
   category: measure
+  simple: "How long an activity in a project can be delayed without delaying the whole project."
+  technical: "Total float = latest finish time − duration − earliest start time. Activities on the critical path have no total float, so any delay to them delays completion. Total float can be shared by a chain of activities, so using it up on one can leave none for the activities after it."
+  misconceptions:
+    - claim: "An activity with total float can be delayed by that much without any effect."
+      correction: "The project still finishes on time, but the delay may use up float that the later activities in the same chain were relying on."
   provenance: subject-knowledge
   related: [free-float, critical-path, critical-path-analysis]
 
@@ -646,6 +671,11 @@
   subtopics: ['toolkit']
   level: HL
   category: measure
+  simple: "How long an activity can be delayed without delaying the earliest start of the activity after it."
+  technical: "Free float = earliest start time of the next activity − duration − earliest start time of this activity. It is never more than total float. Because using it affects no other activity, it is the float a manager can use first."
+  misconceptions:
+    - claim: "Free float and total float are the same thing."
+      correction: "Total float is the delay the whole project can absorb; free float is the delay the next activity can absorb, and it can be smaller."
   provenance: subject-knowledge
   related: [total-float, critical-path, critical-path-analysis]
 

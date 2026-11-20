@@ -113,7 +113,7 @@ describe('the worked connections', () => {
   it('use no dashes, and British spelling with the IB’s -ize', () => {
     for (const x of Object.values(conns)) {
       const text = `${x.title} ${x.explanation} ${x.question.prompt} ${x.question.answer ?? ''}`;
-      expect(text, x.id).not.toMatch(/[–—]/);
+      expect(text, x.id).not.toMatch(/[\u2013\u2014]/);
       expect(text, x.id).not.toMatch(/\borganis(e|ation)/i);
     }
   });
