@@ -98,7 +98,7 @@ export const NAV: NavGroup[] = [
       { label: 'MBA and Advanced Management', href: '/advanced/', text: 'Strategy, finance, leadership, marketing, operations and entrepreneurship at business school depth' },
       { label: 'Enrichment maps', href: '/mindmaps/#enrichment', text: 'Nine maps of management beyond the IB course, labelled enrichment' },
       { label: 'Learning pathways', href: '/pathways/', text: 'Routes for IB students, teachers, university and MBA students, and founders' },
-      { label: 'Lesson library', href: '/pathways/teachers/#lessons', text: 'Timed lesson sequences for teachers, subtopic by subtopic' },
+      { label: 'Teacher resources', href: '/teachers/', text: 'Lesson sequences, discussion prompts, classroom activities and topic checklists, kept apart from student pages' },
       { label: 'Tutorials', href: '/tutorials/', text: 'One-to-one online IB Business Management tutoring with Arjun Agrawal' },
       { label: 'About Arjun Agrawal', href: '/about/', text: 'The educator, his teaching and the story of the platform' },
       { label: 'My Business Workspace', href: '/dashboard/', text: 'Your progress, saved work and notes, kept on this device' },

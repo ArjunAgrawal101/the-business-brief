@@ -1,4 +1,16 @@
+import { statSync } from 'node:fs';
+import { join } from 'node:path';
 import type { Verification } from './schemas';
+import { formatBytes } from './library/downloads';
+
+/** A guide's size, measured from the file itself, so the page can never disagree with the download. */
+const measured = (file: string): string => {
+  try {
+    return formatBytes(statSync(join(process.cwd(), 'public', file)).size);
+  } catch {
+    return '';
+  }
+};
 
 /**
  * The creator's assessment guides, published unchanged as downloads
@@ -9,11 +21,11 @@ export const GUIDES = {
     title: 'The Business Research Project: IA guide',
     file: '/downloads/guides/business-brief-ia-research-project-guide.pdf',
     pages: 5,
-    size: '1.0 MB',
+    size: measured('/downloads/guides/business-brief-ia-research-project-guide.pdf'),
   },
-  'paper-1': { title: 'Paper 1 Assessment Guide', file: '/downloads/guides/business-brief-paper-1-assessment-guide.pdf', pages: 5, size: '1.0 MB' },
-  'paper-2': { title: 'Paper 2 Assessment Guide', file: '/downloads/guides/business-brief-paper-2-assessment-guide.pdf', pages: 5, size: '1.0 MB' },
-  'paper-3': { title: 'Paper 3 Assessment Guide (HL)', file: '/downloads/guides/business-brief-paper-3-assessment-guide-hl.pdf', pages: 5, size: '1.0 MB' },
+  'paper-1': { title: 'Paper 1 Assessment Guide', file: '/downloads/guides/business-brief-paper-1-assessment-guide.pdf', pages: 5, size: measured('/downloads/guides/business-brief-paper-1-assessment-guide.pdf') },
+  'paper-2': { title: 'Paper 2 Assessment Guide', file: '/downloads/guides/business-brief-paper-2-assessment-guide.pdf', pages: 5, size: measured('/downloads/guides/business-brief-paper-2-assessment-guide.pdf') },
+  'paper-3': { title: 'Paper 3 Assessment Guide (HL)', file: '/downloads/guides/business-brief-paper-3-assessment-guide-hl.pdf', pages: 5, size: measured('/downloads/guides/business-brief-paper-3-assessment-guide-hl.pdf') },
 } as const;
 
 export type GuideId = keyof typeof GUIDES;
