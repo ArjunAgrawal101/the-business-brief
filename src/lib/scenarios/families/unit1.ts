@@ -349,7 +349,7 @@ const entryRoute: Family = {
           answer: evOwn * K,
           dp: 0,
           tolerance: 0.5 * K,
-          prefix: p.cur + (/[A-Za-z]$/.test(p.cur) ? ' ' : ''),
+          prefix: p.cur + (/[A-Za-z]$/.test(p.cur) ? '\u00a0' : ''),
           suffix: '',
           working: [
             `Expected value = (${prob} × ${m(own.hi)}) + (${tidy(1 - prob)} × ${m(own.lo)}) − ${m(own.cost)}`,
@@ -701,7 +701,7 @@ const startUpPlan: Family = {
           answer: gap * K,
           dp: 0,
           tolerance: 0.5 * K,
-          prefix: p.cur + (/[A-Za-z]$/.test(p.cur) ? ' ' : ''),
+          prefix: p.cur + (/[A-Za-z]$/.test(p.cur) ? '\u00a0' : ''),
           suffix: '',
           working: [`Start-up costs = ${costs.map(([, v]) => m(v)).join(' + ')} = ${m(total)}`, `Money in hand = ${m(savings)} savings${grant ? ` + ${m(grant)} grant` : ''} = ${m(savings + grant)}`, `Funding gap = ${m(total)} − ${m(savings + grant)} = ${m(gap)}`],
           slips: [

@@ -49,7 +49,7 @@ export function evidenceResult(exhibits: Exhibit[], chosen: readonly string[]): 
 /** A number typed by a person: "1,250", " 12.5 ", "£1,250", "12.5%", with a typographic minus. */
 export function readNumber(raw: string): number | null {
   const cleaned = raw
-    .replace(/[\s, ]/g, '')
+    .replace(/[\s,\u00a0]/g, '')
     .replace(/−/g, '-')
     .replace(/^[^\d.-]+/, '')
     .replace(/[^\d.]+$/, '');

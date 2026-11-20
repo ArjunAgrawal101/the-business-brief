@@ -174,6 +174,9 @@ describe('the kind of a page', () => {
     expect(tools).toContain('/frameworks/lab/');
     expect(kindOfPath('/frameworks/lab/', tools)).toBe('tool');
     expect(kindOfPath('/frameworks/lab/', tools.filter((t) => t !== '/frameworks/lab/'))).toBeNull();
+    // The comparison tool is not a framework either: it counts as a tool once the navigation lists it.
+    expect(kindOfPath('/frameworks/compare/', [...tools, '/frameworks/compare/'])).toBe('tool');
+    expect(kindOfPath('/frameworks/compare/', tools.filter((t) => t !== '/frameworks/compare/'))).toBeNull();
   });
 
   it('cleans a document title for the list', () => {

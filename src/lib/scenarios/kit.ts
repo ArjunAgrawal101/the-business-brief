@@ -80,7 +80,7 @@ export function place(r: Rng, regions?: Array<Place['region']>): Place {
 export function money(v: number, p: Place, dp?: number): string {
   const d = dp ?? (Number.isInteger(Math.round(v * 100) / 100) ? 0 : 2);
   const s = fmtNumber(Math.abs(v), d);
-  const gap = /[A-Za-z]$/.test(p.cur) ? ' ' : '';
+  const gap = /[A-Za-z]$/.test(p.cur) ? '\u00a0' : '';
   return `${v < 0 ? '−' : ''}${p.cur}${gap}${s}`;
 }
 

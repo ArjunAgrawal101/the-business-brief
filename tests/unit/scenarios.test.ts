@@ -197,7 +197,7 @@ describe('checking answers', () => {
     expect(readNumber('£1,250')).toBe(1250);
     expect(readNumber('12.5%')).toBe(12.5);
     expect(readNumber('−40')).toBe(-40);
-    expect(readNumber('KSh 1,200')).toBe(1200);
+    expect(readNumber('KSh\u00a01,200')).toBe(1200);
     expect(readNumber('twelve')).toBeNull();
     expect(readNumber('')).toBeNull();
     expect(readNumber('1.2.3')).toBeNull();

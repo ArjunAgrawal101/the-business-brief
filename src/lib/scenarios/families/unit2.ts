@@ -699,7 +699,7 @@ const payDispute: Family = {
           answer: evArb,
           dp: 0,
           tolerance: Math.max(1, 0.0005 * evArb),
-          prefix: p.cur + (/[A-Za-z]$/.test(p.cur) ? ' ' : ''),
+          prefix: p.cur + (/[A-Za-z]$/.test(p.cur) ? '\u00a0' : ''),
           suffix: '',
           working: [
             `High award: ${pct(hi, 1)} of ${m(bill)} = ${m(cHi)}; low award: ${pct(lo, 1)} of ${m(bill)} = ${m(cLo)}`,

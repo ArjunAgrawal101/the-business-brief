@@ -60,7 +60,7 @@ export function headHtml(s: Scenario, ctx: RenderContext): string {
   return `<header class="sg-head"><p class="sg-head__kicker"><span class="tag tag--simulated">Fictional</span><span class="sg-code">Scenario <span data-code-text>${esc(s.code)}</span></span>${s.level === 'HL' ? '<span class="tag tag--hl">HL</span>' : '<span class="tag tag--plain">SL and HL</span>'}</p><h2 class="sg-title" id="sg-title" tabindex="-1">${esc(s.title)}</h2><p class="sg-meta">${esc(s.industry)} · ${esc(s.place)} · ${esc(s.size)}</p><p class="sg-course">Unit ${s.unit}, ${esc(UNITS[s.unit])}: ${subs}</p></header>`;
 }
 
-export function scenarioHtml(s: Scenario, ctx: RenderContext): string {
+export function scenarioHtml(s: Scenario, _ctx: RenderContext): string {
   const ex = s.evidence.exhibits;
   const brief = `<div class="sg-brief"><p class="sg-role">${esc(s.role)}</p><div class="prose">${s.brief.map((p) => `<p>${esc(p)}</p>`).join('')}</div><p class="sg-question"><span class="sg-question__label">The decision</span> ${esc(s.question)}</p></div>`;
   const pack = `<section class="sg-pack" aria-labelledby="sg-pack-h"><h3 class="sg-pack__h" id="sg-pack-h">The evidence pack <span class="tag tag--simulated">Simulated data</span></h3><div class="sg-pack__grid">${ex.map((e, i) => exhibitHtml(e, i + 1)).join('')}</div></section>`;

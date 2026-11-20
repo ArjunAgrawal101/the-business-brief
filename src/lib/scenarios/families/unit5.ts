@@ -6,7 +6,7 @@
  * to just-in-time (force field analysis, HL). Every business is fictional
  * and every figure simulated.
  */
-import { an, best, businessName, fair, money, notThisTool, num, pct, place, roundTo, sized, table, text, tidy, weak } from '../kit';
+import { an, best, businessName, fair, money, notThisTool, num, place, roundTo, sized, table, text, tidy, weak } from '../kit';
 import type { Family } from '../types';
 
 /* ------------------------------------------------------------------ */
@@ -92,7 +92,7 @@ const productionMethod: Family = {
           answer: ev * K,
           dp: 0,
           tolerance: 0.5 * K,
-          prefix: p.cur + (/[A-Za-z]$/.test(p.cur) ? ' ' : ''),
+          prefix: p.cur + (/[A-Za-z]$/.test(p.cur) ? '\u00a0' : ''),
           suffix: '',
           working: [`Expected value = (${prob} × ${m(hi)}) + (${tidy(1 - prob)} × ${lo < 0 ? `−${m(-lo)}` : m(lo)}) − ${m(cost)}`, `= ${m(tidy(prob * hi))} ${lo < 0 ? '−' : '+'} ${m(Math.abs(tidy((1 - prob) * lo)))} − ${m(cost)}`, `= ${ev < 0 ? '−' : ''}${m(Math.abs(ev))}`],
           slips: [
@@ -240,7 +240,7 @@ const relocation: Family = {
           answer: roundTo(landed * K, 2),
           dp: 2,
           tolerance: 0.006 * Math.max(1, K),
-          prefix: p.cur + (/[A-Za-z]$/.test(p.cur) ? ' ' : ''),
+          prefix: p.cur + (/[A-Za-z]$/.test(p.cur) ? '\u00a0' : ''),
           suffix: '',
           working: [`Tariff = ${tariffPct}% × ${m(prod)} = ${m(tidy((prod * tariffPct) / 100))}`, `Landed cost = ${m(prod)} + ${m(ship)} + ${m(tidy((prod * tariffPct) / 100))}`, `= ${m(landed)}`],
           slips: [
@@ -388,7 +388,7 @@ const makeOrBuy: Family = {
           answer: ctm * K,
           dp: 0,
           tolerance: 0.5 * Math.max(1, K),
-          prefix: p.cur + (/[A-Za-z]$/.test(p.cur) ? ' ' : ''),
+          prefix: p.cur + (/[A-Za-z]$/.test(p.cur) ? '\u00a0' : ''),
           suffix: '',
           working: ['Cost to make = fixed costs + (variable cost per unit × quantity)', `= ${m(fixedM)} + (${money(vcM * K, p, 2)} × ${num(q)})`, `= ${m(fixedM)} + ${m(tidy(vcM * q))} = ${m(ctm)}`, `Cost to buy = ${money(price * K, p, 2)} × ${num(q)} = ${m(ctb)}`],
           slips: [
@@ -627,7 +627,7 @@ const refitProject: Family = {
     const p = place(r);
     const name = businessName(r, k.noun);
     const dA = r.int(2, 4);
-    let dB = r.int(4, 7);
+    const dB = r.int(4, 7);
     let dC = r.int(3, 6);
     if (dB === dC) dC = dB - 1;
     const dD = r.int(3, 5);
@@ -844,7 +844,7 @@ const jitSwitch: Family = {
           answer: saving * K,
           dp: 0,
           tolerance: 0.5 * K,
-          prefix: p.cur + (/[A-Za-z]$/.test(p.cur) ? ' ' : ''),
+          prefix: p.cur + (/[A-Za-z]$/.test(p.cur) ? '\u00a0' : ''),
           suffix: '',
           working: [`Fall in average stock = ${m(stockNow)} − ${m(stockJit)} = ${m(stockNow - stockJit)}`, `Saving = ${m(stockNow - stockJit)} × ${hold}% = ${m(saving)}`],
           slips: [

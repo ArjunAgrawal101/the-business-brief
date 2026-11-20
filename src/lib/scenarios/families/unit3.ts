@@ -468,7 +468,7 @@ const branchCash: Family = {
           answer: closing[2]! * K,
           dp: 0,
           tolerance: 0.5 * K,
-          prefix: p.cur + (/[A-Za-z]$/.test(p.cur) ? ' ' : ''),
+          prefix: p.cur + (/[A-Za-z]$/.test(p.cur) ? '\u00a0' : ''),
           suffix: '',
           working: [
             `Month 3 opening balance = month 2 closing balance = ${br(closing[1]!)}`,
@@ -637,7 +637,7 @@ const dropProduct: Family = {
           answer: cC,
           dp: 0,
           tolerance: 1,
-          prefix: p.cur + (/[A-Za-z]$/.test(p.cur) ? ' ' : ''),
+          prefix: p.cur + (/[A-Za-z]$/.test(p.cur) ? '\u00a0' : ''),
           suffix: '',
           working: [
             `Contribution per ${k.unit} = ${money(C.price, p, 2)} − ${money(C.vc, p, 2)} = ${money(tidy(C.price - C.vc), p, 2)}`,

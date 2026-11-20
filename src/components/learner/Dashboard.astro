@@ -112,6 +112,9 @@ const roomTools: DashRoomTool[] = [
     room: roomName('entrepreneurship-lab', 'Entrepreneurship and Innovation Lab'),
     summary: t.kind === 'plan' ? undefined : `bb:lab:summary:${LAB_SUMMARY[t.kind] ?? t.kind}`,
   })),
+  // The Decision Room's practice tools, each keeping one item with a headline for this list.
+  { key: 'bb:scenarios', title: 'Business scenario generator', url: '/decision-room/scenarios/', room: roomName('decision-room', 'Decision Room') },
+  { key: 'bb:stakeholder-impact', title: 'Stakeholder impact simulator', url: '/decision-room/stakeholder-impact/', room: roomName('decision-room', 'Decision Room') },
 ];
 
 const subtopics: WorkspaceConfig['subtopics'] = coverage.map((r) => {
