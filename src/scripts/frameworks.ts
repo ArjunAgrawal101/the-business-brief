@@ -8,7 +8,8 @@ import { each } from './ix';
 each('[data-ix="frameworks"]', (root) => {
   const selects = [...root.querySelectorAll<HTMLSelectElement>('[data-filter]')];
   const items = [...root.querySelectorAll<HTMLElement>('.fwi-item[data-fw]')];
-  const cells = [...root.querySelectorAll<HTMLElement>('.fwi-table [data-fw]')];
+  // The matrix on wide screens and the list that replaces it on phones narrow together.
+  const cells = [...root.querySelectorAll<HTMLElement>('.fwi-table [data-fw], .fwi-mlist [data-fw]')];
   const sections = [...root.querySelectorAll<HTMLElement>('[data-group-section]')];
   const count = root.querySelector<HTMLElement>('[data-count]');
   const none = root.querySelector<HTMLElement>('[data-none]');

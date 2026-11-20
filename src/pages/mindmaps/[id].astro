@@ -32,7 +32,8 @@ const index = maps.findIndex(([x]) => x === id);
 const prev = index > 0 ? maps[index - 1] : undefined;
 const next = index < maps.length - 1 ? maps[index + 1] : undefined;
 const codeLabel = map.scope === 'unit' ? `Unit ${map.unit}` : map.code;
-const topicLink = map.scope === 'subtopic' ? subtopicHref(c, map.code) : '/topics/';
+const topicLink = map.scope === 'subtopic' ? subtopicHref(c, map.code) : `/topics/#unit-${map.unit}`;
+const topicText = map.scope === 'subtopic' ? `Read the topic: ${map.code} ${map.title}` : `Read the topics of Unit ${map.unit}`;
 const basis = map.basis.map((b) => ({ ...b, title: c.sources[b.source]?.title ?? b.source }));
 ---
 
@@ -43,9 +44,10 @@ const basis = map.basis.map((b) => ({ ...b, title: c.sources[b.source]?.title ??
     title={map.title}
     lead={map.summary}
   >
-    <span class="tag tag--plain">{map.level === 'HL' ? 'HL only' : map.level === 'SL/HL' ? 'SL and HL' : 'SL and HL, with HL-only parts'}</span>
-    <span class="tag tag--plain">{nodeCount(map)} ideas in {map.branches.length} branches</span>
-    <a class="tag tag--plain" href={topicLink}>{map.scope === 'unit' ? 'Topic library' : 'Read the topic'}</a>
+    <p class="mmp-meta">
+      <a class="mmp-topic" href={topicLink}>{topicText}<span aria-hidden="true"> &rarr;</span></a>
+      <span class="mmp-facts">{map.level === 'HL' ? 'HL only' : map.level === 'SL/HL' ? 'SL and HL' : 'SL and HL, with HL-only parts'} · {nodeCount(map)} ideas in {map.branches.length} branches</span>
+    </p>
     <SaveButton title={map.scope === 'unit' ? `Unit ${map.unit}: ${map.title}` : `${map.code} ${map.title}`} kind="mindmap" />
   </PageIntro>
 
@@ -100,6 +102,32 @@ const basis = map.basis.map((b) => ({ ...b, title: c.sources[b.source]?.title ??
 </BaseLayout>
 
 <style>
+  .mmp-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--sp-2) var(--sp-5);
+    margin: 0;
+    flex-basis: 100%;
+  }
+
+  .mmp-topic {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--cobalt-text);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .mmp-topic:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  .mmp-facts {
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+  }
+
   .mmp-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));

@@ -1,0 +1,144 @@
+---
+/**
+ * A mindmap previewed by what it holds: its code and title, the count of its
+ * ideas, and each main branch in order with a bar for the ideas under it, in
+ * the branch's colour (the name, not the colour, says what it is). The title's
+ * link covers the whole preview, so any part of it opens the map.
+ */
+import type { BranchSummary } from '../../lib/mindmap';
+
+interface Props {
+  href: string;
+  code: string;
+  title: string;
+  meta: string;
+  branches: BranchSummary[];
+}
+const { href, code, title, meta, branches } = Astro.props;
+---
+
+<article class="mp">
+  <p class="mp__code">{code}</p>
+  <h3 class="mp__title"><a href={href}>{title}</a></h3>
+  <p class="mp__meta">{meta}</p>
+  <ul class="mp__branches" aria-label={`The branches of ${title}`}>
+    {
+      branches.map((b) => (
+        <li style={`--c:${b.colour};--w:${Math.max(6, Math.round(b.share * 100))}%`}>
+          <span class="mp__name">
+            {b.label}
+            {b.hl && <span class="mp__hl">HL</span>}
+          </span>
+          <span class="mp__bar" aria-hidden="true">
+            <span />
+          </span>
+          <span class="mp__n">{b.ideas}</span>
+        </li>
+      ))
+    }
+  </ul>
+</article>
+
+<style>
+  .mp {
+    position: relative;
+    display: grid;
+    gap: 0.2rem;
+    padding: var(--sp-4) 0;
+  }
+
+  .mp__code {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--brass-text);
+  }
+
+  .mp__title {
+    margin: 0;
+    font-size: 1.1875rem;
+    line-height: 1.3;
+  }
+
+  .mp__title a {
+    color: var(--navy-900);
+    text-decoration: none;
+  }
+
+  /* The whole preview opens the map. */
+  .mp__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .mp:hover .mp__title a,
+  .mp__title a:focus-visible {
+    text-decoration: underline;
+  }
+
+  .mp__meta {
+    margin: 0 0 var(--sp-2);
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .mp__branches {
+    display: grid;
+    gap: 0.3rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .mp__branches li {
+    display: grid;
+    grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) 2ch;
+    gap: 0.6rem;
+    align-items: center;
+    margin: 0;
+    font-size: 0.875rem;
+  }
+
+  .mp__name {
+    display: inline-flex;
+    gap: 0.35rem;
+    align-items: baseline;
+    min-width: 0;
+    color: var(--text-body);
+  }
+
+  .mp__hl {
+    padding: 0 0.25rem;
+    border-radius: 2px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-on-ink);
+    background: var(--navy-900);
+  }
+
+  .mp__bar {
+    height: 0.5rem;
+    background: var(--surface-sunk);
+  }
+
+  .mp__bar span {
+    display: block;
+    height: 100%;
+    width: var(--w);
+    background: var(--c);
+  }
+
+  .mp__n {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
+    text-align: right;
+  }
+
+  @media (max-width: 30rem) {
+    .mp__branches li {
+      grid-template-columns: minmax(0, 1fr) 4rem 2ch;
+    }
+  }
+</style>

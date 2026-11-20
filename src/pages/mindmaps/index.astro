@@ -2,6 +2,11 @@
 /**
  * The Mindmaps section: a map for every subtopic, by unit, and a map of each
  * unit. A subtopic without a map yet is listed as planned, not linked.
+ *
+ * Each map is previewed by what it holds rather than by a picture of its
+ * shape: its main branches in order, each with a bar for the number of ideas
+ * under it, and the count of ideas and branches. Each unit says how many maps
+ * and ideas it has.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/layout/PageIntro.astro';
@@ -9,7 +14,9 @@ import SectionHead from '../../components/layout/SectionHead.astro';
 import ProvenanceTag from '../../components/ui/ProvenanceTag.astro';
 import { corpus, href } from '../../lib/content';
 import { enrichmentMapsInOrder, mindmapFor } from '../../lib/learning';
-import { BRANCH_COLOURS, BRANCH_LABELS, nodeCount, renderThumb } from '../../lib/mindmap';
+import type { Mindmap } from '../../lib/schemas';
+import MindPreview from '../../components/mindmap/MindPreview.astro';
+import { BRANCH_COLOURS, BRANCH_LABELS, branchSummary, nodeCount } from '../../lib/mindmap';
 
 const c = await corpus();
 const cur = c.curricula['ib-dp-bm'];
@@ -19,6 +26,7 @@ const units = (cur?.units ?? []).map((u) => ({
   subs: u.subtopics.map((s) => ({ s, map: mindmapFor(c, s.code) })),
 }));
 const total = units.reduce((n, x) => n + x.subs.length, 0);
+const unitIdeas = (subs: Array<{ map?: [string, Mindmap] }>) => subs.reduce((n, x) => n + (x.map ? nodeCount(x.map[1]) : 0), 0);
 const done = units.reduce((n, x) => n + x.subs.filter((y) => y.map).length, 0);
 const kinds = Object.keys(BRANCH_COLOURS) as Array<keyof typeof BRANCH_COLOURS>;
 // Maps beyond the IB course, for the undergraduate and MBA pathways: listed apart, never counted in the figures above.
@@ -37,10 +45,7 @@ const audienceText = (list: Array<keyof typeof AUDIENCE_LABEL>) =>
     kicker="Mindmaps"
     title="The course, one map at a time"
     lead={`Each map shows the shape of a subtopic: its core ideas, types, theories, tools, calculations and the points to weigh, with the links to the rest of the course. ${done === total ? `All ${total} subtopics have a map.` : `${done} of ${total} subtopics have a map so far.`}${enrichment.length ? ` After the five units, ${enrichment.length} enrichment maps go beyond the course for undergraduate and MBA learners.` : ''}`}
-  >
-    <span class="tag tag--plain">Fold a branch, zoom, or switch to the revision view</span>
-    <span class="tag tag--plain">Download as SVG or PNG, or print</span>
-  </PageIntro>
+  />
 
   <div class="wrap page-body">
     <section class="mmi-how" aria-labelledby="mmi-how-h">
@@ -50,6 +55,10 @@ const audienceText = (list: Array<keyof typeof AUDIENCE_LABEL>) =>
         <p>
           <strong>The full map</strong> holds every idea in the subtopic. <strong>The revision view</strong> keeps only the essentials of each branch, for a
           five-minute check before a lesson or an examination.
+        </p>
+        <p>
+          Read it as a drawn map, which you can fold, zoom and move, or as an outline, which is how a phone opens it. Every map downloads as SVG or PNG,
+          and prints.
         </p>
       </div>
       <div>
@@ -78,31 +87,32 @@ const audienceText = (list: Array<keyof typeof AUDIENCE_LABEL>) =>
       units.map(({ u, unitMap, subs }) => (
         <section class="mmi-unit" aria-labelledby={`mmi-u${u.number}`}>
           <SectionHead no={String(u.number).padStart(2, '0')} title={u.title} id={`mmi-u${u.number}`} level={2}>
-            {unitMap && (
-              <p>
-                <a href={href.mindmap(unitMap[0])}>The whole unit on one map</a>
-              </p>
-            )}
+            <p class="mmi-unit__sum">
+              {subs.filter((x) => x.map).length} maps, {unitIdeas(subs)} ideas
+              {unitMap && (
+                <>
+                  {' · '}
+                  <a href={href.mindmap(unitMap[0])}>The whole unit on one map</a>
+                </>
+              )}
+            </p>
           </SectionHead>
-          <ul class="mmi-tiles" role="list">
+          <ul class="mmi-rows" role="list">
             {subs.map(({ s, map }) => (
-              <li class:list={['mmi-tile', { 'mmi-tile--planned': !map }]} data-hl={s.level === 'HL' ? 'yes' : 'no'}>
+              <li class:list={['mmi-row', { 'mmi-row--planned': !map }]} data-hl={s.level === 'HL' ? 'yes' : 'no'}>
                 {map ? (
-                  <a class="mmi-tile__link" href={href.mindmap(map[0])}>
-                    <span class="mmi-tile__thumb" set:html={renderThumb(map[1])} />
-                    <span class="mmi-tile__code">{s.code}</span>
-                    <span class="mmi-tile__title">{s.title}</span>
-                    <span class="mmi-tile__meta">
-                      {nodeCount(map[1])} ideas{s.level === 'HL' ? ' · HL only' : s.level !== 'SL/HL' ? ' · HL parts marked' : ''}
-                    </span>
-                  </a>
+                  <MindPreview
+                    href={href.mindmap(map[0])}
+                    code={s.code}
+                    title={s.title}
+                    meta={`${nodeCount(map[1])} ideas in ${map[1].branches.length} branches${s.level === 'HL' ? ' · HL only' : s.level !== 'SL/HL' ? ' · HL parts marked' : ''}`}
+                    branches={branchSummary(map[1])}
+                  />
                 ) : (
-                  <span class="mmi-tile__link">
-                    <span class="mmi-tile__thumb mmi-tile__thumb--empty" aria-hidden="true" />
-                    <span class="mmi-tile__code">{s.code}</span>
-                    <span class="mmi-tile__title">{s.title}</span>
-                    <span class="mmi-tile__meta">Planned{s.level === 'HL' ? ' · HL only' : ''}</span>
-                  </span>
+                  <div class="mmi-row__planned">
+                    <span class="mmi-row__code">{s.code}</span> <span class="mmi-row__title">{s.title}</span>
+                    <span class="mmi-row__meta">Planned{s.level === 'HL' ? ' · HL only' : ''}</span>
+                  </div>
                 )}
               </li>
             ))}
@@ -126,17 +136,10 @@ const audienceText = (list: Array<keyof typeof AUDIENCE_LABEL>) =>
               syllabus was supplied, so they are aligned to no university course: each is the platform's own summary of established ideas.
             </p>
           </div>
-          <ul class="mmi-tiles" role="list">
+          <ul class="mmi-rows" role="list">
             {enrichment.map(([eid, m]) => (
-              <li class="mme-tile">
-                <a class="mmi-tile__link mme-tile__link" href={href.enrichmentMap(eid)}>
-                  <span class="mmi-tile__thumb" set:html={renderThumb(m)} />
-                  <span class="mmi-tile__code mme-tile__code">Enrichment · {m.field}</span>
-                  <span class="mmi-tile__title">{m.title}</span>
-                  <span class="mmi-tile__meta">
-                    {nodeCount(m)} ideas · for {audienceText(m.audience)} learners
-                  </span>
-                </a>
+              <li class="mmi-row mme-row">
+                <MindPreview href={href.enrichmentMap(eid)} code={`Enrichment · ${m.field}`} title={m.title} meta={`${nodeCount(m)} ideas · for ${audienceText(m.audience)} learners`} branches={branchSummary(m)} />
               </li>
             ))}
           </ul>
@@ -211,96 +214,54 @@ const audienceText = (list: Array<keyof typeof AUDIENCE_LABEL>) =>
     margin-top: var(--sp-8);
   }
 
-  .mmi-tiles {
+  .mmi-unit__sum {
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+  }
+
+  /* Rows, two to a line on wide screens, each previewing a map by its branches. */
+  .mmi-rows {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15.5rem), 1fr));
-    gap: var(--sp-4);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 30rem), 1fr));
+    gap: 0 var(--sp-6);
     margin: var(--sp-5) 0 0;
     padding: 0;
     list-style: none;
+    border-top: 1px solid var(--rule-hair);
   }
 
-  .mmi-tile {
+  .mmi-row {
     margin: 0;
+    border-bottom: 1px solid var(--rule-hair);
   }
 
-  .mmi-tile[hidden] {
+  .mmi-row[hidden] {
     display: none;
   }
 
-  .mmi-tile__link {
-    display: grid;
-    gap: 0.3rem;
-    height: 100%;
-    padding: var(--sp-3);
-    border: 1px solid var(--rule-hair);
-    background: var(--surface-sheet);
-    color: var(--text-body);
-    text-decoration: none;
-    transition:
-      border-color var(--dur-fast) var(--ease),
-      box-shadow var(--dur-base) var(--ease),
-      transform var(--dur-base) var(--ease-out);
+  .mmi-row__planned {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.6rem;
+    align-items: baseline;
+    padding: var(--sp-4) 0;
+    color: var(--text-muted);
   }
 
-  a.mmi-tile__link:hover {
-    border-color: var(--gold-500);
-    box-shadow: var(--shadow-sheet);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    a.mmi-tile__link:hover {
-      transform: translateY(-2px);
-    }
-  }
-
-  .mmi-tile__thumb {
-    display: block;
-    aspect-ratio: 16 / 9;
-    margin-bottom: var(--sp-2);
-    background: var(--ivory-50);
-    border: 1px solid var(--rule-hair);
-    padding: 0.4rem;
-  }
-
-  .mmi-tile__thumb :global(svg) {
-    width: 100%;
-    height: 100%;
-  }
-
-  .mmi-tile__thumb--empty {
-    background:
-      repeating-linear-gradient(135deg, transparent 0 8px, rgba(11, 26, 51, 0.05) 8px 9px),
-      var(--ivory-100);
-  }
-
-  .mmi-tile__code {
-    font-size: 0.75rem;
+  .mmi-row__code {
     font-weight: 700;
-    letter-spacing: 0.12em;
     color: var(--brass-text);
+    font-variant-numeric: tabular-nums;
   }
 
-  .mmi-tile__title {
+  .mmi-row__title {
     font-family: var(--font-display);
     font-size: 1.125rem;
     font-weight: 600;
-    line-height: 1.25;
-    color: var(--navy-900);
   }
 
-  .mmi-tile__meta {
-    font-size: 0.8125rem;
-    color: var(--text-muted);
-  }
-
-  .mmi-tile--planned .mmi-tile__link {
-    background: transparent;
-    border-style: dashed;
-  }
-
-  .mmi-tile--planned .mmi-tile__title {
-    color: var(--text-muted);
+  .mmi-row__meta {
+    font-size: 0.875rem;
   }
 
   .mme {
@@ -323,18 +284,6 @@ const audienceText = (list: Array<keyof typeof AUDIENCE_LABEL>) =>
     color: var(--text-muted);
   }
 
-  .mme-tile {
-    margin: 0;
-  }
-
-  .mme-tile__link {
-    align-content: start;
-    border-top: 3px solid var(--bb-green);
-  }
-
-  .mme-tile__code {
-    color: var(--green-text);
-  }
 
   @media (max-width: 48rem) {
     .mmi-how {
@@ -345,7 +294,7 @@ const audienceText = (list: Array<keyof typeof AUDIENCE_LABEL>) =>
 
 <script>
   const buttons = document.querySelectorAll<HTMLButtonElement>('[data-level]');
-  const tiles = document.querySelectorAll<HTMLElement>('.mmi-tile');
+  const tiles = document.querySelectorAll<HTMLElement>('.mmi-unit .mmi-row');
   buttons.forEach((b) =>
     b.addEventListener('click', () => {
       buttons.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));

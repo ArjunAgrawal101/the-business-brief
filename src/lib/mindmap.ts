@@ -122,7 +122,7 @@ const STYLE = {
   root: { size: 21, lh: 25, chars: 16, charW: 0.58, padX: 22, padY: 16, minW: 150 },
   branch: { size: 15.5, lh: 19, chars: 21, charW: 0.585, padX: 15, padY: 10, minW: 110 },
   node: { size: 13.5, lh: 17, chars: 28, charW: 0.535, padX: 4, padY: 6, minW: 40 },
-  leaf: { size: 12.75, lh: 16, chars: 30, charW: 0.53, padX: 4, padY: 5, minW: 40 },
+  leaf: { size: 13, lh: 16.5, chars: 30, charW: 0.53, padX: 4, padY: 5, minW: 40 },
 } as const;
 
 type StyleKey = keyof typeof STYLE;
@@ -150,7 +150,7 @@ function measure(label: string, depth: number, extra: { marker?: string; hl?: bo
   const lines = wrap(label, s.chars);
   const longest = Math.max(...lines.map((l) => l.length), extra.formula ? Math.min(extra.formula.length, s.chars + 6) * 0.92 : 0);
   const markerW = extra.marker ? (extra.marker.length + 1) * s.size * 0.55 : 0;
-  const hlW = extra.hl ? 30 : 0;
+  const hlW = extra.hl ? 36 : 0;
   const w = Math.max(s.minW, Math.round(longest * s.size * s.charW + markerW + hlW + s.padX * 2));
   const formulaLines = extra.formula ? wrap(extra.formula, s.chars + 6) : [];
   const h = Math.round((lines.length + formulaLines.length) * s.lh + s.padY * 2);
@@ -395,11 +395,11 @@ export const SVG_STYLE = [
   '.mm-t--root{font-family:"Source Serif 4",Georgia,serif;font-size:21px;font-weight:600;fill:#f4efe4}',
   '.mm-t--d1{font-family:"Source Serif 4",Georgia,serif;font-size:15.5px;font-weight:620;fill:#0b1a33}',
   '.mm-t--d2{font-size:13.5px;font-weight:560;fill:#0b1a33}',
-  '.mm-t--d3{font-size:12.75px;font-weight:440;fill:#252d3a}',
-  '.mm-t--formula{font-size:12px;font-weight:600;fill:#76591f;font-variant-numeric:tabular-nums}',
-  '.mm-code{font-family:Inter,system-ui,sans-serif;font-size:11px;font-weight:700;letter-spacing:.16em;fill:#76591f}',
+  '.mm-t--d3{font-size:13px;font-weight:440;fill:#252d3a}',
+  '.mm-t--formula{font-size:13px;font-weight:600;fill:#76591f;font-variant-numeric:tabular-nums}',
+  '.mm-code{font-family:Inter,system-ui,sans-serif;font-size:13px;font-weight:700;letter-spacing:.16em;fill:#76591f}',
   '.mm-mark{font-family:Inter,system-ui,sans-serif;font-weight:700;font-size:13px}',
-  '.mm-hl rect{fill:#0b1a33}.mm-hl text{font-family:Inter,system-ui,sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.06em;fill:#f4efe4}',
+  '.mm-hl rect{fill:#0b1a33}.mm-hl text{font-family:Inter,system-ui,sans-serif;font-size:13px;font-weight:700;letter-spacing:.04em;fill:#f4efe4}',
   '.mm-term .mm-t{text-decoration:underline dotted;text-underline-offset:3px}',
 ].join('');
 
@@ -484,8 +484,8 @@ function drawNode(n: LaidNode, o: RenderOptions): string {
   }
   if (n.level === 'HL') {
     const longest = Math.max(...labelLines.map((l) => l.length));
-    const hx = Math.min(n.x + n.w - 30, tx + longest * s.size * s.charW + 6);
-    parts.push(`<g class="mm-hl"><rect x="${r(hx)}" y="${r(baseline - s.size * 0.78)}" width="24" height="${r(s.size * 0.98)}" rx="3"/><text x="${r(hx + 12)}" y="${r(baseline - 1)}" text-anchor="middle">HL</text></g>`);
+    const hx = Math.min(n.x + n.w - 34, tx + longest * s.size * s.charW + 6);
+    parts.push(`<g class="mm-hl"><rect x="${r(hx)}" y="${r(baseline - 13)}" width="30" height="17" rx="3"/><text x="${r(hx + 15)}" y="${r(baseline)}" text-anchor="middle">HL</text></g>`);
   }
   if (toggle) {
     const cx = n.side === 1 ? n.x + n.w + 9 : n.x - 9;
@@ -542,4 +542,24 @@ export function renderThumb(map: AnyMap): string {
   }
   parts.push('</svg>');
   return parts.join('');
+}
+
+/** One branch of a map, as the index previews it: its name, its kind and colour, and how many ideas it holds. */
+export interface BranchSummary {
+  label: string;
+  kind: BranchKind;
+  colour: string;
+  /** Nodes under the branch, not counting the branch itself. */
+  ideas: number;
+  /** The branch's ideas as a share of the largest branch in the same map, from 0 to 1. */
+  share: number;
+  hl: boolean;
+}
+
+/** A map's branches in order, each with the number of ideas under it: the shape of the subtopic at a glance. */
+export function branchSummary(map: Pick<AnyMap, 'branches'>): BranchSummary[] {
+  const count = (list: MindNode[]): number => list.reduce((n, x) => n + 1 + count(x.children), 0);
+  const rows = map.branches.map((b) => ({ label: b.label, kind: b.kind, colour: BRANCH_COLOURS[b.kind], ideas: count(b.children), hl: b.level === 'HL' }));
+  const most = Math.max(1, ...rows.map((r) => r.ideas));
+  return rows.map((r) => ({ ...r, share: r.ideas / most }));
 }

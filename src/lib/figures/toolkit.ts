@@ -706,7 +706,8 @@ function swotNarrow(id: string): string {
   const g = grid2({
     colLabels: ['Helpful', 'Harmful'],
     rowLabels: ['Internal: the business', 'External: its environment'],
-    cells: cellsOf(SWOT_CELLS, ([, , letter, title, text, tone]) => ({ title, text, tone, letter })),
+    // The cells' initials are left out: at this width a long name such as Opportunities needs the room.
+    cells: cellsOf(SWOT_CELLS, ([, , , title, text, tone]) => ({ title, text, tone })),
     note: 'A SWOT is a starting point: it lists factors, and analysis then weighs which matter most for the decision.',
   });
   return narrowFrame(id, swot(id), g.h, g.body);
