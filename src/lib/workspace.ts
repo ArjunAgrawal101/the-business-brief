@@ -27,7 +27,8 @@
  */
 import { dashboardView, type DashConfig, type DashboardView, type WorkItem } from './dashboard';
 import { resultsByCode, type EvidenceConfig } from './progress';
-import type { CalcFamily } from './planner';
+import { PLANNER_KEY, parsePlanner, type CalcFamily } from './planner';
+import { STUDY_KEY, parseStudy } from './study';
 import {
   SAVED_KEY,
   SAVED_KIND_LABELS,
@@ -843,9 +844,10 @@ export function selectionWords(sel: Selection): string {
 
 /**
  * Check a file before anything is written: the learner record's checks
- * (src/lib/learner.ts), with the workspace's own items cleaned through their
- * parsers, so a hand-edited note or arrangement cannot carry anything the
- * workspace would not write itself.
+ * (src/lib/learner.ts, which also cleans bb:studied), with the workspace's
+ * own items, the revision plan (bb:planner) and study mode's settings
+ * (bb:study) cleaned through their parsers, so a hand-edited note, plan or
+ * arrangement cannot carry anything the page would not write itself.
  */
 export function checkImport(text: string): ImportCheck {
   const r = validateImport(text);
@@ -856,6 +858,9 @@ export function checkImport(text: string): ImportCheck {
       if (key === LIST_KEY) return { key, value: JSON.stringify(parseList(value)) };
       if (key === NOTES_KEY) return { key, value: JSON.stringify(parseNotebook(value)) };
       if (key === SNAPSHOTS_KEY) return { key, value: JSON.stringify(parseSnapshots(value)) };
+      // The revision plan and study mode's settings, cleaned through their own readers.
+      if (key === PLANNER_KEY) return { key, value: JSON.stringify(parsePlanner(value)) };
+      if (key === STUDY_KEY) return { key, value: JSON.stringify(parseStudy(value)) };
       return { key, value };
     }),
   };

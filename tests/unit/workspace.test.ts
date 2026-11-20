@@ -375,6 +375,18 @@ const CFG: WorkspaceConfig = {
 
 const UNIT = { currency: '$', cac: 20, contribution: 9, lifetime: 12.5, ltv: 112.5, ratio: 5.625, payback: 2.2 };
 
+describe('practice records count a subtopic as practised', () => {
+  it('a rating in the question bank makes its subtopic practised, in the rows, the units and the counts', () => {
+    const cfg = { ...CFG, bank: [['n-what-1', ['1.1'], 'paper-1']] as WorkspaceConfig['bank'] };
+    const before = workspaceView({ 'bb:saved': JSON.stringify(saved('/topics/a/')) }, cfg);
+    expect(before.course.rows[0]?.status).toBe('none');
+    const v = workspaceView({ 'bb:saved': JSON.stringify(saved('/topics/a/')), 'bb:bank': JSON.stringify({ v: 1, items: { 'n-what-1': { attempts: 1, rating: 2, last: '2026-11-03' } } }) }, cfg);
+    expect(v.course.rows[0]?.status).toBe('practised');
+    expect(v.course.units[0]).toMatchObject({ explored: 1, practised: 1 });
+    expect(v.figures).toMatchObject({ explored: 1, practised: 1, completeExplored: 1 });
+  });
+});
+
 describe('saved analyses', () => {
   it('reads each room\'s own items without changing them, with a line that says what each holds', () => {
     expect(familyOf(LIST_KEY)).toBe('workspace');
@@ -539,6 +551,26 @@ describe('exporting a selection', () => {
     expect(parseNotebook(got[NOTES_KEY]).notes).toEqual([expect.objectContaining({ id: 'n-ok-00001', page: null, body: 'Fine' })]);
     expect(JSON.parse(got[SNAPSHOTS_KEY]!)).toEqual({ v: 1, items: [] });
     expect(checkImport('{"format":"other"}')).toMatchObject({ ok: false });
+  });
+
+  it('cleans the revision plan, study mode and the subtopics marked complete in a file too', () => {
+    const file = {
+      format: 'the-business-brief/learner-data',
+      version: 1,
+      items: {
+        'bb:planner': JSON.stringify({ v: 1, gen: 1, sessions: [{ id: '1-1', date: '2026-11-23', kind: 'learn', minutes: 40, code: '1.1' }, { id: '<x>', date: 'soon', kind: 'learn', minutes: 40 }], done: { '1-1': '2026-11-23T10:00:00Z', ghost: '2026-11-23T10:00:00Z' } }),
+        'bb:study': JSON.stringify({ size: 9, low: 'yes', script: '<b>' }),
+        'bb:studied': JSON.stringify({ done: { '1.1': '2026-11-23T10:00:00Z', '<b>': 'x' } }),
+      },
+    };
+    const r = checkImport(JSON.stringify(file));
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    const got = Object.fromEntries(r.items.map((i) => [i.key, JSON.parse(i.value)]));
+    // Without its plan, only the session done is kept.
+    expect(got['bb:planner']).toMatchObject({ v: 1, gen: 1, plan: null, sessions: [{ id: '1-1', code: '1.1' }], done: { '1-1': '2026-11-23T10:00:00.000Z' } });
+    expect(got['bb:study']).toEqual({ v: 1, size: 0, low: false });
+    expect(got['bb:studied']).toEqual({ v: 1, done: { '1.1': '2026-11-23T10:00:00.000Z' } });
   });
 
   it('writes Markdown to read and print, with the reader\'s text escaped so it reads as written', () => {
